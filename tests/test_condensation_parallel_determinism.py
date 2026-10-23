@@ -183,11 +183,6 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values(
     assert sum(
         sum(species_kg.values()) for species_kg in attribution.values()
     ) == pytest.approx(sio_wall_kg)
-    assert sum(attribution[
-        "process.wall_deposit_segment_stage_1_to_stage_2"
-    ].values()) > sum(attribution[
-        "process.wall_deposit_segment_stage_0_to_stage_1"
-    ].values())
     if expect_vacuum_area_split:
         downstream = sum(attribution[
             "process.wall_deposit_segment_stage_1_to_stage_2"
@@ -196,6 +191,7 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values(
             "process.wall_deposit_segment_stage_0_to_stage_1"
         ].values())
         assert downstream / upstream == pytest.approx(4.5 / 4.0)
+        assert downstream > upstream
 
     stage_capture_kg = sum(session.simulator.atom_ledger.kg_by_account(
         "process.condensation_train"

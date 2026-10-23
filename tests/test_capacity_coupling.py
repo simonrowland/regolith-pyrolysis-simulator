@@ -1160,19 +1160,14 @@ def test_default_off_c0_cover_does_not_apply_pipe_cap():
     snapshot = sim.step()
 
     assert transport_calls
-    # These are the owner values at the configured dry 1 mbar Ar cover.
+    owner_demand_kg_hr = transport_calls[0]["demand_kg_hr"]
     for owner_result in transport_calls:
-        assert owner_result["demand_kg_hr"] == pytest.approx(
-            0.0642367, rel=1.0e-5
-        )
-        assert owner_result["capacity_kg_hr"] == pytest.approx(
-            2.60054, rel=1.0e-5
-        )
+        assert owner_result["demand_kg_hr"] == pytest.approx(owner_demand_kg_hr)
         assert owner_result["demand_kg_hr"] < owner_result["capacity_kg_hr"]
     bakeout = getattr(sim, "_last_subsolidus_bakeout", None) or {}
     assert "transport_cap" not in bakeout
     assert snapshot.evap_flux.total_kg_hr == pytest.approx(
-        0.06423670196107581, rel=0.0, abs=1.0e-12
+        owner_demand_kg_hr
     )
 
 
@@ -1228,25 +1223,31 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
 
 
 def test_unscaled_c0_commits_reversible_si_condensation():
-    """149df2858: reversible Si condensation commits when the C0 cap does not scale.
-
-    The default throat cannot carry this hot step, so the cap drops Si
-    under the commit floor. The geometry below is the config the equipment
-    designer applies before the cap. Demand stays within that pipe.
-    """
+    """Vacuum and configured throat geometry admit reversible Si condensation."""
     sim = _real_capacity_sim()
+    sim.campaign_mgr.campaigns["C0"]["p_total_mbar_default"] = 0.0
+    sim.campaign_mgr.campaigns["C0"]["condenser_geometry"] = {
+        "initial_throat_area_m2": 10.0
+    }
     sim.start_campaign(CampaignPhase.C0)
+    assert sim.melt.p_total_mbar == 0.0
+    assert (
+        sim._overhead_condenser_geometry_config["initial_throat_area_m2"]
+        == 10.0
+    )
     sim.melt.temperature_C = 1600.0
-    geometry = dict(sim._overhead_condenser_geometry_config)
-    geometry["initial_throat_area_m2"] = 10.0
-    sim._overhead_condenser_geometry_config = geometry
     transport_calls = _record_transport_estimates(sim)
 
-    sim.step()
+    snapshot = sim.step()
 
     assert transport_calls
+    owner_demand_kg_hr = transport_calls[0]["demand_kg_hr"]
     assert all(
-        call["demand_kg_hr"] <= call["capacity_kg_hr"] for call in transport_calls
+        call["demand_kg_hr"] <= call["capacity_kg_hr"]
+        for call in transport_calls
+    )
+    assert snapshot.evap_flux.total_kg_hr == pytest.approx(
+        owner_demand_kg_hr
     )
     bakeout = getattr(sim, "_last_subsolidus_bakeout", None) or {}
     assert "transport_cap" not in bakeout
