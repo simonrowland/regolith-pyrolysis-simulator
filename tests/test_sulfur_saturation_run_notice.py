@@ -67,6 +67,7 @@ def test_in_range_sulfsat_leaves_run_notice_absent() -> None:
     assert getattr(sim, "_last_sulfur_saturation_result", None) is None
     assert sim._last_vapour_batch_report is None
     assert sim._last_vapour_batch_flux_overlay == {}
+    assert sim.condensation_model.last_sticking_alpha_provenance_notice == {}
     sim._note_sulfur_saturation_step(_sulfur_result("in_range"))
     assert sim.sulfur_saturation_run_notice() is None
 
