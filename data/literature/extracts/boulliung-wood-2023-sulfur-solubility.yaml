@@ -1,0 +1,540 @@
+schema_version: literature_extract.v1
+source_id: boulliung-wood-2023-sulfur-solubility
+source:
+  citation: 'Boulliung, J. & Wood, B. J. (2023). Sulfur oxidation state and solubility in silicate melts. Contributions to Mineralogy and Petrology 178, 56.'
+  doi: 10.1007/s00410-023-02033-9
+  year: 2023
+  corpus_asset: raw/boulliung-wood-2023-sulfur-solubility/boulliung-wood-2023-sulfur-solubility.pdf
+  sha256: 66e2f3646de8666f89da55e0d5f79acd90a3f450694deeb6e2bbbccaf99dd2bf
+extraction:
+  method: >-
+    Born-digital pdftotext-layout transcription. The corpus has no MinerU table blocks or supplementary table. Table 1 and Table 2 row and column assignments were checked against the 600 dpi render of physical PDF page 3. Figures 1–9 are recorded without digitized points.
+  date: '2026-10-19'
+  worker: fam19-1019
+review_status: draft
+fidelity_samples:
+  - path: species.S.observations[boulliung_wood_2023_nib_sulfur_1473].values.points[0].value
+    value: '760'
+    note: Text result on physical PDF page 4; NIB at 1473 K.
+  - path: species.S.observations[boulliung_wood_2023_nib_sulfur_1673].values.points[0].value
+    value: '2433'
+    note: Text result on physical PDF page 4; NIB at 1673 K.
+species:
+  S:
+    observations:
+      - observation_id: boulliung_wood_2023_nib_sulfur_1473
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 4
+          pdf_page_index: 3
+          section: Results
+          note: The prose reports NIB sulfur content at 1473 K.
+        units: ppm
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: sulfur concentration in quenched glass; ppm
+          method_as_printed: Electron microprobe analysis
+          points:
+            - sample_id_as_published: NIB
+              sample_material_as_published: NIB silicate glass
+              value: '760'
+              value_as_printed: '760'
+              value_as_published: '760 ± 25 ppm'
+              T_K: '1473'
+              uncertainty:
+                value: '25'
+                units: ppm
+                as_printed: ± 25 ppm
+                confidence_level: not_stated
+                notice: confidence level not stated
+                locator:
+                  page: 4
+                  pdf_page_index: 3
+                  section: Results
+                  note: Printed sulfur concentration uncertainty; confidence level not stated.
+              quench_statement:
+                text: Samples were quenched in the reduced S-bearing atmosphere by rapidly pulling the chandelier to the cold area at the top of the vertical furnace.
+                preservation: not_stated
+                quench_direction: not_stated
+                locator:
+                  page: 4
+                  pdf_page_index: 3
+                  section: Experimental conditions
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1473'}
+                  locator: {page: 3, pdf_page_index: 2, table: '2', row: '1473', column: Temperature (K)}
+                fO2_log:
+                  state: {tag: value, value: '-9.40'}
+                  locator:
+                    page: 3
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '1473'
+                    column: log fO2
+                    note: The table does not state the reference; the unqualified log convention is log10(bar).
+                delta_FMQ:
+                  state: {tag: value, value: '-1.1'}
+                  locator: {page: 3, pdf_page_index: 2, table: '2', row: '1473', column: FMQ}
+                fS2_log:
+                  state: {tag: value, value: '-1.05'}
+                  locator: {page: 3, pdf_page_index: 2, table: '2', row: '1473', column: log fS2}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: The paper states atmospheric pressure but gives no numeric total pressure.}
+                  locator: {page: 3, pdf_page_index: 2, section: Experimental conditions}
+                pressure_as_published:
+                  state: {tag: value, value: atmospheric pressure}
+                  locator: {page: 3, pdf_page_index: 2, section: Experimental conditions}
+                composition:
+                  state: {tag: unknown, reason: 'The final melt composition is in the supplementary table, absent from the corpus; Table 1 gives only the starting material.'}
+                  locator: {page: 4, pdf_page_index: 3, section: Results, note: Sample identifier NIB; final composition not available.}
+                atmosphere:
+                  state: {tag: value, value: 'CO 110, CO2 70, SO2 70'}
+                  locator: {page: 3, pdf_page_index: 2, table: '2', row: '1473', note: Table gas flow settings; units are not repeated in the table header.}
+      - observation_id: boulliung_wood_2023_nib_sulfur_1673
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 4
+          pdf_page_index: 3
+          section: Results
+          note: The prose reports NIB sulfur content at 1673 K.
+        units: ppm
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: sulfur concentration in quenched glass; ppm
+          method_as_printed: Electron microprobe analysis
+          points:
+            - sample_id_as_published: NIB
+              sample_material_as_published: NIB silicate glass
+              value: '2433'
+              value_as_printed: '2433'
+              value_as_published: '2433 ± 39 ppm'
+              T_K: '1673'
+              uncertainty:
+                value: '39'
+                units: ppm
+                as_printed: ± 39 ppm
+                confidence_level: not_stated
+                notice: confidence level not stated
+                locator:
+                  page: 4
+                  pdf_page_index: 3
+                  section: Results
+                  note: Printed sulfur concentration uncertainty; confidence level not stated.
+              quench_statement:
+                text: Samples were quenched in the reduced S-bearing atmosphere by rapidly pulling the chandelier to the cold area at the top of the vertical furnace.
+                preservation: not_stated
+                quench_direction: not_stated
+                locator:
+                  page: 4
+                  pdf_page_index: 3
+                  section: Experimental conditions
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1673'}
+                  locator: {page: 3, pdf_page_index: 2, table: '2', row: '1673', column: Temperature (K)}
+                fO2_log:
+                  state: {tag: value, value: '-8.97'}
+                  locator:
+                    page: 3
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '1673'
+                    column: log fO2
+                    note: The table does not state the reference; the unqualified log convention is log10(bar).
+                delta_FMQ:
+                  state: {tag: value, value: '-2.71'}
+                  locator: {page: 3, pdf_page_index: 2, table: '2', row: '1673', column: FMQ}
+                fS2_log:
+                  state: {tag: value, value: '-1.15'}
+                  locator: {page: 3, pdf_page_index: 2, table: '2', row: '1673', column: log fS2}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: The paper states atmospheric pressure but gives no numeric total pressure.}
+                  locator: {page: 3, pdf_page_index: 2, section: Experimental conditions}
+                pressure_as_published:
+                  state: {tag: value, value: atmospheric pressure}
+                  locator: {page: 3, pdf_page_index: 2, section: Experimental conditions}
+                composition:
+                  state: {tag: unknown, reason: 'The final melt composition is in the supplementary table, absent from the corpus; Table 1 gives only the starting material.'}
+                  locator: {page: 4, pdf_page_index: 3, section: Results, note: Sample identifier NIB; final composition not available.}
+                atmosphere:
+                  state: {tag: value, value: 'CO 200, CO2 12.5, SO2 37.5'}
+                  locator: {page: 3, pdf_page_index: 2, table: '2', row: '1673', note: Table gas flow settings; units are not repeated in the table header.}
+    context:
+      - observation_id: boulliung_wood_2023_table_1_starting_materials
+        type: printed_table_context
+        locator: {page: 3, pdf_page_index: 2, table: '1'}
+        attribution: Present-work electron microprobe analyses before sulfide-equilibrium experiments.
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - residue_component_composition
+          - liquidus_composition
+        reason_unscored: No existing quantity token represents major-oxide compositions of fused starting materials before equilibration. These are not the final melt compositions and cannot be used as the sulfur-analysis compositions.
+        units: wt.% except n (count)
+        values:
+          quantity_as_printed: Major oxide compositions of the starting materials determined by electron microprobe analysis before sulfide equilibrium experiments
+          quantity_token: unavailable
+          column_order:
+            - Composition
+            - SiO2
+            - Al2O3
+            - MgO
+            - CaO
+            - FeO
+            - TiO2
+            - K2O
+            - Na2O
+            - MnO
+            - P2O5
+            - Total
+            - n
+          missing_cell_conventions: 'The printed dash (–), below-detection marker (b.d.l), and blank P2O5 cell for Andesite are preserved distinctly; none is zero.'
+          rows:
+            - {Composition: T-Basalt, SiO2: '47.0 (1)', Al2O3: '16.4 (1)', MgO: '4.3 (1)', CaO: '9.4 (1)', FeO: '10.3 (2)', TiO2: '3.33 (4)', K2O: '1.87 (3)', Na2O: '4.68 (4)', MnO: '0.21 (2)', P2O5: '1.24', Total: '98.7', n: '10'}
+            - {Composition: Lunar Basalt, SiO2: '42.3 (2)', Al2O3: '11.9 (1)', MgO: '7.5 (1)', CaO: '9.6 (1)', FeO: '16.9 (1)', TiO2: '8.34 (6)', K2O: '0.20 (3)', Na2O: '0.88 (2)', MnO: '0.58 (2)', P2O5: '–', Total: '98.2', n: '10'}
+            - {Composition: NIB, SiO2: '49.6 (1)', Al2O3: '14.6 (1)', MgO: '8.7 (1)', CaO: '12.4 (1)', FeO: '9.0 (1)', TiO2: '0.92 (2)', K2O: '0.21 (6)', Na2O: '2.25 (6)', MnO: '0.17 (5)', P2O5: '0.30', Total: '98.2', n: '10'}
+            - {Composition: Nephelinite, SiO2: '41.7 (1)', Al2O3: '14.2 (1)', MgO: '8.0 (1)', CaO: '13.9 (1)', FeO: '9.9 (1)', TiO2: '2.68 (1)', K2O: '3.21 (3)', Na2O: '3.95 (4)', MnO: '2.45 (2)', P2O5: '–', Total: '99.9', n: '8'}
+            - {Composition: Andac, SiO2: '61.6 (9)', Al2O3: '19.0 (9)', MgO: '2.0 (2)', CaO: '4.1 (3)', FeO: '4.9 (3)', TiO2: '1.04 (4)', K2O: '4.60 (9)', Na2O: '0.87 (3)', MnO: 'b.d.l', P2O5: '–', Total: '98.1', n: '8'}
+            - {Composition: B-A, SiO2: '53.9 (5)', Al2O3: '14.6 (2)', MgO: '9.4 (2)', CaO: '9.9 (2)', FeO: '6.4 (1)', TiO2: '0.61 (1)', K2O: '1.34 (5)', Na2O: '2.79 (6)', MnO: 'b.d.l', P2O5: '–', Total: '99.0', n: '8'}
+            - {Composition: Andesite, SiO2: '61.1 (6)', Al2O3: '18.0 (2)', MgO: '3.5 (1)', CaO: '6.9 (2)', FeO: '3.9 (1)', TiO2: '0.61 (1)', K2O: '1.19 (4)', Na2O: '4.07 (6)', MnO: 'b.d.l', P2O5: '', Total: '99.2', n: '10'}
+            - {Composition: Basanite, SiO2: '43.8 (1)', Al2O3: '10.9 (1)', MgO: '13.1 (1)', CaO: '9.4 (1)', FeO: '11.5 (1)', TiO2: '2.28 (3)', K2O: '1.89 (2)', Na2O: '3.94 (4)', MnO: '0.18 (5)', P2O5: '1.45', Total: '98.4', n: '10'}
+            - {Composition: T-Phonolite, SiO2: '53.3 (9)', Al2O3: '22.9 (9)', MgO: '1.9 (1)', CaO: '4.8 (3)', FeO: '4.4 (1)', TiO2: '1.50 (6)', K2O: '3.64 (9)', Na2O: '7.77 (9)', MnO: 'b.d.l', P2O5: '–', Total: '100.4', n: '8'}
+            - {Composition: SLC, SiO2: '39.9 (1)', Al2O3: '10.9 (1)', MgO: '15.4 (1)', CaO: '17.3 (1)', FeO: '14.4 (1)', TiO2: 'b.d.l', K2O: 'b.d.l', Na2O: '0.13 (3)', MnO: 'b.d.l', P2O5: '–', Total: '98.0', n: '8'}
+            - {Composition: CMAS1, SiO2: '48.4 (1)', Al2O3: '16.8 (2)', MgO: '12.4 (1)', CaO: '22.3 (1)', FeO: 'b.d.l', TiO2: 'b.d.l', K2O: 'b.d.l', Na2O: 'b.d.l', MnO: 'b.d.l', P2O5: '–', Total: '100.1', n: '10'}
+            - {Composition: CMAS2, SiO2: '45.5 (1)', Al2O3: '18.7 (1)', MgO: '17.4 (1)', CaO: '18.4 (1)', FeO: 'b.d.l', TiO2: 'b.d.l', K2O: 'b.d.l', Na2O: 'b.d.l', MnO: 'b.d.l', P2O5: '–', Total: '100.1', n: '10'}
+            - {Composition: CMAS3, SiO2: '50.4 (1)', Al2O3: '15.6 (1)', MgO: '14.5 (1)', CaO: '19.6 (1)', FeO: 'b.d.l', TiO2: 'b.d.l', K2O: 'b.d.l', Na2O: 'b.d.l', MnO: 'b.d.l', P2O5: '–', Total: '100.2', n: '10'}
+      - observation_id: boulliung_wood_2023_table_2_run_conditions
+        type: run_conditions_table
+        locator: {page: 3, pdf_page_index: 2, table: '2'}
+        attribution: Present-work run conditions; the paper says fO2 and fS2 were calculated from thermodynamic data.
+        reason_unscored: This table reports experimental settings and conditions, not measured sulfur concentrations or sulfur capacities. Its printed fO2 values are retained as conditions on the two numeric observations above.
+        units: Temperature K; CO, CO2 and SO2 flow settings as printed; log fO2, FMQ offset and log fS2 as printed; duration h.
+        values:
+          column_order: ['Temperature (K)', CO, CO2, SO2, 'log fO2', FMQ, 'log fS2', 't (h)']
+          rows:
+            - {'Temperature (K)': '1473', CO: '110', CO2: '70', SO2: '70', 'log fO2': '− 9.40', FMQ: '− 1.1', 'log fS2': '− 1.05', 't (h)': '8'}
+            - {'Temperature (K)': '1523', CO: '103', CO2: '87', SO2: '60', 'log fO2': '− 8.98', FMQ: '− 1.24', 'log fS2': '− 1.15', 't (h)': '8'}
+            - {'Temperature (K)': '1573', CO: '148', CO2: '99', SO2: '48', 'log fO2': '− 8.98', FMQ: '− 1.76', 'log fS2': '− 1.21', 't (h)': '8'}
+            - {'Temperature (K)': '1623', CO: '175', CO2: '30', SO2: '45', 'log fO2': '− 8.99', FMQ: '− 2.26', 'log fS2': '− 1.08', 't (h)': '8'}
+            - {'Temperature (K)': '1673', CO: '200', CO2: '12.5', SO2: '37.5', 'log fO2': '− 8.97', FMQ: '− 2.71', 'log fS2': '− 1.15', 't (h)': '8'}
+            - {'Temperature (K)': '1723', CO: '208', CO2: '22', SO2: '20', 'log fO2': '− 8.99', FMQ: '− 3.16', 'log fS2': '− 1.44', 't (h)': '6'}
+            - {'Temperature (K)': '1773', CO: '219', CO2: '19', SO2: '12', 'log fO2': '− 8.94', FMQ: '− 3.52', 'log fS2': '− 1.61', 't (h)': '3'}
+      - observation_id: boulliung_wood_2023_fitted_capacity_equations
+        type: model_equation_context
+        locator: {page: 5, pdf_page_index: 4, section: Quantitative description of sulfide capacity}
+        attribution: Present-work regressions; equation 7 combines this study with O'Neill and Mavrogenes (2002), and equation 9 refits Boulliung and Wood (2022) sulfate-capacity data.
+        reason_unscored: Fitted sulfide and sulfate capacity equations are model-derived, and the store has no quantity token for either capacity. Their supplementary input table is absent from the corpus.
+        units: Log capacity as printed; T in K; X terms are mole fractions.
+        values:
+          method_class: model_derived
+          quantity_as_printed: Log sulfide capacity and log sulfate capacity
+          quantity_token: unavailable
+          schema_gap: No existing quantity enum represents sulfide capacity or sulfate capacity.
+          equations_as_printed:
+            - equation: '6'
+              value: 'log C_S2− = 0.338(0.219) + 24328(1149)X_FeO + 5411(627)X_CaO + 15872(5294)X_MnO − 9697(369)/T'
+            - equation: '7'
+              value: 'log C_S2− = 0.225(0.190) + 25237(784)X_FeO + 5214(838)X_CaO + 12705(4420)X_MnO + 19829(7139)X_K2O − 1109(337)X_Si0.5O − 8879(408)/T'
+            - equation: '9'
+              value: 'log C_S6+ = −12.948(0.278) + 28649(4040)X_Na2O + 15602(1645)X_CaO + 9496(1279)X_MgO + 16016(7128)X_MnO + 4194(1163)X_Al0.67O + 29244(493)/T'
+            - equation: '11'
+              value: 'log C_S6+ = −213.65(89.95) + 25696(4131)X_Na2O + 15076(1616)X_CaO + 9543(1243)X_MgO + 16158(6932)X_MnO + 4316(1132)X_Al0.67O + 68254(16907)/T + 55.03(23.84)log T'
+      - observation_id: boulliung_wood_2023_figure_1a
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, figure: '1'}
+        panel: A
+        attribution: Present-work experimental data; sulfide capacities calculated from measured sulfur contents.
+        units: Log C_S2− with S in wt.%; temperature K.
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity enum represents sulfide capacity.
+          species: S
+          phase: quenched silicate glass
+          temperature_as_printed: 1473–1773 K
+          axes_as_printed: {x: '1000/T (K)', y: 'Log C_S2− (S in wt.%)'}
+          caption: 'Temperature (A) and FeO content (B) effect on sulfide capacity for the different melt compositions. In A, all compositions and temperatures (ranging from 1473 to 1773 K) are shown.'
+          series:
+            - {name: NIB, marker_count: 7, evidence_class: measured_reduced}
+            - {name: T-Basalt, marker_count: 7, evidence_class: measured_reduced}
+            - {name: Andesite, marker_count: 7, evidence_class: measured_reduced}
+            - {name: B-A, marker_count: 7, evidence_class: measured_reduced}
+            - {name: Nephelinite, marker_count: 7, evidence_class: measured_reduced}
+            - {name: T-Phonolite, marker_count: 7, evidence_class: measured_reduced}
+            - {name: Basanite, marker_count: 7, evidence_class: measured_reduced}
+            - {name: SLC, marker_count: 7, evidence_class: measured_reduced}
+            - {name: Lunar Basalt, marker_count: 7, evidence_class: measured_reduced}
+            - {name: Andac, marker_count: 7, evidence_class: measured_reduced}
+            - {name: CMAS1, marker_count: 7, evidence_class: measured_reduced}
+            - {name: CMAS2, marker_count: 7, evidence_class: measured_reduced}
+            - {name: CMAS3, marker_count: 7, evidence_class: measured_reduced}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_1b
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, figure: '1'}
+        panel: B
+        attribution: Present-work experimental data; iron content is total Fe as FeO.
+        units: Log C_S2− with S in wt.%; FeO wt.%.
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity enum represents sulfide capacity.
+          species: S
+          phase: quenched silicate glass
+          temperature_as_printed: 1573 K
+          axes_as_printed: {x: 'FeO (wt.%)', y: 'Log C_S2− (S in wt.%)'}
+          caption: 'Temperature (A) and FeO content (B) effect on sulfide capacity for the different melt compositions. In B, only the data obtained for the experiments at 1573 K are shown. The iron content is given as total Fe as FeO.'
+          series:
+            - {name: NIB, marker_count: 1, evidence_class: measured_reduced}
+            - {name: T-Basalt, marker_count: 1, evidence_class: measured_reduced}
+            - {name: Andesite, marker_count: 1, evidence_class: measured_reduced}
+            - {name: B-A, marker_count: 1, evidence_class: measured_reduced}
+            - {name: Nephelinite, marker_count: 1, evidence_class: measured_reduced}
+            - {name: T-Phonolite, marker_count: 1, evidence_class: measured_reduced}
+            - {name: Basanite, marker_count: 1, evidence_class: measured_reduced}
+            - {name: SLC, marker_count: 1, evidence_class: measured_reduced}
+            - {name: Lunar Basalt, marker_count: 1, evidence_class: measured_reduced}
+            - {name: Andac, marker_count: 1, evidence_class: measured_reduced}
+            - {name: CMAS1, marker_count: 1, evidence_class: measured_reduced}
+            - {name: CMAS2, marker_count: 1, evidence_class: measured_reduced}
+            - {name: CMAS3, marker_count: 1, evidence_class: measured_reduced}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_2a
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, figure: '2'}
+        panel: A
+        attribution: Measured sulfide capacities from this study compared with the O'Neill (2021) model.
+        units: Log C_S2−.
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity enum represents sulfide capacity.
+          species: S
+          phase: quenched silicate glass
+          temperature_as_printed: 1473–1773 K
+          axes_as_printed: {x: 'Log C_S2− measured (this study)', y: 'Log C_S2− calculated (O’Neill, 2021)'}
+          caption: 'A Sulfide capacities measured (this study) as a function of log C_S2− calculated using the O’Neill (2021) model.'
+          series:
+            - {name: 1473 K, marker_count: 13, evidence_class: measured_reduced}
+            - {name: 1523 K, marker_count: 13, evidence_class: measured_reduced}
+            - {name: 1573 K, marker_count: 13, evidence_class: measured_reduced}
+            - {name: 1623 K, marker_count: 13, evidence_class: measured_reduced}
+            - {name: 1673 K, marker_count: 13, evidence_class: measured_reduced}
+            - {name: 1723 K, marker_count: 13, evidence_class: measured_reduced}
+            - {name: 1773 K, marker_count: 13, evidence_class: measured_reduced}
+            - {name: '1:1 reference', marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_2b
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, figure: '2'}
+        panel: B
+        attribution: Measured sulfate capacities from Boulliung and Wood (2022) compared with the O'Neill and Mavrogenes (2022) model.
+        units: Log C_S6+.
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity enum represents sulfate capacity.
+          species: S
+          phase: quenched silicate glass
+          temperature_as_printed: 1473–1773 K
+          axes_as_printed: {x: 'Log C_S6+ measured (Boulliung and Wood, 2022)', y: 'Log C_S6+ calculated (O’Neill and Mavrogenes, 2022)'}
+          caption: 'B Measured sulfate capacities (Boulliung and Wood 2022) plotted against log C_S6+ calculated using the O’Neill and Mavrogenes (2022) equation.'
+          series:
+            - {name: 1473 K, marker_count: 14, evidence_class: quoted_attributed}
+            - {name: 1523 K, marker_count: 14, evidence_class: quoted_attributed}
+            - {name: 1573 K, marker_count: 14, evidence_class: quoted_attributed}
+            - {name: 1623 K, marker_count: 14, evidence_class: quoted_attributed}
+            - {name: 1673 K, marker_count: 14, evidence_class: quoted_attributed}
+            - {name: 1723 K, marker_count: 14, evidence_class: quoted_attributed}
+            - {name: 1773 K, marker_count: 14, evidence_class: quoted_attributed}
+            - {name: '1:1 reference', marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_3
+        type: figure_record
+        locator: {page: 6, pdf_page_index: 5, figure: '3'}
+        panel: whole_figure
+        attribution: Sulfide-capacity measurements from Nash et al. (2019); current-study regression shown as the comparison line.
+        units: Log C_S2−.
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity enum represents sulfide capacity.
+          species: S
+          phase: glass
+          temperature_as_printed: 1573 K
+          axes_as_printed: {x: 'Log C_S2− calculated (this study)', y: 'Log C_S2− (Nash et al., 2019)'}
+          caption: 'Comparison between the measured log C_S2− from Nash et al. (2019) and the log C_S2− calculated using our fit Eq. (7) on the final glass compositions. The data from Nash et al. (2019) are for 6 different melt compositions and three different redox conditions.'
+          series:
+            - {name: FMQ − 1.76, marker: green circle, marker_count: 6, evidence_class: quoted_attributed}
+            - {name: FMQ − 1.02, marker: open square, marker_count: 6, evidence_class: quoted_attributed}
+            - {name: FMQ − 0.78, marker: magenta diamond, marker_count: 6, evidence_class: quoted_attributed}
+            - {name: Eq. 7 fit comparison line, marker: line, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_4
+        type: figure_record
+        locator: {page: 7, pdf_page_index: 6, figure: '4'}
+        panel: whole_figure
+        attribution: Present-work model using average basalt and dacite compositions from Carmichael et al. (1974).
+        units: Dimensionless S6+/ΣS; ΔFMQ.
+        values:
+          quantity: valence_ratio
+          method_class: model_derived
+          species: S
+          phase: silicate melt
+          temperature_as_printed: 1473 K and 1773 K
+          valence_basis: {numerator_oxidation_states: [6], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          axes_as_printed: {x: 'ΔFMQ', y: 'S6+/(S6+ + S2−)'}
+          caption: 'The ratio of S6+/(S6+ + S2−) as a function of fO2 (relative to the FMQ buffer; Frost 1991) at 1 bar for average basalt and average dacite compositions of Carmichael et al. (1974) at 1773 K and 1473 K.'
+          series:
+            - {name: Basalt 1473 K, marker_count: 0, evidence_class: model_derived}
+            - {name: Basalt 1773 K, marker_count: 0, evidence_class: model_derived}
+            - {name: Dacite 1473 K, marker_count: 0, evidence_class: model_derived}
+            - {name: Dacite 1773 K, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_5
+        type: figure_record
+        locator: {page: 8, pdf_page_index: 7, figure: '5'}
+        panel: whole_figure
+        attribution: Jugo et al. (2010), Botcharnikov et al. (2011), and Nash et al. (2019); dashed curves are this study.
+        units: Dimensionless S6+/ΣS; ΔFMQ.
+        values:
+          quantity: valence_ratio
+          method_class: model_derived
+          species: S
+          phase: experimentally equilibrated silicate melts; quenched run products
+          temperature_as_printed: 1323 K for Jugo et al. and Botcharnikov et al.; 1573 K for Nash et al.
+          valence_basis: {numerator_oxidation_states: [6], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          axes_as_printed: {x: 'ΔFMQ', y: 'S6+/ΣS'}
+          caption: 'Observed S6+/ΣS from experimental run products compared to calculated values from our sulfide and sulfate capacities (dashed lines). Jugo et al. (2010) and Botcharnikov et al. (2011) used XANES on melts equilibrated at 1323 K and 2000 bars; Nash et al. (2019) analyzed melts equilibrated at 1573 K and 1 bar.'
+          series:
+            - {name: 'Etna basalt (Jugo et al., 2010)', marker: open circle, marker_count: 8, evidence_class: quoted_attributed}
+            - {name: 'Synthetic andesite (Botcharnikov et al., 2011)', marker: gray circle, marker_count: 8, evidence_class: quoted_attributed}
+            - {name: 'JFR Martian basalt (Nash et al., 2019)', marker: orange square, marker_count: 9, evidence_class: quoted_attributed}
+            - {name: This study (Etna basalt and synthetic andesite), marker: dashed line, marker_count: 0, evidence_class: model_derived}
+            - {name: 'This study (Nash et al., 2019; JFR Martian basalt)', marker: dashed line, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_6a
+        type: figure_record
+        locator: {page: 9, pdf_page_index: 8, figure: '6'}
+        panel: A
+        attribution: Present-work model estimates using compositions attributed in the caption to Carmichael et al. (1974), Sautter et al. (2012), Rubin et al. (2000), and Hewins et al. (2020).
+        units: Dimensionless S6+/ΣS; ΔFMQ.
+        values:
+          quantity: valence_ratio
+          method_class: model_derived
+          species: S
+          phase: silicate melt
+          temperature_as_printed: 1473–1673 K
+          valence_basis: {numerator_oxidation_states: [6], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          axes_as_printed: {x: 'ΔFMQ', y: 'S6+/ΣS'}
+          caption: 'Sulfur speciation for terrestrial basalt and for Martian basalts based on SNC meteorites and parent magma composition estimates. The blue area is the S6+/ΣS range for average terrestrial basalt at 1473–1673 K; the red area includes Martian basaltic compositions over the temperatures in the caption.'
+          series:
+            - {name: Nakhlite NPM05, marker_count: 0, evidence_class: model_derived}
+            - {name: Chassigny, marker_count: 0, evidence_class: model_derived}
+            - {name: Basaltic shergottite Los Angeles, marker_count: 0, evidence_class: model_derived}
+            - {name: Terrestrial basalt, marker_count: 0, evidence_class: model_derived}
+            - {name: Average terrestrial basalt range, marker: shaded area, marker_count: 0, evidence_class: model_derived}
+            - {name: Martian basalt compositions range, marker: shaded area, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_6b
+        type: figure_record
+        locator: {page: 9, pdf_page_index: 8, figure: '6'}
+        panel: B
+        attribution: Present-work model curves compared with S6+/ΣS measurements in Nakhla glass mesostasis from Brounce et al. (2022); fO2 estimated using Jugo et al. (2010).
+        units: Dimensionless S6+/ΣS; ΔFMQ.
+        values:
+          quantity: valence_ratio
+          method_class: model_derived
+          species: S
+          phase: glass mesostasis
+          temperature_as_printed: 1473–1673 K
+          valence_basis: {numerator_oxidation_states: [6], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          axes_as_printed: {x: 'ΔFMQ', y: 'S6+/ΣS'}
+          caption: 'Comparison of S6+/ΣS calculated from sulfide and sulfate capacities at 1473–1673 K with values measured in glass mesostasis from Nakhla meteorite (Brounce et al., 2022). Brounce et al. estimated log fO2 using the calibration of Jugo et al. (2010).'
+          series:
+            - {name: 'Brounce et al. (2022) measured glass mesostasis values', marker: circle, marker_count: 15, evidence_class: quoted_attributed}
+            - {name: 1473 K, marker: dashed line, marker_count: 0, evidence_class: model_derived}
+            - {name: 1573 K, marker: dashed line, marker_count: 0, evidence_class: model_derived}
+            - {name: 1673 K, marker: dashed line, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_7
+        type: figure_record
+        locator: {page: 10, pdf_page_index: 9, figure: '7'}
+        panel: whole_figure
+        attribution: Present-work calculated temperatures from Mauna Kea glass oxidation-state data of Brounce et al. (2017), using Fe3+/Fe2+ from Kress and Carmichael (1991).
+        units: K; dimensionless sample number.
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents the calculated Fe-S redox-equilibrium temperature shown here; transition_temperature does not describe this model-matched temperature.
+          species: S
+          phase: quenched basaltic glass
+          temperature_as_printed: Calculated temperatures; values span about 1370–1600 K on the plotted axis.
+          axes_as_printed: {x: 'Sample number', y: 'Equilibration temperature (K)'}
+          caption: 'Calculated temperatures of Fe3+/Fe2+ equilibrium with S6+/S2− obtained from the Mauna Kea glass oxidation-state data of Brounce et al. (2017). Error bar is one standard deviation of the average. Sample numbers were allocated arbitrarily to separate high and low silica compositions.'
+          series:
+            - {name: High silica, marker: blue square, marker_count: 19, evidence_class: model_derived}
+            - {name: Low silica, marker: red circle, marker_count: 8, evidence_class: model_derived}
+            - {name: Average, marker: star, marker_count: 1, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_8a
+        type: figure_record
+        locator: {page: 11, pdf_page_index: 10, figure: '8'}
+        panel: A
+        attribution: Present-work degassing simulation for average basalt composition from Carmichael et al. (1974).
+        units: Fraction S remaining; MPa.
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents modeled fraction of dissolved sulfur remaining versus pressure.
+          species: S
+          phase: silicate melt
+          temperature_as_printed: 1473 K
+          axes_as_printed: {x: 'P (MPa)', y: 'Fraction S remaining in the melt'}
+          caption: 'Degassing simulations of upwelling basaltic melts at different starting redox conditions (FMQ −2, FMQ and FMQ +2) and fixed temperature (1473 K). The simulation begins to degas H2O-rich fluid at 250 MPa from the average basalt of Carmichael et al. (1974).'
+          series:
+            - {name: Basalt (FMQ +2), marker_count: 0, evidence_class: model_derived}
+            - {name: Basalt (FMQ), marker_count: 0, evidence_class: model_derived}
+            - {name: Basalt (FMQ −2), marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_8b
+        type: figure_record
+        locator: {page: 11, pdf_page_index: 10, figure: '8'}
+        panel: B
+        attribution: Present-work degassing simulation; FMQ calculation refers to Frost (1991).
+        units: ΔFMQ; MPa.
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents modeled buffer-relative oxygen fugacity versus pressure.
+          species: S
+          phase: silicate melt
+          temperature_as_printed: 1473 K
+          axes_as_printed: {x: 'P (MPa)', y: 'ΔFMQ'}
+          caption: 'Evolution of the redox conditions relative to the FMQ buffer during magma ascent and degassing. The initial S content of the melt is fixed at 0.12 wt%. The FMQ buffer calculation refers to Frost (1991).'
+          series:
+            - {name: Basalt (FMQ +2), marker_count: 0, evidence_class: model_derived}
+            - {name: Basalt (FMQ), marker_count: 0, evidence_class: model_derived}
+            - {name: Basalt (FMQ −2), marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: boulliung_wood_2023_figure_9
+        type: figure_record
+        locator: {page: 12, pdf_page_index: 11, figure: '9'}
+        panel: whole_figure
+        attribution: Model curves from Ding et al. (2023) with this study's curve added.
+        units: Weight-based partition coefficient; MPa.
+        values:
+          quantity: unavailable
+          schema_gap: A sulfur fluid-melt partition coefficient is not an activity coefficient or another existing quantity token.
+          species: S
+          phase: H2O-rich fluid and silicate melt
+          temperature_as_printed: Temperature of 1303 K described in the text for the Fuego-melt calculation.
+          axes_as_printed: {x: 'S partition coefficient (wt.)', y: 'P (MPa)'}
+          caption: 'Calculated partitioning of S between fluid and melt (partition coefficient = S(fluid)/S(melt) on a weight basis) for ascent of Fuego melts with associated evolution of an H2O-rich fluid. Calculated curves were taken from Fig. 8 of Ding et al. (2023) with addition of our results in red.'
+          series:
+            - {name: DCompress, marker_count: 0, evidence_class: quoted_attributed}
+            - {name: SolEx, marker_count: 0, evidence_class: quoted_attributed}
+            - {name: R2020, marker_count: 0, evidence_class: quoted_attributed}
+            - {name: Sulfur_X, marker_count: 0, evidence_class: quoted_attributed}
+            - {name: This study, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
