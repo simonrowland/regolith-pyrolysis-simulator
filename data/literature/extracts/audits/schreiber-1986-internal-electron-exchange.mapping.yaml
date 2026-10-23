@@ -1,0 +1,22 @@
+source_id: schreiber-1986-internal-electron-exchange
+source:
+  citation: Schreiber, H. D. (1986). Internal Electron Exchange Reactions in Synthetic Magmas. Lunar and Planetary Science XVII, 771-772 (abstract 1393).
+tables: []
+table_dispositions:
+  - table: '1'
+    page: 2
+    printed_rows: 26
+    disposition: context-duplicate
+    candidate_tokens: [valence_ratio, interaction_parameter]
+    linked_record: schreiber-1985-geochemical-emf-series#schreiber_1985_table1_reference_reduction_potentials
+    reason: >-
+      Table 1 repeats the SRL-131 relative reduction-potential values already
+      preserved in the 1985 extract. The render was checked against those rows;
+      the duplicate is linked rather than emitted again. No quantity token
+      represents the printed relative potential.
+    audit: >-
+      MinerU table draft found no table blocks. Its details block contains chart
+      readings and was ignored under the figure rule. The printed Table 1 is
+      visible on page 2; its 26 rows match the 1985 source's SRL-131 column.
+figures:
+  - {figure: '1', page: 2, disposition: deferred, numeric_points: none}

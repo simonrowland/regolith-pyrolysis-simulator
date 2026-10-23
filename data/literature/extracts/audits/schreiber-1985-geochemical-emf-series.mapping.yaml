@@ -1,0 +1,24 @@
+source_id: schreiber-1985-geochemical-emf-series
+source:
+  citation: Schreiber, H. D. (1985). A geochemical electromotive force series. Lunar and Planetary Science XVI, 738-739 (abstract 1376).
+tables: []
+table_dispositions:
+  - table: '1'
+    page: 2
+    printed_rows: 26
+    disposition: context-no-token
+    candidate_tokens: [valence_ratio, interaction_parameter]
+    reason: >-
+      The table reports reference reduction potentials in relative units.
+      Neither redox-ratio nor interaction-parameter quantities fit these
+      potentials; EMF_CELL is a method token, not a quantity token. The 600 dpi
+      render was checked for every row and cell, including blanks and the > .8 bound.
+    audit: >-
+      MinerU table draft p002-t01 provided row and column structure. pdftotext
+      did not read the table body; all 26 body rows and six columns were checked
+      against the page 2 render. Blanks were preserved as null and > .8 as a
+      bound. No table-tool rows were emitted because no valid quantity token
+      exists.
+figures:
+  - {figure: '1', page: 2, disposition: deferred, numeric_points: none}
+  - {figure: '2', page: 2, disposition: deferred, numeric_points: none}

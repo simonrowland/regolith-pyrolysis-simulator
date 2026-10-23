@@ -1,0 +1,114 @@
+schema_version: literature_extract.v1
+source_id: schreiber-1979-lpsc-redox-interactions-abstract
+figure_policy: Figure 1 is recorded without numeric plot points; experimental markers remain deferred to a figure pass.
+source:
+  citation: >-
+    Schreiber, H. D. (1979). Redox Interactions in Synthetic Lunar Magmas.
+    Lunar and Planetary Science X, 1067-1069 (abstract 1375).
+  year: 1979
+  doi: null
+extraction:
+  method: >-
+    Three-page scanned LPSC abstract transcribed from pdftotext-layout and
+    MinerU. Experimental redox interactions are presented in Figure 1 and are
+    deferred. Printed prior-study estimates and fitted relative series remain
+    context.
+  date: '2026-10-20'
+  worker: fam27-1020
+review_status: draft
+experiments:
+  - experiment_id: schreiber_1979_mutual_redox_interactions
+    series: >-
+      Interactions among Ti(IV)-Ti(III), Cr(III)-Cr(II), and Eu(III)-Eu(II) in
+      two iron-free synthetic silicate melts as functions of temperature, oxygen
+      fugacity, and concentration. Measured results are shown only in deferred
+      Figure 1.
+    locator: {page: 1, pdf_page_index: 0, published_page: 1067, section: Abstract}
+species:
+  Ti:
+    observations: []
+    context:
+      - observation_id: schreiber_1979_figure1_mutual_redox_interactions
+        type: figure_record
+        locator: {page: 2, pdf_page_index: 1, published_page: 1068, figure: '1'}
+        phase: glass
+        units: redox ratio R and reduced-ion fraction X
+        values:
+          quantity: valence_ratio
+          method_class: figure_only
+          species: [Ti, Cr, Eu]
+          temperature_as_published: 1500 and 1550 °C
+          axes_as_published: x log R (reduced/oxidized ion ratio); y X (fraction of element in reduced state)
+          caption_as_published: >-
+            Experimental results for mutual interaction of pairs of redox couples
+            in synthetic silicate melts. Concentrations in quenched glasses were
+            determined by EPR and wet-chemistry procedures. Solid symbols are
+            measured paired-couple experiments; open symbols are points
+            interpolated from previous individual-couple studies. The panels
+            show Ti-Cr, Ti-Eu, and Cr-Eu systems, each with FAS and FAD bulk
+            compositions. Symbol shapes encode temperature and -log fO2.
+          panel: Ti-Cr FAS/FAD; Ti-Eu FAS/FAD; Cr-Eu FAS/FAD
+          series:
+            - {label: 'measured 1500 °C, -log fO2 = 5.5', marker: filled triangle, marker_count: uncounted}
+            - {label: 'measured 1500 °C, -log fO2 = 7.7', marker: filled circle, marker_count: uncounted}
+            - {label: 'measured 1550 °C, -log fO2 = 5.5', marker: filled square, marker_count: uncounted}
+            - {label: 'measured 1550 °C, -log fO2 = 7.7', marker: filled diamond, marker_count: uncounted}
+            - {label: interpolated no-interaction values, markers: 'open triangle, circle, square, diamond', marker_count: uncounted}
+          marker_count_note: >-
+            The six small panels contain overlapping points separated by element
+            pair, FAS/FAD composition, temperature and oxygen fugacity. Counts
+            were not separated by each combined series in this deferred record.
+          composition_as_published: >-
+            FAS = 53 wt% forsterite, 27 wt% anorthite, 20 wt% silica; FAD = 25 wt%
+            forsterite, 6 wt% anorthite, 69 wt% diopside.
+          oxygen_reference_as_published: Not stated for the printed -log fO2 legend values; retained verbatim.
+          attribution: This work; open symbols interpolated from previous studies
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: schreiber_1979_interaction_findings
+        type: assessment
+        locator: {page: 1, pdf_page_index: 0, published_page: 1067, section: Abstract}
+        units: qualitative
+        values:
+          quantity: mutual redox interaction among Ti, Cr, and Eu couples
+          method_class: model_derived
+          admission_status: typed_unavailable
+          claims_as_printed:
+            - Ti and Cr redox couples did not interact appreciably.
+            - Cr(II) and Ti(III) each produced more Eu(II) from Eu(III).
+            - Interaction depended on melt temperature and bulk composition.
+          reason: >-
+            These are conclusions from deferred Figure 1; no numerical measured
+            ratios are printed in the abstract prose.
+      - observation_id: schreiber_1979_prior_lunar_redox_estimates
+        type: assessment
+        locator: {page: 1, pdf_page_index: 0, published_page: 1067, section: Abstract}
+        units: percent of element in reduced state
+        values:
+          quantity: estimated lunar-magma reduced-state fractions
+          method_class: quoted_attributed
+          admission_status: typed_unavailable
+          attribution: Previous individual equilibrium studies (references 2 and 3)
+          estimates_as_printed:
+            Cr(II): 90% of total Cr
+            Eu(II): 70% of total Eu
+            Ti(III): 4% of total Ti
+          reason: >-
+            The abstract explicitly describes these as estimates based on earlier
+            individual-couple equilibrium studies; they are not measurements from
+            the mutual-interaction experiment.
+      - observation_id: schreiber_1979_relative_reduction_series
+        type: assessment
+        locator: {page: 1, pdf_page_index: 0, published_page: 1067, section: Abstract}
+        units: qualitative ordering
+        values:
+          quantity: electromotive-force series for redox couples in silicate melts
+          method_class: model_derived
+          admission_status: typed_unavailable
+          value_as_printed: >-
+            The text compares a series derived from shifts in equilibria after
+            adding a second redox couple with the prior series from individual
+            equilibria; mechanisms proposed are solvolysis and direct electron exchange.
+          reason: >-
+            Relative fitted series and reaction mechanisms are model-level
+            interpretation, not measured redox-ratio observations.
