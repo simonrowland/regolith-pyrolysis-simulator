@@ -88,7 +88,8 @@ _ROUND_ONE_RESULT_PINS = json.loads(r'''
 
 # Actual archived designer area, not the historical 0.08/0.16 m film operands.
 AREA = 0.41006003303200633
-DIAMETER = 0.7225682229915182
+DIAMETER = math.sqrt(4 * AREA / math.pi)
+PIN_DIAMETER_M = 0.7225682229915182
 
 
 def flow(u, geometry='planar'):
@@ -128,24 +129,36 @@ def _hex_tree(value):
     return value
 
 
+def _matches_round_one_pin(actual, expected):
+    if isinstance(expected, dict):
+        return (isinstance(actual, dict)
+                and all(key in actual and _matches_round_one_pin(actual[key], value)
+                        for key, value in expected.items()))
+    if isinstance(expected, list):
+        return (isinstance(actual, list) and len(actual) == len(expected)
+                and all(_matches_round_one_pin(a, e) for a, e in zip(actual, expected)))
+    return actual == expected
+
+
 @pytest.mark.parametrize('expected', _ROUND_ONE_RESULT_PINS,
                          ids=lambda row: f"{row[0]}-{row[1]}-{row[2]}")
 def test_archived_cases_pin_every_round_one_series_result(expected):
     feedstock, hour, species, expected_result = expected
     pin = next(p for p in PINS if (p['feedstock'], p['hour'], p['inputs']['species'])
                == (feedstock, hour, species))
-    result = source(**pin['inputs'], melt_surface_area_m2=AREA, surface_flow=flow(0))
+    result = source(**pin['inputs'], melt_surface_area_m2=AREA, surface_flow=replace(
+        flow(0), length_m=PIN_DIAMETER_M, width_m=AREA / PIN_DIAMETER_M))
     import dataclasses
-    assert _hex_tree(dataclasses.asdict(result)) == expected_result
+    assert _matches_round_one_pin(_hex_tree(dataclasses.asdict(result)), expected_result)
 
 
 def test_disk_diffusion_anchor_and_stefan_series_reconstruction():
-    result=sample(P_eq_pa=100, P_bulk_pa=0, overhead_pressure_pa=1000)
+    result=sample(P_eq_pa=100, P_bulk_pa=0, overhead_pressure_pa=1000, surface_flow=flow(0))
     d=result.as_diagnostic();f=d['surface_film']
     # Exact isolated circular disk diffusion result, Sh_d=8/pi.
     assert f['Sh']==pytest.approx(2.5464790894703255)
     assert f['length_m']==pytest.approx(0.7225682229915182, rel=1e-6)
-    assert 'surface flow undeclared: still-gas floor' in f['domain_flags']
+    assert not f['flow_assumed']
     assert f['stefan_model']=='binary_stagnant_carrier_logarithmic'
     assert f['stefan_conductance_multiplier'] > 1
     assert result.flux_kg_s_m2==pytest.approx(100/(result.r_interface+result.r_gas),rel=1e-12)
@@ -189,9 +202,9 @@ def test_missing_area_or_hardware_refuses_without_pipe_fallback():
 
 
 def test_zero_flow_is_declared_still_disk_and_no_pipe_or_stir_causality():
-    still=sample()
+    still=sample(surface_flow=flow(0))
     assert sample(surface_flow=flow(0)).flux_kg_s_m2==still.flux_kg_s_m2
-    assert sample(pipe_diameter_m=0.001,radial_stir_factor=10).flux_kg_s_m2==still.flux_kg_s_m2
+    assert sample(pipe_diameter_m=0.001,radial_stir_factor=10,surface_flow=flow(0)).flux_kg_s_m2==still.flux_kg_s_m2
     assert sample(P_bulk_pa=1e6).flux_kg_s_m2==0
     hot=sample(P_eq_pa=1000,P_bulk_pa=0,overhead_pressure_pa=1000)
     assert any('high vapour fraction' in f for f in hot.surface_film['domain_flags'])
@@ -218,7 +231,7 @@ def test_frozen_study_dilute_multipliers(feed,u,expected):
     sums={s:[0.,0.] for s in expected}
     for p in PINS:
         if p['feedstock']!=feed:continue
-        r=source(**p['inputs'],melt_surface_area_m2=AREA,surface_flow=None if u is None else flow(u))
+        r=source(**p['inputs'],melt_surface_area_m2=AREA,surface_flow=flow(0 if u is None else u))
         sums[p['inputs']['species']][0]+=p['archived_flux']
         sums[p['inputs']['species']][1]+=(r.surface_film or {}).get('dilute_flux_kg_s_m2',r.flux_kg_s_m2)
     for species,want in expected.items():
@@ -271,6 +284,7 @@ def test_operator_metadata_exports_snapshot_resistance_and_groups():
     exported=metadata['surface_transport_by_species']['Na']
     assert exported['R_gas_fraction']>.9
     assert exported['surface_film']['Sh']==diagnostic['surface_film']['Sh']
+    assert exported['surface_film']['still_gas_comparison']==diagnostic['surface_film']['still_gas_comparison']
     assert 'surface_transport_by_species' not in result
 
 
@@ -280,3 +294,37 @@ def test_subnormal_vapour_drive_does_not_divide_by_underflow(gas_enabled):
     assert result.flux_kg_s_m2==0
     assert math.isfinite(result.alpha_effective)
     assert 0<=result.alpha_effective<=result.alpha_intrinsic
+
+
+def test_d254_default_matches_declared_planar3_and_exports_still_comparison():
+    default=sample()
+    declared=sample(surface_flow=flow(3))
+    assert default.flux_kg_s_m2==declared.flux_kg_s_m2
+    still=sample(surface_flow=SurfaceFlow('stagnant_disk',0.,'explicit still gas','pool','stagnant'))
+    f=default.surface_film
+    assert f['geometry']=='planar' and f['u_m_s']==3
+    assert f['length_m']==pytest.approx(DIAMETER)
+    assert f['geometry_parameters']['coverage']==pytest.approx(1)
+    assert 'surface flow undeclared: default 3 m/s planar recirculation fan (assumed hardware)' in f['domain_flags']
+    comparison=f['still_gas_comparison']
+    assert comparison['k_g_m_s']==still.surface_film['k_g_m_s']
+    assert comparison['flux_kg_s_m2']==still.flux_kg_s_m2
+    assert comparison['rate_multiplier']==pytest.approx(default.flux_kg_s_m2/still.flux_kg_s_m2)
+    assert still.surface_film['still_gas_comparison']['rate_multiplier']==1
+    assert not declared.surface_film['flow_assumed'] and not still.surface_film['flow_assumed']
+
+
+@pytest.mark.parametrize(('surface_delta','gas_delta','unqualified'),[(0,0,False),(1,0,True),(0,1,True)])
+def test_default_fan_material_service_temperature_predicts_and_flags(surface_delta,gas_delta,unqualified):
+    from simulator.furnace_materials import load_furnace_materials
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+    rating=load_furnace_materials()['dense_alumina_continuous']['max_service_T_C']
+    temperature=rating+CELSIUS_TO_KELVIN_OFFSET
+    result=sample(T_surface_K=temperature+surface_delta,T_gas_K=temperature+gas_delta)
+    assert result.flux_kg_s_m2>0
+    assert result.surface_film['geometry_parameters']['impeller_service_T_C']==rating
+    notice='default fan unqualified above material service T'
+    assert (notice in result.surface_film['domain_flags']) is unqualified
+    declared=sample(T_surface_K=temperature+surface_delta,T_gas_K=temperature+gas_delta,surface_flow=flow(3))
+    assert declared.flux_kg_s_m2==result.flux_kg_s_m2
+    assert notice not in declared.surface_film['domain_flags']

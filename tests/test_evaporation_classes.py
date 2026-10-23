@@ -157,7 +157,7 @@ def test_report_species_class_diagnostics_class_alpha_fallback_unchanged():
     assert diag.interface_share_s == interface_share_s(diag.series)
     assert diag.r_interface == 16479.794223102974
     assert diag.r_gas == diag.series.r_gas
-    assert diag.series.surface_film["formula_id"] == "isolated_disk_halfspace_8_over_pi"
+    assert diag.series.surface_film["formula_id"] == "Blasius_plate_area_mean_0.664"
     assert diag.r_melt == 0.0
     assert diag.flux_band_factor_high == flux_band_factors(diag.interface_share_s, diag.membership.residual_dex)[1]
     assert diag.flux_band_factor_low == flux_band_factors(diag.interface_share_s, diag.membership.residual_dex)[0]

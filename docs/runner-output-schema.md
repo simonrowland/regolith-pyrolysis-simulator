@@ -829,8 +829,27 @@ incident, stuck, re-evaporated, and net continuous flux and has
   `length_m`, `rho_kg_m3`, `mu_Pa_s`, `D_m2_s`, `Re`, `Sc`, `Pe`, `Sh`,
   `Kn_film`, `Kn_geometry`, `Mach`, provenance and `domain_flags` (Dg06).
   An undeclared surface field carries the literal notice
-  `surface flow undeclared: still-gas floor`. A film share above 0.9
+  `surface flow undeclared: default 3 m/s planar recirculation fan (assumed hardware)`
+  (d-254). The assumed planar footprint has L equal to pool diameter and W=A/L,
+  with a uniform 3 m/s free stream independent of net sweep. Its material ID and
+  service rating are in `geometry_parameters.impeller_material_id` and
+  `impeller_service_T_C`, sourced from `data/furnace_materials.yaml`
+  (`dense_alumina_continuous`). If either melt or headspace temperature exceeds
+  that rating, `domain_flags` also contains
+  `default fan unqualified above material service T`; prediction continues.
+  Any explicit `SurfaceFlow` overrides the assumption, including
+  `stagnant_disk` at zero velocity (or a declared zero-velocity geometry).
+  A film share above 0.9
   describes film-limited transport; no recommendation is computed.
+  `surface_film.still_gas_comparison` reports the same-state floor: `k_g_m_s`
+  (diffusive film coefficient, m/s), `flux_kg_s_m2` (including its applicable
+  Stefan correction), and `rate_multiplier` (actual source rate / still-gas
+  source rate at equal partials, alpha and area). It also retains `formula_id`,
+  `stefan_model` and `domain_flags`. An explicit still-gas declaration gives
+  multiplier 1; zero representable floor flux gives a null multiplier. The
+  comparison is null when film transport is not evaluated (e.g. saturated
+  zero drive, disabled gas resistance or open-vacuum HK). These are a
+  comparison at the current state, not a second coupled trajectory.
   The stagnant-disk binary Stefan correction reports its model, multiplier
   and gas-face fraction; `dilute_flux_kg_s_m2` retains the study reference.
   Large vapour fractions retain a flagged dilute estimate while coupled

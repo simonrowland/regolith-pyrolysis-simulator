@@ -10,10 +10,13 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import Enum
+from functools import lru_cache
+from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Mapping
 
-from simulator.physical_constants import BOLTZMANN, GAS_CONSTANT
+from simulator.physical_constants import BOLTZMANN, GAS_CONSTANT, CELSIUS_TO_KELVIN_OFFSET
+from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.silent_zero import (
     CATEGORY_MARK,
@@ -1784,7 +1787,7 @@ class SeriesEvaporationFlux:
             "d_ab_m2_s": self.d_ab_m2_s,
             "transport_length_m": self.transport_length_m,
             "source_film_length_m": self.source_film_length_m,
-            "surface_film": dict(self.surface_film or {}),
+            "surface_film": {"still_gas_comparison": None, **dict(self.surface_film or {})},
             # HKL upper-bound authority (matrix policy i): R_m=0 until
             # species/state melt-transfer inputs exist. Not certified flux.
             "authority_class": "upper-bound",
@@ -1861,11 +1864,11 @@ def _zero_series_evaporation_flux(
 
 @dataclass(frozen=True)
 class SurfaceFlow:
-    """Declared measured gas field; independent of net sweep and melt stirring.
+    """Declared or explicitly assumed gas field, independent of net sweep/stirring.
 
     Planar length/width describe the swept footprint; round length is the
     nozzle diameter; slot width is the full physical slot width B (S=2B).
-    Velocity location/profile and provenance describe the measured field,
+    Velocity location/profile and provenance describe the supplied field,
     rather than claiming that a fan speed or net exit flow determines it.
     """
     geometry: str
@@ -1903,6 +1906,14 @@ def carrier_dynamic_viscosity_Pa_s(carrier, temperature_K):
     return 5 * math.sqrt(p.molar_mass_kg_mol / AVOGADRO * BOLTZMANN * temperature_K / math.pi) / (16 * p.collision_diameter_m ** 2 * omega)
 
 
+@lru_cache(maxsize=1)
+def _default_fan_service_T_C():
+    # Read the impeller assumption from its data owner, not a second rating.
+    path = Path(__file__).resolve().parents[1] / 'data' / 'furnace_materials.yaml'
+    row = load_cached_safe_yaml(path.read_text(encoding='utf-8'))['furnace_materials']['dense_alumina_continuous']
+    return _surface_scalar(row['max_service_T_C'], 'dense_alumina_continuous.max_service_T_C')
+
+
 def surface_gas_film(*, area_m2, flow, temperature_K, pressure_pa, carrier, diffusivity_m2_s):
     """Area-mean surface law; no net-sweep or radial-stir velocity inference.
 
@@ -1927,52 +1938,63 @@ def surface_gas_film(*, area_m2, flow, temperature_K, pressure_pa, carrier, diff
     diameter = math.sqrt(4 * area / math.pi)
     flags = []
     parameters = {"pool_area_m2": area}
-    if flow is None:
-        geometry, u, length = 'stagnant_disk', 0.0, diameter
-        flags.append('surface flow undeclared: still-gas floor')
+    assumed = flow is None
+    if assumed:
+        # A=pi*L^2/4 gives L=sqrt(4A/pi), and W=A/L covers the same
+        # actual pool area [m^2/m=m]. d-254 declares u=3 m/s independently
+        # of net sweep; no flow or area is inferred from an outlet pipe.
+        flow = SurfaceFlow('planar', 3.0, 'd-254 assumed recirculation hardware',
+                           'pool free stream', 'uniform_free_stream',
+                           length_m=diameter, width_m=area / diameter)
+        flags.append('surface flow undeclared: default 3 m/s planar recirculation fan (assumed hardware)')
+        parameters.update(impeller_material_id='dense_alumina_continuous',
+                          impeller_service_T_C=_default_fan_service_T_C())
+    if not isinstance(flow, SurfaceFlow):
+        raise EvaporationFluxConfigurationError('missing_input: surface_flow must be typed SurfaceFlow hardware')
+    geometry = flow.geometry
+    if geometry not in ('planar', 'round', 'slot', 'stagnant_disk'):
+        raise EvaporationFluxConfigurationError('missing_input: surface_flow.geometry must be planar, round, slot or stagnant_disk')
+    u = _surface_scalar(flow.velocity_m_s, 'surface_flow.velocity_m_s', zero_allowed=True)
+    for name in ('provenance', 'velocity_location', 'velocity_profile'):
+        if not isinstance(getattr(flow, name), str) or not getattr(flow, name).strip():
+            raise EvaporationFluxConfigurationError(f'missing_input: surface_flow.{name}')
+    if geometry == 'stagnant_disk':
+        if u != 0:
+            raise EvaporationFluxConfigurationError('invalid_input: stagnant_disk requires zero velocity')
+        length, coverage = diameter, 1.0
+    elif geometry == 'planar':
+        length = _surface_scalar(flow.length_m, 'surface_flow.length_m')
+        width = _surface_scalar(flow.width_m, 'surface_flow.width_m')
+        coverage = length * width / area
+        if flow.velocity_profile != 'uniform_free_stream':
+            flags.append('nonuniform planar velocity profile')
+    elif geometry == 'round':
+        length = _surface_scalar(flow.length_m, 'surface_flow.nozzle_diameter_m')
+        height = _surface_scalar(flow.standoff_m, 'surface_flow.standoff_m')
+        radius = _surface_scalar(flow.footprint_radius_m, 'surface_flow.footprint_radius_m')
+        coverage = math.pi * radius ** 2 / area
+        if not 2.5 <= radius / length <= 7.5:
+            flags.append('Martin round r/d outside [2.5,7.5]')
+        if not 2 <= height / length <= 12:
+            flags.append('Martin round H/d outside [2,12]')
     else:
-        if not isinstance(flow, SurfaceFlow):
-            raise EvaporationFluxConfigurationError('missing_input: surface_flow must be typed SurfaceFlow hardware')
-        geometry = flow.geometry
-        if geometry not in ('planar', 'round', 'slot'):
-            raise EvaporationFluxConfigurationError('missing_input: surface_flow.geometry must be planar, round or slot')
-        u = _surface_scalar(flow.velocity_m_s, 'surface_flow.velocity_m_s', zero_allowed=True)
-        for name in ('provenance', 'velocity_location', 'velocity_profile'):
-            if not isinstance(getattr(flow, name), str) or not getattr(flow, name).strip():
-                raise EvaporationFluxConfigurationError(f'missing_input: surface_flow.{name}')
-        if geometry == 'planar':
-            length = _surface_scalar(flow.length_m, 'surface_flow.length_m')
-            width = _surface_scalar(flow.width_m, 'surface_flow.width_m')
-            coverage = length * width / area
-            if flow.velocity_profile != 'uniform_free_stream':
-                flags.append('nonuniform planar velocity profile')
-        elif geometry == 'round':
-            length = _surface_scalar(flow.length_m, 'surface_flow.nozzle_diameter_m')
-            height = _surface_scalar(flow.standoff_m, 'surface_flow.standoff_m')
-            radius = _surface_scalar(flow.footprint_radius_m, 'surface_flow.footprint_radius_m')
-            coverage = math.pi * radius ** 2 / area
-            if not 2.5 <= radius / length <= 7.5:
-                flags.append('Martin round r/d outside [2.5,7.5]')
-            if not 2 <= height / length <= 12:
-                flags.append('Martin round H/d outside [2,12]')
-        else:
-            width = _surface_scalar(flow.slot_width_m, 'surface_flow.slot_width_m')
-            length = 2 * width  # physical B -> hydraulic S=2B [m].
-            height = _surface_scalar(flow.standoff_m, 'surface_flow.standoff_m')
-            halfspan = _surface_scalar(flow.averaging_half_span_m, 'surface_flow.averaging_half_span_m')
-            span = _surface_scalar(flow.width_m, 'surface_flow.span_m')
-            coverage = 2 * halfspan * span / area
-            if not 2 <= halfspan / length <= 25:
-                flags.append('Martin slot x/S outside [2,25]')
-            if not 2 <= height / length <= 10:
-                flags.append('Martin slot H/S outside [2,10]')
-        parameters.update(coverage=coverage, declared_length_m=length)
-        if geometry == 'round':
-            parameters.update(H_over_d=height / length, r_over_d=radius / length)
-        elif geometry == 'slot':
-            parameters.update(H_over_S=height / length, x_over_S=halfspan / length)
-        if abs(coverage - 1) > 0.01:
-            flags.append('declared flow footprint differs from pool area')
+        width = _surface_scalar(flow.slot_width_m, 'surface_flow.slot_width_m')
+        length = 2 * width  # physical B -> hydraulic S=2B [m].
+        height = _surface_scalar(flow.standoff_m, 'surface_flow.standoff_m')
+        halfspan = _surface_scalar(flow.averaging_half_span_m, 'surface_flow.averaging_half_span_m')
+        span = _surface_scalar(flow.width_m, 'surface_flow.span_m')
+        coverage = 2 * halfspan * span / area
+        if not 2 <= halfspan / length <= 25:
+            flags.append('Martin slot x/S outside [2,25]')
+        if not 2 <= height / length <= 10:
+            flags.append('Martin slot H/S outside [2,10]')
+    parameters.update(coverage=coverage, declared_length_m=length)
+    if geometry == 'round':
+        parameters.update(H_over_d=height / length, r_over_d=radius / length)
+    elif geometry == 'slot':
+        parameters.update(H_over_S=height / length, x_over_S=halfspan / length)
+    if abs(coverage - 1) > 0.01:
+        flags.append('declared flow footprint differs from pool area')
     re = rho * u * length / mu
     pe = re * sc
     if u == 0:
@@ -2029,7 +2051,7 @@ def surface_gas_film(*, area_m2, flow, temperature_K, pressure_pa, carrier, diff
                 rho_kg_m3=rho, mu_Pa_s=mu, D_m2_s=D, Re=re, Sc=sc, Pe=pe,
                 Sh=sh, k_g_m_s=k, Kn_film=kn_film, Kn_geometry=kn_geometry,
                 Mach=mach, domain_flags=flags, authority_status='status_bearing_non_authoritative',
-                velocity_provenance=flow.provenance if flow else 'undeclared',
+                velocity_provenance=flow.provenance, flow_assumed=assumed,
                 geometry_parameters=parameters)
 
 
@@ -2152,6 +2174,10 @@ def series_evaporation_flux(
         film = surface_gas_film(area_m2=melt_surface_area_m2, flow=surface_flow,
                                 temperature_K=tg, pressure_pa=pressure,
                                 carrier=carrier_gas, diffusivity_m2_s=diffusion)
+        if film['flow_assumed'] and max(ts, tg) > (
+            film['geometry_parameters']['impeller_service_T_C'] + CELSIUS_TO_KELVIN_OFFSET
+        ):
+            film['domain_flags'].append('default fan unqualified above material service T')
         length = film['length_m']
         if knudsen_number is None:
             kn = film['Kn_geometry']
@@ -2164,6 +2190,27 @@ def series_evaporation_flux(
         )
     else:
         flux = delta * (1.0 / ri)
+    if rg > 0:
+        still = surface_gas_film(
+            area_m2=melt_surface_area_m2,
+            flow=SurfaceFlow('stagnant_disk', 0.0, 'same-state still-gas comparison',
+                             'pool', 'stagnant'),
+            temperature_K=tg, pressure_pa=pressure, carrier=carrier_gas,
+            diffusivity_m2_s=diffusion,
+        )
+        still_flux, _, _ = _surface_film_series_flux(
+            still, diffusion, still['length_m'], tg, mass, ri, eq, bulk, pressure,
+        )
+        # Equal partials, alpha and pool area make the flux ratio the rate
+        # ratio (kg/(m^2 s) cancels). Identical still flow gives 1; zero
+        # representable drive has no defined ratio and is reported as null.
+        film['still_gas_comparison'] = {
+            'formula_id': still['formula_id'], 'k_g_m_s': still['k_g_m_s'],
+            'flux_kg_s_m2': still_flux,
+            'rate_multiplier': flux / still_flux if still_flux > 0 else None,
+            'stefan_model': still.get('stefan_model'),
+            'domain_flags': still['domain_flags'],
+        }
     # J/delta = 1/(Ri+Rg); use conductances directly so subnormal vapour
     # drives cannot underflow delta*k_HK to zero in the alpha diagnostic.
     # Both conductances have units kg/(m^2 s Pa), so their ratio is
