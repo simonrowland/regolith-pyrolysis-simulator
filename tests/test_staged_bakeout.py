@@ -275,6 +275,11 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # docs-private/reviews/2026-07-11-wave08/runtime-golden-attribution.md
     # The repaired 510 -> 860 C continuous trajectory no longer dwells in the
     # staged high-temperature Na recovery window.
+    # This 30 h probe stops before the full path's final Na recovery. The
+    # longer C3 window recycles condensed Na into reagent inventory: product
+    # Na moves 0.8123188230 -> 0.3228797459 kg (-0.4894390771 kg, -60.2521%)
+    # and unspent Na moves 3.5686464095 -> 4.0815650500 kg (+0.5129186405 kg,
+    # +14.3729%). The completed-path test checks closure, not recovered Na.
     assert staged_products.get("Na", 0.0) > continuous_products.get("Na", 0.0) > 0.0
     # 2026-07-21 B1 wall-gate fix: "Stage 3 remains Fe-only / Si goes to the
     # wall" was the unguarded hot-wall backstop artifact. With hot walls
@@ -300,7 +305,9 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
         staged_silica, rel=1e-12
     )
     assert continuous_sio_stage == {}
-    assert staged_products["SiO"] == pytest.approx(0.0076796816652895455)
+    # The same added C3 bakeout ticks shift this 30 h probe's SiO product by
+    # +3.271097e-6 kg (+0.042594%).
+    assert staged_products["SiO"] == pytest.approx(0.007682952762507284)
 
 
 def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():
