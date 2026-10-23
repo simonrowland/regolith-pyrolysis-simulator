@@ -13817,6 +13817,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             '_last_backend_status',
             '_last_backend_diagnostics',
             '_last_out_of_domain_diagnostics',
+            '_last_sulfur_saturation_result',
             '_last_vapor_pressures_source',
             '_last_vapor_pressure_diagnostic',
             '_last_evaporation_flux_diagnostic',
