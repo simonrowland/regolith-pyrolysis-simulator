@@ -2091,7 +2091,13 @@ def _phase_boundary_gap(
 def _segment_antoine_finite(
     segment: Mapping[str, Any], temperature_K: float
 ) -> bool:
-    """True when A, B, and C are present and the Antoine form is finite."""
+    """True when the flank's pressure at this temperature is finite and positive.
+
+    ``_pure_segment_usable`` only requires a finite log10 pressure at or
+    below 308. Exponentiating a large negative log underflows to 0.0,
+    and the wall evaluator refuses that. A flank that cannot produce a
+    positive pressure is not an available extension.
+    """
 
     for key in ("A", "B", "C"):
         if segment.get(key) is None:
@@ -2102,7 +2108,22 @@ def _segment_antoine_finite(
             return False
         if not math.isfinite(value):
             return False
-    return _pure_segment_usable(segment, temperature_K)
+    if not _pure_segment_usable(segment, temperature_K):
+        return False
+    try:
+        pressure = _pow10_pressure_or_raise(
+            _antoine_log10_pressure(
+                float(segment["A"]),
+                float(segment["B"]),
+                float(segment["C"]),
+                float(temperature_K),
+            ),
+            species=str(segment.get("name") or "antoine_segment"),
+            field="phase_gap_flank_Pa",
+        )
+    except (VaporPressureComputationError, VaporPressureNumericalOverflowError):
+        return False
+    return math.isfinite(pressure) and pressure > 0.0
 
 
 def _declared_join_temperature_K(
@@ -2157,9 +2178,11 @@ def _phase_gap_extension(
 
     If the gap has no single declared join on its closure, use the
     nearer certified edge and record that. An equal distance takes the
-    lower edge. If the physical flank has no finite Antoine triple,
-    use the other flank and say so. If neither flank is finite, return
-    None and the caller keeps the coefficient-free refusal.
+    lower edge. A flank is finite only when its pressure at this
+    temperature is representable and positive. An exponent that
+    underflows to 0 is not finite: use the other flank and say so.
+    If neither flank is finite, return None and the caller keeps the
+    coefficient-free refusal.
     """
 
     gap = _phase_boundary_gap(left, right)
