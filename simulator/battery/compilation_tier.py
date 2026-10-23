@@ -15,6 +15,7 @@ are not collapsed. ``transition_temperature`` series are not expanded.
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import math
@@ -52,6 +53,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
+    ideal_gas_entropy_pressure_shift_J_per_mol_K,
     identity_equal,
     log10K_from_delta_fG_kJ_mol,
     quantity_token,
@@ -385,6 +387,119 @@ def _parse_product(segment: EllinghamFitSegment) -> _Product | None:
     return _Product(formula, coeff, phase, polymorph, token.strip())
 
 
+def _janaf_row_contains(temperature: float, row: object) -> bool:
+    """One JANAF coefficient row. Open at T_min, closed at T_max.
+
+    This is the only copy of that bound. ``_vaporock_gas_attempt`` and the
+    source-basis adapter both use it.
+    """
+
+    return temperature > float(row["T_min"]) and temperature <= float(row["T_max"])
+
+
+def _installed_janaf_vapor_csv() -> Path | None:
+    """JANAF vapor CSV beside ``vaporock.equil``, without importing that package.
+
+    Importing ``vaporock`` constructs ThermoEngine. The editable finder already
+    on ``sys.meta_path`` names the package directory whose ``equil.py`` the
+    engine loads, and the CSV sits next to that module.
+    """
+
+    import sys
+
+    for entry in sys.meta_path:
+        module = sys.modules.get(getattr(entry, "__module__", "") or "")
+        mapping = getattr(module, "MAPPING", None)
+        if not isinstance(mapping, dict):
+            continue
+        root = mapping.get("vaporock")
+        if not root:
+            continue
+        path = Path(root) / "data" / "JANAF-vapor-data-full.csv"
+        if path.is_file():
+            return path
+    try:
+        import importlib.util
+
+        spec = importlib.util.find_spec("vaporock.equil")
+    except Exception:  # noqa: BLE001 - optional engine import boundary
+        spec = None
+    origin = getattr(spec, "origin", None)
+    if not origin:
+        return None
+    path = Path(origin).resolve().parent / "data" / "JANAF-vapor-data-full.csv"
+    return path if path.is_file() else None
+
+
+def _janaf_vapor_rows() -> dict[str, tuple[dict[str, str], ...]]:
+    """Installed vapor-table rows keyed by species name. Empty if unreadable."""
+
+    cached = getattr(_janaf_vapor_rows, "_rows", None)
+    if cached is not None:
+        return cached
+    path = _installed_janaf_vapor_csv()
+    grouped: dict[str, list[dict[str, str]]] = defaultdict(list)
+    if path is not None:
+        with path.open(newline="", encoding="utf-8") as handle:
+            for row in csv.DictReader(handle):
+                grouped[row["species_name"]].append(dict(row))
+    cached = {name: tuple(rows) for name, rows in grouped.items()}
+    setattr(_janaf_vapor_rows, "_rows", cached)
+    return cached
+
+
+def vaporock_gas_has_one_coefficient_row(
+    species_name: str,
+    temperatures_K: Iterable[Decimal],
+) -> bool:
+    """True when one temperature sits in exactly one installed coefficient row.
+
+    Species absent from the loaded table is false. The caller leaves those
+    rows unmapped so they keep the missing-basis refusal.
+    """
+
+    rows = _janaf_vapor_rows().get(species_name)
+    if not rows:
+        return False
+    for temperature_K in temperatures_K:
+        temperature = float(temperature_K)
+        hits = sum(1 for row in rows if _janaf_row_contains(temperature, row))
+        if hits == 1:
+            return True
+    return False
+
+
+def formula_is_ellingham_oxide_product(formula: str) -> bool:
+    """True when the formula's composition is a parsed Ellingham oxide product.
+
+    Same composition parser the formation attempt uses. A string spelling
+    that does not parse is not a match.
+    """
+
+    _, _, _, parse_species_formula = _score_predicates()
+    target = parse_species_formula(formula)
+    if target is None:
+        return False
+    return target in _ellingham_product_compositions(parse_species_formula)
+
+
+def _ellingham_product_compositions(parse_species_formula) -> frozenset:
+    cached = getattr(_ellingham_product_compositions, "_value", None)
+    if cached is None:
+        found = []
+        for segments in ELLINGHAM_FIT_SEGMENTS.values():
+            for segment in segments:
+                product = _parse_product(segment)
+                if product is None:
+                    continue
+                parsed = parse_species_formula(product.formula)
+                if parsed is not None and parsed not in found:
+                    found.append(parsed)
+        cached = frozenset(found)
+        setattr(_ellingham_product_compositions, "_value", cached)
+    return cached
+
+
 def _phase_compatible(product: _Product, identity: Identity) -> bool:
     if phase_token(identity.species) is not product.phase:
         return False
@@ -576,8 +691,9 @@ def _ellingham_attempt(
     # print another ideal-gas standard pressure. Its explicit formation
     # reaction supplies Δν_g, normalized below to the identity's declared
     # molar basis. Algebra: ΔfG°(p2)-ΔfG°(p1) = Δν_g R T ln(p2/p1).
-    # log10 Kf is recomputed from that shifted ΔfG. S°_gas(p2)-S°_gas(p1)
-    # = -R ln(p2/p1) (this attempt emits no entropy). Unit check: R·T is
+    # log10 Kf is recomputed from that shifted ΔfG. The one-mole entropy
+    # form of the same ln is ideal_gas_entropy_pressure_shift_J_per_mol_K;
+    # this attempt emits no entropy. Unit check: R·T is
     # J/mol, divided by 1000 gives kJ/mol; the log shift is dimensionless.
     # Sanity: CaO from Ca(s)+½O2(g)→CaO(cr) has Δν_g=-½, so at 1000 K
     # and 1 atm the ΔfG shift is -½·8.314·1000·ln(1.01325) ≈ -54.7 J/mol.
@@ -1029,6 +1145,40 @@ def _pure_phase_attempt(
     )
 
 
+def _janaf_catalog_standard_pressure_Pa() -> Decimal | None:
+    """Published JANAF p° from the generator that writes the catalog identity.
+
+    None when that constant cannot be read. Callers refuse rather than
+    substitute another 1 bar literal.
+    """
+
+    try:
+        from simulator.battery.generators.janaf import STANDARD_PRESSURE_PA
+    except Exception:  # noqa: BLE001 - catalog constant may be unimportable
+        return None
+    if isinstance(STANDARD_PRESSURE_PA, Decimal) and STANDARD_PRESSURE_PA > 0:
+        return STANDARD_PRESSURE_PA
+    return None
+
+
+def _printed_entropy_shift(identity: Identity) -> tuple[Decimal | None, str | None]:
+    """Catalog S moved onto the observation pressure, or a refusal detail."""
+
+    catalog_pressure = _janaf_catalog_standard_pressure_Pa()
+    if catalog_pressure is None:
+        return None, "janaf-catalog-standard-pressure-unknown"
+    printed = identity.standard_pressure_Pa
+    if not isinstance(printed, State) or not printed.is_value or printed.value is None:
+        return None, "standard-pressure-unknown"
+    printed_pressure = as_decimal(printed.value)
+    if printed_pressure <= 0:
+        return None, "standard-pressure-transform-pressure-nonpositive"
+    return (
+        ideal_gas_entropy_pressure_shift_J_per_mol_K(catalog_pressure, printed_pressure),
+        None,
+    )
+
+
 def _vaporock_gas_attempt(
     identity: Identity,
     quantity: Quantity,
@@ -1133,9 +1283,7 @@ def _vaporock_gas_attempt(
     )
     temperature = float(temperature_K)
     matching_rows = tuple(
-        row
-        for row in table_rows
-        if temperature > float(row["T_min"]) and temperature <= float(row["T_max"])
+        row for row in table_rows if _janaf_row_contains(temperature, row)
     )
     if not matching_rows:
         return _refuse(
@@ -1177,6 +1325,12 @@ def _vaporock_gas_attempt(
                 + row["E"] / t**2
             )
         elif quantity is Quantity.S:
+            # Catalog S is the JANAF 1 bar value. The shift to the
+            # observation's printed pressure is
+            # ideal_gas_entropy_pressure_shift_J_per_mol_K:
+            # dS = −R dln p at fixed T, so S°(p2) = S°(p1) − R ln(p2/p1),
+            # J/mol/K, with p2/p1 dimensionless. Cp and H−H298 are left on
+            # this raw value: for an ideal gas both depend only on T.
             raw = vapor._janaf_S(temperature, row)
         else:
             raw = vapor._janaf_dH(temperature, row) - row["H"]
@@ -1199,6 +1353,32 @@ def _vaporock_gas_attempt(
             extra={"engine": Engine.VAPOROCK.value},
             call_evidence=call_evidence,
         )
+    if quantity is Quantity.S:
+        shift, why = _printed_entropy_shift(identity)
+        if shift is None:
+            reason = (
+                RefusalReason.ATTEMPTED_UNAVAILABLE
+                if why == "janaf-catalog-standard-pressure-unknown"
+                else RefusalReason.IDENTITY_UNKNOWN
+            )
+            return _refuse(
+                reason,
+                why or "standard-pressure-unknown",
+                quantity=quantity,
+                origin=origin,
+                extra={"engine": Engine.VAPOROCK.value},
+                call_evidence=call_evidence,
+            )
+        value = value + shift
+        if not value.is_finite():
+            return _refuse(
+                RefusalReason.METRIC_DOMAIN,
+                "nonfinite-engine-value",
+                quantity=quantity,
+                origin=origin,
+                extra={"engine": Engine.VAPOROCK.value},
+                call_evidence=call_evidence,
+            )
     return ThermoAttempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],
