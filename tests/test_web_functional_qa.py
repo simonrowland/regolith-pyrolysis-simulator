@@ -402,47 +402,37 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     )
 
     stage_collection = sim._stage_collection_kg_by_source
-    assert story["glass"]["species_kg"] == {
-        species: round(sum(
-            mass
-            for (account, stage, routed_species), mass in stage_collection.items()
-            if account == "process.condensation_train"
-            and stage == 3
-            and routed_species == species
-        ), 2)
-        for species in {"SiO", "SiO2"}
-        if any(
-            account == "process.condensation_train"
-            and stage == 3
-            and routed_species == species
-            and mass > 0
-            for (account, stage, routed_species), mass in stage_collection.items()
-        )
-    }
-    assert story["captured_volatiles"]["species_kg"] == {
-        species: round(sum(
-            mass
-            for (account, stage, routed_species), mass in stage_collection.items()
-            if account == "process.condensation_train"
-            and stage == 4
-            and routed_species == species
-        ), 2)
-        for species in {"Na", "K", "Mg"}
-        if any(
-            account == "process.condensation_train"
-            and stage == 4
-            and routed_species == species
-            and mass > 0
-            for (account, stage, routed_species), mass in stage_collection.items()
-        )
-    }
+    # _product_story_bucket omits positive species that display as 0.00 kg.
+    def _rounded_stage_species_kg(stage_number, allowed_species):
+        species_kg = {}
+        for (account, stage, species), mass in stage_collection.items():
+            if (
+                account == "process.condensation_train"
+                and stage == stage_number
+                and species in allowed_species
+                and mass > 0
+            ):
+                species_kg[species] = species_kg.get(species, 0.0) + mass
+        return {
+            species: round(mass, 2)
+            for species, mass in species_kg.items()
+            if round(mass, 2) != 0.0
+        }
+
+    assert story["glass"]["species_kg"] == _rounded_stage_species_kg(
+        3, {"SiO", "SiO2"}
+    )
+    assert story["captured_volatiles"]["species_kg"] == (
+        _rounded_stage_species_kg(4, {"Na", "K", "Mg"})
+    )
     assert story["escaped_to_vacuum"]["species_kg"] == {
         species: round(mass, 2)
-        for species, mass in sim.atom_ledger.project_account_kg(
-            "terminal.offgas"
-        ).items()
-        if mass > 0
+        for species, mass in offgas_kg.items()
+        if mass > 0 and round(mass, 2) != 0.0
     }
+    assert story["escaped_to_vacuum"]["class_total_kg"] == round(
+        sum(offgas_kg.values()), 2
+    )
     rump = sim._terminal_rump_by_species()
     assert story["refractory_ceramic"]["species_kg"] == {
         species: round(mass, 2)
