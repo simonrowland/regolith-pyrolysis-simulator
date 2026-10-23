@@ -3,6 +3,8 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
+import yaml
+
 from simulator.battery.enums import Quantity
 from simulator.battery.identity import quantity_token
 from tests.battery.test_migrate import _migrate_real_extract
@@ -20,6 +22,28 @@ TABLE9_PARENTS = (
     "rys_2007_table9_eutectic",
     "rys_2007_table9_structure_change",
 )
+
+
+def _printed_points(parents: tuple[str, ...]) -> int:
+    document = yaml.safe_load(
+        (
+            Path(__file__).resolve().parents[2]
+            / "data"
+            / "literature"
+            / "extracts"
+            / EXTRACT
+        ).read_text(encoding="utf-8")
+    )
+    count = 0
+    for body in (document.get("species") or {}).values():
+        if not isinstance(body, dict):
+            continue
+        for observation in body.get("observations") or []:
+            if observation.get("observation_id") not in parents:
+                continue
+            points = (observation.get("values") or {}).get("points") or []
+            count += len(points)
+    return count
 
 
 def _rows(result, parents: tuple[str, ...]):
@@ -50,7 +74,7 @@ def test_rys_tables_7_and_9_thermal_cells_migrate_with_composition_and_locators(
     table7 = _rows(result, TABLE7_PARENTS)
     table9 = _rows(result, TABLE9_PARENTS)
 
-    assert len(table7) == 60
+    assert len(table7) == _printed_points(TABLE7_PARENTS)
     assert len(table9) == 13
     assert len(table7) + len(table9) == 73
     assert all(quantity_token(row.identity) is Quantity.TRANSITION_TEMPERATURE for row in table7 + table9)
