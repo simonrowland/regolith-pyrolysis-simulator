@@ -2515,6 +2515,9 @@ def test_feedstock_context_preserves_custom_search_schema_and_binds_admission(mo
 
 # Keep b151 parent expectations visible while owner-ruled value moves are classified.
 def test_c2a_staged_stage_gas_knobs_validate_and_render_b151() -> None:
+    # d-203/d-209, approved pressure stack d-254: retain exact pins against
+    # the live controls (1d8018fbd), d-215 sweep and d-231 derived hardware.
+    # Fresh production values: reconcile-evidence/recipe-values.log.
     schema = RecipeSchema()
     search_paths = {spec.path for spec in schema.search_allowlist}
 
@@ -2528,7 +2531,7 @@ def test_c2a_staged_stage_gas_knobs_validate_and_render_b151() -> None:
     mode_spec = schema.spec_for(STAGE_SIO_GAS_MODE)
     assert po2_spec.low == pytest.approx(0.0)
     assert po2_spec.high == pytest.approx(15.0)
-    assert total_spec.low == pytest.approx(5.0)
+    assert total_spec.low == pytest.approx(0.1)
     assert total_spec.high == pytest.approx(15.0)
     assert mode_spec.choices == ("pn2_sweep", "po2_hold")
 
@@ -2552,6 +2555,9 @@ def test_c2a_staged_stage_gas_knobs_validate_and_render_b151() -> None:
 
 
 def test_c2a_staged_stage_gas_knobs_fail_loudly_b151() -> None:
+    # d-203/d-209, approved pressure stack d-254: retain exact pins against
+    # the live controls (1d8018fbd), d-215 sweep and d-231 derived hardware.
+    # Fresh production values: reconcile-evidence/recipe-values.log.
     schema = RecipeSchema()
 
     with pytest.raises(
@@ -2563,7 +2569,7 @@ def test_c2a_staged_stage_gas_knobs_fail_loudly_b151() -> None:
         RecipeValidationError,
         match=r"campaigns\.C2A_staged\.stages\.sio_window\.p_total_mbar",
     ):
-        RecipePatch({STAGE_SIO_PTOTAL: 4.9}).validated(schema)
+        RecipePatch({STAGE_SIO_PTOTAL: 0.0}).validated(schema)
     with pytest.raises(
         RecipeValidationError,
         match=r"campaigns\.C2A_staged\.stages\.sio_window\.pN2_mbar",
@@ -2585,6 +2591,9 @@ def test_c2a_staged_stage_gas_knobs_fail_loudly_b151() -> None:
 
 
 def test_recipe_schema_setpoint_bounds_match_golden_pin_b151() -> None:
+    # d-203/d-209, approved pressure stack d-254: retain exact pins against
+    # the live controls (1d8018fbd), d-215 sweep and d-231 derived hardware.
+    # Fresh production values: reconcile-evidence/recipe-values.log.
     expected = {
         "campaigns.C0.temp_range_C": (20, 950),
         "campaigns.C0b_p_cleanup.temp_range_C": (1180, 1320),
@@ -2594,16 +2603,8 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin_b151() -> None:
         "campaigns.C0b_p_cleanup.duration_hr": (0.5, 2.5),
         "campaigns.C2A_continuous.temp_range_C": (1050, 1843),
         "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C": (10, 20),
-        "campaigns.C2A_continuous.p_total_mbar": (5, 15),
-        "campaigns.C2A_continuous.p_total_mbar_default": (5, 15),
         "campaigns.C2A_staged.temp_range_C": (1250, 1750),
         "campaigns.C2A_staged.default_hold_T_C": (1250, 1750),
-        "campaigns.C2A_staged.p_total_mbar": (5, 15),
-        "campaigns.C2A_staged.p_total_mbar_default": (5, 15),
-        "campaigns.C2A_staged.stages.alkali_early_fe.p_total_mbar": (5.0, 15.0),
-        "campaigns.C2A_staged.stages.sio_window.p_total_mbar": (5.0, 15.0),
-        "campaigns.C2A_staged.stages.fe_hot_hold.p_total_mbar": (5.0, 15.0),
-        "campaigns.C2A_staged.stages.cool_for_na_shuttle.p_total_mbar": (5.0, 15.0),
         "campaigns.C2B.temp_range_C": (1320, 1480),
         "campaigns.C2B.pO2_mbar": (0.8, 2.3),
         "campaigns.C2B.pO2_mbar_default": (0.8, 2.3),
@@ -2626,9 +2627,7 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin_b151() -> None:
         "campaigns.C5.p_total_mbar_default": (10, 100),
         "campaigns.C6.temp_range_C": (1380, 1450),
         "campaigns.C6.default_hold_T_C": (1380, 1450),
-        "campaigns.C6.pO2_mbar": (0.08, 0.35),
-        "campaigns.C6.pO2_mbar_default": (0.08, 0.35),
-        "campaigns.C6.p_total_mbar_default": (0.08, 0.35),
+        "campaigns.C6.p_total_mbar_default": (5, 15),
     }
     schema = RecipeSchema()
     actual = {
@@ -2645,7 +2644,7 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin_b151() -> None:
         )
     }
 
-    assert len(actual) == 43
+    assert len(actual) == 33
     assert actual == {
         path: (type(low), low, type(high), high)
         for path, (low, high) in expected.items()
@@ -2653,14 +2652,28 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin_b151() -> None:
 
 
 def test_knob_bounds_source_provenance_is_honest_b151() -> None:
+    # d-203/d-209, approved pressure stack d-254: retain exact pins against
+    # the live controls (1d8018fbd), d-215 sweep and d-231 derived hardware.
+    # Fresh production values: reconcile-evidence/recipe-values.log.
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
     range_sourced = 0
     converted_setpoint_ranges = 0
     engineering_envelopes = 0
     grounded_sources = 0
+    disabled_unbounded = 0
 
     for spec in RecipeSchema().allowlist:
-        if spec.bounds_source.startswith("setpoints:"):
+        # Categorical controls have choices rather than numeric bounds and
+        # retain their existing provenance checks.
+        if spec.kind != "categorical" and spec.high is None:
+            assert spec.search_enabled is False, (
+                f"{'.'.join(spec.path)} unbounded numeric control must be search disabled"
+            )
+            assert spec.bounds_source.startswith("search disabled:") and re.search(
+                r"\b[tbd]-[0-9]+\b", spec.bounds_source,
+            ), f"{'.'.join(spec.path)} requires a ticketed disabling reason"
+            disabled_unbounded += 1
+        elif spec.bounds_source.startswith("setpoints:"):
             yaml_path = spec.bounds_source.removeprefix("setpoints:")
             yaml_value = _lookup_setpoint(setpoints, yaml_path)
             assert isinstance(yaml_value, list), (
@@ -2709,15 +2722,19 @@ def test_knob_bounds_source_provenance_is_honest_b151() -> None:
         + converted_setpoint_ranges
         + engineering_envelopes
         + grounded_sources
+        + disabled_unbounded
         == len(RecipeSchema().allowlist)
     )
-    assert range_sourced == 41
+    assert range_sourced == 31
     assert converted_setpoint_ranges == 2
     assert engineering_envelopes > 0
     assert grounded_sources > 0
 
 
 def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves_b151() -> None:
+    # d-203/d-209, approved pressure stack d-254: retain exact pins against
+    # the live controls (1d8018fbd), d-215 sweep and d-231 derived hardware.
+    # Fresh production values: reconcile-evidence/recipe-values.log.
     schema = RecipeSchema()
     empty = RecipePatch({})
     assert empty.canonical_json().encode() == b"[]"
@@ -2746,17 +2763,21 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves_b151() -> N
     #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
-    # Recomputed 2026-10-22 (t-1441 stirring labels): 4 description strings
-    # changed, no values. Paths: campaigns.C2A_continuous.adaptive_control.
-    # induction_stirring; endpoint_criteria.control.surface_renewal;
-    # endpoint_criteria.general; furnace.induction_stirring.note.
+    # d-210/d-231: C6 Kr default/floor metadata and removal of fixed throats.
+    # Merge b151 t-1441: also retain its four stirring description changes.
+    # Recomputed from the combined production-resolved setpoints; no numeric
+    # setpoint or pressure/film expectation is changed to resolve this digest.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "6e96c06bd07493a6db66db50de75fc9599b8a0353c5d08ae37d68f09ec90ccb6"
+        "dfcc5ab93969b1f5e0ae0be4bba7d10906d657c050d2f192e0143cbf2aa9c034"
     )
+    # d-215: regenerated with the production schema/search identity producers;
+    # sweep is now area-normalized, and the Mars fallback is resolved setpoints data.
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
+    # d-209: recomputed from RecipeSchema after separating physical admission
+    # from the C2A engineering search envelope [0.1, 15] mbar.
     assert schema.bounds_digest == (
-        "21c0c4905a878d30051332ef69cc25cbd395a52ed5fd0f9a68484280efa7e0dc"
+        "7f730e1f827a3a022c4e2a33149055f874e63401d1e3bad5917c2ff6ce4c6d28"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -2765,7 +2786,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves_b151() -> N
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
     # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
     assert empty.recipe_id(schema) == (
-        "be70d44b9d30688788e535c9e84b42d51111956487b2b7e962deb1a70790d95e"
+        "fb920946810c1eba8ad512f857d49485896b5bd3e776e831cedfc09ed7f0730f"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -2778,7 +2799,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves_b151() -> N
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "0cfae3821a514712c36151ca997fd5d9381191deeccca66ceb807628e179b160"
+        "5b5eb7cfd5a7a630f906eb1fe8d4cf3d453ee66a7759695dfbb1bd816aed9fdd"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -2792,6 +2813,9 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves_b151() -> N
 
 
 def test_pinned_c2a_temperature_targets_leave_other_knobs_searchable_b151() -> None:
+    # d-203/d-209, approved pressure stack d-254: retain exact pins against
+    # the live controls (1d8018fbd), d-215 sweep and d-231 derived hardware.
+    # Fresh production values: reconcile-evidence/recipe-values.log.
     target_paths = (
         ("campaigns", "C2A_staged", "stages", "alkali_early_fe", "target_C"),
         ("campaigns", "C2A_staged", "stages", "sio_window", "target_C"),
@@ -2811,7 +2835,7 @@ def test_pinned_c2a_temperature_targets_leave_other_knobs_searchable_b151() -> N
         spec = schema.spec_for(path)
         assert spec.search_enabled is False
         assert spec.runtime_enabled is True
-    assert ("campaigns", "C2A_staged", "p_total_mbar") in search_paths
+    assert ("campaigns", "C2A_staged", "stages", "alkali_early_fe", "p_total_mbar") in search_paths
     assert (
         "campaigns",
         "C2A_staged",
@@ -2837,6 +2861,9 @@ def test_pinned_c2a_temperature_targets_leave_other_knobs_searchable_b151() -> N
 
 
 def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash_b151() -> None:
+    # d-203/d-209, approved pressure stack d-254: retain exact pins against
+    # the live controls (1d8018fbd), d-215 sweep and d-231 derived hardware.
+    # Fresh production values: reconcile-evidence/recipe-values.log.
     profile = {
         "profile_id": "pin-golden-neutral-test",
         "profile_schema_version": "profile-schema-v1",
@@ -2870,10 +2897,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash_b151() -> 
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
     assert unpinned is schema
-    assert len(paths) == 65
+    assert len(paths) == 59
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
+        == "9e8932d384c7dbcb1a17aab3d3066f820b5fc99c098116d82a29d65bdd8c1817"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -2993,6 +3020,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash_b151() -> 
 
 
 def test_nested_yaml_round_trip_and_setpoints_patch_smoke_b151() -> None:
+    # d-203/d-209, approved pressure stack d-254: retain exact pins against
+    # the live controls (1d8018fbd), d-215 sweep and d-231 derived hardware.
+    # Fresh production values: reconcile-evidence/recipe-values.log.
     patch = RecipePatch(
         {
             PO2_DEFAULT: 10.0,
@@ -3009,19 +3039,20 @@ def test_nested_yaml_round_trip_and_setpoints_patch_smoke_b151() -> None:
     assert loaded_patch.values[PTOTAL_DEFAULT] == pytest.approx(10.0)
     assert loaded_patch.values[
         ("campaigns", "C2A_continuous", "duration_hr")
-    ] == [20, 24]
+    ] == 24
 
     run = PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch=nested)
     config = run._session_config()
     assert config.setpoints["campaigns"]["C0b_p_cleanup"]["pO2_mbar_default"] == 10.0
     assert config.setpoints["campaigns"]["C0b_p_cleanup"]["p_total_mbar_default"] == 10.0
-    assert config.setpoints["campaigns"]["C2A_continuous"]["duration_h"] == [
-        20,
-        24,
-    ]
+    assert config.setpoints["campaigns"]["C2A_continuous"]["duration_h"] == 24
+    assert CampaignManager(config.setpoints)._max_hold_hr(CampaignPhase.C2A) == 24
 
 
 def test_recipe_id_is_stable_and_schema_versioned_b151() -> None:
+    # d-203/d-209, approved pressure stack d-254: retain exact pins against
+    # the live controls (1d8018fbd), d-215 sweep and d-231 derived hardware.
+    # Fresh production values: reconcile-evidence/recipe-values.log.
     first = RecipePatch({PO2_DEFAULT: 9.0}).validated()
     second = RecipePatch.from_nested(
         {"campaigns": {"C0b_p_cleanup": {"pO2_mbar_default": 9.0}}}
@@ -3039,9 +3070,10 @@ def test_recipe_id_is_stable_and_schema_versioned_b151() -> None:
     # difference between two moving numbers, written down as a constant, goes
     # stale every time either moves. It is now evaluated, not pinned. Recomputed
     # 2026-09-29 for C2 loader-scalar pressure coupling.
+    # d-209: regenerated by RecipePatch.recipe_id for the new sampling bounds.
     assert (
         first.recipe_id()
-                == "cb77c9b93e43903f3820c491df51dce7a7a3d4f8784d9b55121f64906bca7b6d"
+                == "3bea2029b9622d8613081a00e49039dcc2f311b226245cd128c84191fecdffad"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
