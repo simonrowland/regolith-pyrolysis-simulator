@@ -9891,7 +9891,26 @@ def _selection_from_named_field(
         for key, unit in _PRESSURE_SERIES_KEYS:
             if key not in payload:
                 continue
-            val, trail = convert_pressure_to_pa(payload.get(key), unit)
+            raw_pressure = payload.get(key)
+            if (
+                isinstance(raw_pressure, Mapping)
+                and raw_pressure.get("kind") == "interval"
+            ):
+                low, low_trail = convert_pressure_to_pa(
+                    raw_pressure.get("interval_low"), unit
+                )
+                high, high_trail = convert_pressure_to_pa(
+                    raw_pressure.get("interval_high"), unit
+                )
+                if low is not None and high is not None:
+                    return _interval_selection(
+                        low, high, key, payload, condition_ranges,
+                        f"{low_trail}; {high_trail}",
+                    )
+                trail = low_trail or high_trail
+                val = None
+            else:
+                val, trail = convert_pressure_to_pa(raw_pressure, unit)
             if val is not None:
                 return _point_selection(
                     val, key, trail or "identity", payload, condition_ranges
@@ -18934,7 +18953,10 @@ class Migrator:
             EvidenceClass.MEASURED_REDUCED,
         }:
             return
-        if not derived_from:
+        has_grounded_unprinted_inputs = (
+            derivation is not None and derivation.has_located_unprinted_raw_inputs
+        )
+        if not derived_from and not has_grounded_unprinted_inputs:
             self.result.add_queue(
                 work_id,
                 locator,

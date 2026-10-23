@@ -2428,15 +2428,21 @@ def test_recovered_qualitative_sequences_cannot_become_numeric_rates():
 
 
 def test_stolyarova_wilson_numbers_are_gibbs_model_parameters_only():
-    observation = _repo_observation(
-        "kems-016-stolyarova-1992.yaml",
-        "stolyarova_1992_binary_wilson_model_parameters_table2",
+    extract = load_cached_safe_yaml(
+        (EXTRACTS / "kems-016-stolyarova-1992.yaml").read_text()
+    )
+    observation = next(
+        context
+        for species in extract["species"].values()
+        for context in species.get("context", [])
+        if context["observation_id"]
+        == "stolyarova_1992_binary_wilson_model_parameters_table2"
     )
     al_si = next(
         row for row in observation["values"]["parameters"]
         if row["system"] == "Al2O3-SiO2"
     )
-    assert observation["type"] == "gibbs_table"
+    assert observation["type"] == "printed_table_context"
     assert observation["values"]["evidence_class"] == "thermodynamic_model_parameter"
     assert observation["values"]["activity_pin_eligible"] is False
     assert al_si["l210"] == 316.3

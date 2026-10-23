@@ -14,6 +14,7 @@ extraction:
 review_status: draft
 species:
   SiO2:
+    observations: []
     context:
     - observation_id: stolyarova_1992_silicate_kems_geometry_activities
       type: method
@@ -23,9 +24,9 @@ species:
       T_range_K:
       - 1300.0
       - 1973.0
-      phase: multicomponent_silicate_melt
+      phase: l
       standard_state: oxide activities via Belton-Fruehan / comparison method (Ag, Au standards)
-      regime: kems_effusion
+      regime: knudsen_effusion
       units: as published (activities; Gibbs energies kcal/mol in tables)
       values:
         quantity: multicomponent_silicate_KEMS_activities_geometry
@@ -89,9 +90,8 @@ species:
           locator:
             paragraph: Vaporization from platinum, molybdenum and tungsten effusion cells
             line_range: '17'
-    observations:
     - observation_id: stolyarova_1992_gibbs_cas_and_fcm_table1
-      type: gibbs_table
+      type: printed_table_context
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
         repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
@@ -99,11 +99,8 @@ species:
         page: PDF p. 2 / printed p. 186
         line_range: 27-45
         paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
-      T_range_K:
-      - 1833.0
-      - 1933.0
-      phase: multicomponent_silicate_melt_CAS_CMAS_FCMAS
-      regime: kems_effusion
+      phase: l
+      regime: knudsen_effusion
       units: kcal/mol (−ΔG as published)
       values:
         quantity: minus_delta_G_melt_experimental_HTMS
@@ -170,6 +167,7 @@ species:
           minus_delta_G_wilson: null
         co_measurement_note: Each −ΔG_exp is from simultaneous multicomponent KEMS activities on one melt
           composition; partial pressures not published as species-resolved series in this paper.
+        first_CAS_minus_delta_G_exp_kcal_mol: 8.3
       equipment:
         cell_material:
           value: Pt, Mo, W (system-dependent)
@@ -177,7 +175,7 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
             line_range: '17'
     - observation_id: stolyarova_1992_binary_wilson_model_parameters_table2
-      type: gibbs_table
+      type: printed_table_context
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
         table: '2'
@@ -186,7 +184,7 @@ species:
       T_range_K:
       - 1300.0
       - 1900.0
-      phase: binary_oxide_silicate_melts
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -251,12 +249,14 @@ species:
           l120: 47.1
           l21: -36.0
           l210: 55.9
+        Al2O3_SiO2_l210_kcal_mol_as_printed: 316.3
       uncertainty:
         note: Table values are published model coefficients; no measurement uncertainty is assigned.
   Fe:
-    observations:
+    observations: []
+    context:
     - observation_id: stolyarova_1992_fe_bearing_melt_activity_context
-      type: activity_coefficient
+      type: printed_table_context
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
         paragraph: CaO-Al2O3-SiO2-FeO-MgO melts studied; oxide activities
@@ -264,8 +264,8 @@ species:
       T_range_K:
       - 1300.0
       - 1973.0
-      phase: multicomponent_silicate_melt
-      regime: kems_effusion
+      phase: l
+      regime: knudsen_effusion
       units: as published
       values:
         quantity: FeO_bearing_multicomponent_system_studied
@@ -284,9 +284,10 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
             line_range: 17-19
   Mg:
-    observations:
+    observations: []
+    context:
     - observation_id: stolyarova_1992_mg_bearing_melt_activity_context
-      type: activity_coefficient
+      type: printed_table_context
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
         paragraph: systems containing MgO among multi-oxide melts
@@ -294,8 +295,8 @@ species:
       T_range_K:
       - 1300.0
       - 1973.0
-      phase: multicomponent_silicate_melt
-      regime: kems_effusion
+      phase: l
+      regime: knudsen_effusion
       units: as published
       values:
         quantity: MgO_bearing_multicomponent_system_studied
@@ -313,9 +314,10 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
             line_range: '17'
   Na:
-    observations:
+    observations: []
+    context:
     - observation_id: stolyarova_1992_na2o_k2o_sio2_gibbs_table3
-      type: gibbs_table
+      type: printed_table_context
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
         table: '3'
@@ -324,8 +326,8 @@ species:
       T_range_K:
       - 1300.0
       - 1300.0
-      phase: silicate_melt_Na2O_K2O_SiO2
-      regime: kems_effusion
+      phase: l
+      regime: knudsen_effusion
       units: kcal/mol (−ΔG)
       values:
         quantity: minus_delta_G_NKS_melts
@@ -363,7 +365,7 @@ species:
           minus_delta_G_exp_kcal_mol: 11.6
           minus_delta_G_wilson: 24.7
     - observation_id: stolyarova_1992_na2o_chemical_potential_nbs_table4
-      type: gibbs_table
+      type: printed_table_context
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
         table: '4'
@@ -372,8 +374,8 @@ species:
       T_range_K:
       - 1273.0
       - 1273.0
-      phase: silicate_melt_Na2O_B2O3_SiO2
-      regime: kems_effusion
+      phase: l
+      regime: knudsen_effusion
       units: kcal/mol (chemical potential of Na2O)
       values:
         quantity: chemical_potential_Na2O
@@ -396,10 +398,12 @@ species:
         - x_Na2O: 0.09
           mu_Na2O_wilson_kcal_mol: 83.0
           mu_Na2O_exp_kcal_mol: 80.0
+        first_mu_Na2O_exp_kcal_mol: 56.0
   K:
-    observations:
+    observations: []
+    context:
     - observation_id: stolyarova_1992_k2o_in_nks_gibbs_table3
-      type: gibbs_table
+      type: printed_table_context
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
         table: '3'
@@ -407,8 +411,8 @@ species:
       T_range_K:
       - 1300.0
       - 1300.0
-      phase: silicate_melt_Na2O_K2O_SiO2
-      regime: kems_effusion
+      phase: l
+      regime: knudsen_effusion
       units: kcal/mol
       values:
         quantity: K2O_component_of_NKS_gibbs_table3
@@ -416,9 +420,10 @@ species:
         linked_observation: stolyarova_1992_na2o_k2o_sio2_gibbs_table3
         note: Same Table 3 compositions include K2O; no separate K partial-pressure series
   Ca:
-    observations:
+    observations: []
+    context:
     - observation_id: stolyarova_1992_cao_cas_gibbs_table1
-      type: gibbs_table
+      type: printed_table_context
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
         table: '1'
@@ -426,8 +431,8 @@ species:
       T_range_K:
       - 1933.0
       - 1933.0
-      phase: silicate_melt_CAS
-      regime: kems_effusion
+      phase: l
+      regime: knudsen_effusion
       units: kcal/mol
       values:
         quantity: CaO_component_CAS_multicomponent_gibbs
@@ -444,9 +449,10 @@ species:
         - CaAlO+
         - CaAl+
   Al:
-    observations:
+    observations: []
+    context:
     - observation_id: stolyarova_1992_al_cas_vapor_ions_and_gibbs
-      type: rate_series
+      type: printed_table_context
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
         line_range: '19'
@@ -454,8 +460,8 @@ species:
       T_range_K:
       - 1300.0
       - 1973.0
-      phase: silicate_melt_CAS
-      regime: kems_effusion
+      phase: l
+      regime: knudsen_effusion
       units: as published
       values:
         quantity: associated_vapor_ions_observed_Mo_cell
@@ -475,7 +481,10 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
             line_range: '19'
 fidelity_samples:
-- path: species.SiO2.observations[stolyarova_1992_gibbs_cas_and_fcm_table1].values.points[0].minus_delta_G_exp_kcal_mol
+- species: SiO2
+  observable: printed_table_context
+  observation_id: stolyarova_1992_gibbs_cas_and_fcm_table1
+  field: first_CAS_minus_delta_G_exp_kcal_mol
   value: 8.3
   note: 'Table 1: CAS 0.50:0.43:0.07 at 1933 K −ΔG_exp = 8.3 kcal/mol'
   locator:
@@ -494,13 +503,19 @@ fidelity_samples:
   locator:
     section: 2. Experimental procedures
     line_range: '17'
-- path: species.Na.observations[stolyarova_1992_na2o_chemical_potential_nbs_table4].values.points[0].mu_Na2O_exp_kcal_mol
+- species: Na
+  observable: printed_table_context
+  observation_id: stolyarova_1992_na2o_chemical_potential_nbs_table4
+  field: first_mu_Na2O_exp_kcal_mol
   value: 56.0
   note: 'Table 4: μ(Na2O) exp at x=0.44 is 56.0 kcal/mol'
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
     table: '4'
-- path: species.SiO2.observations[stolyarova_1992_binary_wilson_model_parameters_table2].values.parameters[5].l210
+- species: SiO2
+  observable: printed_table_context
+  observation_id: stolyarova_1992_binary_wilson_model_parameters_table2
+  field: Al2O3_SiO2_l210_kcal_mol_as_printed
   value: 316.3
   note: 'Table 2: Al2O3-SiO2 Wilson l210 = 316.3 kcal/mol'
   locator:
