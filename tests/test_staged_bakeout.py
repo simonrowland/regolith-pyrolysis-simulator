@@ -1,14 +1,24 @@
+import copy
+import math
 import shlex
 from dataclasses import replace
 from unittest.mock import patch
 
 import pytest
 
+from simulator.accounting.formulas import (
+    ATOMIC_WEIGHTS_G_PER_MOL,
+    resolve_species_formula,
+)
 from simulator.core import FERRIC_DIVERGENCE_WARNING_THRESHOLD
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.session_cli import SessionScriptRunner
 import simulator.session_cli as session_cli_module
 from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS, STOICH_RATIOS
+from simulator.transport_constants import (
+    FREE_MOLECULAR_KNUDSEN_MIN,
+    VISCOUS_KNUDSEN_MAX,
+)
 
 
 FEEDSTOCK = "lunar_mare_low_ti"
@@ -92,7 +102,11 @@ def _complete_recommended_path(
     return None
 
 
-def _run_staged(*, complete: bool = False):
+def _run_staged(
+    *,
+    complete: bool = False,
+    transport_diagnostics: list[tuple[int, dict]] | None = None,
+):
     runner = SessionScriptRunner()
     for line in [
         (
@@ -121,6 +135,45 @@ def _run_staged(*, complete: bool = False):
             ):
                 runner.execute(shlex.split(line), line)
         else:
+            if line.startswith("advance ") and transport_diagnostics is not None:
+                sim = runner.session._sim
+                original_step = sim.step
+
+                def instrumented_step():
+                    snapshot = original_step()
+                    diagnostic = getattr(
+                        sim,
+                        "_last_evaporation_flux_diagnostic",
+                        {},
+                    ) or {}
+                    transport_diagnostics.append((
+                        int(snapshot.hour),
+                        {
+                            "continuum_extrapolation_notice": copy.deepcopy(
+                                diagnostic.get("continuum_extrapolation_notice")
+                            ),
+                            "evaporation_series_resistance": {
+                                str(species): {
+                                    key: copy.deepcopy(item[key])
+                                    for key in (
+                                        "knudsen_number",
+                                        "gas_resistance_weight",
+                                        "continuum_extrapolation_notice",
+                                    )
+                                    if key in item
+                                }
+                                for species, item in (
+                                    diagnostic.get(
+                                        "evaporation_series_resistance", {}
+                                    ) or {}
+                                ).items()
+                                if isinstance(item, dict)
+                            },
+                        },
+                    ))
+                    return snapshot
+
+                sim.step = instrumented_step
             runner.execute(shlex.split(line), line)
     if complete:
         refusal = _complete_recommended_path(runner)
@@ -167,6 +220,126 @@ def _cumulative_transition_imbalance_kg(sim) -> float:
     )
 
 
+def _stage_product_composition_report(sim) -> dict[int, dict]:
+    """Report cation purity and free-Si / (free-Si + SiO2) per stage."""
+    report = {}
+    for stage in sim.train.stages:
+        element_mass_kg: dict[str, float] = {}
+        free_si_product_kg = 0.0
+        sio2_product_kg = 0.0
+
+        for species, raw_mass_kg in stage.collected_kg.items():
+            mass_kg = float(raw_mass_kg)
+            formula = resolve_species_formula(
+                str(species), sim.species_formula_registry
+            )
+            molar_mass_g_mol = float(formula.molar_mass_g_mol)
+            elements = formula.elements
+            species_element_mass_kg = {}
+            for element, count in elements.items():
+                element_mass = (
+                    mass_kg
+                    * float(count)
+                    * ATOMIC_WEIGHTS_G_PER_MOL[element]
+                    / molar_mass_g_mol
+                )
+                species_element_mass_kg[element] = element_mass
+                element_mass_kg[element] = (
+                    element_mass_kg.get(element, 0.0) + element_mass
+                )
+
+            if set(elements) == {"Si"}:
+                free_si_product_kg += mass_kg
+            if (
+                set(elements) == {"Si", "O"}
+                and math.isclose(float(elements["Si"]), 1.0)
+                and math.isclose(float(elements["O"]), 2.0)
+            ):
+                sio2_product_kg += mass_kg
+
+            assert sum(species_element_mass_kg.values()) == pytest.approx(
+                mass_kg, rel=1e-12, abs=1e-12
+            ), f"formula mass did not close for stage {stage.stage_number} {species}"
+
+        total_deposit_kg = sum(float(mass) for mass in stage.collected_kg.values())
+        total_cation_mass_kg = sum(
+            mass for element, mass in element_mass_kg.items() if element != "O"
+        )
+        si_cation_mass_kg = element_mass_kg.get("Si", 0.0)
+        non_si_cation_mass_kg = total_cation_mass_kg - si_cation_mass_kg
+        assert total_cation_mass_kg == pytest.approx(
+            si_cation_mass_kg + non_si_cation_mass_kg,
+            rel=1e-12,
+            abs=1e-12,
+        )
+        si_bearing_product_kg = free_si_product_kg + sio2_product_kg
+        report[int(stage.stage_number)] = {
+            "total_deposit_kg": total_deposit_kg,
+            "element_mass_kg_by_element": dict(sorted(element_mass_kg.items())),
+            "total_cation_mass_kg": total_cation_mass_kg,
+            "non_si_cation_mass_kg": non_si_cation_mass_kg,
+            "non_si_cation_mass_fraction": (
+                non_si_cation_mass_kg / total_cation_mass_kg
+                if total_cation_mass_kg > 0.0
+                else None
+            ),
+            "free_si_product_kg": free_si_product_kg,
+            "sio2_product_kg": sio2_product_kg,
+            "free_si_fraction_of_free_si_plus_sio2": (
+                free_si_product_kg / si_bearing_product_kg
+                if si_bearing_product_kg > 0.0
+                else None
+            ),
+        }
+
+    return report
+
+
+def _assert_transitional_kn_hours_are_flagged(
+    transport_diagnostics: list[tuple[int, dict]],
+) -> list[int]:
+    flagged_hours = []
+    for hour, diagnostic in transport_diagnostics:
+        series = diagnostic.get("evaporation_series_resistance", {}) or {}
+        transitional_species = []
+        for species, item in series.items():
+            if not isinstance(item, dict):
+                continue
+            knudsen_number = item.get("knudsen_number")
+            resistance_weight = item.get("gas_resistance_weight", 0.0)
+            if (
+                isinstance(knudsen_number, (int, float))
+                and not isinstance(knudsen_number, bool)
+                and isinstance(resistance_weight, (int, float))
+                and not isinstance(resistance_weight, bool)
+                and VISCOUS_KNUDSEN_MAX <= float(knudsen_number)
+                < FREE_MOLECULAR_KNUDSEN_MIN
+                and float(resistance_weight) > 0.0
+            ):
+                transitional_species.append((str(species), item))
+        if not transitional_species:
+            continue
+
+        flagged_hours.append(hour)
+        global_notice = diagnostic.get("continuum_extrapolation_notice")
+        for species, item in transitional_species:
+            notice = item.get("continuum_extrapolation_notice")
+            if not isinstance(notice, dict) and isinstance(global_notice, dict):
+                if species in global_notice.get("affected_species", ()):
+                    notice = global_notice
+            assert isinstance(notice, dict), (
+                f"transitional Kn at hour {hour} for {species} lacked a notice"
+            )
+            assert notice.get("status") == "extrapolated"
+            assert notice.get("authority_level") == "extrapolated"
+            assert notice.get("reason") == (
+                "viscous_p_bulk_transport_out_of_domain"
+            )
+
+    assert flagged_hours, "the staged path must reach transitional-Kn transport"
+    return flagged_hours
+
+
 def _staged_metrics(sim) -> tuple[float, ...]:
     products = sim.product_ledger()
     initial_fe = _fe_element_kg(sim.record.snapshots[0].inventory.raw_components_kg)
@@ -182,7 +355,12 @@ def _staged_metrics(sim) -> tuple[float, ...]:
 
 @pytest.fixture(scope="module")
 def staged_ceiling_case():
-    return _run_staged(complete=True)
+    transport_diagnostics = []
+    sim, refusal = _run_staged(
+        complete=True,
+        transport_diagnostics=transport_diagnostics,
+    )
+    return sim, refusal, transport_diagnostics
 
 
 # gate-2: module fixture advances the recommended staged path until the first
@@ -194,7 +372,7 @@ def staged_ceiling_case():
 def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
     staged_ceiling_case,
 ):
-    sim, refusal = staged_ceiling_case
+    sim, refusal, transport_diagnostics = staged_ceiling_case
     shuttle_fe = _metal_phase_fe_kg(sim)
     shuttle_snapshots = [
         s for s in sim.record.snapshots
@@ -218,6 +396,7 @@ def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
     assert max(s.temperature_C for s in shuttle_snapshots) < 1200.0
     assert _max_mass_balance_pct(sim) < MASS_BALANCE_MAX_PCT
     assert _cumulative_transition_imbalance_kg(sim) < 1e-6
+    assert _assert_transitional_kn_hours_are_flagged(transport_diagnostics)
 
 
 # Deleted 2026-07-24 (CI-audit finding 2): a strict-xfail test
@@ -243,6 +422,49 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     continuous_products = continuous.product_ledger()
     staged_sio_stage = first.train.stages[3].collected_kg
     continuous_sio_stage = continuous.train.stages[3].collected_kg
+    composition_report = _stage_product_composition_report(first)
+
+    assert set(composition_report) == {
+        int(stage.stage_number) for stage in first.train.stages
+    }
+    for stage in first.train.stages:
+        stage_report = composition_report[int(stage.stage_number)]
+        assert "non_si_cation_mass_fraction" in stage_report
+        assert "free_si_fraction_of_free_si_plus_sio2" in stage_report
+        assert sum(
+            stage_report["element_mass_kg_by_element"].values()
+        ) == pytest.approx(
+            stage_report["total_deposit_kg"], rel=1e-12, abs=1e-12
+        ), f"element mass did not close for stage {stage.stage_number}"
+        assert stage_report["total_deposit_kg"] == pytest.approx(
+            stage.total_collected_kg(), rel=1e-12, abs=1e-12
+        )
+        if stage_report["total_cation_mass_kg"] > 0.0:
+            fraction = stage_report["non_si_cation_mass_fraction"]
+            assert fraction is not None
+            assert fraction == pytest.approx(
+                stage_report["non_si_cation_mass_kg"]
+                / stage_report["total_cation_mass_kg"]
+            )
+            assert 0.0 <= fraction <= 1.0
+        if stage_report["free_si_product_kg"] + stage_report["sio2_product_kg"] > 0.0:
+            free_si_fraction = stage_report[
+                "free_si_fraction_of_free_si_plus_sio2"
+            ]
+            assert free_si_fraction is not None
+            assert free_si_fraction == pytest.approx(
+                stage_report["free_si_product_kg"]
+                / (
+                    stage_report["free_si_product_kg"]
+                    + stage_report["sio2_product_kg"]
+                )
+            )
+            assert 0.0 <= free_si_fraction <= 1.0
+
+    assert composition_report[3]["non_si_cation_mass_fraction"] is not None
+    assert composition_report[3][
+        "free_si_fraction_of_free_si_plus_sio2"
+    ] is not None
     staged_silica = staged_sio_stage.get("Si", 0.0) + staged_sio_stage.get(
         "SiO2", 0.0
     )
