@@ -69,6 +69,23 @@ def test_demaria_1971_table_pressures_match_rendered_cells_and_counts() -> None:
         assert "total_pressure_Pa" not in rows[oid].get("point_conditions", {})
 
 
+def test_demaria_1971_reduced_pressures_declare_unprinted_raw_inputs() -> None:
+    rows = _observations(yaml.safe_load(EXTRACT.read_text()))
+    reduced = (
+        "demaria_1971_mn_psat_table2_sample_12022",
+        "demaria_1971_cr_psat_table2_sample_12022",
+        "demaria_1971_mg_psat_table3_lunar_basalt",
+        "demaria_1971_al2o_psat_table4",
+        "demaria_1971_alo_psat_table4",
+    )
+    for observation_id in reduced:
+        raw_inputs = rows[observation_id]["derivation"]["raw_inputs"]
+        assert raw_inputs["state"] == {"tag": "value", "value": "not_printed"}
+        assert raw_inputs["locator"]["published_page"] == 1368
+        assert raw_inputs["locator"]["pdf_page_index"] == 2
+        assert "ion intensities" in raw_inputs["locator"]["paragraph"]
+
+
 def test_demaria_1971_table6_thermochemistry_values_match_render() -> None:
     """Table 6, p. 1376 (PDF p. 10): retain the printed ± values and footnotes."""
     rows = _observations(yaml.safe_load(EXTRACT.read_text()))
