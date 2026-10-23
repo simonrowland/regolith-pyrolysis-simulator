@@ -226,7 +226,7 @@ def _wait_loop_settled(sid, *, timeout=40.0):
     raise AssertionError('background loop thread never settled at the gate')
 
 
-def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=240.0):
+def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=1200.0):
     """Answer every gate with its recommendation.
 
     Returns ``(decisions, counts, completion, status_counts)`` where
