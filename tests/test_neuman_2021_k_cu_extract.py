@@ -10,7 +10,7 @@ import yaml
 
 from simulator.battery.enums import IdentityEqualKind, Quantity
 from simulator.battery.identity import identity_equal
-from simulator.battery.migrate import REPO_ROOT
+from simulator.battery.migrate import REPO_ROOT, convert_duration_to_s
 from simulator.battery.score import _printed_uncertainty_band
 from tests.battery.test_migrate import _migrate_real_extract
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
@@ -43,37 +43,52 @@ def test_neuman_table2_retypes_fraction_remaining_rows_from_audit_cells() -> Non
         isotope = next(
             obs for obs in observations if obs['values']['quantity'] == 'isotope_delta'
         )
-        fraction = next(
+        fractions = [
             obs for obs in observations
             if obs['values']['quantity'] == 'element_fraction_remaining'
-        )
+        ]
         isotope_series = isotope['values']['series']
-        fraction_series = fraction['values']['series']
-        assert len(isotope_series) == len(fraction_series) == 20
+        assert len(isotope_series) == len(fractions) == 20
         assert isotope_series[0]['isotope_delta_isotope_delta'] == delta
         assert isotope_series[0]['sigma'] == sigma
-        assert isotope['locator']['page'] == fraction['locator']['page'] == 51
+        assert isotope['locator']['page'] == 51
         assert isotope['units'] == 'per_mil'
         assert isotope['uncertainty']['confidence_level'] == 'not_stated'
         assert all('sigma' in row and 'two_SE_per_mil' not in row for row in isotope_series)
-        values = fraction['values']
-        assert fraction['type'] == 'concentration_series'
-        assert values['quantity'] == 'element_fraction_remaining'
-        assert values['element'] == element
-        assert values['normalising_element'] == 'Ca'
-        assert 'basis' not in values
-        assert values['basis_as_printed'] == ratio_cell[element]
-        assert 'quantitatively retained' in values['retention_assumption']
-        assert values['sample_mass'] == {'value': 'approximately 250', 'unit': 'mg'}
-        assert values['sample_geometry']['value'] == 'pre-baked alumina crucible, OD 8 mm, ID 6 mm'
-        assert 'RSD' in fraction['uncertainty']['note']
+        fraction_by_run = {
+            obs['observation_id'].rsplit('_', 1)[-1].upper(): obs
+            for obs in fractions
+        }
+        assert set(fraction_by_run) == {
+            cell['row'] for cell in audit_cells
+            if cell['pdf_page'] == '51'
+            and cell['table'] == '2'
+            and cell['cell'] == ratio_cell[element]
+        }
+        for fraction in fractions:
+            values = fraction['values']
+            assert fraction['type'] == 'concentration_series'
+            assert fraction['locator']['page'] == 51
+            assert values['quantity'] == 'element_fraction_remaining'
+            assert values['element'] == element
+            assert values['normalising_element'] == 'Ca'
+            assert 'basis' not in values
+            assert values['basis_as_printed'] == ratio_cell[element]
+            assert 'quantitatively retained' in values['retention_assumption']
+            assert values['sample_mass'] == {'value': 'approximately 250', 'unit': 'mg'}
+            assert values['sample_geometry']['value'] == 'pre-baked alumina crucible, OD 8 mm, ID 6 mm'
+            assert values['duration']['unit'] == 'h'
+            assert 'RSD' in fraction['uncertainty']['note']
         assert all(
             not any(key.startswith('fraction_remaining_') for key in row)
             for row in isotope_series
         )
         extracted = {
-            row['run']: (row['fraction_remaining'], row['RSD_percent_as_printed'])
-            for row in fraction_series
+            run: (
+                fraction['values']['fraction_remaining'],
+                fraction['values']['RSD_percent_as_printed'],
+            )
+            for run, fraction in fraction_by_run.items()
         }
         ratio_audit: dict[str, str] = {}
         rsd_audit: dict[str, str] = {}
@@ -90,9 +105,10 @@ def test_neuman_table2_retypes_fraction_remaining_rows_from_audit_cells() -> Non
         }
     cu_fraction = next(
         obs for obs in doc['species']['Cu']['observations']
-        if obs['values']['quantity'] == 'element_fraction_remaining'
+        if obs['values'].get('quantity') == 'element_fraction_remaining'
+        and obs['observation_id'].endswith('_20b14a')
     )
-    assert cu_fraction['values']['series'][8]['fraction_remaining'] == '1.218'
+    assert cu_fraction['values']['fraction_remaining'] == '1.218'
     assert 'table_2_fraction_remaining_schema_gap' not in doc['extraction']
 
     mutated = deepcopy(doc)
@@ -189,14 +205,18 @@ def test_neuman_series_conditions_reach_real_migrated_observations(tmp_path: Pat
 
         typed_prefix = f'{SOURCE}::neuman_2021_table2_{element.lower()}_fraction_remaining'
         typed = [obs for key, obs in result.observations.items() if key.startswith(typed_prefix)]
-        fraction = next(
-            obs for obs in doc['species'][element]['observations']
-            if obs['values']['quantity'] == 'element_fraction_remaining'
-        )
-        fraction_by_run = {
-            row['run'].casefold(): Decimal(row['fraction_remaining'])
-            for row in fraction['values']['series']
-        }
+        fraction_by_observation = {}
+        for fraction in doc['species'][element]['observations']:
+            if fraction['values'].get('quantity') != 'element_fraction_remaining':
+                continue
+            duration_s, refusal = convert_duration_to_s(
+                fraction['values']['duration']['value'],
+                fraction['values']['duration']['unit'],
+            )
+            assert duration_s is not None, refusal
+            fraction_by_observation[fraction['observation_id']] = (
+                Decimal(fraction['values']['fraction_remaining']), duration_s
+            )
         assert len(typed) == 20
         assert all(obs.identity.quantity.value.value == 'element_fraction_remaining' for obs in typed)
         assert all(obs.identity.normalising_element.value == 'Ca' for obs in typed)
@@ -213,12 +233,11 @@ def test_neuman_series_conditions_reach_real_migrated_observations(tmp_path: Pat
             for obs in typed
         )
         for observation in typed:
-            run = next(
-                run for run in sorted(fraction_by_run, key=len, reverse=True)
-                if f'row={run}' in observation.observation_id.casefold()
-            )
-            assert observation.value.point == fraction_by_run[run]
+            observation_id = observation.observation_id.rsplit('::', 1)[-1]
+            expected_value, expected_duration_s = fraction_by_observation[observation_id]
+            assert observation.value.point == expected_value
             assert observation.identity.temperature_K.value is not None
+            assert observation.identity.exposure.value.duration_s.value == expected_duration_s
             conditions = observation.point_conditions or {}
             assert set(('temperature_K', 'fO2_log', 'total_pressure_Pa', 'composition')) <= set(conditions)
             assert all(
@@ -233,13 +252,13 @@ def test_neuman_fraction_remaining_mutation_reaches_the_typed_value(tmp_path: Pa
     mutated = deepcopy(doc)
     fraction = next(
         obs for obs in mutated['species']['K']['observations']
-        if obs['values']['quantity'] == 'element_fraction_remaining'
+        if obs['values'].get('quantity') == 'element_fraction_remaining'
+        and obs['observation_id'].endswith('_8b13a')
     )
-    fraction['values']['series'][0]['fraction_remaining'] = '0.958'
+    fraction['values']['fraction_remaining'] = '0.958'
     result = _migrate_real_extract(tmp_path, f'{SOURCE}.yaml', extract_doc=mutated)
     point = next(
         obs for obs in result.observations.values()
-        if f'::neuman_2021_table2_k_fraction_remaining::' in obs.observation_id
-        and 'row=8b13a' in obs.observation_id
+        if f'::neuman_2021_table2_k_fraction_remaining_8b13a' in obs.observation_id
     )
     assert point.value.point == Decimal('0.958')
