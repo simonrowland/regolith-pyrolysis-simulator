@@ -74,13 +74,17 @@ class _C0ForecastSulfsatRefusal(RuntimeError):
 
 
 class _C0ForecastContextRefusal(RuntimeError):
-    """Typed refusal with the failure detail for a C0 snapshot build."""
+    """Typed forecast-construction refusal carrying its exception detail."""
 
-    prediction_status = 'unavailable_forecast_context'
-
-    def __init__(self, exception: Exception) -> None:
+    def __init__(
+        self,
+        exception: Exception,
+        *,
+        prediction_status: str = 'unavailable_forecast_context',
+    ) -> None:
         source = exception.__cause__ or exception
         message = str(source)
+        self.prediction_status = prediction_status
         self.detail = {
             'exception_class': type(source).__name__,
             'exception_message': message,
@@ -13856,8 +13860,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     return None, 'unavailable_forecast_backend'
             else:
                 return None, 'unavailable_forecast_backend'
-        except Exception:
-            return None, 'unavailable_forecast_backend'
+        except Exception as exc:
+            return None, _C0ForecastContextRefusal(
+                exc,
+                prediction_status='unavailable_forecast_backend',
+            )
 
         live_store = getattr(self, '_pt0_determinism_store', None)
         forecast_store = None
@@ -13867,8 +13874,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return None, 'unavailable_forecast_cache'
             try:
                 forecast_store = clone_store()
-            except Exception:
-                return None, 'unavailable_forecast_cache'
+            except Exception as exc:
+                return None, _C0ForecastContextRefusal(
+                    exc,
+                    prediction_status='unavailable_forecast_cache',
+                )
             if forecast_store is live_store:
                 return None, 'unavailable_forecast_cache'
 
@@ -13894,6 +13904,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             context._c0_forecast_engine = forecast_engine
             context._c0_forecast_backend_factory = None
             context._chem_kernel = context._build_chemistry_kernel()
+            # Shadow outputs are parity diagnostics only; the C0 decision
+            # consumes authoritative results. Keep their engines out of this
+            # detached evaluator, including direct kernel-dispatch call sites.
+            context._chem_registry._shadows.clear()
             live_registry = self._chem_registry
             if (
                 live_registry.authoritative_for(
