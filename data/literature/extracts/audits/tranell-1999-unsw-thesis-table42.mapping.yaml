@@ -1,0 +1,46 @@
+source_id: tranell-1999-unsw-thesis
+source:
+  citation: "Tranell, G. M. (1999), Thermodynamics of Slags Containing Titanium, PhD thesis, University of New South Wales."
+extraction:
+  method: mineru_table_draft emit; render checked at 600 dpi
+  date: '2026-10-20'
+  worker: fam22-1020
+review_status: draft
+tables:
+  - page: 118
+    table_index: 1
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: mole-fraction ppm as printed
+    phase: liquid copper
+    rows: [2, 3]
+    temperature:
+      as_printed: '1873'
+      unit: K
+    values:
+      - column: 2
+        species: Si
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-12}
+        locator: {page: 118, pdf_page_index: 117, table: '4.2', row: conditions}
+  - page: 118
+    table_index: 1
+    type: activity_coefficient
+    quantity: activity_coefficient
+    evidence_class: measured_reduced
+    unit: dimensionless activity coefficient
+    phase: liquid copper
+    published_page: 108
+    rows: [2, 3]
+    temperature:
+      as_printed: '1873'
+      unit: K
+    values:
+      - column: 3
+        species: Si
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-12}
+        locator: {page: 118, pdf_page_index: 117, table: '4.2', row: conditions}
