@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+from decimal import Decimal
 
 import yaml
 
+from simulator.battery.enums import Quantity
 from simulator.battery.migrate import Migrator
 
 
@@ -15,7 +17,6 @@ EXTRACT = ROOT / "data/literature/extracts" / f"{SOURCE_ID}.yaml"
 def test_xanes_tables_and_deferred_figures_preserve_printed_evidence() -> None:
     document = yaml.safe_load(EXTRACT.read_text())
     sulfur = document["species"]["S"]
-    assert sulfur["observations"] == []
     context = sulfur["context"]
 
     def record(observation_id: str) -> dict:
@@ -24,12 +25,53 @@ def test_xanes_tables_and_deferred_figures_preserve_printed_evidence() -> None:
     table_2a = record("evans_2009_table_2a_mn_glass_compositions")["values"]["rows_as_printed"]
     assert "B310706p1a |" in table_2a
     assert "B020806p6b |" in table_2a
+    assert "bdl" in table_2a
+    assert "101.5(5)" in table_2a
     table_2b = record("evans_2009_table_2b_w_glass_compositions")["values"]["rows_as_printed"]
     assert "B301205p3b |" in table_2b
     assert "B141106p1a |" in table_2b
     table_2c = record("evans_2009_table_2c_ni_glass_compositions")["values"]["rows_as_printed"]
     assert "B120406p6b |" in table_2c
     assert "B010806p1a |" in table_2c
+
+    typed_vectors = {}
+    all_source_points = []
+    for formula, species_data in document["species"].items():
+        for observation in species_data["observations"]:
+            if observation["type"] != "equilibrium_phase_composition":
+                continue
+            for point in observation["values"]["points"]:
+                all_source_points.append(point)
+                typed_vectors.setdefault(point["sample"], {})[formula] = point["value_as_published"]
+
+    assert len(all_source_points) == 381
+    assert len(typed_vectors) == 50
+    assert typed_vectors["B030106p2b"]["Si"] == "19.93(8)"
+    assert typed_vectors["B030106p2b"]["S"] == "0.224(1)"
+    assert typed_vectors["B030106p2b"]["Mn"] == "0.381(3)"
+    assert typed_vectors["B301205p3b"]["Si"] == "19.8(1)"
+    assert typed_vectors["B111006p2"]["Ca"] == "24.(1)"
+    assert typed_vectors["B120406p6b"]["O"] == "41.(1)"
+    assert typed_vectors["B220806p4"]["W"] == "2.23(3)"
+    assert typed_vectors["B010806p2"]["Ni"] == "0.132(8)"
+    expected_sigma = {
+        ("B030106p2b", "S"): "0.001",
+        ("B301205p3b", "Si"): "0.1",
+        ("B111006p2", "Ca"): "1",
+        ("B120406p6b", "O"): "1",
+    }
+    assert all("sigma" in point for point in all_source_points)
+    for point in all_source_points:
+        key = (point["sample"], point["species_as_printed"])
+        if key in expected_sigma:
+            assert point["sigma"] == expected_sigma[key]
+    assert all(point["run_as_printed"] == point["sample"][:7] for point in all_source_points)
+    assert all(
+        point["locator"]["page"] in {7, 8}
+        and point["locator"]["published_page"] == (6853 if point["locator"]["page"] == 7 else 6854)
+        and point["point_conditions"]["T_C"]["state"]["value"] == "1400"
+        for point in all_source_points
+    )
 
     # Independent transcription from the 600 dpi rendering of PDF page 10, Table 3.
     table_3 = record("evans_2009_table_3_s_xanes_peak_proportions")["values"]["rows_as_printed"]
@@ -75,5 +117,19 @@ def test_xanes_tables_and_deferred_figures_preserve_printed_evidence() -> None:
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
-    assert not migrator.result.observations
-    assert not migrator.result.validation.hard_issues
+    assert len(migrator.result.observations) == 381
+    assert migrator.result.validation.hard_issues == ()
+    migrated = [
+        row for row in migrator.result.observations.values()
+        if row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    ]
+    assert len(migrated) == 381
+    assert all(row.identity.temperature_K.value == Decimal("1673.15") for row in migrated)
+    assert all(row.point_conditions["T_C"].state.value == Decimal("1400") for row in migrated)
+    assert all(row.locator.page in {7, 8} and row.locator.published_page in {6853, 6854} for row in migrated)
+    assert all("fO2_log" not in row.point_conditions and "atmosphere" not in row.point_conditions for row in migrated)
+    sulfur = next(
+        row for row in migrated
+        if row.identity.species.formula == "S" and row.value.point == Decimal("0.224")
+    )
+    assert sulfur.uncertainty.verbatim["sigma"] == "0.001"
