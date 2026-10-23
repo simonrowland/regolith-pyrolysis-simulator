@@ -1,0 +1,2838 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2025-perovskite-condensation
+source:
+  citation: Shornikov, S. I., & Yakovlev, O. I. (2025). Condensation parameters of perovskite as the least volatile
+    compound of CAIs matter. Experiment in Geosciences, 31(1), 32–34.
+  doi: null
+  year: 2025
+  corpus_asset: raw/shornikov-2025-perovskite-condensation/shornikov-2025-perovskite-condensation.pdf
+  corpus_sha256: bc04a5d1441f9a14c780d648a5cc34b7f7ddf75f3cbb7c7632584053925a188b
+extraction:
+  method: MinerU Table 1 mapping emitted 56 numeric cells; MinerU and pdftotext digits agree, and row/column assignments
+    were checked against the 600-dpi render of PDF page 3. Printed scientific-notation pressures and mole fractions
+    are retained alongside decimal literals for migration. The method context was transcribed from PDF page 3; five
+    explicit prose pressures and the melting point were transcribed from PDF page 4. Figure 1 records are deferred
+    without digitized points.
+  date: '2026-10-18'
+  worker: w4b-1018
+review_status: draft
+species:
+  O:
+    observations:
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r03_c02
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: O
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1800'
+        pressure_atm: '6.25e-10'
+        pressure_atm_as_printed: '6.25×10⁻¹⁰'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id001
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id001
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r03_c03
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: O
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2241'
+        pressure_atm: '8.38e-7'
+        pressure_atm_as_printed: '8.38×10⁻⁷'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id002
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id002
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r03_c04
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: O
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2400'
+        pressure_atm: '5.98e-6'
+        pressure_atm_as_printed: '5.98×10⁻⁶'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id003
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id003
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r03_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: O
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '1800'
+        value: '3.0e-1'
+        value_as_printed: '3.0×10⁻¹'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id004
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id004
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r03_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: O
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2241'
+        value: '1.5e-1'
+        value_as_printed: '1.5×10⁻¹'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id005
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id005
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r03_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: O
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2400'
+        value: '1.7e-1'
+        value_as_printed: '1.7×10⁻¹'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id006
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id006
+    - observation_id: shornikov_2025_prose_o_pressure_2200k
+      type: partial_pressure
+      locator: &id007
+        page: 4
+        pdf_page_index: 3
+        published_page: 34
+        section: Conclusions
+        figure: '1'
+        panel: A
+        note: Explicit prose pressure at 2200 K accompanying Fig. 1A; not read from the plotted curve.
+      units: atm
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2200'
+          locator: *id007
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: *id007
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id007
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Shornikov (2019, 2019a, 2020)
+        T_K: '2200'
+        pressure_atm: '5.05e-7'
+        pressure_atm_as_printed: '5.05×10⁻⁷'
+    context:
+    - observation_id: shornikov_2025_table1_o_xi2400_over_xi1800_refusal
+      type: refusal
+      locator: &id008
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: O
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature
+          observation token.
+      units: dimensionless ratio as printed
+      values:
+        quantity: refused_source_content
+        method_class: method_only
+        refused:
+        - item: xi,2400 / xi,1800 concentration ratio
+          reason: schema_gap_ratio_across_temperatures
+          species_as_printed: O
+          value_as_printed: '0.6'
+          numerator_temperature_K_as_printed: 2400 K
+          denominator_temperature_K_as_printed: 1800 K
+          locator: *id008
+  O2:
+    observations:
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r04_c02
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $O_2$
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1800'
+        pressure_atm: '2.64e-11'
+        pressure_atm_as_printed: '2.64×10⁻¹¹'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id009
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id009
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r04_c03
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $O_2$
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2241'
+        pressure_atm: '5.84e-8'
+        pressure_atm_as_printed: '5.84×10⁻⁸'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id010
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id010
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r04_c04
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $O_2$
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2400'
+        pressure_atm: '4.87e-7'
+        pressure_atm_as_printed: '4.87×10⁻⁷'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id011
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id011
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r04_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $O_2$
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '1800'
+        value: '1.3e-2'
+        value_as_printed: '1.3×10⁻²'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id012
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id012
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r04_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $O_2$
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2241'
+        value: '1.1e-2'
+        value_as_printed: '1.1×10⁻²'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id013
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id013
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r04_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $O_2$
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2400'
+        value: '1.4e-2'
+        value_as_printed: '1.4×10⁻²'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id014
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id014
+    context:
+    - observation_id: shornikov_2025_table1_o2_xi2400_over_xi1800_refusal
+      type: refusal
+      locator: &id015
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $O_2$
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature
+          observation token.
+      units: dimensionless ratio as printed
+      values:
+        quantity: refused_source_content
+        method_class: method_only
+        refused:
+        - item: xi,2400 / xi,1800 concentration ratio
+          reason: schema_gap_ratio_across_temperatures
+          species_as_printed: O2
+          value_as_printed: '1.1'
+          numerator_temperature_K_as_printed: 2400 K
+          denominator_temperature_K_as_printed: 1800 K
+          locator: *id015
+  Ca:
+    observations:
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r05_c02
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ca
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1800'
+        pressure_atm: '6.10e-10'
+        pressure_atm_as_printed: '6.10×10⁻¹⁰'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id016
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id016
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r05_c03
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ca
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2241'
+        pressure_atm: '5.57e-7'
+        pressure_atm_as_printed: '5.57×10⁻⁷'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id017
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id017
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r05_c04
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ca
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2400'
+        pressure_atm: '3.05e-6'
+        pressure_atm_as_printed: '3.05×10⁻⁶'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id018
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id018
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r05_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ca
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '1800'
+        value: '2.9e-1'
+        value_as_printed: '2.9×10⁻¹'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id019
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id019
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r05_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ca
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2241'
+        value: '1.0e-1'
+        value_as_printed: '1.0×10⁻¹'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id020
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id020
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r05_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ca
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2400'
+        value: '8.6e-2'
+        value_as_printed: '8.6×10⁻²'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id021
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id021
+    - observation_id: shornikov_2025_prose_ca_pressure_2200k
+      type: partial_pressure
+      locator: &id022
+        page: 4
+        pdf_page_index: 3
+        published_page: 34
+        section: Conclusions
+        figure: '1'
+        panel: A
+        note: Explicit prose pressure at 2200 K accompanying Fig. 1A; not read from the plotted curve.
+      units: atm
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2200'
+          locator: *id022
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: *id022
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id022
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Shornikov (2019, 2019a, 2020)
+        T_K: '2200'
+        pressure_atm: '3.18e-7'
+        pressure_atm_as_printed: '3.18×10⁻⁷'
+    context:
+    - observation_id: shornikov_2025_table1_ca_xi2400_over_xi1800_refusal
+      type: refusal
+      locator: &id023
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ca
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature
+          observation token.
+      units: dimensionless ratio as printed
+      values:
+        quantity: refused_source_content
+        method_class: method_only
+        refused:
+        - item: xi,2400 / xi,1800 concentration ratio
+          reason: schema_gap_ratio_across_temperatures
+          species_as_printed: Ca
+          value_as_printed: '0.3'
+          numerator_temperature_K_as_printed: 2400 K
+          denominator_temperature_K_as_printed: 1800 K
+          locator: *id023
+  CaO:
+    observations:
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r06_c02
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: CaO
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1800'
+        pressure_atm: '2.47e-13'
+        pressure_atm_as_printed: '2.47×10⁻¹³'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id024
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id024
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r06_c03
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: CaO
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2241'
+        pressure_atm: '1.83e-9'
+        pressure_atm_as_printed: '1.83×10⁻⁹'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id025
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id025
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r06_c04
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: CaO
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2400'
+        pressure_atm: '1.80e-8'
+        pressure_atm_as_printed: '1.80×10⁻⁸'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id026
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id026
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r06_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: CaO
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '1800'
+        value: '1.2e-4'
+        value_as_printed: '1.2×10⁻⁴'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id027
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id027
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r06_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: CaO
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2241'
+        value: '3.3e-4'
+        value_as_printed: '3.3×10⁻⁴'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id028
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id028
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r06_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: CaO
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2400'
+        value: '5.1e-4'
+        value_as_printed: '5.1×10⁻⁴'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id029
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id029
+    context:
+    - observation_id: shornikov_2025_table1_cao_xi2400_over_xi1800_refusal
+      type: refusal
+      locator: &id030
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: CaO
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature
+          observation token.
+      units: dimensionless ratio as printed
+      values:
+        quantity: refused_source_content
+        method_class: method_only
+        refused:
+        - item: xi,2400 / xi,1800 concentration ratio
+          reason: schema_gap_ratio_across_temperatures
+          species_as_printed: CaO
+          value_as_printed: '4.3'
+          numerator_temperature_K_as_printed: 2400 K
+          denominator_temperature_K_as_printed: 1800 K
+          locator: *id030
+  Ti:
+    observations:
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r07_c02
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ti
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1800'
+        pressure_atm: '2.25e-15'
+        pressure_atm_as_printed: '2.25×10⁻¹⁵'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id031
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id031
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r07_c03
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ti
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2241'
+        pressure_atm: '1.67e-10'
+        pressure_atm_as_printed: '1.67×10⁻¹⁰'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id032
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id032
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r07_c04
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ti
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2400'
+        pressure_atm: '2.12e-9'
+        pressure_atm_as_printed: '2.12×10⁻⁹'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id033
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id033
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r07_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ti
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '1800'
+        value: '1.1e-6'
+        value_as_printed: '1.1×10⁻⁶'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id034
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id034
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r07_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ti
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2241'
+        value: '3.0e-5'
+        value_as_printed: '3.0×10⁻⁵'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id035
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id035
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r07_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ti
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2400'
+        value: '6.0e-5'
+        value_as_printed: '6.0×10⁻⁵'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id036
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id036
+    context:
+    - observation_id: shornikov_2025_table1_ti_xi2400_over_xi1800_refusal
+      type: refusal
+      locator: &id037
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ti
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature
+          observation token.
+      units: dimensionless ratio as printed
+      values:
+        quantity: refused_source_content
+        method_class: method_only
+        refused:
+        - item: xi,2400 / xi,1800 concentration ratio
+          reason: schema_gap_ratio_across_temperatures
+          species_as_printed: Ti
+          value_as_printed: '56'
+          numerator_temperature_K_as_printed: 2400 K
+          denominator_temperature_K_as_printed: 1800 K
+          locator: *id037
+  TiO:
+    observations:
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r08_c02
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: TiO
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1800'
+        pressure_atm: '3.73e-11'
+        pressure_atm_as_printed: '3.73×10⁻¹¹'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id038
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id038
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r08_c03
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: TiO
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2241'
+        pressure_atm: '4.75e-7'
+        pressure_atm_as_printed: '4.75×10⁻⁷'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id039
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id039
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r08_c04
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: TiO
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2400'
+        pressure_atm: '3.80e-6'
+        pressure_atm_as_printed: '3.80×10⁻⁶'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id040
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id040
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r08_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: TiO
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '1800'
+        value: '1.8e-2'
+        value_as_printed: '1.8×10⁻²'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id041
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id041
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r08_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: TiO
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2241'
+        value: '8.6e-2'
+        value_as_printed: '8.6×10⁻²'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id042
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id042
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r08_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: TiO
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2400'
+        value: '1.1e-1'
+        value_as_printed: '1.1×10⁻¹'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id043
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id043
+    - observation_id: shornikov_2025_prose_tio_pressure_2200k
+      type: partial_pressure
+      locator: &id044
+        page: 4
+        pdf_page_index: 3
+        published_page: 34
+        section: Conclusions
+        figure: '1'
+        panel: A
+        note: Explicit prose pressure at 2200 K accompanying Fig. 1A; not read from the plotted curve.
+      units: atm
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2200'
+          locator: *id044
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: *id044
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id044
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Shornikov (2019, 2019a, 2020)
+        T_K: '2200'
+        pressure_atm: '2.55e-7'
+        pressure_atm_as_printed: '2.55×10⁻⁷'
+    context:
+    - observation_id: shornikov_2025_table1_tio_xi2400_over_xi1800_refusal
+      type: refusal
+      locator: &id045
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: TiO
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature
+          observation token.
+      units: dimensionless ratio as printed
+      values:
+        quantity: refused_source_content
+        method_class: method_only
+        refused:
+        - item: xi,2400 / xi,1800 concentration ratio
+          reason: schema_gap_ratio_across_temperatures
+          species_as_printed: TiO
+          value_as_printed: '6.1'
+          numerator_temperature_K_as_printed: 2400 K
+          denominator_temperature_K_as_printed: 1800 K
+          locator: *id045
+  TiO2:
+    observations:
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r09_c02
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $TiO_2$
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1800'
+        pressure_atm: '8.05e-10'
+        pressure_atm_as_printed: '8.05×10⁻¹⁰'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id046
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id046
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r09_c03
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $TiO_2$
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2241'
+        pressure_atm: '3.58e-6'
+        pressure_atm_as_printed: '3.58×10⁻⁶'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id047
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id047
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r09_c04
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $TiO_2$
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2400'
+        pressure_atm: '2.20e-5'
+        pressure_atm_as_printed: '2.20×10⁻⁵'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id048
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id048
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r09_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $TiO_2$
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '1800'
+        value: '3.8e-1'
+        value_as_printed: '3.8×10⁻¹'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id049
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id049
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r09_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $TiO_2$
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2241'
+        value: '6.5e-1'
+        value_as_printed: '6.5×10⁻¹'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id050
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id050
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r09_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $TiO_2$
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2400'
+        value: '6.2e-1'
+        value_as_printed: '6.2×10⁻¹'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id051
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id051
+    - observation_id: shornikov_2025_prose_tio2_pressure_2200k
+      type: partial_pressure
+      locator: &id052
+        page: 4
+        pdf_page_index: 3
+        published_page: 34
+        section: Conclusions
+        figure: '1'
+        panel: A
+        note: Explicit prose pressure at 2200 K accompanying Fig. 1A; not read from the plotted curve.
+      units: atm
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2200'
+          locator: *id052
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: *id052
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id052
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Shornikov (2019, 2019a, 2020)
+        T_K: '2200'
+        pressure_atm: '2.17e-6'
+        pressure_atm_as_printed: '2.17×10⁻⁶'
+    context:
+    - observation_id: shornikov_2025_table1_tio2_xi2400_over_xi1800_refusal
+      type: refusal
+      locator: &id053
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $TiO_2$
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature
+          observation token.
+      units: dimensionless ratio as printed
+      values:
+        quantity: refused_source_content
+        method_class: method_only
+        refused:
+        - item: xi,2400 / xi,1800 concentration ratio
+          reason: schema_gap_ratio_across_temperatures
+          species_as_printed: TiO2
+          value_as_printed: '1.6'
+          numerator_temperature_K_as_printed: 2400 K
+          denominator_temperature_K_as_printed: 1800 K
+          locator: *id053
+  CaTiO3:
+    observations:
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r10_c02
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $CaTiO_3$
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1800'
+        pressure_atm: '4.87e-15'
+        pressure_atm_as_printed: '4.87×10⁻¹⁵'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id054
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id054
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r10_c03
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $CaTiO_3$
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2241'
+        pressure_atm: '3.58e-9'
+        pressure_atm_as_printed: '3.58×10⁻⁹'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id055
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id055
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r10_c04
+      type: partial_pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $CaTiO_3$
+        column_header: Partial pressure  $p_i$ , atm
+        published_page: 33
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2400'
+        pressure_atm: '7.74e-8'
+        pressure_atm_as_printed: '7.74×10⁻⁸'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id056
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id056
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r10_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $CaTiO_3$
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '1800'
+        value: '2.3e-6'
+        value_as_printed: '2.3×10⁻⁶'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 1800 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id057
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id057
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r10_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $CaTiO_3$
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2241'
+        value: '6.5e-4'
+        value_as_printed: '6.5×10⁻⁴'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2241 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id058
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id058
+    - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r10_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $CaTiO_3$
+        column_header: Concentration  $x_i$ , mol
+        published_page: 33
+      units: mol
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        T_K: '2400'
+        value: '2.2e-3'
+        value_as_printed: '2.2×10⁻³'
+        basis_as_published: 'x_i, mol'
+        attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2400'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+            column_header: 2400 K
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: &id059
+            page: 3
+            pdf_page_index: 2
+            published_page: 33
+            table: '1'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id059
+    - observation_id: shornikov_2025_prose_catio3_pressure_2200k
+      type: partial_pressure
+      locator: &id060
+        page: 4
+        pdf_page_index: 3
+        published_page: 34
+        section: Conclusions
+        figure: '1'
+        panel: A
+        note: Explicit prose pressure at 2200 K accompanying Fig. 1A; not read from the plotted curve.
+      units: atm
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2200'
+          locator: *id060
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The text says only “under reducing conditions”; no numeric oxygen fugacity is reported.
+          locator: *id060
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Total pressure is not reported.
+          locator: *id060
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Shornikov (2019, 2019a, 2020)
+        T_K: '2200'
+        pressure_atm: '1.28e-9'
+        pressure_atm_as_printed: '1.28×10⁻⁹'
+    - observation_id: shornikov_2025_perovskite_melting_point
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 34
+        section: Conclusions
+        note: The text states that 2200 K is slightly below the perovskite melting point.
+      phase: perovskite
+      units: K
+      values:
+        method_class: quoted_attributed
+        quantity: transition_temperature
+        property_kind: melting_point
+        temperature_K: 2241
+        temperature_K_as_printed: '2241 K'
+        attribution: Shornikov and Yakovlev (2025)
+        quote_as_printed: 'melting point of perovskite, equal to 2241 K'
+    context:
+    - observation_id: shornikov_2025_perovskite_evaporation_temperature_range_context
+      type: method
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 33
+        section: Experimental methods
+      units: K
+      values:
+        quantity: perovskite_evaporation_temperature_range
+        method_class: quoted_attributed
+        attribution: Shornikov (2019, 2019a, 2020)
+        temperature_range_K: [1791, 2441]
+        quote_as_printed: 'CaTiO3 perovskite evaporation from a Knudsen effusion molybdenum cell was studied by mass spectrometry in the temperature range of 1791–2441 K (Shornikov, 2019, 2019a, 2020).'
+    - observation_id: shornikov_2025_ion_source_temperature_limit_context
+      type: method
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 33
+        section: Experimental methods
+      units: K
+      values:
+        quantity: modified_ion_source_temperature_limit
+        method_class: quoted_attributed
+        attribution: Shornikov et al. (2000)
+        ion_source_temperature_limit_K: 3000
+        quote_as_printed: 'The mass spectrometer MI-1201 was equipped with a modified ion source for high-temperature studies (up to a temperature of 3000 K). The design of the developed ion source and the methodological features of experiment were described in detail earlier (Shornikov et al., 2000).'
+    - observation_id: shornikov_2025_table1_catio3_xi2400_over_xi1800_refusal
+      type: refusal
+      locator: &id061
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $CaTiO_3$
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature
+          observation token.
+      units: dimensionless ratio as printed
+      values:
+        quantity: refused_source_content
+        method_class: method_only
+        refused:
+        - item: xi,2400 / xi,1800 concentration ratio
+          reason: schema_gap_ratio_across_temperatures
+          species_as_printed: CaTiO3
+          value_as_printed: '945'
+          numerator_temperature_K_as_printed: 2400 K
+          denominator_temperature_K_as_printed: 1800 K
+          locator: *id061
+    - observation_id: shornikov_2025_figure1_panel_a
+      type: figure_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 33
+        figure: '1'
+        panel: A
+      units: logarithmic axis as printed; temperature in K
+      values:
+        quantity: partial_pressure
+        species_as_printed: &id062
+        - O
+        - O2
+        - Ca
+        - CaO
+        - TiO
+        - TiO2
+        - CaTiO3
+        phase: gas
+        temperature_axis_as_printed: T, K (top); 10^4/T, K^-1 (bottom)
+        value_axis_as_printed: lg p_i, atm
+        caption_as_printed: Fig. 1. Dependences of the logarithm of the partial pressures (A) and the mole fractions
+          (B) of the vapor species over perovskite vs. the reverse temperature.
+        panel: A
+        series:
+        - species: O
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: O2
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: Ca
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: CaO
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: TiO
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: TiO2
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: CaTiO3
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        marker_count_note: No discrete markers are drawn in the 600-dpi render.
+        digitisation: deferred to a figure pass
+    - observation_id: shornikov_2025_figure1_panel_b
+      type: figure_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 33
+        figure: '1'
+        panel: B
+      units: logarithmic axis as printed; temperature in K
+      values:
+        quantity: vapor_mole_fraction
+        species_as_printed: *id062
+        phase: gas
+        temperature_axis_as_printed: T, K (top); 10^4/T, K^-1 (bottom)
+        value_axis_as_printed: lg x_i, mol
+        caption_as_printed: Fig. 1. Dependences of the logarithm of the partial pressures (A) and the mole fractions
+          (B) of the vapor species over perovskite vs. the reverse temperature.
+        panel: B
+        series:
+        - species: O
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: O2
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: Ca
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: CaO
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: TiO
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: TiO2
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        - species: CaTiO3
+          attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+          representation: continuous curve
+          marker_count: 0
+        marker_count_note: No discrete markers are drawn in the 600-dpi render.
+        digitisation: deferred to a figure pass
+notes:
+- The source bundle contains unrelated papers on PDF pages 1 and 5; only the perovskite article on PDF pages 2–4
+  is extracted.
+- The article summarizes prior Shornikov KEMS results. Table 1 values and the five prose pressures are quoted_attributed
+  to the prior works named in the article; no new experiment is claimed.
+- Duplicate-value check against the 2019 TMS chapter, 2019 RJPC extract, 2020 fractionation extract and 2020 CaO–TiO2
+  melts extract found no matching species, temperature and printed-pressure tuple for these Table 1 or prose values.
+  The 2241 K Table 1 column remains a temperature condition, while the separately stated melting point is recorded once.
+- The eight printed xi,2400 / xi,1800 ratios are retained as typed context refusals because they span two temperatures
+  and the extract schema has no ratio-across-temperatures token; their source values and both temperatures are retained
+  without recomputation.
+- Figure 1 panels A and B are records only; plotted curves are not digitized in this wave. Curves have no discrete
+  markers in the render.
+- Only “under reducing conditions” is specified; numeric oxygen fugacity and total pressure are not reported. No
+  melt composition is printed for this stoichiometric perovskite system.
+fidelity_samples:
+- species: O
+  observation_id: shornikov_2025_perovskite_condensation_p003_t01_r03_c02
+  field: pressure_atm
+  value: '6.25e-10'
+  locator:
+    page: 3
+    published_page: 33
+    pdf_page_index: 2
+    table: '1'
+- species: Ca
+  observation_id: shornikov_2025_perovskite_condensation_p003_t01_r05_c03
+  field: pressure_atm
+  value: '5.57e-7'
+  locator:
+    page: 3
+    published_page: 33
+    pdf_page_index: 2
+    table: '1'
+- species: CaTiO3
+  observation_id: shornikov_2025_perovskite_condensation_p003_t01_r10_c07
+  field: value
+  value: '2.2e-3'
+  locator:
+    page: 3
+    published_page: 33
+    pdf_page_index: 2
+    table: '1'

@@ -1,0 +1,40 @@
+source_id: gaillard-2003-hydrogen-iron-redox-rate
+source:
+  doi: 10.1016/S0016-7037(02)01407-2
+  year: 2003
+extraction:
+  method: pdftotext-layout plus manual transcription; no MinerU content-list is present
+  render_check: every numeric table cell checked against 600 dpi physical-page renders
+  pages: [2, 3, 4, 9]
+tables:
+  - page: 2
+    published_page: 2428
+    table: 1
+    rows: [starting obsidian]
+    disposition: typed valence_ratio for Fe3+/Fetot with quench status unknown; whole-glass wt% composition in context because no starting-glass composition token fits
+    quantity: valence_ratio
+    species: Fe
+  - page: 3
+    published_page: 2429
+    table: 2
+    rows: 25
+    disposition: typed H2 fugacity and printed fO2 conditions; front positions and durations in context because no matching quantity token exists
+    quantity: fugacity
+    species: H2
+  - page: 4
+    published_page: 2430
+    table: 3
+    rows: 13
+    disposition: typed initially loaded H2 and Ar partial pressures; dwell pressure, exposure duration and front positions in context because no matching quantity token exists
+    quantity: partial_pressure
+    species: [H2, Ar]
+  - page: 9
+    published_page: 2435
+    table: 4
+    rows: 12
+    disposition: measured log K is context because no reaction-rate token fits; solubility, diffusivity and alpha are model-derived context
+    quantity: no matching quantity token for reaction-front K
+    species: [Fe, H2]
+figures:
+  disposition: all ten figure records are deferred without numeric points
+  pages: [5, 6, 7, 8, 9, 10, 12, 13]

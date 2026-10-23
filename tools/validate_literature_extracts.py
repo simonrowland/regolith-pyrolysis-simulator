@@ -235,6 +235,31 @@ def _absolute_path_value_errors(doc: Any, label: str) -> list[str]:
     return errors
 
 
+def _docs_private_prose_errors(doc: Any, label: str) -> list[str]:
+    """Refuse private-workspace references in extract prose, not path fields."""
+    errors: list[str] = []
+
+    def walk(node: Any, field_path: str = "") -> None:
+        if isinstance(node, Mapping):
+            for key, value in node.items():
+                key_s = str(key)
+                child_path = f"{field_path}.{key_s}" if field_path else key_s
+                if key_s.endswith("_path"):
+                    continue
+                walk(value, child_path)
+        elif isinstance(node, (list, tuple)):
+            for index, value in enumerate(node):
+                walk(value, f"{field_path}[{index}]")
+        elif isinstance(node, str) and "docs-private" in node:
+            errors.append(
+                f"{label}:{field_path}: [docs-private-prose] private path reference "
+                "is forbidden in prose"
+            )
+
+    walk(doc)
+    return errors
+
+
 class ExtractValidationError(Exception):
     """One or more extract validation failures."""
 
@@ -1610,6 +1635,8 @@ def validate_extract_document(
     if not isinstance(doc, Mapping):
         return [f"{label}: root must be a mapping"]
 
+    errors.extend(_docs_private_prose_errors(doc, label))
+
     for key_path in iter_unsupported_context_container_paths(doc):
         rendered_path = ".".join(key_path)
         errors.append(
@@ -1737,6 +1764,7 @@ def validate_extract_file(
         return [f"{path}: failed to load YAML: {exc}"]
     if isinstance(doc, Mapping) and doc.get("schema_version") == TABLE_SCHEMA_VERSION:
         errors: list[str] = []
+        errors.extend(_docs_private_prose_errors(doc, str(path)))
         errors.extend(_absolute_path_value_errors(doc, str(path)))
         source_id = doc.get("source_id")
         if not isinstance(source_id, str) or not source_id:

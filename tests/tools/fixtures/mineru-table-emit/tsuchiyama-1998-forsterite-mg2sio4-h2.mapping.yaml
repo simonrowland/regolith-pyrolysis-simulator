@@ -1,0 +1,28 @@
+# Table 1's measured deltaM/S column is a direct scalar per experimental run;
+# temperature is printed in the second column.
+source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+source:
+  citation: >-
+    Tsuchiyama, Takahashi and Tachibana (1998), Evaporation rates of forsterite
+    in the system Mg2SiO4-H2, Mineralogical Journal 20(3), 113-126.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: emitbt-1018
+review_status: draft
+tables:
+  - page: 4
+    table_index: 1
+    type: mass_loss
+    quantity: mass_loss_areal_density
+    evidence_class: measured_tabulated
+    unit: g cm^-2
+    phase: cr
+    published_page: 116
+    rows: all
+    temperature:
+      column: 2
+      unit: C
+    values:
+      - column: 11
+        species: forsterite

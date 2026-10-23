@@ -9,7 +9,7 @@ experiments:
   - experiment_id: shornikov_2007_prior_kems_comparison_2033k
     method: knudsen_effusion
     locator:
-      page: 36
+      page: 2
       published_page: 36
       pdf_page_index: 1
       section: Discussion
@@ -20,7 +20,7 @@ experiments:
           tag: value
           value: 2033.0
         locator:
-          page: 36
+          page: 2
           published_page: 36
           pdf_page_index: 1
           section: Discussion
@@ -28,7 +28,7 @@ experiments:
   - experiment_id: shornikov_2007_model_calculation_2000k
     method: engine_evaluation
     locator:
-      page: 36
+      page: 2
       published_page: 36
       pdf_page_index: 1
       table: "Table"
@@ -39,13 +39,19 @@ experiments:
           tag: value
           value: 2000.0
         locator:
-          page: 36
+          page: 2
           published_page: 36
           pdf_page_index: 1
           table: "Table"
           note: "The Gibbs-energy table is at 2000 K."
 extraction:
-  method: "Manual transcription checked against 300 dpi renders of all three PDF pages. The unnumbered first and only table has 20 rows and 54 Gibbs-energy numbers. Figure 1 activity and thermodynamic curves are figure-only; no numerical curve values were digitized."
+  method: >-
+    Manual transcription checked against 600-dpi renders of all three PDF
+    pages. The unnumbered first and only table has 20 rows and 54 Gibbs-energy
+    numbers. Figure 1 experimental activity markers from reference [1] are
+    digitized; the present-study calculated curves and thermodynamic curves
+    remain figure-only. Axis calibration and raw pixel reads are in
+    crown4-1018-figure-read-audit.md.
   date: '2026-10-04'
   worker: x-2007-cao-aluminosilicate-melts
 review_status: draft
@@ -56,7 +62,7 @@ fidelity_samples:
     field: method_class
     value: figure_only
     locator:
-      page: 37
+      page: 3
       published_page: 37
       pdf_page_index: 2
       figure: '1'
@@ -67,26 +73,27 @@ species:
       type: activity_coefficient
       experiment: shornikov_2007_prior_kems_comparison_2033k
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: "Experimental CaO activity markers from reference [1]; numeric coordinates not digitized."
+        panel: "a and b"
+        symbol: filled squares
+        note: "Experimental CaO markers from reference [1], recorded separately for panels (a) and (b)."
       phase: CaO-Al2O3-SiO2 melt
       regime: knudsen_effusion
-      units: dimensionless activity as plotted
-      T_range_K:
-      - 2033.0
-      - 2033.0
+      units: dimensionless activity; log10 activity as plotted
+      T_range_K: [2033.0, 2033.0]
       values:
-        quantity: CaO_activity_figure_only
+        quantity: activity
+        activity_component: CaO
+        composition_component: Al2O3
         method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
-        reason: "Experimental CaO activity markers from reference [1]; numeric coordinates not digitized."
-        series: experimental_markers_from_reference_1
-        temperature_K: 2033.0
+        series: "experimental markers from reference [1]; filled squares"
         pseudobinary_joins: "CaSiO3-CaAl2Si2O8 and CaAl2Si2O8-CaAl2O4"
+        temperature_K: 2033.0
         standard_state:
           state:
             tag: unknown
@@ -96,29 +103,342 @@ species:
             tag: unknown
             reason: not_reported_for_reference_1
           attribution: "Shornikov, Stolyarova and Shultz (1996), cited as reference [1]."
+        points:
+          - Al2O3_mole_percent_as_plotted: '0.00'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.5'
+              Al2O3: '0'
+              SiO2: '0.5'
+            activity: 0.022
+            read_uncertainty_dex: 0.001388
+            audit_read_id: shornikov_2007_figure1_cao_activity_prior_markers-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.5']
+                    - [Al2O3, '0']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=0.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-1.653; independent pixel reads (884.00,1224.50) and (884.00,1224.50); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-01."
+          - Al2O3_mole_percent_as_plotted: '6.89'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.4311'
+              Al2O3: '0.0689'
+              SiO2: '0.5'
+            activity: 0.021
+            read_uncertainty_dex: 0.0004
+            audit_read_id: shornikov_2007_figure1_cao_activity_prior_markers-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.4311']
+                    - [Al2O3, '0.0689']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=6.89 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-1.686; independent pixel reads (1200.25,1236.25) and (1200.34,1235.97); read uncertainty 0.0004 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-02."
+          - Al2O3_mole_percent_as_plotted: '11.68'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3832'
+              Al2O3: '0.1168'
+              SiO2: '0.5'
+            activity: 0.015
+            read_uncertainty_dex: 0.001388
+            audit_read_id: shornikov_2007_figure1_cao_activity_prior_markers-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3832']
+                    - [Al2O3, '0.1168']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=11.68 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-1.819; independent pixel reads (1419.75,1284.00) and (1419.75,1284.00); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-03."
+          - Al2O3_mole_percent_as_plotted: '13.00'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.37'
+              Al2O3: '0.13'
+              SiO2: '0.5'
+            activity: 0.013
+            read_uncertainty_dex: 0.0001
+            audit_read_id: shornikov_2007_figure1_cao_activity_prior_markers-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.37']
+                    - [Al2O3, '0.13']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=13.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-1.896; independent pixel reads (1480.25,1311.75) and (1480.32,1311.68); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-04."
+          - Al2O3_mole_percent_as_plotted: '18.99'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3101'
+              Al2O3: '0.1899'
+              SiO2: '0.5'
+            activity: 0.0082
+            read_uncertainty_dex: 0.001388
+            audit_read_id: shornikov_2007_figure1_cao_activity_prior_markers-05
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3101']
+                    - [Al2O3, '0.1899']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=18.99 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-2.084; independent pixel reads (1755.00,1379.75) and (1755.00,1379.75); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-05."
+          - Al2O3_mole_percent_as_plotted: '25.00'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.25'
+              Al2O3: '0.25'
+              SiO2: '0.5'
+            activity: 0.0048
+            read_uncertainty_dex: 0.001388
+            audit_read_id: shornikov_2007_figure1_cao_activity_prior_markers-06
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.25']
+                    - [Al2O3, '0.25']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=25.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-2.320; independent pixel reads (2030.00,1464.75) and (2030.00,1464.75); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-06."
+          - Al2O3_mole_percent_as_plotted: '29.98'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.2998'
+              Al2O3: '0.2998'
+              SiO2: '0.4004'
+            activity: 0.0063
+            read_uncertainty_dex: 0.001388
+            audit_read_id: shornikov_2007_figure1_cao_activity_prior_markers-07
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.2998']
+                    - [Al2O3, '0.2998']
+                    - [SiO2, '0.4004']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=29.98 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(CaO))=-2.199; independent pixel reads (2259.00,1421.00) and (2259.00,1421.00); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-07."
+          - Al2O3_mole_percent_as_plotted: '33.32'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3332'
+              Al2O3: '0.3332'
+              SiO2: '0.3336'
+            activity: 0.0081
+            read_uncertainty_dex: 0.0001
+            audit_read_id: shornikov_2007_figure1_cao_activity_prior_markers-08
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3332']
+                    - [Al2O3, '0.3332']
+                    - [SiO2, '0.3336']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=33.32 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(CaO))=-2.093; independent pixel reads (2411.75,1382.75) and (2411.68,1382.68); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-08."
+          - Al2O3_mole_percent_as_plotted: '37.48'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3748'
+              Al2O3: '0.3748'
+              SiO2: '0.2504'
+            activity: 0.010
+            read_uncertainty_dex: 0.0001
+            audit_read_id: shornikov_2007_figure1_cao_activity_prior_markers-09
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3748']
+                    - [Al2O3, '0.3748']
+                    - [SiO2, '0.2504']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=37.48 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(CaO))=-1.996; independent pixel reads (2602.75,1347.75) and (2602.68,1347.68); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-09."
+          - Al2O3_mole_percent_as_plotted: '44.98'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.4498'
+              Al2O3: '0.4498'
+              SiO2: '0.1004'
+            activity: 0.038
+            read_uncertainty_dex: 0.001388
+            audit_read_id: shornikov_2007_figure1_cao_activity_prior_markers-10
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.4498']
+                    - [Al2O3, '0.4498']
+                    - [SiO2, '0.1004']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=44.98 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(CaO))=-1.423; independent pixel reads (2946.50,1141.50) and (2946.50,1141.50); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-10."
+          - Al2O3_mole_percent_as_plotted: '49.98'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.4998'
+              Al2O3: '0.4998'
+              SiO2: '0.0004'
+            activity: 0.098
+            read_uncertainty_dex: 0.0009
+            audit_read_id: shornikov_2007_figure1_cao_activity_prior_markers-11
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.4998']
+                    - [Al2O3, '0.4998']
+                    - [SiO2, '0.0004']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=49.98 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(CaO))=-1.010; independent pixel reads (3175.75,992.75) and (3175.75,992.12); read uncertainty 0.0009 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-11."
+
     - observation_id: shornikov_2007_figure1_cao_activity_calculated_curve
       type: activity_coefficient
       experiment: shornikov_2007_model_calculation_2000k
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: "Present-study calculated CaO activity curve; numeric coordinates not digitized."
+        panel: "a and b"
+        symbol: calculated curves
+        note: "Present-study calculated CaO curves at 2000 K; unmarked model curves are not digitized."
       phase: CaO-Al2O3-SiO2 melt
-      units: dimensionless activity as plotted
-      T_range_K:
-      - 2000.0
-      - 2000.0
+      units: dimensionless activity; log10 activity as plotted
+      T_range_K: [2000.0, 2000.0]
       values:
-        quantity: CaO_activity_figure_only
+        quantity: activity
+        activity_component: CaO
         method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
-        reason: "Present-study calculated CaO activity curve; numeric coordinates not digitized."
+        status: typed_refusal
+        reason: unmarked model curve not digitized
+        activity: null
+        unavailable_reason: unmarked_model_curve_not_digitized
         series: present_study_calculated_curve
         temperature_K: 2000.0
-        pseudobinary_joins: "CaSiO3-CaAl2Si2O8 and CaAl2Si2O8-CaAl2O4"
         standard_state:
           state:
             tag: unknown
@@ -127,30 +447,33 @@ species:
           state:
             tag: unknown
             reason: not_applicable_to_model_calculated_activity
+  Al2O3:
+    observations:
     - observation_id: shornikov_2007_figure1_al2o3_activity_prior_markers
       type: activity_coefficient
       experiment: shornikov_2007_prior_kems_comparison_2033k
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: "Experimental Al2O3 activity markers from reference [1]; numeric coordinates not digitized."
+        panel: "a and b"
+        symbol: open circles
+        note: "Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b)."
       phase: CaO-Al2O3-SiO2 melt
       regime: knudsen_effusion
-      units: dimensionless activity as plotted
-      T_range_K:
-      - 2033.0
-      - 2033.0
+      units: dimensionless activity; log10 activity as plotted
+      T_range_K: [2033.0, 2033.0]
       values:
-        quantity: Al2O3_activity_figure_only
+        quantity: activity
+        activity_component: Al2O3
+        composition_component: Al2O3
         method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
-        reason: "Experimental Al2O3 activity markers from reference [1]; numeric coordinates not digitized."
-        series: experimental_markers_from_reference_1
-        temperature_K: 2033.0
+        series: "experimental markers from reference [1]; open circles"
         pseudobinary_joins: "CaSiO3-CaAl2Si2O8 and CaAl2Si2O8-CaAl2O4"
+        temperature_K: 2033.0
         standard_state:
           state:
             tag: unknown
@@ -160,29 +483,314 @@ species:
             tag: unknown
             reason: not_reported_for_reference_1
           attribution: "Shornikov, Stolyarova and Shultz (1996), cited as reference [1]."
+        points:
+          - Al2O3_mole_percent_as_plotted: '6.89'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.4311'
+              Al2O3: '0.0689'
+              SiO2: '0.5'
+            activity: 0.017
+            read_uncertainty_dex: 0.001388
+            audit_read_id: shornikov_2007_figure1_al2o3_activity_prior_markers-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.4311']
+                    - [Al2O3, '0.0689']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=6.89 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(Al2O3))=-1.769; independent pixel reads (1200.25,1266.00) and (1200.22,1266.00); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-01."
+          - Al2O3_mole_percent_as_plotted: '11.68'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3832'
+              Al2O3: '0.1168'
+              SiO2: '0.5'
+            activity: 0.060
+            read_uncertainty_dex: 0.000014
+            audit_read_id: shornikov_2007_figure1_al2o3_activity_prior_markers-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3832']
+                    - [Al2O3, '0.1168']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=11.68 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(Al2O3))=-1.220; independent pixel reads (1419.75,1068.25) and (1419.76,1068.24); read uncertainty 0.000014 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-02."
+          - Al2O3_mole_percent_as_plotted: '13.00'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.37'
+              Al2O3: '0.13'
+              SiO2: '0.5'
+            activity: 0.090
+            read_uncertainty_dex: 0.001388
+            audit_read_id: shornikov_2007_figure1_al2o3_activity_prior_markers-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.37']
+                    - [Al2O3, '0.13']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=13.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(Al2O3))=-1.045; independent pixel reads (1480.25,1005.50) and (1480.19,1005.50); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-03."
+          - Al2O3_mole_percent_as_plotted: '19.01'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3099'
+              Al2O3: '0.1901'
+              SiO2: '0.5'
+            activity: 0.23
+            read_uncertainty_dex: 0.000014
+            audit_read_id: shornikov_2007_figure1_al2o3_activity_prior_markers-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3099']
+                    - [Al2O3, '0.1901']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=19.01 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(Al2O3))=-0.635; independent pixel reads (1755.75,857.75) and (1755.75,857.76); read uncertainty 0.000014 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-04."
+          - Al2O3_mole_percent_as_plotted: '25.00'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.25'
+              Al2O3: '0.25'
+              SiO2: '0.5'
+            activity: 0.43
+            read_uncertainty_dex: 0.0006
+            audit_read_id: shornikov_2007_figure1_al2o3_activity_prior_markers-05
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.25']
+                    - [Al2O3, '0.25']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=25.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(Al2O3))=-0.364; independent pixel reads (2029.75,760.00) and (2029.78,760.45); read uncertainty 0.0006 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-05."
+          - Al2O3_mole_percent_as_plotted: '29.98'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.2998'
+              Al2O3: '0.2998'
+              SiO2: '0.4004'
+            activity: 0.33
+            read_uncertainty_dex: 0.0007
+            audit_read_id: shornikov_2007_figure1_al2o3_activity_prior_markers-06
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.2998']
+                    - [Al2O3, '0.2998']
+                    - [SiO2, '0.4004']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=29.98 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(Al2O3))=-0.479; independent pixel reads (2259.00,801.50) and (2259.50,802.00); read uncertainty 0.0007 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-06."
+          - Al2O3_mole_percent_as_plotted: '33.32'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3332'
+              Al2O3: '0.3332'
+              SiO2: '0.3336'
+            activity: 0.26
+            read_uncertainty_dex: 0.000014
+            audit_read_id: shornikov_2007_figure1_al2o3_activity_prior_markers-07
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3332']
+                    - [Al2O3, '0.3332']
+                    - [SiO2, '0.3336']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=33.32 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(Al2O3))=-0.582; independent pixel reads (2411.75,838.75) and (2411.76,838.76); read uncertainty 0.000014 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-07."
+          - Al2O3_mole_percent_as_plotted: '37.48'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3748'
+              Al2O3: '0.3748'
+              SiO2: '0.2504'
+            activity: 0.24
+            read_uncertainty_dex: 0.001388
+            audit_read_id: shornikov_2007_figure1_al2o3_activity_prior_markers-08
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3748']
+                    - [Al2O3, '0.3748']
+                    - [SiO2, '0.2504']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=37.48 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(Al2O3))=-0.618; independent pixel reads (2602.75,851.50) and (2602.81,851.50); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-08."
+          - Al2O3_mole_percent_as_plotted: '44.99'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.4499'
+              Al2O3: '0.4499'
+              SiO2: '0.1002'
+            activity: 0.20
+            read_uncertainty_dex: 0.000014
+            audit_read_id: shornikov_2007_figure1_al2o3_activity_prior_markers-09
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.4499']
+                    - [Al2O3, '0.4499']
+                    - [SiO2, '0.1002']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=44.99 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(Al2O3))=-0.698; independent pixel reads (2946.75,880.25) and (2946.76,880.24); read uncertainty 0.000014 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-09."
+          - Al2O3_mole_percent_as_plotted: '49.98'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.4998'
+              Al2O3: '0.4998'
+              SiO2: '0.0004'
+            activity: 0.18
+            read_uncertainty_dex: 0.0002
+            audit_read_id: shornikov_2007_figure1_al2o3_activity_prior_markers-10
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.4998']
+                    - [Al2O3, '0.4998']
+                    - [SiO2, '0.0004']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=49.98 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(Al2O3))=-0.741; independent pixel reads (3175.75,896.00) and (3175.74,896.12); read uncertainty 0.0002 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-10."
+
     - observation_id: shornikov_2007_figure1_al2o3_activity_calculated_curve
       type: activity_coefficient
       experiment: shornikov_2007_model_calculation_2000k
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: "Present-study calculated Al2O3 activity curve; numeric coordinates not digitized."
+        panel: "a and b"
+        symbol: calculated curves
+        note: "Present-study calculated Al2O3 curves at 2000 K; unmarked model curves are not digitized."
       phase: CaO-Al2O3-SiO2 melt
-      units: dimensionless activity as plotted
-      T_range_K:
-      - 2000.0
-      - 2000.0
+      units: dimensionless activity; log10 activity as plotted
+      T_range_K: [2000.0, 2000.0]
       values:
-        quantity: Al2O3_activity_figure_only
+        quantity: activity
+        activity_component: Al2O3
         method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
-        reason: "Present-study calculated Al2O3 activity curve; numeric coordinates not digitized."
+        status: typed_refusal
+        reason: unmarked model curve not digitized
+        activity: null
+        unavailable_reason: unmarked_model_curve_not_digitized
         series: present_study_calculated_curve
         temperature_K: 2000.0
-        pseudobinary_joins: "CaSiO3-CaAl2Si2O8 and CaAl2Si2O8-CaAl2O4"
         standard_state:
           state:
             tag: unknown
@@ -191,30 +799,33 @@ species:
           state:
             tag: unknown
             reason: not_applicable_to_model_calculated_activity
+  SiO2:
+    observations:
     - observation_id: shornikov_2007_figure1_sio2_activity_prior_markers
       type: activity_coefficient
       experiment: shornikov_2007_prior_kems_comparison_2033k
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: "Experimental SiO2 activity markers from reference [1]; numeric coordinates not digitized."
+        panel: "a and b"
+        symbol: filled triangles
+        note: "Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b)."
       phase: CaO-Al2O3-SiO2 melt
       regime: knudsen_effusion
-      units: dimensionless activity as plotted
-      T_range_K:
-      - 2033.0
-      - 2033.0
+      units: dimensionless activity; log10 activity as plotted
+      T_range_K: [2033.0, 2033.0]
       values:
-        quantity: SiO2_activity_figure_only
+        quantity: activity
+        activity_component: SiO2
+        composition_component: Al2O3
         method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
-        reason: "Experimental SiO2 activity markers from reference [1]; numeric coordinates not digitized."
-        series: experimental_markers_from_reference_1
-        temperature_K: 2033.0
+        series: "experimental markers from reference [1]; filled triangles"
         pseudobinary_joins: "CaSiO3-CaAl2Si2O8 and CaAl2Si2O8-CaAl2O4"
+        temperature_K: 2033.0
         standard_state:
           state:
             tag: unknown
@@ -224,29 +835,314 @@ species:
             tag: unknown
             reason: not_reported_for_reference_1
           attribution: "Shornikov, Stolyarova and Shultz (1996), cited as reference [1]."
+        points:
+          - Al2O3_mole_percent_as_plotted: '0.00'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.5'
+              Al2O3: '0'
+              SiO2: '0.5'
+            activity: 0.18
+            read_uncertainty_dex: 0.000042
+            audit_read_id: shornikov_2007_figure1_sio2_activity_prior_markers-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.5']
+                    - [Al2O3, '0']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=0.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.745; independent pixel reads (884.17,897.33) and (884.17,897.36); read uncertainty 0.000042 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-01."
+          - Al2O3_mole_percent_as_plotted: '6.89'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.4311'
+              Al2O3: '0.0689'
+              SiO2: '0.5'
+            activity: 0.21
+            read_uncertainty_dex: 0.0001
+            audit_read_id: shornikov_2007_figure1_sio2_activity_prior_markers-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.4311']
+                    - [Al2O3, '0.0689']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=6.89 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.677; independent pixel reads (1200.33,872.83) and (1200.34,872.88); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-02."
+          - Al2O3_mole_percent_as_plotted: '11.69'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3831'
+              Al2O3: '0.1169'
+              SiO2: '0.5'
+            activity: 0.27
+            read_uncertainty_dex: 0.000014
+            audit_read_id: shornikov_2007_figure1_sio2_activity_prior_markers-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3831']
+                    - [Al2O3, '0.1169']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=11.69 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.568; independent pixel reads (1420.17,833.67) and (1420.24,833.68); read uncertainty 0.000014 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-03."
+          - Al2O3_mole_percent_as_plotted: '13.01'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3699'
+              Al2O3: '0.1301'
+              SiO2: '0.5'
+            activity: 0.30
+            read_uncertainty_dex: 0.0001
+            audit_read_id: shornikov_2007_figure1_sio2_activity_prior_markers-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3699']
+                    - [Al2O3, '0.1301']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=13.01 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.520; independent pixel reads (1480.67,816.33) and (1480.61,816.29); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-04."
+          - Al2O3_mole_percent_as_plotted: '18.99'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3101'
+              Al2O3: '0.1899'
+              SiO2: '0.5'
+            activity: 0.39
+            read_uncertainty_dex: 0.001388
+            audit_read_id: shornikov_2007_figure1_sio2_activity_prior_markers-05
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3101']
+                    - [Al2O3, '0.1899']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=18.99 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.409; independent pixel reads (1755.17,776.17) and (1755.22,776.17); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-05."
+          - Al2O3_mole_percent_as_plotted: '25.00'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.25'
+              Al2O3: '0.25'
+              SiO2: '0.5'
+            activity: 0.52
+            read_uncertainty_dex: 0.000028
+            audit_read_id: shornikov_2007_figure1_sio2_activity_prior_markers-06
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.25']
+                    - [Al2O3, '0.25']
+                    - [SiO2, '0.5']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(Al2O3)=25.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.281; independent pixel reads (2030.17,730.33) and (2030.28,730.31); read uncertainty 0.000028 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-06."
+          - Al2O3_mole_percent_as_plotted: '29.99'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.2999'
+              Al2O3: '0.2999'
+              SiO2: '0.4002'
+            activity: 0.30
+            read_uncertainty_dex: 0.000028
+            audit_read_id: shornikov_2007_figure1_sio2_activity_prior_markers-07
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.2999']
+                    - [Al2O3, '0.2999']
+                    - [SiO2, '0.4002']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=29.99 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(SiO2))=-0.520; independent pixel reads (2259.17,816.33) and (2259.28,816.31); read uncertainty 0.000028 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-07."
+          - Al2O3_mole_percent_as_plotted: '33.33'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3333'
+              Al2O3: '0.3333'
+              SiO2: '0.3334'
+            activity: 0.15
+            read_uncertainty_dex: 0.0001
+            audit_read_id: shornikov_2007_figure1_sio2_activity_prior_markers-08
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3333']
+                    - [Al2O3, '0.3333']
+                    - [SiO2, '0.3334']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=33.33 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(SiO2))=-0.821; independent pixel reads (2412.17,924.83) and (2412.21,924.89); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-08."
+          - Al2O3_mole_percent_as_plotted: '37.49'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.3749'
+              Al2O3: '0.3749'
+              SiO2: '0.2502'
+            activity: 0.054
+            read_uncertainty_dex: 0.000028
+            audit_read_id: shornikov_2007_figure1_sio2_activity_prior_markers-09
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3749']
+                    - [Al2O3, '0.3749']
+                    - [SiO2, '0.2502']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=37.49 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(SiO2))=-1.267; independent pixel reads (2603.17,1085.33) and (2603.28,1085.31); read uncertainty 0.000028 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-09."
+          - Al2O3_mole_percent_as_plotted: '44.99'
+            T_K: '2033'
+            T_K_as_printed: '2033'
+            composition_mol:
+              CaO: '0.4499'
+              Al2O3: '0.4499'
+              SiO2: '0.1002'
+            activity: 0.011
+            read_uncertainty_dex: 0.000042
+            audit_read_id: shornikov_2007_figure1_sio2_activity_prior_markers-10
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: digitized_pseudobinary_oxide_mole_fraction
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.4499']
+                    - [Al2O3, '0.4499']
+                    - [SiO2, '0.1002']
+                locator:
+                  page: 3
+                  published_page: 37
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: b
+                  note: "x(Al2O3)=44.99 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(SiO2))=-1.958; independent pixel reads (2946.67,1334.17) and (2946.62,1334.20); read uncertainty 0.000042 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-10."
+
     - observation_id: shornikov_2007_figure1_sio2_activity_calculated_curve
       type: activity_coefficient
       experiment: shornikov_2007_model_calculation_2000k
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: "Present-study calculated SiO2 activity curve; numeric coordinates not digitized."
+        panel: "a and b"
+        symbol: calculated curves
+        note: "Present-study calculated SiO2 curves at 2000 K; unmarked model curves are not digitized."
       phase: CaO-Al2O3-SiO2 melt
-      units: dimensionless activity as plotted
-      T_range_K:
-      - 2000.0
-      - 2000.0
+      units: dimensionless activity; log10 activity as plotted
+      T_range_K: [2000.0, 2000.0]
       values:
-        quantity: SiO2_activity_figure_only
+        quantity: activity
+        activity_component: SiO2
         method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
-        reason: "Present-study calculated SiO2 activity curve; numeric coordinates not digitized."
+        status: typed_refusal
+        reason: unmarked model curve not digitized
+        activity: null
+        unavailable_reason: unmarked_model_curve_not_digitized
         series: present_study_calculated_curve
         temperature_K: 2000.0
-        pseudobinary_joins: "CaSiO3-CaAl2Si2O8 and CaAl2Si2O8-CaAl2O4"
         standard_state:
           state:
             tag: unknown
@@ -259,7 +1155,7 @@ species:
       - observation_id: shornikov_2007_table1_thermochemical_inputs
         type: thermodynamic_example
         locator:
-          page: 36
+          page: 2
           published_page: 36
           pdf_page_index: 1
           table: "Table"
@@ -295,7 +1191,7 @@ species:
                         tag: unknown
                         reason: liquid_phase_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -305,7 +1201,7 @@ species:
                         tag: unknown
                         reason: liquid_value_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -323,7 +1219,7 @@ species:
                         tag: unknown
                         reason: liquid_phase_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -333,7 +1229,7 @@ species:
                         tag: unknown
                         reason: liquid_value_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -381,7 +1277,7 @@ species:
                         tag: unknown
                         reason: liquid_phase_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -391,7 +1287,7 @@ species:
                         tag: unknown
                         reason: liquid_value_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -459,7 +1355,7 @@ species:
                         tag: unknown
                         reason: liquid_phase_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -469,7 +1365,7 @@ species:
                         tag: unknown
                         reason: liquid_value_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -487,7 +1383,7 @@ species:
                         tag: unknown
                         reason: liquid_phase_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -497,7 +1393,7 @@ species:
                         tag: unknown
                         reason: liquid_value_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -555,7 +1451,7 @@ species:
                         tag: unknown
                         reason: liquid_phase_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -565,7 +1461,7 @@ species:
                         tag: unknown
                         reason: liquid_value_not_listed_in_source_table
                       locator:
-                        page: 36
+                        page: 2
                         published_page: 36
                         pdf_page_index: 1
                         table: "Table"
@@ -586,7 +1482,7 @@ species:
         type: experiment_series
         experiment: shornikov_2007_prior_kems_comparison_2033k
         locator:
-          page: 36
+          page: 2
           published_page: 36
           pdf_page_index: 1
           section: "Discussion"
@@ -604,7 +1500,7 @@ species:
                 tag: unknown
                 reason: not_reported_for_the_cited_comparator_in_this_source
               locator:
-                page: 36
+                page: 2
                 published_page: 36
                 pdf_page_index: 1
                 section: "Discussion"
@@ -615,7 +1511,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -625,7 +1521,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -636,7 +1532,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -646,7 +1542,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -656,7 +1552,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -666,7 +1562,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -677,7 +1573,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -687,7 +1583,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -697,7 +1593,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -708,7 +1604,7 @@ species:
                 tag: unknown
                 reason: not_reported_for_the_cited_comparator_in_this_source
               locator:
-                page: 36
+                page: 2
                 published_page: 36
                 pdf_page_index: 1
                 section: "Discussion"
@@ -719,7 +1615,7 @@ species:
                 tag: unknown
                 reason: not_reported_for_the_cited_comparator_in_this_source
               locator:
-                page: 36
+                page: 2
                 published_page: 36
                 pdf_page_index: 1
                 section: "Discussion"
@@ -729,7 +1625,7 @@ species:
                 tag: unknown
                 reason: not_reported_for_the_cited_comparator_in_this_source
               locator:
-                page: 36
+                page: 2
                 published_page: 36
                 pdf_page_index: 1
                 section: "Discussion"
@@ -740,7 +1636,7 @@ species:
                 tag: unknown
                 reason: not_reported_for_the_cited_comparator_in_this_source
               locator:
-                page: 36
+                page: 2
                 published_page: 36
                 pdf_page_index: 1
                 section: "Discussion"
@@ -751,7 +1647,7 @@ species:
                 tag: unknown
                 reason: not_reported_for_the_cited_comparator_in_this_source
               locator:
-                page: 36
+                page: 2
                 published_page: 36
                 pdf_page_index: 1
                 section: "Discussion"
@@ -761,7 +1657,7 @@ species:
                 tag: unknown
                 reason: not_reported_for_the_cited_comparator_in_this_source
               locator:
-                page: 36
+                page: 2
                 published_page: 36
                 pdf_page_index: 1
                 section: "Discussion"
@@ -771,7 +1667,7 @@ species:
                 tag: unknown
                 reason: not_reported_for_the_cited_comparator_in_this_source
               locator:
-                page: 36
+                page: 2
                 published_page: 36
                 pdf_page_index: 1
                 section: "Discussion"
@@ -781,7 +1677,7 @@ species:
                 tag: unknown
                 reason: not_reported_for_the_cited_comparator_in_this_source
               locator:
-                page: 36
+                page: 2
                 published_page: 36
                 pdf_page_index: 1
                 section: "Discussion"
@@ -791,7 +1687,7 @@ species:
                 tag: unknown
                 reason: not_reported_for_the_cited_comparator_in_this_source
               locator:
-                page: 36
+                page: 2
                 published_page: 36
                 pdf_page_index: 1
                 section: "Discussion"
@@ -803,7 +1699,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -813,7 +1709,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -824,7 +1720,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -834,7 +1730,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -845,7 +1741,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -855,7 +1751,7 @@ species:
                   tag: unknown
                   reason: not_reported_for_the_cited_comparator_in_this_source
                 locator:
-                  page: 36
+                  page: 2
                   published_page: 36
                   pdf_page_index: 1
                   section: "Discussion"
@@ -863,7 +1759,7 @@ species:
       - observation_id: shornikov_2007_figure1c_d_formation_thermodynamics_figure_only
         type: thermodynamic_example
         locator:
-          page: 37
+          page: 3
           published_page: 37
           pdf_page_index: 2
           figure: '1'
@@ -887,7 +1783,7 @@ species:
       - observation_id: shornikov_2007_model_scope_and_data_qualifications
         type: thermodynamic_example
         locator:
-          page: 36
+          page: 2
           published_page: 36
           pdf_page_index: 1
         units: as reported
@@ -907,7 +1803,7 @@ species:
       - observation_id: shornikov_2007_opening_data_qualifications
         type: thermodynamic_example
         locator:
-          page: 35
+          page: 1
           published_page: 35
           pdf_page_index: 0
           section: Introduction

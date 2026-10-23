@@ -3,6 +3,7 @@
 from decimal import Decimal
 from pathlib import Path
 
+from simulator.battery.enums import Quantity
 from tests.battery.factories import migrate_one_extract
 
 
@@ -32,4 +33,13 @@ def test_shornikov_2002_table_2_activity_values_migrate() -> None:
     assert silica.value.point == Decimal("0.19")
     assert alumina.locator.published_page == silica.locator.published_page == 1058
     assert alumina.locator.table == silica.locator.table == "2"
+    assert silica.identity.quantity.is_value
+    assert silica.identity.quantity.value is Quantity.ACTIVITY
+    silica_composition = silica.point_conditions["composition"]
+    assert silica_composition.locator is not None
+    assert (
+        "no complementary oxide fraction inferred"
+        in silica_composition.locator.note
+    )
+    assert silica.identity.composition is None or not silica.identity.composition.is_value
     assert not migrator.result.validation.hard_issues

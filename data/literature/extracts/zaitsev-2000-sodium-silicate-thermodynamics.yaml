@@ -1,0 +1,633 @@
+schema_version: literature_extract.v1
+source_id: zaitsev-2000-sodium-silicate-thermodynamics
+source:
+  citation: >-
+    Zaitsev, A. I., Shelkova, N. E., and Mogutnov, B. M. (2000).
+    Thermodynamics of Na2O-SiO2 Melts. Inorganic Materials 36(6), 529–543.
+  doi: 10.1007/BF02757949
+  year: 2000
+extraction:
+  method: >-
+    Born-digital pdftotext-layout transcription with MinerU table drafts;
+    table cells checked against 600 dpi page renders.
+  date: '2026-10-18'
+  worker: fam1-1018
+review_status: draft
+fidelity_samples:
+  - path: species.Na2O.observations[zaitsev_2000_table6_this_work_partial_molar_enthalpy].values.points[0].printed_minus_delta_H_kJ_per_mol
+    value: '223.2'
+    locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6', row: '0.4', note: 'Printed -Delta H(Na2O) = 223.2 kJ/mol; stored Delta H = -223.2 kJ/mol'}
+species:
+  SiO2:
+    observations:
+      - observation_id: zaitsev_2000_table4_sio2_experimental_activity
+        type: activity_coefficient
+        locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4'}
+        phase: l
+        units: dimensionless activity
+        standard_state: pure liquid SiO2
+        composition_basis: printed_mole_fraction
+        composition_derivation: 'binary Na2O-SiO2 as declared on p.535; x_Na2O = 1 - x_SiO2'
+        derived_from: [zaitsev_2000_table4_na2o_experimental_activity]
+        derivation:
+          relation: Gibbs-Duhem integration over measured Na2O activities and the silica-saturation boundary
+          inputs: [zaitsev_2000_table4_na2o_experimental_activity]
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          points:
+            - {row_as_printed: '1', x_SiO2_as_printed: '0.805', T_K: '1473', activity: '0.860', activity_as_printed: '0.860', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '1', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.805', Na2O: '0.195'}}
+            - {row_as_printed: '2', x_SiO2_as_printed: '0.805', T_K: '1573', activity: '0.842', activity_as_printed: '0.842', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '2', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.805', Na2O: '0.195'}}
+            - {row_as_printed: '3', x_SiO2_as_printed: '0.753', T_K: '1273', activity: '0.735', activity_as_printed: '0.735', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '3', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.753', Na2O: '0.247'}}
+            - {row_as_printed: '4', x_SiO2_as_printed: '0.753', T_K: '1473', activity: '0.714', activity_as_printed: '0.714', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '4', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.753', Na2O: '0.247'}}
+            - {row_as_printed: '5', x_SiO2_as_printed: '0.753', T_K: '1673', activity: '0.697', activity_as_printed: '0.697', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '5', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.753', Na2O: '0.247'}}
+            - {row_as_printed: '6', x_SiO2_as_printed: '0.709', T_K: '1273', activity: '0.532', activity_as_printed: '0.532', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '6', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.709', Na2O: '0.291'}}
+            - {row_as_printed: '7', x_SiO2_as_printed: '0.709', T_K: '1473', activity: '0.541', activity_as_printed: '0.541', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '7', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.709', Na2O: '0.291'}}
+            - {row_as_printed: '8', x_SiO2_as_printed: '0.709', T_K: '1673', activity: '0.536', activity_as_printed: '0.536', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '8', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.709', Na2O: '0.291'}}
+            - {row_as_printed: '9', x_SiO2_as_printed: '0.671', T_K: '1173', activity: '0.342', activity_as_printed: '0.342', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '9', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.671', Na2O: '0.329'}}
+            - {row_as_printed: '10', x_SiO2_as_printed: '0.671', T_K: '1373', activity: '0.355', activity_as_printed: '0.355', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '10', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.671', Na2O: '0.329'}}
+            - {row_as_printed: '11', x_SiO2_as_printed: '0.671', T_K: '1573', activity: '0.365', activity_as_printed: '0.365', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '11', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.671', Na2O: '0.329'}}
+            - {row_as_printed: '12', x_SiO2_as_printed: '0.625', T_K: '1173', activity: '0.151', activity_as_printed: '0.151', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '12', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.625', Na2O: '0.375'}}
+            - {row_as_printed: '13', x_SiO2_as_printed: '0.625', T_K: '1373', activity: '0.178', activity_as_printed: '0.178', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '13', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.625', Na2O: '0.375'}}
+            - {row_as_printed: '14', x_SiO2_as_printed: '0.625', T_K: '1573', activity: '0.199', activity_as_printed: '0.199', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '14', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.625', Na2O: '0.375'}}
+            - {row_as_printed: '15', x_SiO2_as_printed: '0.573', T_K: '1273', activity: '0.0565', activity_as_printed: '0.0565', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '15', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.573', Na2O: '0.427'}}
+            - {row_as_printed: '16', x_SiO2_as_printed: '0.573', T_K: '1473', activity: '0.0703', activity_as_printed: '0.0703', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '16', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.573', Na2O: '0.427'}}
+            - {row_as_printed: '17', x_SiO2_as_printed: '0.573', T_K: '1573', activity: '0.0757', activity_as_printed: '0.0757', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '17', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.573', Na2O: '0.427'}}
+            - {row_as_printed: '18', x_SiO2_as_printed: '0.524', T_K: '1373', activity: '0.0162', activity_as_printed: '0.0162', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '18', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.524', Na2O: '0.476'}}
+            - {row_as_printed: '19', x_SiO2_as_printed: '0.524', T_K: '1473', activity: '0.0177', activity_as_printed: '0.0177', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '19', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.524', Na2O: '0.476'}}
+            - {row_as_printed: '20', x_SiO2_as_printed: '0.524', T_K: '1573', activity: '0.0204', activity_as_printed: '0.0204', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '20', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.524', Na2O: '0.476'}}
+            - {row_as_printed: '21', x_SiO2_as_printed: '0.477', T_K: '1373', activity: '1.75e-3', activity_as_printed: '1.75 × 10^-3', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '21', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.477', Na2O: '0.523'}}
+            - {row_as_printed: '22', x_SiO2_as_printed: '0.477', T_K: '1473', activity: '2.19e-3', activity_as_printed: '2.19 × 10^-3', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '22', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.477', Na2O: '0.523'}}
+            - {row_as_printed: '23', x_SiO2_as_printed: '0.430', T_K: '1373', activity: '3.12e-4', activity_as_printed: '3.12 × 10^-4', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '23', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.430', Na2O: '0.570'}}
+            - {row_as_printed: '24', x_SiO2_as_printed: '0.430', T_K: '1473', activity: '3.80e-4', activity_as_printed: '3.80 × 10^-4', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '24', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.430', Na2O: '0.570'}}
+            - {row_as_printed: '25', x_SiO2_as_printed: '0.405', T_K: '1423', activity: '1.38e-4', activity_as_printed: '1.38 × 10^-4', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '25', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.405', Na2O: '0.595'}}
+            - {row_as_printed: '26', x_SiO2_as_printed: '0.405', T_K: '1473', activity: '1.58e-4', activity_as_printed: '1.58 × 10^-4', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '26', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.405', Na2O: '0.595'}}
+            - {row_as_printed: '27', x_SiO2_as_printed: '0.382', T_K: '1383', activity: '4.76e-5', activity_as_printed: '4.76 × 10^-5', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '27', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.382', Na2O: '0.618'}}
+            - {row_as_printed: '28', x_SiO2_as_printed: '0.382', T_K: '1423', activity: '5.15e-5', activity_as_printed: '5.15 × 10^-5', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '28', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.382', Na2O: '0.618'}}
+            - {row_as_printed: '29', x_SiO2_as_printed: '0.349', T_K: '1373', activity: '3.77e-6', activity_as_printed: '3.77 × 10^-6', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '29', note: 'Gibbs-Duhem integration over 550 measured a_Na2O and the silica-saturation boundary (p.535); only the 29 Table 4 points are printed'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.349', Na2O: '0.651'}}
+    context:
+      - observation_id: zaitsev_2000_table4_calculated_activities
+        type: table
+        locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4'}
+        units: dimensionless activity
+        values:
+          quantity: calculated Na2O and SiO2 activities
+          method_class: model_derived
+          admission_status: typed_unavailable
+          rows_as_printed: |-
+            x(SiO2) | T(K) | calculated a(SiO2) | calculated a(Na2O)
+            0.805 | 1473 | 0.854 | 7.13 x 10^-10
+            0.805 | 1573 | 0.845 | 2.65 x 10^-9
+            0.753 | 1273 | 0.729 | 5.35 x 10^-11
+            0.753 | 1473 | 0.712 | 1.34 x 10^-9
+            0.753 | 1673 | 0.702 | 2.65 x 10^-8
+            0.709 | 1273 | 0.536 | 1.22 x 10^-10
+            0.709 | 1473 | 0.536 | 2.89 x 10^-9
+            0.709 | 1673 | 0.537 | 3.24 x 10^-8
+            0.671 | 1173 | 0.337 | 4.72 x 10^-11
+            0.671 | 1373 | 0.355 | 1.66 x 10^-9
+            0.671 | 1573 | 0.370 | 2.38 x 10^-8
+            0.625 | 1173 | 0.152 | 2.05 x 10^-10
+            0.625 | 1373 | 0.176 | 6.04 x 10^-9
+            0.625 | 1573 | 0.196 | 7.65 x 10^-8
+            0.573 | 1273 | 0.0574 | 6.13 x 10^-9
+            0.573 | 1473 | 0.0698 | 1.01 x 10^-7
+            0.573 | 1573 | 0.0756 | 3.16 x 10^-7
+            0.524 | 1373 | 0.0160 | 1.46 x 10^-7
+            0.524 | 1473 | 0.0180 | 5.17 x 10^-7
+            0.524 | 1573 | 0.0201 | 1.56 x 10^-6
+            0.477 | 1373 | 1.77 x 10^-3 | 1.31 x 10^-6
+            0.477 | 1473 | 2.16 x 10^-3 | 4.33 x 10^-6
+            0.430 | 1373 | 3.07 x 10^-4 | 5.67 x 10^-6
+            0.430 | 1473 | 3.83 x 10^-4 | 1.83 x 10^-5
+            0.405 | 1423 | 1.40 x 10^-4 | 1.98 x 10^-5
+            0.405 | 1473 | 1.56 x 10^-4 | 3.44 x 10^-5
+            0.382 | 1383 | 4.73 x 10^-5 | 2.43 x 10^-5
+            0.382 | 1423 | 5.20 x 10^-5 | 3.71 x 10^-5
+            0.349 | 1373 | 3.80 x 10^-6 | 8.62 x 10^-5
+          note: >-
+            Calculated values are retained as model_derived context and are not
+            scored observations.
+      - observation_id: zaitsev_2000_table3_standard_thermodynamic_functions
+        type: standard_thermodynamic_functions
+        locator: {page: 5, published_page: 533, pdf_page_index: 4, table: '3'}
+        units: mixed as printed; see per-column units
+        values:
+          quantity: standard thermodynamic functions
+          admission_status: typed_unavailable
+          reason: >-
+            Table 3 compares calculated standard thermodynamic functions with
+            values cited from [22]; this context record preserves the printed
+            comparison without treating calculated or attributed values as
+            measurements from this paper.
+          rows:
+            - formula_as_printed: NS2
+              source_as_printed: This work
+              S_standard_at_298_15_K_J_per_mol_K: '165.4 ± 4.0'
+              minus_delta_fH_from_oxides_kJ_per_mol: '227.4 ± 5'
+              delta_fS_from_oxides_J_per_mol_K: '7.3 ± 3.0'
+              delta_fH_from_elements_kJ_per_mol: '2464.2'
+            - formula_as_printed: NS2
+              source_as_printed: '[22]'
+              S_standard_at_298_15_K_J_per_mol_K: '164.055'
+              minus_delta_fH_from_oxides_kJ_per_mol: '230.54'
+              delta_fS_from_oxides_J_per_mol_K: '6.03'
+              delta_fH_from_elements_kJ_per_mol: '2467.3'
+            - formula_as_printed: NS
+              source_as_printed: This work
+              S_standard_at_298_15_K_J_per_mol_K: '114.8 ± 3.0'
+              minus_delta_fH_from_oxides_kJ_per_mol: '228.1 ± 5'
+              delta_fS_from_oxides_J_per_mol_K: '−1.7 ± 2.0'
+              delta_fH_from_elements_kJ_per_mol: '1554.0'
+            - formula_as_printed: NS
+              source_as_printed: '[22]'
+              S_standard_at_298_15_K_J_per_mol_K: '113.805'
+              minus_delta_fH_from_oxides_kJ_per_mol: '230.120'
+              delta_fS_from_oxides_J_per_mol_K: '−2.76'
+              delta_fH_from_elements_kJ_per_mol: '1556.03'
+            - formula_as_printed: N2S
+              source_as_printed: This work
+              S_standard_at_298_15_K_J_per_mol_K: '194.1 ± 5.0'
+              minus_delta_fH_from_oxides_kJ_per_mol: '363.0 ± 8'
+              delta_fS_from_oxides_J_per_mol_K: '2.4 ± 4.0'
+              delta_fH_from_elements_kJ_per_mol: '2104.0'
+            - formula_as_printed: N2S
+              source_as_printed: '[22]'
+              S_standard_at_298_15_K_J_per_mol_K: '195.811'
+              minus_delta_fH_from_oxides_kJ_per_mol: '359.8'
+              delta_fS_from_oxides_J_per_mol_K: '4.15'
+              delta_fH_from_elements_kJ_per_mol: '2100.8'
+        attribution_for_bracket_22: 'Knacke, O., Kubaschewski, O., and Hesselmann, K., Thermochemical Properties of Inorganic Substances, 2nd ed., Springer, 1991.'
+        row_evidence:
+          this_work: model_derived
+          '[22]': quoted_attributed
+        note: >-
+          The oxide-formation columns are from oxides, not elemental formation.
+          The row-specific text values remain as printed and are not scored.
+      - observation_id: zaitsev_2000_table1_partial_thermodynamic_functions
+        type: thermodynamic_values
+        locator: {page: 4, published_page: 532, pdf_page_index: 3, table: '1'}
+        units: 'Delta T in K; -Delta H(Na2O) in J/mol; Delta S(Na2O) in J/(mol K)'
+        values:
+          quantity: partial thermodynamic functions of Na2O in solid phase mixtures
+          admission_status: typed_unavailable
+          method_class: measured_reduced
+          standard_state: beta-Na2O
+          rows_as_printed: |-
+            phase mixture | Delta T(K) | -Delta H(Na2O) (J/mol) | Delta S(Na2O) (J/(mol K))
+            N3S8 + SiO2 | 974-1071 | 213800 ± 2800 | 24.55 ± 2.70
+            NS2 + N3S8 | 973-1078 | 242600 ± 2160 | -5.00 ± 2.10
+            NS + NS2 | 953-1110 | 240500 ± 1040 | -26.30 ± 1.00
+            N3S2 + NS | 1068-1285 | 90800 ± 1680 | 39.90 ± 1.40
+            N2S + N3S2 | 1072-1271 | 210200 ± 2270 | -72.20 ± 1.90
+            N2S + NS | 942-1063 | 150520 ± 2330 | -16.10 ± 2.30
+          note: >-
+            Table 1 partial functions are retained as printed; the negative
+            enthalpy header and partial entropy do not map without a distinct
+            row-level quantity convention.
+      - observation_id: zaitsev_2000_table2_formation_functions_from_oxides
+        type: thermodynamic_values
+        locator: {page: 4, published_page: 532, pdf_page_index: 3, table: '2'}
+        units: 'Delta T in K; -Delta_f H in J/mol; Delta_f S in J/(mol K)'
+        values:
+          quantity: sodium silicate formation functions from quartz and beta-Na2O
+          admission_status: typed_unavailable
+          method_class: model_derived
+          formation_reaction_as_printed: from quartz and beta-Na2O
+          rows_as_printed: |-
+            phase | Delta T(K) | -Delta_f H (J/mol) | Delta_f S (J/(mol K))
+            N3S8 | 974-1071 | 58300 ± 755 | 6.70 ± 0.70
+            NS2 | 973-1078 | 73660 ± 715 | 5.70 ± 0.70
+            NS | 953-1110 | 115400 ± 600 | -2.30 ± 0.60
+            N3S2 | 1068-1285 | 110500 ± 580 | 6.15 ± 0.55
+            N2S | 942-1271 | 127100 ± 620 | -6.90 ± 0.60
+          note: >-
+            These formation values are from oxides and are not delta_fH from
+            elements or absolute S; they remain unscored context.
+      - observation_id: zaitsev_2000_figure4_silicate_formation_functions
+        type: figure
+        locator: {page: 5, published_page: 533, pdf_page_index: 4, figure: '4'}
+        units: kJ/mol as plotted
+        values:
+          quantity: unavailable
+          printed_quantity: formation thermodynamic functions of sodium silicates
+          method_class: model_derived
+          admission_status: figure_only
+          species: sodium silicates in the Na2O-SiO2 binary
+          phase: solid phases and neighboring phase transformations
+          temperature: 1070 K for Delta_f G-prime; caption gives no separate T for series 1 and 2
+          axes: {x: 'x(SiO2)', y: '-Delta_f H, -Delta_f G, -Delta_f G-prime (kJ/mol)'}
+          panel: none_stated
+          caption: >-
+            Thermodynamic functions of formation of sodium silicates from
+            beta-Na2O and quartz: (1) Delta_f G; (2) Delta_f H; (3) Delta_f
+            G-prime at 1070 K.
+          series:
+            - {name: '(1) Delta_f G', marker_count: 7}
+            - {name: '(2) Delta_f H', marker_count: 6}
+            - {name: '(3) Delta_f G-prime at 1070 K', marker_count: 7}
+          points: []
+          attribution: model results of this work
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_2000_figure7_silica_activity
+        type: figure
+        locator: {page: 8, published_page: 536, pdf_page_index: 7, figure: '7'}
+        units: as plotted; log activity axis
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: figure_only
+          species: SiO2
+          phase: liquid
+          temperature: series-specific temperatures in the caption
+          axes: {x: 'x(Na2O)', y: 'log(a(SiO2))'}
+          panel: none_stated
+          caption: >-
+            SiO2 activity in Na2O-SiO2 melts with respect to pure liquid silica.
+          series:
+            - {name: 'I, this work, 1573 K curve', marker_count: 0}
+            - {name: 'II, this work, 1473 K curve', marker_count: 0}
+            - {name: 'III, this work, 1373 K curve', marker_count: 0}
+            - {name: 'IV, 1473 K [34]', marker_count: 0}
+            - {name: 'V, 1573 K [33]', marker_count: 0}
+            - {name: 'VI, 1673 K [33]', marker_count: 0}
+            - {name: '(1), 1073 K [24]', marker_count: 3}
+            - {name: '(2), 1473 K [24]', marker_count: 3}
+            - {name: '(3), 1473 K [25]', marker_count: 3}
+            - {name: '(4), 1573 K [30]', marker_count: 3}
+            - {name: '(5), 1293 K [36]', marker_count: 3}
+            - {name: '(6), 1423 K [36]', marker_count: 3}
+            - {name: '(7), 1323 K [29]', marker_count: 3}
+          points: []
+          attribution: this work and cited data as shown by series
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_2000_figure8_total_formation_functions
+        type: figure
+        locator: {page: 8, published_page: 536, pdf_page_index: 7, figure: '8'}
+        units: kJ/mol as plotted
+        values:
+          quantity: unavailable
+          printed_quantity: total thermodynamic functions of formation of Na2O-SiO2 melts
+          method_class: figure_only
+          admission_status: figure_only
+          species: Na2O-SiO2 liquid melt
+          phase: liquid
+          temperature: series-specific temperatures in the caption
+          axes: {x: 'x(Na2O)', y: '-Delta_f G, -Delta_f H (kJ/mol)'}
+          panel: none_stated
+          caption: >-
+            Composition dependences of the total thermodynamic functions of
+            formation of Na2O-SiO2 melts. This work and earlier data are labeled
+            by function and temperature in the caption.
+          series:
+            - {name: '(IV) this work, -Delta_f H, 1473 K', marker_count: 0}
+            - {name: '(V) this work, -Delta_f G, 1473 K', marker_count: 0}
+            - {name: '(I) -Delta_f H, 1300 K [31]', marker_count: 0}
+            - {name: '(1) -Delta_f G, 1293 K [31]', marker_count: 3}
+            - {name: '(2) -Delta_f G, 1423 K [31]', marker_count: 3}
+            - {name: '(II) -Delta_f G, 1573 K [28]', marker_count: 0}
+            - {name: '(III) -Delta_f G, 1673 K [28]', marker_count: 0}
+            - {name: '(3) -Delta_f G, 1473 K [18]', marker_count: 3}
+            - {name: '(4) -Delta_f H, 1473 K [18]', marker_count: 3}
+            - {name: '(5) -Delta_f G, 1323 K [24]', marker_count: 3}
+            - {name: '(6) -Delta_f H, 1323 K [24]', marker_count: 3}
+          points: []
+          attribution: this work and cited data as shown by series
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_2000_figure9_binary_phase_diagram
+        type: figure
+        locator: {page: 11, published_page: 539, pdf_page_index: 10, figure: '9'}
+        units: K and mole fraction as plotted
+        values:
+          quantity: unavailable
+          printed_quantity: Na2O-SiO2 phase diagram
+          method_class: figure_only
+          admission_status: figure_only
+          species: Na2O-SiO2 binary system
+          phase: solid, liquid, and mixed-phase fields as labeled
+          temperature: varies on the T axis
+          axes: {x: 'mole fraction from Na2O to SiO2', y: 'T, K'}
+          panel: none_stated
+          caption: >-
+            Na2O-SiO2 phase diagram calculated in this work (solid lines).
+            Open circles show data obtained by Kracek [13]; earlier invariant
+            point data [13-17] are given in parentheses.
+          series:
+            - {name: calculated phase boundaries, marker_count: 0, attribution: this work}
+            - {name: 'open circles from Kracek [13]', marker_count: 7, attribution: '[13]'}
+            - {name: invariant point annotations in parentheses, marker_count: 0, attribution: '[13-17]'}
+          points: []
+          attribution: this work and cited data as shown by series
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_2000_figure10_metastable_miscibility_gap
+        type: figure
+        locator: {page: 12, published_page: 540, pdf_page_index: 11, figure: '10'}
+        units: K and mole fraction as plotted
+        values:
+          quantity: unavailable
+          printed_quantity: metastable liquid miscibility gap in Na2O-SiO2
+          method_class: figure_only
+          admission_status: figure_only
+          species: Na2O-SiO2 binary system
+          phase: liquid
+          temperature: varies on the T axis
+          axes: {x: 'x(Na2O)', y: 'T, K'}
+          panel: none_stated
+          caption: >-
+            Metastable liquid miscibility gap in the Na2O-SiO2 system; curve is
+            calculated, points show experimental data from references [49-54].
+          series:
+            - {name: '(1) [49]', marker_count: 7, attribution: '[49]'}
+            - {name: '(2) [50]', marker_count: 3, attribution: '[50]'}
+            - {name: '(3) [51]', marker_count: 4, attribution: '[51]'}
+            - {name: '(4) [53]', marker_count: 4, attribution: '[53]'}
+            - {name: '(5) [52]', marker_count: 3, attribution: '[52]'}
+            - {name: '(6) [54]', marker_count: 6, attribution: '[54]'}
+            - {name: calculated gap curve, marker_count: 0, attribution: this work}
+          points: []
+          attribution: this work and cited data as shown by series
+          digitisation: deferred to a figure pass
+  Na2O:
+    observations:
+      - observation_id: zaitsev_2000_table4_na2o_experimental_activity
+        type: activity_coefficient
+        locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4'}
+        phase: l
+        units: dimensionless activity
+        standard_state: pure liquid Na2O
+        composition_basis: printed_mole_fraction
+        composition_derivation: 'binary Na2O-SiO2 as declared on p.535; x_Na2O = 1 - x_SiO2'
+        values:
+          quantity: activity
+          method_class: measured_direct
+          admission_status: admitted
+          points:
+            - {row_as_printed: '1', x_SiO2_as_printed: '0.805', T_K: '1473', activity: '7.19e-10', activity_as_printed: '7.19 × 10^-10', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '1'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.805', Na2O: '0.195'}}
+            - {row_as_printed: '2', x_SiO2_as_printed: '0.805', T_K: '1573', activity: '2.61e-9', activity_as_printed: '2.61 × 10^-9', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '2'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.805', Na2O: '0.195'}}
+            - {row_as_printed: '3', x_SiO2_as_printed: '0.753', T_K: '1273', activity: '5.29e-11', activity_as_printed: '5.29 × 10^-11', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '3'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.753', Na2O: '0.247'}}
+            - {row_as_printed: '4', x_SiO2_as_printed: '0.753', T_K: '1473', activity: '1.35e-9', activity_as_printed: '1.35 × 10^-9', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '4'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.753', Na2O: '0.247'}}
+            - {row_as_printed: '5', x_SiO2_as_printed: '0.753', T_K: '1673', activity: '2.61e-8', activity_as_printed: '2.61 × 10^-8', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '5'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.753', Na2O: '0.247'}}
+            - {row_as_printed: '6', x_SiO2_as_printed: '0.709', T_K: '1273', activity: '1.20e-10', activity_as_printed: '1.20 × 10^-10', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '6'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.709', Na2O: '0.291'}}
+            - {row_as_printed: '7', x_SiO2_as_printed: '0.709', T_K: '1473', activity: '2.94e-9', activity_as_printed: '2.94 × 10^-9', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '7'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.709', Na2O: '0.291'}}
+            - {row_as_printed: '8', x_SiO2_as_printed: '0.709', T_K: '1673', activity: '3.24e-8', activity_as_printed: '3.24 × 10^-8', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '8'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.709', Na2O: '0.291'}}
+            - {row_as_printed: '9', x_SiO2_as_printed: '0.671', T_K: '1173', activity: '4.67e-11', activity_as_printed: '4.67 × 10^-11', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '9'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.671', Na2O: '0.329'}}
+            - {row_as_printed: '10', x_SiO2_as_printed: '0.671', T_K: '1373', activity: '1.63e-9', activity_as_printed: '1.63 × 10^-9', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '10'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.671', Na2O: '0.329'}}
+            - {row_as_printed: '11', x_SiO2_as_printed: '0.671', T_K: '1573', activity: '2.41e-8', activity_as_printed: '2.41 × 10^-8', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '11'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.671', Na2O: '0.329'}}
+            - {row_as_printed: '12', x_SiO2_as_printed: '0.625', T_K: '1173', activity: '2.01e-10', activity_as_printed: '2.01 × 10^-10', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '12'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.625', Na2O: '0.375'}}
+            - {row_as_printed: '13', x_SiO2_as_printed: '0.625', T_K: '1373', activity: '6.10e-9', activity_as_printed: '6.10 × 10^-9', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '13'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.625', Na2O: '0.375'}}
+            - {row_as_printed: '14', x_SiO2_as_printed: '0.625', T_K: '1573', activity: '7.63e-8', activity_as_printed: '7.63 × 10^-8', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '14'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.625', Na2O: '0.375'}}
+            - {row_as_printed: '15', x_SiO2_as_printed: '0.573', T_K: '1273', activity: '6.10e-9', activity_as_printed: '6.10 × 10^-9', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '15'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.573', Na2O: '0.427'}}
+            - {row_as_printed: '16', x_SiO2_as_printed: '0.573', T_K: '1473', activity: '1.02e-7', activity_as_printed: '1.02 × 10^-7', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '16'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.573', Na2O: '0.427'}}
+            - {row_as_printed: '17', x_SiO2_as_printed: '0.573', T_K: '1573', activity: '3.20e-7', activity_as_printed: '3.20 × 10^-7', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '17'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.573', Na2O: '0.427'}}
+            - {row_as_printed: '18', x_SiO2_as_printed: '0.524', T_K: '1373', activity: '1.45e-7', activity_as_printed: '1.45 × 10^-7', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '18'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.524', Na2O: '0.476'}}
+            - {row_as_printed: '19', x_SiO2_as_printed: '0.524', T_K: '1473', activity: '5.24e-7', activity_as_printed: '5.24 × 10^-7', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '19'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.524', Na2O: '0.476'}}
+            - {row_as_printed: '20', x_SiO2_as_printed: '0.524', T_K: '1573', activity: '1.53e-6', activity_as_printed: '1.53 × 10^-6', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '20'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.524', Na2O: '0.476'}}
+            - {row_as_printed: '21', x_SiO2_as_printed: '0.477', T_K: '1373', activity: '1.32e-6', activity_as_printed: '1.32 × 10^-6', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '21'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.477', Na2O: '0.523'}}
+            - {row_as_printed: '22', x_SiO2_as_printed: '0.477', T_K: '1473', activity: '4.27e-6', activity_as_printed: '4.27 × 10^-6', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '22'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.477', Na2O: '0.523'}}
+            - {row_as_printed: '23', x_SiO2_as_printed: '0.430', T_K: '1373', activity: '5.71e-6', activity_as_printed: '5.71 × 10^-6', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '23'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.430', Na2O: '0.570'}}
+            - {row_as_printed: '24', x_SiO2_as_printed: '0.430', T_K: '1473', activity: '1.83e-5', activity_as_printed: '1.83 × 10^-5', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '24'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.430', Na2O: '0.570'}}
+            - {row_as_printed: '25', x_SiO2_as_printed: '0.405', T_K: '1423', activity: '2.01e-5', activity_as_printed: '2.01 × 10^-5', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '25'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.405', Na2O: '0.595'}}
+            - {row_as_printed: '26', x_SiO2_as_printed: '0.405', T_K: '1473', activity: '1.56e-5', activity_as_printed: '1.56 × 10^-5', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '26'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.405', Na2O: '0.595'}}
+            - {row_as_printed: '27', x_SiO2_as_printed: '0.382', T_K: '1383', activity: '4.73e-5', activity_as_printed: '4.73 × 10^-5', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '27'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.382', Na2O: '0.618'}}
+            - {row_as_printed: '28', x_SiO2_as_printed: '0.382', T_K: '1423', activity: '5.20e-5', activity_as_printed: '5.20 × 10^-5', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '28'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.382', Na2O: '0.618'}}
+            - {row_as_printed: '29', x_SiO2_as_printed: '0.349', T_K: '1373', activity: '3.80e-5', activity_as_printed: '3.80 × 10^-5', locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4', row: '29'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.349', Na2O: '0.651'}}
+      - observation_id: zaitsev_2000_table6_this_work_partial_molar_enthalpy
+        type: gibbs_table
+        locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6'}
+        phase: l
+        units: kJ/mol
+        standard_state: pure liquid Na2O
+        component_as_printed: Na2O
+        composition_basis: printed_mole_fraction
+        composition_derivation: 'binary Na2O-SiO2 as declared on p.537; x_SiO2 = 1 - x_Na2O'
+        derived_from: [zaitsev_2000_table4_na2o_experimental_activity]
+        derivation:
+          relation: Partial enthalpy and entropy of Na2O determined from temperature dependences of chemical potential by least-squares fitting (p.531); only 29 of 550 measured Na2O activities are printed in Table 4
+          inputs: [zaitsev_2000_table4_na2o_experimental_activity]
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: measured_reduced
+          admission_status: admitted
+          printed_header_as_published: '-Delta H(Na2O)'
+          points:
+            - {row_as_printed: '0.4', x_Na2O_as_printed: '0.4', T_K: '1473', partial_molar_enthalpy_as_printed: {value: -223.2, units: kJ/mol, as_printed: '-223.2'}, sigma: '5', printed_minus_delta_H_kJ_per_mol: '223.2', locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6', row: '0.4', note: 'printed -Delta H(Na2O) = 223.2 kJ/mol; stored Delta H = -223.2 kJ/mol'}, composition_mol: {basis: printed_mole_fraction, Na2O: '0.4', SiO2: '0.6'}}
+            - {row_as_printed: '0.45', x_Na2O_as_printed: '0.45', T_K: '1473', partial_molar_enthalpy_as_printed: {value: -216.5, units: kJ/mol, as_printed: '-216.5'}, sigma: '5', printed_minus_delta_H_kJ_per_mol: '216.5', locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6', row: '0.45', note: 'printed -Delta H(Na2O) = 216.5 kJ/mol; stored Delta H = -216.5 kJ/mol'}, composition_mol: {basis: printed_mole_fraction, Na2O: '0.45', SiO2: '0.55'}}
+            - {row_as_printed: '0.5', x_Na2O_as_printed: '0.5', T_K: '1473', partial_molar_enthalpy_as_printed: {value: -206.3, units: kJ/mol, as_printed: '-206.3'}, sigma: '5', printed_minus_delta_H_kJ_per_mol: '206.3', locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6', row: '0.5', note: 'printed -Delta H(Na2O) = 206.3 kJ/mol; stored Delta H = -206.3 kJ/mol'}, composition_mol: {basis: printed_mole_fraction, Na2O: '0.5', SiO2: '0.5'}}
+            - {row_as_printed: '0.55', x_Na2O_as_printed: '0.55', T_K: '1473', partial_molar_enthalpy_as_printed: {value: -197.9, units: kJ/mol, as_printed: '-197.9'}, sigma: '5', printed_minus_delta_H_kJ_per_mol: '197.9', locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6', row: '0.55', note: 'printed -Delta H(Na2O) = 197.9 kJ/mol; stored Delta H = -197.9 kJ/mol'}, composition_mol: {basis: printed_mole_fraction, Na2O: '0.55', SiO2: '0.45'}}
+      - observation_id: zaitsev_2000_table6_reference_34_partial_molar_enthalpy
+        type: gibbs_table
+        locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6'}
+        phase: l
+        units: kJ/mol
+        standard_state: pure liquid Na2O
+        component_as_printed: Na2O
+        composition_basis: printed_mole_fraction
+        composition_derivation: 'binary Na2O-SiO2 as declared on p.537; x_SiO2 = 1 - x_Na2O'
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: quoted_attributed
+          admission_status: admitted
+          attribution: '[34]'
+          printed_header_as_published: '-Delta H(Na2O)'
+          points:
+            - {row_as_printed: '0.4', x_Na2O_as_printed: '0.4', T_K: '1473', partial_molar_enthalpy_as_printed: {value: -279.5, units: kJ/mol, as_printed: '-279.5'}, sigma: '3.9', printed_minus_delta_H_kJ_per_mol: '279.5', locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6', row: '0.4', note: 'printed -Delta H(Na2O) = 279.5 kJ/mol; stored Delta H = -279.5 kJ/mol; source [34]'}, composition_mol: {basis: printed_mole_fraction, Na2O: '0.4', SiO2: '0.6'}}
+            - {row_as_printed: '0.45', x_Na2O_as_printed: '0.45', T_K: '1473', partial_molar_enthalpy_as_printed: {value: -225.9, units: kJ/mol, as_printed: '-225.9'}, sigma: '5.8', printed_minus_delta_H_kJ_per_mol: '225.9', locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6', row: '0.45', note: 'printed -Delta H(Na2O) = 225.9 kJ/mol; stored Delta H = -225.9 kJ/mol; source [34]'}, composition_mol: {basis: printed_mole_fraction, Na2O: '0.45', SiO2: '0.55'}}
+            - {row_as_printed: '0.5', x_Na2O_as_printed: '0.5', T_K: '1473', partial_molar_enthalpy_as_printed: {value: -183.8, units: kJ/mol, as_printed: '-183.8'}, sigma: '5.8', printed_minus_delta_H_kJ_per_mol: '183.8', locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6', row: '0.5', note: 'printed -Delta H(Na2O) = 183.8 kJ/mol; stored Delta H = -183.8 kJ/mol; source [34]'}, composition_mol: {basis: printed_mole_fraction, Na2O: '0.5', SiO2: '0.5'}}
+            - {row_as_printed: '0.55', x_Na2O_as_printed: '0.55', T_K: '1473', partial_molar_enthalpy_as_printed: {value: -141.7, units: kJ/mol, as_printed: '-141.7'}, sigma: '3.9', printed_minus_delta_H_kJ_per_mol: '141.7', locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6', row: '0.55', note: 'printed -Delta H(Na2O) = 141.7 kJ/mol; stored Delta H = -141.7 kJ/mol; source [34]'}, composition_mol: {basis: printed_mole_fraction, Na2O: '0.55', SiO2: '0.45'}}
+    context:
+      - observation_id: zaitsev_2000_table5_negative_log_na2o_activity
+        type: thermodynamic_values
+        locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '5'}
+        units: '-log[a(Na2O)] as printed; dimensionless logarithm'
+        values:
+          quantity: negative log activity of Na2O
+          admission_status: typed_unavailable
+          schema_gap: no existing store token for the printed negative-log activity form
+          sources_as_printed: [this work, '[39]']
+          reference_39_as_printed: 'Rudnyi, E. B., Vovk, O. M., Sidorov, L. N., et al., Activity of the Alkali Oxide in Soda-Silica Melts by the Ionic-Molecular Equilibrium Method, Fiz. Khim. Stekla, 1988, 14(2), 218–225.'
+          footnotes:
+            '*': Melt-tridymite equilibrium.
+            '**': Determined by extrapolating melt properties to the stability field of sodium metasilicate.
+          rows_as_printed: |-
+            x(Na2O) | T(K) | this work -log[a(Na2O)] | [39] -log[a(Na2O)]
+            0.103* | 1430 | 9.394 | 9.823
+            0.103* | 1473 | 9.158 | 9.770
+            0.254 | 1430 | 9.094 | 9.572
+            0.254 | 1473 | 8.827 | 9.515
+            0.254 | 1515 | 8.580 | 8.981
+            0.254 | 1557 | 8.348 | 8.790
+            0.303 | 1344 | 9.261 | 9.090
+            0.303 | 1387 | 8.966 | 8.859
+            0.303 | 1430 | 8.689 | 8.590
+            0.303 | 1473 | 8.429 | 8.286
+            0.303 | 1515 | 8.188 | 8.065
+            0.402 | 1255 | 8.674 | 8.143
+            0.402 | 1344 | 8.062 | 7.756
+            0.402 | 1387 | 7.794 | 7.596
+            0.402 | 1430 | 7.543 | 7.374
+            0.402 | 1473 | 7.305 | 7.392
+            0.500** | 1255 | 7.080 | 6.558
+            0.500** | 1300 | 6.784 | 6.236
+            0.500** | 1344 | 6.512 | 5.841
+            0.500 | 1387 | 6.264 | 5.641
+            0.500 | 1430 | 6.030 | 5.576
+            0.500 | 1473 | 5.810 | 5.429
+      - observation_id: zaitsev_2000_table6_partial_molar_entropy
+        type: thermodynamic_values
+        locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6'}
+        units: kJ/(mol K)
+        values:
+          quantity: partial molar entropy of Na2O
+          admission_status: typed_unavailable
+          schema_gap: no existing store token for partial molar entropy
+          rows_as_printed: |-
+            x(Na2O) | this work Delta S(Na2O) | [34] Delta S(Na2O)
+            0.4 | 11.2 ± 1.5 | -58.2 ± 1.2
+            0.45 | -18.9 ± 1.5 | -34.3 ± 1.2
+            0.5 | -28.8 ± 1.5 | -19.7 ± 0.6
+            0.55 | -39.2 ± 1.5 | -1.1 ± 0.2
+          note: '[34] values are quoted attributed; printed unit is kJ/(mol K).'
+      - observation_id: zaitsev_2000_figure1_partial_gibbs_energy
+        type: figure
+        locator: {page: 3, published_page: 531, pdf_page_index: 2, figure: '1'}
+        units: kJ/mol as plotted
+        values:
+          quantity: unavailable
+          printed_quantity: partial Gibbs energy of Na2O
+          method_class: figure_only
+          admission_status: figure_only
+          species: Na2O
+          phase: two-phase condensed assemblages
+          temperature: varies on the T axis
+          axes: {x: 'T, K', y: '-Delta G(Na2O), kJ/mol'}
+          panel: none_stated
+          caption: >-
+            Partial Gibbs energy of Na2O as a function of temperature for the
+            N3S8 + SiO2 and N3S8 + NS2 two-phase regions.
+          series:
+            - {name: '(1) x(SiO2)=0.805, Nb cell, D=0.203 mm', marker_count: 18}
+            - {name: '(2) x(SiO2)=0.733, Ta cell, D=0.314 mm', marker_count: 8}
+            - {name: '(3) x(SiO2)=0.709, Nb cell, D=0.247 mm', marker_count: 16}
+            - {name: '(4) x(SiO2)=0.671, Ta cell, D=0.356 mm', marker_count: 20}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_2000_figure2_partial_gibbs_energy
+        type: figure
+        locator: {page: 3, published_page: 531, pdf_page_index: 2, figure: '2'}
+        units: kJ/mol as plotted
+        values:
+          quantity: unavailable
+          printed_quantity: partial Gibbs energy of Na2O
+          method_class: figure_only
+          admission_status: figure_only
+          species: Na2O
+          phase: two-phase condensed assemblage
+          temperature: varies on the T axis
+          axes: {x: 'T, K', y: '-Delta G(Na2O), kJ/mol'}
+          panel: none_stated
+          caption: >-
+            Partial Gibbs energy of Na2O as a function of temperature for the
+            NS + NS2 two-phase region.
+          series:
+            - {name: '(1) x(SiO2)=0.625, Nb cell, D=0.322 mm', marker_count: 18}
+            - {name: '(2) x(SiO2)=0.573, Ta cell, D=0.208 mm', marker_count: 20}
+            - {name: '(3) x(SiO2)=0.524, Mo cell, D=0.351 mm', marker_count: 17}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_2000_figure3_partial_gibbs_energy
+        type: figure
+        locator: {page: 4, published_page: 532, pdf_page_index: 3, figure: '3'}
+        units: kJ/mol as plotted
+        values:
+          quantity: unavailable
+          printed_quantity: partial Gibbs energy of Na2O
+          method_class: figure_only
+          admission_status: figure_only
+          species: Na2O
+          phase: two-phase condensed assemblages
+          temperature: varies on the T axis
+          axes: {x: 'T, K', y: '-Delta G(Na2O), kJ/mol'}
+          panel: none_stated
+          caption: >-
+            Partial Gibbs energy of Na2O as a function of temperature for the
+            N3S2 + NS, N3S2 + N2S, and N2S + NS two-phase regions.
+          series:
+            - {name: '(1) x(SiO2)=0.477, Nb cell, D=0.311 mm', marker_count: 12}
+            - {name: '(2) x(SiO2)=0.430, Ta cell, D=0.203 mm', marker_count: 12}
+            - {name: '(3) x(SiO2)=0.450, Mo cell, D=0.207 mm', marker_count: 9}
+            - {name: '(4) x(SiO2)=0.405, Mo cell, D=0.351 mm', marker_count: 10}
+            - {name: '(5) x(SiO2)=0.382, Nb cell, D=0.209 mm', marker_count: 15}
+            - {name: '(6) x(SiO2)=0.382, Ta cell, D=0.314 mm', marker_count: 11}
+            - {name: '(7) x(SiO2)=0.360, Mo cell, D=0.248 mm', marker_count: 14}
+            - {name: '(8) x(SiO2)=0.349, Ni cell, D=0.212 mm', marker_count: 14}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_2000_figure5_alpha_function
+        type: figure
+        locator: {page: 6, published_page: 534, pdf_page_index: 5, figure: '5'}
+        units: as plotted
+        values:
+          quantity: unavailable
+          printed_quantity: '-alpha(Na2O) = -ln(gamma(Na2O))/[1-x(Na2O)]^2'
+          method_class: figure_only
+          admission_status: figure_only
+          species: Na2O
+          phase: liquid
+          temperature: 1473 K
+          axes: {x: 'x(SiO2)', y: '-alpha(Na2O)'}
+          panel: none_stated
+          caption: 'Composition dependence of alpha(Na2O) at 1473 K.'
+          series:
+            - {name: this work square-symbol series, marker_count: 11}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_2000_figure6_na2o_activity
+        type: figure
+        locator: {page: 6, published_page: 534, pdf_page_index: 5, figure: '6'}
+        units: as plotted; log activity axis
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: figure_only
+          species: Na2O
+          phase: liquid
+          temperature: series-specific temperatures in the caption
+          axes: {x: 'x(Na2O)', y: 'log(a(Na2O))'}
+          panel: none_stated
+          caption: >-
+            Na2O activity in Na2O-SiO2 melts with respect to pure liquid Na2O.
+            This work and earlier data are listed by series in the caption.
+          series:
+            - {name: 'I, this work, 1573 K curve', marker_count: 0}
+            - {name: 'II, this work, 1473 K curve', marker_count: 0}
+            - {name: 'III, this work, 1373 K curve', marker_count: 0}
+            - {name: 'IV, 1573 K [33]', marker_count: 0}
+            - {name: 'V, 1673 K [33]', marker_count: 0}
+            - {name: '(1), 1450 K [26]', marker_count: 3}
+            - {name: '(2), 1373 K [30]', marker_count: 3}
+            - {name: '(3), 1573 K [30]', marker_count: 3}
+            - {name: '(4), 1773 K [30]', marker_count: 3}
+            - {name: '(5), 1293 K [36]', marker_count: 3}
+            - {name: '(6), 1423 K [36]', marker_count: 3}
+            - {name: '(7), 1373 K [37]', marker_count: 3}
+            - {name: '(8), 1323 K [29]', marker_count: 3}
+            - {name: '(9), 1573 K [34]', marker_count: 3}
+            - {name: '(10), 1473 K [34]', marker_count: 3}
+            - {name: '(11), 1373 K [34]', marker_count: 3}
+            - {name: '(12), 1473 K [27]', marker_count: 3}
+            - {name: '(13), 1473 K [25]', marker_count: 3}
+            - {name: '(14), 1173 K [28]', marker_count: 3}
+            - {name: '(15), 1273 K [28]', marker_count: 3}
+            - {name: '(16), 1373 K [28]', marker_count: 3}
+            - {name: '(17), 1273 K [31, 32]', marker_count: 3}
+            - {name: '(18), 1373 K [31, 32]', marker_count: 3}
+            - {name: '(19), 1473 K [31, 32]', marker_count: 3}
+            - {name: '(20), 1473 K [24]', marker_count: 3}
+          points: []
+          attribution: this work and cited data as shown by series
+          digitisation: deferred to a figure pass

@@ -1,0 +1,167 @@
+source_id: shornikov-2019-mgo-titania-melts
+source:
+  citation: >-
+    Shornikov, S. I. (2019). Thermodynamic properties of the MgO–TiO2 melts.
+    Experiment in Geosciences, 25(1), 85–88.
+  year: 2019
+  corpus_asset: raw/shornikov-2019-mgo-titania-melts/shornikov-2019-mgo-titania-melts.pdf
+extraction:
+  method: >-
+    MinerU table_draft emit for the point-temperature Table 1 cells and Table 2;
+    Table 1 cells printed with ± and interval temperatures were normalized by hand.
+  date: '2026-10-18'
+  worker: trial-lmax-1018
+review_status: draft
+fidelity_samples:
+  - path: >-
+      species.Mg2TiO4.observations[shornikov_2019_mgo_titania_melts_p002_t01_r03_c03].values.value
+    value: '-5.69'
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 86
+      table: '1'
+      note: Table 1, row Mg2TiO4 at 298 K, enthalpy column.
+  - path: >-
+      species.MgTiO3.observations[shornikov_2019_mgo_titania_melts_p002_t01_r08_c04].values.value
+    value: '-2.30'
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 86
+      table: '1'
+      note: Table 1, row MgTiO3 at 298 K, entropy column.
+  - path: >-
+      species.MgO.observations[shornikov_2019_mgo_titania_melts_p003_t02_r03_c02].values.value
+    value: '-355.987'
+    locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 87
+      table: '2'
+      note: Table 2, MgO solid column.
+  - path: >-
+      species.O2.observations[shornikov_2019_mgo_titania_melts_p003_t02_r12_c06].values.value
+    value: '0.000'
+    locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 87
+      table: '2'
+      note: Table 2, O2 gas-species column.
+tables:
+  - page: 2
+    table_index: 1
+    type: gibbs_table
+    quantity: delta_fH
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    published_page: 86
+    rows: [2, 3, 4, 5, 6]
+    temperature:
+      column: 2
+      unit: K
+    values:
+      - column: 3
+        species: Mg2TiO4
+        quantity: delta_fH
+        unit: kJ/mol
+      - column: 4
+        species: Mg2TiO4
+        quantity: delta_fS
+        unit: J/(mol×K)
+      - column: 5
+        species: Mg2TiO4
+        quantity: delta_fG
+        unit: kJ/mol
+    attribution: >-
+      The source Reference column is transcribed per row into the extract.
+  - page: 2
+    table_index: 1
+    type: gibbs_table
+    quantity: delta_fH
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    published_page: 86
+    rows: [8, 9, 10, 11, 12, 13]
+    temperature:
+      column: 2
+      unit: K
+    values:
+      - column: 3
+        species: MgTiO3
+        quantity: delta_fH
+        unit: kJ/mol
+      - column: 4
+        species: MgTiO3
+        quantity: delta_fS
+        unit: J/(mol×K)
+      - column: 5
+        species: MgTiO3
+        quantity: delta_fG
+        unit: kJ/mol
+    attribution: >-
+      The source Reference column is transcribed per row into the extract.
+  - page: 2
+    table_index: 1
+    type: gibbs_table
+    quantity: delta_fH
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    published_page: 86
+    rows: [15, 16, 17, 18, 19]
+    temperature:
+      column: 2
+      unit: K
+    values:
+      - column: 3
+        species: MgTi2O5
+        quantity: delta_fH
+        unit: kJ/mol
+      - column: 4
+        species: MgTi2O5
+        quantity: delta_fS
+        unit: J/(mol×K)
+      - column: 5
+        species: MgTi2O5
+        quantity: delta_fG
+        unit: kJ/mol
+    attribution: >-
+      The source Reference column is transcribed per row into the extract.
+  - page: 3
+    table_index: 2
+    type: gibbs_table
+    quantity: delta_fG
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    per: mol_species
+    published_page: 87
+    rows: all
+    species_form: printed_formula
+    experiment: shornikov-2019-present-study-model
+    temperature:
+      as_printed: '2173'
+      unit: K
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 87
+        table: '2'
+        column_header: >-
+          ΔG°2173, kJ/mol
+        note: >-
+          The table caption gives the calculation temperature as 2173 K.
+    attribution: >-
+      Table 2 caption says the standard Gibbs energies were calculated in the
+      present study. The per-species input mapping is not printed, so these
+      values remain attributed rather than model-derived.
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+        phase: cr
+      - species_column: 3
+        value_column: 4
+        phase: l
+      - species_column: 5
+        value_column: 6
+        phase: g

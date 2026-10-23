@@ -3373,6 +3373,13 @@ _PRINTED_COMPOSITION_TOTAL_KEYS = frozenset(
         "sum_as_published",
     }
 )
+_RESIDUE_COMPONENT_SLOT_FIELDS = (
+    "SiO2_wt_pct",
+    "Al2O3_wt_pct",
+    "FeO_wt_pct",
+    "MgO_wt_pct",
+    "CaO_wt_pct",
+)
 _COMPOSITION_CONDITION_KEYS = frozenset(
     {
         "T_C",
@@ -3705,12 +3712,13 @@ def _printed_initial_charge_row_map(
 def _mass_loss_oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
     if not isinstance(obj, Mapping):
         return None
+    fields, _invalid = _residue_component_field_sets(obj)
     components = {
-        oxide: obj[f"{oxide}_wt_pct"]
-        for oxide in ("SiO2", "Al2O3", "FeO", "MgO", "CaO")
-        if f"{oxide}_wt_pct" in obj
+        field.removesuffix("_wt_pct"): amount
+        for field in fields
+        if (amount := _as_dec_or_none(obj.get(field))) is not None
     }
-    return _oxide_map_from_mapping(components, declared_map=True)
+    return components if len(components) >= 2 else None
 
 
 def _initial_oxide_map_from_values(
@@ -5278,6 +5286,9 @@ def _quantities_named_by_payload(
         if isinstance(raw, Mapping) and raw.get("value") is None and "value" in raw:
             continue
         named.add(quantity)
+    residue_fields, _invalid_residue_fields = _residue_component_field_sets(values)
+    if residue_fields:
+        named.add(Quantity.RESIDUE_COMPONENT_COMPOSITION)
     return frozenset(named)
 
 
@@ -5586,6 +5597,14 @@ def _quantity_corroborated(
         return "gamma" in values or "activity_coefficient" in values
     if candidate is Quantity.MASS_LOSS_RATE:
         return "mass_loss_rate" in values
+    if candidate is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        series = values.get("series")
+        if _residue_component_field_sets(values)[0]:
+            return True
+        return isinstance(series, list) and any(
+            isinstance(item, Mapping) and _residue_component_field_sets(item)[0]
+            for item in series
+        )
     if candidate is Quantity.MASS_LOSS_AREAL_DENSITY:
         return values.get("quantity_as_printed") == "delta_q" or any(
             key in values for key in QUANTITY_SOURCE_FIELDS[candidate]
@@ -5715,6 +5734,10 @@ def _historical_prefix_stem(alias: str) -> bool:
 
 
 def _co_present_quantity_field(quantity: Quantity, values: Mapping[str, Any]) -> bool:
+    if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        return bool(_residue_component_field_sets(values)[0]) or (
+            values.get("residue_ppm") not in (None, "")
+        )
     keys = QUANTITY_SOURCE_FIELDS.get(quantity, ())
     if quantity is Quantity.ACTIVITY:
         keys = ("activity",)
@@ -8660,6 +8683,45 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.CHLORIDE_CAPACITY: ("log10_C_Cl",),
 }
 
+
+def _residue_component_field_sets(
+    payload: Mapping[str, Any] | None,
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Return formula-valid residue fields and oxide-looking fields that refuse."""
+
+    if not isinstance(payload, Mapping):
+        return (), ()
+    from simulator.accounting.formulas import resolve_species_formula
+
+    valid: list[str] = []
+    invalid: list[str] = []
+    ordered_fields = (*_RESIDUE_COMPONENT_SLOT_FIELDS, *payload)
+    seen: set[str] = set()
+    for field in ordered_fields:
+        if not isinstance(field, str) or not field.endswith("_wt_pct"):
+            continue
+        if field not in payload:
+            continue
+        if field in seen:
+            continue
+        seen.add(field)
+        if (
+            field in _PRINTED_COMPOSITION_MAP_KEYS
+            or field in _COMPOSITION_CONDITION_KEYS
+            or field.startswith("pin_")
+        ):
+            continue
+        oxide = field.removesuffix("_wt_pct")
+        try:
+            formula = resolve_species_formula(oxide)
+        except ValueError:
+            invalid.append(field)
+            continue
+        if "O" not in formula.elements:
+            continue
+        valid.append(field)
+    return tuple(valid), tuple(invalid)
+
 _CONDITION_RANGE_KEYS = ("T_range_K", "temperature_range_k", "temperature_range_K")
 AXIS_TEMPERATURE_K = "temperature_K"
 AXIS_STANDARD_PRESSURE_PA = "standard_pressure_Pa"
@@ -9118,6 +9180,10 @@ def _unavailable_selection(
     )
 
 
+def _is_approximate_qualifier(payload: Mapping[str, Any] | None) -> bool:
+    return payload is not None and payload.get("qualifier") == "approximate"
+
+
 def _point_selection(
     amount: Decimal,
     field_name: str,
@@ -9129,7 +9195,8 @@ def _point_selection(
         value=Value(
             ValueKind.POINT,
             point=amount,
-            approximate=bool(payload.get("approximate")),
+            approximate=bool(payload.get("approximate"))
+            or _is_approximate_qualifier(payload),
         ),
         field_name=field_name,
         unit_trail=unit_trail,
@@ -9951,6 +10018,31 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
+    if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        oxide_fields, invalid_fields = _residue_component_field_sets(payload)
+        for field in ("residue_ppm", *oxide_fields):
+            if field not in payload:
+                continue
+            amount = _as_dec_or_none(payload.get(field))
+            if amount is not None:
+                return _point_selection(
+                    amount, field, "identity:as_published", payload, condition_ranges
+                )
+            return _unavailable_selection(
+                (
+                    f"{field} is null; absence is not a measured zero"
+                    if payload.get(field) is None or payload.get(field) == ""
+                    else f"{field} is not numeric: {payload.get(field)!r}"
+                ),
+                condition_ranges=condition_ranges,
+                field_name=field,
+            )
+        if invalid_fields:
+            return _unavailable_selection(
+                "unrecognized residue oxide field(s): " + ", ".join(invalid_fields),
+                condition_ranges=condition_ranges,
+                field_name=invalid_fields[0],
+            )
     if (
         q_token is Quantity.H_MINUS_H298
         and "minus_delta_H_cool_kJ_mol-1" in payload
@@ -10872,26 +10964,29 @@ def _located_from_hit(
             )
             for key in ("inference", "qualifier", "note", "quote")
         )
-    approximate = (
+    approximate = _is_approximate_qualifier(mapping) or (
         is_pressure
-        and isinstance(mapping, Mapping)
         and (
             str(mapping.get("kind") or "").lower() in {"about_nominal", "approximate"}
             or bool(mapping.get("approximate"))
             or bool(_PRESSURE_NON_POINT_RE.search(own_printed))
         )
     )
-    state = (
-        State.of(si)
-        if isinstance(si, Value)
-        else State.of(
+    if isinstance(si, Value):
+        value = (
+            replace(si, approximate=True)
+            if approximate and si.kind is ValueKind.POINT
+            else si
+        )
+        state = State.of(value)
+    elif approximate:
+        state = State.of(
             _value_from_plain(
                 {"kind": ValueKind.POINT.value, "point": si, "approximate": True}
             )
         )
-        if approximate
-        else State.of(si)
-    )
+    else:
+        state = State.of(si)
     if non_point:
         state = State.unknown(
             f"extract {hit.entry.printed} is a bound or approximate value, not a point; "
@@ -12856,7 +12951,7 @@ class Migrator:
         # (not the parent observation's). A row-local map describes that row
         # (often an evaporation residue), so it never promotes to the sample.
         self._row_local_printed_observations: set[str] = set()
-        # Compilation record JSON paths registered as Work assets (not INDEX).
+        # Declared source assets not present in INDEX, including table CSVs.
         self._work_extra_assets: dict[str, dict[str, SourceFile]] = defaultdict(dict)
         # t-1123a: per-source printed liquidus / plateau records (phase_field.py).
         self._phase_field_records: dict[str, PhaseFieldRecords | None] = {}
@@ -12903,6 +12998,7 @@ class Migrator:
         source_id: str,
         index_row: Mapping[str, Any] | None,
         source_method_uncertainty: SourceMethodUncertainty | None = None,
+        source_files: Mapping[str, Any] | None = None,
     ) -> Work:
         work_id, canonical_doi = work_id_for(
             citation=citation,
@@ -12938,7 +13034,20 @@ class Migrator:
                     f"conflicting source method uncertainty for {source_id}"
                 )
             source_method_uncertainties[source_id] = source_method_uncertainty
+        if source_files is not None:
+            if not isinstance(source_files, Mapping):
+                raise ValueError("extract source_files must be a mapping")
+            for payload in source_files.get("files") or ():
+                asset = _source_file_from_plain(payload)
+                existing = self._work_extra_assets[work_id].get(asset.asset_id)
+                if existing is not None and existing != asset:
+                    raise ValueError(
+                        f"conflicting declared source asset {asset.asset_id!r}"
+                    )
+                self._work_extra_assets[work_id][asset.asset_id] = asset
         pack = source_files_for(source_id, index_row)
+        if source_files is not None and source_files.get("corpus_repo"):
+            pack = replace(pack, corpus_repo=str(source_files["corpus_repo"]))
         merged = self._merge_extra_assets(work_id, list(pack.files))
         work = Work(
             work_id=work_id,
@@ -14259,6 +14368,7 @@ class Migrator:
             source_id=source_id,
             index_row=index_row,
             source_method_uncertainty=source_method_uncertainty,
+            source_files=doc.get("source_files"),
         )
         experiment_refs = self._lift_extract_registries(
             doc, work=work, source_key=rel
@@ -16158,21 +16268,61 @@ class Migrator:
             and isinstance(values.get("series"), list)
             and values["series"]
         ):
-            residue_fields = QUANTITY_SOURCE_FIELDS[q_token]
-            oxide_fields = tuple(
-                field for field in residue_fields if field.endswith("_wt_pct")
+            series_items = [
+                item for item in values["series"] if isinstance(item, Mapping)
+            ]
+            series_oxide_fields = tuple(
+                dict.fromkeys(
+                    field
+                    for item in series_items
+                    for field in _residue_component_field_sets(item)[0]
+                )
             )
+            appended_oxide_fields = tuple(
+                field
+                for field in series_oxide_fields
+                if field not in _RESIDUE_COMPONENT_SLOT_FIELDS
+            )
+            residue_fields = (
+                "residue_ppm",
+                *_RESIDUE_COMPONENT_SLOT_FIELDS,
+                *appended_oxide_fields,
+            )
+            # This is the historical six-slot ordinal space. New columns get
+            # field-and-row ids below so they cannot shift any existing slot.
+            point_stride = len(_RESIDUE_COMPONENT_SLOT_FIELDS) + 1
             for point in exploded:
                 raw_item = point.get("item")
                 if not isinstance(raw_item, Mapping):
                     continue
+                _valid_fields, invalid_fields = _residue_component_field_sets(raw_item)
+                for field in invalid_fields:
+                    self.result.registry_issues.append(
+                        ValidationIssue(
+                            path=(
+                                f"observations.{obs_id}.values.series"
+                                f"[{point.get('index', 0)}].{field}"
+                            ),
+                            reason=RefusalReason.INVALID_SOURCE,
+                            detail=(
+                                f"residue component field {field!r} does not name "
+                                "a parseable oxide formula"
+                            ),
+                        )
+                    )
                 component_fields = (
-                    oxide_fields
-                    if any(field in raw_item for field in oxide_fields)
+                    tuple(field for field in series_oxide_fields if field in raw_item)
+                    if any(field in raw_item for field in series_oxide_fields)
                     else (("residue_ppm",) if "residue_ppm" in raw_item else ())
                 )
                 point_index = int(point.get("index", 0))
-                for component_index, field in enumerate(component_fields):
+                for field in component_fields:
+                    if field == "residue_ppm":
+                        component_index = 0
+                    elif field in _RESIDUE_COMPONENT_SLOT_FIELDS:
+                        component_index = _RESIDUE_COMPONENT_SLOT_FIELDS.index(field)
+                    else:
+                        component_index = len(_RESIDUE_COMPONENT_SLOT_FIELDS)
                     cell_units = str(obs.get("units") or "")
                     if (
                         field.endswith("_wt_pct")
@@ -16200,7 +16350,7 @@ class Migrator:
                     self._emit_exploded_point(
                         parent_id=obs_id,
                         item={
-                            "index": point_index * len(residue_fields) + component_index,
+                            "index": point_index * point_stride + component_index,
                             "item": cell_item,
                             "units": cell_units,
                         },
@@ -16229,6 +16379,15 @@ class Migrator:
                         parent_point_conditions=point_conditions,
                         source_point_oxide_map=_mass_loss_oxide_map_from_mapping(
                             raw_item
+                        ),
+                        ordinal_point_id=(
+                            series_point_id(
+                                obs_id,
+                                field=field.removesuffix("_wt_pct"),
+                                extra=f"row:{point_index}",
+                            )
+                            if field not in _RESIDUE_COMPONENT_SLOT_FIELDS
+                            else None
                         ),
                     )
             return
@@ -16924,6 +17083,7 @@ class Migrator:
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
         source_point_oxide_map: Mapping[str, Decimal] | None = None,
         content_stable_id: bool = False,
+        ordinal_point_id: str | None = None,
         use_printed_point_species: bool = False,
     ) -> None:
         raw_item = item.get("item")
@@ -17135,7 +17295,9 @@ class Migrator:
             row_extra = series_row_extra(
                 raw_item, include_locator=content_stable_id
             )
-            if content_stable_id:
+            if coord is None and ordinal_point_id is not None:
+                point_id = ordinal_point_id
+            elif content_stable_id:
                 point_id = _exploded_point_id(
                     parent_id, item, coord, raw_item, row_extra
                 )
@@ -18080,29 +18242,53 @@ class Migrator:
                     locator=point_locator,
                 ),
             }
-        if q_token_point is Quantity.VALENCE_RATIO and (
-            identity.composition is None or not identity.composition.is_value
-        ):
+        if identity.composition is None or not identity.composition.is_value:
             located_composition = (point_conditions or {}).get("composition")
             if (
                 isinstance(located_composition, Located)
                 and located_composition.state.is_value
             ):
                 raw_composition = located_composition.state.value
-                converted_composition = (
-                    Located(State.of(raw_composition))
-                    if isinstance(raw_composition, Composition)
-                    else _composition_located_from_plain(
+                # Activity axes can be partial coordinates. Keep explicit
+                # melt rows and Xiao's marked full inventories; figure axes
+                # and single-coordinate activity points are not compositions.
+                if isinstance(raw_composition, Composition) and (
+                    q_token_point is Quantity.VALENCE_RATIO
+                    or (
+                        q_token_point
+                        in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+                        and isinstance(raw_item, Mapping)
+                        and isinstance(raw_item.get("phase_as_printed"), str)
+                        and "melt"
+                        in raw_item["phase_as_printed"].casefold()
+                    )
+                    or (
+                        isinstance(raw_item, Mapping)
+                        and isinstance(
+                            raw_item.get("composition_as_published"), Mapping
+                        )
+                        and raw_item["composition_as_published"].get("basis")
+                        == "mol pct"
+                        and raw_composition.basis
+                        == "printed_mole_percent_as_moles_per_nominal_100_mol_inventory"
+                        and raw_composition.amount_basis is AmountBasis.MOL_INVENTORY
+                        and len(raw_composition.components) > 1
+                    )
+                ):
+                    identity = replace(
+                        identity, composition=State.of(raw_composition)
+                    )
+                elif q_token_point is Quantity.VALENCE_RATIO:
+                    converted_composition = _composition_located_from_plain(
                         {
                             "amount_basis": AmountBasis.MASS_PERCENT.value,
                             "components": raw_composition,
                         }
                     )
-                )
-                if converted_composition.state.is_value:
-                    identity = replace(
-                        identity, composition=converted_composition.state
-                    )
+                    if converted_composition.state.is_value:
+                        identity = replace(
+                            identity, composition=converted_composition.state
+                        )
         if q_token_point is Quantity.VALENCE_RATIO and (
             identity.total_pressure_Pa is None
             or not identity.total_pressure_Pa.is_value
@@ -18119,15 +18305,6 @@ class Migrator:
                     identity = replace(
                         identity, total_pressure_Pa=State.of(pressure)
                     )
-        if printed_phase_kind is not None and (
-            identity.composition is None or not identity.composition.is_value
-        ):
-            located_composition = (point_conditions or {}).get("composition")
-            if (
-                isinstance(located_composition, Located)
-                and located_composition.state.is_value
-            ):
-                identity = replace(identity, composition=located_composition.state)
         child_notices = list(notices)
         parent_hold_notice = _hold_reason_notice(
             parent_reason,

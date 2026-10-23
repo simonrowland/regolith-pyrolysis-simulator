@@ -1,0 +1,188 @@
+# Numeric tables only. Page 2 Table 1 is prior-study prose (several text
+# columns, no single measured value). Table 3 cells are emitted with the
+# printed evidence class; derivation, derived_from, and evidence.model are
+# not mapping fields.
+source_id: shornikov-2017-spinel-evaporation
+source:
+  citation: >-
+    Shornikov, S. I. (2017). Mass Spectrometric Study of the Evaporation of
+    MgAl2O4 Spinel. Russian Journal of Physical Chemistry A, 91(1), 10–16.
+  doi: 10.1134/S0036024417010241
+  year: 2017
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-17'
+  worker: emit-1017
+review_status: draft
+fidelity_samples:
+  - path: species.Mg.observations[shornikov_2017_spinel_evaporation_p004_t02_r02_c02].values.pressure_atm
+    value: '$4.68 \times 10^{-7}$'
+    locator:
+      page: 4
+      published_page: 13
+      pdf_page_index: 3
+      table: '2'
+      note: >-
+        The pinned spelling is the MinerU cell. The page glyph differs:
+        4.68 × 10–7 (multiplication sign U+00D7, en-dash U+2013). The decimals match.
+tables:
+  - page: 4
+    table_index: 2
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: measured_direct
+    unit: atm
+    phase: gas
+    per: mol_species
+    experiment: shornikov_2017_spinel_molybdenum_series
+    regime: knudsen_effusion
+    condensed_form: solid
+    published_page: 13
+    rows: all
+    temperature:
+      column: 1
+      unit: K
+    uncertainty:
+      form: relative_bound
+      bound_operator: '<='
+      bound_value: '8%'
+      as_printed: 'with an error not exceeding 8%'
+      confidence_level: not_stated
+      notice: 'confidence level not stated'
+    conditions:
+      - key: composition
+        state:
+          tag: value
+          value:
+            basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+            amount_basis: mole_fraction
+            components:
+              - - MgO
+                - '0.5'
+              - - Al2O3
+                - '0.5'
+        locator:
+          page: 2
+          published_page: 11
+          pdf_page_index: 1
+          section: EXPERIMENTAL
+          note: >-
+            Stoichiometric MgAl2O4 charge; 50 mol% MgO and 50 mol% Al2O3.
+      - key: fO2_Pa
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          published_page: 13
+          pdf_page_index: 3
+          table: '2'
+          note: >-
+            No numeric oxygen fugacity is printed for the Table 2 pressure points.
+      - key: total_pressure_Pa
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          published_page: 13
+          pdf_page_index: 3
+          table: '2'
+          note: >-
+            No numeric in-cell total pressure is printed for these pressure points.
+    values:
+      - column: 2
+        species: Mg
+      - column: 3
+        species: MgO
+      - column: 4
+        species: Al
+      - column: 5
+        species: AlO
+      - column: 6
+        species: Al2O
+      - column: 7
+        species: O2
+      - column: 8
+        species: MgAlO
+  - page: 4
+    table_index: 3
+    type: partial_pressure
+    quantity: partial_pressure
+    unit: atm
+    phase: gas
+    per: mol_species
+    experiment: shornikov_2017_spinel_molybdenum_series
+    regime: knudsen_effusion
+    condensed_form: solid
+    published_page: 13
+    rows: all
+    temperature:
+      column: 1
+      unit: K
+    uncertainty:
+      columns:
+        2:
+          form: relative_bound
+          bound_operator: '<='
+          bound_value: '8%'
+          as_printed: 'with an error not exceeding 8%'
+          confidence_level: not_stated
+          notice: 'confidence level not stated'
+    conditions:
+      - key: composition
+        state:
+          tag: value
+          value:
+            basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+            amount_basis: mole_fraction
+            components:
+              - - MgO
+                - '0.5'
+              - - Al2O3
+                - '0.5'
+        locator:
+          page: 2
+          published_page: 11
+          pdf_page_index: 1
+          section: EXPERIMENTAL
+          note: >-
+            Stoichiometric MgAl2O4 charge; 50 mol% MgO and 50 mol% Al2O3.
+      - key: fO2_Pa
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          published_page: 13
+          pdf_page_index: 3
+          table: '3'
+          note: >-
+            No numeric oxygen fugacity is printed for the Table 3 pressure points.
+      - key: total_pressure_Pa
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          published_page: 13
+          pdf_page_index: 3
+          table: '3'
+          note: >-
+            No numeric in-cell total pressure is printed for these pressure points.
+    values:
+      - column: 2
+        species: O
+        evidence_class: measured_reduced
+      - column: 3
+        species: O
+        evidence_class: model_derived
+      - column: 4
+        species: O
+        evidence_class: model_derived
+      - column: 5
+        species: O
+        evidence_class: model_derived
+      - column: 6
+        species: O
+        evidence_class: model_derived

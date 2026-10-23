@@ -1,0 +1,37 @@
+# Table 4.4's first numeric data row is classified as a header by MinerU and
+# requires render verification. Table 4.2/4.3 composition vectors are
+# structured observations and cannot be emitted as scalar rows.
+source_id: kems-046-van-limpt-2007
+source:
+  citation: >-
+    van Limpt (2007), Modeling of evaporation processes in glass melting
+    furnaces, PhD thesis, TU Eindhoven.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: emitbt-1018
+review_status: draft
+tables:
+  - page: 158
+    table_index: 11
+    type: rate_series
+    quantity: sodium_disilicate_total_weight_loss
+    evidence_class: measured_direct
+    unit: mg
+    phase: silicate_melt
+    rows: all
+    temperature:
+      column: 1
+      unit: C
+    values:
+      - column: 2
+        species: Na
+      - column: 3
+        species: Na
+    render_verified:
+      - row: 2
+        column: 2
+        text: '112'
+      - row: 2
+        column: 3
+        text: '125'

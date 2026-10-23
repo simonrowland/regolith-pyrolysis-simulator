@@ -1,0 +1,1028 @@
+schema_version: literature_extract.v1
+source_id: arutyunyan-2005-magnesium-silicate-activities
+source:
+  citation: >-
+    Arutyunyan, N. A., Zaitsev, A. I., Zaitseva, N. E. and Shakhpazov, E. Kh.
+    (2005), "Thermodynamic Properties of Magnesium Silicates", Doklady Physics
+    50(8):389–392. Translated from Doklady Akademii Nauk 403(4):471–474.
+  doi: 10.1134/1.2039976
+  year: 2005
+  sha256: b5ac855d8fd2996db1627f878194db423f9961635031f88e37f05fa6e5efae54
+extraction:
+  method: >-
+    Manual transcription of Tables 1 and 2 from the born-digital paper's
+    pdftotext layout, with every table cell checked against the 600 dpi PDF
+    render. Figure values were not digitised; figure and oxide-based
+    thermodynamic records are retained in sibling context containers.
+  date: '2026-10-18'
+  worker: codex
+review_status: draft
+fidelity_samples:
+  - path: species.SiO2.observations[arutyunyan_2005_table2_silica_activity_1873k].values.points[0].activity_as_printed
+    value: '0.693'
+    note: Table 2 first silica activity cell, printed p. 391
+    locator:
+      published_page: 391
+      pdf_page_index: 2
+      table: '2'
+  - path: species.MgO.observations[arutyunyan_2005_table2_mgo_activity_1873k].values.points[2].activity_as_printed
+    value: '0.158'
+    note: Table 2 third MgO activity cell, printed p. 391
+    locator:
+      published_page: 391
+      pdf_page_index: 2
+      table: '2'
+  - path: species.SiO2.observations[arutyunyan_2005_table2_silica_activity_1873k].values.points[5].activity_as_printed
+    value: '1.0'
+    note: Table 2 last silica activity cell, printed p. 391
+    locator:
+      published_page: 391
+      pdf_page_index: 2
+      table: '2'
+experiments:
+  - experiment_id: arutyunyan_2005_kems_mgo_sio2
+    method: knudsen_effusion
+    method_as_printed: Knudsen-effusion mass spectrometry
+    locator:
+      published_page: 389
+      pdf_page_index: 0
+      section: Experimental Procedure
+    conditions:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator:
+          published_page: 389
+          pdf_page_index: 0
+          section: Experimental Procedure
+          note: The measurement total pressure is not reported.
+species:
+  MgO:
+    observations:
+      - observation_id: arutyunyan_2005_table2_mgo_activity_1873k
+        type: activity_coefficient
+        locator:
+          published_page: 391
+          pdf_page_index: 2
+          table: '2'
+          note: Six MgO activities; each point has its own row locator.
+        experiment: arutyunyan_2005_kems_mgo_sio2
+        T_range_K: ['1873', '1873']
+        phase: l
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: MgO
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: periclase}
+              component_basis: MgO
+          inferred: true
+          note: >-
+            The paper specifies crystalline MgO; its crystalline endmember at
+            1873 K is periclase.
+          locator:
+            published_page: 391
+            pdf_page_index: 2
+            table: '2'
+            note: Table 2 reference state says crystalline MgO.
+        units: dimensionless activity
+        uncertainty:
+          note: No numeric uncertainty is printed for the Table 2 activity cells.
+        values:
+          quantity: activity
+          composition_component: MgO
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          derivation:
+            relation: >-
+              Table 2 activities result from Gibbs–Duhem integration of the
+              ionic-current intensity-ratio/composition relation in Eq. (10).
+              The initial MgO activity in the melt + Mg2SiO4 region is
+              calculated from Eq. (9) and the silica activity.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                published_page: 391
+                pdf_page_index: 2
+                figure: '2'
+                note: >-
+                  Numeric ion-current ratio/composition inputs are plotted in
+                  Figure 2 but not tabulated; digitisation is deferred.
+            output_unit: dimensionless activity
+          method_as_printed: >-
+            Activities obtained by integrating the Gibbs–Duhem equation in
+            terms of the ionic-current intensity ratio.
+          reference_state_as_printed: crystalline MgO
+          points:
+            - row_as_printed: '1'
+              x_SiO2_as_printed: '0.486*'
+              T_K: '1873'
+              activity: '0.181'
+              activity_as_printed: '0.181'
+              composition_mol: {SiO2: '0.486', MgO: '0.514'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '1'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.486']
+                        - [MgO, '0.514']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '1'
+                    note: >-
+                      Printed binary x(SiO2) is 0.486; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: 'liquid + Mg2SiO4'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '1'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '1'
+                    note: Total pressure during the activity measurement is not reported.
+            - row_as_printed: '2'
+              x_SiO2_as_printed: '0.498'
+              T_K: '1873'
+              activity: '0.171'
+              activity_as_printed: '0.171'
+              composition_mol: {SiO2: '0.498', MgO: '0.502'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '2'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.498']
+                        - [MgO, '0.502']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '2'
+                    note: >-
+                      Printed binary x(SiO2) is 0.498; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: liquid}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '2'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '2'
+                    note: Total pressure during the activity measurement is not reported.
+            - row_as_printed: '3'
+              x_SiO2_as_printed: '0.511'
+              T_K: '1873'
+              activity: '0.158'
+              activity_as_printed: '0.158'
+              composition_mol: {SiO2: '0.511', MgO: '0.489'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '3'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.511']
+                        - [MgO, '0.489']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '3'
+                    note: >-
+                      Printed binary x(SiO2) is 0.511; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: liquid}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '3'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '3'
+                    note: Total pressure during the activity measurement is not reported.
+            - row_as_printed: '4'
+              x_SiO2_as_printed: '0.528'
+              T_K: '1873'
+              activity: '0.144'
+              activity_as_printed: '0.144'
+              composition_mol: {SiO2: '0.528', MgO: '0.472'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '4'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.528']
+                        - [MgO, '0.472']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '4'
+                    note: >-
+                      Printed binary x(SiO2) is 0.528; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: liquid}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '4'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '4'
+                    note: Total pressure during the activity measurement is not reported.
+            - row_as_printed: '5'
+              x_SiO2_as_printed: '0.550'
+              T_K: '1873'
+              activity: '0.129'
+              activity_as_printed: '0.129'
+              composition_mol: {SiO2: '0.550', MgO: '0.450'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '5'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.550']
+                        - [MgO, '0.450']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '5'
+                    note: >-
+                      Printed binary x(SiO2) is 0.550; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: liquid}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '5'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '5'
+                    note: Total pressure during the activity measurement is not reported.
+            - row_as_printed: '6'
+              x_SiO2_as_printed: '0.563'
+              T_K: '1873'
+              activity: '0.122'
+              activity_as_printed: '0.122'
+              composition_mol: {SiO2: '0.563', MgO: '0.437'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '6'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.563']
+                        - [MgO, '0.437']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '6'
+                    note: >-
+                      Printed binary x(SiO2) is 0.563; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: liquid}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '6'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '6'
+                    note: Total pressure during the activity measurement is not reported.
+    context:
+      - observation_id: arutyunyan_2005_sample_preparation_vacuum
+        type: sample_preparation
+        locator:
+          published_page: 389
+          pdf_page_index: 0
+          section: Experimental Procedure
+        units: Pa
+        values:
+          quantity_as_printed: vacuum during melting in closed molybdenum crucibles
+          sample_preparation_pressure_Pa:
+            state:
+              tag: value
+              value:
+                kind: bound
+                bound_operator: '<='
+                bound_value: '0.0001'
+            locator:
+              published_page: 389
+              pdf_page_index: 0
+              section: Experimental Procedure
+          vacuum_as_printed: not worse than 10^-4 Pa
+          crucible_as_printed: closed molybdenum crucibles
+          note: Sample synthesis condition; not the KEMS measurement pressure.
+      - observation_id: arutyunyan_2005_table1_ion_ratio_fits
+        type: thermodynamic_example
+        locator:
+          published_page: 390
+          pdf_page_index: 1
+          table: '1'
+        units: coefficients as printed
+        values:
+          quantity: ion_intensity_ratio
+          method_class: model_derived
+          admission_status: context_only
+          equation_as_printed: 'ln(I(Mg+)/I(SiO+)) = A/T + B'
+          column_header_as_printed: '−B ± ΔB'
+          fits:
+            - phase_field_as_printed: MgO + Mg2SiO4
+              temperature_range_K_as_printed: '1584–1835'
+              sample_count_n_as_printed: '95'
+              A_plus_uncertainty_as_printed: '14190 ± 68'
+              negative_B_plus_uncertainty_as_printed: '5.455 ± 0.040'
+            - phase_field_as_printed: MgSiO3 + Mg2SiO4
+              temperature_range_K_as_printed: '1571–1824'
+              sample_count_n_as_printed: '95'
+              A_plus_uncertainty_as_printed: '2592 ± 56'
+              negative_B_plus_uncertainty_as_printed: '4.680 ± 0.040'
+            - phase_field_as_printed: MgSiO3 + SiO2
+              temperature_range_K_as_printed: '1578–1808'
+              sample_count_n_as_printed: '92'
+              A_plus_uncertainty_as_printed: '2905 ± 57'
+              negative_B_plus_uncertainty_as_printed: '5.164 ± 0.040'
+          equation_units: dimensionless intensity ratio
+          temperature_units: K
+          note: >-
+            Least-squares coefficients; the source reports the fit column as
+            negative B, so that sign is retained. No quantity token describes
+            this fitted intensity-ratio parameter table as a thermodynamic
+            observation.
+      - observation_id: arutyunyan_2005_ionic_current_measurement_error
+        type: thermodynamic_example
+        locator:
+          published_page: 390
+          pdf_page_index: 1
+          section: Results
+        units: percent
+        values:
+          quantity: ion_intensity_ratio
+          evidence_class: measured_direct
+          method_class: measured_direct
+          admission_status: context_only
+          experimental_error:
+            value:
+              kind: point
+              point: '1'
+              approximate: true
+            qualifier_as_printed: about
+          comparison_as_printed: Maximum deviation did not exceed the experimental error.
+          corroborating_locator:
+            published_page: 392
+            pdf_page_index: 3
+            section: Conclusion
+            note: Repeats the measurement error as about 1%.
+      - observation_id: arutyunyan_2005_fig1_ratio_temperature
+        type: figure_record
+        locator: {figure: '1', published_page: 390, pdf_page_index: 1}
+        units: dimensionless intensity ratio; K^-1
+        values:
+          quantity: ion_intensity_ratio
+          evidence_class: measured_direct
+          species_as_printed: MgO–SiO2 crystalline mixtures
+          phase_as_printed: crystalline mixtures in three coexistence fields
+          temperature_as_printed: varies; horizontal axis is 10^4/T
+          axes_as_printed:
+            x: '10^4/T, K^-1'
+            y: 'ln{I(Mg+)/I(SiO+)}'
+          caption: >-
+            Temperature dependence of ln{I(Mg+)/I(SiO+)} determined for
+            MgO–SiO2 crystalline mixtures of different chemical composition,
+            measured under different experimental conditions, i.e., different
+            x(SiO2), effusion-cell materials, and effusion-hole diameters deff
+            (mm): (1) 0.498, Nb, 0.162; (2) 0.486, Ta, 0.190; (3) 0.403, Mo,
+            0.284; (4) 0.605, Nb, 0.154; (5) 0.563, Ta, 0.181; (6) 0.528, Mo,
+            0.232; (7) 0.678, Nb, 0.129; (8) 0.745, Ta, 0.157; (9) 0.811, Mo,
+            0.201.
+          fitted_lines:
+            relation_as_printed: 'ln(I(Mg+)/I(SiO+)) = A/T + B'
+            method_class: model_derived
+            fit_method_as_printed: least-squares method
+          panel: main
+          series:
+            - label: '1: x(SiO2)=0.498, Nb, deff=0.162 mm'
+              attribution: present study
+              marker_as_printed: filled circle
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '2: x(SiO2)=0.486, Ta, deff=0.190 mm'
+              attribution: present study
+              marker_as_printed: open upward triangle
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '3: x(SiO2)=0.403, Mo, deff=0.284 mm'
+              attribution: present study
+              marker_as_printed: open square
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '4: x(SiO2)=0.605, Nb, deff=0.154 mm'
+              attribution: present study
+              marker_as_printed: open circle
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '5: x(SiO2)=0.563, Ta, deff=0.181 mm'
+              attribution: present study
+              marker_as_printed: filled upward triangle
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '6: x(SiO2)=0.528, Mo, deff=0.232 mm'
+              attribution: present study
+              marker_as_printed: filled square
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '7: x(SiO2)=0.678, Nb, deff=0.129 mm'
+              attribution: present study
+              marker_as_printed: filled inverted triangle
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '8: x(SiO2)=0.745, Ta, deff=0.157 mm'
+              attribution: present study
+              marker_as_printed: open inverted triangle
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '9: x(SiO2)=0.811, Mo, deff=0.201 mm'
+              attribution: present study
+              marker_as_printed: open diamond
+              marker_count: unresolved_due_to_overlapping_symbols
+          marker_count_note: Marker centers overlap too densely for a reliable per-series count.
+          digitisation: deferred to a figure pass
+      - observation_id: arutyunyan_2005_fig2_melt_composition_ratio
+        type: figure_record
+        locator: {figure: '2', published_page: 391, pdf_page_index: 2}
+        units: mole fraction; dimensionless intensity ratio
+        values:
+          quantity: ion_intensity_ratio
+          evidence_class: measured_direct
+          species_as_printed: MgO–SiO2 melt
+          phase_as_printed: liquid
+          temperature_K_as_printed: '1873'
+          axes_as_printed:
+            x: 'ln{I(Mg+)/I(SiO+)}'
+            y: x(MgO)
+          caption: >-
+            Dependence of x(MgO) on ln{I(Mg+)/I(SiO+)} determined from the
+            experimental data for MgO–SiO2 melt (T = 1873 K).
+          panel: main
+          series:
+            - label: present study
+              attribution: present study
+              marker_as_printed: filled circles
+              marker_count: 8
+              marker_count_note: Eight visible data markers, including two at each of the two vertical endpoint spans.
+          digitisation: deferred to a figure pass
+      - observation_id: arutyunyan_2005_liquidus_compositions_1873k
+        type: thermodynamic_example
+        locator:
+          published_page: 391
+          pdf_page_index: 2
+          section: Results
+        units: mole fraction
+        values:
+          quantity: liquidus_composition
+          method_class: model_derived
+          admission_status: context_only
+          species_as_printed: SiO2 in the MgO–SiO2 system
+          phase_as_printed: liquidus
+          temperature_K_as_printed: '1873'
+          positions_as_printed:
+            from magnesium-silicate side: 'x_l(SiO2) = 0.488'
+            from silica side: 'x_l(SiO2) = 0.563'
+          method_note: Values calculated in the present study from Table 2 activities.
+      - observation_id: arutyunyan_2005_partial_gibbs_mgo_from_oxide_field
+        type: thermodynamic_example
+        locator:
+          published_page: 390
+          pdf_page_index: 1
+          equation: '6'
+        units: J/mol
+        values:
+          quantity_as_printed: ΔfG''(MgO)
+          method_class: model_derived
+          admission_status: context_only
+          schema_gap: No existing quantity token represents this partial Gibbs function on its printed oxide reference basis.
+          reaction_as_printed: 'SiO2(solid, liquid) + Mg(gas) = MgO(solid, liquid) + SiO(gas)'
+          phase_field_as_printed: MgSiO3 + Mg2SiO4 two-phase region
+          reference_components_as_printed: crystalline MgO and β-cristobalite
+          temperature_function_as_printed: '−(32144 ± 245) + (2.15 ± 0.16)T'
+      - observation_id: arutyunyan_2005_fig4_component_activities
+        type: figure_record
+        locator: {figure: '4', published_page: 392, pdf_page_index: 3}
+        units: dimensionless activity; mole fraction
+        values:
+          quantity: activity
+          evidence_class: measured_reduced
+          species_as_printed: [SiO2, MgO]
+          phase_as_printed: liquid MgO–SiO2 melt
+          temperature_K_as_printed: '1873'
+          axes_as_printed:
+            x: x(SiO2)
+            y: 'a(SiO2), a(MgO)'
+          caption: >-
+            Activities of components forming MgO–SiO2 melt at T = 1873 K. Data
+            of the present study: (●) a(SiO2) and (○) a(MgO). Data of other
+            authors: (■) a(SiO2) and (□) a(MgO), T = 1873 K [1]; (▲) a(SiO2)
+            and (△) a(MgO), T = 1973 K [2].
+          panel: main
+          series:
+            - label: present study, a(SiO2)
+              attribution: present study
+              marker_as_printed: filled circles
+              marker_count: 6
+            - label: present study, a(MgO)
+              attribution: present study
+              marker_as_printed: open circles
+              marker_count: 6
+            - label: '[1], a(SiO2), 1873 K'
+              attribution: 'S. Kambayashi and E. Kato, J. Chem. Thermodyn. 15, 701 (1983)'
+              evidence_class: quoted_attributed
+              marker_as_printed: filled squares
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '[1], a(MgO), 1873 K'
+              attribution: 'S. Kambayashi and E. Kato, J. Chem. Thermodyn. 15, 701 (1983)'
+              evidence_class: quoted_attributed
+              marker_as_printed: open squares
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '[2], a(SiO2), 1973 K'
+              attribution: 'S. Kambayashi and E. Kato, J. Chem. Thermodyn. 16, 241 (1984)'
+              evidence_class: quoted_attributed
+              marker_as_printed: filled triangles
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '[2], a(MgO), 1973 K'
+              attribution: 'S. Kambayashi and E. Kato, J. Chem. Thermodyn. 16, 241 (1984)'
+              evidence_class: quoted_attributed
+              marker_as_printed: open triangles
+              marker_count: unresolved_due_to_overlapping_symbols
+          marker_count_note: Cited-series markers overlap and are not individually countable in the printed raster.
+          digitisation: deferred to a figure pass
+      - observation_id: arutyunyan_2005_quoted_liquidus_compositions_1873k
+        type: thermodynamic_example
+        locator:
+          published_page: 391
+          pdf_page_index: 2
+          section: Results
+          reference: '3'
+        units: mole fraction
+        values:
+          quantity: liquidus_composition
+          evidence_class: quoted_attributed
+          method_class: quoted_attributed
+          admission_status: context_only
+          species_as_printed: SiO2 in the MgO–SiO2 system
+          phase_as_printed: liquidus
+          temperature_K_as_printed: '1873'
+          positions_as_printed:
+            from magnesium-silicate side: 'x_l(SiO2) = 0.494'
+            from silica side: 'x_l(SiO2) = 0.562'
+          attribution_as_printed: >-
+            Atlas of Slags. Reference Book (Metallurgiya, Moscow, 1985)
+            [in Russian].
+  SiO2:
+    observations:
+      - observation_id: arutyunyan_2005_table2_silica_activity_1873k
+        type: activity_coefficient
+        locator:
+          published_page: 391
+          pdf_page_index: 2
+          table: '2'
+          note: Six SiO2 activities; each point has its own row locator.
+        experiment: arutyunyan_2005_kems_mgo_sio2
+        T_range_K: ['1873', '1873']
+        phase: l
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: SiO2
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: cristobalite_high}
+              component_basis: SiO2
+          inferred: false
+          note: The paper explicitly names β-cristobalite as the reference.
+          locator:
+            published_page: 391
+            pdf_page_index: 2
+            table: '2'
+        units: dimensionless activity
+        uncertainty:
+          note: No numeric uncertainty is printed for the Table 2 activity cells.
+        values:
+          quantity: activity
+          composition_component: SiO2
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          derivation:
+            relation: >-
+              Table 2 activities result from Gibbs–Duhem integration of the
+              ionic-current intensity-ratio/composition relation in Eq. (10).
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                published_page: 391
+                pdf_page_index: 2
+                figure: '2'
+                note: >-
+                  Numeric ion-current ratio/composition inputs are plotted in
+                  Figure 2 but not tabulated; digitisation is deferred.
+            output_unit: dimensionless activity
+          method_as_printed: >-
+            Activities obtained by integrating the Gibbs–Duhem equation in
+            terms of the ionic-current intensity ratio.
+          reference_state_as_printed: β-cristobalite
+          points:
+            - row_as_printed: '1'
+              x_SiO2_as_printed: '0.486*'
+              T_K: '1873'
+              activity: '0.693'
+              activity_as_printed: '0.693'
+              composition_mol: {SiO2: '0.486', MgO: '0.514'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '1'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.486']
+                        - [MgO, '0.514']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '1'
+                    note: >-
+                      Printed binary x(SiO2) is 0.486; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: 'liquid + Mg2SiO4'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '1'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '1'
+                    note: Total pressure during the activity measurement is not reported.
+            - row_as_printed: '2'
+              x_SiO2_as_printed: '0.498'
+              T_K: '1873'
+              activity: '0.737'
+              activity_as_printed: '0.737'
+              composition_mol: {SiO2: '0.498', MgO: '0.502'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '2'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.498']
+                        - [MgO, '0.502']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '2'
+                    note: >-
+                      Printed binary x(SiO2) is 0.498; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: liquid}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '2'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '2'
+                    note: Total pressure during the activity measurement is not reported.
+            - row_as_printed: '3'
+              x_SiO2_as_printed: '0.511'
+              T_K: '1873'
+              activity: '0.797'
+              activity_as_printed: '0.797'
+              composition_mol: {SiO2: '0.511', MgO: '0.489'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '3'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.511']
+                        - [MgO, '0.489']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '3'
+                    note: >-
+                      Printed binary x(SiO2) is 0.511; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: liquid}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '3'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '3'
+                    note: Total pressure during the activity measurement is not reported.
+            - row_as_printed: '4'
+              x_SiO2_as_printed: '0.528'
+              T_K: '1873'
+              activity: '0.865'
+              activity_as_printed: '0.865'
+              composition_mol: {SiO2: '0.528', MgO: '0.472'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '4'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.528']
+                        - [MgO, '0.472']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '4'
+                    note: >-
+                      Printed binary x(SiO2) is 0.528; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: liquid}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '4'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '4'
+                    note: Total pressure during the activity measurement is not reported.
+            - row_as_printed: '5'
+              x_SiO2_as_printed: '0.550'
+              T_K: '1873'
+              activity: '0.951'
+              activity_as_printed: '0.951'
+              composition_mol: {SiO2: '0.550', MgO: '0.450'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '5'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.550']
+                        - [MgO, '0.450']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '5'
+                    note: >-
+                      Printed binary x(SiO2) is 0.550; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: liquid}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '5'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '5'
+                    note: Total pressure during the activity measurement is not reported.
+            - row_as_printed: '6'
+              x_SiO2_as_printed: '0.563'
+              T_K: '1873'
+              activity: '1.0'
+              activity_as_printed: '1.0'
+              composition_mol: {SiO2: '0.563', MgO: '0.437'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '6'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SiO2, '0.563']
+                        - [MgO, '0.437']
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '6'
+                    note: >-
+                      Printed binary x(SiO2) is 0.563; x(MgO) is its binary
+                      complement and is not separately printed.
+                phase_assemblage:
+                  state: {tag: value, value: liquid}
+                  locator: {published_page: 391, pdf_page_index: 2, table: '2', row: '6'}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published}
+                  locator:
+                    published_page: 391
+                    pdf_page_index: 2
+                    table: '2'
+                    row: '6'
+                    note: Total pressure during the activity measurement is not reported.
+    context:
+      - observation_id: arutyunyan_2005_partial_gibbs_sio2_from_oxide_field
+        type: thermodynamic_example
+        locator:
+          published_page: 390
+          pdf_page_index: 1
+          equation: '7'
+        units: J/mol
+        values:
+          quantity_as_printed: ΔfG''(SiO2)
+          method_class: model_derived
+          admission_status: context_only
+          schema_gap: No existing quantity token represents this partial Gibbs function on its printed oxide reference basis.
+          reaction_as_printed: 'SiO2(solid, liquid) + Mg(gas) = MgO(solid, liquid) + SiO(gas)'
+          phase_field_as_printed: MgSiO3 + Mg2SiO4 two-phase region
+          reference_components_as_printed: crystalline MgO and β-cristobalite
+          temperature_function_as_printed: '(1302 ± 332) + (2.01 ± 0.24)T'
+  MgSiO3:
+    observations: []
+    context:
+      - observation_id: arutyunyan_2005_mgsio3_formation_from_oxides
+        type: thermodynamic_example
+        locator:
+          published_page: 390
+          pdf_page_index: 1
+          equation: '8'
+        units: J/mol
+        values:
+          quantity_as_printed: ΔfG(MgSiO3)
+          method_class: model_derived
+          admission_status: context_only
+          schema_gap: The existing delta_fG token denotes formation from elements, unlike this oxide-component reaction.
+          reaction_as_printed: 'MgO(s) + β-cristobalite-SiO2(s) = MgSiO3(s)'
+          phase_as_printed: protoenstatite MgSiO3
+          formation_basis_as_printed: crystalline oxide components
+          temperature_function_as_printed: '−(30842 ± 413) + (0.14 ± 0.29)T'
+      - observation_id: arutyunyan_2005_fig3_oxide_formation_functions
+        type: figure_record
+        locator: {figure: '3', published_page: 391, pdf_page_index: 2}
+        units: kJ/(g-atom)
+        values:
+          quantity_as_printed: formation thermodynamic functions from oxide components
+          schema_gap: Figure 3 uses ΔfG and ΔfH from oxides; neither is stored as the element-based delta_fG or delta_fH quantity.
+          evidence_class: model_derived
+          species_as_printed: magnesium silicates in crystalline MgO–SiO2 mixtures
+          phase_as_printed: crystalline; includes protoenstatite MgSiO3 and forsterite Mg2SiO4
+          temperature_K_as_printed: '1700'
+          axes_as_printed:
+            x: x(MgO)
+            y: '−ΔfG, −ΔfH, kJ/(g-atom)'
+          caption: >-
+            Thermodynamic functions that characterize the formation of
+            magnesium silicates (T = 1700 K) from β-cristobalite and crystalline
+            MgO. The results of the present study: (●) ΔfG and (○) ΔfH. The
+            data of other authors: (■) ΔfG and (□) ΔfH [6]; (▲) ΔfG and (△)
+            ΔfH [4]; (▼) ΔfG and (▽) ΔfH [7].
+          panel: main
+          series:
+            - label: present-study ΔfG
+              attribution: present study
+              marker_as_printed: filled circles
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: present-study ΔfH
+              attribution: present study
+              marker_as_printed: open circles
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '[6] ΔfG'
+              attribution: 'JANAF Thermochemical Tables, J. Phys. Ref. Data 14 (1985)'
+              evidence_class: quoted_attributed
+              marker_as_printed: filled squares
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '[6] ΔfH'
+              attribution: 'JANAF Thermochemical Tables, J. Phys. Ref. Data 14 (1985)'
+              evidence_class: quoted_attributed
+              marker_as_printed: open squares
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '[4] ΔfG'
+              attribution: 'M. Hillert and X. Wang, Calphad 13 (3), 253 (1989)'
+              evidence_class: quoted_attributed
+              marker_as_printed: filled triangles
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '[4] ΔfH'
+              attribution: 'M. Hillert and X. Wang, Calphad 13 (3), 253 (1989)'
+              evidence_class: quoted_attributed
+              marker_as_printed: open triangles
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '[7] ΔfG'
+              attribution: 'P. Wu, G. Erikson, A. Pelton, et al., ISIJ Intern. 33 (1), 26 (1993)'
+              evidence_class: quoted_attributed
+              marker_as_printed: filled inverted triangles
+              marker_count: unresolved_due_to_overlapping_symbols
+            - label: '[7] ΔfH'
+              attribution: 'P. Wu, G. Erikson, A. Pelton, et al., ISIJ Intern. 33 (1), 26 (1993)'
+              evidence_class: quoted_attributed
+              marker_as_printed: open inverted triangles
+              marker_count: unresolved_due_to_overlapping_symbols
+          marker_count_note: Series markers overlap in the printed figure and cannot be counted separately with confidence.
+          digitisation: deferred to a figure pass
+  Mg2SiO4:
+    observations: []
+    context:
+      - observation_id: arutyunyan_2005_mg2sio4_formation_from_oxides
+        type: thermodynamic_example
+        locator:
+          published_page: 390
+          pdf_page_index: 1
+          equation: '9'
+        units: J/mol
+        values:
+          quantity_as_printed: ΔfG(Mg2SiO4)
+          method_class: model_derived
+          admission_status: context_only
+          schema_gap: The existing delta_fG token denotes formation from elements, unlike this oxide-component reaction.
+          reaction_as_printed: '2MgO(s) + β-cristobalite-SiO2(s) = Mg2SiO4(s)'
+          phase_as_printed: forsterite Mg2SiO4
+          formation_basis_as_printed: crystalline oxide components
+          temperature_function_as_printed: '−(62986 ± 592) + (2.19 ± 0.40)T'

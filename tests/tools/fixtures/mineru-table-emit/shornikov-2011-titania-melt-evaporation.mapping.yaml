@@ -1,0 +1,84 @@
+# The one printed Gibbs-energy table. Temperature is the 2050 in the
+# column header, not a body column. Empty liquid cells are dashes in the
+# source and are skipped, not stored as zero.
+source_id: shornikov-2011-titania-melt-evaporation
+source:
+  citation: >-
+    Shornikov, S. I. (2011), A thermodynamic investigation of evaporation of
+    oxide melts containing titanium dioxide, Vestn. Otd. nauk Zemle, 3,
+    NZ6101, doi:10.2205/2011NZ000231.
+  doi: 10.2205/2011NZ000231
+  year: 2011
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: trial-grok-1018
+review_status: draft
+fidelity_samples:
+  - path: species.CaO.observations[shornikov_2011_titania_melt_evaporation_p001_t01_r03_c02].values.value
+    value: '-416.099'
+    locator:
+      page: 1
+      pdf_page_index: 0
+      table: '1'
+      note: >-
+        The pinned spelling is the MinerU cell, ASCII hyphen U+002D. The page
+        glyph is an en-dash U+2013: –416.099. The decimals match. PDF page 1,
+        solid CaO.
+  - path: species.CaO.observations[shornikov_2011_titania_melt_evaporation_p001_t01_r03_c04].values.value
+    value: '-404.461'
+    locator:
+      page: 1
+      pdf_page_index: 0
+      table: '1'
+      note: >-
+        The pinned spelling is the MinerU cell, ASCII hyphen U+002D. The page
+        glyph is an en-dash U+2013: –404.461. PDF page 1, liquid CaO.
+  - path: species.Ca.observations[shornikov_2011_titania_melt_evaporation_p001_t01_r03_c06].values.value
+    value: '-25.442'
+    locator:
+      page: 1
+      pdf_page_index: 0
+      table: '1'
+      note: >-
+        The pinned spelling is the MinerU cell, ASCII hyphen U+002D. The page
+        glyph is an en-dash U+2013: –25.442. PDF page 1, gas Ca.
+tables:
+  - page: 1
+    table_index: 1
+    type: gibbs_table
+    quantity: delta_fG
+    evidence_class: quoted_attributed
+    unit: kJ/mole
+    per: mol_species
+    rows: all
+    species_form: printed_formula
+    temperature:
+      as_printed: '2050'
+      unit: K
+      column_header: 'ΔfG°2050, kJ/mole'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        column_header: 'ΔfG°2050, kJ/mole'
+        note: >-
+          The temperature is the 2050 printed in each Gibbs-energy column
+          header and in the table caption.
+    attribution: >-
+      Table caption: "calculated in the present study"; formation from
+      elements. The text cites experimental and reference inputs
+      (Xirouchakis et al., 1997; DeСapitani and Kirschen, 1998; Shornikov
+      et al., 2000; Shornikov and Archakov, 2003; Glushko et al., 1978-1982)
+      but does not state per-row input lineage. Quoted_attributed because
+      those derivation parents are not stored in this extract.
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+        phase: cr
+      - species_column: 3
+        value_column: 4
+        phase: l
+      - species_column: 5
+        value_column: 6
+        phase: g

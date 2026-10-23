@@ -1,0 +1,118 @@
+# This paper only. The preceding abstract on PDF page 1 is not mapped.
+# Table 1 dashes are skipped. Row 4 of the CaO block has a dash for Tm, so it
+# is not given a temperature column (a dash must not become T_K). Its ΔHm is
+# added from the draft cell after emit. Table 1 Tm cells are not emitted:
+# transition_temperature is read from T_K, and emit writes other quantities
+# on values.value.
+# Table 2 empty cells are blank and are skipped. O2 0.000 is a printed zero.
+source_id: shornikov-2020-cao-mgo-thermodynamics
+source:
+  citation: >-
+    Shornikov, S. I. (2020), Thermodynamic properties of the CaO–MgO melts,
+    Experiment in Geosciences, vol. 26, no. 1, pp. 77–80.
+  year: 2020
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: trial-grok-1018
+review_status: draft
+fidelity_samples:
+  - path: species.CaO.observations[shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c02].values.value
+    value: '-284.532'
+    locator:
+      page: 3
+      pdf_page_index: 2
+      table: '2'
+      note: >-
+        Solid CaO. The pinned spelling is the MinerU cell, ASCII hyphen
+        U+002D. PDF page 3, published page 79.
+  - path: species.CaO.observations[shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c04].values.value
+    value: '-279.824'
+    locator:
+      page: 3
+      pdf_page_index: 2
+      table: '2'
+      note: >-
+        Liquid CaO. MinerU ASCII hyphen. PDF page 3, published page 79.
+  - path: species.O2.observations[shornikov_2020_cao_mgo_thermodynamics_p003_t02_r10_c06].values.value
+    value: '0.000'
+    locator:
+      page: 3
+      pdf_page_index: 2
+      table: '2'
+      note: >-
+        Gas O2. Printed zero, stored. PDF page 3, published page 79.
+tables:
+  - page: 2
+    table_index: 1
+    published_page: 78
+    type: heat_capacity_and_heat_content_series
+    quantity: heat_of_fusion
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    phase: cr
+    rows: [3, 5, 6, 7, 9, 10]
+    temperature:
+      column: 1
+      unit: K
+    values:
+      - column: 2
+        species: CaO
+    attribution: >-
+      Table 1 CaO melting enthalpy. The reference cell of each row replaces
+      this sentence after emit. Parents cited in the text are not stored.
+  - page: 2
+    table_index: 1
+    published_page: 78
+    type: heat_capacity_and_heat_content_series
+    quantity: heat_of_fusion
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    phase: cr
+    rows: all
+    temperature:
+      column: 4
+      unit: K
+    values:
+      - column: 5
+        species: MgO
+    attribution: >-
+      Table 1 MgO melting enthalpy. The reference cell of each row replaces
+      this sentence after emit. Parents cited in the text are not stored.
+  - page: 3
+    table_index: 2
+    published_page: 79
+    type: gibbs_table
+    quantity: delta_fG
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    per: mol_species
+    rows: all
+    species_form: printed_formula
+    temperature:
+      as_printed: '2973'
+      unit: K
+      column_header: 'ΔG°2973, kJ/mol'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        column_header: 'ΔG°2973, kJ/mol'
+        note: >-
+          The temperature is the 2973 printed in each Gibbs-energy column
+          header and in the table caption. Published page 79. The model
+          domain 2600-3300 K is not this table's temperature.
+    attribution: >-
+      Table 2 caption: calculated in the present study at 2973 K. The text
+      cites the melting temperatures and other inputs, but those parents are
+      not stored in this extract, so the rows are quoted_attributed.
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+        phase: cr
+      - species_column: 3
+        value_column: 4
+        phase: l
+      - species_column: 5
+        value_column: 6
+        phase: g

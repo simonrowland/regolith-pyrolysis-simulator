@@ -596,6 +596,65 @@ def test_source_method_uncertainty_rejects_zero_value() -> None:
     )
 
 
+def test_tachibana_approximate_author_estimate_reaches_residual_stratum(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
+        ScoreContext,
+        compile_residual,
+        flagged_strata,
+    )
+
+    result = _migrate_real_extract(
+        tmp_path, "tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml"
+    )
+    assert len(result.observations) == 6
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(
+            "tachibana_1998_forsterite_hbd_alpha_assumption"
+        )
+    )
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.1")
+    assert observation.value.approximate is True
+
+    context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations=result.observations,
+        extract_review={observation.source_id or "": "reviewed"},
+    )
+    residual, _ = compile_residual(
+        observation, Engine.INTERNAL_ANALYTICAL, context=context
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
+    )
+
+
+def test_flemetakis_approximate_sample_mass_reaches_value_without_row_growth(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "ta-flemetakis-2024.yaml")
+
+    assert len(result.observations) == 72
+    sample_masses = [
+        experiment.sample.mass_kg.state.value
+        for experiment in result.experiments.values()
+        if experiment.sample is not None
+        and experiment.sample.mass_kg is not None
+        and experiment.sample.mass_kg.state.is_value
+        and experiment.sample.mass_kg.state.value.kind is ValueKind.POINT
+        and experiment.sample.mass_kg.state.value.point == Decimal("0.00004")
+    ]
+    assert len(sample_masses) == 1
+    assert sample_masses[0].approximate is True
+
+
 def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
     tmp_path: Path,
 ) -> None:
@@ -6497,6 +6556,8 @@ def _series_census(
     extracts: Path, extracts_v2: Path
 ) -> tuple[dict[str, int], list[str], int, int, dict[str, dict[str, int]]]:
     from decimal import Decimal, InvalidOperation
+    from simulator.battery.migrate import _residue_component_field_sets
+    from simulator.yaml_cache import YAML12SafeLoader
 
     census: dict[str, int] = {}
     per_source: dict[str, dict[str, int]] = {}
@@ -6504,13 +6565,17 @@ def _series_census(
     n_numeric = 0
     n_unavailable = 0
     for src_path in sorted(extracts.glob("*.yaml")):
-        source = yaml.safe_load(src_path.read_text(encoding="utf-8"))
+        source = yaml.load(
+            src_path.read_text(encoding="utf-8"), Loader=YAML12SafeLoader
+        )
         if not isinstance(source, dict):
             continue
         store_path = extracts_v2 / src_path.name
         if not store_path.is_file():
             continue
-        stored = yaml.safe_load(store_path.read_text(encoding="utf-8"))
+        stored = yaml.load(
+            store_path.read_text(encoding="utf-8"), Loader=YAML12SafeLoader
+        )
         stored_observations = [
             o
             for o in (stored.get("observations") or [])
@@ -6541,11 +6606,7 @@ def _series_census(
                     if q_token == "residue_component_composition":
                         residue_fields = (
                             "residue_ppm",
-                            "SiO2_wt_pct",
-                            "Al2O3_wt_pct",
-                            "FeO_wt_pct",
-                            "MgO_wt_pct",
-                            "CaO_wt_pct",
+                            *_residue_component_field_sets(item)[0],
                         )
                         for field in residue_fields:
                             if field not in item:
@@ -9311,6 +9372,59 @@ def test_reference_prose_rejects_ambiguous_or_negated_raoult_conventions() -> No
     assert typed.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
     assert typed.value.endmember.formula == "NaBO2"
     assert typed.value.endmember.phase.value is Phase.L
+
+
+def test_demaria_1973_table1_temperature_and_conditions_reach_every_row(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-023-demaria-1973.yaml")
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+    rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-023-demaria-1973"
+        and "table1" in obs.observation_id
+    ]
+    assert len(rows) == 61
+    expected_row_counts = Counter(
+        {
+            ("Na", 1300): 2,
+            ("Na", 1400): 4,
+            ("Na", 1500): 3,
+            ("Fe", 1400): 4,
+            ("Fe", 1500): 4,
+            ("Fe", 1600): 4,
+            ("Mg", 1700): 2,
+            ("Mg", 1800): 4,
+            ("Mg", 1900): 4,
+            ("SiO", 1800): 4,
+            ("SiO", 1900): 4,
+            ("SiO", 2000): 4,
+            ("Ca", 1900): 4,
+            ("Ca", 2000): 4,
+            ("TiO", 2100): 4,
+            ("TiO", 2200): 3,
+            ("Al", 2100): 3,
+        }
+    )
+    actual_row_counts = Counter(
+        (obs.identity.species.formula, int(obs.identity.temperature_K.value))
+        for obs in rows
+    )
+    assert actual_row_counts == expected_row_counts
+
+    for obs in rows:
+        temperature = obs.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        condition = (obs.point_conditions or {}).get("temperature_K")
+        assert condition is not None and condition.state.is_value
+        assert condition.state.value == temperature.value
+        assert condition.locator is not None
+        assert condition.locator.table == "1"
+        assert condition.locator.published_page == 176
+        assert condition.locator.pdf_page_index == 2
+        assert obs.locator is not None and obs.locator.table == "1"
 
 
 def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> None:
@@ -14014,6 +14128,263 @@ def test_residue_component_quantity_aliases_keep_printed_values_and_missing_cell
         assert "null" in (missing.reason or "")
 
 
+def test_residue_series_scores_every_parseable_printed_oxide(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.migrate import _mass_loss_oxide_map_from_mapping
+
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-026-markova-1984.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    row = next(
+        observation
+        for observation in source["species"]["SiO2"]["observations"]
+        if observation.get("observation_id")
+        == "markova_1984_table2_residual_melt_VI_lherzolite"
+    )
+    row["values"]["series"] = [
+        {
+            "T_C": 1475,
+            "mass_loss_pct": "1.46",
+            "SiO2_wt_pct": "44.4",
+            "TiO2_wt_pct": "1.23",
+            "Na2O_wt_pct": "0.44",
+        }
+    ]
+    assert _mass_loss_oxide_map_from_mapping(row["values"]["series"][0]) == {
+        "SiO2": Decimal("44.4"),
+        "TiO2": Decimal("1.23"),
+        "Na2O": Decimal("0.44"),
+    }
+    migrated = _migrate_real_extract(
+        tmp_path, "kems-026-markova-1984.yaml", extract_doc=source
+    )
+    cells = {
+        observation.identity.species.formula: observation.value.point
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.observation_id.startswith(
+            "kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::"
+        )
+        and observation.identity.species.formula in {"SiO2", "TiO2", "Na2O"}
+        and observation.value.kind is ValueKind.POINT
+    }
+    assert cells == {
+        "SiO2": Decimal("44.4"),
+        "TiO2": Decimal("1.23"),
+        "Na2O": Decimal("0.44"),
+    }
+
+
+def test_unparseable_residue_oxide_field_is_a_typed_refusal(
+    tmp_path: Path,
+) -> None:
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-026-markova-1984.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    row = next(
+        observation
+        for observation in source["species"]["SiO2"]["observations"]
+        if observation.get("observation_id")
+        == "markova_1984_table2_residual_melt_VI_lherzolite"
+    )
+    row["values"]["series"] = [
+        {"T_C": 1475, "SiO2_wt_pct": "44.4", "UnobtainiumO2_wt_pct": "0.2"}
+    ]
+    migrated = _migrate_real_extract(
+        tmp_path, "kems-026-markova-1984.yaml", extract_doc=source
+    )
+    issues = [
+        issue
+        for issue in migrated.validation.issues
+        if "UnobtainiumO2_wt_pct" in issue.path
+    ]
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.INVALID_SOURCE
+    assert "parseable oxide formula" in issues[0].detail
+
+
+def test_ivanova_residue_ordinal_ids_keep_their_printed_components(
+    tmp_path: Path,
+) -> None:
+    source_id = "ivanova-2018-spinel-rich-cai-evaporation"
+    migrated = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+    stored_payload = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    stored = [
+        observation_from_plain(row)
+        for row in stored_payload["observations"]
+        if row["identity"]["quantity"].get("value")
+        == "residue_component_composition"
+    ]
+    actual = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+
+    def by_id(observations):
+        return {
+            observation.observation_id: (
+                observation.identity.species.formula,
+                observation.value.point,
+            )
+            for observation in observations
+        }
+
+    expected_by_id = by_id(stored)
+    assert len(expected_by_id) == 32
+    assert by_id(actual) == expected_by_id
+
+
+def test_appended_residue_oxide_does_not_move_ordinal_component_ids(
+    tmp_path: Path,
+) -> None:
+    source_id = "ivanova-2018-spinel-rich-cai-evaporation"
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    row = next(
+        observation
+        for observation in source["species"]["CaO"]["observations"]
+        if observation.get("observation_id")
+        == "ivanova_2018_table1_residue_composition"
+    )
+    for point in row["values"]["series"]:
+        point["TiO2_wt_pct"] = "1.11"
+    migrated = _migrate_real_extract(
+        tmp_path, f"{source_id}.yaml", extract_doc=source
+    )
+    stored_payload = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    stored_silica = {
+        row["observation_id"]: (
+            row["identity"]["species"]["formula"],
+            Decimal(row["value"]["point"]),
+        )
+        for row in stored_payload["observations"]
+        if row["identity"]["quantity"].get("value")
+        == "residue_component_composition"
+        and row["identity"]["species"]["formula"] == "SiO2"
+    }
+    migrated_silica = {
+        observation.observation_id: (
+            observation.identity.species.formula,
+            observation.value.point,
+        )
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.identity.species.formula == "SiO2"
+    }
+    migrated_titania = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.identity.species.formula == "TiO2"
+    ]
+    assert len(stored_silica) == 8
+    assert migrated_silica == stored_silica
+    assert len(migrated_titania) == 8
+    assert all(obs.value.point == Decimal("1.11") for obs in migrated_titania)
+    assert len({obs.observation_id for obs in migrated_titania}) == 8
+    assert all(
+        "::field:TiO2:row:" in obs.observation_id for obs in migrated_titania
+    )
+    assert not (set(stored_silica) & {obs.observation_id for obs in migrated_titania})
+
+
+def test_quantity_absent_activity_row_is_not_misclassified_as_residue(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import AdmissionStatus
+
+    source_id = "kang-2007-sio2-activity-cas-low-silica"
+    migrated = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+    activity = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.observation_id.endswith(
+            "::kang_2007_t2_sample_301_sio2_activity"
+        )
+    ]
+    assert len(activity) == 1
+    assert activity[0].identity.quantity.is_value
+    assert activity[0].identity.quantity.value is Quantity.ACTIVITY
+    assert activity[0].value.point == Decimal("0.00102")
+    assert activity[0].admission.status is AdmissionStatus.ADMITTED
+
+
+def test_markova_residue_default_admission_survives_printed_composition_maps(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import AdmissionStatus
+
+    source_id = "kems-026-markova-1984"
+    migrated = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+    residue = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert len(residue) == 110
+    assert all(obs.admission.status is AdmissionStatus.ADMITTED for obs in residue)
+    assert all(
+        obs.admission.reason
+        and obs.admission.reason.startswith("admission_defaulted:")
+        and "d-056" in obs.admission.reason
+        for obs in residue
+    )
+    stored_payload = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    stored_mass_loss = [
+        observation_from_plain(row)
+        for row in stored_payload["observations"]
+        if row["identity"]["quantity"].get("value") == "mass_loss_fraction"
+    ]
+    migrated_mass_loss = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+    ]
+    def by_id(observations):
+        return {
+            observation.observation_id: (
+                observation.value.point,
+                observation.admission.status,
+                observation.admission.reason,
+            )
+            for observation in observations
+        }
+    assert len(stored_mass_loss) == 24
+    assert by_id(migrated_mass_loss) == by_id(stored_mass_loss)
+
+
 def test_hashimoto_row_left_live_diagnostics_are_final(
     tmp_path: Path,
 ) -> None:
@@ -14947,7 +15318,8 @@ def test_stolyarova_1995_printed_compositions_reach_migrated_observations(
         condition = obs.point_conditions["composition"]
         assert condition.state.is_value
         assert condition.locator is not None
-        assert condition.locator.page == 687
+        assert condition.locator.page == 2
+        assert condition.locator.published_page == 687
         assert condition.locator.table == "2"
         assert "binary complement" in condition.locator.note
         assert condition.state.value == obs.identity.composition.value
