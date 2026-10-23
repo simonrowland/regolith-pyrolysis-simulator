@@ -372,6 +372,13 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         + float(offgas_kg.get("CrO2", 0.0) or 0.0) * (_CR_MW / _CRO2_MW)
         + float(offgas_kg.get("CrO3", 0.0) or 0.0) * (_CR_MW / _CRO3_MW)
     )
+    import json as _j, os as _o
+    _j.dump({"Cr2O3_rump": rump.get("Cr2O3", 0.0), "cr_ingot_kg": cr_ingot_kg, "cro_offgas_kg": cro_offgas_kg,
+             "cr_offgas_eq_kg": cr_offgas_eq_kg, "offgas_kg": {k: float(v) for k, v in offgas_kg.items()},
+             "story_ingot_Cr": story["metal_ingots"]["species_kg"].get("Cr", 0.0),
+             "story_escaped_CrO": story["escaped_to_vacuum"]["species_kg"].get("CrO", 0.0),
+             "closure": cr_in_rump_kg + cr_ingot_kg + cr_offgas_eq_kg, "rump": {k: float(v) for k, v in rump.items()}},
+            open(_o.environ.get("CR_PROBE_OUT", "/tmp/cr_probe.json"), "w"), indent=1, sort_keys=True)
     # Cr conserved; the residual moved via run trajectory/end hour (257 -> 188 h across the t-470..d-019 refusal window), not Cr accounting.
     assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3280281761957307, rel=1e-9)
     assert cr_ingot_kg == pytest.approx(0.18, abs=0.005)
