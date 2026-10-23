@@ -13,8 +13,10 @@ cheaper facts, that no unacknowledged input changed after the store and no
 extract silently lacks a store trace. Under d-255, offers carry extracts and
 code without regenerated store outputs, so an offer with migrate-input changes
 is expected to report STALE before the train gate. Offer authors can use
---pre-gate to label that result; the train regenerates once per batch and
-records fixed-point store-neutral inputs under scripts/store_neutral_acks/.
+--pre-gate to label that result. This checker currently recognizes historical
+store-neutral commits through STORE_NEUTRAL_INPUT_COMMITS; the separately
+accepted ackdir change adds validated per-file train acknowledgements under
+scripts/store_neutral_acks/ after the gate regen.
 
 Exit 0: store is at least as new as every migrate input, and every extract
 has an extracts-v2 sibling or a migration-queue entry.
@@ -63,11 +65,13 @@ CODE_INPUTS = (
 )
 
 
-# Historical migrate-input commits that are PROVEN store-neutral: a full regen on a tree
-# containing them leaves every STORE_OUTPUT byte-identical, so no regen commit
-# can exist to follow them, and they would read as STALE forever. Each entry
-# needs that receipt (regen run, no store diff). Short shas, 9 characters,
-# matching the keys stale_input_commits() emits.
+# Historical migrate-input commits that are PROVEN store-neutral: a full regen
+# on a tree containing them leaves every STORE_OUTPUT byte-identical, so no
+# regen commit can exist to follow them, and they would read as STALE forever.
+# Each entry has its evidence described in the notes below. New train
+# acknowledgements use validated per-file records in the separately accepted
+# ackdir change. Short shas, 9 characters, match the keys
+# stale_input_commits() emits.
 #   037f97ff6, 5d46c88e1: d-216, source-oxygen scoring. They score Knudsen
 #     vapour rows at typed source oxygen conditions and keep typed reasons for
 #     closure fallbacks, in simulator/battery/source_oxygen.py and score.py.
