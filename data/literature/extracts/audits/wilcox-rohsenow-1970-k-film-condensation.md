@@ -44,7 +44,7 @@ The rendered cells resolve the OCR discrepancies: run 1 `T_v = 853.76 °F`
 run 14 `σ = 0.975` (pdftotext has `0'.975`); run 21 `T_v = 989.38 °F`
 (pdftotext has `9S9.38`); and run 22 `T_w = 1096.87 °F` (pdftotext has
 `1006.87`). The render also resolves run-label OCR substitutions in pdftotext
-(runs 6, 8, 11, and 18);
+(runs 6, 8, 11, 16, and 18; run 16 is printed by pdftotext as `10`);
 run labels are retained as strings and are not numeric measurement cells.
 
 `mineru_table_draft.py compare` was run against the generated MinerU index; its
@@ -54,14 +54,29 @@ or these ancillary fields, so the output does not independently reconcile
 this condensation-coefficient table. The full cell audit above is the
 reconciliation record.
 
-## Schema gap
+## Units, evidence, and conditions
 
-The source prints temperatures in °F. The current condensation-coefficient
-schema accepts `T_C`, `T_K`, or `T_range_K`, and the task rules prohibit
-replacing source values with converted unit twins. All 22 rows therefore keep
-their measured `σ` and printed temperatures, vapor pressures, and `q/A`, with
-`status: typed_refusal` and a refusal reason. No Celsius/Kelvin conversion was
-made. `P_v` and `P_s` are retained as printed pressure observations; neither is
-asserted to be total system pressure. The identity's total pressure remains
-unknown because the table does not print total pressure. Figure-read values
-elsewhere in the paper are not included.
+The source prints temperatures in °F. The extract stores the interface
+temperature as `T_F` and the other printed temperatures, `P_v`, `P_s`, and
+`q/A` as located point conditions. The real migrator converts `T_F` to the
+Kelvin identity while retaining the printed Fahrenheit value in the conversion
+derivation; the extract contains no converted temperature twin. `P_v` and
+`P_s` are retained as printed vapor/saturation pressures; neither is asserted
+to be total system pressure. The identity's total pressure remains unknown
+because the table does not print total pressure. Figure-read values elsewhere
+in the paper are not included.
+
+## Migration result and unresolved evidence admission
+
+The isolated real-migrator run produced 22 observations, 0 hard validation
+issues, and 0 unavailable values. Temperature and printed point conditions
+reach all 22 observations; total pressure remains unknown. The source says
+that `σ` is calculated from equation (2) (printed page 360 / PDF page 2), and
+all rows store `method_class: calculated`. The migrator leaves the evidence
+class unknown on all 22 rows because this method class requires an author
+derivation plus admitted measured `derived_from` parent observations. The
+table prints each run's temperatures, heat flux, and pressures on the same
+row as `σ`; it does not provide separate parent observation rows. Creating
+those rows or changing the shared same-row evidence admission rule requires a
+scope ruling. The focused regression test pins the requested
+`measured_reduced` class and currently fails at this admission gate.

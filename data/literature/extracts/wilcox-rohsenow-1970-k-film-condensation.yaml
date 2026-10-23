@@ -1,7 +1,7 @@
 schema_version: literature_extract.v1
 source_id: wilcox-rohsenow-1970-k-film-condensation
 source:
-  citation: Wilcox, D. C. & Rohsenow, W. M. (1970), “Film Condensation of Potassium Using Copper Condensing Block
+  citation: Wilcox, S. J. & Rohsenow, W. M. (1970), “Film Condensation of Potassium Using Copper Condensing Block
     for Precise Wall-Temperature Measurement,” Journal of Heat Transfer 92(3):359–371, DOI 10.1115/1.3449671
   doi: 10.1115/1.3449671
   year: 1970
@@ -9,9 +9,9 @@ extraction:
   method: MinerU table transcription cross-checked against pdftotext and rendered table layout
   date: '2026-10-22'
   worker: wave52-F66
-  note: Table 1 contains 22 measured potassium condensation-coefficient rows. Rows are typed refusals because the
-    printed temperature form °F has no schema token (T_C/T_K only); all printed temperatures, pressures, heat fluxes,
-    sigma, and run identifiers are retained verbatim. No unprinted total pressure or ambient condition is added.
+  note: Table 1 contains 22 measured potassium condensation-coefficient rows. Temperatures, vapor pressures, heat
+    fluxes, sigma, and run identifiers are retained as printed. The migrator converts printed T_F to identity temperature_K;
+    P_v and P_s are not asserted as total pressure.
 review_status: draft
 fidelity_samples:
 - species: K
@@ -36,6 +36,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 1, run 1; Table 1; PDF page 6
+      T_F: '851.66'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -50,11 +51,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 1, run 1; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '851.66'
-          locator: *id001
         T_w_F_as_printed:
           state:
             tag: value
@@ -82,18 +78,15 @@ species:
           locator: *id001
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.873'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '1'
         run_no_as_printed: '1'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_2
       type: alpha
       locator:
@@ -102,6 +95,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 1, run 2; Table 1; PDF page 6
+      T_F: '841.01'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -116,11 +110,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 1, run 2; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '841.01'
-          locator: *id002
         T_w_F_as_printed:
           state:
             tag: value
@@ -148,18 +137,15 @@ species:
           locator: *id002
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.920'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '1'
         run_no_as_printed: '2'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_3
       type: alpha
       locator:
@@ -168,6 +154,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 1, run 3; Table 1; PDF page 6
+      T_F: '853.81'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -182,11 +169,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 1, run 3; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '853.81'
-          locator: *id003
         T_w_F_as_printed:
           state:
             tag: value
@@ -214,18 +196,15 @@ species:
           locator: *id003
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.855'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '1'
         run_no_as_printed: '3'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_4
       type: alpha
       locator:
@@ -234,6 +213,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 1, run 4; Table 1; PDF page 6
+      T_F: '987.15'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -248,11 +228,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 1, run 4; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '987.15'
-          locator: *id004
         T_w_F_as_printed:
           state:
             tag: value
@@ -280,18 +255,15 @@ species:
           locator: *id004
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.882'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '1'
         run_no_as_printed: '4'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_5
       type: alpha
       locator:
@@ -300,6 +272,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 1, run 5; Table 1; PDF page 6
+      T_F: '962.87'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -314,11 +287,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 1, run 5; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '962.87'
-          locator: *id005
         T_w_F_as_printed:
           state:
             tag: value
@@ -346,18 +314,15 @@ species:
           locator: *id005
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.981'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '1'
         run_no_as_printed: '5'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_6
       type: alpha
       locator:
@@ -366,6 +331,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 1, run 6; Table 1; PDF page 6
+      T_F: '979.98'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -380,11 +346,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 1, run 6; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '979.98'
-          locator: *id006
         T_w_F_as_printed:
           state:
             tag: value
@@ -412,18 +373,15 @@ species:
           locator: *id006
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.864'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '1'
         run_no_as_printed: '6'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_7
       type: alpha
       locator:
@@ -432,6 +390,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 1, run 7; Table 1; PDF page 6
+      T_F: '976.60'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -446,11 +405,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 1, run 7; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '976.60'
-          locator: *id007
         T_w_F_as_printed:
           state:
             tag: value
@@ -478,18 +432,15 @@ species:
           locator: *id007
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.964'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '1'
         run_no_as_printed: '7'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_8
       type: alpha
       locator:
@@ -498,6 +449,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 1, run 8; Table 1; PDF page 6
+      T_F: '861.99'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -512,11 +464,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 1, run 8; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '861.99'
-          locator: *id008
         T_w_F_as_printed:
           state:
             tag: value
@@ -544,18 +491,15 @@ species:
           locator: *id008
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.897'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '1'
         run_no_as_printed: '8'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_9
       type: alpha
       locator:
@@ -564,6 +508,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 2, run 9; Table 1; PDF page 6
+      T_F: '843.57'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -578,11 +523,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 2, run 9; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '843.57'
-          locator: *id009
         T_w_F_as_printed:
           state:
             tag: value
@@ -610,18 +550,15 @@ species:
           locator: *id009
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.885'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '2'
         run_no_as_printed: '9'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_10
       type: alpha
       locator:
@@ -630,6 +567,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 2, run 10; Table 1; PDF page 6
+      T_F: '850.09'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -644,11 +582,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 2, run 10; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '850.09'
-          locator: *id010
         T_w_F_as_printed:
           state:
             tag: value
@@ -676,18 +609,15 @@ species:
           locator: *id010
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.859'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '2'
         run_no_as_printed: '10'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_11
       type: alpha
       locator:
@@ -696,6 +626,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 2, run 11; Table 1; PDF page 6
+      T_F: '848.56'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -710,11 +641,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 2, run 11; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '848.56'
-          locator: *id011
         T_w_F_as_printed:
           state:
             tag: value
@@ -742,18 +668,15 @@ species:
           locator: *id011
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.912'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '2'
         run_no_as_printed: '11'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_12
       type: alpha
       locator:
@@ -762,6 +685,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 2, run 12; Table 1; PDF page 6
+      T_F: '850.38'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -776,11 +700,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 2, run 12; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '850.38'
-          locator: *id012
         T_w_F_as_printed:
           state:
             tag: value
@@ -808,18 +727,15 @@ species:
           locator: *id012
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.917'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '2'
         run_no_as_printed: '12'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_13
       type: alpha
       locator:
@@ -828,6 +744,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 2, run 13; Table 1; PDF page 6
+      T_F: '785.18'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -842,11 +759,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 2, run 13; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '785.18'
-          locator: *id013
         T_w_F_as_printed:
           state:
             tag: value
@@ -874,18 +786,15 @@ species:
           locator: *id013
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.959'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '2'
         run_no_as_printed: '13'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_14
       type: alpha
       locator:
@@ -894,6 +803,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 2, run 14; Table 1; PDF page 6
+      T_F: '756.55'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -908,11 +818,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 2, run 14; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '756.55'
-          locator: *id014
         T_w_F_as_printed:
           state:
             tag: value
@@ -940,18 +845,15 @@ species:
           locator: *id014
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.975'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '2'
         run_no_as_printed: '14'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_15
       type: alpha
       locator:
@@ -960,6 +862,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 2, run 15; Table 1; PDF page 6
+      T_F: '913.65'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -974,11 +877,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 2, run 15; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '913.65'
-          locator: *id015
         T_w_F_as_printed:
           state:
             tag: value
@@ -1006,18 +904,15 @@ species:
           locator: *id015
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.882'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '2'
         run_no_as_printed: '15'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_16
       type: alpha
       locator:
@@ -1026,6 +921,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 2, run 16; Table 1; PDF page 6
+      T_F: '971.71'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -1040,11 +936,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 2, run 16; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '971.71'
-          locator: *id016
         T_w_F_as_printed:
           state:
             tag: value
@@ -1072,18 +963,15 @@ species:
           locator: *id016
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.867'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '2'
         run_no_as_printed: '16'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_17
       type: alpha
       locator:
@@ -1092,6 +980,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 2, run 17; Table 1; PDF page 6
+      T_F: '852.35'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -1106,11 +995,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 2, run 17; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '852.35'
-          locator: *id017
         T_w_F_as_printed:
           state:
             tag: value
@@ -1138,18 +1022,15 @@ species:
           locator: *id017
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.894'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '2'
         run_no_as_printed: '17'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_18
       type: alpha
       locator:
@@ -1158,6 +1039,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 3, run 18; Table 1; PDF page 6
+      T_F: '839.89'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -1172,11 +1054,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 3, run 18; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '839.89'
-          locator: *id018
         T_w_F_as_printed:
           state:
             tag: value
@@ -1204,18 +1081,15 @@ species:
           locator: *id018
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.926'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '3'
         run_no_as_printed: '18'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_19
       type: alpha
       locator:
@@ -1224,6 +1098,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 3, run 19; Table 1; PDF page 6
+      T_F: '920.83'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -1238,11 +1113,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 3, run 19; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '920.83'
-          locator: *id019
         T_w_F_as_printed:
           state:
             tag: value
@@ -1270,18 +1140,15 @@ species:
           locator: *id019
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.785'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '3'
         run_no_as_printed: '19'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_20
       type: alpha
       locator:
@@ -1290,6 +1157,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 3, run 20; Table 1; PDF page 6
+      T_F: '989.88'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -1304,11 +1172,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 3, run 20; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '989.88'
-          locator: *id020
         T_w_F_as_printed:
           state:
             tag: value
@@ -1336,18 +1199,15 @@ species:
           locator: *id020
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.825'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '3'
         run_no_as_printed: '20'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_21
       type: alpha
       locator:
@@ -1356,6 +1216,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 3, run 21; Table 1; PDF page 6
+      T_F: '988.56'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -1370,11 +1231,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 3, run 21; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '988.56'
-          locator: *id021
         T_w_F_as_printed:
           state:
             tag: value
@@ -1402,18 +1258,15 @@ species:
           locator: *id021
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.957'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '3'
         run_no_as_printed: '21'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
     - observation_id: wilcox_rohsenow_1970_k_run_22
       type: alpha
       locator:
@@ -1422,6 +1275,7 @@ species:
         published_page: 364
         pdf_page_index: 5
         note: Series 3, run 22; Table 1; PDF page 6
+      T_F: '1097.30'
       phase: solid_polycrystalline
       regime: film_condensation
       units: dimensionless
@@ -1436,11 +1290,6 @@ species:
             pdf_page_index: 5
             table: '1'
             note: Table 1, Series 3, run 22; PDF page 6
-        T_s_F_as_printed:
-          state:
-            tag: value
-            value: '1097.30'
-          locator: *id022
         T_w_F_as_printed:
           state:
             tag: value
@@ -1468,15 +1317,12 @@ species:
           locator: *id022
       values:
         quantity: condensation_coefficient
-        evidence_class: measured_direct
+        method_class: calculated
         alpha: '0.655'
-        status: typed_refusal
-        refusal_reason: Fahrenheit temperature form is not represented by the extract schema; values retained as
-          printed.
         gas_species: K(g)
         substrate: nickel_plated_copper
         technique: film condensation with copper condensing block
         series_no_as_printed: '3'
         run_no_as_printed: '22'
-        note: 'Typed refusal: Table 1 temperatures are in °F; the schema supports T_C/T_K only. No total pressure
-          other than printed P_v and P_s is asserted.'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
