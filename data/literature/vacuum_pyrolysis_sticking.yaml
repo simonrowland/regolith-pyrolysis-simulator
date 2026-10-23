@@ -42,6 +42,9 @@ reactivity_class_by_species:
   Al: physisorbing
   Ti: physisorbing
   CrO2: physisorbing
+  # Intact SiO2(g) condenses reversibly against its JANAF silica surface;
+  # SiO's reactive disproportionation product remains a separate owner.
+  SiO2_gas: physisorbing
 
 # Declared wall-product class authorizes condensation backstops (F4 / S10).
 # reactive_product uses reactivity_class == reactive (SiO today).

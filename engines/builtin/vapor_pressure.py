@@ -2115,8 +2115,9 @@ def vapor_pressure_antoine_coefficients(
 
     if _fit_target(row) == FIT_TARGET_STANDARD_REACTION:
         antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
-        if _is_mapping(antoine):
-            return antoine, COEFF_BLOCK_ANTOINE
+        # A compiled source reaction need not have a legacy Antoine block.
+        # Its pure wall sidecar cannot substitute for the melt source term.
+        return (antoine if _is_mapping(antoine) else {}), COEFF_BLOCK_ANTOINE
 
     if not bool((row or {}).get("interval_required")):
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
@@ -2150,6 +2151,13 @@ def _pure_segment_usable(
 
     if temperature_K is None:
         return True
+    valid_range = _range_tuple(selected.get("valid_range_K"))
+    if (
+        selected.get("extrapolation_policy") == "refuse"
+        and valid_range is not None
+        and temperature_K < valid_range[0]
+    ):
+        return False
     try:
         denominator = float(temperature_K) + float(selected.get("C", 0.0))
         # Antoine's shifted inverse-temperature fit is calibrated on the
@@ -2199,13 +2207,33 @@ def wall_condensation_antoine_coefficients(
 
 def _liquid_reference_pressure_from_solid(
     species: str, temperature_K: float, solid_pressure_pa: float,
+    *, fusion_energy_kJ_mol: float | None = None,
 ) -> tuple[float, str | None]:
     """Return (liquid pressure in Pa, missing-input reason or None).
 
     Only bracketed JANAF liquid cells are usable. On missing input the
     returned pressure is unchanged; callers must refuse the liquid request.
+    SiO2's caller supplies the existing fusion owner's phase-specific Gibbs
+    difference; this engine layer must not depend on the battery generator.
     """
     from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    if species == "SiO2":
+        if fusion_energy_kJ_mol is None:
+            return solid_pressure_pa, "fusion term unavailable: SiO2 Gibbs input not supplied"
+        try:
+            # mu_l-mu_s=DeltaG_fus; P_l/P_s=exp(DeltaG_fus/RT).
+            # kJ/mol *1000 / (J/mol/K * K) is dimensionless. At the
+            # owner's Gibbs crossing DeltaG_fus=0, so P_l=P_s.
+            pressure = solid_pressure_pa * math.exp(
+                fusion_energy_kJ_mol * 1000.0
+                / (8.31441 * temperature_K)
+            )
+        except (OSError, ValueError, OverflowError) as exc:
+            return solid_pressure_pa, f"fusion term unavailable: {exc}"
+        if math.isfinite(pressure) and pressure > 0.0:
+            return pressure, None
+        return solid_pressure_pa, "fusion term unavailable: SiO2 pressure not finite positive"
 
     table_id = {"Na": "Na-003"}.get(species)
     if table_id is None:

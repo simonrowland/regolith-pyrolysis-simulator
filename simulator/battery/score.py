@@ -6186,6 +6186,12 @@ def predict_with_engine(
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
             )
             row = vapor_pressure_data.get("metals", {}).get(formula)
+            if row is None:
+                matches = [
+                    candidate for candidate in vapor_pressure_data.get("oxide_vapors", {}).values()
+                    if candidate.get("formula") == formula
+                ]
+                row = matches[0] if len(matches) == 1 else None
             coefficients, coefficient_block = wall_condensation_antoine_coefficients(
                 row, float(T)
             )
@@ -6253,19 +6259,47 @@ def predict_with_engine(
                             authority=Authority.EXTRAPOLATED,
                         ),
                     )
-            # This intake certifies Na phase references only. Preserve the
+            # These intakes certify Na and SiO2 phase references. Preserve the
             # pre-existing treatment of other elements' sidecars.
-            source_phase = coefficients.get("phase") if formula == "Na" else None
-            solid_reference = source_phase in {"solid", "alpha_solid", "crystal", "crystalline"}
+            source_phase = coefficients.get("phase") if formula in {"Na", "SiO2"} else None
+            solid_reference = source_phase in {
+                "solid", "alpha_solid", "crystal", "crystalline", "quartz", "high_cristobalite",
+            }
             phase_mismatch = (
                 (solid_reference and reservoir[1] != Phase.CR.value)
                 or (source_phase == "liquid" and reservoir[1] == Phase.CR.value)
             )
+            if formula == "SiO2" and source_phase == "liquid":
+                phase_mismatch = reservoir[1] not in {Phase.L.value, Phase.SUPERCOOLED_L.value}
+            if formula == "SiO2" and solid_reference and reservoir[1] == Phase.CR.value:
+                declared_polymorph = polymorph_token(identity.reservoir.value)
+                supported_polymorphs = (
+                    {Polymorph.QUARTZ, Polymorph.ALPHA_QUARTZ}
+                    if source_phase == "quartz" and float(T) <= 847.0
+                    else {Polymorph.QUARTZ} if source_phase == "quartz"
+                    else {Polymorph.CRISTOBALITE_HIGH}
+                )
+                phase_mismatch = (
+                    declared_polymorph is not None
+                    and declared_polymorph not in supported_polymorphs
+                )
             if solid_reference and phase_mismatch:
                 if reservoir[1] in {Phase.L.value, Phase.SUPERCOOLED_L.value}:
-                    pressure, fusion_unavailable = _liquid_reference_pressure_from_solid(
-                        formula, float(T), pressure,
-                    )
+                    fusion_energy = None
+                    fusion_unavailable = None
+                    if formula == "SiO2":
+                        from simulator.battery.generators.janaf import _janaf_fusion_energy_for_pair
+
+                        crystal_table = {"quartz": "O-037", "high_cristobalite": "O-035"}[source_phase]
+                        try:
+                            fusion = _janaf_fusion_energy_for_pair(formula, crystal_table, "O-038", T)
+                            fusion_energy = float(fusion.delta_g_fus_kJ_per_mol)
+                        except (OSError, ValueError) as exc:
+                            fusion_unavailable = str(exc)
+                    if fusion_unavailable is None:
+                        pressure, fusion_unavailable = _liquid_reference_pressure_from_solid(
+                            formula, float(T), pressure, fusion_energy_kJ_mol=fusion_energy,
+                        )
                     if fusion_unavailable is not None:
                         return _input_refusal(
                             engine=engine, channel=channel, sources=sources,
@@ -6275,7 +6309,7 @@ def predict_with_engine(
                                     "missing_input": fusion_unavailable},
                         )
                 authority = Authority.EXTRAPOLATED
-            elif source_phase == "liquid" and reservoir[1] == Phase.CR.value:
+            elif source_phase == "liquid" and phase_mismatch:
                 authority = Authority.EXTRAPOLATED
             if phase_mismatch:
                 notices += (

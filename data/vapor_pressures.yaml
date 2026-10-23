@@ -14431,6 +14431,500 @@ families:
               allow_henrian_upper_bound: false
               compound_bearing: false
               require_assemblage_match: false
+          pure_component_antoine:
+            # SiO2(cond) -> SiO2(g), pure condensed activity=1. Premise:
+            # mu_g^0 + RT ln(P/p0) = mu_cond^0, common Si(ref)+O2 references.
+            # Hence log10(P/p0)=logKf_g-logKf_cond
+            # = -(Gf_g-Gf_cond)/(RT ln10); p0=0.1 MPa=100000 Pa.
+            # Gf in kJ/mol is multiplied by1000; R=8.31441 J/mol/K
+            # (JANAF convention). Exponent and P/p0 are dimensionless.
+            # Printed Gf cells (0.001 kJ/mol), not rounded logKf cells,
+            # establish crossings coherently with the existing fusion owner.
+            # Linear G(T) interpolation gives y=log10(P/Pa)=A-B/T:
+            # B=(y2-y1)/(1/T1-1/T2) [K], A=y1+B/T1 [dimensionless], C=0 K.
+            # Both endpoints recover their chemical potentials exactly;
+            # shared nodes guarantee pressure continuity, including transitions.
+            # Stable among supplied JANAF phases: O-037 quartz (I/II at847 K)
+            # to1079.120879120879 K; O-035 high cristobalite thereafter;
+            # O-038 liquid above1994.469026548673 K (fusion owner's crossing;
+            # accepted melt1986 K). No tridymite table exists in this corpus.
+            # O-036 low cristobalite is metastable to quartz; O-039 cr,l is
+            # the metastable quartz/liquid path (1696 K), not this envelope.
+            # Lowest common positive row100 K; below it refuse. Upper4500 K
+            # is the last liquid row; above it predict and flag continuation.
+            # At100 K P~6.1e-302 Pa is finite; no zero-pressure substitute.
+            # Sanity, corpus Shornikov1998 Table2 Ir(W), at1900 K:
+            # log10(P_SiO2/atm)=-30637/T+8.85 gives0.00538245 Pa;
+            # JANAF gives0.00403645 Pa (0.125 dex lower, no retuning).
+            # Matched SiO: -28134/T+9.46 gives0.455353 Pa, so molecular
+            # SiO2 is only1.182% of SiO (~85x smaller). This is a partial
+            # pressure, not total silica vapour pressure. Low-T printed
+            # logKf and Gf columns differ by up to0.00344 dex at100 K
+            # with the existing JANAF R convention; Gf is the coherent input.
+            # This reversible SiO2 surface does not change the separate SiO
+            # disproportionation/oxidation wall-product owner or source model.
+            default_segment: janaf_sio2_300_350
+            segments:
+            - name: janaf_sio2_100_200
+              extrapolation_policy: refuse
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [100.0, 200.0]
+              valid_range_K: [100.0, 200.0]
+              A: 14.578139536852234
+              B: 31578.87062898286
+              C: 0.0
+            - name: janaf_sio2_200_250
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [200.0, 250.0]
+              valid_range_K: [200.0, 250.0]
+              A: 14.808036773438317
+              B: 31624.850076300077
+              C: 0.0
+            - name: janaf_sio2_250_298.15
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [250.0, 298.15]
+              valid_range_K: [250.0, 298.15]
+              A: 14.748639774439866
+              B: 31610.000826550466
+              C: 0.0
+            - name: janaf_sio2_298.15_300
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [298.15, 300.0]
+              valid_range_K: [298.15, 300.0]
+              A: 14.769160506230804
+              B: 31616.119082733934
+              C: 0.0
+            - name: janaf_sio2_300_350
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [300.0, 350.0]
+              valid_range_K: [300.0, 350.0]
+              A: 14.793865753175425
+              B: 31623.530656817322
+              C: 0.0
+            - name: janaf_sio2_350_400
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [350.0, 400.0]
+              valid_range_K: [350.0, 400.0]
+              A: 14.758346666710608
+              B: 31611.098976554633
+              C: 0.0
+            - name: janaf_sio2_400_450
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [400.0, 450.0]
+              valid_range_K: [400.0, 450.0]
+              A: 14.719171203697925
+              B: 31595.428791349557
+              C: 0.0
+            - name: janaf_sio2_450_500
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [450.0, 500.0]
+              valid_range_K: [450.0, 500.0]
+              A: 14.697232944410878
+              B: 31585.556574670387
+              C: 0.0
+            - name: janaf_sio2_500_600
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [500.0, 600.0]
+              valid_range_K: [500.0, 600.0]
+              A: 14.61940435789225
+              B: 31546.642281411074
+              C: 0.0
+            - name: janaf_sio2_600_700
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [600.0, 700.0]
+              valid_range_K: [600.0, 700.0]
+              A: 14.524338567648066
+              B: 31489.602807264564
+              C: 0.0
+            - name: janaf_sio2_700_800
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [700.0, 800.0]
+              valid_range_K: [700.0, 800.0]
+              A: 14.422482363815071
+              B: 31418.303464581466
+              C: 0.0
+            - name: janaf_sio2_800_847
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [800.0, 847.0]
+              valid_range_K: [800.0, 847.0]
+              A: 14.294509184640152
+              B: 31315.92492124153
+              C: 0.0
+            - name: janaf_sio2_847_900
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [847.0, 900.0]
+              valid_range_K: [847.0, 900.0]
+              A: 14.294509184640315
+              B: 31315.92492124167
+              C: 0.0
+            - name: janaf_sio2_900_1000
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [900.0, 1000.0]
+              valid_range_K: [900.0, 1000.0]
+              A: 14.206756147491792
+              B: 31236.947187807997
+              C: 0.0
+            - name: janaf_sio2_1000_1079.12
+              phase: quartz
+              source: REF-020 JANAF O-040 gas minus O-037 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1000.0, 1079.1208791208792]
+              valid_range_K: [1000.0, 1079.1208791208792]
+              A: 14.150343480753467
+              B: 31180.534521069676
+              C: 0.0
+            - name: janaf_sio2_1079.12_1100
+              phase: high_cristobalite
+              source: REF-020 JANAF O-040 gas minus O-035 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1079.1208791208792, 1100.0]
+              valid_range_K: [1079.1208791208792, 1100.0]
+              A: 14.055277690509286
+              B: 31077.94704192705
+              C: 0.0
+            - name: janaf_sio2_1100_1200
+              phase: high_cristobalite
+              source: REF-020 JANAF O-040 gas minus O-035 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1100.0, 1200.0]
+              valid_range_K: [1100.0, 1200.0]
+              A: 13.999909702784748
+              B: 31017.04225543006
+              C: 0.0
+            - name: janaf_sio2_1200_1300
+              phase: high_cristobalite
+              source: REF-020 JANAF O-040 gas minus O-035 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1200.0, 1300.0]
+              valid_range_K: [1200.0, 1300.0]
+              A: 13.946631073087435
+              B: 30953.107899793285
+              C: 0.0
+            - name: janaf_sio2_1300_1400
+              phase: high_cristobalite
+              source: REF-020 JANAF O-040 gas minus O-035 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1300.0, 1400.0]
+              valid_range_K: [1300.0, 1400.0]
+              A: 13.898053498951688
+              B: 30889.957053416812
+              C: 0.0
+            - name: janaf_sio2_1400_1500
+              phase: high_cristobalite
+              source: REF-020 JANAF O-040 gas minus O-035 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1400.0, 1500.0]
+              valid_range_K: [1400.0, 1500.0]
+              A: 13.852087622350112
+              B: 30825.604826174607
+              C: 0.0
+            - name: janaf_sio2_1500_1600
+              phase: high_cristobalite
+              source: REF-020 JANAF O-040 gas minus O-035 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1500.0, 1600.0]
+              valid_range_K: [1500.0, 1600.0]
+              A: 13.80873344328274
+              B: 30760.57355757355
+              C: 0.0
+            - name: janaf_sio2_1600_1700
+              phase: high_cristobalite
+              source: REF-020 JANAF O-040 gas minus O-035 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1600.0, 1700.0]
+              valid_range_K: [1600.0, 1700.0]
+              A: 13.767468622242665
+              B: 30694.54984390943
+              C: 0.0
+            - name: janaf_sio2_1700_1800
+              phase: high_cristobalite
+              source: REF-020 JANAF O-040 gas minus O-035 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1700.0, 1800.0]
+              valid_range_K: [1700.0, 1800.0]
+              A: 13.72829315923
+              B: 30627.951556787895
+              C: 0.0
+            - name: janaf_sio2_1800_1900
+              phase: high_cristobalite
+              source: REF-020 JANAF O-040 gas minus O-035 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1800.0, 1900.0]
+              valid_range_K: [1800.0, 1900.0]
+              A: 13.69120705424463
+              B: 30561.196567814237
+              C: 0.0
+            - name: janaf_sio2_1900_1994.47
+              phase: high_cristobalite
+              source: REF-020 JANAF O-040 gas minus O-035 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1900.0, 1994.4690265486727]
+              valid_range_K: [1900.0, 1994.4690265486727]
+              A: 13.655687967779738
+              B: 30493.71030353094
+              C: 0.0
+            - name: janaf_sio2_1994.47_2000
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1994.4690265486727, 2000.0]
+              valid_range_K: [1994.4690265486727, 2000.0]
+              A: 13.419590510690792
+              B: 30022.821238120127
+              C: 0.0
+            - name: janaf_sio2_2000_2100
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2000.0, 2100.0]
+              valid_range_K: [2000.0, 2100.0]
+              A: 13.354820411842226
+              B: 29893.281040422997
+              C: 0.0
+            - name: janaf_sio2_2100_2200
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2100.0, 2200.0]
+              valid_range_K: [2100.0, 2200.0]
+              A: 13.294229029049244
+              B: 29766.039136557738
+              C: 0.0
+            - name: janaf_sio2_2200_2300
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2200.0, 2300.0]
+              valid_range_K: [2200.0, 2300.0]
+              A: 13.236249343790448
+              B: 29638.483828988385
+              C: 0.0
+            - name: janaf_sio2_2300_2400
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2300.0, 2400.0]
+              valid_range_K: [2300.0, 2400.0]
+              A: 13.181403695572675
+              B: 29512.338838087508
+              C: 0.0
+            - name: janaf_sio2_2400_2500
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2400.0, 2500.0]
+              valid_range_K: [2400.0, 2500.0]
+              A: 13.128647405382234
+              B: 29385.72374163045
+              C: 0.0
+            - name: janaf_sio2_2500_2600
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2500.0, 2600.0]
+              valid_range_K: [2500.0, 2600.0]
+              A: 13.07745813371228
+              B: 29257.750562455563
+              C: 0.0
+            - name: janaf_sio2_2600_2700
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2600.0, 2700.0]
+              valid_range_K: [2600.0, 2700.0]
+              A: 13.02940289908338
+              B: 29132.80695242042
+              C: 0.0
+            - name: janaf_sio2_2700_2800
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2700.0, 2800.0]
+              valid_range_K: [2700.0, 2800.0]
+              A: 12.983437022481825
+              B: 29008.699085596225
+              C: 0.0
+            - name: janaf_sio2_2800_2900
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2800.0, 2900.0]
+              valid_range_K: [2800.0, 2900.0]
+              A: 12.93799348538705
+              B: 28881.457181730853
+              C: 0.0
+            - name: janaf_sio2_2900_3000
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2900.0, 3000.0]
+              valid_range_K: [2900.0, 3000.0]
+              A: 12.89516164582655
+              B: 28757.244847005404
+              C: 0.0
+            - name: janaf_sio2_3000_3100
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3000.0, 3100.0]
+              valid_range_K: [3000.0, 3100.0]
+              A: 12.853374485279634
+              B: 28631.883365364658
+              C: 0.0
+            - name: janaf_sio2_3100_3200
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3100.0, 3200.0]
+              valid_range_K: [3100.0, 3200.0]
+              A: 12.813154343253284
+              B: 28507.200925082972
+              C: 0.0
+            - name: janaf_sio2_3200_3300
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3200.0, 3300.0]
+              valid_range_K: [3200.0, 3300.0]
+              A: 12.773978880240575
+              B: 28381.839443442306
+              C: 0.0
+            - name: janaf_sio2_3300_3400
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3300.0, 3400.0]
+              valid_range_K: [3300.0, 3400.0]
+              A: 12.736370435748329
+              B: 28257.731576617894
+              C: 0.0
+            - name: janaf_sio2_3400_3500
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3400.0, 3500.0]
+              valid_range_K: [3400.0, 3500.0]
+              A: 12.700329009776741
+              B: 28135.190728314494
+              C: 0.0
+            - name: janaf_sio2_3500_3600
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3500.0, 3600.0]
+              valid_range_K: [3500.0, 3600.0]
+              A: 12.664287583804988
+              B: 28009.045737413355
+              C: 0.0
+            - name: janaf_sio2_3600_3700
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3600.0, 3700.0]
+              valid_range_K: [3600.0, 3700.0]
+              A: 12.629290836846977
+              B: 27883.057448364518
+              C: 0.0
+            - name: janaf_sio2_3700_3800
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3700.0, 3800.0]
+              valid_range_K: [3700.0, 3800.0]
+              A: 12.596383447916295
+              B: 27761.300109320993
+              C: 0.0
+            - name: janaf_sio2_3800_3900
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3800.0, 3900.0]
+              valid_range_K: [3800.0, 3900.0]
+              A: 12.563998398492505
+              B: 27638.236921510594
+              C: 0.0
+            - name: janaf_sio2_3900_4000
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3900.0, 4000.0]
+              valid_range_K: [3900.0, 4000.0]
+              A: 12.531613349068646
+              B: 27511.93522875754
+              C: 0.0
+            - name: janaf_sio2_4000_4100
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [4000.0, 4100.0]
+              valid_range_K: [4000.0, 4100.0]
+              A: 12.500795318165324
+              B: 27388.663105144256
+              C: 0.0
+            - name: janaf_sio2_4100_4200
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [4100.0, 4200.0]
+              valid_range_K: [4100.0, 4200.0]
+              A: 12.471021966275691
+              B: 27266.592362396757
+              C: 0.0
+            - name: janaf_sio2_4200_4300
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [4200.0, 4300.0]
+              valid_range_K: [4200.0, 4300.0]
+              A: 12.441248614386016
+              B: 27141.544284460128
+              C: 0.0
+            - name: janaf_sio2_4300_4400
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [4300.0, 4400.0]
+              valid_range_K: [4300.0, 4400.0]
+              A: 12.412519941510038
+              B: 27018.01099109342
+              C: 0.0
+            - name: janaf_sio2_4400_4500
+              phase: liquid
+              source: REF-020 JANAF O-040 gas minus O-038 condensed formation Gibbs energy
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [4400.0, 4500.0]
+              valid_range_K: [4400.0, 4500.0]
+              A: 12.384313608140914
+              B: 26893.90312426927
+              C: 0.0
           pressure_models:
           - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
