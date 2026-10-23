@@ -29,19 +29,16 @@ The VapoRock wrapper still checks whether the canonical `vaporock` Python packag
 
 ## Local alphaMELTS Path
 
-For local binary use, put the executable at:
-
-```text
-engines/alphamelts/run_alphamelts.command
-```
-
-The `engines/` directory is ignored by git so local licensed or platform-specific binaries are not published.
+`install-dependencies.py` places the verified macOS arm64 app under
+`~/repos/engine-bin/alphaMELTS/<archive-sha>/`. `install-engines.py` records
+the binary from that versioned directory in the checkout's generated
+`engines/engines.local.toml`.
 
 ## Python Packages
 
-`petthermotools`, Thermobar and PySulfSat are installer-owned editable sibling clones. Run `install-engines.py` after base dependency setup; the base manifests/lock do not pin their revisions. An exact `uv sync` removes installer-owned packages, so provision engines again afterward. Use the venv Python or `uv run --no-sync` for tests after provisioning. See README installation instructions for pip bootstrap and import verification.
+`petthermotools`, Thermobar and PySulfSat are installer-owned editable clones at the reviewed revisions in `engines/engines.lock.toml`, under `~/repos/engine-bin/<engine>/<pin>/`. Run `install-engines.py` after base dependency setup; the base manifests/lock do not install these engines. An exact `uv sync` removes installer-owned packages, so provision engines again afterward. Use the venv Python or `uv run --no-sync` for tests after provisioning. See README installation instructions for pip bootstrap and import verification.
 
-`vaporock` is deliberately **not** a pip dependency. `import vaporock` hard-requires `thermoengine`, a native build (Cython extension linking system GSL, Objective-C/C dylibs, and the transitive `sulfLiq` dep) that pip cannot compile, so a `git+https` pin in `pyproject.toml` aborted the whole pip batch whenever its ref went stale. VapoRock and ThermoEngine are therefore provisioned by `install-engines.py`, which clones them as siblings of the repo (VapoRock from `https://gitlab.com/ENKI-portal/vaporock.git`) and installs them editable. It tracks the default branch, **not** a tag: VapoRock's only tag (`v0.1`) predates the `src/` restructure and exposes no installable Python project. See the comment block in `pyproject.toml [project.dependencies]` for the authoritative version of this note.
+`vaporock` is deliberately **not** a pip dependency. `import vaporock` hard-requires `thermoengine`, a native build (Cython extension linking system GSL, Objective-C/C dylibs, and the transitive `sulfLiq` dep) that pip cannot compile, so a `git+https` pin in `pyproject.toml` aborted the whole pip batch whenever its ref went stale. VapoRock and ThermoEngine are therefore provisioned by `install-engines.py` from the commits in `engines/engines.lock.toml`; their editable source and native libraries live under the canonical engine root. The lock preserves the validated VapoRock source rather than following its default branch or the old `v0.1` tag. See the comment block in `pyproject.toml [project.dependencies]` for the dependency boundary.
 
 The `numpy>=1.26,<2` upper bound in `[project.dependencies]` is load-bearing for the same stack: VapoRock imports `np.bool8`, removed in numpy 2.0, so an unbounded spec silently breaks `import vaporock`.
 
@@ -115,7 +112,7 @@ diagnostic transport metadata, not ledger authority.
 
 `simulator/melt_backend/magemin.py` wraps MAGEMin, an open-source Gibbs free-energy minimiser for silicate phase equilibria. The adapter probes for MAGEMin lazily inside `initialize()`; a missing binary marks the backend unavailable and returns warnings instead of crashing the simulator.
 
-**Bridge choice.** MAGEMin has no pure-PyPI package — the upstream clone ships zero Python files, no `setup.py`, no `pyproject.toml`. Its primary interface is Julia (`MAGEMin_C.jl`); from Python it is reached either through that Julia bridge or by driving the compiled `MAGEMin` binary over a subprocess. The adapter's supported default is the **subprocess bridge**: `initialize()` locates the compiled binary (a sibling clone at `../MAGEMin/MAGEMin`, or `engines/magemin/{,bin/}MAGEMin`, or `MAGEMin` on `PATH`) and `_call_magemin` invokes it with `--Verb=0` single-point arguments, parsing the compact `Phase :` / `Mode :` stdout block. The optional `pymagemin` and `julia` bridges are still probed first when a caller has them installed; the `ctypes` bridge is opt-in only (`python_bridge="ctypes"`) because its struct marshaling is unimplemented and auto-preferring it would shadow the working subprocess path. See `pyproject.toml` `[magemin]` for the build path.
+**Bridge choice.** MAGEMin has no pure-PyPI package — the upstream clone ships zero Python files, no `setup.py`, no `pyproject.toml`. Its primary interface is Julia (`MAGEMin_C.jl`); from Python it is reached either through that Julia bridge or by driving the compiled `MAGEMin` binary over a subprocess. The installer builds the locked source at `~/repos/engine-bin/MAGEMin/<commit>/MAGEMin` and records that exact path in `engines.local.toml`. The optional `pymagemin` and `julia` bridges are still probed first when a caller has them installed; the `ctypes` bridge is opt-in only (`python_bridge="ctypes"`) because its struct marshaling is unimplemented and auto-preferring it would shadow the working subprocess path. See `pyproject.toml` `[magemin]` for the build path.
 
 **Oxide basis.** MAGEMin and alphaMELTS share the 14-oxide MELTS basis (`simulator.state.OXIDE_SPECIES`: SiO2, TiO2, Al2O3, FeO, Fe2O3, MgO, CaO, Na2O, K2O, Cr2O3, MnO, P2O5, NiO, CoO), so shadow comparisons are a straight rename. The adapter projects the mol-native simulator melt inventory into oxide wt% over that basis. For the binary's igneous (`ig`) database the wt% vector is folded onto MAGEMin's `ig` bulk order (`SiO2, Al2O3, CaO, MgO, FeOt, K2O, Na2O, TiO2, O, Cr2O3, H2O`): FeO and Fe2O3 combine into the single FeOt total-iron component; explicit Fe2O3 (or the spectroscopic total-iron-as-FeO convention when no Fe2O3 split is present) provisions the free `O` redox component so the qfm buffer can engage; oxides outside the `ig` system (MnO, P2O5, NiO, CoO) are dropped. Metal, sulfide, salt, and halide accounts are never passed to MAGEMin — when called with the layered ABC's `composition_mol_by_account`, only `process.cleaned_melt` is consumed and every other account is reported as a dropped-account warning.
 

@@ -8,6 +8,41 @@ All commands assume you are **in the repo root** and use the project venv
 (`./.venv/bin/python`). Create it with `python3 install-dependencies.py` (and
 `install-engines.py` for the real thermochemistry engines).
 
+## Install and check pinned engines
+
+`install-dependencies.py` installs the base Python environment and the
+checksum-verified alphaMELTS app, then writes this checkout's
+`engines/engines.local.toml` from the lock and shared install root. Then run:
+
+```bash
+python3 install-engines.py
+python3 install-engines.py --check
+```
+
+The reviewed pins and build commands live in `engines/engines.lock.toml`.
+Engine sources and artifacts live at `~/repos/engine-bin/<engine>/<pin>/`,
+shared by checkouts and worktrees. `--check` compares the lock with that engine
+root and this checkout's `engines/engines.local.toml`, and scans `~/repos` for
+extra engine builds. It reports wrong source revisions, missing artifacts, and
+config path or identity-digest drift. It also prints artifact SHA-256 values
+for comparison across hosts. Different native artifact hashes are warnings;
+the locked source pin remains authoritative. ThermoEngine's three libraries
+are built under the shared root and published as symlinks in `~/lib`, where
+upstream `ctypes` lookup expects them; `--check` reports missing, regular-file,
+or misdirected links without changing them. `install-engines.py` verifies
+ThermoEngine and VapoRock imports in a fresh process with that library path and
+fails if verification fails.
+
+Runtime readers prefer the generated TOML. Before every checkout has a local
+TOML, the adapters retain their legacy fallback locations: alphaMELTS in the
+checkout or on `PATH`, MAGEMin in the checkout, a sibling clone, or on `PATH`,
+and ThermoEngine libraries in `~/lib`. The installer, TOML writer, and
+`--check` remain lock-only; the checker reports extra builds under `~/repos`
+without selecting or deleting them. Generated identity versions come from the
+lock; digests use installed executable bytes (or the combined ThermoEngine
+libraries), while Python-only engines use their pinned commit. Change a reviewed
+lock entry to bump an engine; `--update` no longer follows upstream HEAD.
+
 ---
 
 ## 1. Fire one simulation (the canonical command)

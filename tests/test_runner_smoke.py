@@ -1770,20 +1770,20 @@ def test_runner_golden_fixture_matches(scenario, isolated_engine_config, monkeyp
 
 
 def test_runner_golden_output_ignores_host_binding_receipts(
+    tmp_path,
     monkeypatch,
-    isolated_engine_config,
 ):
-    from simulator import engine_binding_admission, engine_local_config
+    import simulator.engine_local_config as engine_config
+    from simulator import engine_binding_admission
 
-    host_config_path = isolated_engine_config
+    host_config_path = tmp_path / "host" / "engines" / "engines.local.toml"
     host_config_path.parent.mkdir(parents=True, exist_ok=True)
-    if not host_config_path.exists():
-        host_config_path.write_text("", encoding="utf-8")
     monkeypatch.setattr(
-        engine_local_config,
-        "repo_root",
-        lambda: host_config_path.parent.parent,
+        engine_config,
+        "config_path",
+        lambda: host_config_path,
     )
+    host_config_path.write_text("", encoding="utf-8")
     host_receipt_path = host_config_path.with_name(
         engine_binding_admission.RECEIPT_FILENAME
     )

@@ -46,7 +46,7 @@ def _configured_alphamelts_identity(
     monkeypatch: pytest.MonkeyPatch,
     content: bytes | None,
 ) -> tuple[BindingIdentity, Path]:
-    from simulator import engine_local_config
+    import simulator.engine_local_config as engine_config
 
     binary = tmp_path / "alphamelts"
     if content is not None:
@@ -56,7 +56,7 @@ def _configured_alphamelts_identity(
         encoding="utf-8",
     )
     monkeypatch.setattr(
-        engine_local_config,
+        engine_config,
         "config_path",
         lambda: tmp_path / "engines.local.toml",
     )
@@ -183,12 +183,12 @@ def test_install_provenance_records_selected_producer_artifact(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from simulator import engine_local_config
+    import simulator.engine_local_config as engine_config
 
     config_path = tmp_path / "engines.local.toml"
     config_path.write_text("[paths]\n", encoding="utf-8")
     monkeypatch.setattr(
-        engine_local_config,
+        engine_config,
         "config_path",
         lambda: config_path,
     )
@@ -216,12 +216,12 @@ def test_install_provenance_distinguishes_selected_digest_from_optional_metadata
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from simulator import engine_local_config
+    import simulator.engine_local_config as engine_config
 
     config_path = tmp_path / "engines.local.toml"
     config_path.write_text("[paths]\n", encoding="utf-8")
     monkeypatch.setattr(
-        engine_local_config,
+        engine_config,
         "config_path",
         lambda: config_path,
     )
@@ -609,10 +609,10 @@ def test_install_provenance_binds_alpha_subprocess_environment(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from simulator import engine_local_config
+    import simulator.engine_local_config as engine_config
 
     monkeypatch.setattr(
-        engine_local_config,
+        engine_config,
         "config_path",
         lambda: tmp_path / "engines.local.toml",
     )
