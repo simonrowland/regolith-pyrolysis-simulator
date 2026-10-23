@@ -358,6 +358,35 @@ def _marker_backend(tmp_path: Path):
     return _backend(stub, timeout_s=1.0), marker
 
 
+def _launched_then_signaled_backend(tmp_path: Path):
+    """Record that the binary started, then die with SIGSEGV.
+
+    A zero-exit stub with empty stdout raises parse_empty_output after
+    launch. Positive controls claim the launch-or-refusal boundary, the
+    same marker-plus-signal contract as the existing crash test, not a
+    parsed assemblage.
+    """
+    marker = tmp_path / 'invoked'
+    stub = tmp_path / 'alphamelts'
+    stub.write_text(
+        '#!/bin/sh\n'
+        f'printf invoked > "{marker}"\n'
+        'kill -SEGV $$\n'
+    )
+    stub.chmod(0o755)
+    return _backend(stub, timeout_s=1.0), marker
+
+
+def _assert_launched_then_signaled(result, marker: Path) -> None:
+    assert marker.is_file()
+    assert result.diagnostics['backend_status_reason'] == (
+        ALPHAMELTS_REASON_SUBPROCESS_DIED
+    )
+    failure = result.diagnostics['subprocess_failure']
+    assert failure['returncode'] == -11
+    assert failure['signal'] == 'SIGSEGV'
+
+
 def _melt(moles: dict[str, float]) -> dict[str, dict[str, float]]:
     return {'process.cleaned_melt': dict(moles)}
 
@@ -479,30 +508,33 @@ def test_measured_fe_free_silicate_absolute_fo2_refuses_before_launch(
     assert 'imposed' in result.warnings[0]
 
 
+@pytest.mark.skipif(os.name != 'posix', reason='signal contract is POSIX')
 def test_mgo_sio2_absolute_fo2_is_outside_the_new_matching_scope(tmp_path):
     """Same SIGSEGV trigger, not one of the measured 414 sets, so it still launches."""
-    backend, marker = _marker_backend(tmp_path)
+    backend, marker = _launched_then_signaled_backend(tmp_path)
 
-    _run(backend, _melt({'MgO': 0.5, 'SiO2': 0.5}))
+    result = _run(backend, _melt({'MgO': 0.5, 'SiO2': 0.5}))
 
-    assert marker.exists()
+    _assert_launched_then_signaled(result, marker)
 
 
+@pytest.mark.skipif(os.name != 'posix', reason='signal contract is POSIX')
 def test_fe_bearing_control_with_imposed_fo2_still_launches(tmp_path):
-    backend, marker = _marker_backend(tmp_path)
+    backend, marker = _launched_then_signaled_backend(tmp_path)
 
-    _run(backend)
+    result = _run(backend)
 
-    assert marker.exists()
+    _assert_launched_then_signaled(result, marker)
 
 
+@pytest.mark.skipif(os.name != 'posix', reason='signal contract is POSIX')
 def test_fe_free_silicate_without_imposed_fo2_still_launches(tmp_path):
-    """CAS computes when absolute fO2 is omitted. The guard must not fire."""
+    """CAS with absolute fO2 omitted is outside the guard, so it still launches."""
     from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
 
-    backend, marker = _marker_backend(tmp_path)
+    backend, marker = _launched_then_signaled_backend(tmp_path)
 
-    backend.equilibrate(
+    result = backend.equilibrate(
         temperature_C=1400.0,
         pressure_bar=1.0,
         fO2_log=None,
@@ -515,7 +547,7 @@ def test_fe_free_silicate_without_imposed_fo2_still_launches(tmp_path):
         subprocess_run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
     )
 
-    assert marker.exists()
+    _assert_launched_then_signaled(result, marker)
 
 
 def _qualification_handle(tmp_path: Path):
