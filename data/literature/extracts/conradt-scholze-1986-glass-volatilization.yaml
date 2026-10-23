@@ -1189,7 +1189,7 @@ species:
       locator: &id030
         page: 10
         table: '6'
-        note: P_H2O=0.1 bar; K2O=17 mole %
+        note: P_H2O=0.1 bar; binary K2O-B2O3 melt (as printed); K2O=17 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1204,12 +1204,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '17'
-              - - B2O3
-                - '83'
+              K2O: '17 mole %'
           locator: *id030
       values:
         quantity: evaporation_flux
@@ -1217,7 +1212,7 @@ species:
         evaporation_flux_as_printed: '1'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=17 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=17 mole %
         condition_as_printed: P_H2O=0.1 bar
         method_class: measured_direct
     - observation_id: conradt_scholze_t6_k2o_29
@@ -1226,7 +1221,7 @@ species:
       locator: &id031
         page: 10
         table: '6'
-        note: P_H2O=0.1 bar; K2O=20 mole %
+        note: P_H2O=0.1 bar; binary K2O-B2O3 melt (as printed); K2O=20 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1241,12 +1236,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '20'
-              - - B2O3
-                - '80'
+              K2O: '20 mole %'
           locator: *id031
       values:
         quantity: evaporation_flux
@@ -1254,7 +1244,7 @@ species:
         evaporation_flux_as_printed: '2'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=20 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=20 mole %
         condition_as_printed: P_H2O=0.1 bar
         method_class: measured_direct
     - observation_id: conradt_scholze_t6_k2o_30
@@ -1263,7 +1253,7 @@ species:
       locator: &id032
         page: 10
         table: '6'
-        note: P_H2O=0.1 bar; K2O=25 mole %
+        note: P_H2O=0.1 bar; binary K2O-B2O3 melt (as printed); K2O=25 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1278,12 +1268,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '25'
-              - - B2O3
-                - '75'
+              K2O: '25 mole %'
           locator: *id032
       values:
         quantity: evaporation_flux
@@ -1291,7 +1276,7 @@ species:
         evaporation_flux_as_printed: '5'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=25 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=25 mole %
         condition_as_printed: P_H2O=0.1 bar
         method_class: measured_direct
     - observation_id: conradt_scholze_t6_k2o_31
@@ -1300,7 +1285,7 @@ species:
       locator: &id033
         page: 10
         table: '6'
-        note: P_H2O=0.1 bar; K2O=33 mole %
+        note: P_H2O=0.1 bar; binary K2O-B2O3 melt (as printed); K2O=33 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1315,12 +1300,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '33'
-              - - B2O3
-                - '67'
+              K2O: '33 mole %'
           locator: *id033
       values:
         quantity: evaporation_flux
@@ -1328,7 +1308,7 @@ species:
         evaporation_flux_as_printed: '16'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=33 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=33 mole %
         condition_as_printed: P_H2O=0.1 bar
         method_class: measured_direct
     - observation_id: conradt_scholze_t6_k2o_32
@@ -1337,7 +1317,7 @@ species:
       locator: &id034
         page: 10
         table: '6'
-        note: P_H2O=0.25 bar; K2O=17 mole %
+        note: P_H2O=0.25 bar; binary K2O-B2O3 melt (as printed); K2O=17 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1352,12 +1332,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '17'
-              - - B2O3
-                - '83'
+              K2O: '17 mole %'
           locator: *id034
       values:
         quantity: evaporation_flux
@@ -1365,7 +1340,7 @@ species:
         evaporation_flux_as_printed: '1'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=17 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=17 mole %
         condition_as_printed: P_H2O=0.25 bar
         method_class: measured_direct
     - observation_id: conradt_scholze_t6_k2o_33
@@ -1374,7 +1349,7 @@ species:
       locator: &id035
         page: 10
         table: '6'
-        note: P_H2O=0.25 bar; K2O=20 mole %
+        note: P_H2O=0.25 bar; binary K2O-B2O3 melt (as printed); K2O=20 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1389,12 +1364,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '20'
-              - - B2O3
-                - '80'
+              K2O: '20 mole %'
           locator: *id035
       values:
         quantity: evaporation_flux
@@ -1402,7 +1372,7 @@ species:
         evaporation_flux_as_printed: '3'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=20 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=20 mole %
         condition_as_printed: P_H2O=0.25 bar
         method_class: measured_direct
     - observation_id: conradt_scholze_t6_k2o_34
@@ -1411,7 +1381,7 @@ species:
       locator: &id036
         page: 10
         table: '6'
-        note: P_H2O=0.25 bar; K2O=25 mole %
+        note: P_H2O=0.25 bar; binary K2O-B2O3 melt (as printed); K2O=25 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1426,12 +1396,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '25'
-              - - B2O3
-                - '75'
+              K2O: '25 mole %'
           locator: *id036
       values:
         quantity: evaporation_flux
@@ -1439,7 +1404,7 @@ species:
         evaporation_flux_as_printed: '5'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=25 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=25 mole %
         condition_as_printed: P_H2O=0.25 bar
         method_class: measured_direct
     - observation_id: conradt_scholze_t6_k2o_35
@@ -1448,7 +1413,7 @@ species:
       locator: &id037
         page: 10
         table: '6'
-        note: P_H2O=0.25 bar; K2O=33 mole %
+        note: P_H2O=0.25 bar; binary K2O-B2O3 melt (as printed); K2O=33 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1463,12 +1428,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '33'
-              - - B2O3
-                - '67'
+              K2O: '33 mole %'
           locator: *id037
       values:
         quantity: evaporation_flux
@@ -1476,7 +1436,7 @@ species:
         evaporation_flux_as_printed: '14'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=33 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=33 mole %
         condition_as_printed: P_H2O=0.25 bar
         method_class: measured_direct
     - observation_id: conradt_scholze_t6_k2o_36
@@ -1485,7 +1445,7 @@ species:
       locator: &id038
         page: 10
         table: '6'
-        note: P_H2O=0.5 bar; K2O=17 mole %
+        note: P_H2O=0.5 bar; binary K2O-B2O3 melt (as printed); K2O=17 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1500,12 +1460,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '17'
-              - - B2O3
-                - '83'
+              K2O: '17 mole %'
           locator: *id038
       values:
         quantity: evaporation_flux
@@ -1513,7 +1468,7 @@ species:
         evaporation_flux_as_printed: '2'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=17 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=17 mole %
         condition_as_printed: P_H2O=0.5 bar
         method_class: measured_direct
     - observation_id: conradt_scholze_t6_k2o_37
@@ -1522,7 +1477,7 @@ species:
       locator: &id039
         page: 10
         table: '6'
-        note: P_H2O=0.5 bar; K2O=20 mole %
+        note: P_H2O=0.5 bar; binary K2O-B2O3 melt (as printed); K2O=20 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1537,12 +1492,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '20'
-              - - B2O3
-                - '80'
+              K2O: '20 mole %'
           locator: *id039
       values:
         quantity: evaporation_flux
@@ -1550,7 +1500,7 @@ species:
         evaporation_flux_as_printed: '2'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=20 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=20 mole %
         condition_as_printed: P_H2O=0.5 bar
         method_class: measured_direct
     - observation_id: conradt_scholze_t6_k2o_38
@@ -1559,7 +1509,7 @@ species:
       locator: &id040
         page: 10
         table: '6'
-        note: P_H2O=0.5 bar; K2O=25 mole %
+        note: P_H2O=0.5 bar; binary K2O-B2O3 melt (as printed); K2O=25 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1574,12 +1524,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '25'
-              - - B2O3
-                - '75'
+              K2O: '25 mole %'
           locator: *id040
       values:
         quantity: evaporation_flux
@@ -1587,7 +1532,7 @@ species:
         evaporation_flux_as_printed: '10'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=25 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=25 mole %
         condition_as_printed: P_H2O=0.5 bar
         method_class: measured_direct
     - observation_id: conradt_scholze_t6_k2o_39
@@ -1596,7 +1541,7 @@ species:
       locator: &id041
         page: 10
         table: '6'
-        note: P_H2O=0.5 bar; K2O=33 mole %
+        note: P_H2O=0.5 bar; binary K2O-B2O3 melt (as printed); K2O=33 mole %
       T_C: 1000
       units: kg m^-2 s^-1
       phase: liquid
@@ -1611,12 +1556,7 @@ species:
           state:
             tag: value
             value:
-              amount_basis: mole_fraction
-              components:
-              - - K2O
-                - '33'
-              - - B2O3
-                - '67'
+              K2O: '33 mole %'
           locator: *id041
       values:
         quantity: evaporation_flux
@@ -1624,6 +1564,6 @@ species:
         evaporation_flux_as_printed: '15'
         units_as_printed: 10^-6 kg m^-2 s^-1
         component_as_printed: K2O
-        composition_as_printed: K2O-B2O3 melt; K2O=33 mole %
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=33 mole %
         condition_as_printed: P_H2O=0.5 bar
         method_class: measured_direct

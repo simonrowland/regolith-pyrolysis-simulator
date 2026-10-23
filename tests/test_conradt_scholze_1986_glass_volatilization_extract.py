@@ -28,6 +28,18 @@ def test_conradt_scholze_tables_5_and_6_flux_cells_and_conditions(tmp_path: Path
     k = doc["species"]["K2O"]["observations"]
     assert len(na) == 27
     assert len(k) == 12
+    k2o_mol_percent = ["17", "20", "25", "33"] * 3
+    assert [
+        obs["values"]["composition_as_printed"].removeprefix(
+            "binary K2O-B2O3 melt (as printed); K2O="
+        ).removesuffix(" mole %")
+        for obs in k
+    ] == k2o_mol_percent
+    for obs, mol_percent in zip(k, k2o_mol_percent, strict=True):
+        assert obs["point_conditions"]["composition"]["state"]["value"] == (
+            {"K2O": f"{mol_percent} mole %"}
+        )
+        assert "binary K2O-B2O3 melt (as printed)" in obs["locator"]["note"]
     assert all("gas_species" not in obs["values"] for obs in observations)
     assert all("flow" not in obs["values"] for obs in observations)
     assert all("P_total" not in obs["values"] for obs in observations)
