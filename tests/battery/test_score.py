@@ -12430,13 +12430,15 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             "stolyarova_1996_table2_pO_double_prime_1933k",
         )
     ] == [30, 10, 15]
-    assert len(kems_model_derived) == 28
+    # dc7eafe24 adds the quoted Table 4 gamma successors. 5f44bd3ee copies the
+    # parent derivation onto them, so they migrate as model_derived: 26 Sossi
+    # plus 24 ms2000 rows. 28->50. The union and the headline each gain those
+    # 22 rows (91->113, 55->77). The calculated oxygen columns stay quoted.
+    assert len(kems_model_derived) == 50
     assert len(
         stolyarova_activities | stolyarova_atomic_oxygen_pressures | kems_model_derived
-    ) == 91
-    # The 81 calculated oxygen rows are quoted, so they leave this model-derived
-    # union: 136 - 26 - 55 = 55.
-    assert len(headline_diagnostic_references) == 55
+    ) == 113
+    assert len(headline_diagnostic_references) == 77
     assert admitted_model_derived == (
         headline_diagnostic_references - stolyarova_atomic_oxygen_pressures
     )
