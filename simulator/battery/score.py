@@ -7024,6 +7024,19 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "composition"},
             execution=ExecutionState.NOT_PROBED,
         )
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and composition_state.value.amount_basis is AmountBasis.MASS_PERCENT
+    ):
+        return refused(
+            RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+            {
+                "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
+                "identity_amount_basis": AmountBasis.MASS_PERCENT.value,
+                "engine_basis": "mole_fraction or mol_inventory",
+                "detail": "printed mass-percent phase identity cannot be read as moles",
+            },
+        )
     wt = composition_wt_pct(composition_state.value)
     if not wt:
         return refused(
