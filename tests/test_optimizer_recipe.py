@@ -94,8 +94,9 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # changed, no values. Paths: campaigns.C2A_continuous.adaptive_control.
     # induction_stirring; endpoint_criteria.control.surface_renewal;
     # endpoint_criteria.general; furnace.induction_stirring.note.
+    # Recomputed 2026-10-23 for the staged C3 duration change (3 -> 6 h).
     assert hashlib.sha256(resolved).hexdigest() == (
-        "6e96c06bd07493a6db66db50de75fc9599b8a0353c5d08ae37d68f09ec90ccb6"
+        "83b08b10bbd289ae3471a83d2733da066e73ea6b0c2115bc36c087a51c6e4a12"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
@@ -123,6 +124,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
+    # Recomputed after t-1494 changed the staged-duration floor.
     assert identity_digest == (
         "d23a4a199032f00dbdcd30d9738415cae5d94b47058e6abf787cc7c21286e42f"
     )
@@ -1707,9 +1709,10 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # difference between two moving numbers, written down as a constant, goes
     # stale every time either moves. It is now evaluated, not pinned. Recomputed
     # 2026-09-29 for C2 loader-scalar pressure coupling.
+    # Recomputed 2026-10-23 after t-1494 changed the staged-duration bound.
     assert (
         first.recipe_id()
-                == "cb77c9b93e43903f3820c491df51dce7a7a3d4f8784d9b55121f64906bca7b6d"
+                == "8e716a8a96628531996f0477f71fc1493f41b3807c072343950117b8f800e021"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
