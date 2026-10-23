@@ -3638,13 +3638,23 @@
           "regime": "kems_effusion",
           "units": "atm",
           "experiment": "shornikov_2018_mo_cell_kems",
+          "derivation": {
+            "relation": "Hertz–Knudsen reduction of atomic oxygen pressure using Eqs. (17), (18)",
+            "output_unit": "atm",
+            "raw_inputs": {
+              "state": {"tag": "value", "value": "not_printed"},
+              "locator": {"published_page": 1451, "pdf_page_index": 4, "equation": "17, 18", "note": "Integrated ion-current inputs for this reduction are not tabulated."}
+            }
+          },
           "values": {
             "quantity": "partial_pressure",
             "gas_species": "(O)",
-            "method_class": "measured_tabulated",
+            "reaction": {"tag": "unknown", "reason": "no_reaction_stated_for_hertz_knudsen_reduction"},
+            "method_class": "measured_reduced",
+            "evidence_class": "measured_reduced",
             "admission_status": "admitted",
             "method": "Hertz–Knudsen relation, Eq. (17), with K_alpha correction, Eq. (18).",
-            "method_as_printed": "Partial pressures determined using the Hertz–Knudsen equation.",
+            "method_as_printed": "Hertz–Knudsen Eq. (17) with K_alpha correction, Eq. (18).",
             "pressure_scale_as_printed": "atm",
             "composition_component": "Al2O3",
             "composition_basis": "mol % as printed",
@@ -3881,7 +3891,7 @@
             "published_page": 1452,
             "pdf_page_index": 5,
             "table": "2",
-            "note": "Calculated using Eqs. (22), (23)."
+            "note": "Table 2 header cites Eqs. (22), (23); MgO(g) = Mg(g) + O(g) is Eq. (19), p. 1451."
           },
           "T_range_K": [
             2100,
@@ -3906,6 +3916,7 @@
           "values": {
             "quantity": "partial_pressure",
             "gas_species": "(O)",
+            "reaction": "MgO(g) = Mg(g) + O(g)",
             "method_class": "model_derived",
             "admission_status": "admitted",
             "method": "Author calculation using Eqs. (22), (23)",
@@ -5117,13 +5128,23 @@
           "regime": "kems_effusion",
           "units": "atm",
           "experiment": "shornikov_2018_mo_cell_kems",
+          "derivation": {
+            "relation": "Hertz–Knudsen reduction of molecular oxygen pressure using Eqs. (17), (18)",
+            "output_unit": "atm",
+            "raw_inputs": {
+              "state": {"tag": "value", "value": "not_printed"},
+              "locator": {"published_page": 1451, "pdf_page_index": 4, "equation": "17, 18", "note": "Integrated ion-current inputs for this reduction are not tabulated."}
+            }
+          },
           "values": {
             "quantity": "partial_pressure",
             "gas_species": "(O2)",
-            "method_class": "measured_tabulated",
+            "reaction": {"tag": "unknown", "reason": "no_reaction_stated_for_hertz_knudsen_reduction"},
+            "method_class": "measured_reduced",
+            "evidence_class": "measured_reduced",
             "admission_status": "admitted",
             "method": "Hertz–Knudsen relation, Eq. (17), with K_alpha correction, Eq. (18).",
-            "method_as_printed": "Partial pressures determined using the Hertz–Knudsen equation.",
+            "method_as_printed": "Hertz–Knudsen Eq. (17) with K_alpha correction, Eq. (18).",
             "pressure_scale_as_printed": "atm",
             "composition_component": "Al2O3",
             "composition_basis": "mol % as printed",
