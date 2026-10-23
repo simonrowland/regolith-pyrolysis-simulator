@@ -1983,6 +1983,9 @@ def surface_gas_film(*, area_m2, flow, temperature_K, pressure_pa, carrier, diff
     elif geometry == 'planar':
         sh = 0.664 * math.sqrt(re) * sc ** (1 / 3)
         formula = 'Blasius_plate_area_mean_0.664'
+        # Blasius delta_99/L ~= 5/sqrt(Re): requiring <=0.1 gives
+        # Re >= (5/0.1)^2 = 2500, dimensionless. At large Re this
+        # thin-layer premise improves; the separate laminar ceiling remains.
         if re < 2500:
             flags.append('momentum layer exceeds 10% of flow length')
         if re > 5e5:
@@ -2011,6 +2014,8 @@ def surface_gas_film(*, area_m2, flow, temperature_K, pressure_pa, carrier, diff
         raise EvaporationFluxConfigurationError('invalid_input: geometry produces nonpositive transfer')
     k = sh * D / length
     mfp = _mean_free_path_m(pressure_pa, temperature_K, carrier_gas=carrier)
+    # Equivalent diffusive thickness delta=D/k gives Kn_film=lambda*k/D;
+    # [m]*(m/s)/(m^2/s)=1, and lambda -> 0 recovers the continuum limit.
     kn_film, kn_geometry = mfp * k / D, mfp / length
     gamma = 5 / 3 if carrier in ('He', 'Ar', 'Kr') else 1.4
     mach = u / math.sqrt(gamma * GAS_CONSTANT * temperature_K / props.molar_mass_kg_mol)
@@ -2150,6 +2155,8 @@ def series_evaporation_flux(
         film['binary_approximation'] = 'independent dilute species; not coupled multicomponent certification'
     # J/delta = 1/(Ri+Rg); use conductances directly so subnormal vapour
     # drives cannot underflow delta*k_HK to zero in the alpha diagnostic.
+    # Both conductances have units kg/(m^2 s Pa), so their ratio is
+    # dimensionless; Rg -> 0 returns the intrinsic interface alpha.
     alpha_eff = (1.0 / (ri + rg)) / k_hk
     return SeriesEvaporationFlux(
         flux_kg_s_m2=flux, alpha_intrinsic=alpha,
