@@ -1619,6 +1619,99 @@ species:
           \ Since melilite and anorthite              perature reached 1900 °C (i.e., the zero-time run samples)\n\
           are essentially fully exchanged, their preeexchange isotopic         shows that samples lost a signiﬁcant\
           \ amount of magnesium"
+    - observation_id: mendybaev_2013_abstract_unique_isotope_factor_context
+      type: method_context
+      locator:
+        page: 1
+        published_page: 368
+        pdf_page_index: 0
+        section: Abstract
+      units: isotope fractionation factor as printed
+      values:
+        candidate_quantity: isotope_fractionation_factor
+        reason: The abstract's a25,24 value is not duplicated by the distinct Figure 7 estimate; retained as context.
+        temperature: FUN1 and FUN2 evaporation experiments at 1900 °C
+        factor: a25,24
+        value: 0.98372 ± 0.00041
+        composition_group: residues with >15 wt% MgO
+    - observation_id: mendybaev_2013_printed_evaporation_rate_estimates_context
+      type: method_context
+      locator:
+        page: 15
+        published_page: 382
+        pdf_page_index: 14
+        section: 4.2 Isotopic composition of evaporation residues and 5. Conclusions
+      units: elemental loss and relative rates as described
+      values:
+        candidate_quantities:
+        - mass_loss_rate
+        - mass_loss_fraction
+        reason: Author estimates concern element-specific loss, not measured total sample loss or direct run rates.
+        estimates_as_printed:
+        - condition: vacuum at 1900 °C
+          statement: Up to 80% of Mg and Si can evaporate in less than one hour.
+          locator:
+            page: 15
+            published_page: 382
+            pdf_page_index: 14
+            section: 5. Conclusions
+        - condition: low-pressure hydrogen-dominated solar-composition gas
+          statement: The same degree of Mg and Si loss can take less than one minute.
+          locator:
+            page: 15
+            published_page: 382
+            pdf_page_index: 14
+            section: 5. Conclusions
+        - condition: hydrogen partial pressure 10^-4 bar
+          statement: Evaporation rates are about 100 times faster than in vacuum.
+          locator:
+            page: 15
+            published_page: 382
+            pdf_page_index: 14
+            section: 4.2 Isotopic composition of evaporation residues
+        - condition: temperature slightly above the starting composition liquidus
+          statement: About half an hour is estimated to produce the observed large Mg and Si isotope enrichments in vacuum experiments.
+          locator:
+            page: 15
+            published_page: 382
+            pdf_page_index: 14
+            section: 4.2 Isotopic composition of evaporation residues
+        - condition: experimental isotope trends summarized for FUN CAIs
+          statement: Evaporation of 30 to 80% of Mg and Si can produce d25Mg of 6–30 per mil and d29Si of 3–15 per mil.
+          locator:
+            page: 15
+            published_page: 382
+            pdf_page_index: 14
+            section: 5. Conclusions
+    - observation_id: mendybaev_2013_natural_cai_isotope_loss_estimates_context
+      type: method_context
+      locator:
+        page: 15
+        published_page: 382
+        pdf_page_index: 14
+        section: 4.2 Isotopic composition of evaporation residues
+      units: elemental percentages and isotope deltas as printed
+      values:
+        candidate_quantities:
+        - mass_loss_fraction
+        - isotope_delta
+        reason: These are isotope-based natural-CAI estimates, not measured run mass-loss fractions or source-mapped isotope ratios.
+        estimates_as_printed:
+        - sample: Vigarano 1623-5
+          printed_isotope_inputs: d25Mg = 30.6 per mil; d29Si = 10.3 per mil
+          estimated_elemental_losses: approximately 82% Mg; approximately 63% Si
+          locator:
+            page: 15
+            published_page: 382
+            pdf_page_index: 14
+            section: 4.2 Isotopic composition of evaporation residues
+        - sample: Allende C1
+          estimated_elemental_losses: approximately 82% Mg; approximately 75% Si
+          locator:
+            page: 14
+            published_page: 381
+            pdf_page_index: 13
+            section: 4.2 Isotopic composition of evaporation residues
     - observation_id: mendybaev_2013_figure1_context
       type: figure_only
       locator:
