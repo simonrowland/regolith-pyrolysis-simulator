@@ -12383,15 +12383,37 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         for observation in fresh_stolyarova_pressures.values()
     )
-    # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9) are model-derived,
-    # not measured pressures (review, Derived O / O2).
-    assert len(stolyarova_1995_derived_pressures) == 26
-    # Table 2's calculated 1933 K oxygen-pressure columns contain 30 pO,
-    # 10 p'O, and 15 p''O observations, all model-derived.
-    assert len(stolyarova_1996_derived_pressures) == 55
+    # 4e0819f6d and 3de591b81 type the calculated oxygen columns quoted_attributed.
+    # The parents are not printed, so the rows are not model_derived.
+    assert len(stolyarova_1995_derived_pressures) == 0
+    assert len(stolyarova_1996_derived_pressures) == 0
+    stolyarova_1995_quoted_pressures = {
+        key
+        for key, obs in observations.items()
+        if obs.source_id == "stolyarova-1995-cao-alumina-kems"
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    }
+    stolyarova_1996_quoted_pressures = {
+        key
+        for key, obs in observations.items()
+        if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    }
+    # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9).
+    assert len(stolyarova_1995_quoted_pressures) == 26
+    # Table 2's calculated 1933 K oxygen-pressure columns: 30 pO, 10 p'O, 15 p''O.
+    assert len(stolyarova_1996_quoted_pressures) == 55
     assert {
         observations[key].observation_id.split("::")[1]
-        for key in stolyarova_1996_derived_pressures
+        for key in stolyarova_1996_quoted_pressures
     } == {
         "stolyarova_1996_table2_pO_1933k",
         "stolyarova_1996_table2_pO_prime_1933k",
@@ -12400,7 +12422,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     assert [
         sum(
             observations[key].observation_id.split("::")[1] == observation_id
-            for key in stolyarova_1996_derived_pressures
+            for key in stolyarova_1996_quoted_pressures
         )
         for observation_id in (
             "stolyarova_1996_table2_pO_1933k",
@@ -12412,7 +12434,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     assert len(
         stolyarova_activities | stolyarova_atomic_oxygen_pressures | kems_model_derived
     ) == 91
-    assert len(headline_diagnostic_references) == 136
+    # The 81 calculated oxygen rows are quoted, so they leave this model-derived
+    # union: 136 - 26 - 55 = 55.
+    assert len(headline_diagnostic_references) == 55
     assert admitted_model_derived == (
         headline_diagnostic_references - stolyarova_atomic_oxygen_pressures
     )
