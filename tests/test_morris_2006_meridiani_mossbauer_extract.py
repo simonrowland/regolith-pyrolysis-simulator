@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import os
 from pathlib import Path
 
@@ -15,6 +16,7 @@ EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
 CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
 PDF = CORPUS / "raw" / SID / f"{SID}.pdf"
 TEXT = CORPUS / "text" / SID / "pdftotext-layout.txt"
+TABLES = CORPUS / "tables" / SID
 
 # Independent transcription from the 600 dpi Table 3 renders, physical PDF pages 8–9.
 RENDER_GRID = {
@@ -103,6 +105,43 @@ def test_all_tables_have_a_disposition_and_figures_are_deferred_without_points()
         assert all(isinstance(count, int) or isinstance(count, str) for count in values["marker_count_per_series"])
 
 
+@pytest.mark.skipif(not TABLES.is_dir(), reason=f"corpus table assets are unavailable: {TABLES}")
+def test_derived_class_means_remain_context_linked_to_registered_tables():
+    source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    context = source["species"]["Fe"]["context"]
+    table7 = next(
+        row for row in context
+        if row["observation_id"] == "morris_2006_meridiani_table7_context"
+    )
+    assert table7["type"] == "measured_table_context"
+    assert table7["values"]["derived_from"] == [f"tables:{SID}"]
+    assert table7["values"]["derivation"]["inputs"] == [f"tables:{SID}"]
+    assert "table-3.csv" in table7["values"]["derivation"]["locator"]
+    assert "remain context" in table7["values"]["derivation"]["relation"]
+    table10 = next(
+        row for row in context
+        if row["observation_id"] == "morris_2006_meridiani_table10_context"
+    )
+    assert table10["values"]["derived_from"] == [f"tables:{SID}"]
+    assert table10["values"]["derivation"]["inputs"] == [f"tables:{SID}"]
+    assert "table-9.csv" in table10["values"]["derivation"]["locator"]
+    relation = table10["values"]["derivation"]["relation"]
+    disposition = table10["values"]["disposition_reason"]
+    assert 'Calculated from elemental data in Table 9.' in relation
+    assert 'Calculated from elemental data in Table 9.' in disposition
+    assert "copy" not in disposition.lower()
+    assert "copied" not in disposition.lower()
+    assert "arithmetic means of member target values" not in relation
+    assert "copies" not in relation
+    assert "remain context" in relation
+    assert "OCBP1" in table10["values"]["disposition_reason"]
+
+    with (TABLES / "table-9.csv").open(newline="", encoding="utf-8") as table_file:
+        csv_row = next(row for row in csv.DictReader(table_file) if row["quantity_as_printed"] == "Fe3+/FeT")
+    page_cell = "0.39 ± 0.03"
+    assert csv_row["Martian_Dust_average_percent_as_printed"] == page_cell
+
+
 @pytest.mark.skipif(not PDF.is_file() or not TEXT.is_file(), reason=f"corpus source is unavailable: {SID}")
 def test_context_only_extract_migrates_no_unavailable_scored_observations():
     index = {
@@ -110,6 +149,7 @@ def test_context_only_extract_migrates_no_unavailable_scored_observations():
             "corpus": {
                 "raw": {"path": str(PDF), "present": PDF.is_file()},
                 "text": {"path": str(TEXT), "exists": TEXT.is_file()},
+                "tables": {"path": str(TABLES), "exists": TABLES.is_dir()},
             }
         }
     }
@@ -119,3 +159,7 @@ def test_context_only_extract_migrates_no_unavailable_scored_observations():
     observations = [row for row in migrator.result.observations.values() if row.source_id == SID]
     assert observations == []
     assert not [row for row in observations if row.value.kind is ValueKind.UNAVAILABLE]
+    assert not migrator.result.validation.hard_issues
+    work = next(work for work in migrator.result.works.values() if SID in work.source_ids)
+    table_asset = next(asset for asset in work.source_files.files if asset.asset_id == f"tables:{SID}")
+    assert table_asset.path == str(TABLES)
