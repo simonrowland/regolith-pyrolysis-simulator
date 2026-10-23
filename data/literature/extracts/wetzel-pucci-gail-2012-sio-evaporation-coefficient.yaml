@@ -1,0 +1,595 @@
+schema_version: literature_extract.v1
+source_id: wetzel-pucci-gail-2012-sio-evaporation-coefficient
+source:
+  citation: 'Wetzel, S., Pucci, A. & Gail, H.-P. (2012), "Vapor pressure and evaporation coefficient measurements at elevated temperatures with a Knudsen cell and a quartz crystal microbalance: new data for SiO", J. Chem. Eng. Data 57(5):1594-1601.'
+  doi: 10.1021/je300199a
+  url: https://doi.org/10.1021/je300199a
+  year: 2012
+extraction:
+  method: Born-digital pdftotext and MinerU machine-text transcription; Table 2 row/column assignment checked against PDF page 7 render.
+  date: '2026-10-22'
+  worker: wave51-F53
+review_status: draft
+experiments:
+- experiment_id: sio_amorphous_powder_knudsen_series
+  method: knudsen_effusion
+  locator:
+    page: 7
+    table: '2'
+    note: QCM detection in UHV; amorphous SiO powder sublimation.
+  sample:
+    form:
+      state: {tag: value, value: amorphous SiO powder}
+      locator: {page: 5, section: Results}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: UHV is stated qualitatively but no numeric total pressure is reported}
+      locator: {page: 7, section: Conclusion}
+    sweep_gas:
+      state: {tag: not_applicable, reason: vacuum Knudsen-cell experiment; no sweep gas used}
+      locator: {page: 7, table: '2', note: Knudsen effusion in UHV}
+    regime:
+      regime_class: {tag: unknown, reason: "no molecular, transitional, or viscous flow classification is reported"}
+  fO2_control:
+    channel: {tag: unknown, reason: no oxygen-fugacity control is stated}
+    oxygen_partial_pressure_Pa:
+      state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}
+      locator: {page: 7, table: '2'}
+species:
+  SiO:
+    observations:
+    - observation_id: wetzel_2012_table2_r01
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 1, note: "left T/p pair"}
+      condensed_form:
+        state: amorphous_solid
+        basis: explicit_author
+        note: "Amorphous SiO powder, as printed in Table 2 caption."
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1211.00
+      values:
+        quantity: pure_Psat
+        method_class: measured_reduced
+        gas_species: SiO(g)
+        pressure_Pa: 0.003
+        p_uncertainty_Pa: 0.002
+        uncertainty_as_printed: ±0.002 Pa
+      uncertainty: "±0.002 Pa; confidence level not stated"
+      derivation: &sio_pressure_derivation
+        relation: Equilibrium pressure calculated from two-orifice QCM measurements using equations 12-13 and the equation 15 alpha fit.
+        output_unit: Pa
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 7, table: '2', note: QCM readings are not tabulated; each pressure point is reduced by the printed equations.}
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1211.00'}
+          locator: {page: 7, table: '2', row: 1, note: "left T/p pair"}
+        total_pressure_Pa: &sio_uhv_pressure
+          state: {tag: unknown, reason: UHV is stated qualitatively but no numeric total pressure is reported}
+          locator: {page: 7, section: Conclusion}
+        fO2_log:
+          state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}
+          locator: {page: 7, table: '2', row: 1, note: "left T/p pair"}
+    - observation_id: wetzel_2012_table2_r02
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 2, note: "left T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1229.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.0016, p_uncertainty_Pa: 0.0007, uncertainty_as_printed: ±0.0007 Pa}
+      uncertainty: "±0.0007 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1229.00'}, locator: {page: 7, table: '2', row: 2, note: "left T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 2, note: "left T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r03
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 3, note: "left T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1249.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.008, p_uncertainty_Pa: 0.003, uncertainty_as_printed: ±0.003 Pa}
+      uncertainty: "±0.003 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1249.00'}, locator: {page: 7, table: '2', row: 3, note: "left T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 3, note: "left T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r04
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 4, note: "left T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1267.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.013, p_uncertainty_Pa: 0.005, uncertainty_as_printed: ±0.005 Pa}
+      uncertainty: "±0.005 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1267.00'}, locator: {page: 7, table: '2', row: 4, note: "left T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 4, note: "left T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r05
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 5, note: "left T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1281.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.022, p_uncertainty_Pa: 0.009, uncertainty_as_printed: ±0.009 Pa}
+      uncertainty: "±0.009 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1281.00'}, locator: {page: 7, table: '2', row: 5, note: "left T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 5, note: "left T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r06
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 6, note: "left T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1300.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.04, p_uncertainty_Pa: 0.02, uncertainty_as_printed: ±0.02 Pa}
+      uncertainty: "±0.02 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1300.00'}, locator: {page: 7, table: '2', row: 6, note: "left T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 6, note: "left T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r07
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 7, note: "left T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1314.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.06, p_uncertainty_Pa: 0.02, uncertainty_as_printed: ±0.02 Pa}
+      uncertainty: "±0.02 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1314.00'}, locator: {page: 7, table: '2', row: 7, note: "left T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 7, note: "left T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r08
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 8, note: "left T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1329.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.09, p_uncertainty_Pa: 0.03, uncertainty_as_printed: ±0.03 Pa}
+      uncertainty: "±0.03 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1329.00'}, locator: {page: 7, table: '2', row: 8, note: "left T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 8, note: "left T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r09
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 9, note: "left T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1343.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.13, p_uncertainty_Pa: 0.05, uncertainty_as_printed: ±0.05 Pa}
+      uncertainty: "±0.05 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1343.00'}, locator: {page: 7, table: '2', row: 9, note: "left T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 9, note: "left T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r10
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 10, note: "left T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1356.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.20, p_uncertainty_Pa: 0.07, uncertainty_as_printed: ±0.07 Pa}
+      uncertainty: "±0.07 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1356.00'}, locator: {page: 7, table: '2', row: 10, note: "left T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 10, note: "left T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r11
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 1, note: "center T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1370.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.28, p_uncertainty_Pa: 0.10, uncertainty_as_printed: ±0.10 Pa}
+      uncertainty: "±0.10 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1370.00'}, locator: {page: 7, table: '2', row: 1, note: "center T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 1, note: "center T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r12
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 2, note: "center T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1384.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.4, p_uncertainty_Pa: 0.1, uncertainty_as_printed: ±0.1 Pa}
+      uncertainty: "±0.1 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1384.00'}, locator: {page: 7, table: '2', row: 2, note: "center T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 2, note: "center T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r13
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 3, note: "center T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1397.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.5, p_uncertainty_Pa: 0.2, uncertainty_as_printed: ±0.2 Pa}
+      uncertainty: "±0.2 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1397.00'}, locator: {page: 7, table: '2', row: 3, note: "center T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 3, note: "center T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r14
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 4, note: "center T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1409.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 0.7, p_uncertainty_Pa: 0.2, uncertainty_as_printed: ±0.2 Pa}
+      uncertainty: "±0.2 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1409.00'}, locator: {page: 7, table: '2', row: 4, note: "center T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 4, note: "center T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r15
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 5, note: "center T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1421.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 1.0, p_uncertainty_Pa: 0.3, uncertainty_as_printed: ±0.3 Pa}
+      uncertainty: "±0.3 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1421.00'}, locator: {page: 7, table: '2', row: 5, note: "center T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 5, note: "center T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r16
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 6, note: "center T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1432.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 1.3, p_uncertainty_Pa: 0.4, uncertainty_as_printed: ±0.4 Pa}
+      uncertainty: "±0.4 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1432.00'}, locator: {page: 7, table: '2', row: 6, note: "center T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 6, note: "center T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r17
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 7, note: "center T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1443.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 1.7, p_uncertainty_Pa: 0.5, uncertainty_as_printed: ±0.5 Pa}
+      uncertainty: "±0.5 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1443.00'}, locator: {page: 7, table: '2', row: 7, note: "center T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 7, note: "center T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r18
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 8, note: "center T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1454.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 2.3, p_uncertainty_Pa: 0.6, uncertainty_as_printed: ±0.6 Pa}
+      uncertainty: "±0.6 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1454.00'}, locator: {page: 7, table: '2', row: 8, note: "center T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 8, note: "center T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r19
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 9, note: "center T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1463.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 2.9, p_uncertainty_Pa: 0.8, uncertainty_as_printed: ±0.8 Pa}
+      uncertainty: "±0.8 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1463.00'}, locator: {page: 7, table: '2', row: 9, note: "center T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 9, note: "center T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r20
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 10, note: "center T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1474.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 3.6, p_uncertainty_Pa: 1.0, uncertainty_as_printed: ±1.0 Pa}
+      uncertainty: "±1.0 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1474.00'}, locator: {page: 7, table: '2', row: 10, note: "center T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 10, note: "center T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r21
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 1, note: "right T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1484.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 5, p_uncertainty_Pa: 1, uncertainty_as_printed: ±1 Pa}
+      uncertainty: "±1 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1484.00'}, locator: {page: 7, table: '2', row: 1, note: "right T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 1, note: "right T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r22
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 2, note: "right T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1494.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 6, p_uncertainty_Pa: 1, uncertainty_as_printed: ±1 Pa}
+      uncertainty: "±1 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1494.00'}, locator: {page: 7, table: '2', row: 2, note: "right T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 2, note: "right T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r23
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 3, note: "right T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1503.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 7, p_uncertainty_Pa: 2, uncertainty_as_printed: ±2 Pa}
+      uncertainty: "±2 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1503.00'}, locator: {page: 7, table: '2', row: 3, note: "right T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 3, note: "right T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r24
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 4, note: "right T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1512.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 9, p_uncertainty_Pa: 2, uncertainty_as_printed: ±2 Pa}
+      uncertainty: "±2 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1512.00'}, locator: {page: 7, table: '2', row: 4, note: "right T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 4, note: "right T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r25
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 5, note: "right T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1522.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 11, p_uncertainty_Pa: 2, uncertainty_as_printed: ±2 Pa}
+      uncertainty: "±2 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1522.00'}, locator: {page: 7, table: '2', row: 5, note: "right T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 5, note: "right T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r26
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 6, note: "right T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1530.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 13, p_uncertainty_Pa: 3, uncertainty_as_printed: ±3 Pa}
+      uncertainty: "±3 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1530.00'}, locator: {page: 7, table: '2', row: 6, note: "right T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 6, note: "right T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r27
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 7, note: "right T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1539.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 15, p_uncertainty_Pa: 3, uncertainty_as_printed: ±3 Pa}
+      uncertainty: "±3 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1539.00'}, locator: {page: 7, table: '2', row: 7, note: "right T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 7, note: "right T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r28
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 8, note: "right T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1547.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 18, p_uncertainty_Pa: 4, uncertainty_as_printed: ±4 Pa}
+      uncertainty: "±4 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1547.00'}, locator: {page: 7, table: '2', row: 8, note: "right T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 8, note: "right T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r29
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 9, note: "right T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1555.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 21, p_uncertainty_Pa: 4, uncertainty_as_printed: ±4 Pa}
+      uncertainty: "±4 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1555.00'}, locator: {page: 7, table: '2', row: 9, note: "right T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 9, note: "right T/p pair"}}}
+    - observation_id: wetzel_2012_table2_r30
+      experiment: sio_amorphous_powder_knudsen_series
+      type: psat_series
+      phase: solid
+      locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 10, note: "right T/p pair"}
+      condensed_form: {state: amorphous_solid, basis: explicit_author, note: "Amorphous SiO powder, as printed in Table 2 caption."}
+      standard_state: SiO(g) in equilibrium with subliming amorphous SiO solid
+      regime: knudsen_effusion
+      units: Pa
+      T_K: 1565.00
+      values: {quantity: pure_Psat, method_class: measured_reduced, gas_species: SiO(g), pressure_Pa: 24, p_uncertainty_Pa: 5, uncertainty_as_printed: ±5 Pa}
+      uncertainty: "±5 Pa; confidence level not stated"
+      derivation: *sio_pressure_derivation
+      point_conditions: {temperature_K: {state: {tag: value, value: '1565.00'}, locator: {page: 7, table: '2', row: 10, note: "right T/p pair"}}, total_pressure_Pa: *sio_uhv_pressure, fO2_log: {state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}, locator: {page: 7, table: '2', row: 10, note: "right T/p pair"}}}
+    - observation_id: wetzel_2012_equation15_alpha_fit
+      type: alpha
+      locator: {page: 5, published_page: 1598, equation: '15'}
+      T_range_K: [1100, 1800]
+      standard_state: Evaporation coefficient for sublimation of amorphous SiO powder to SiO(g)
+      regime: knudsen_effusion
+      units: dimensionless
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        attribution: Authors' fit to their alpha(T) measurements; individual alpha points are plotted in Figure 7 and are not digitized here.
+        admission_status: typed_refusal
+        reason: literature_extract.v1 has no supported polynomial alpha_form value selector; expression retained verbatim.
+        value_kind: expression
+        alpha: null
+        alpha_form:
+          type: expression
+          expression: α(T) = 0.20821 − 3.12269×10⁻⁴ T + 1.35599×10⁻⁷ T²
+          coefficients_as_printed: [0.20821, -3.12269e-4, 1.35599e-7]
+          T_unit: K
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: "equation is a fitted expression over 1100-1800 K, not one point"}
+          locator: {page: 5, equation: '15'}
+        total_pressure_Pa: *sio_uhv_pressure
+        fO2_log:
+          state: {tag: unknown, reason: no oxygen partial pressure or fugacity is reported}
+          locator: {page: 5, equation: '15'}
+    - observation_id: wetzel_2012_table3_this_work_second_law_enthalpy
+      type: gibbs_table
+      locator: {page: 7, published_page: 1600, table: '3'}
+      T_K: 1400
+      standard_state: SiO(s) sublimation to SiO(g); standard enthalpy corrected to 298 K
+      units: kJ/mol
+      derived_from: [wetzel_2012_table2_r01, wetzel_2012_table2_r02, wetzel_2012_table2_r03, wetzel_2012_table2_r04, wetzel_2012_table2_r05, wetzel_2012_table2_r06, wetzel_2012_table2_r07, wetzel_2012_table2_r08, wetzel_2012_table2_r09, wetzel_2012_table2_r10, wetzel_2012_table2_r11, wetzel_2012_table2_r12, wetzel_2012_table2_r13, wetzel_2012_table2_r14, wetzel_2012_table2_r15, wetzel_2012_table2_r16, wetzel_2012_table2_r17, wetzel_2012_table2_r18, wetzel_2012_table2_r19, wetzel_2012_table2_r20, wetzel_2012_table2_r21, wetzel_2012_table2_r22, wetzel_2012_table2_r23, wetzel_2012_table2_r24, wetzel_2012_table2_r25, wetzel_2012_table2_r26, wetzel_2012_table2_r27, wetzel_2012_table2_r28, wetzel_2012_table2_r29, wetzel_2012_table2_r30]
+      values:
+        quantity: second_law_enthalpy_of_vaporization
+        method_class: model_derived_second_law_fit
+        admission_status: typed_refusal
+        reason: literature_extract.v1 migrator has no value selector for the printed second-law enthalpy fields.
+        dH_1400K_kJ_mol: 419
+        dH_1400K_uncertainty_kJ_mol: 20
+        dH_298K_kJ_mol: 432
+        dH_298K_uncertainty_kJ_mol: 20
+      derivation:
+        relation: Second-law Clausius-Clapeyron slope from the Table 2 vapor-pressure series; the 298 K value corrects the 1400 K value using the printed heat-capacity functions.
+        locator: {page: 6, published_page: 1599, equation: '17-21'}
+        inputs: [wetzel_2012_table2_r01, wetzel_2012_table2_r02, wetzel_2012_table2_r03, wetzel_2012_table2_r04, wetzel_2012_table2_r05, wetzel_2012_table2_r06, wetzel_2012_table2_r07, wetzel_2012_table2_r08, wetzel_2012_table2_r09, wetzel_2012_table2_r10, wetzel_2012_table2_r11, wetzel_2012_table2_r12, wetzel_2012_table2_r13, wetzel_2012_table2_r14, wetzel_2012_table2_r15, wetzel_2012_table2_r16, wetzel_2012_table2_r17, wetzel_2012_table2_r18, wetzel_2012_table2_r19, wetzel_2012_table2_r20, wetzel_2012_table2_r21, wetzel_2012_table2_r22, wetzel_2012_table2_r23, wetzel_2012_table2_r24, wetzel_2012_table2_r25, wetzel_2012_table2_r26, wetzel_2012_table2_r27, wetzel_2012_table2_r28, wetzel_2012_table2_r29, wetzel_2012_table2_r30]
+      uncertainty: {note: Printed ± widths; confidence level not stated.}
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1400'}
+          locator: {page: 7, table: '3', row: this_work}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Table 3 does not state the pressure for the enthalpy determination}
+          locator: {page: 7, table: '3', row: this_work}
+        fO2_log:
+          state: {tag: unknown, reason: Table 3 does not state oxygen fugacity for the enthalpy determination}
+          locator: {page: 7, table: '3', row: this_work}
+    - observation_id: wetzel_2012_table3_geld_kochnev_1948_1949
+      type: gibbs_table
+      locator: {page: 7, published_page: 1600, table: '3', row: Gel'd and Kochnev}
+      T_K: 1273
+      standard_state: SiO(s) sublimation to SiO(g); attributed second-law enthalpy
+      units: kJ/mol
+      values: {quantity: second_law_enthalpy_of_vaporization, method_class: quoted_attributed, admission_status: typed_refusal, reason: literature_extract.v1 migrator has no value selector for the printed second-law enthalpy fields., attribution: "Gel'd and Kochnev, references 5 and 6", dH_T_K: 1273, dH_T_kJ_mol: 318.28, dH_298K_kJ_mol: 320.79}
+      point_conditions: {temperature_K: {state: {tag: value, value: '1273'}, locator: {page: 7, table: '3', row: Gel'd and Kochnev}}, total_pressure_Pa: {state: {tag: unknown, reason: Table 3 does not state the pressure for the enthalpy determination}, locator: {page: 7, table: '3', row: Gel'd and Kochnev}}, fO2_log: {state: {tag: unknown, reason: Table 3 does not state oxygen fugacity for the enthalpy determination}, locator: {page: 7, table: '3', row: Gel'd and Kochnev}}}
+    - observation_id: wetzel_2012_table3_guenther_1958
+      type: gibbs_table
+      locator: {page: 7, published_page: 1600, table: '3', row: Günther}
+      T_K: 1361
+      standard_state: SiO(s) sublimation to SiO(g); attributed second-law enthalpy
+      units: kJ/mol
+      values: {quantity: second_law_enthalpy_of_vaporization, method_class: quoted_attributed, admission_status: typed_refusal, reason: literature_extract.v1 migrator has no value selector for the printed second-law enthalpy fields., attribution: "Günther, reference 7", dH_T_K: 1361, dH_T_kJ_mol: 398.21, calculated_from_values_in_paper: true, dH_298K_kJ_mol: 410}
+      point_conditions: {temperature_K: {state: {tag: value, value: '1361'}, locator: {page: 7, table: '3', row: Günther}}, total_pressure_Pa: {state: {tag: unknown, reason: Table 3 does not state the pressure for the enthalpy determination}, locator: {page: 7, table: '3', row: Günther}}, fO2_log: {state: {tag: unknown, reason: Table 3 does not state oxygen fugacity for the enthalpy determination}, locator: {page: 7, table: '3', row: Günther}}}
+    - observation_id: wetzel_2012_table3_rocabois_1992
+      type: gibbs_table
+      locator: {page: 7, published_page: 1600, table: '3', row: Rocabois et al.}
+      standard_state: SiO(s) sublimation to SiO(g); attributed second-law enthalpy
+      units: kJ/mol
+      values: {quantity: second_law_enthalpy_of_vaporization, method_class: quoted_attributed, admission_status: typed_refusal, reason: literature_extract.v1 migrator has no value selector for the printed second-law enthalpy fields., attribution: "Rocabois et al., reference 9", dH_298K_kJ_mol: 360, dH_298K_uncertainty_kJ_mol: 4}
+      point_conditions:
+        temperature_K: {state: {tag: unknown, reason: Table 3 prints no ΔH_T temperature for this row}, locator: {page: 7, table: '3', row: Rocabois et al.}}
+        total_pressure_Pa: {state: {tag: unknown, reason: Table 3 does not state the pressure for the enthalpy determination}, locator: {page: 7, table: '3', row: Rocabois et al.}}
+        fO2_log: {state: {tag: unknown, reason: Table 3 does not state oxygen fugacity for the enthalpy determination}, locator: {page: 7, table: '3', row: Rocabois et al.}}
+    - observation_id: wetzel_2012_table3_ferguson_nuth_2008
+      type: gibbs_table
+      locator: {page: 7, published_page: 1600, table: '3', row: Ferguson and Nuth}
+      T_K: 1410
+      standard_state: SiO(s) sublimation to SiO(g); attributed second-law enthalpy
+      units: kJ/mol
+      values: {quantity: second_law_enthalpy_of_vaporization, method_class: quoted_attributed, admission_status: typed_refusal, reason: literature_extract.v1 migrator has no value selector for the printed second-law enthalpy fields., attribution: "Ferguson and Nuth, reference 4", dH_T_K: 1410, dH_T_kJ_mol: 339.63, calculated_from_values_in_paper: true, dH_298K_kJ_mol: 351, dH_298K_uncertainty_kJ_mol: 11}
+      point_conditions: {temperature_K: {state: {tag: value, value: '1410'}, locator: {page: 7, table: '3', row: Ferguson and Nuth}}, total_pressure_Pa: {state: {tag: unknown, reason: Table 3 does not state the pressure for the enthalpy determination}, locator: {page: 7, table: '3', row: Ferguson and Nuth}}, fO2_log: {state: {tag: unknown, reason: Table 3 does not state oxygen fugacity for the enthalpy determination}, locator: {page: 7, table: '3', row: Ferguson and Nuth}}}
+fidelity_samples:
+- species: SiO
+  observation_id: wetzel_2012_table2_r01
+  observable: psat_series
+  field: pressure_Pa
+  value: 0.003
+  locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 1}
+- species: SiO
+  observation_id: wetzel_2012_table2_r15
+  observable: psat_series
+  field: pressure_Pa
+  value: 1.0
+  locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 15}
+- species: SiO
+  observation_id: wetzel_2012_table2_r30
+  observable: psat_series
+  field: pressure_Pa
+  value: 24
+  locator: {page: 7, pdf_page_index: 6, published_page: 1600, table: '2', row: 30}
