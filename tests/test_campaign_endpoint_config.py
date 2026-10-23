@@ -375,6 +375,12 @@ def test_c0_exit_forecast_does_not_raise_for_scalar_temperature_range():
             }
         )
     )
+    sim._build_c0_forecast_context = lambda: (sim, "")
+    sim._evaluate_c0_exit_forecast = (
+        lambda **kwargs: PyrolysisSimulator._evaluate_c0_exit_forecast(
+            sim, **kwargs
+        )
+    )
 
     prediction = PyrolysisSimulator._predict_c0_exit(sim)
 

@@ -6,8 +6,13 @@ from types import ModuleType
 import pytest
 import yaml
 
-from simulator.core import Atmosphere, CampaignPhase, PyrolysisSimulator
+from simulator.core import (
+    Atmosphere,
+    CampaignPhase,
+    PyrolysisSimulator,
+)
 from simulator.campaigns import c0_exit_run_notice
+from simulator.accounting.ledger import snapshot_atom_ledger
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 
@@ -93,6 +98,21 @@ def test_c0_start_predicts_exit_from_live_flux_and_caps_the_ramp():
     assert target_C == prediction["T_exit_C"]
 
 
+def test_c0_forecast_reports_internal_analytical_when_live_backend_is_none():
+    feedstocks = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "feedstocks.yaml").read_text()
+    )
+    sim = _sim(feedstocks)
+    sim.load_batch("lunar_mare_low_ti", 1000.0)
+    sim.backend = None
+
+    sim.start_campaign(CampaignPhase.C0)
+
+    prediction = sim.campaign_mgr.c0_exit_prediction
+    assert prediction["prediction_status"] == "ok"
+    assert prediction["forecast_engine"] == "internal-analytical"
+
+
 def _canonical_bytes(value):
     return json.dumps(
         value,
@@ -102,9 +122,79 @@ def _canonical_bytes(value):
     ).encode("utf-8")
 
 
+_PYSULFSAT_MUTABLE_EXPORTS = (
+    "oxide_mass_liq_anhyd",
+    "cation_num_liq_anhyd",
+    "oxide_mass_liq_anhyd_df",
+    "cation_num_liq_anhyd_df",
+)
+
+
+class _ForecastReplayStore:
+    replay_enabled = True
+
+    def __init__(self):
+        self.replay_calls = 0
+        self.entries = {"equilibrium": []}
+
+    def clone_for_replay(self):
+        clone = _ForecastReplayStore()
+        clone.replay_calls = self.replay_calls
+        clone.entries = deepcopy(self.entries)
+        return clone
+
+    def replay_equilibrium(self, forecast_sim):
+        self.replay_calls += 1
+        return forecast_sim._internal_analytical_equilibrium()
+
+
+def _attach_mutable_sulfsat_module(sim):
+    module = ModuleType("forecast_test_sulfsat")
+    module.oxide_mass_liq_anhyd = {"SiO2_Liq": [60.0]}
+    module.cation_num_liq_anhyd = {"Si": [1.0]}
+    module.oxide_mass_liq_anhyd_df = [[60.0]]
+    module.cation_num_liq_anhyd_df = [[1.0]]
+    sim._sulfsat_gate._module = module
+    sim._sulfsat_gate._available = True
+    return module
+
+
+def _forecast_owned_state_digest(sim, per_hour_summaries):
+    ledger = snapshot_atom_ledger(sim.atom_ledger)
+    store = getattr(sim, "_pt0_determinism_store", None)
+    sulfur_module = getattr(sim._sulfsat_gate, "_module", None)
+    sulfur_exports = {
+        name: deepcopy(getattr(sulfur_module, name))
+        for name in _PYSULFSAT_MUTABLE_EXPORTS
+        if sulfur_module is not None and hasattr(sulfur_module, name)
+    }
+    return _canonical_bytes(
+        {
+            "atom_ledger_snapshot": ledger.close_report(),
+            "notices": {
+                "c0_exit": c0_exit_run_notice(sim),
+                "sulfur": sim.sulfur_saturation_run_notice(),
+                "commissioning": sim.engine_commissioning_run_notice(),
+                "high_t_melt_activity": sim.high_t_melt_activity_run_notice(),
+            },
+            "backend_vars": (
+                vars(sim.backend) if sim.backend is not None else None
+            ),
+            "phase_context_diagnostics": deepcopy(
+                getattr(sim, "_last_phase_context_diagnostic", None)
+            ),
+            "per_hour_summaries": deepcopy(per_hour_summaries),
+            "pt0_replay_state": deepcopy(vars(store)) if store is not None else None,
+            "pysulfsat_mutable_exports": sulfur_exports,
+        }
+    )
+
+
 def _short_c0_trajectory(feedstocks, prediction=None):
     sim = _sim(feedstocks)
     sim.load_batch("lunar_mare_low_ti", 1000.0)
+    _attach_mutable_sulfsat_module(sim)
+    sim.configure_pt0_determinism_store(_ForecastReplayStore())
     if prediction is not None:
         sim._predict_c0_exit = lambda **_kwargs: deepcopy(prediction)
     sim.start_campaign(CampaignPhase.C0)
@@ -126,6 +216,9 @@ def test_c0_forecast_and_supplied_decision_have_identical_realized_trajectory():
         feedstocks
     )
     assert forecasted.campaign_mgr.c0_exit_prediction["prediction_status"] == "ok"
+    assert forecasted.campaign_mgr.c0_exit_prediction["forecast_engine"] == (
+        "internal-analytical"
+    )
     decision = deepcopy(forecasted.campaign_mgr.c0_exit_prediction)
     supplied, supplied_phase_context, supplied_payloads = _short_c0_trajectory(
         feedstocks,
@@ -157,9 +250,12 @@ def test_c0_forecast_and_supplied_decision_have_identical_realized_trajectory():
     assert _canonical_bytes(forecast_payloads) == _canonical_bytes(
         supplied_payloads
     )
+    assert _forecast_owned_state_digest(
+        forecasted, forecast_payloads
+    ) == _forecast_owned_state_digest(supplied, supplied_payloads)
 
 
-def test_c0_forecast_context_keeps_loaded_sulfsat_module_shared():
+def test_c0_forecast_context_does_not_retain_loaded_sulfsat_module():
     sim = _sim(
         {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
     )
@@ -172,8 +268,37 @@ def test_c0_forecast_context_keeps_loaded_sulfsat_module_shared():
 
     assert status == ""
     assert context is not None
-    assert context._sulfsat_gate is not sim._sulfsat_gate
-    assert context._sulfsat_gate._module is sulfur_module
+    assert context._sulfsat_gate is None
+    assert sulfur_module.oxide_mass_liq_anhyd == {"SiO2_Liq": [60.0]}
+
+
+def test_c0_forecast_refuses_post_equilibrium_sulfsat_path():
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    sim.start_campaign(CampaignPhase.C0)
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    with pytest.raises(RuntimeError) as refusal:
+        context._get_equilibrium(run_post_equilibrium_sulfsat=True)
+    assert type(refusal.value).__name__ == "_C0ForecastSulfsatRefusal"
+
+
+def test_c0_forecast_digest_is_unchanged_by_forecast():
+    feedstocks = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "feedstocks.yaml").read_text()
+    )
+    sim, _phase_context, per_hour_summaries = _short_c0_trajectory(feedstocks)
+    before = _forecast_owned_state_digest(sim, per_hour_summaries)
+
+    prediction = sim._predict_c0_exit()
+
+    assert prediction["prediction_status"] == "ok"
+    assert prediction["forecast_engine"] == "internal-analytical"
+    assert _forecast_owned_state_digest(sim, per_hour_summaries) == before
 
 
 def test_c0_cached_replay_forecast_preserves_live_sulfur_and_authority_state():

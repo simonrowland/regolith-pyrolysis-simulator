@@ -222,6 +222,19 @@ def test_c0_forecast_backend_failure_does_not_mutate_live_backend_or_flags():
     } == before_flags
 
 
+def test_c0_forecast_refuses_missing_equivalent_backend():
+    live_backend = RecordingInternalAnalyticalBackend()
+    sim = _c0_forecast_sim(live_backend)
+    sim._c0_forecast_backend_factory = lambda: None
+    before_backend = deepcopy(vars(live_backend))
+
+    prediction = sim._predict_c0_exit()
+
+    assert prediction["prediction_status"] == "unavailable_forecast_backend"
+    assert prediction["forecast_engine"] is None
+    assert vars(live_backend) == before_backend
+
+
 def test_c0_forecast_transition_does_not_commit_to_live_ledger():
     def new_transition_backend():
         backend = AtomDeltaBackend(MaterialLot, LedgerTransition)
