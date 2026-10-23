@@ -18351,85 +18351,6 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
-    - observation_id: sossi_2019_li_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        line_range: '1112-1118'
-        note: >-
-          Table 4 γ_i (this work) for LiO0.5; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1673.15
-      - 1673.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=LiO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        gamma_uncertainty: 3.1
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 15.4
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_li_logKstar_table3_Li_g
-        oxide_formula_as_published: LiO0.5
-        gas_species: Li(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_li_logKstar_table3_Li_g
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 LiO0.5 (−8) γ_i (this work)=15.4±3.1 at 1673.15 K. Air row is 1.8±0.2
-          (competing; this observation is the reducing row).
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
     - observation_id: sossi_2019_li_table5_experimental_Li_g
       type: gibbs_table
       locator:
@@ -18579,51 +18500,6 @@ species:
             log10_K_star: -3.39
             N_points_at_T: 2
         gas_species: LiO(g)
-    - observation_id: sossi_2019_li_table4_gamma_this_work_quoted_20260906
-      supersedes: sossi_2019_li_table4_gamma_this_work
-      type: activity_coefficient
-      class: model
-      phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=LiO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-          \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-          \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-          \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-          Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nLiO0.5 (-8) | γi (this work) |  | 15.4±3.1\
-          \ |  |  | "
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      uncertainty:
-        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines 561–562).
-        by_channel:
-          LiO0.5 (-8):
-          - T_K: 1673.15
-            gamma_uncertainty: 3.1
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'LiO0.5 (-8); 1673.15 K: 15.4±3.1'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      values:
-        quantity: activity_coefficient_this_work
-        evidence_class: model
-        method_class: model_derived
-        per_temperature_by_channel:
-          LiO0.5 (-8):
-          - T_K: 1673.15
-            gamma: 15.4
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'LiO0.5 (-8); 1673.15 K: 15.4±3.1'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
     - observation_id: sossi_2019_li_table5_experimental_Li_g_quoted_20260906
       supersedes: sossi_2019_li_table5_experimental_Li_g
       type: gibbs_table
@@ -18735,96 +18611,6 @@ species:
             N_points_at_T: 1
         note: >-
           Table 3 t0=14.4 min. 1573.15 and 1823.15 values have no published SD (N=1).
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
-    - observation_id: sossi_2019_rb_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        page: 57
-        note: >-
-          Table 4 γ_i (this work) for RbO0.5; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1673.15
-      - 1823.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=RbO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        gamma_uncertainty: 1.5e-05
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.00013
-        per_temperature:
-        - T_K: 1673.15
-          gamma: 0.00013
-          gamma_uncertainty: 1.5e-05
-        - T_K: 1773.15
-          gamma: 7.4e-05
-          gamma_uncertainty: 5.9e-06
-        - T_K: 1823.15
-          gamma: 9.0e-05
-          gamma_uncertainty: null
-          uncertainty_note: no uncertainty printed for this Table 4 cell
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_rb_logKstar_table3
-        oxide_formula_as_published: RbO0.5
-        gas_species: Rb(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_rb_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=1.3e-4±1.5e-5 at 1673.15 K; 7.4e-5±5.9e-6 at 1773.15 K; 9.0e-5
-          at 1823.15 K. Primary scalar is 1673.15 K.
       equipment:
         sample_surface_area:
           value: 2.0e-05
@@ -18974,75 +18760,6 @@ species:
             log10_K_star: -2.26
             N_points_at_T: 1
         gas_species: Rb(g)
-    - observation_id: sossi_2019_rb_table4_gamma_this_work_quoted_20260906
-      supersedes: sossi_2019_rb_table4_gamma_this_work
-      type: activity_coefficient
-      class: model
-      phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=RbO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-          \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-          \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-          \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-          Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nRbO0.5 | γi (this work) |  | 1.3×10⁻⁴±1.5×10⁻⁵\
-          \ | 7.4×10⁻⁵±5.9×10⁻⁶ | 9.0×10⁻⁵ | "
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      uncertainty:
-        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines 561–562).
-        by_channel:
-          RbO0.5:
-          - T_K: 1673.15
-            gamma_uncertainty: 1.5e-05
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'RbO0.5; 1673.15 K: 1.3×10⁻⁴±1.5×10⁻⁵'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1773.15
-            gamma_uncertainty: 5.9e-06
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'RbO0.5; 1773.15 K: 7.4×10⁻⁵±5.9×10⁻⁶'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      values:
-        quantity: activity_coefficient_this_work
-        evidence_class: model
-        method_class: model_derived
-        per_temperature_by_channel:
-          RbO0.5:
-          - T_K: 1673.15
-            gamma: 0.00013
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'RbO0.5; 1673.15 K: 1.3×10⁻⁴±1.5×10⁻⁵'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1773.15
-            gamma: 7.4e-05
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'RbO0.5; 1773.15 K: 7.4×10⁻⁵±5.9×10⁻⁶'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1823.15
-            gamma: 9.0e-05
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'RbO0.5; 1823.15 K: 9.0×10⁻⁵'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
     - observation_id: sossi_2019_rb_table5_experimental_quoted_20260906
       supersedes: sossi_2019_rb_table5_experimental
       type: gibbs_table
@@ -19157,105 +18874,6 @@ species:
             N_points_at_T: 1
         note: >-
           Table 3 fitted logK*; open-furnace apparent K*, not a vacuum Langmuir alpha.
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
-    - observation_id: sossi_2019_cu_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        page: 57
-        note: >-
-          Table 4 γ_i (this work) for CuO0.5; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1573.15
-      - 1923.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CuO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        gamma_uncertainty: 1.7
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 11.8
-        per_temperature:
-        - T_K: 1573.15
-          gamma: 24.0
-          gamma_uncertainty: 6.3
-        - T_K: 1673.15
-          gamma: 11.8
-          gamma_uncertainty: 1.7
-        - T_K: 1773.15
-          gamma: 8.5
-          gamma_uncertainty: 0.1
-        - T_K: 1823.15
-          gamma: 6.4
-          gamma_uncertainty: null
-          uncertainty_note: no uncertainty printed for this Table 4 cell
-        - T_K: 1923.15
-          gamma: 4.2
-          gamma_uncertainty: null
-          source_marker: '*'
-          uncertainty_note: source footnote states this value was extrapolated to 1923.15 K
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_cu_logKstar_table3
-        oxide_formula_as_published: CuO0.5
-        gas_species: Cu(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_cu_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=11.8±1.7 at 1673.15 K (also 24.0±6.3 at 1573.15, 8.5±0.1 at
-          1773.15, 6.4 at 1823.15). Literature α_e=2.4±0.8 at 1300 °C is K*/(γ_lit K) — not
-          extracted as type:alpha.
       equipment:
         sample_surface_area:
           value: 2.0e-05
@@ -19415,100 +19033,6 @@ species:
             log10_K_star: -2.9
             N_points_at_T: 1
         gas_species: Cu(g)
-    - observation_id: sossi_2019_cu_table4_gamma_this_work_quoted_20260906
-      supersedes: sossi_2019_cu_table4_gamma_this_work
-      type: activity_coefficient
-      class: model
-      phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CuO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-          \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-          \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-          \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-          Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nCuO0.5 | γi (this work) | 24.0±6.3 |\
-          \ 11.8±1.7 | 8.5±0.1 | 6.4 | 4.2*"
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      uncertainty:
-        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines 561–562).
-        by_channel:
-          CuO0.5:
-          - T_K: 1573.15
-            gamma_uncertainty: 6.3
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'CuO0.5; 1573.15 K: 24.0±6.3'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1673.15
-            gamma_uncertainty: 1.7
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'CuO0.5; 1673.15 K: 11.8±1.7'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1773.15
-            gamma_uncertainty: 0.1
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'CuO0.5; 1773.15 K: 8.5±0.1'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      values:
-        quantity: activity_coefficient_this_work
-        evidence_class: model
-        method_class: model_derived
-        per_temperature_by_channel:
-          CuO0.5:
-          - T_K: 1573.15
-            gamma: 24.0
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'CuO0.5; 1573.15 K: 24.0±6.3'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1673.15
-            gamma: 11.8
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'CuO0.5; 1673.15 K: 11.8±1.7'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1773.15
-            gamma: 8.5
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'CuO0.5; 1773.15 K: 8.5±0.1'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1823.15
-            gamma: 6.4
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'CuO0.5; 1823.15 K: 6.4'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1923.15
-            gamma: 4.2
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'CuO0.5; 1923.15 K: 4.2*'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-            note: 'Printed asterisk: extrapolated to 1923.15 K.'
     - observation_id: sossi_2019_cu_table5_experimental_quoted_20260906
       supersedes: sossi_2019_cu_table5_experimental
       type: gibbs_table
@@ -19634,84 +19158,6 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
-    - observation_id: sossi_2019_ag_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        line_range: '1112-1118'
-        note: >-
-          Table 4 γ_i (this work) for AgO0.5; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1673.15
-      - 1673.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=AgO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.67
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_ag_logKstar_table3
-        oxide_formula_as_published: AgO0.5
-        gas_species: Ag(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_ag_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=0.67 in the 1673.15 K column; no SD. logK* itself is only at
-          1573.15 K — T assignment of gamma is as printed, not re-derived.
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
     - observation_id: sossi_2019_ag_logKstar_table3_quoted_20260906
       standard_state:
         state:
@@ -19750,44 +19196,6 @@ species:
             log10_K_star: -2.23
             N_points_at_T: 1
         gas_species: Ag(g)
-    - observation_id: sossi_2019_ag_table4_gamma_this_work_quoted_20260906
-      supersedes: sossi_2019_ag_table4_gamma_this_work
-      type: activity_coefficient
-      class: model
-      phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=AgO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-          \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-          \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-          \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-          Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nAgO0.5 | γi (this work) |  | 0.67 |\
-          \  |  | "
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      uncertainty:
-        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines 561–562).
-        by_channel:
-          AgO0.5: []
-      values:
-        quantity: activity_coefficient_this_work
-        evidence_class: model
-        method_class: model_derived
-        per_temperature_by_channel:
-          AgO0.5:
-          - T_K: 1673.15
-            gamma: 0.67
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'AgO0.5; 1673.15 K: 0.67'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-        source_inconsistency: Table 4 places gamma at 1673.15 K; Table 3 places logK* at 1573.15 K. Retained without reconciliation.
   Zn:
     observations:
     - observation_id: sossi_2019_zn_logKstar_table3
@@ -19867,99 +19275,6 @@ species:
             N_points_at_T: 1
         note: >-
           Table 3 t0=9.0 min. n=2.
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
-    - observation_id: sossi_2019_zn_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        page: 57
-        note: >-
-          Table 4 γ_i (this work) for ZnO; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1573.15
-      - 1823.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=ZnO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        gamma_uncertainty: 0.13
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.51
-        per_temperature:
-        - T_K: 1573.15
-          gamma: 0.24
-          gamma_uncertainty: 0.02
-        - T_K: 1673.15
-          gamma: 0.51
-          gamma_uncertainty: 0.13
-        - T_K: 1773.15
-          gamma: 0.97
-          gamma_uncertainty: 0.38
-        - T_K: 1823.15
-          gamma: 1.01
-          gamma_uncertainty: null
-          uncertainty_note: no uncertainty printed for this Table 4 cell
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_zn_logKstar_table3
-        oxide_formula_as_published: ZnO
-        gas_species: Zn(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_zn_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=0.51±0.13 at 1673.15 K. Literature α_e≈2 (Reyes & Gaskell) is
-          K*/(γ_lit K) — not extracted as type:alpha.
       equipment:
         sample_surface_area:
           value: 2.0e-05
@@ -20118,91 +19433,6 @@ species:
             log10_K_star: -2.57
             N_points_at_T: 1
         gas_species: Zn(g)
-    - observation_id: sossi_2019_zn_table4_gamma_this_work_quoted_20260906
-      supersedes: sossi_2019_zn_table4_gamma_this_work
-      type: activity_coefficient
-      class: model
-      phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=ZnO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-          \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-          \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-          \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-          Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nZnO | γi (this work) | 0.24±0.02 | 0.51±0.13\
-          \ | 0.97±0.38 | 1.01 | "
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      uncertainty:
-        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines 561–562).
-        by_channel:
-          ZnO:
-          - T_K: 1573.15
-            gamma_uncertainty: 0.02
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'ZnO; 1573.15 K: 0.24±0.02'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1673.15
-            gamma_uncertainty: 0.13
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'ZnO; 1673.15 K: 0.51±0.13'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1773.15
-            gamma_uncertainty: 0.38
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'ZnO; 1773.15 K: 0.97±0.38'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      values:
-        quantity: activity_coefficient_this_work
-        evidence_class: model
-        method_class: model_derived
-        per_temperature_by_channel:
-          ZnO:
-          - T_K: 1573.15
-            gamma: 0.24
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'ZnO; 1573.15 K: 0.24±0.02'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1673.15
-            gamma: 0.51
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'ZnO; 1673.15 K: 0.51±0.13'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1773.15
-            gamma: 0.97
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'ZnO; 1773.15 K: 0.97±0.38'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1823.15
-            gamma: 1.01
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'ZnO; 1823.15 K: 1.01'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
     - observation_id: sossi_2019_zn_table5_experimental_quoted_20260906
       supersedes: sossi_2019_zn_table5_experimental
       type: gibbs_table
@@ -20317,98 +19547,6 @@ species:
             N_points_at_T: 1
         note: >-
           Table 3 t0=10.4 min. n=2. Gas species GeO(g), not Ge(g).
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
-    - observation_id: sossi_2019_ge_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        page: 57
-        note: >-
-          Table 4 γ_i (this work) for GeO2; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1573.15
-      - 1823.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=GeO2; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        gamma_uncertainty: 0.01
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.11
-        per_temperature:
-        - T_K: 1573.15
-          gamma: 0.04
-          gamma_uncertainty: 0.01
-        - T_K: 1673.15
-          gamma: 0.11
-          gamma_uncertainty: 0.01
-        - T_K: 1773.15
-          gamma: 0.18
-          gamma_uncertainty: 0.07
-        - T_K: 1823.15
-          gamma: 0.19
-          gamma_uncertainty: null
-          uncertainty_note: no uncertainty printed for this Table 4 cell
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_ge_logKstar_table3
-        oxide_formula_as_published: GeO2
-        gas_species: Ge(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_ge_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=0.11±0.01 at 1673.15 K.
       equipment:
         sample_surface_area:
           value: 2.0e-05
@@ -20567,91 +19705,6 @@ species:
             log10_K_star: -2.29
             N_points_at_T: 1
         gas_species: GeO(g)
-    - observation_id: sossi_2019_ge_table4_gamma_this_work_quoted_20260906
-      supersedes: sossi_2019_ge_table4_gamma_this_work
-      type: activity_coefficient
-      class: model
-      phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=GeO2; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-          \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-          \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-          \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-          Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nGeO2 | γi (this work) | 0.04±0.01 |\
-          \ 0.11±0.01 | 0.18±0.07 | 0.19 | "
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      uncertainty:
-        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines 561–562).
-        by_channel:
-          GeO2:
-          - T_K: 1573.15
-            gamma_uncertainty: 0.01
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'GeO2; 1573.15 K: 0.04±0.01'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1673.15
-            gamma_uncertainty: 0.01
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'GeO2; 1673.15 K: 0.11±0.01'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1773.15
-            gamma_uncertainty: 0.07
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'GeO2; 1773.15 K: 0.18±0.07'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      values:
-        quantity: activity_coefficient_this_work
-        evidence_class: model
-        method_class: model_derived
-        per_temperature_by_channel:
-          GeO2:
-          - T_K: 1573.15
-            gamma: 0.04
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'GeO2; 1573.15 K: 0.04±0.01'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1673.15
-            gamma: 0.11
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'GeO2; 1673.15 K: 0.11±0.01'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1773.15
-            gamma: 0.18
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'GeO2; 1773.15 K: 0.18±0.07'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1823.15
-            gamma: 0.19
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'GeO2; 1823.15 K: 0.19'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
     - observation_id: sossi_2019_ge_table5_experimental_quoted_20260906
       supersedes: sossi_2019_ge_table5_experimental
       type: gibbs_table
@@ -20774,83 +19827,6 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
-    - observation_id: sossi_2019_cd_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        line_range: '1112-1118'
-        note: >-
-          Table 4 γ_i (this work) for CdO; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1673.15
-      - 1673.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CdO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.15
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_cd_logKstar_table3
-        oxide_formula_as_published: CdO
-        gas_species: Cd(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_cd_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=0.15 in the 1673.15 K column; no SD. logK* only at 1573.15 K.
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
     - observation_id: sossi_2019_cd_logKstar_table3_quoted_20260906
       standard_state:
         state:
@@ -20889,44 +19865,6 @@ species:
             log10_K_star: -2.48
             N_points_at_T: 1
         gas_species: Cd(g)
-    - observation_id: sossi_2019_cd_table4_gamma_this_work_quoted_20260906
-      supersedes: sossi_2019_cd_table4_gamma_this_work
-      type: activity_coefficient
-      class: model
-      phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CdO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-          \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-          \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-          \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-          Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nCdO | γi (this work) |  | 0.15 |  |\
-          \  | "
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      uncertainty:
-        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines 561–562).
-        by_channel:
-          CdO: []
-      values:
-        quantity: activity_coefficient_this_work
-        evidence_class: model
-        method_class: model_derived
-        per_temperature_by_channel:
-          CdO:
-          - T_K: 1673.15
-            gamma: 0.15
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'CdO; 1673.15 K: 0.15'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-        source_inconsistency: Table 4 places gamma at 1673.15 K; Table 3 places logK* at 1573.15 K. Retained without reconciliation.
   Ga:
     observations:
     - observation_id: sossi_2019_ga_logKstar_table3_Ga_g
@@ -21529,104 +20467,6 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
-    - observation_id: sossi_2019_pb_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        page: 57
-        note: >-
-          Table 4 γ_i (this work) for PbO; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1573.15
-      - 1673.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=PbO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.17
-        per_temperature_by_channel:
-          PbO_caret:
-          - T_K: 1573.15
-            gamma: 0.06
-            gamma_uncertainty: 0.02
-          - T_K: 1673.15
-            gamma: 0.17
-            gamma_uncertainty: null
-            uncertainty_note: no uncertainty printed for this Table 4 cell
-          PbO_hash:
-          - T_K: 1573.15
-            gamma: 0.21
-            gamma_uncertainty: 0.09
-          - T_K: 1673.15
-            gamma: 0.38
-            gamma_uncertainty: null
-            uncertainty_note: no uncertainty printed for this Table 4 cell
-        channel_note: PbO^ and PbO# retained as printed; channel footnote was not recovered from the repaired slice.
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_pb_logKstar_table3_Pb_g
-        oxide_formula_as_published: PbO
-        gas_species: Pb(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_pb_logKstar_table3_Pb_g
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 PbO^ (n=0, PbO(g) channel) γ_i (this work)=0.17 at 1673.15 K; 0.06±0.02 at
-          1573.15 K. Companion PbO# (n=2) γ=0.38 at 1673.15 / 0.21±0.09 at 1573.15. Primary scalar
-          is the n=0 1673.15 value as printed. Table 4 α_e rows (0.3–1.7) are K*/(γ_lit K) — not
-          extracted as type:alpha.
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
     - observation_id: sossi_2019_pb_table5_experimental_PbO_g
       type: gibbs_table
       locator:
@@ -21783,86 +20623,6 @@ species:
             log10_K_star: -3.49
             N_points_at_T: 1
         gas_species: Pb(g)
-    - observation_id: sossi_2019_pb_table4_gamma_this_work_quoted_20260906
-      supersedes: sossi_2019_pb_table4_gamma_this_work
-      type: activity_coefficient
-      class: model
-      phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=PbO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-          \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-          \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-          \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-          Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nPbO^ | γi (this work) | 0.06±0.02 |\
-          \ 0.17 |  |  | \nPbO# | γi (this work) | 0.21±0.09 | 0.38 |  |  | \n^ = calculated from the reaction PbO(l) = PbO(g)\n\
-          # = calculated from the reaction PbO(l) = Pb(g) + ½O2"
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      uncertainty:
-        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines 561–562).
-        by_channel:
-          PbO^:
-          - T_K: 1573.15
-            gamma_uncertainty: 0.02
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'PbO^; 1573.15 K: 0.06±0.02'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          PbO#:
-          - T_K: 1573.15
-            gamma_uncertainty: 0.09
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'PbO#; 1573.15 K: 0.21±0.09'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      values:
-        quantity: activity_coefficient_this_work
-        evidence_class: model
-        method_class: model_derived
-        per_temperature_by_channel:
-          PbO^:
-          - T_K: 1573.15
-            gamma: 0.06
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'PbO^; 1573.15 K: 0.06±0.02'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1673.15
-            gamma: 0.17
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'PbO^; 1673.15 K: 0.17'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          PbO#:
-          - T_K: 1573.15
-            gamma: 0.21
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'PbO#; 1573.15 K: 0.21±0.09'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-          - T_K: 1673.15
-            gamma: 0.38
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'PbO#; 1673.15 K: 0.38'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
     - observation_id: sossi_2019_pb_table5_experimental_PbO_g_quoted_20260906
       supersedes: sossi_2019_pb_table5_experimental_PbO_g
       type: gibbs_table
@@ -22576,6 +21336,1685 @@ species:
         Delta_S_std_kJ_molK: 0.08
         Delta_H_std_kJ_mol: 237.6
         source_column: 1, 6
+
+  LiO0.5:
+    observations:
+    - observation_id: sossi_2019_li_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        page: 57
+        pdf_page_index: 56
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for LiO0.5; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=LiO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 3.1
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 15.4
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_li_logKstar_table3_Li_g
+        oxide_formula_as_published: LiO0.5
+        gas_species: Li(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_li_logKstar_table3_Li_g
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 LiO0.5 (−8) γ_i (this work)=15.4±3.1 at 1673.15 K. Air row is 1.8±0.2
+          (competing; this observation is the reducing row).
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_li_table4_gamma_this_work_quoted_20260906
+      supersedes: sossi_2019_li_table4_gamma_this_work
+      type: activity_coefficient
+      class: model
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
+        endmember=LiO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+        page: 57
+        table: '4'
+        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+          \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+          \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+          \                             Temperature (K)\n                                       1573.15  \
+          \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+          \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nLiO0.5 (-8) | γi (this work) |  |\
+          \ 15.4±3.1 |  |  | "
+        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+        pdf_page_index: 56
+      uncertainty:
+        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines
+          561–562).
+        by_channel:
+          LiO0.5 (-8):
+          - T_K: 1673.15
+            gamma_uncertainty: 3.1
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'LiO0.5 (-8); 1673.15 K: 15.4±3.1'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+      values:
+        admission_status: admitted
+        quantity: activity_coefficient_this_work
+        evidence_class: model
+        method_class: model_derived
+        points:
+        - gamma: 15.4
+          T_K: 1673.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: LiO0.5 (-8); 1673.15 K: 15.4±3.1'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1673.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: LiO0.5 (-8)
+        derivation_note: gamma derives from measured K* using the authors' adopted alpha_e=1.
+        derived_from:
+        - tables:kems-012-sossi-2019
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
+  RbO0.5:
+    observations:
+    - observation_id: sossi_2019_rb_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        page: 57
+        pdf_page_index: 56
+        note: >-
+          Table 4 γ_i (this work) for RbO0.5; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      T_range_K:
+      - 1673.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=RbO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 1.5e-05
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.00013
+        per_temperature:
+        - T_K: 1673.15
+          gamma: 0.00013
+          gamma_uncertainty: 1.5e-05
+        - T_K: 1773.15
+          gamma: 7.4e-05
+          gamma_uncertainty: 5.9e-06
+        - T_K: 1823.15
+          gamma: 9.0e-05
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_rb_logKstar_table3
+        oxide_formula_as_published: RbO0.5
+        gas_species: Rb(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_rb_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=1.3e-4±1.5e-5 at 1673.15 K; 7.4e-5±5.9e-6 at 1773.15 K; 9.0e-5
+          at 1823.15 K. Primary scalar is 1673.15 K.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_rb_table4_gamma_this_work_quoted_20260906
+      supersedes: sossi_2019_rb_table4_gamma_this_work
+      type: activity_coefficient
+      class: model
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
+        endmember=RbO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+        page: 57
+        table: '4'
+        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+          \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+          \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+          \                             Temperature (K)\n                                       1573.15  \
+          \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+          \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nRbO0.5 | γi (this work) |  | 1.3×10⁻⁴±1.5×10⁻⁵\
+          \ | 7.4×10⁻⁵±5.9×10⁻⁶ | 9.0×10⁻⁵ | "
+        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+        pdf_page_index: 56
+      uncertainty:
+        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines
+          561–562).
+        by_channel:
+          RbO0.5:
+          - T_K: 1673.15
+            gamma_uncertainty: 1.5e-05
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'RbO0.5; 1673.15 K: 1.3×10⁻⁴±1.5×10⁻⁵'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+          - T_K: 1773.15
+            gamma_uncertainty: 5.9e-06
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'RbO0.5; 1773.15 K: 7.4×10⁻⁵±5.9×10⁻⁶'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+      values:
+        admission_status: admitted
+        quantity: activity_coefficient_this_work
+        evidence_class: model
+        method_class: model_derived
+        points:
+        - gamma: 0.00013
+          T_K: 1673.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: RbO0.5; 1673.15 K: 1.3×10⁻⁴±1.5×10⁻⁵'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1673.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: RbO0.5
+        - gamma: 7.4e-05
+          T_K: 1773.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: RbO0.5; 1773.15 K: 7.4×10⁻⁵±5.9×10⁻⁶'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: RbO0.5
+        - gamma: 9.0e-05
+          T_K: 1823.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: RbO0.5; 1823.15 K: 9.0×10⁻⁵'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1823.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: RbO0.5
+        derivation_note: gamma derives from measured K* using the authors' adopted alpha_e=1.
+        derived_from:
+        - tables:kems-012-sossi-2019
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
+  CuO0.5:
+    observations:
+    - observation_id: sossi_2019_cu_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        page: 57
+        pdf_page_index: 56
+        note: >-
+          Table 4 γ_i (this work) for CuO0.5; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      T_range_K:
+      - 1573.15
+      - 1923.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CuO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 1.7
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 11.8
+        per_temperature:
+        - T_K: 1573.15
+          gamma: 24.0
+          gamma_uncertainty: 6.3
+        - T_K: 1673.15
+          gamma: 11.8
+          gamma_uncertainty: 1.7
+        - T_K: 1773.15
+          gamma: 8.5
+          gamma_uncertainty: 0.1
+        - T_K: 1823.15
+          gamma: 6.4
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
+        - T_K: 1923.15
+          gamma: 4.2
+          gamma_uncertainty: null
+          source_marker: '*'
+          uncertainty_note: source footnote states this value was extrapolated to 1923.15 K
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_cu_logKstar_table3
+        oxide_formula_as_published: CuO0.5
+        gas_species: Cu(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_cu_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=11.8±1.7 at 1673.15 K (also 24.0±6.3 at 1573.15, 8.5±0.1 at
+          1773.15, 6.4 at 1823.15). Literature α_e=2.4±0.8 at 1300 °C is K*/(γ_lit K) — not
+          extracted as type:alpha.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_cu_table4_gamma_this_work_quoted_20260906
+      supersedes: sossi_2019_cu_table4_gamma_this_work
+      type: activity_coefficient
+      class: model
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
+        endmember=CuO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+        page: 57
+        table: '4'
+        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+          \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+          \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+          \                             Temperature (K)\n                                       1573.15  \
+          \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+          \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nCuO0.5 | γi (this work) | 24.0±6.3\
+          \ | 11.8±1.7 | 8.5±0.1 | 6.4 | 4.2*"
+        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+        pdf_page_index: 56
+      uncertainty:
+        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines
+          561–562).
+        by_channel:
+          CuO0.5:
+          - T_K: 1573.15
+            gamma_uncertainty: 6.3
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'CuO0.5; 1573.15 K: 24.0±6.3'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+          - T_K: 1673.15
+            gamma_uncertainty: 1.7
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'CuO0.5; 1673.15 K: 11.8±1.7'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+          - T_K: 1773.15
+            gamma_uncertainty: 0.1
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'CuO0.5; 1773.15 K: 8.5±0.1'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+      values:
+        admission_status: admitted
+        quantity: activity_coefficient_this_work
+        evidence_class: model
+        method_class: model_derived
+        points:
+        - gamma: 24.0
+          T_K: 1573.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: CuO0.5; 1573.15 K: 24.0±6.3'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1573.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: CuO0.5
+        - gamma: 11.8
+          T_K: 1673.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: CuO0.5; 1673.15 K: 11.8±1.7'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1673.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: CuO0.5
+        - gamma: 8.5
+          T_K: 1773.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: CuO0.5; 1773.15 K: 8.5±0.1'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: CuO0.5
+        - gamma: 6.4
+          T_K: 1823.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: CuO0.5; 1823.15 K: 6.4'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1823.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: CuO0.5
+        - gamma: 4.2
+          T_K: 1923.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: CuO0.5; 1923.15 K: 4.2*'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1923.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          note: 'Printed asterisk: extrapolated to 1923.15 K.'
+          channel_as_published: CuO0.5
+        derivation_note: gamma derives from measured K* using the authors' adopted alpha_e=1.
+        derived_from:
+        - tables:kems-012-sossi-2019
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
+  AgO0.5:
+    observations:
+    - observation_id: sossi_2019_ag_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        page: 57
+        pdf_page_index: 56
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for AgO0.5; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=AgO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.67
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_ag_logKstar_table3
+        oxide_formula_as_published: AgO0.5
+        gas_species: Ag(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_ag_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.67 in the 1673.15 K column; no SD. logK* itself is only at
+          1573.15 K — T assignment of gamma is as printed, not re-derived.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_ag_table4_gamma_this_work_quoted_20260906
+      supersedes: sossi_2019_ag_table4_gamma_this_work
+      type: activity_coefficient
+      class: model
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
+        endmember=AgO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+        page: 57
+        table: '4'
+        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+          \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+          \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+          \                             Temperature (K)\n                                       1573.15  \
+          \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+          \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nAgO0.5 | γi (this work) |  | 0.67\
+          \ |  |  | "
+        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+        pdf_page_index: 56
+      uncertainty:
+        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines
+          561–562).
+        by_channel:
+          AgO0.5: []
+      values:
+        admission_status: admitted
+        quantity: activity_coefficient_this_work
+        evidence_class: model
+        method_class: model_derived
+        source_inconsistency: Table 4 places gamma at 1673.15 K; Table 3 places logK* at 1573.15 K. Retained
+          without reconciliation.
+        points:
+        - gamma: 0.67
+          T_K: 1673.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: AgO0.5; 1673.15 K: 0.67'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1673.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: AgO0.5
+        derivation_note: gamma derives from measured K* using the authors' adopted alpha_e=1.
+        derived_from:
+        - tables:kems-012-sossi-2019
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
+  ZnO:
+    observations:
+    - observation_id: sossi_2019_zn_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        page: 57
+        pdf_page_index: 56
+        note: >-
+          Table 4 γ_i (this work) for ZnO; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=ZnO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 0.13
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.51
+        per_temperature:
+        - T_K: 1573.15
+          gamma: 0.24
+          gamma_uncertainty: 0.02
+        - T_K: 1673.15
+          gamma: 0.51
+          gamma_uncertainty: 0.13
+        - T_K: 1773.15
+          gamma: 0.97
+          gamma_uncertainty: 0.38
+        - T_K: 1823.15
+          gamma: 1.01
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_zn_logKstar_table3
+        oxide_formula_as_published: ZnO
+        gas_species: Zn(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_zn_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.51±0.13 at 1673.15 K. Literature α_e≈2 (Reyes & Gaskell) is
+          K*/(γ_lit K) — not extracted as type:alpha.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_zn_table4_gamma_this_work_quoted_20260906
+      supersedes: sossi_2019_zn_table4_gamma_this_work
+      type: activity_coefficient
+      class: model
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
+        endmember=ZnO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+        page: 57
+        table: '4'
+        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+          \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+          \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+          \                             Temperature (K)\n                                       1573.15  \
+          \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+          \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nZnO | γi (this work) | 0.24±0.02\
+          \ | 0.51±0.13 | 0.97±0.38 | 1.01 | "
+        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+        pdf_page_index: 56
+      uncertainty:
+        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines
+          561–562).
+        by_channel:
+          ZnO:
+          - T_K: 1573.15
+            gamma_uncertainty: 0.02
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'ZnO; 1573.15 K: 0.24±0.02'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+          - T_K: 1673.15
+            gamma_uncertainty: 0.13
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'ZnO; 1673.15 K: 0.51±0.13'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+          - T_K: 1773.15
+            gamma_uncertainty: 0.38
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'ZnO; 1773.15 K: 0.97±0.38'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+      values:
+        admission_status: admitted
+        quantity: activity_coefficient_this_work
+        evidence_class: model
+        method_class: model_derived
+        points:
+        - gamma: 0.24
+          T_K: 1573.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: ZnO; 1573.15 K: 0.24±0.02'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1573.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: ZnO
+        - gamma: 0.51
+          T_K: 1673.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: ZnO; 1673.15 K: 0.51±0.13'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1673.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: ZnO
+        - gamma: 0.97
+          T_K: 1773.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: ZnO; 1773.15 K: 0.97±0.38'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: ZnO
+        - gamma: 1.01
+          T_K: 1823.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: ZnO; 1823.15 K: 1.01'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1823.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: ZnO
+        derivation_note: gamma derives from measured K* using the authors' adopted alpha_e=1.
+        derived_from:
+        - tables:kems-012-sossi-2019
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
+  GeO2:
+    observations:
+    - observation_id: sossi_2019_ge_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        page: 57
+        pdf_page_index: 56
+        note: >-
+          Table 4 γ_i (this work) for GeO2; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=GeO2; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 0.01
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.11
+        per_temperature:
+        - T_K: 1573.15
+          gamma: 0.04
+          gamma_uncertainty: 0.01
+        - T_K: 1673.15
+          gamma: 0.11
+          gamma_uncertainty: 0.01
+        - T_K: 1773.15
+          gamma: 0.18
+          gamma_uncertainty: 0.07
+        - T_K: 1823.15
+          gamma: 0.19
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_ge_logKstar_table3
+        oxide_formula_as_published: GeO2
+        gas_species: Ge(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_ge_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.11±0.01 at 1673.15 K.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_ge_table4_gamma_this_work_quoted_20260906
+      supersedes: sossi_2019_ge_table4_gamma_this_work
+      type: activity_coefficient
+      class: model
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
+        endmember=GeO2; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+        page: 57
+        table: '4'
+        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+          \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+          \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+          \                             Temperature (K)\n                                       1573.15  \
+          \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+          \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nGeO2 | γi (this work) | 0.04±0.01\
+          \ | 0.11±0.01 | 0.18±0.07 | 0.19 | "
+        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+        pdf_page_index: 56
+      uncertainty:
+        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines
+          561–562).
+        by_channel:
+          GeO2:
+          - T_K: 1573.15
+            gamma_uncertainty: 0.01
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'GeO2; 1573.15 K: 0.04±0.01'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+          - T_K: 1673.15
+            gamma_uncertainty: 0.01
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'GeO2; 1673.15 K: 0.11±0.01'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+          - T_K: 1773.15
+            gamma_uncertainty: 0.07
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'GeO2; 1773.15 K: 0.18±0.07'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+      values:
+        admission_status: admitted
+        quantity: activity_coefficient_this_work
+        evidence_class: model
+        method_class: model_derived
+        points:
+        - gamma: 0.04
+          T_K: 1573.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: GeO2; 1573.15 K: 0.04±0.01'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1573.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: GeO2
+        - gamma: 0.11
+          T_K: 1673.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: GeO2; 1673.15 K: 0.11±0.01'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1673.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: GeO2
+        - gamma: 0.18
+          T_K: 1773.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: GeO2; 1773.15 K: 0.18±0.07'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: GeO2
+        - gamma: 0.19
+          T_K: 1823.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: GeO2; 1823.15 K: 0.19'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1823.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: GeO2
+        derivation_note: gamma derives from measured K* using the authors' adopted alpha_e=1.
+        derived_from:
+        - tables:kems-012-sossi-2019
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
+  CdO:
+    observations:
+    - observation_id: sossi_2019_cd_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        page: 57
+        pdf_page_index: 56
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for CdO; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CdO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.15
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_cd_logKstar_table3
+        oxide_formula_as_published: CdO
+        gas_species: Cd(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_cd_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.15 in the 1673.15 K column; no SD. logK* only at 1573.15 K.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_cd_table4_gamma_this_work_quoted_20260906
+      supersedes: sossi_2019_cd_table4_gamma_this_work
+      type: activity_coefficient
+      class: model
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
+        endmember=CdO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+        page: 57
+        table: '4'
+        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+          \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+          \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+          \                             Temperature (K)\n                                       1573.15  \
+          \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+          \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nCdO | γi (this work) |  | 0.15 |\
+          \  |  | "
+        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+        pdf_page_index: 56
+      uncertainty:
+        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines
+          561–562).
+        by_channel:
+          CdO: []
+      values:
+        admission_status: admitted
+        quantity: activity_coefficient_this_work
+        evidence_class: model
+        method_class: model_derived
+        source_inconsistency: Table 4 places gamma at 1673.15 K; Table 3 places logK* at 1573.15 K. Retained
+          without reconciliation.
+        points:
+        - gamma: 0.15
+          T_K: 1673.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: CdO; 1673.15 K: 0.15'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1673.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: CdO
+        derivation_note: gamma derives from measured K* using the authors' adopted alpha_e=1.
+        derived_from:
+        - tables:kems-012-sossi-2019
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
+  PbO:
+    observations:
+    - observation_id: sossi_2019_pb_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        page: 57
+        pdf_page_index: 56
+        note: >-
+          Table 4 γ_i (this work) for PbO; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      T_range_K:
+      - 1573.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=PbO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.17
+        per_temperature_by_channel:
+          PbO_caret:
+          - T_K: 1573.15
+            gamma: 0.06
+            gamma_uncertainty: 0.02
+          - T_K: 1673.15
+            gamma: 0.17
+            gamma_uncertainty: null
+            uncertainty_note: no uncertainty printed for this Table 4 cell
+          PbO_hash:
+          - T_K: 1573.15
+            gamma: 0.21
+            gamma_uncertainty: 0.09
+          - T_K: 1673.15
+            gamma: 0.38
+            gamma_uncertainty: null
+            uncertainty_note: no uncertainty printed for this Table 4 cell
+        channel_note: PbO^ and PbO# retained as printed; channel footnote was not recovered from the repaired slice.
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_pb_logKstar_table3_Pb_g
+        oxide_formula_as_published: PbO
+        gas_species: Pb(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_pb_logKstar_table3_Pb_g
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 PbO^ (n=0, PbO(g) channel) γ_i (this work)=0.17 at 1673.15 K; 0.06±0.02 at
+          1573.15 K. Companion PbO# (n=2) γ=0.38 at 1673.15 / 0.21±0.09 at 1573.15. Primary scalar
+          is the n=0 1673.15 value as printed. Table 4 α_e rows (0.3–1.7) are K*/(γ_lit K) — not
+          extracted as type:alpha.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_pb_table4_gamma_this_work_quoted_20260906
+      supersedes: sossi_2019_pb_table4_gamma_this_work
+      type: activity_coefficient
+      class: model
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
+        endmember=PbO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+        page: 57
+        table: '4'
+        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+          \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+          \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+          \                             Temperature (K)\n                                       1573.15  \
+          \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+          \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nPbO^ | γi (this work) | 0.06±0.02\
+          \ | 0.17 |  |  | \nPbO# | γi (this work) | 0.21±0.09 | 0.38 |  |  | \n^ = calculated from the reaction\
+          \ PbO(l) = PbO(g)\n# = calculated from the reaction PbO(l) = Pb(g) + ½O2"
+        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+        pdf_page_index: 56
+      uncertainty:
+        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines
+          561–562).
+        by_channel:
+          PbO^:
+          - T_K: 1573.15
+            gamma_uncertainty: 0.02
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'PbO^; 1573.15 K: 0.06±0.02'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+      values:
+        admission_status: admitted
+        quantity: activity_coefficient_this_work
+        evidence_class: model
+        method_class: model_derived
+        points:
+        - gamma: 0.06
+          T_K: 1573.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: PbO^; 1573.15 K: 0.06±0.02'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1573.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: PbO^
+        - gamma: 0.17
+          T_K: 1673.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: PbO^; 1673.15 K: 0.17'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1673.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: PbO^
+        derivation_note: gamma derives from measured K* using the authors' adopted alpha_e=1.
+        derived_from:
+        - tables:kems-012-sossi-2019
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
+    - observation_id: sossi_2019_pb_table4_gamma_this_work_quoted_20260906_pbo_hash
+      type: activity_coefficient
+      class: model
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
+        endmember=PbO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      locator:
+        page: 57
+        table: '4'
+        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+          \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+          \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+          \                             Temperature (K)\n                                       1573.15  \
+          \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+          \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nPbO^ | γi (this work) | 0.06±0.02\
+          \ | 0.17 |  |  | \nPbO# | γi (this work) | 0.21±0.09 | 0.38 |  |  | \n^ = calculated from the reaction\
+          \ PbO(l) = PbO(g)\n# = calculated from the reaction PbO(l) = Pb(g) + ½O2"
+        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+        pdf_page_index: 56
+      uncertainty:
+        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines
+          561–562).
+        by_channel:
+          PbO#:
+          - T_K: 1573.15
+            gamma_uncertainty: 0.09
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'PbO#; 1573.15 K: 0.21±0.09'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+      values:
+        admission_status: admitted
+        quantity: activity_coefficient_this_work
+        evidence_class: model
+        method_class: model_derived
+        points:
+        - gamma: 0.21
+          T_K: 1573.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: PbO#; 1573.15 K: 0.21±0.09'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1573.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: PbO#
+        - gamma: 0.38
+          T_K: 1673.15
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 57
+            table: '4'
+            note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+              printed cell: PbO#; 1673.15 K: 0.38'
+            pdf_page_index: 56
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1673.15
+              locator:
+                page: 57
+                pdf_page_index: 56
+                table: '4'
+          channel_as_published: PbO#
+        derivation_note: gamma derives from measured K* using the authors' adopted alpha_e=1.
+        derived_from:
+        - tables:kems-012-sossi-2019
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
 fidelity_samples:
 - species: Na
   observable: alpha
@@ -22783,7 +23222,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Li
+- species: LiO0.5
   observable: activity_coefficient
   observation_id: sossi_2019_li_table4_gamma_this_work
   field: gamma
@@ -22810,7 +23249,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Rb
+- species: RbO0.5
   observable: activity_coefficient
   observation_id: sossi_2019_rb_table4_gamma_this_work
   field: gamma
@@ -22837,7 +23276,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Cu
+- species: CuO0.5
   observable: activity_coefficient
   observation_id: sossi_2019_cu_table4_gamma_this_work
   field: gamma
@@ -22864,7 +23303,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Ag
+- species: AgO0.5
   observable: activity_coefficient
   observation_id: sossi_2019_ag_table4_gamma_this_work
   field: gamma
@@ -22882,7 +23321,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Zn
+- species: ZnO
   observable: activity_coefficient
   observation_id: sossi_2019_zn_table4_gamma_this_work
   field: gamma
@@ -22909,7 +23348,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Ge
+- species: GeO2
   observable: activity_coefficient
   observation_id: sossi_2019_ge_table4_gamma_this_work
   field: gamma
@@ -22936,7 +23375,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Cd
+- species: CdO
   observable: activity_coefficient
   observation_id: sossi_2019_cd_table4_gamma_this_work
   field: gamma
@@ -22990,7 +23429,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Pb
+- species: PbO
   observable: activity_coefficient
   observation_id: sossi_2019_pb_table4_gamma_this_work
   field: gamma
@@ -23410,30 +23849,43 @@ fidelity_samples:
       \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K\n\
       Li | LiO0.5(l) + ¼O2 = LiO(g) | -1 | 0 |  | -3.39±0.07 |  | \nN |  |  |  |  | 2 |  | "
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
-- species: Li
+- species: LiO0.5
+  observable: activity_coefficient
   observation_id: sossi_2019_li_table4_gamma_this_work_quoted_20260906
-  field: per_temperature_by_channel
+  field: points
   value:
-    LiO0.5 (-8):
-    - T_K: 1673.15
-      gamma: 15.4
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'LiO0.5 (-8); 1673.15 K: 15.4±3.1'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+  - gamma: 15.4
+    T_K: 1673.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: LiO0.5 (-8); 1673.15 K: 15.4±3.1'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1673.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: LiO0.5 (-8)
   locator:
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
     page: 57
     table: '4'
-    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-      \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-      \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-      \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-      Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nLiO0.5 (-8) | γi (this work) |  | 15.4±3.1\
-      \ |  |  | "
+    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+      \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+      \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+      \                             Temperature (K)\n                                       1573.15  \
+      \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+      \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nLiO0.5 (-8) | γi (this work) |  |\
+      \ 15.4±3.1 |  |  | "
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+    pdf_page_index: 56
 - species: Li
   observation_id: sossi_2019_li_table5_experimental_Li_g_quoted_20260906
   field: Delta_H_std_kJ_mol
@@ -23467,46 +23919,81 @@ fidelity_samples:
 
       N |  |  |  | 1 | 3 | 2 | 1'
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
-- species: Rb
+- species: RbO0.5
+  observable: activity_coefficient
   observation_id: sossi_2019_rb_table4_gamma_this_work_quoted_20260906
-  field: per_temperature_by_channel
+  field: points
   value:
-    RbO0.5:
-    - T_K: 1673.15
-      gamma: 0.00013
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'RbO0.5; 1673.15 K: 1.3×10⁻⁴±1.5×10⁻⁵'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1773.15
-      gamma: 7.4e-05
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'RbO0.5; 1773.15 K: 7.4×10⁻⁵±5.9×10⁻⁶'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1823.15
-      gamma: 9.0e-05
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'RbO0.5; 1823.15 K: 9.0×10⁻⁵'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+  - gamma: 0.00013
+    T_K: 1673.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: RbO0.5; 1673.15 K: 1.3×10⁻⁴±1.5×10⁻⁵'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1673.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: RbO0.5
+  - gamma: 7.4e-05
+    T_K: 1773.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: RbO0.5; 1773.15 K: 7.4×10⁻⁵±5.9×10⁻⁶'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1773.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: RbO0.5
+  - gamma: 9.0e-05
+    T_K: 1823.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: RbO0.5; 1823.15 K: 9.0×10⁻⁵'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1823.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: RbO0.5
   locator:
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
     page: 57
     table: '4'
-    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-      \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-      \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-      \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-      Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nRbO0.5 | γi (this work) |  | 1.3×10⁻⁴±1.5×10⁻⁵\
+    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+      \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+      \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+      \                             Temperature (K)\n                                       1573.15  \
+      \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+      \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nRbO0.5 | γi (this work) |  | 1.3×10⁻⁴±1.5×10⁻⁵\
       \ | 7.4×10⁻⁵±5.9×10⁻⁶ | 9.0×10⁻⁵ | "
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+    pdf_page_index: 56
 - species: Rb
   observation_id: sossi_2019_rb_table5_experimental_quoted_20260906
   field: Delta_H_std_kJ_mol
@@ -23540,63 +24027,120 @@ fidelity_samples:
 
       N |  |  |  | 3 | 3 | 2 | 1'
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
-- species: Cu
+- species: CuO0.5
+  observable: activity_coefficient
   observation_id: sossi_2019_cu_table4_gamma_this_work_quoted_20260906
-  field: per_temperature_by_channel
+  field: points
   value:
-    CuO0.5:
-    - T_K: 1573.15
-      gamma: 24.0
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'CuO0.5; 1573.15 K: 24.0±6.3'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1673.15
-      gamma: 11.8
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'CuO0.5; 1673.15 K: 11.8±1.7'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1773.15
-      gamma: 8.5
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'CuO0.5; 1773.15 K: 8.5±0.1'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1823.15
-      gamma: 6.4
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'CuO0.5; 1823.15 K: 6.4'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1923.15
-      gamma: 4.2
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'CuO0.5; 1923.15 K: 4.2*'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-      note: 'Printed asterisk: extrapolated to 1923.15 K.'
+  - gamma: 24.0
+    T_K: 1573.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: CuO0.5; 1573.15 K: 24.0±6.3'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1573.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: CuO0.5
+  - gamma: 11.8
+    T_K: 1673.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: CuO0.5; 1673.15 K: 11.8±1.7'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1673.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: CuO0.5
+  - gamma: 8.5
+    T_K: 1773.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: CuO0.5; 1773.15 K: 8.5±0.1'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1773.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: CuO0.5
+  - gamma: 6.4
+    T_K: 1823.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: CuO0.5; 1823.15 K: 6.4'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1823.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: CuO0.5
+  - gamma: 4.2
+    T_K: 1923.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: CuO0.5; 1923.15 K: 4.2*'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1923.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    note: 'Printed asterisk: extrapolated to 1923.15 K.'
+    channel_as_published: CuO0.5
   locator:
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
     page: 57
     table: '4'
-    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-      \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-      \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-      \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-      Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nCuO0.5 | γi (this work) | 24.0±6.3 |\
-      \ 11.8±1.7 | 8.5±0.1 | 6.4 | 4.2*"
+    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+      \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+      \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+      \                             Temperature (K)\n                                       1573.15  \
+      \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+      \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nCuO0.5 | γi (this work) | 24.0±6.3\
+      \ | 11.8±1.7 | 8.5±0.1 | 6.4 | 4.2*"
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+    pdf_page_index: 56
 - species: Cu
   observation_id: sossi_2019_cu_table5_experimental_quoted_20260906
   field: Delta_H_std_kJ_mol
@@ -23625,30 +24169,43 @@ fidelity_samples:
       \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K\n\
       Ag | AgO0.5(l) = Ag(g) + ¼O2 | 1 | 0 | -2.23 |  |  | \nN |  |  |  | 1 |  |  | "
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
-- species: Ag
+- species: AgO0.5
+  observable: activity_coefficient
   observation_id: sossi_2019_ag_table4_gamma_this_work_quoted_20260906
-  field: per_temperature_by_channel
+  field: points
   value:
-    AgO0.5:
-    - T_K: 1673.15
-      gamma: 0.67
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'AgO0.5; 1673.15 K: 0.67'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+  - gamma: 0.67
+    T_K: 1673.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: AgO0.5; 1673.15 K: 0.67'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1673.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: AgO0.5
   locator:
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
     page: 57
     table: '4'
-    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-      \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-      \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-      \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-      Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nAgO0.5 | γi (this work) |  | 0.67 |\
-      \  |  | "
+    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+      \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+      \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+      \                             Temperature (K)\n                                       1573.15  \
+      \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+      \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nAgO0.5 | γi (this work) |  | 0.67\
+      \ |  |  | "
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+    pdf_page_index: 56
 - species: Zn
   observation_id: sossi_2019_zn_logKstar_table3_quoted_20260906
   field: n_electrons
@@ -23666,54 +24223,100 @@ fidelity_samples:
 
       N |  |  |  | 3 | 4 | 2 | 1'
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
-- species: Zn
+- species: ZnO
+  observable: activity_coefficient
   observation_id: sossi_2019_zn_table4_gamma_this_work_quoted_20260906
-  field: per_temperature_by_channel
+  field: points
   value:
-    ZnO:
-    - T_K: 1573.15
-      gamma: 0.24
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'ZnO; 1573.15 K: 0.24±0.02'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1673.15
-      gamma: 0.51
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'ZnO; 1673.15 K: 0.51±0.13'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1773.15
-      gamma: 0.97
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'ZnO; 1773.15 K: 0.97±0.38'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1823.15
-      gamma: 1.01
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'ZnO; 1823.15 K: 1.01'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+  - gamma: 0.24
+    T_K: 1573.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: ZnO; 1573.15 K: 0.24±0.02'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1573.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: ZnO
+  - gamma: 0.51
+    T_K: 1673.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: ZnO; 1673.15 K: 0.51±0.13'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1673.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: ZnO
+  - gamma: 0.97
+    T_K: 1773.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: ZnO; 1773.15 K: 0.97±0.38'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1773.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: ZnO
+  - gamma: 1.01
+    T_K: 1823.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: ZnO; 1823.15 K: 1.01'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1823.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: ZnO
   locator:
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
     page: 57
     table: '4'
-    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-      \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-      \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-      \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-      Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nZnO | γi (this work) | 0.24±0.02 | 0.51±0.13\
-      \ | 0.97±0.38 | 1.01 | "
+    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+      \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+      \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+      \                             Temperature (K)\n                                       1573.15  \
+      \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+      \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nZnO | γi (this work) | 0.24±0.02\
+      \ | 0.51±0.13 | 0.97±0.38 | 1.01 | "
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+    pdf_page_index: 56
 - species: Zn
   observation_id: sossi_2019_zn_table5_experimental_quoted_20260906
   field: Delta_H_std_kJ_mol
@@ -23747,54 +24350,100 @@ fidelity_samples:
 
       N |  |  |  | 3 | 4 | 2 | 1'
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
-- species: Ge
+- species: GeO2
+  observable: activity_coefficient
   observation_id: sossi_2019_ge_table4_gamma_this_work_quoted_20260906
-  field: per_temperature_by_channel
+  field: points
   value:
-    GeO2:
-    - T_K: 1573.15
-      gamma: 0.04
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'GeO2; 1573.15 K: 0.04±0.01'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1673.15
-      gamma: 0.11
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'GeO2; 1673.15 K: 0.11±0.01'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1773.15
-      gamma: 0.18
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'GeO2; 1773.15 K: 0.18±0.07'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1823.15
-      gamma: 0.19
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'GeO2; 1823.15 K: 0.19'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+  - gamma: 0.04
+    T_K: 1573.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: GeO2; 1573.15 K: 0.04±0.01'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1573.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: GeO2
+  - gamma: 0.11
+    T_K: 1673.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: GeO2; 1673.15 K: 0.11±0.01'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1673.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: GeO2
+  - gamma: 0.18
+    T_K: 1773.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: GeO2; 1773.15 K: 0.18±0.07'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1773.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: GeO2
+  - gamma: 0.19
+    T_K: 1823.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: GeO2; 1823.15 K: 0.19'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1823.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: GeO2
   locator:
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
     page: 57
     table: '4'
-    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-      \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-      \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-      \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-      Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nGeO2 | γi (this work) | 0.04±0.01 |\
-      \ 0.11±0.01 | 0.18±0.07 | 0.19 | "
+    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+      \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+      \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+      \                             Temperature (K)\n                                       1573.15  \
+      \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+      \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nGeO2 | γi (this work) | 0.04±0.01\
+      \ | 0.11±0.01 | 0.18±0.07 | 0.19 | "
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+    pdf_page_index: 56
 - species: Ge
   observation_id: sossi_2019_ge_table5_experimental_quoted_20260906
   field: Delta_H_std_kJ_mol
@@ -23823,30 +24472,43 @@ fidelity_samples:
       \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K\n\
       Cd | CdO(l) = Cd(g) + ½O2 | 2 | 0 | -2.48 |  |  | \nN |  |  |  | 1 |  |  | "
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
-- species: Cd
+- species: CdO
+  observable: activity_coefficient
   observation_id: sossi_2019_cd_table4_gamma_this_work_quoted_20260906
-  field: per_temperature_by_channel
+  field: points
   value:
-    CdO:
-    - T_K: 1673.15
-      gamma: 0.15
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'CdO; 1673.15 K: 0.15'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+  - gamma: 0.15
+    T_K: 1673.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: CdO; 1673.15 K: 0.15'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1673.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: CdO
   locator:
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
     page: 57
     table: '4'
-    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-      \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-      \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-      \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-      Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nCdO | γi (this work) |  | 0.15 |  |\
-      \  | "
+    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+      \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+      \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+      \                             Temperature (K)\n                                       1573.15  \
+      \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+      \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nCdO | γi (this work) |  | 0.15 |\
+      \  |  | "
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+    pdf_page_index: 56
 - species: Ga
   observation_id: sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906
   field: n_electrons
@@ -23921,56 +24583,121 @@ fidelity_samples:
       \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K\n\
       Pb | PbO(l) = Pb(g) + ½O2 | 2 | 0 | -4.47±0.19 | -3.49 |  | \nN |  |  |  | 2 | 1 |  | "
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
-- species: Pb
+- species: PbO
+  observable: activity_coefficient
   observation_id: sossi_2019_pb_table4_gamma_this_work_quoted_20260906
-  field: per_temperature_by_channel
+  field: points
   value:
-    PbO^:
-    - T_K: 1573.15
-      gamma: 0.06
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'PbO^; 1573.15 K: 0.06±0.02'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1673.15
-      gamma: 0.17
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'PbO^; 1673.15 K: 0.17'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    PbO#:
-    - T_K: 1573.15
-      gamma: 0.21
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'PbO#; 1573.15 K: 0.21±0.09'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-    - T_K: 1673.15
-      gamma: 0.38
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-        page: 57
-        table: '4'
-        quote: 'PbO#; 1673.15 K: 0.38'
-        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+  - gamma: 0.06
+    T_K: 1573.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: PbO^; 1573.15 K: 0.06±0.02'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1573.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: PbO^
+  - gamma: 0.17
+    T_K: 1673.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: PbO^; 1673.15 K: 0.17'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1673.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: PbO^
   locator:
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
     page: 57
     table: '4'
-    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients calculated\
-      \ with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with αe = 1 from\
-      \ eq. 6.\nSpecies                                                                  Temperature (K)\n               \
-      \                        1573.15                 1673.15                 1773.15            1823.15        1923.15\n\
-      Species | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nPbO^ | γi (this work) | 0.06±0.02 |\
-      \ 0.17 |  |  | \nPbO# | γi (this work) | 0.21±0.09 | 0.38 |  |  | \n^ = calculated from the reaction PbO(l) = PbO(g)\n\
-      # = calculated from the reaction PbO(l) = Pb(g) + ½O2"
+    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+      \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+      \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+      \                             Temperature (K)\n                                       1573.15  \
+      \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+      \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nPbO^ | γi (this work) | 0.06±0.02\
+      \ | 0.17 |  |  | \nPbO# | γi (this work) | 0.21±0.09 | 0.38 |  |  | \n^ = calculated from the reaction\
+      \ PbO(l) = PbO(g)\n# = calculated from the reaction PbO(l) = Pb(g) + ½O2"
     note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+    pdf_page_index: 56
+
+- species: PbO
+  observable: activity_coefficient
+  observation_id: sossi_2019_pb_table4_gamma_this_work_quoted_20260906_pbo_hash
+  field: points
+  value:
+  - gamma: 0.21
+    T_K: 1573.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: PbO#; 1573.15 K: 0.21±0.09'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1573.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: PbO#
+  - gamma: 0.38
+    T_K: 1673.15
+    locator:
+      source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+      page: 57
+      table: '4'
+      note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;
+        printed cell: PbO#; 1673.15 K: 0.38'
+      pdf_page_index: 56
+    point_conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1673.15
+        locator:
+          page: 57
+          pdf_page_index: 56
+          table: '4'
+    channel_as_published: PbO#
+  locator:
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+    page: 57
+    table: '4'
+    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+      \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+      \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+      \                             Temperature (K)\n                                       1573.15  \
+      \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+      \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nPbO^ | γi (this work) | 0.06±0.02\
+      \ | 0.17 |  |  | \nPbO# | γi (this work) | 0.21±0.09 | 0.38 |  |  | \n^ = calculated from the reaction\
+      \ PbO(l) = PbO(g)\n# = calculated from the reaction PbO(l) = Pb(g) + ½O2"
+    note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+    pdf_page_index: 56
 - species: Pb
   observation_id: sossi_2019_pb_table5_experimental_PbO_g_quoted_20260906
   field: Delta_H_std_kJ_mol
