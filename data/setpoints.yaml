@@ -1149,11 +1149,14 @@ condensation_train:
 
     stage_6_turbine_compressor:
       label: "Turbine-Compressor (Pressure Regulator)"
+      temp_range_C: [50, 200]
       function: "pressure regulator + first-stage O2 compression"
       control: "turbine speed sets upstream pO2; IR feedback loop"
 
     stage_7_accumulator:
       label: "O2 Accumulator"
+      # Runtime outlet-monitor band, not the downstream oxygen storage temperature.
+      temp_range_C: [20, 50]
       storage: "compressed O2 gas at ~3 bar"
       compression_energy_kWh_per_t: [15, 30]
 

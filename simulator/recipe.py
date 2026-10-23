@@ -12,14 +12,13 @@ from types import MappingProxyType
 from typing import Any, Literal, Mapping, Sequence
 import warnings
 
-from simulator.config import DEFAULT_DATA_DIR
+from simulator.config import DEFAULT_DATA_DIR, resolve_collector_bands_C
 from simulator.chemistry.kernel.config import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
 )
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.canonical import canonical_json_dumps
-from simulator.state import CondensationTrain
 from simulator.yaml_cache import load_cached_safe_yaml
 
 KeyPath = tuple[str, ...]
@@ -87,36 +86,22 @@ DOWNSTREAM_CONDENSATION_STAGE_PAIRS: tuple[tuple[str, int, int], ...] = (
 )
 
 
-def _condensation_train_downstream_segment_bounds() -> Mapping[str, tuple[float, float]]:
-    default_train = CondensationTrain.create_default()
-    stage_ranges = {
-        stage.stage_number: (
-            float(stage.temp_range_C[0]),
-            float(stage.temp_range_C[1]),
-        )
-        for stage in default_train.stages
-    }
+def _condensation_train_downstream_segment_bounds(
+    setpoints: Mapping[str, Any],
+) -> Mapping[str, tuple[float, float]]:
+    stage_ranges = resolve_collector_bands_C(setpoints)
     bounds: dict[str, tuple[float, float]] = {}
     for segment_name, upstream_stage, downstream_stage in DOWNSTREAM_CONDENSATION_STAGE_PAIRS:
-        if upstream_stage not in stage_ranges or downstream_stage not in stage_ranges:
-            raise RuntimeError(
-                "CondensationTrain.create_default() missing stages needed for "
-                f"{segment_name}"
-            )
         low = stage_ranges[downstream_stage][0]
         high = stage_ranges[upstream_stage][1]
         if not (math.isfinite(low) and math.isfinite(high) and low <= high):
             raise RuntimeError(
-                "CondensationTrain.create_default() produced invalid interface "
+                "condensation_train config produced invalid interface "
                 f"bounds for {segment_name}: {(low, high)!r}"
             )
         bounds[segment_name] = (low, high)
     return MappingProxyType(bounds)
 
-
-OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C: Mapping[str, tuple[float, float]] = (
-    _condensation_train_downstream_segment_bounds()
-)
 
 FURNACE_MAX_T_C_PATH: KeyPath = ("furnace_max_T_C",)
 C5_ALLOW_MRE_VOLTAGE_CAP_PATH: KeyPath = tuple(
@@ -1313,32 +1298,26 @@ class RecipeSchema:
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.segments.stage_4_to_stage_5.default_C",
-            low=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_4_to_stage_5"][0],
-            high=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_4_to_stage_5"][1],
             units="C",
             bounds_source=(
                 "condensation_train stage 4/5 interface envelope: "
-                "state.py CondensationTrain.create_default"
+                "setpoints.yaml condensation_train.metals_train bands"
             ),
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.segments.stage_5_to_stage_6.default_C",
-            low=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_5_to_stage_6"][0],
-            high=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_5_to_stage_6"][1],
             units="C",
             bounds_source=(
                 "condensation_train stage 5/6 interface envelope: "
-                "state.py CondensationTrain.create_default"
+                "setpoints.yaml condensation_train.metals_train bands"
             ),
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.segments.stage_6_to_stage_7.default_C",
-            low=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_6_to_stage_7"][0],
-            high=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_6_to_stage_7"][1],
             units="C",
             bounds_source=(
                 "condensation_train stage 6/7 interface envelope: "
-                "state.py CondensationTrain.create_default"
+                "setpoints.yaml condensation_train.metals_train bands"
             ),
         ),
     )
@@ -2036,8 +2015,19 @@ def _setpoint_sourced_allowlist(
     setpoints: Mapping[str, Any],
 ) -> tuple[KnobSpec, ...]:
     converted_source_prefix = "engineering_envelope converted from setpoints:"
+    downstream_bounds = {
+        tuple((
+            "overhead_headspace.pipe_segment_temperatures_C.segments."
+            f"{name}.default_C"
+        ).split(".")): band
+        for name, band in _condensation_train_downstream_segment_bounds(setpoints).items()
+    }
     resolved: list[KnobSpec] = []
     for spec in template_allowlist:
+        if spec.path in downstream_bounds:
+            low, high = downstream_bounds[spec.path]
+            resolved.append(replace(spec, low=low, high=high))
+            continue
         if spec.bounds_source.startswith("setpoints:"):
             source_path = spec.bounds_source.removeprefix("setpoints:")
             scale = 1

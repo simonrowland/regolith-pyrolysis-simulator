@@ -13,6 +13,9 @@ from pathlib import Path
 from typing import Any
 
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.condensation_routing import COLLECTOR_STAGE_KEY_BY_NUMBER
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -218,6 +221,57 @@ def _load_required_yaml(
     return deepcopy(loaded), digest
 
 
+def resolve_collector_bands_C(
+    setpoints: Mapping[str, Any] | None = None,
+) -> dict[int, tuple[float, float]]:
+    """Resolve collector bands from YAML; partial callers inherit omitted stages.
+
+    Species reference/dew temperatures are a different input. There is no
+    in-code band fallback: even the no-argument train reads shipped setpoints.
+    Explicit malformed bands refuse rather than reverting to default physics.
+    """
+    defaults, _ = _load_required_yaml(
+        DEFAULT_DATA_DIR / "setpoints.yaml", functional_digest=True,
+    )
+    default_stages = defaults["condensation_train"]["metals_train"]
+    train = (setpoints if setpoints is not None else defaults).get(
+        "condensation_train", {},
+    )
+    if not isinstance(train, Mapping):
+        raise ValueError("condensation_train must be a mapping")
+    stages = train.get("metals_train", {})
+    if not isinstance(stages, Mapping):
+        raise ValueError("condensation_train.metals_train must be a mapping")
+    bands = {}
+    for number, key in COLLECTOR_STAGE_KEY_BY_NUMBER.items():
+        stage = stages.get(key, default_stages[key])
+        label = f"condensation_train.metals_train.{key}.temp_range_C"
+        if not isinstance(stage, Mapping):
+            raise ValueError(f"{label} stage must be a mapping")
+        band = stage.get("temp_range_C")
+        if not isinstance(band, (list, tuple)) or len(band) != 2:
+            raise ValueError(f"{label} must contain two finite temperatures")
+        if not all(is_declared_real_scalar(value, allow_numeric_str=True) for value in band):
+            raise ValueError(f"{label} endpoints must be numeric, not boolean")
+        low, high = map(float, band)
+        if not (
+            math.isfinite(low) and math.isfinite(high)
+            and low > -CELSIUS_TO_KELVIN_OFFSET and low <= high
+        ):
+            raise ValueError(f"{label} must be finite, above absolute zero and ordered")
+        limit = stage.get("max_service_T_C", default_stages[key].get("max_service_T_C"))
+        if limit is not None:
+            if not (
+                is_declared_real_scalar(limit, allow_numeric_str=True)
+                and math.isfinite(float(limit))
+            ):
+                raise ValueError(f"{label} has invalid max_service_T_C")
+            if high > float(limit):
+                raise ValueError(f"{label} exceeds declared max_service_T_C={limit}")
+        bands[number] = (low, high)
+    return bands
+
+
 def load_config_bundle(
     data_dir: Path | None = None,
     *,
@@ -267,6 +321,7 @@ def load_config_bundle(
         loaded["vapor_pressures"] = vapor_pressure_compatibility_view(
             loaded["vapor_pressures"]
         )
+    resolve_collector_bands_C(loaded["setpoints"])
     return ConfigBundle(
         setpoints=loaded["setpoints"],
         feedstocks=loaded["feedstocks"],

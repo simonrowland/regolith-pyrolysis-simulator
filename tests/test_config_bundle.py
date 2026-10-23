@@ -323,3 +323,41 @@ def test_load_config_bundle_missing_required_file_raises(tmp_path: Path) -> None
 
     with pytest.raises(FileNotFoundError, match="required config file missing"):
         load_config_bundle(tmp_path)
+
+
+@pytest.mark.parametrize('band', [
+    None, [], [350], [350, 700, 800], '350,700',
+    [True, 700], ['warm', 700], [float('nan'), 700], [350, float('inf')],
+    [-273.15, 0], [700, 350],
+])
+def test_collector_band_resolver_refuses_malformed_supplied_band(band):
+    setpoints = load_config_bundle().setpoints
+    setpoints['condensation_train']['metals_train'][
+        'stage_4_alkali_mg_cyclone']['temp_range_C'] = band
+    with pytest.raises(ValueError, match='stage_4_alkali_mg_cyclone.temp_range_C'):
+        config_module.resolve_collector_bands_C(setpoints)
+
+
+def test_collector_band_resolver_checks_declared_service_ceiling(tmp_path):
+    setpoints = load_config_bundle().setpoints
+    stage = setpoints['condensation_train']['metals_train']['stage_3_sio_zone']
+    stage['temp_range_C'] = [900, stage['max_service_T_C'] + 1]
+    path = tmp_path / 'setpoints.yaml'
+    path.write_text(yaml.safe_dump(setpoints))
+    with pytest.raises(ValueError, match='stage_3_sio_zone.*max_service_T_C'):
+        load_config_bundle(setpoints_path=path)
+
+
+def test_collector_band_defaults_are_yaml_owned_and_detached():
+    from simulator.condensation_routing import COLLECTOR_STAGE_KEY_BY_NUMBER
+    from simulator.state import CondensationTrain
+
+    setpoints = load_config_bundle().setpoints
+    resolved = config_module.resolve_collector_bands_C()
+    assert resolved == {
+        number: tuple(setpoints['condensation_train']['metals_train'][key]['temp_range_C'])
+        for number, key in COLLECTOR_STAGE_KEY_BY_NUMBER.items()
+    }
+    assert config_module.resolve_collector_bands_C({}) == resolved
+    resolved[4] = (1.0, 2.0)
+    assert CondensationTrain.create_default().stages[4].temp_range_C != resolved[4]
