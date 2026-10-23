@@ -10,7 +10,11 @@ from simulator.gas_balance import bled_species_mol, controlled_flow_capacity
 from simulator.accounting import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
-from simulator.overhead import continuous_sweep_balance
+from simulator.overhead import (
+    SWEEP_BALANCE_ATOL,
+    SWEEP_BALANCE_RTOL,
+    continuous_sweep_balance,
+)
 from simulator.thermal_train import FiniteCapacity
 from tests.test_pressure_projection_pins import _hex
 
@@ -87,7 +91,63 @@ def balance_outputs():
 
 def test_balance_and_removal_binary64_pins():
     expected = json.loads((Path(__file__).parent / "fixtures/gas_balance_pin.json").read_text())
-    assert balance_outputs() == expected
+    actual = balance_outputs()
+    # d-263: only capacity-limited Radau outputs and their consumers are defined
+    # to the solver's error control. Their last bits depend on memory alignment
+    # through vectorized reductions. All other leaves remain binary64 exact.
+    adaptive = {
+        ("mars_0.007", "external_o2_outflow_mol"),
+        ("mars_0.007", "pressure_bar"),
+        ("mars_0.007", "capacity_shortfall", "achieved_pressure_pa"),
+        ("mars_commit_0.007", "diagnostic", "capacity_shortfall", "achieved_pressure_pa"),
+    }
+    for species in ("Ar", "CO2", "O2"):
+        for field in ("final_species_mol", "outflow_species_mol"):
+            adaptive.add(("mars_0.007", field, species))
+        adaptive.add(("mars_commit_0.007", "debits", "process.overhead_gas", species))
+        for field in ("bled_species_mol", "candidate_bled_species_mol"):
+            adaptive.add(("mars_commit_0.007", "diagnostic", field, species))
+    for account, species in (("process.overhead_gas", "Ar"),
+                             ("terminal.offgas", "Ar"), ("terminal.offgas", "CO2"),
+                             ("terminal.oxygen_bubbler_external_vented_to_vacuum", "O2"),
+                             ("terminal.oxygen_melt_offgas_stored", "O2")):
+        adaptive.add(("mars_commit_0.007", "credits", account, species))
+    for field in ("bled_o2_kg", "bled_o2_mol", "bled_total_kg", "candidate_bled_o2_mol",
+                  "external_o2_bled_mol", "external_o2_vented_kg", "external_o2_vented_mol",
+                  "melt_o2_bled_mol", "o2_admitted_mol", "o2_stored_mol",
+                  "o2_vented_kg", "o2_vented_mol"):
+        adaptive.add(("mars_commit_0.007", "diagnostic", field))
+    # Zero outlet capacity enters the same Radau call, including its roundoff
+    # in the source residence integral; its derived leaves obey the same rule.
+    sealed_keys = {"mars_0.007": "mars_0.0", "mars_commit_0.007": "mars_commit_0.0"}
+    adaptive |= {(sealed_keys[path[0]], *path[1:]) for path in adaptive}
+
+    missing = object()
+
+    def check(got, pin, path=()):
+        if isinstance(pin, dict) or isinstance(got, dict):
+            if got is missing or pin is missing:
+                assert any(p[:len(path)] == path for p in adaptive), path
+                got = {} if got is missing else got
+                pin = {} if pin is missing else pin
+            assert isinstance(got, dict) and isinstance(pin, dict), path
+            for key in got.keys() | pin.keys():
+                check(got.get(key, missing), pin.get(key, missing), (*path, key))
+        elif path in adaptive:
+            # Sparse mol maps omit zero: Radau roundoff can create/remove a
+            # sub-atol CO2 outlet at zero capacity. Only these declared adaptive
+            # leaves may compare an absent entry as numerical zero.
+            value = (0.0 if got is missing else
+                     float.fromhex(got) if isinstance(got, str) else float(got))
+            reference = (0.0 if pin is missing else
+                         float.fromhex(pin) if isinstance(pin, str) else float(pin))
+            assert abs(value - reference) <= (
+                SWEEP_BALANCE_RTOL * abs(reference) + max(SWEEP_BALANCE_ATOL)
+            ), path
+        else:
+            assert got == pin, path
+
+    check(actual, expected)
 
 
 def legacy_preview_output():
