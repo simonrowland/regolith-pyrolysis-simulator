@@ -498,6 +498,8 @@ def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
 # physics rather than resurrecting the old ceiling; do not retune.
 
 
+@pytest.mark.nightly
+@pytest.mark.timeout(1800)
 def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     first = _run_staged()
     second = _run_staged()
