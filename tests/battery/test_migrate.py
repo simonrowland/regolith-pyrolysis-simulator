@@ -10468,6 +10468,10 @@ def test_kume_activity_compositions_map_to_parent_oxide_basis(tmp_path: Path) ->
 
     # A chemically parseable but unsupported oxide must invalidate the whole
     # composition; mapping only the components we happen to recognise is lossy.
+    from simulator.battery.migrate import _kume_formula_unit_oxide
+
+    assert _kume_formula_unit_oxide("CuO") is None
+    assert _kume_formula_unit_oxide("PbO") is None
     source = REPO_ROOT / "data" / "literature" / "extracts" / name
     extract = yaml.safe_load(source.read_text(encoding="utf-8"))
     extract["source_id"] = "fixture-source"
@@ -10476,7 +10480,7 @@ def test_kume_activity_compositions_map_to_parent_oxide_basis(tmp_path: Path) ->
         for row in _extract_observations(name)
         if row.get("observation_id") == "kume_2000_table2_sample_101"
     )
-    raw_table2["values"]["composition_mole_fraction"]["ZnO"] = 0.001
+    raw_table2["values"]["composition_mole_fraction"]["CuO"] = 0.001
     for block in extract["species"].values():
         block["observations"] = [
             raw_table2

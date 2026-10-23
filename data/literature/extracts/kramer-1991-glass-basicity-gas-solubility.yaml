@@ -1,0 +1,278 @@
+schema_version: literature_extract.v1
+source_id: kramer-1991-glass-basicity-gas-solubility
+source:
+  citation: "Krämer FW (1991). Contribution to basicity of technical glass melts in relation to redox equilibria and gas solubilities. Glastechnische Berichte 64(3):71-80."
+  doi: 10.34657/14114
+  year: 1991
+  corpus_asset: raw/kramer-1991-glass-basicity-gas-solubility/kramer-1991-glass-basicity-gas-solubility.pdf
+extraction:
+  method: >-
+    Scanned paper; MinerU supplied the two tables and pdftotext-layout supplied the surrounding text. Both tables and all figure pages were checked against 600 dpi PDF renders. No printed quantity in the tables or figures has a matching store token: the redox ratios and solubilities occur only in deferred figures, while the author-defined acidity/basicity scales and fitted laws are not stored measurement quantities. All measured table numbers, plotted-series metadata, conditions and author fits are retained in context; no values were digitised from figures.
+  table_dispositions:
+    table_1: context-only; published oxide acid-value scales have no store quantity token
+    table_2: context-only; author-calculated glass basicity values have no store quantity token; inputs recorded in .agent-scratch/F31-tables/kramer-1991-glass-basicity-gas-solubility/table2.csv; derivation pending a corpus table asset (controller, t-1382)
+    figures_1_to_9: context-only; figure values deferred; figure 1 oxygen-ion activity and figures 6-9 gas solubilities have no store quantity token
+  date: '2026-10-20'
+  worker: fam31-1020
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: kramer_1991_table_1_acid_values
+      type: measured_table_context
+      locator: {page: 2, published_page: 72, pdf_page_index: 1, table: '1'}
+      attribution: cited literature values compiled by Kramer; references as printed in table
+      units: dimensionless scales as printed; table does not state units
+      reason: Printed oxide acid-value scales are measured or literature-reported descriptors, not any quantity represented by the store enums.
+      candidate_tokens: [activity, equilibrium_phase_composition]
+      values:
+        quantity_as_printed: acidic values of oxides and elements
+        quantity_token: unavailable
+        schema_gap: No existing quantity enum represents Dietzel, Duffy-Ingram, or Sun acidic-value scales.
+        rows:
+        - {oxide: B2O3, element: B, dietzel: '1.62 to 1.45', duffy_ingram: 2.4, sun: 119}
+        - {oxide: SiO2, element: Si, dietzel: '1.56 to 1.36', duffy_ingram: 2.1, sun: 106}
+        - {oxide: Al2O3, element: Al, dietzel: '0.97 to 0.84', duffy_ingram: 1.6, sun: '53 to 67'}
+        - {oxide: Sc2O3, element: Sc, dietzel: 0.65, duffy_ingram: unreported, sun: 60}
+        - {oxide: La2O3, element: La, dietzel: 0.43, duffy_ingram: unreported, sun: 58}
+        - {oxide: TiO2, element: Ti, dietzel: '1.25 to 0.89', duffy_ingram: unreported, sun: 73}
+        - {oxide: ZrO2, element: Zr, dietzel: '0.84 to 0.77', duffy_ingram: unreported, sun: 61}
+        - {oxide: As2O3, element: As, dietzel: 1.0, duffy_ingram: unreported, sun: '70 to 87'}
+        - {oxide: Sb2O3, element: Sb, dietzel: 0.73, duffy_ingram: unreported, sun: '68 to 85'}
+        - {oxide: ZnO, element: Zn, dietzel: '0.52 to 0.59', duffy_ingram: unreported, sun: 36}
+        - {oxide: BeO, element: Be, dietzel: 0.86, duffy_ingram: unreported, sun: 63}
+        - {oxide: MgO, element: Mg, dietzel: '0.45 to 0.51', duffy_ingram: 1.2, sun: 37}
+        - {oxide: CaO, element: Ca, dietzel: '0.35 to 0.33', duffy_ingram: 1.0, sun: 32}
+        - {oxide: SrO, element: Sr, dietzel: 0.27, duffy_ingram: unreported, sun: 32}
+        - {oxide: BaO, element: Ba, dietzel: 0.24, duffy_ingram: 0.87, sun: 33}
+        - {oxide: Li2O, element: Li, dietzel: 0.23, duffy_ingram: 1.0, sun: 36}
+        - {oxide: Na2O, element: Na, dietzel: 0.18, duffy_ingram: 0.87, sun: 20}
+        - {oxide: K2O, element: K, dietzel: 0.13, duffy_ingram: 0.67, sun: 13}
+        - {oxide: Rb2O, element: Rb, dietzel: 0.12, duffy_ingram: unreported, sun: 12}
+        - {oxide: Cs2O, element: Cs, dietzel: 0.10, duffy_ingram: 0.60, sun: 10}
+        column_note: Table columns are Dietzel, Duffy and Ingram, and Sun. Numeric ranges are transcribed as printed; dashes are unreported, not zero.
+    - observation_id: kramer_1991_table_2_glass_basicities
+      type: model_derived_table_context
+      locator: {page: 3, published_page: 73, pdf_page_index: 2, table: '2'}
+      attribution: present work
+      units: basicity number B, dimensionless
+      reason: Kramer calculated B from glass composition using the author-defined scale; the fitted/derived basicity is context, not a measured store quantity.
+      candidate_tokens: [activity, equilibrium_phase_composition]
+      values:
+        quantity_as_printed: basicity number B of selected glass compositions
+        quantity_token: unavailable
+        schema_gap: No existing quantity enum represents the author-defined basicity number.
+        derivation: Basicity B is calculated as 119 minus the acidic value of the glass (equation 5).
+        derivation_status: derivation pending a corpus table asset (controller, t-1382)
+        inputs_csv: .agent-scratch/F31-tables/kramer-1991-glass-basicity-gas-solubility/table2.csv
+        rows:
+        - {glass: boron acid, composition_as_printed: boron acid, B: 0}
+        - {glass: silica, composition_as_printed: silica, B: 13}
+        - {glass: sodium borate, composition_as_printed: '20 mol% Na2O; 80 mol% B2O3', B: 19.8}
+        - {glass: sodium silicate, composition_as_printed: '20 mol% Na2O; 80 mol% SiO2', B: 30.2}
+        - {glass: potassium silicate, composition_as_printed: '20 mol% K2O; 80 mol% SiO2', B: 31.6}
+        - {glass: soda-lime silicate, composition_as_printed: '16 mol% Na2O; 10 mol% CaO; 74 mol% SiO2', B: 34.2}
+        - {glass: borosilicate glass, composition_as_printed: not_printed, B: 15.6}
+        - {glass: neutral tube glass, composition_as_printed: not_printed, B: 20.4}
+        - {glass: tv screen glass, composition_as_printed: not_printed, B: 35.6}
+    - observation_id: kramer_1991_figure_1_oxygen_ion_activity
+      type: figure_record
+      locator: {page: 3, published_page: 73, pdf_page_index: 2, figure: '1'}
+      panel: whole_figure
+      attribution: quoted_attributed, reference [7] Holmquist (1968)
+      units: activity as printed
+      values:
+        quantity_as_printed: mole fraction (activity) of free oxygen ions, a_O2-
+        quantity_token: unavailable
+        schema_gap: No existing quantity enum represents free oxygen-ion activity in glass melts.
+        species: [O2-]
+        phase: glass melt
+        temperature_as_printed: not stated in figure caption
+        axes_as_printed: {x: 'Basicity number B', y: 'Mole fractions (activity) of free oxygen ions, a_O2-'}
+        caption: 'Mole fractions (activity) of free oxygen ions, a_O2-, as function of B according to [7].'
+        series: [{name: 'reference [7]', marker: star, marker_count: 7}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: kramer_1991_figure_7_water_solubility
+      type: figure_record
+      locator: {page: 7, published_page: 77, pdf_page_index: 6, figure: '7'}
+      panel: whole_figure
+      attribution: quoted_attributed, reference [8] Franz and Scholze (1963)
+      units: 10^-3 g/(cm3 bar^1/2), as stated in text
+      values:
+        quantity_as_printed: water-vapour solubility S_H2O
+        quantity_token: unavailable
+        schema_gap: No existing quantity enum represents dissolved-water concentration/solubility in glass melt.
+        species: [H2O]
+        phase: alkali silicate glass melts
+        temperature_as_printed: 1480 °C
+        pressure_as_printed: pH2O = 1 bar
+        axes_as_printed: {x: 'Basicity number B', y: 'Water solubility as plotted'}
+        caption: 'Water solubility in binary and ternary alkali silicate melts as a function of the basicity numbers, B, according to [8].'
+        series:
+        - {name: lithium silicate, marker: circle, marker_count: 12}
+        - {name: sodium silicate, marker: plus, marker_count: 11}
+        - {name: potassium silicate, marker: star, marker_count: 7}
+        - {name: potassium-lithium silicate, marker: square, marker_count: 4}
+        - {name: potassium-sodium silicate, marker: x, marker_count: 2}
+        points: []
+      reported_fit_context: log S_H2O = -1.483 + 1.349 log B; S_H2O scale 10^-3 g/(cm3 bar^1/2); equation 37, author fit to values of [8].
+      digitisation: deferred to a figure pass
+    - observation_id: kramer_1991_figure_8_carbon_dioxide_solubility
+      type: figure_record
+      locator: {page: 8, published_page: 78, pdf_page_index: 7, figure: '8'}
+      panel: whole_figure
+      attribution: quoted_attributed, references [10] and [11]
+      units: wt% CO3^2-/bar, as stated in text
+      values:
+        quantity_as_printed: carbon dioxide solubility expressed as carbonate, S_CO3^2-
+        quantity_token: unavailable
+        schema_gap: No existing quantity enum represents dissolved-carbonate concentration/solubility in glass melt.
+        species: [CO3^2-]
+        phase: binary alkali silicate and borate melts
+        temperature_as_printed: 1000, 1100, 1200, and 1300 °C
+        axes_as_printed: {x: 'Basicity number B', y: 'S_CO3^2- in wt%/bar'}
+        caption: 'CO2 solubility in binary alkali silicate and borate melts as a function of basicity numbers, B, according to [10 and 11] for silicate (s) and borate (b) melts.'
+        series:
+        - {name: silicate 1000 °C, marker: circle, marker_count: 5}
+        - {name: silicate 1100 °C, marker: plus, marker_count: 5}
+        - {name: silicate 1200 °C, marker: star, marker_count: 5}
+        - {name: silicate 1300 °C, marker: open square, marker_count: 4}
+        - {name: borate 1000 °C, marker: x, marker_count: 6}
+        - {name: borate 1100 °C, marker: diamond, marker_count: 5}
+        - {name: borate 1200 °C, marker: open triangle, marker_count: 4}
+        - {name: 'reference [49] 1000 °C', marker: x, marker_count: 1}
+        points: []
+      reported_fit_context: >-
+        Author fits: for 26 < B < 40 at 1000 °C, log S_CO3^2- = -9.1 + 4.63 log B (equation 40); for soda-lime-silica at 1300 °C, log S_CO3^2- = -13.1 + 5.74 log B (equation 41). For B > 40, equations 42-45 give 1000 °C: -30.28 + 17.46 log B; 1100 °C: -35.46 + 20.28 log B; 1200 °C: -41.16 + 23.29 log B; 1300 °C: -39.86 + 22.12 log B. These are author fits to literature data, not digitised points.
+      digitisation: deferred to a figure pass
+    - observation_id: kramer_1991_figure_9_sulfur_trioxide_content
+      type: figure_record
+      locator: {page: 9, published_page: 79, pdf_page_index: 8, figure: '9'}
+      panel: whole_figure
+      attribution: quoted_attributed, reference [9] Holmquist (1966)
+      units: wt% SO3
+      values:
+        quantity_as_printed: SO3 content of sodium silicate melts
+        quantity_token: unavailable
+        schema_gap: No existing quantity enum represents dissolved-SO3 concentration in glass melt.
+        species: [SO3]
+        phase: sodium silicate melt
+        temperature_as_printed: 1200 °C
+        pressure_as_printed: pSO2 · pO2^1/2 = 2 × 10^-4 bar^3/2; the corresponding carrier gas is 0.4 vol% SO2 and 0.25 vol% O2
+        axes_as_printed: {x: 'Basicity number B', y: 'Amount of SO3 in wt%'}
+        caption: 'Amount of SO3 in sodium silicate melts at 1200 °C as a function of the basicity numbers, B, according to [9], at the printed constant pSO2 · pO2^1/2 condition.'
+        series: [{name: 'reference [9]', marker: star, marker_count: 5}]
+        points: []
+      reported_fit_context: log A_SO3 = -23.68 + 14.76 log B at 1200 °C and pO2^1/2 pSO2 = 2 × 10^-4 bar^3/2 (equation 48); author regression, not a digitised observation.
+      digitisation: deferred to a figure pass
+    - observation_id: kramer_1991_figure_2_redox_ratios
+      type: figure_record
+      locator: {page: 4, published_page: 74, pdf_page_index: 3, figure: '2'}
+      panel: [a, b]
+      attribution: quoted_attributed, references [24] and [27]
+      units: valence ratios, plotted logarithmically
+      values:
+        quantity_as_printed: Fe3+/Fe2+ and As5+/As3+ redox ratios
+        quantity_token: valence_ratio
+        species: [Fe, As]
+        phase: alkali silicate glass melts
+        temperature_as_printed: 1400 °C
+        atmosphere_as_printed: air
+        axes_by_panel: {a: {x: 'Basicity number B', y: 'Fe3+/Fe2+'}, b: {x: 'Basicity number B', y: 'As5+/As3+'}}
+        caption: Fe3+/Fe2+ and As5+/As3+ ratios as a function of basicity in alkali silicate melts.
+        series:
+        - {panel: a, name: sodium silicate, marker: circle, marker_count: 6}
+        - {panel: a, name: potassium silicate, marker: plus, marker_count: 4}
+        - {panel: a, name: lithium silicate, marker: star, marker_count: 4}
+        - {panel: b, name: sodium silicate, marker: circle, marker_count: 6}
+        - {panel: b, name: potassium silicate, marker: plus, marker_count: 5}
+        - {panel: b, name: lithium silicate, marker: star, marker_count: 5}
+        points: []
+      reported_fit_context: log(Fe3+/Fe2+) = -3.75 + 2.86 log B (r=0.97); log(As5+/As3+) = -6.27 + 4.15 log B (r=0.98). Author fits to cited literature, not digitised observations.
+      digitisation: deferred to a figure pass
+    - observation_id: kramer_1991_figure_3_antimony_redox
+      type: figure_record
+      locator: {page: 5, published_page: 75, pdf_page_index: 4, figure: '3'}
+      panel: whole_figure
+      attribution: quoted_attributed, references [41] and [42]
+      units: valence ratio, plotted logarithmically
+      values:
+        quantity_as_printed: Sb5+/Sb3+ redox ratio
+        quantity_token: valence_ratio
+        species: [Sb]
+        phase: sodium borate melt
+        temperature_as_printed: 900 °C
+        atmosphere_as_printed: oxygen partial pressure 0.15 kPa
+        axes_as_printed: {x: 'Basicity number B', y: 'Sb5+/Sb3+'}
+        caption: Sb5+/Sb3+ ratio in alkali borate melts at 900 °C.
+        series: [{name: sodium borate, marker: star, marker_count: 4}]
+        points: []
+      reported_fit_context: log(Sb5+/Sb3+) = -4.13 + 3.2 log B (r=0.99); author fit, not digitised observations.
+      digitisation: deferred to a figure pass
+    - observation_id: kramer_1991_figure_4_multivalent_redox
+      type: figure_record
+      locator: {page: 5, published_page: 75, pdf_page_index: 4, figure: '4'}
+      panel: [a, b]
+      attribution: quoted_attributed, references [25], [26], and [39]
+      units: valence ratios, plotted logarithmically
+      values:
+        quantity_as_printed: Ce4+/Ce3+ and Cr6+/Cr3+ redox ratios
+        quantity_token: valence_ratio
+        species: [Ce, Cr]
+        phase: alkali borate and silicate melts
+        temperature_as_printed: Ce borates 1100 °C and silicates 1400 °C; Cr silicates 1400 °C and sodium borate 1000 °C
+        atmosphere_as_printed: air
+        axes_by_panel: {a: {x: 'Basicity number B', y: 'Ce4+/Ce3+'}, b: {x: 'Basicity number B', y: 'Cr6+/Cr3+'}}
+        caption: Ce4+/Ce3+ and Cr6+/Cr3+ ratios as functions of basicity in alkali borate and silicate melts.
+        series:
+        - {panel: a, name: sodium series, marker: circle, marker_count: 5}
+        - {panel: a, name: potassium series, marker: plus, marker_count: 4}
+        - {panel: a, name: lithium series, marker: star, marker_count: 3}
+        - {panel: b, name: sodium silicate, marker: circle, marker_count: 5}
+        - {panel: b, name: potassium silicate, marker: plus, marker_count: 5}
+        - {panel: b, name: lithium silicate, marker: star, marker_count: 5}
+        points: []
+      reported_fit_context: >-
+        Author fits: Ce borate data log(Ce4+/Ce3+) = -2.54 + 1.51 log B; Ce silicate data = -7.15 + 4.25 log B (both r=0.99). Cr sodium silicate = -10.51 + 6.66 log B; Cr sodium borate = -1.97 + 1.2 log B. Fits are context, not digitised observations.
+      digitisation: deferred to a figure pass
+    - observation_id: kramer_1991_figure_5_manganese_redox
+      type: figure_record
+      locator: {page: 6, published_page: 76, pdf_page_index: 5, figure: '5'}
+      panel: whole_figure
+      attribution: quoted_attributed, reference [29] Paul and Lahiri
+      units: valence ratio, plotted logarithmically
+      values:
+        quantity_as_printed: Mn3+/Mn2+ redox ratio
+        quantity_token: valence_ratio
+        species: [Mn]
+        phase: alkali borate melts
+        temperature_as_printed: 900 °C
+        axes_as_printed: {x: 'Basicity number B', y: 'Mn3+/Mn2+'}
+        caption: Mn3+/Mn2+ ratio as a function of basicity in alkali borate melts.
+        series: [{name: sodium borate, marker: circle, marker_count: 5}, {name: potassium borate, marker: plus, marker_count: 5}, {name: lithium borate, marker: star, marker_count: 4}]
+        points: []
+      reported_fit_context: log(Mn3+/Mn2+) = -5.04 + 2.94 log B for sodium borate at 900 °C; author fit, not digitised observations.
+      digitisation: deferred to a figure pass
+    - observation_id: kramer_1991_figure_6_oxygen_solubility
+      type: figure_record
+      locator: {page: 7, published_page: 77, pdf_page_index: 6, figure: '6'}
+      panel: whole_figure
+      attribution: present work, author-calculated curves
+      units: oxygen solubility as plotted
+      values:
+        quantity_as_printed: oxygen solubility in glass melts
+        quantity_token: unavailable
+        schema_gap: No existing quantity enum represents dissolved oxygen solubility in glass melt.
+        species: [O2]
+        phase: glass melt
+        temperature_as_printed: temperature-dependent curves; individual temperatures not labelled in caption
+        pressure_as_printed: pO2 = 1 bar
+        axes_as_printed: {x: 'Temperature in °C', y: 'Oxygen solubility'}
+        caption: Oxygen solubility in a glass melt with an antimony redox equilibrium for pO2 = 1 bar as a function of temperature for several basicity numbers.
+        series: [{name: B=15.6, marker: circle, marker_count: 13}, {name: B=20.4, marker: plus, marker_count: 13}, {name: B=34.1, marker: star, marker_count: 13}, {name: B=35.6, marker: open square, marker_count: 13}]
+        points: []
+      reported_model_context: >-
+        The author calculates saturation solubility S_O2 at oxygen fugacity 1 bar, density 2.3 g/cm3, c=0.50 wt% Sb2O3, and basicity B=34.1 using ln(k2(T)) = -37 290 800/T^2 + 25 962.5/T - 0.21 244 (equations 31-32; references [41,42]) and S_O2 = 0.00125·w/(1+w), where w=B^3/(34.1^3·k2(T,Sb,B')) (equation 33). S_O2 is in g O2/(cm3 bar^1/2). These are author-calculated curves, not measured points.
+      digitisation: deferred to a figure pass
