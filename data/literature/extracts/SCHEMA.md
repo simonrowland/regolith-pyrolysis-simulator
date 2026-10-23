@@ -415,10 +415,9 @@ values:
   method_class: measured_direct
 ```
 
-Shape only. The numeric example is not a seated extract. No seated extract
-prints `quantity: element_fraction_remaining` at this diff. Rows that print
-`f_Mg` inside a custom `runs` map are not this token until a later extract
-uses the fields above.
+Shape only. The numeric example is not a seated extract. Rows that print
+`f_Mg` inside a custom `runs` map are not this token until an extract uses
+the fields above.
 
 ## The `context` container (d-032 owner ruling, 2026-09-21)
 

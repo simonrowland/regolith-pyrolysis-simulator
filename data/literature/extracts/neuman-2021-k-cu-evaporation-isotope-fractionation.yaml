@@ -46,9 +46,6 @@ extraction:
       P2O5: '0.02'
     sum_wt_pct: '98.97'
   table_2_printed_run_count: 20
-  table_2_fraction_remaining_schema_gap: The printed values are (element/Ca)/(element/Ca)0 ratios, with RSD in percent.
-    They can exceed 1.0 and are not mass-loss fractions. No fraction-remaining quantity token exists; retained in
-    series as explicitly typed-refused context.
   method_schema_gap: The closed method tokens do not include evaporation in a 1-atm gas-mixing furnace. The printed
     apparatus/regime description is retained; no vacuum, Langmuir, or KEMS token is substituted.
   table_3_model_derived_context:
@@ -294,8 +291,6 @@ species:
         starting_material_composition_locator: *id001
         quench_status: asserted_preserved
         quench_statement_locator: *id006
-        fraction_remaining_schema_gap: No quantity token represents the printed Ca-normalized element ratio remaining;
-          mass_loss_fraction is semantically wrong.
         series:
         - run: 8B13A
           T_C: '1300'
@@ -305,9 +300,6 @@ species:
           delta_K_printed: '0.051'
           isotope_delta_isotope_delta: '0.051'
           sigma: '0.08'
-          fraction_remaining_ratio_as_printed: '0.959'
-          fraction_remaining_RSD_percent_as_printed: '1.03'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id027
             temperature_K:
               state:
@@ -381,9 +373,6 @@ species:
           delta_K_printed: '0.026'
           isotope_delta_isotope_delta: '0.026'
           sigma: '0.10'
-          fraction_remaining_ratio_as_printed: '0.969'
-          fraction_remaining_RSD_percent_as_printed: '0.86'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id028
             temperature_K:
               state:
@@ -457,9 +446,6 @@ species:
           delta_K_printed: '0.059'
           isotope_delta_isotope_delta: '0.059'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.975'
-          fraction_remaining_RSD_percent_as_printed: '2.21'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id029
             temperature_K:
               state:
@@ -533,9 +519,6 @@ species:
           delta_K_printed: '0.071'
           isotope_delta_isotope_delta: '0.071'
           sigma: '0.10'
-          fraction_remaining_ratio_as_printed: '0.973'
-          fraction_remaining_RSD_percent_as_printed: '1.47'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id030
             temperature_K:
               state:
@@ -609,9 +592,6 @@ species:
           delta_K_printed: '-0.005'
           isotope_delta_isotope_delta: '-0.005'
           sigma: '0.08'
-          fraction_remaining_ratio_as_printed: '0.996'
-          fraction_remaining_RSD_percent_as_printed: '2.44'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id031
             temperature_K:
               state:
@@ -685,9 +665,6 @@ species:
           delta_K_printed: '0.101'
           isotope_delta_isotope_delta: '0.101'
           sigma: '0.08'
-          fraction_remaining_ratio_as_printed: '0.964'
-          fraction_remaining_RSD_percent_as_printed: '1.09'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id032
             temperature_K:
               state:
@@ -761,9 +738,6 @@ species:
           delta_K_printed: '0.177'
           isotope_delta_isotope_delta: '0.177'
           sigma: '0.06'
-          fraction_remaining_ratio_as_printed: '0.947'
-          fraction_remaining_RSD_percent_as_printed: '0.83'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id033
             temperature_K:
               state:
@@ -837,9 +811,6 @@ species:
           delta_K_printed: '0.153'
           isotope_delta_isotope_delta: '0.153'
           sigma: '0.08'
-          fraction_remaining_ratio_as_printed: '0.935'
-          fraction_remaining_RSD_percent_as_printed: '0.83'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id034
             temperature_K:
               state:
@@ -913,9 +884,6 @@ species:
           delta_K_printed: '0.257'
           isotope_delta_isotope_delta: '0.257'
           sigma: '0.09'
-          fraction_remaining_ratio_as_printed: '0.937'
-          fraction_remaining_RSD_percent_as_printed: '1.23'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id035
             temperature_K:
               state:
@@ -989,9 +957,6 @@ species:
           delta_K_printed: '0.150'
           isotope_delta_isotope_delta: '0.150'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.958'
-          fraction_remaining_RSD_percent_as_printed: '0.94'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id036
             temperature_K:
               state:
@@ -1065,9 +1030,6 @@ species:
           delta_K_printed: '0.163'
           isotope_delta_isotope_delta: '0.163'
           sigma: '0.08'
-          fraction_remaining_ratio_as_printed: '0.965'
-          fraction_remaining_RSD_percent_as_printed: '0.90'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id037
             temperature_K:
               state:
@@ -1141,9 +1103,6 @@ species:
           delta_K_printed: '0.229'
           isotope_delta_isotope_delta: '0.229'
           sigma: '0.08'
-          fraction_remaining_ratio_as_printed: '0.962'
-          fraction_remaining_RSD_percent_as_printed: '0.86'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id038
             temperature_K:
               state:
@@ -1217,9 +1176,6 @@ species:
           delta_K_printed: '0.139'
           isotope_delta_isotope_delta: '0.139'
           sigma: '0.08'
-          fraction_remaining_ratio_as_printed: '0.949'
-          fraction_remaining_RSD_percent_as_printed: '1.64'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id039
             temperature_K:
               state:
@@ -1293,9 +1249,6 @@ species:
           delta_K_printed: '0.181'
           isotope_delta_isotope_delta: '0.181'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.940'
-          fraction_remaining_RSD_percent_as_printed: '0.86'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id040
             temperature_K:
               state:
@@ -1369,9 +1322,6 @@ species:
           delta_K_printed: '0.494'
           isotope_delta_isotope_delta: '0.494'
           sigma: '0.08'
-          fraction_remaining_ratio_as_printed: '0.919'
-          fraction_remaining_RSD_percent_as_printed: '1.45'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id041
             temperature_K:
               state:
@@ -1445,9 +1395,6 @@ species:
           delta_K_printed: '0.190'
           isotope_delta_isotope_delta: '0.190'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.951'
-          fraction_remaining_RSD_percent_as_printed: '1.08'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id042
             temperature_K:
               state:
@@ -1521,9 +1468,6 @@ species:
           delta_K_printed: '0.145'
           isotope_delta_isotope_delta: '0.145'
           sigma: '0.08'
-          fraction_remaining_ratio_as_printed: '0.966'
-          fraction_remaining_RSD_percent_as_printed: '0.90'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id043
             temperature_K:
               state:
@@ -1597,9 +1541,6 @@ species:
           delta_K_printed: '0.451'
           isotope_delta_isotope_delta: '0.451'
           sigma: '0.10'
-          fraction_remaining_ratio_as_printed: '0.931'
-          fraction_remaining_RSD_percent_as_printed: '1.91'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id044
             temperature_K:
               state:
@@ -1673,9 +1614,6 @@ species:
           delta_K_printed: '0.637'
           isotope_delta_isotope_delta: '0.637'
           sigma: '0.08'
-          fraction_remaining_ratio_as_printed: '0.897'
-          fraction_remaining_RSD_percent_as_printed: '1.52'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id045
             temperature_K:
               state:
@@ -1749,9 +1687,6 @@ species:
           delta_K_printed: '1.373'
           isotope_delta_isotope_delta: '1.373'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.805'
-          fraction_remaining_RSD_percent_as_printed: '0.83'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: &id046
             temperature_K:
               state:
@@ -1817,6 +1752,156 @@ species:
                 tag: value
                 value: CO-CO2 gas mixture
               locator: *id003
+    - observation_id: neuman_2021_table2_k_fraction_remaining
+      experiment: ortenberg-basalt-1atm-series
+      type: concentration_series
+      locator: *id004
+      phase: glass
+      regime: 1_atm_gas_mixing_furnace
+      units: dimensionless
+      uncertainty:
+        note: Table 2 column headers mark RSD in percent; footnote c defines RSD as relative standard deviation.
+        confidence_level: not_stated
+        locator: *id004
+      values:
+        quantity: element_fraction_remaining
+        element: K
+        basis_as_printed: '(K/Ca)/(K/Ca)0'
+        normalising_element: Ca
+        retention_assumption: The authors assume that Ca is quantitatively retained in melts during the experimental runs.
+        starting_composition: Ortenberg basalt; oxide composition and trace-element analyses are in Table 1
+        pressure: {value: 1, unit: atm}
+        sample_mass: {value: 'approximately 250', unit: mg}
+        sample_geometry: {value: 'pre-baked alumina crucible, OD 8 mm, ID 6 mm'}
+        method_class: measured_reduced
+        derivation:
+          relation: Ratios of measured K/Ca intensities in evaporation residue and starting material give the printed fraction remaining.
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: *id004
+        series:
+        - run: 8B13A
+          T_C: '1300'
+          duration_h: '45.6'
+          fraction_remaining: '0.959'
+          RSD_percent_as_printed: '1.03'
+          point_conditions: *id027
+        - run: 17B13A
+          T_C: '1300'
+          duration_h: '72.2'
+          fraction_remaining: '0.969'
+          RSD_percent_as_printed: '0.86'
+          point_conditions: *id028
+        - run: 10B13A
+          T_C: '1301'
+          duration_h: '118.5'
+          fraction_remaining: '0.975'
+          RSD_percent_as_printed: '2.21'
+          point_conditions: *id029
+        - run: 9B13A
+          T_C: '1302'
+          duration_h: '168.2'
+          fraction_remaining: '0.973'
+          RSD_percent_as_printed: '1.47'
+          point_conditions: *id030
+        - run: 13B13A
+          T_C: '1301'
+          duration_h: '189.2'
+          fraction_remaining: '0.996'
+          RSD_percent_as_printed: '2.44'
+          point_conditions: *id031
+        - run: 27B14
+          T_C: '1378'
+          duration_h: '48.3'
+          fraction_remaining: '0.964'
+          RSD_percent_as_printed: '1.09'
+          point_conditions: *id032
+        - run: 24B14A
+          T_C: '1379'
+          duration_h: '95.9'
+          fraction_remaining: '0.947'
+          RSD_percent_as_printed: '0.83'
+          point_conditions: *id033
+        - run: 28B14
+          T_C: '1378'
+          duration_h: '120.0'
+          fraction_remaining: '0.935'
+          RSD_percent_as_printed: '0.83'
+          point_conditions: *id034
+        - run: 20B14A
+          T_C: '1379'
+          duration_h: '169.2'
+          fraction_remaining: '0.937'
+          RSD_percent_as_printed: '1.23'
+          point_conditions: *id035
+        - run: 19B14A
+          T_C: '1400'
+          duration_h: '48.2'
+          fraction_remaining: '0.958'
+          RSD_percent_as_printed: '0.94'
+          point_conditions: *id036
+        - run: 18B13
+          T_C: '1301'
+          duration_h: '48.0'
+          fraction_remaining: '0.965'
+          RSD_percent_as_printed: '0.90'
+          point_conditions: *id037
+        - run: 16B13
+          T_C: '1301'
+          duration_h: '47.9'
+          fraction_remaining: '0.962'
+          RSD_percent_as_printed: '0.86'
+          point_conditions: *id038
+        - run: 15B13
+          T_C: '1300'
+          duration_h: '48.0'
+          fraction_remaining: '0.949'
+          RSD_percent_as_printed: '1.64'
+          point_conditions: *id039
+        - run: 14B13
+          T_C: '1301'
+          duration_h: '47.8'
+          fraction_remaining: '0.940'
+          RSD_percent_as_printed: '0.86'
+          point_conditions: *id040
+        - run: 12B13
+          T_C: '1301'
+          duration_h: '47.7'
+          fraction_remaining: '0.919'
+          RSD_percent_as_printed: '1.45'
+          point_conditions: *id041
+        - run: 21B14
+          T_C: '1401'
+          duration_h: '47.6'
+          fraction_remaining: '0.951'
+          RSD_percent_as_printed: '1.08'
+          point_conditions: *id042
+        - run: 22B14
+          T_C: '1401'
+          duration_h: '47.8'
+          fraction_remaining: '0.966'
+          RSD_percent_as_printed: '0.90'
+          point_conditions: *id043
+        - run: 23B14
+          T_C: '1401'
+          duration_h: '51.1'
+          fraction_remaining: '0.931'
+          RSD_percent_as_printed: '1.91'
+          point_conditions: *id044
+        - run: 25B14
+          T_C: '1401'
+          duration_h: '47.8'
+          fraction_remaining: '0.897'
+          RSD_percent_as_printed: '1.52'
+          point_conditions: *id045
+        - run: 26B14
+          T_C: '1401'
+          duration_h: '47.5'
+          fraction_remaining: '0.805'
+          RSD_percent_as_printed: '0.83'
+          point_conditions: *id046
+
   Cu:
     observations:
     - observation_id: neuman_2021_table2_cu_isotope_and_remaining_ratio
@@ -1844,8 +1929,6 @@ species:
         starting_material_composition_locator: *id001
         quench_status: asserted_preserved
         quench_statement_locator: *id006
-        fraction_remaining_schema_gap: No quantity token represents the printed Ca-normalized element ratio remaining;
-          mass_loss_fraction is semantically wrong.
         series:
         - run: 8B13A
           T_C: '1300'
@@ -1855,9 +1938,6 @@ species:
           delta_Cu_printed: '-0.153'
           isotope_delta_isotope_delta: '-0.153'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '1.031'
-          fraction_remaining_RSD_percent_as_printed: '1.15'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id027
         - run: 17B13A
           T_C: '1300'
@@ -1867,9 +1947,6 @@ species:
           delta_Cu_printed: '-0.070'
           isotope_delta_isotope_delta: '-0.070'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '1.052'
-          fraction_remaining_RSD_percent_as_printed: '1.58'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id028
         - run: 10B13A
           T_C: '1301'
@@ -1879,9 +1956,6 @@ species:
           delta_Cu_printed: '-0.198'
           isotope_delta_isotope_delta: '-0.198'
           sigma: '0.02'
-          fraction_remaining_ratio_as_printed: '1.002'
-          fraction_remaining_RSD_percent_as_printed: '1.48'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id029
         - run: 9B13A
           T_C: '1302'
@@ -1891,9 +1965,6 @@ species:
           delta_Cu_printed: '-0.317'
           isotope_delta_isotope_delta: '-0.317'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '0.983'
-          fraction_remaining_RSD_percent_as_printed: '0.44'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id030
         - run: 13B13A
           T_C: '1301'
@@ -1903,9 +1974,6 @@ species:
           delta_Cu_printed: '-0.202'
           isotope_delta_isotope_delta: '-0.202'
           sigma: '0.02'
-          fraction_remaining_ratio_as_printed: '1.032'
-          fraction_remaining_RSD_percent_as_printed: '1.21'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id031
         - run: 27B14
           T_C: '1378'
@@ -1915,9 +1983,6 @@ species:
           delta_Cu_printed: '-0.145'
           isotope_delta_isotope_delta: '-0.145'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '1.019'
-          fraction_remaining_RSD_percent_as_printed: '0.44'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id032
         - run: 24B14A
           T_C: '1379'
@@ -1927,9 +1992,6 @@ species:
           delta_Cu_printed: '-0.449'
           isotope_delta_isotope_delta: '-0.449'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '1.155'
-          fraction_remaining_RSD_percent_as_printed: '0.44'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id033
         - run: 28B14
           T_C: '1378'
@@ -1939,9 +2001,6 @@ species:
           delta_Cu_printed: '-0.248'
           isotope_delta_isotope_delta: '-0.248'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '1.019'
-          fraction_remaining_RSD_percent_as_printed: '0.87'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id034
         - run: 20B14A
           T_C: '1379'
@@ -1951,9 +2010,6 @@ species:
           delta_Cu_printed: '-0.373'
           isotope_delta_isotope_delta: '-0.373'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '1.218'
-          fraction_remaining_RSD_percent_as_printed: '0.71'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id035
         - run: 19B14A
           T_C: '1400'
@@ -1963,9 +2019,6 @@ species:
           delta_Cu_printed: '-0.491'
           isotope_delta_isotope_delta: '-0.491'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '0.955'
-          fraction_remaining_RSD_percent_as_printed: '0.44'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id036
         - run: 18B13
           T_C: '1301'
@@ -1975,9 +2028,6 @@ species:
           delta_Cu_printed: '0.347'
           isotope_delta_isotope_delta: '0.347'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '1.018'
-          fraction_remaining_RSD_percent_as_printed: '0.53'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id037
         - run: 16B13
           T_C: '1301'
@@ -1987,9 +2037,6 @@ species:
           delta_Cu_printed: '0.537'
           isotope_delta_isotope_delta: '0.537'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '1.021'
-          fraction_remaining_RSD_percent_as_printed: '0.42'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id038
         - run: 15B13
           T_C: '1300'
@@ -1999,9 +2046,6 @@ species:
           delta_Cu_printed: '5.469'
           isotope_delta_isotope_delta: '5.469'
           sigma: '0.02'
-          fraction_remaining_ratio_as_printed: '0.414'
-          fraction_remaining_RSD_percent_as_printed: '0.86'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id039
         - run: 14B13
           T_C: '1301'
@@ -2011,9 +2055,6 @@ species:
           delta_Cu_printed: null
           isotope_delta_isotope_delta: null
           sigma: null
-          fraction_remaining_ratio_as_printed: '0.072'
-          fraction_remaining_RSD_percent_as_printed: '0.73'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id040
         - run: 12B13
           T_C: '1301'
@@ -2023,9 +2064,6 @@ species:
           delta_Cu_printed: null
           isotope_delta_isotope_delta: null
           sigma: null
-          fraction_remaining_ratio_as_printed: '0.019'
-          fraction_remaining_RSD_percent_as_printed: '0.80'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id041
         - run: 21B14
           T_C: '1401'
@@ -2035,9 +2073,6 @@ species:
           delta_Cu_printed: '0.714'
           isotope_delta_isotope_delta: '0.714'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '0.853'
-          fraction_remaining_RSD_percent_as_printed: '0.42'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id042
         - run: 22B14
           T_C: '1401'
@@ -2047,9 +2082,6 @@ species:
           delta_Cu_printed: '1.534'
           isotope_delta_isotope_delta: '1.534'
           sigma: '0.03'
-          fraction_remaining_ratio_as_printed: '0.730'
-          fraction_remaining_RSD_percent_as_printed: '0.60'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id043
         - run: 23B14
           T_C: '1401'
@@ -2059,9 +2091,6 @@ species:
           delta_Cu_printed: '8.512'
           isotope_delta_isotope_delta: '8.512'
           sigma: '0.02'
-          fraction_remaining_ratio_as_printed: '0.094'
-          fraction_remaining_RSD_percent_as_printed: '1.74'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id044
         - run: 25B14
           T_C: '1401'
@@ -2071,9 +2100,6 @@ species:
           delta_Cu_printed: null
           isotope_delta_isotope_delta: null
           sigma: null
-          fraction_remaining_ratio_as_printed: '0.029'
-          fraction_remaining_RSD_percent_as_printed: '2.29'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id045
         - run: 26B14
           T_C: '1401'
@@ -2083,10 +2109,157 @@ species:
           delta_Cu_printed: null
           isotope_delta_isotope_delta: null
           sigma: null
-          fraction_remaining_ratio_as_printed: '0.024'
-          fraction_remaining_RSD_percent_as_printed: '0.67'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id046
+    - observation_id: neuman_2021_table2_cu_fraction_remaining
+      experiment: ortenberg-basalt-1atm-series
+      type: concentration_series
+      locator: *id004
+      phase: glass
+      regime: 1_atm_gas_mixing_furnace
+      units: dimensionless
+      uncertainty:
+        note: Table 2 column headers mark RSD in percent; footnote c defines RSD as relative standard deviation.
+        confidence_level: not_stated
+        locator: *id004
+      values:
+        quantity: element_fraction_remaining
+        element: Cu
+        basis_as_printed: '(Cu/Ca)/(Cu/Ca)0'
+        normalising_element: Ca
+        retention_assumption: The authors assume that Ca is quantitatively retained in melts during the experimental runs.
+        starting_composition: Ortenberg basalt; oxide composition and trace-element analyses are in Table 1
+        pressure: {value: 1, unit: atm}
+        sample_mass: {value: 'approximately 250', unit: mg}
+        sample_geometry: {value: 'pre-baked alumina crucible, OD 8 mm, ID 6 mm'}
+        method_class: measured_reduced
+        derivation:
+          relation: Ratios of measured Cu/Ca intensities in evaporation residue and starting material give the printed fraction remaining.
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: *id004
+        series:
+        - run: 8B13A
+          T_C: '1300'
+          duration_h: '45.6'
+          fraction_remaining: '1.031'
+          RSD_percent_as_printed: '1.15'
+          point_conditions: *id027
+        - run: 17B13A
+          T_C: '1300'
+          duration_h: '72.2'
+          fraction_remaining: '1.052'
+          RSD_percent_as_printed: '1.58'
+          point_conditions: *id028
+        - run: 10B13A
+          T_C: '1301'
+          duration_h: '118.5'
+          fraction_remaining: '1.002'
+          RSD_percent_as_printed: '1.48'
+          point_conditions: *id029
+        - run: 9B13A
+          T_C: '1302'
+          duration_h: '168.2'
+          fraction_remaining: '0.983'
+          RSD_percent_as_printed: '0.44'
+          point_conditions: *id030
+        - run: 13B13A
+          T_C: '1301'
+          duration_h: '189.2'
+          fraction_remaining: '1.032'
+          RSD_percent_as_printed: '1.21'
+          point_conditions: *id031
+        - run: 27B14
+          T_C: '1378'
+          duration_h: '48.3'
+          fraction_remaining: '1.019'
+          RSD_percent_as_printed: '0.44'
+          point_conditions: *id032
+        - run: 24B14A
+          T_C: '1379'
+          duration_h: '95.9'
+          fraction_remaining: '1.155'
+          RSD_percent_as_printed: '0.44'
+          point_conditions: *id033
+        - run: 28B14
+          T_C: '1378'
+          duration_h: '120.0'
+          fraction_remaining: '1.019'
+          RSD_percent_as_printed: '0.87'
+          point_conditions: *id034
+        - run: 20B14A
+          T_C: '1379'
+          duration_h: '169.2'
+          fraction_remaining: '1.218'
+          RSD_percent_as_printed: '0.71'
+          point_conditions: *id035
+        - run: 19B14A
+          T_C: '1400'
+          duration_h: '48.2'
+          fraction_remaining: '0.955'
+          RSD_percent_as_printed: '0.44'
+          point_conditions: *id036
+        - run: 18B13
+          T_C: '1301'
+          duration_h: '48.0'
+          fraction_remaining: '1.018'
+          RSD_percent_as_printed: '0.53'
+          point_conditions: *id037
+        - run: 16B13
+          T_C: '1301'
+          duration_h: '47.9'
+          fraction_remaining: '1.021'
+          RSD_percent_as_printed: '0.42'
+          point_conditions: *id038
+        - run: 15B13
+          T_C: '1300'
+          duration_h: '48.0'
+          fraction_remaining: '0.414'
+          RSD_percent_as_printed: '0.86'
+          point_conditions: *id039
+        - run: 14B13
+          T_C: '1301'
+          duration_h: '47.8'
+          fraction_remaining: '0.072'
+          RSD_percent_as_printed: '0.73'
+          point_conditions: *id040
+        - run: 12B13
+          T_C: '1301'
+          duration_h: '47.7'
+          fraction_remaining: '0.019'
+          RSD_percent_as_printed: '0.80'
+          point_conditions: *id041
+        - run: 21B14
+          T_C: '1401'
+          duration_h: '47.6'
+          fraction_remaining: '0.853'
+          RSD_percent_as_printed: '0.42'
+          point_conditions: *id042
+        - run: 22B14
+          T_C: '1401'
+          duration_h: '47.8'
+          fraction_remaining: '0.730'
+          RSD_percent_as_printed: '0.60'
+          point_conditions: *id043
+        - run: 23B14
+          T_C: '1401'
+          duration_h: '51.1'
+          fraction_remaining: '0.094'
+          RSD_percent_as_printed: '1.74'
+          point_conditions: *id044
+        - run: 25B14
+          T_C: '1401'
+          duration_h: '47.8'
+          fraction_remaining: '0.029'
+          RSD_percent_as_printed: '2.29'
+          point_conditions: *id045
+        - run: 26B14
+          T_C: '1401'
+          duration_h: '47.5'
+          fraction_remaining: '0.024'
+          RSD_percent_as_printed: '0.67'
+          point_conditions: *id046
+
   Zn:
     observations:
     - observation_id: neuman_2021_table2_zn_isotope_and_remaining_ratio
@@ -2114,8 +2287,6 @@ species:
         starting_material_composition_locator: *id001
         quench_status: asserted_preserved
         quench_statement_locator: *id006
-        fraction_remaining_schema_gap: No quantity token represents the printed Ca-normalized element ratio remaining;
-          mass_loss_fraction is semantically wrong.
         series:
         - run: 8B13A
           T_C: '1300'
@@ -2125,9 +2296,6 @@ species:
           delta_Zn_printed: '0.076'
           isotope_delta_isotope_delta: '0.076'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.610'
-          fraction_remaining_RSD_percent_as_printed: '0.39'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id027
         - run: 17B13A
           T_C: '1300'
@@ -2137,9 +2305,6 @@ species:
           delta_Zn_printed: '0.203'
           isotope_delta_isotope_delta: '0.203'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.532'
-          fraction_remaining_RSD_percent_as_printed: '1.73'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id028
         - run: 10B13A
           T_C: '1301'
@@ -2149,9 +2314,6 @@ species:
           delta_Zn_printed: '0.417'
           isotope_delta_isotope_delta: '0.417'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.436'
-          fraction_remaining_RSD_percent_as_printed: '2.37'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id029
         - run: 9B13A
           T_C: '1302'
@@ -2161,9 +2323,6 @@ species:
           delta_Zn_printed: '0.513'
           isotope_delta_isotope_delta: '0.513'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.360'
-          fraction_remaining_RSD_percent_as_printed: '0.63'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id030
         - run: 13B13A
           T_C: '1301'
@@ -2173,9 +2332,6 @@ species:
           delta_Zn_printed: '0.514'
           isotope_delta_isotope_delta: '0.514'
           sigma: '0.11'
-          fraction_remaining_ratio_as_printed: '0.353'
-          fraction_remaining_RSD_percent_as_printed: '1.12'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id031
         - run: 27B14
           T_C: '1378'
@@ -2185,9 +2341,6 @@ species:
           delta_Zn_printed: '0.178'
           isotope_delta_isotope_delta: '0.178'
           sigma: '0.08'
-          fraction_remaining_ratio_as_printed: '0.349'
-          fraction_remaining_RSD_percent_as_printed: '0.58'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id032
         - run: 24B14A
           T_C: '1379'
@@ -2197,9 +2350,6 @@ species:
           delta_Zn_printed: '0.030'
           isotope_delta_isotope_delta: '0.030'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.328'
-          fraction_remaining_RSD_percent_as_printed: '1.14'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id033
         - run: 28B14
           T_C: '1378'
@@ -2209,9 +2359,6 @@ species:
           delta_Zn_printed: '0.063'
           isotope_delta_isotope_delta: '0.063'
           sigma: '0.06'
-          fraction_remaining_ratio_as_printed: '0.297'
-          fraction_remaining_RSD_percent_as_printed: '0.60'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id034
         - run: 20B14A
           T_C: '1379'
@@ -2221,9 +2368,6 @@ species:
           delta_Zn_printed: '0.167'
           isotope_delta_isotope_delta: '0.167'
           sigma: '0.09'
-          fraction_remaining_ratio_as_printed: '0.261'
-          fraction_remaining_RSD_percent_as_printed: '0.59'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id035
         - run: 19B14A
           T_C: '1400'
@@ -2233,9 +2377,6 @@ species:
           delta_Zn_printed: '0.084'
           isotope_delta_isotope_delta: '0.084'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.347'
-          fraction_remaining_RSD_percent_as_printed: '1.09'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id036
         - run: 18B13
           T_C: '1301'
@@ -2245,9 +2386,6 @@ species:
           delta_Zn_printed: '2.548'
           isotope_delta_isotope_delta: '2.548'
           sigma: '0.07'
-          fraction_remaining_ratio_as_printed: '0.446'
-          fraction_remaining_RSD_percent_as_printed: '0.49'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id037
         - run: 16B13
           T_C: '1301'
@@ -2257,9 +2395,6 @@ species:
           delta_Zn_printed: '4.400'
           isotope_delta_isotope_delta: '4.400'
           sigma: '0.11'
-          fraction_remaining_ratio_as_printed: '0.309'
-          fraction_remaining_RSD_percent_as_printed: '0.54'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id038
         - run: 15B13
           T_C: '1300'
@@ -2269,9 +2404,6 @@ species:
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
           sigma: null
-          fraction_remaining_ratio_as_printed: '0.059'
-          fraction_remaining_RSD_percent_as_printed: '1.15'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id039
         - run: 14B13
           T_C: '1301'
@@ -2281,9 +2413,6 @@ species:
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
           sigma: null
-          fraction_remaining_ratio_as_printed: '0.034'
-          fraction_remaining_RSD_percent_as_printed: '0.65'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id040
         - run: 12B13
           T_C: '1301'
@@ -2293,9 +2422,6 @@ species:
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
           sigma: null
-          fraction_remaining_ratio_as_printed: '0.032'
-          fraction_remaining_RSD_percent_as_printed: '1.60'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id041
         - run: 21B14
           T_C: '1401'
@@ -2305,9 +2431,6 @@ species:
           delta_Zn_printed: '3.131'
           isotope_delta_isotope_delta: '3.131'
           sigma: '0.06'
-          fraction_remaining_ratio_as_printed: '0.203'
-          fraction_remaining_RSD_percent_as_printed: '0.46'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id042
         - run: 22B14
           T_C: '1401'
@@ -2317,9 +2440,6 @@ species:
           delta_Zn_printed: '5.960'
           isotope_delta_isotope_delta: '5.960'
           sigma: '0.06'
-          fraction_remaining_ratio_as_printed: '0.089'
-          fraction_remaining_RSD_percent_as_printed: '0.42'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id043
         - run: 23B14
           T_C: '1401'
@@ -2329,9 +2449,6 @@ species:
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
           sigma: null
-          fraction_remaining_ratio_as_printed: '0.034'
-          fraction_remaining_RSD_percent_as_printed: '2.42'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id044
         - run: 25B14
           T_C: '1401'
@@ -2341,9 +2458,6 @@ species:
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
           sigma: null
-          fraction_remaining_ratio_as_printed: '0.039'
-          fraction_remaining_RSD_percent_as_printed: '1.67'
-          fraction_remaining_quantity_status: typed_refusal
           point_conditions: *id045
         - run: 26B14
           T_C: '1401'
@@ -2353,7 +2467,153 @@ species:
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
           sigma: null
-          fraction_remaining_ratio_as_printed: '0.027'
-          fraction_remaining_RSD_percent_as_printed: '5.27'
-          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id046
+    - observation_id: neuman_2021_table2_zn_fraction_remaining
+      experiment: ortenberg-basalt-1atm-series
+      type: concentration_series
+      locator: *id004
+      phase: glass
+      regime: 1_atm_gas_mixing_furnace
+      units: dimensionless
+      uncertainty:
+        note: Table 2 column headers mark RSD in percent; footnote c defines RSD as relative standard deviation.
+        confidence_level: not_stated
+        locator: *id004
+      values:
+        quantity: element_fraction_remaining
+        element: Zn
+        basis_as_printed: '(Zn/Ca)/(Zn/Ca)0'
+        normalising_element: Ca
+        retention_assumption: The authors assume that Ca is quantitatively retained in melts during the experimental runs.
+        starting_composition: Ortenberg basalt; oxide composition and trace-element analyses are in Table 1
+        pressure: {value: 1, unit: atm}
+        sample_mass: {value: 'approximately 250', unit: mg}
+        sample_geometry: {value: 'pre-baked alumina crucible, OD 8 mm, ID 6 mm'}
+        method_class: measured_reduced
+        derivation:
+          relation: Ratios of measured Zn/Ca intensities in evaporation residue and starting material give the printed fraction remaining.
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: *id004
+        series:
+        - run: 8B13A
+          T_C: '1300'
+          duration_h: '45.6'
+          fraction_remaining: '0.610'
+          RSD_percent_as_printed: '0.39'
+          point_conditions: *id027
+        - run: 17B13A
+          T_C: '1300'
+          duration_h: '72.2'
+          fraction_remaining: '0.532'
+          RSD_percent_as_printed: '1.73'
+          point_conditions: *id028
+        - run: 10B13A
+          T_C: '1301'
+          duration_h: '118.5'
+          fraction_remaining: '0.436'
+          RSD_percent_as_printed: '2.37'
+          point_conditions: *id029
+        - run: 9B13A
+          T_C: '1302'
+          duration_h: '168.2'
+          fraction_remaining: '0.360'
+          RSD_percent_as_printed: '0.63'
+          point_conditions: *id030
+        - run: 13B13A
+          T_C: '1301'
+          duration_h: '189.2'
+          fraction_remaining: '0.353'
+          RSD_percent_as_printed: '1.12'
+          point_conditions: *id031
+        - run: 27B14
+          T_C: '1378'
+          duration_h: '48.3'
+          fraction_remaining: '0.349'
+          RSD_percent_as_printed: '0.58'
+          point_conditions: *id032
+        - run: 24B14A
+          T_C: '1379'
+          duration_h: '95.9'
+          fraction_remaining: '0.328'
+          RSD_percent_as_printed: '1.14'
+          point_conditions: *id033
+        - run: 28B14
+          T_C: '1378'
+          duration_h: '120.0'
+          fraction_remaining: '0.297'
+          RSD_percent_as_printed: '0.60'
+          point_conditions: *id034
+        - run: 20B14A
+          T_C: '1379'
+          duration_h: '169.2'
+          fraction_remaining: '0.261'
+          RSD_percent_as_printed: '0.59'
+          point_conditions: *id035
+        - run: 19B14A
+          T_C: '1400'
+          duration_h: '48.2'
+          fraction_remaining: '0.347'
+          RSD_percent_as_printed: '1.09'
+          point_conditions: *id036
+        - run: 18B13
+          T_C: '1301'
+          duration_h: '48.0'
+          fraction_remaining: '0.446'
+          RSD_percent_as_printed: '0.49'
+          point_conditions: *id037
+        - run: 16B13
+          T_C: '1301'
+          duration_h: '47.9'
+          fraction_remaining: '0.309'
+          RSD_percent_as_printed: '0.54'
+          point_conditions: *id038
+        - run: 15B13
+          T_C: '1300'
+          duration_h: '48.0'
+          fraction_remaining: '0.059'
+          RSD_percent_as_printed: '1.15'
+          point_conditions: *id039
+        - run: 14B13
+          T_C: '1301'
+          duration_h: '47.8'
+          fraction_remaining: '0.034'
+          RSD_percent_as_printed: '0.65'
+          point_conditions: *id040
+        - run: 12B13
+          T_C: '1301'
+          duration_h: '47.7'
+          fraction_remaining: '0.032'
+          RSD_percent_as_printed: '1.60'
+          point_conditions: *id041
+        - run: 21B14
+          T_C: '1401'
+          duration_h: '47.6'
+          fraction_remaining: '0.203'
+          RSD_percent_as_printed: '0.46'
+          point_conditions: *id042
+        - run: 22B14
+          T_C: '1401'
+          duration_h: '47.8'
+          fraction_remaining: '0.089'
+          RSD_percent_as_printed: '0.42'
+          point_conditions: *id043
+        - run: 23B14
+          T_C: '1401'
+          duration_h: '51.1'
+          fraction_remaining: '0.034'
+          RSD_percent_as_printed: '2.42'
+          point_conditions: *id044
+        - run: 25B14
+          T_C: '1401'
+          duration_h: '47.8'
+          fraction_remaining: '0.039'
+          RSD_percent_as_printed: '1.67'
+          point_conditions: *id045
+        - run: 26B14
+          T_C: '1401'
+          duration_h: '47.5'
+          fraction_remaining: '0.027'
+          RSD_percent_as_printed: '5.27'
           point_conditions: *id046
