@@ -4346,9 +4346,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return float(transport_pO2())
         return float(self._commanded_pO2_bar())
 
+    def _evaporation_campaign_active(self):
+        return self.melt.campaign in (
+            CampaignPhase.C0, CampaignPhase.C0B,
+            CampaignPhase.C2A, CampaignPhase.C2A_STAGED,
+            CampaignPhase.C2B, CampaignPhase.C3_K,
+            CampaignPhase.C3_NA, CampaignPhase.C4,
+        )
+
+    def _intrinsic_oxygen_publication(self, result=None):
+        from simulator.fe_redox import _published_intrinsic_melt_fO2
+
+        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+        intrinsic = getattr(reservoir, 'melt_intrinsic_fO2_log', None)
+        if intrinsic is None:
+            intrinsic = getattr(self.melt, 'melt_fO2_log', None)
+        if intrinsic is None:
+            current = getattr(self, '_current_melt_redox_fO2_log', None)
+            intrinsic = (current() if callable(current) else
+                         getattr(result, 'fO2_log', getattr(self.melt, 'fO2_log', -9.0)))
+        return _published_intrinsic_melt_fO2(float(intrinsic),
+            self.atom_ledger.project_account_mol('process.cleaned_melt'),
+            float(self.melt.temperature_C) + 273.15)
+
     def _vapor_pressure_dispatch_pO2_bar(self) -> float:
         reaction = getattr(self, '_reaction_pO2_bar', None)
-        if reaction is not None:
+        if reaction is not None or not self._evaporation_campaign_active():
             # The closure owns this physical coordinate. Cache quantization
             # must never change the accepted root on its way to a consumer.
             return self._reaction_oxygen_pO2_bar()
@@ -10316,25 +10339,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._vapor_pressure_dispatch_pO2_bar()
             if observation_pO2_bar is None else observation_pO2_bar
         )
-        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
-        intrinsic_fO2_log = getattr(
-            reservoir,
-            'melt_intrinsic_fO2_log',
-            None,
-        )
-        if intrinsic_fO2_log is None:
-            intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
-        if intrinsic_fO2_log is None:
-            current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
-            if callable(current_fO2):
-                intrinsic_fO2_log = current_fO2()
-            else:
-                intrinsic_fO2_log = getattr(
-                    result,
-                    'fO2_log',
-                    getattr(self.melt, 'fO2_log', -9.0),
-                )
-        intrinsic_fO2_log = float(intrinsic_fO2_log)
+        intrinsic_publication = self._intrinsic_oxygen_publication(result)
+        intrinsic_fO2_log = intrinsic_publication['published_intrinsic_fO2_log']
         vacuum_floor = (
             float(self._oxygen_numerical_floor_bar())
             if callable(getattr(self, '_oxygen_numerical_floor_bar', None))
@@ -10396,6 +10402,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_high_t_melt_activity_temperature_K = T_C + 273.15
         diagnostic = dict(kernel_result.diagnostic or {})
+        diagnostic['intrinsic_fO2_publication'] = intrinsic_publication
 
         def append_kernel_warnings(
             messages: tuple[str, ...] | str,
@@ -10414,6 +10421,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             diagnostic['kernel_vapor_pressure_warnings'] = existing
 
         append_kernel_warnings(getattr(kernel_result, 'warnings', ()) or ())
+        if intrinsic_publication['notice']:
+            append_kernel_warnings(intrinsic_publication['notice'])
+            result.warnings.append(intrinsic_publication['notice'])
+        if getattr(self, '_reaction_pO2_bar', None) is None and not self._evaporation_campaign_active():
+            notice = 'no gas-side closure; published intrinsic melt oxygen potential used'
+            append_kernel_warnings(notice)
+            result.warnings.append(notice)
         self._last_high_t_melt_activity = dict(
             diagnostic.get("high_t_melt_activity") or {}
         )
@@ -14482,12 +14496,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.melt.campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             self._step_c7_ca_aluminothermic()
 
-        evaporation_campaign = self.melt.campaign in (
-            CampaignPhase.C0, CampaignPhase.C0B,
-            CampaignPhase.C2A, CampaignPhase.C2A_STAGED,
-            CampaignPhase.C2B, CampaignPhase.C3_K,
-            CampaignPhase.C3_NA, CampaignPhase.C4,
-        )
+        evaporation_campaign = self._evaporation_campaign_active()
         self._apply_fe_redox_respeciation()
         native_fe_split = self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
         native_fe_source_mol = (native_fe_split or {}).get('overhead_source_mol', {})

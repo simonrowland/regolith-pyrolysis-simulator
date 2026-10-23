@@ -110,7 +110,15 @@ class EquilibriumMixin:
     def _reaction_oxygen_pO2_bar(self) -> float:
         """Accepted reaction coordinate, or the explicitly supplied boundary."""
         reaction = getattr(self, '_reaction_pO2_bar', None)
-        return float(self._headspace_transport_pO2_bar() if reaction is None else reaction)
+        if reaction is not None:
+            return float(reaction)
+        campaign_active = getattr(self, '_evaporation_campaign_active', None)
+        if callable(campaign_active) and not campaign_active():
+            # Without a gas-side source closure, b-724 publishes the melt's
+            # present-oxide reduction buffer; bulk vacuum is not its potential.
+            publication = self._intrinsic_oxygen_publication()
+            return 10.0 ** publication['published_intrinsic_fO2_log']
+        return float(self._headspace_transport_pO2_bar())
 
     def _get_equilibrium(self):
         raise NotImplementedError(

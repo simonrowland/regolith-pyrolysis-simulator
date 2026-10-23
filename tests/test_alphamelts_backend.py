@@ -10344,7 +10344,7 @@ def test_battery_melts_invalid_observation_refuses_before_native(
     (0.0, 0.0), (1.3e-12, 1.3e-12), (1e-9, 1e-9), (1e-6, 1e-6),
 ])
 def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, raw_oxygen, expected, monkeypatch):
-    from simulator.state import Atmosphere
+    from simulator.state import Atmosphere, CampaignPhase
 
     backend = backend_cls()
     assert _initialize_melts_transport_for_oxygen_test(
@@ -10355,7 +10355,7 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, raw_oxy
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim.backend = backend
     sim.melt = types.SimpleNamespace(
-        body='moon', ambient_pressure_mbar=0.0,
+        body='moon', ambient_pressure_mbar=0.0, campaign=CampaignPhase.C2A,
         atmosphere=Atmosphere.HARD_VACUUM,
         sweep_mol_per_s=None,
         temperature_C=1600.0, p_total_mbar=1000.0,

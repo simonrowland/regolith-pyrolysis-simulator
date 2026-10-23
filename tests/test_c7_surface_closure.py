@@ -169,3 +169,25 @@ def test_real_hour_closes_current_sources_and_preserves_oxygen_atoms(monkeypatch
         assert oxygen_atoms() == pytest.approx(before, rel=0.0, abs=8.0 * math.ulp(before))
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+@pytest.mark.parametrize('campaign', ('C6', 'C7_CA_ALUMINOTHERMIC'))
+def test_non_evaporating_step_uses_published_intrinsic_oxygen(campaign):
+    from simulator.state import CampaignPhase
+    from tests.test_c7_ca_aluminothermic_campaign import _c7_patch
+    sim = simulation('targeted_super_kreep_ore' if campaign.startswith('C7') else 'lunar_mare_low_ti')
+    try:
+        if campaign.startswith('C7'):
+            sim.setpoints['campaigns']['C7'].update(_c7_patch()['campaigns']['C7'])
+        sim.start_campaign(CampaignPhase[campaign])
+        sim.melt.temperature_C = 1400.0 if campaign == 'C6' else 1600.0
+        sim.step()
+        diagnostic = sim._last_vapor_pressure_diagnostic
+        published = diagnostic['intrinsic_fO2_publication']['published_intrinsic_fO2_log']
+        assert diagnostic['pO2_bar'] == 10.0 ** published > 0.0
+        assert math.isfinite(diagnostic['pO2_bar'])
+        assert any('no gas-side closure; published intrinsic' in str(note)
+                   for note in diagnostic['kernel_vapor_pressure_warnings'])
+        assert sim.melt.hour == 1
+    finally:
+        close_test_owned_magemin_backend(sim)
