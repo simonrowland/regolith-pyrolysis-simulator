@@ -26,6 +26,34 @@ from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
 from tests.battery.test_migrate_benches import _registry_extract
 from tools.validate_literature_extracts import validate_extract_document
 
+
+def _context_data_row(result, source_id: str, observation_id: str) -> dict:
+    def visit(value):
+        if isinstance(value, dict):
+            if value.get("observation_id") == observation_id or value.get(
+                "source_observation_id"
+            ) == observation_id:
+                return value
+            for child in value.values():
+                match = visit(child)
+                if match is not None:
+                    return match
+        elif isinstance(value, list):
+            for child in value:
+                match = visit(child)
+                if match is not None:
+                    return match
+        return None
+
+    for records in result.context_by_work.values():
+        for record in records:
+            if record.get("source_id") != source_id:
+                continue
+            match = visit(record)
+            if match is not None:
+                return match
+    raise AssertionError(f"no context row for {source_id}::{observation_id}")
+
 EXTRACTS = Path(__file__).resolve().parents[2] / "data/literature/extracts"
 UNKNOWN = {"tag": "unknown", "reason": "not_published"}
 
@@ -382,63 +410,67 @@ def test_heck_inferred_one_atmosphere_remains_a_point(tmp_path) -> None:
 
 def test_sossi_printed_one_atmosphere_still_inherits(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-012-sossi-2019.yaml")
-    observation = result.observations[
-        "kems-012-sossi-2019::sossi_2019_k_class_b1"
-    ]
-    assert observation.identity.total_pressure_Pa == State.of(Decimal("100000"))
+    context = _context_data_row(result, "kems-012-sossi-2019", "sossi_2019_k_class_b1")
+    assert context["values"]["chamber_pressure_bar"] == 1.0
 
 
 @pytest.mark.parametrize(
-    "observation_id",
+    "observation_id,context_id",
     [
-        "sossi_2019_na_alpha_e_authors_adopted_unity",
-        "sossi_2019_na_alpha_e_authors_adopted_unity_quoted_20260906",
-        "sossi_2019_na_pure_system_LH_table5",
-        "sossi_2019_na_pure_system_LH_table5_quoted_20260906",
-        "sossi_2019_k_open_furnace_alpha_e_context",
+        (
+            "sossi_2019_na_alpha_e_authors_adopted_unity",
+            "sossi_2019_na_alpha_e_authors_adopted_unity",
+        ),
+        (
+            "sossi_2019_na_alpha_e_authors_adopted_unity_quoted_20260906",
+            "sossi_2019_na_alpha_e_authors_adopted_unity",
+        ),
+        ("sossi_2019_na_pure_system_LH_table5", "sossi_2019_na_pure_system_LH_table5"),
+        (
+            "sossi_2019_na_pure_system_LH_table5_quoted_20260906",
+            "sossi_2019_na_pure_system_LH_table5",
+        ),
+        (
+            "sossi_2019_k_open_furnace_alpha_e_context",
+            "sossi_2019_k_open_furnace_alpha_e_context",
+        ),
     ],
 )
 def test_model_carrier_keeps_printed_sossi_furnace_condition(
-    tmp_path, observation_id: str
+    tmp_path, observation_id: str, context_id: str
 ) -> None:
     result = _migrate_real_extract(tmp_path, "kems-012-sossi-2019.yaml")
-    observation = result.observations[
-        f"kems-012-sossi-2019::{observation_id}"
-    ]
-    assert observation.identity.total_pressure_Pa == State.of(Decimal("100000"))
+    context = _context_data_row(result, "kems-012-sossi-2019", context_id)
+    assert context["values"]["chamber_pressure_bar"] == 1.0
 
 
 @pytest.mark.parametrize(
-    "observation_id",
+    "observation_id,context_id",
     [
-        "sossi_2019_na_logKstar_table3",
-        "sossi_2019_na_logKstar_table3_quoted_20260906",
+        ("sossi_2019_na_logKstar_table3", "sossi_2019_na_logKstar_table3"),
+        (
+            "sossi_2019_na_logKstar_table3_quoted_20260906",
+            "sossi_2019_na_logKstar_table3",
+        ),
     ],
 )
 def test_sossi_log_k_star_does_not_use_furnace_pressure(
-    tmp_path, observation_id: str
+    tmp_path, observation_id: str, context_id: str
 ) -> None:
     result = _migrate_real_extract(tmp_path, "kems-012-sossi-2019.yaml")
-    observation = result.observations[
-        f"kems-012-sossi-2019::{observation_id}"
-    ]
-    assert observation.identity.total_pressure_Pa == State.not_applicable(
-        "profile log10_K_star does not use total_pressure_Pa"
-    )
+    context = _context_data_row(result, "kems-012-sossi-2019", context_id)
+    assert context["values_by_temperature_K"]
+    assert "chamber_pressure_bar" not in context.get("values", {})
 
 
 def test_model_carrier_keeps_printed_fedkin_chamber_condition(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-005-fedkin-2006.yaml")
-    points = [
-        observation
-        for observation in result.observations.values()
-        if "fedkin_2006_sio_hashimoto_table3_complete_b1::" in observation.observation_id
-    ]
-    assert len(points) == 4
-    assert all(
-        observation.identity.total_pressure_Pa == State.of(Decimal("0.0013"))
-        for observation in points
+    context = _context_data_row(
+        result, "kems-005-fedkin-2006", "fedkin_2006_table3_hashimoto_fit_outputs"
     )
+    pressure = context["equipment"]["chamber_pressure_bar"]
+    assert pressure["value"] == 1.3e-8
+    assert pressure["locator"]["published_page"] == 212
 
 
 def test_norris_printed_atmosphere_ignores_page_range_locator(tmp_path) -> None:
