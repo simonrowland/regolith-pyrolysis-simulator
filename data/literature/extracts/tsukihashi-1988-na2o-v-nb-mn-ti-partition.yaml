@@ -1,0 +1,835 @@
+schema_version: literature_extract.v1
+source_id: tsukihashi-1988-na2o-v-nb-mn-ti-partition
+source:
+  citation: Tsukihashi F, Tagaya A, Sano N (1988). Effect of Na2O Addition on the Partition of Vanadium,
+    Niobium, Manganese and Titanium between CaO-CaF2-SiO2 Melts and Carbon Saturated Iron. Transactions
+    of the Iron and Steel Institute of Japan 28(3):164-171.
+  doi: 10.2355/isijinternational1966.28.164
+  year: 1988
+extraction:
+  method: Born-digital pdftotext-layout; figure identity and marker metadata checked against 600 dpi PDF
+    renders; no table blocks were present.
+  date: '2026-10-20'
+  worker: fam26-1020
+review_status: draft
+species:
+  V:
+    observations: []
+    context:
+    - observation_id: tsukihashi_1988_figure_2_v
+      type: figure_record
+      locator:
+        page: 2
+        published_page: 165
+        pdf_page_index: 1
+        figure: '2'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt / carbon-saturated liquid iron
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: (%V)/[%V] and (%Mn)/[%Mn]'
+      caption: Effect of Na2O addition on partition ratios of vanadium and manganese at 1300 °C.
+      panel: single
+      series:
+      - name: vanadium, present study
+        marker: filled circle
+        marker_count: 7
+        method_class: measured_direct
+      - name: vanadium, Na2O-SiO2 comparison
+        marker: filled square
+        marker_count: 1
+        method_class: quoted_attributed
+        attribution: Tsukihashi et al. [10], the 1985 Na2O-SiO2 distribution paper
+      - name: Simeonov and Sano comparison
+        marker: dashed curve
+        marker_count: 0
+        method_class: quoted_attributed
+        attribution: Simeonov and Sano [8]
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: distribution ratio (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+        composition_as_printed: CaO-CaF2-SiO2 melt doubly saturated with CaO and 3CaO·SiO2
+    - observation_id: tsukihashi_1988_figure_3_v
+      type: figure_record
+      locator:
+        page: 3
+        published_page: 166
+        pdf_page_index: 2
+        figure: '3'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: vanadium valence'
+      caption: Change in valency of vanadium, niobium and titanium with Na2O content at 1300 °C.
+      panel: single
+      series:
+      - name: vanadium valence in present system
+        marker: open square
+        marker_count: 10
+        method_class: measured_direct
+      - name: Na2O-SiO2 valence comparison
+        marker: open square
+        marker_count: 10
+        method_class: quoted_attributed
+        attribution: Tsukihashi et al. [10], 1985
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: distribution ratio (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+        composition_as_printed: CaO-CaF2-SiO2 melt
+    - observation_id: tsukihashi_1988_figure_4_v
+      type: figure_record
+      locator:
+        page: 4
+        published_page: 167
+        pdf_page_index: 3
+        figure: '4'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2-VOx melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: activity coefficients of VO2 and VO2.5'
+      caption: Activity coefficients of VO2 and VO2.5 at 1300 °C.
+      panel: single
+      series:
+      - name: VO2
+        marker: open circle
+        marker_count: 9
+        method_class: model_derived
+      - name: VO2.5
+        marker: filled circle
+        marker_count: 9
+        method_class: model_derived
+      - name: Na2O-SiO2 comparison VO2
+        marker: open square
+        marker_count: 1
+        method_class: quoted_attributed
+        attribution: Tsukihashi et al. [10], 1985
+      - name: Na2O-SiO2 comparison VO2.5
+        marker: filled square
+        marker_count: 1
+        method_class: quoted_attributed
+        attribution: Tsukihashi et al. [10], 1985
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: activity_coefficient
+        method_class: model_derived
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_figure_8_v
+      type: figure_record
+      locator:
+        page: 6
+        published_page: 169
+        pdf_page_index: 5
+        figure: '8'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: log capacity of VO4-, VO3- species'
+      caption: Effect of Na2O addition on capacities of vanadium, niobium, titanium and manganese at 1300
+        °C.
+      panel: single
+      series:
+      - name: VO4-
+        marker: filled triangle
+        marker_count: 7
+        method_class: model_derived
+      - name: VO3-
+        marker: open triangle
+        marker_count: 8
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: capacity (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_figure_9_v
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 170
+        pdf_page_index: 6
+        figure: '9'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: log carbonate or phosphate capacity; y: log species capacity'
+      caption: Relation between capacities of V, Nb, Ti and Mn and carbonate capacity at 1300 °C.
+      panel: single
+      series:
+      - name: V capacity vs carbonate capacity
+        marker: line
+        marker_count: 0
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: capacity relationship (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_figure_10_v
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 170
+        pdf_page_index: 6
+        figure: '10'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: log carbonate or phosphate capacity; y: log species capacity'
+      caption: Relation between capacities of V, Nb, Ti and Mn and phosphate capacity at 1300 °C.
+      panel: single
+      series:
+      - name: V capacity vs phosphate capacity
+        marker: line
+        marker_count: 0
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: capacity relationship (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_v_activity_coefficient_fe_c
+      type: context_record
+      locator:
+        page: 4
+        published_page: 167
+        pdf_page_index: 3
+        section: Activity Coefficients
+      units: dimensionless
+      candidate_quantities:
+      - activity_coefficient
+      reason: The value is an author estimate imported from a previous paper and is used as an input to
+        calculate slag oxide coefficients; the fit inputs are not stored.
+      values:
+        method_class: model_derived
+        gamma_V_in_carbon_saturated_iron_as_printed: 8.59×10^-4
+        temperature_as_printed: 1300 °C
+        attribution: previous paper [2]
+    - observation_id: tsukihashi_1988_v_partition_endpoints_text
+      type: context_record
+      locator:
+        page: 2
+        published_page: 165
+        pdf_page_index: 1
+        section: III. Results
+      units: mass-percent distribution ratio as printed
+      candidate_quantities:
+      - equilibrium_phase_composition
+      reason: Measured distribution ratios are explicitly summarized in prose but no store quantity fits
+        a slag/metal partition ratio. The figure series remain deferred with no numeric points.
+      values:
+        typed_quantity_as_printed: partition ratio
+        start_value_as_printed: '0.4'
+        end_value_as_printed: '5'
+        Na2O_addition_as_printed: about 2 %
+        temperature_as_printed: 1300 °C
+        slag_composition_as_printed: CaO:CaF2:SiO2 = 65:22:13; doubly saturated with CaO and 3CaO·SiO2
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_experimental_conditions_and_o2_estimate
+      type: context_record
+      locator:
+        page: 6
+        published_page: 169
+        pdf_page_index: 5
+        section: Capacities
+      units: as printed
+      candidate_quantities:
+      - p_partial
+      reason: The authors calculate the oxygen partial pressure from the graphite/CO equilibrium in Eq.
+        (30); this estimate is recorded verbatim and was not independently computed.
+      values:
+        temperature_as_printed: 1300 °C
+        carbon_monoxide_partial_pressure_as_printed: 1 atm
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm
+        sample_quench_as_printed: quenched under an argon flow
+        slag_composition_as_printed: CaO:CaF2:SiO2 = 65:22:13; doubly saturated with CaO and 3CaO·SiO2
+        minor_oxide_contents_as_printed: VOx, NbOx and MnO about 3%; TiO2 about 0.8%
+  Nb:
+    observations: []
+    context:
+    - observation_id: tsukihashi_1988_figure_1_nb
+      type: figure_record
+      locator:
+        page: 2
+        published_page: 165
+        pdf_page_index: 1
+        figure: '1'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt / carbon-saturated liquid iron
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: (%Ti)/[%Ti] and (%Nb)/[%Nb]'
+      caption: Effect of Na2O addition on partition ratios of titanium and niobium at 1300 °C.
+      panel: single
+      series:
+      - name: niobium, present study
+        marker: filled circle
+        marker_count: 10
+        method_class: measured_direct
+      - name: niobium, Na2O-SiO2 comparison
+        marker: filled square
+        marker_count: 1
+        method_class: quoted_attributed
+        attribution: Tsukihashi et al. [10], the 1985 Na2O-SiO2 distribution paper
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: distribution ratio (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+        composition_as_printed: CaO-CaF2-SiO2 melt doubly saturated with CaO and 3CaO·SiO2
+    - observation_id: tsukihashi_1988_figure_3_nb
+      type: figure_record
+      locator:
+        page: 3
+        published_page: 166
+        pdf_page_index: 2
+        figure: '3'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: niobium valence'
+      caption: Change in valency of vanadium, niobium and titanium with Na2O content at 1300 °C.
+      panel: single
+      series:
+      - name: niobium valence in present system
+        marker: open circle
+        marker_count: 8
+        method_class: measured_direct
+      - name: Na2O-SiO2 valence comparison
+        marker: open circle
+        marker_count: 8
+        method_class: quoted_attributed
+        attribution: Tsukihashi et al. [10], 1985
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: distribution ratio (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+        composition_as_printed: CaO-CaF2-SiO2 melt
+    - observation_id: tsukihashi_1988_figure_5_nb
+      type: figure_record
+      locator:
+        page: 4
+        published_page: 167
+        pdf_page_index: 3
+        figure: '5'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2-NbOx melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: activity coefficients of NbO2 and NbO2.5'
+      caption: Activity coefficients of NbO2 and NbO2.5 at 1300 °C.
+      panel: single
+      series:
+      - name: NbO2
+        marker: open circle
+        marker_count: 9
+        method_class: model_derived
+      - name: NbO2.5
+        marker: filled circle
+        marker_count: 11
+        method_class: model_derived
+      - name: Na2O-SiO2 comparison NbO2
+        marker: open square
+        marker_count: 1
+        method_class: quoted_attributed
+        attribution: Tsukihashi et al. [10], 1985
+      - name: Na2O-SiO2 comparison NbO2.5
+        marker: filled square
+        marker_count: 1
+        method_class: quoted_attributed
+        attribution: Tsukihashi et al. [10], 1985
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: activity_coefficient
+        method_class: model_derived
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_figure_9_nb
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 170
+        pdf_page_index: 6
+        figure: '9'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: log carbonate or phosphate capacity; y: log species capacity'
+      caption: Relation between capacities of V, Nb, Ti and Mn and carbonate capacity at 1300 °C.
+      panel: single
+      series:
+      - name: Nb capacity vs carbonate capacity
+        marker: line
+        marker_count: 0
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: capacity relationship (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_figure_10_nb
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 170
+        pdf_page_index: 6
+        figure: '10'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: log carbonate or phosphate capacity; y: log species capacity'
+      caption: Relation between capacities of V, Nb, Ti and Mn and phosphate capacity at 1300 °C.
+      panel: single
+      series:
+      - name: Nb capacity vs phosphate capacity
+        marker: line
+        marker_count: 0
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: capacity relationship (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_nb_activity_coefficient_fe_c
+      type: context_record
+      locator:
+        page: 4
+        published_page: 167
+        pdf_page_index: 3
+        section: Activity Coefficients
+      units: dimensionless
+      candidate_quantities:
+      - activity_coefficient
+      reason: The value is an author estimate imported from a prior NbC-solubility calculation and is
+        used as an input to calculate slag oxide coefficients; the input series is not stored.
+      values:
+        method_class: model_derived
+        gamma_Nb_in_carbon_saturated_iron_as_printed: 7.73×10^-3
+        temperature_as_printed: 1300 °C
+        attribution: Fuwa et al. [17]
+    - observation_id: tsukihashi_1988_nb_partition_endpoints_text
+      type: context_record
+      locator:
+        page: 2
+        published_page: 165
+        pdf_page_index: 1
+        section: III. Results
+      units: mass-percent distribution ratio as printed
+      candidate_quantities:
+      - equilibrium_phase_composition
+      reason: Measured distribution ratios are explicitly summarized in prose but no store quantity fits
+        a slag/metal partition ratio. The figure series remain deferred with no numeric points.
+      values:
+        typed_quantity_as_printed: partition ratio
+        start_value_as_printed: '6'
+        end_value_as_printed: '100'
+        Na2O_addition_as_printed: about 2 %
+        temperature_as_printed: 1300 °C
+        slag_composition_as_printed: CaO:CaF2:SiO2 = 65:22:13; doubly saturated with CaO and 3CaO·SiO2
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+  Mn:
+    observations: []
+    context:
+    - observation_id: tsukihashi_1988_figure_2_mn
+      type: figure_record
+      locator:
+        page: 2
+        published_page: 165
+        pdf_page_index: 1
+        figure: '2'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt / carbon-saturated liquid iron
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: (%V)/[%V] and (%Mn)/[%Mn]'
+      caption: Effect of Na2O addition on partition ratios of vanadium and manganese at 1300 °C.
+      panel: single
+      series:
+      - name: manganese, present study
+        marker: open circle
+        marker_count: 9
+        method_class: measured_direct
+      - name: manganese, Na2O-SiO2 comparison
+        marker: open square
+        marker_count: 1
+        method_class: quoted_attributed
+        attribution: Tsukihashi and Sano [15]
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: distribution ratio (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+        composition_as_printed: CaO-CaF2-SiO2 melt doubly saturated with CaO and 3CaO·SiO2
+    - observation_id: tsukihashi_1988_figure_6_mn
+      type: figure_record
+      locator:
+        page: 5
+        published_page: 168
+        pdf_page_index: 4
+        figure: '6'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2-MnO melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: activity coefficient of MnO'
+      caption: Activity coefficients of MnO for the CaO-Na2O-CaF2-SiO2-MnO system at 1300 °C.
+      panel: single
+      series:
+      - name: MnO, present study
+        marker: filled circle
+        marker_count: 10
+        method_class: model_derived
+      - name: Simeonov and Sano comparison
+        marker: dashed curve
+        marker_count: 0
+        method_class: quoted_attributed
+        attribution: Simeonov and Sano [8]
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: activity_coefficient
+        method_class: model_derived
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_figure_8_mn
+      type: figure_record
+      locator:
+        page: 6
+        published_page: 169
+        pdf_page_index: 5
+        figure: '8'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: log capacity of Mn2+'
+      caption: Effect of Na2O addition on capacities of vanadium, niobium, titanium and manganese at 1300
+        °C.
+      panel: single
+      series:
+      - name: Mn2+
+        marker: open inverted triangle
+        marker_count: 8
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: capacity (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_figure_9_mn
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 170
+        pdf_page_index: 6
+        figure: '9'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: log carbonate or phosphate capacity; y: log species capacity'
+      caption: Relation between capacities of V, Nb, Ti and Mn and carbonate capacity at 1300 °C.
+      panel: single
+      series:
+      - name: Mn capacity vs carbonate capacity
+        marker: line
+        marker_count: 0
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: capacity relationship (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_figure_10_mn
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 170
+        pdf_page_index: 6
+        figure: '10'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: log carbonate or phosphate capacity; y: log species capacity'
+      caption: Relation between capacities of V, Nb, Ti and Mn and phosphate capacity at 1300 °C.
+      panel: single
+      series:
+      - name: Mn capacity vs phosphate capacity
+        marker: line
+        marker_count: 0
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: capacity relationship (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_mn_activity_coefficient_fe_c
+      type: context_record
+      locator:
+        page: 5
+        published_page: 168
+        pdf_page_index: 4
+        section: Activity Coefficients
+      units: dimensionless
+      candidate_quantities:
+      - activity_coefficient
+      reason: The value is an author estimate imported from a previous paper and is used as an input to
+        calculate the MnO coefficient; the underlying input series is not stored.
+      values:
+        method_class: model_derived
+        gamma_Mn_in_carbon_saturated_iron_as_printed: '0.536'
+        temperature_as_printed: 1300 °C
+        attribution: previous paper [2]
+    - observation_id: tsukihashi_1988_mn_partition_endpoints_text
+      type: context_record
+      locator:
+        page: 2
+        published_page: 165
+        pdf_page_index: 1
+        section: III. Results
+      units: mass-percent distribution ratio as printed
+      candidate_quantities:
+      - equilibrium_phase_composition
+      reason: Measured distribution ratios are explicitly summarized in prose but no store quantity fits
+        a slag/metal partition ratio. The figure series remain deferred with no numeric points.
+      values:
+        typed_quantity_as_printed: partition ratio
+        start_value_as_printed: '2'
+        end_value_as_printed: '0.7'
+        Na2O_addition_as_printed: about 2 %
+        temperature_as_printed: 1300 °C
+        slag_composition_as_printed: CaO:CaF2:SiO2 = 65:22:13; doubly saturated with CaO and 3CaO·SiO2
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+  Ti:
+    observations: []
+    context:
+    - observation_id: tsukihashi_1988_figure_1_ti
+      type: figure_record
+      locator:
+        page: 2
+        published_page: 165
+        pdf_page_index: 1
+        figure: '1'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt / carbon-saturated liquid iron
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: (%Ti)/[%Ti] and (%Nb)/[%Nb]'
+      caption: Effect of Na2O addition on partition ratios of titanium and niobium at 1300 °C.
+      panel: single
+      series:
+      - name: titanium, present study
+        marker: open circle
+        marker_count: 10
+        method_class: measured_direct
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: distribution ratio (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+        composition_as_printed: CaO-CaF2-SiO2 melt doubly saturated with CaO and 3CaO·SiO2
+    - observation_id: tsukihashi_1988_figure_3_ti
+      type: figure_record
+      locator:
+        page: 3
+        published_page: 166
+        pdf_page_index: 2
+        figure: '3'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: titanium valence'
+      caption: Change in valency of vanadium, niobium and titanium with Na2O content at 1300 °C.
+      panel: single
+      series:
+      - name: titanium valence
+        marker: filled circle
+        marker_count: 9
+        method_class: measured_direct
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: distribution ratio (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+        composition_as_printed: CaO-CaF2-SiO2 melt
+    - observation_id: tsukihashi_1988_figure_7_ti
+      type: figure_record
+      locator:
+        page: 5
+        published_page: 168
+        pdf_page_index: 4
+        figure: '7'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2-TiOx melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: activity coefficients of TiO1.5 and TiO2'
+      caption: Activity coefficients of TiO1.5 and TiO2 at 1300 °C.
+      panel: single
+      series:
+      - name: TiO1.5
+        marker: open circle
+        marker_count: 8
+        method_class: model_derived
+      - name: TiO2
+        marker: filled circle
+        marker_count: 9
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: activity_coefficient
+        method_class: model_derived
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_figure_8_ti
+      type: figure_record
+      locator:
+        page: 6
+        published_page: 169
+        pdf_page_index: 5
+        figure: '8'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: Na2O content (wt%); y: log capacity of TiO3-, TiO2 species'
+      caption: Effect of Na2O addition on capacities of vanadium, niobium, titanium and manganese at 1300
+        °C.
+      panel: single
+      series:
+      - name: TiO3-
+        marker: open square
+        marker_count: 8
+        method_class: model_derived
+      - name: TiO2
+        marker: filled square
+        marker_count: 8
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: capacity (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_figure_9_ti
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 170
+        pdf_page_index: 6
+        figure: '9'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: log carbonate or phosphate capacity; y: log species capacity'
+      caption: Relation between capacities of V, Nb, Ti and Mn and carbonate capacity at 1300 °C.
+      panel: single
+      series:
+      - name: Ti capacity vs carbonate capacity
+        marker: line
+        marker_count: 0
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: capacity relationship (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_figure_10_ti
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 170
+        pdf_page_index: 6
+        figure: '10'
+      units: as printed
+      phase_as_printed: CaO-Na2O-CaF2-SiO2 melt
+      temperature_as_printed: 1300 °C
+      axes_as_printed: 'x: log carbonate or phosphate capacity; y: log species capacity'
+      caption: Relation between capacities of V, Nb, Ti and Mn and phosphate capacity at 1300 °C.
+      panel: single
+      series:
+      - name: Ti capacity vs phosphate capacity
+        marker: line
+        marker_count: 0
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: capacity relationship (no store token)
+        method_class: measured_direct
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
+    - observation_id: tsukihashi_1988_ti_activity_coefficient_fe_c
+      type: context_record
+      locator:
+        page: 5
+        published_page: 168
+        pdf_page_index: 4
+        section: Activity Coefficients
+      units: dimensionless, relative to 1 wt% Ti
+      candidate_quantities:
+      - activity_coefficient
+      reason: The value is calculated with a recommended temperature-dependent equation from a cited source
+        and is used as an input to calculate titanium oxide coefficients; the equation input series is
+        not stored.
+      values:
+        method_class: model_derived
+        gamma_Ti_in_carbon_saturated_iron_as_printed: '0.103'
+        temperature_as_printed: 1300 °C
+        standard_state_as_printed: relative to 1 wt%
+        attribution: recommended equation [19]
+    - observation_id: tsukihashi_1988_ti_partition_endpoints_text
+      type: context_record
+      locator:
+        page: 2
+        published_page: 165
+        pdf_page_index: 1
+        section: III. Results
+      units: mass-percent distribution ratio as printed
+      candidate_quantities:
+      - equilibrium_phase_composition
+      reason: Measured distribution ratios are explicitly summarized in prose but no store quantity fits
+        a slag/metal partition ratio. The figure series remain deferred with no numeric points.
+      values:
+        typed_quantity_as_printed: partition ratio
+        start_value_as_printed: '100'
+        end_value_as_printed: '300'
+        Na2O_addition_as_printed: about 2 %
+        temperature_as_printed: 1300 °C
+        slag_composition_as_printed: CaO:CaF2:SiO2 = 65:22:13; doubly saturated with CaO and 3CaO·SiO2
+        oxygen_partial_pressure_as_printed: 2.76×10^-17 atm at 1300 °C, calculated by the authors from
+          the graphite/CO equilibrium in Eq. (30); not independently recomputed.
