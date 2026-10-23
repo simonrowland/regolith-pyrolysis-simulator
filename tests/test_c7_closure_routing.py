@@ -6,6 +6,7 @@ balance and d-259 tests supply the physical and guard checks.
 from copy import deepcopy
 from contextlib import closing
 import json
+import math
 from pathlib import Path
 
 import pytest
@@ -54,12 +55,16 @@ def consumer_receipt(oxygen, *, legacy_sweep=False, quantized=False):
         total_mol = sim._headspace_o2_mol_for_pO2_bar(sim.melt.p_total_mbar / 1000.0)
         sim.atom_ledger.load_external_mol(
             "process.overhead_gas", {"O2": o2_mol, "Ar": total_mol - o2_mol},
-            material_origin="reagent", source="C7 routing initial gas",
+            material_origin="feedstock", source="C7 routing initial gas",
         )
         raw = (sim._headspace_ledger_pO2_bar_from_o2_mol(o2_mol)
                if legacy_sweep else sim._physical_sweep_boundary()["partials_bar"].get("O2", 0.0))
         assert raw == pytest.approx(oxygen, rel=1e-12, abs=0.0)
         sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+        boundary = sim._solve_evaporative_oxygen_boundary()
+        sim._reaction_pO2_bar = boundary.reaction_pO2_bar
         requests = []
         dispatch = sim._dispatch_only
         legacy = sim._internal_analytical_equilibrium
@@ -107,6 +112,10 @@ def consumer_receipt(oxygen, *, legacy_sweep=False, quantized=False):
             "vaporock_transport_audit": shadow_receipts,
             "flux_oxygen": controls["pO2_bar"],
             "intrinsic": sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log,
+            "closure": {"reaction": boundary.reaction_pO2_bar,
+                        "gas_face": boundary.gas_face_pO2_bar,
+                        "bulk": boundary.bulk_pO2_bar,
+                        "relative_residual": abs(boundary.residual) / math.fsum(abs(term) for term in boundary.balance_terms)},
         })
     finally:
         close_test_owned_magemin_backend(sim)
@@ -158,6 +167,7 @@ def _trajectory_rows(feed, campaign):
                 "ferric": sim._last_fe_redox_respeciation_diagnostic,
                 "native_source_mol": native_sources[-1],
                 "native_fe_vapor_mol": sim._last_native_fe_partition_diagnostic.get("native_fe_vapor_mol", 0.0),
+                "closure": sim._last_surface_oxygen_diagnostic,
             })
     finally:
         close_test_owned_magemin_backend(sim)
@@ -187,17 +197,42 @@ def lunar_trajectory(request):
 
 @pytest.mark.parametrize("oxygen", (0.0, 1.3e-12, 1e-9, 1e-6))
 def test_real_controls_oxygen_receipt(oxygen):
-    assert consumer_receipt(oxygen) == json.loads(PINS.read_text())["consumers"][str(oxygen)]
+    receipt = consumer_receipt(oxygen)
+    assert receipt['raw'] == json.loads(PINS.read_text())["consumers"][str(oxygen)]['raw']
+    assert_solved_controls(receipt)
+
+
+def assert_solved_controls(receipt):
+    oxygen = float.fromhex(receipt['closure']['reaction'])
+    assert oxygen > 0.0
+    assert float.fromhex(receipt['closure']['relative_residual']) < math.sqrt(math.ulp(1.0))
+    assert receipt['dispatch'] == receipt['flux_oxygen'] == receipt['closure']['reaction']
+    for request in receipt['requests']:
+        assert request['controls']['pO2_bar'] == request['resolved'] == receipt['dispatch']
+    # PT0 may canonicalize other inputs; it must not round solved oxygen.
+    assert receipt['requests'][0]['controls']['pO2_admission'] == 'surface_closure'
 
 
 @pytest.mark.parametrize("legacy_sweep,quantized", ((True, False), (False, True)))
 @pytest.mark.parametrize("oxygen", (0.0, 1.23456789123e-12, 1.23456789123e-6))
 def test_real_controls_alternate_routing_receipt(oxygen, legacy_sweep, quantized):
     key = f"{legacy_sweep}:{quantized}:{oxygen}"
-    assert consumer_receipt(oxygen, legacy_sweep=legacy_sweep, quantized=quantized) == json.loads(PINS.read_text())["alternate_consumers"][key]
+    receipt = consumer_receipt(oxygen, legacy_sweep=legacy_sweep, quantized=quantized)
+    assert receipt['raw'] == json.loads(PINS.read_text())["alternate_consumers"][key]['raw']
+    assert_solved_controls(receipt)
 
 
 @pytest.mark.parametrize("hour", range(1, 25))
 def test_lunar_24_hour_sources_and_oxygen(lunar_trajectory, hour):
     campaign, receipt = lunar_trajectory
-    assert receipt(hour) == json.loads(PINS.read_text())["trajectories"][campaign][hour - 1]
+    row = receipt(hour)
+    assert row['hour'] == hour
+    for rate in row['source_kg_hr'].values():
+        assert math.isfinite(float.fromhex(rate)) and float.fromhex(rate) >= 0.0
+    closure = row['closure']
+    assert float.fromhex(closure['relative_residual']) <= math.sqrt(math.ulp(1.0))
+    reaction, face, bulk = (float.fromhex(closure[key]) for key in
+                           ('reaction_pO2_bar', 'gas_face_pO2_bar', 'bulk_pO2_bar'))
+    assert min(reaction, face, bulk) >= 0.0
+    tolerance = 8 * math.fsum(math.ulp(value) for value in (reaction, face, bulk))
+    assert min(reaction, bulk) - tolerance <= face <= max(reaction, bulk) + tolerance

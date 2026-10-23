@@ -107,6 +107,11 @@ def _internal_analytical_control_refusal(
 
 
 class EquilibriumMixin:
+    def _reaction_oxygen_pO2_bar(self) -> float:
+        """Accepted reaction coordinate, or the explicitly supplied boundary."""
+        reaction = getattr(self, '_reaction_pO2_bar', None)
+        return float(self._headspace_transport_pO2_bar() if reaction is None else reaction)
+
     def _get_equilibrium(self):
         raise NotImplementedError(
             "backend equilibrium must be supplied by the simulator class "
@@ -195,8 +200,6 @@ class EquilibriumMixin:
         physical = self._physical_sweep_boundary()['partials_bar'].get('O2', 0.0)
         if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
             physical = max(physical, self.melt.pO2_mbar / 1000.0)
-            if self.melt.body != 'mars':
-                physical = max(physical, self._oxygen_numerical_floor_bar())
         return physical
 
     def _commanded_pO2_bar(self) -> float:
@@ -214,13 +217,9 @@ class EquilibriumMixin:
             an explicit *floor*, and only when the atmosphere is an
             actively O₂-controlled mode (turbine + bleed holding the
             setpoint). Uncontrolled HARD_VACUUM / PN2_SWEEP runs do not
-            apply that setpoint. Effective pO₂ on those paths is
-            ``max(real_upstream_or_headspace_O2, vacuum_floor)``, so any
-            carried O₂ above the environmental floor still controls
-            equilibrium. It does not collapse to the vacuum floor for the
-            whole campaign.
-          - A hard numerical floor (``self._oxygen_numerical_floor_bar()``) guards the
-            1/√pO₂ and K/pO₂ divisions; it is not a setpoint.
+            apply that setpoint; they retain the physical bulk oxygen.
+            The surface closure supplies a separate positive reaction
+            coordinate for active inverse-pressure source laws.
 
         With finite headspace enabled, melt-offgas O₂ remains in
         ``process.overhead_gas`` until the OVERHEAD_BLEED provider moves it
@@ -250,7 +249,7 @@ class EquilibriumMixin:
             if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
                 pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
             physical = self._headspace_equilibrated_pO2_bar(pO2_bar)
-            return physical if self.melt.body == 'mars' else max(physical, self._oxygen_numerical_floor_bar())
+            return physical
 
         upstream_partials = getattr(
             self,
@@ -264,7 +263,7 @@ class EquilibriumMixin:
         if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
             pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
         physical = self._headspace_equilibrated_pO2_bar(pO2_bar)
-        return physical if self.melt.body == 'mars' else max(physical, self._oxygen_numerical_floor_bar())
+        return physical
 
     def _headspace_transport_pO2_bar(self) -> float:
         """O2 transport reservoir pO2 consumed by SiO/vapor transport."""
@@ -277,10 +276,7 @@ class EquilibriumMixin:
                 getattr(reservoir, 'headspace_transport_pO2_bar', 0.0)
                 or 0.0
             )
-            if self.melt.body == 'mars':
-                return pO2_bar
-            if pO2_bar > 0.0:
-                return max(pO2_bar, self._oxygen_numerical_floor_bar())
+            return pO2_bar
         return self._commanded_pO2_bar()
 
     # --- Ellingham thermodynamic data for oxide equilibrium ---        [ELLI]
@@ -420,7 +416,6 @@ class EquilibriumMixin:
             _range_tuple,
             _require_finite_vapor_value,
             _standard_reaction_pressure_Pa,
-            physical_melt_dissociation_pO2_bar,
             reject_noncertifying_vapor_pressure_row,
             require_antoine_source_certified_temperature,
             vapor_pressure_authority_diagnostic,
@@ -449,6 +444,15 @@ class EquilibriumMixin:
             )
 
         T_K = float(self.melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        # A solved exact zero may skip inverse-pressure laws only when the
+        # current carrier inventory or the existing admitted gate proves zero.
+        if getattr(self, '_reaction_pO2_bar', None) == 0.0:
+            zero_reason = self._evaporation_carrier_zero_reason()
+            if zero_reason:
+                return EquilibriumResult(temperature_C=self.melt.temperature_C,
+                    pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+                    liquid_fraction=None, phase_assemblage_available=False,
+                    status='ok', diagnostics={'vapor_pressure_zero_reason': zero_reason})
         if T_K < 400:
             # Reached only after the control guard: T_K is finite and > 0 K,
             # p_total_mbar is finite and >= 0. On this cold path the
@@ -572,7 +576,7 @@ class EquilibriumMixin:
         # SSO-R keeps intrinsic melt fO2 and headspace transport pO2 as
         # coupled but distinct channels: Fe redox reads the melt reservoir;
         # SiO suppression reads the headspace reservoir.
-        pO2_bar = self._headspace_transport_pO2_bar()
+        pO2_bar = self._reaction_oxygen_pO2_bar()
         vacuum_floor_bar = self._oxygen_numerical_floor_bar()
         reservoir = getattr(self.melt, "oxygen_reservoir", None)
         intrinsic_fO2_value = getattr(
@@ -589,16 +593,9 @@ class EquilibriumMixin:
         else:
             intrinsic_fO2_log = float(intrinsic_fO2_value)
 
-        melt_dissociation_pO2_bar, melt_pO2_clamped = (
-            physical_melt_dissociation_pO2_bar(intrinsic_fO2_log)
-        )
-        if melt_pO2_clamped:
-            # b-148: do not feed the 1e300 float sentinel into mass action.
-            warnings.append(
-                "melt_dissociation_pO2_clamped_to_physical_envelope: "
-                f"fO2_log={intrinsic_fO2_log:.6g} "
-                f"pO2_bar={melt_dissociation_pO2_bar:g}"
-            )
+        # Reaction oxygen is supplied by the surface closure; intrinsic fO2
+        # continues to own finite melt redox and Kress91 FeO activity.
+        melt_dissociation_pO2_bar = pO2_bar
         feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
             floor_bar=vacuum_floor_bar,
         )
@@ -867,9 +864,8 @@ class EquilibriumMixin:
                 )
                 pO2_exponent = float(sp_data.get("pO2_exponent", 0.0) or 0.0)
                 if pO2_exponent:
-                    # Melt-dissolved non-FeO oxide dissociation sees the
-                    # melt's oxygen chemical potential; headspace pO2 is only
-                    # the transport/backpressure channel.
+                    # Dissociation sees the accepted reaction oxygen;
+                    # intrinsic melt redox remains the activity input.
                     pO2_reference_bar = max(
                         1e-30,
                         float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
@@ -1231,9 +1227,7 @@ class EquilibriumMixin:
             K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
 
             # a_M(row basis) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
-            dissociation_pO2_bar = (
-                max(pO2_bar, vacuum_floor_bar) if parent_oxide == 'FeO' else melt_dissociation_pO2_bar
-            )
+            dissociation_pO2_bar = pO2_bar
             # Premise: this fallback solves the melt-supported source pressure;
             # the later surface-flux layer owns overhead species backpressure.
             # For MgO(l) -> Mg(g) + 1/2 O2,
@@ -1243,9 +1237,9 @@ class EquilibriumMixin:
             # Unit check: K, activity, and reduced fugacities are dimensionless;
             # the gas/condensed pressure rail supplies Pa below. Sanity/limit:
             # fO2 down by 100 raises Mg by 10; fO2 -> infinity suppresses Mg.
-            # Thus non-FeO uses intrinsic melt fO2, while overhead pO2 remains
-            # available to transport/backpressure. FeO already carries melt
-            # redox through Kress91 activity and is intentionally unchanged.
+            # Every dissociation denominator uses solved reaction oxygen.
+            # FeO activity separately retains intrinsic Kress91 melt redox;
+            # the bulk gas remains the transport/backpressure boundary.
             numerator = K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar
 
             if numerator <= 0:
@@ -1420,8 +1414,7 @@ class EquilibriumMixin:
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
                 P_sat = _require_finite_vapor_value(
-                    P_sat * ((max(pO2_bar, vacuum_floor_bar) if pO2_exponent < 0.0 else pO2_bar)
-                             / pO2_reference_bar) ** pO2_exponent,
+                    P_sat * (pO2_bar / pO2_reference_bar) ** pO2_exponent,
                     species=name,
                     field="P_sat_pO2",
                 )
@@ -1441,15 +1434,6 @@ class EquilibriumMixin:
                 from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
 
                 sio_pO2_bar = pO2_bar
-                if sio_pO2_bar == 0.0:
-                    # d-259: C7 has not closed the zero-O2 sweep boundary.
-                    # Guard this evaluation only; retain raw state and positives.
-                    sio_pO2_bar = vacuum_floor_bar
-                    warnings.append(
-                        "SiO: pO2 closure missing (C7); "
-                        "authority_level=numerical guard, not physics; "
-                        f"guard_pO2_bar={sio_pO2_bar!r}"
-                    )
                 suppression = _sio_oxygen_pressure_factor(sio_pO2_bar, sio_reference_bar)
                 P_sat = _require_finite_vapor_value(
                     P_sat * suppression,

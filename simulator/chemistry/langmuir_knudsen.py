@@ -553,6 +553,7 @@ class _SurfaceOxygenEvaluation:
     other_oxygen_mol_m2_s: float
     storage_mol_m2_s: float
     payload: Any = None
+    bulk_pO2_bar: float = 0.0
 
     @property
     def balance_terms(self) -> tuple[float, ...]:

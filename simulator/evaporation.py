@@ -807,7 +807,9 @@ class EvaporationMixin:
         # governs only when liquid exists (or liquid_fraction is unset
         # and the path cannot prove physical zero).
         liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
-        if (
+        zero_reason = (self._evaporation_carrier_zero_reason(equilibrium)
+                       if getattr(self, '_reaction_pO2_bar', None) == 0.0 else None)
+        if zero_reason or (
             liquid_fraction is not None
             and legacy_raw_liquid_fraction_is_zero(liquid_fraction)
         ):
@@ -816,6 +818,10 @@ class EvaporationMixin:
             self._last_vapour_batch_flux_overlay = {}
             self._last_vapour_batch_resolve_error = {}
             self._last_imcc_activity_shadow = {}
+            if zero_reason:
+                self._last_evaporation_flux_diagnostic = {
+                    'evaporation_flux_kg_hr': {}, 'reason': zero_reason,
+                }
             return flux
 
         # VR-11: batch owns channel refusal, eligibility, and active membership.
@@ -3872,6 +3878,7 @@ class EvaporationMixin:
     def _apply_evaporation_carrier_batch(self, evap_flux):
         """One carrier/finite-settlement path for projection and acceptance."""
         overhead_flux = evap_flux
+        self._effective_transport_capacity_this_tick = self._controlled_o2_transport_capacity(evap_flux)
         self._ledger_committed_evap_flux_this_tick = evap_flux
         if evap_flux.total_kg_hr > 0 or bool(evap_flux.carrier_authority_by_species):
             self._configure_condensation_operating_conditions(evap_flux)
@@ -3916,6 +3923,12 @@ class EvaporationMixin:
         operands = defaultdict(list)
         oxygen_accounts = ('process.overhead_gas', 'reservoir.fo2_buffer')
         for transition in self.atom_ledger.transitions[transition_start:]:
+            gas_species = {species for lot in (*transition.credits, *transition.debits)
+                           if lot.account == 'process.overhead_gas' for species in lot.species_kg}
+            for species in gas_species:
+                for side, sign in (('credits', 1.0), ('debits', -1.0)):
+                    operands[f'gas:{species}'].append(sign * self._transition_species_mol(
+                        transition, side=side, account='process.overhead_gas', species=species))
             carrier = transition.name.removeprefix('evaporate_') if transition.name.startswith('evaporate_') else None
             if carrier is not None:
                 label = f'source:{carrier}'
@@ -3951,12 +3964,39 @@ class EvaporationMixin:
         if mismatches:
             raise EvaporationFluxRefusal('oxygen_projection_commit_mismatch', {'signed_amounts_mol': mismatches})
 
-    def _solve_evaporative_oxygen_boundary(self, equilibrium, *, overhead_partials_override_Pa=None):
+    def _evaporation_carrier_zero_reason(self, equilibrium=None):
+        """Existing current-inventory/gate proofs; no numerical rate cutoff."""
+        if self.melt.temperature_C + 273.15 < 400.0:
+            return 'internal_analytical_below_400K'
+        if not self.vapour_rail_catalog.build_request(self.atom_ledger.mol_by_account()):
+            return 'empty_carrier_request'
+        liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
+        if (liquid_fraction is not None and liquid_fraction_invalidity(liquid_fraction) is None
+                and melt_regime(liquid_fraction=liquid_fraction, epsilon=0.0) == MeltRegime.FROZEN):
+            return 'no_liquid_phase'
+        if self._freeze_gate_enabled():
+            factor = self._freeze_gate_liquid_fraction_factor()
+            if melt_regime(liquid_fraction=factor, epsilon=0.0) == MeltRegime.FROZEN:
+                return 'no_liquid_surface'
+        return None
+
+    def _solve_evaporative_oxygen_boundary(self, equilibrium=None, *, overhead_partials_override_Pa=None):
         from simulator.chemistry.langmuir_knudsen import (
             OxygenClosureNonconvergence, _SurfaceOxygenEvaluation,
             _solve_surface_oxygen_balance,
         )
         from simulator.transport_regime import series_evaporation_flux
+
+        if equilibrium is None:
+            # Obtain the condensed-phase/canonical state on a detached trial.
+            # This initial log-bracket coordinate is never an achieved oxygen
+            # value. Native diagnostic adapters are shared and may observe
+            # this coordinate; acceptance resets their controls to the root
+            # before any live source batch or ledger mutation.
+            seed = self._detached_evaporation_projection()
+            seed._reaction_pO2_bar = 10.0 ** -12.0
+            return seed._solve_evaporative_oxygen_boundary(seed._get_equilibrium(),
+                overhead_partials_override_Pa=overhead_partials_override_Pa)
 
         # C7 freezes the pre-batch bulk partials, removal boundary, T, and
         # interval (one hour). C8 will couple evolving bulk inventory/removal
@@ -4020,6 +4060,7 @@ class EvaporationMixin:
                 2.0 * amounts['ferric_oxygen'] / area_dt,
                 amounts['other_oxygen'] / area_dt, amounts['storage'] / area_dt,
                 (proposed_flux, receipt, trial, result, series.as_diagnostic()),
+                bulk_pO2_bar=bulk,
             )
 
         try:
@@ -4027,9 +4068,7 @@ class EvaporationMixin:
             # of a trial pressure or rate cutoff. Settlement may still supply
             # oxygen, so check its individually signed terms before accepting 0.
             zero = None
-            if bulk == 0.0 and (self.melt.temperature_C + 273.15 < 400.0
-                                or getattr(equilibrium, 'liquid_fraction', None) == 0.0
-                                or empty_request):
+            if bulk == 0.0 and self._evaporation_carrier_zero_reason(equilibrium):
                 candidate = evaluate(0.0)
                 if not any(candidate.balance_terms):
                     zero = candidate

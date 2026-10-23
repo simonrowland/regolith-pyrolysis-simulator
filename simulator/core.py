@@ -4289,7 +4289,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             residual_o2_mol
         )
         physical = self._headspace_equilibrated_pO2_bar(max(incoming_sweep_pO2, residual_pO2))
-        return physical if self.melt.body == 'mars' else max(physical, self._oxygen_numerical_floor_bar())
+        return physical
 
     def _pn2_sweep_transport_pO2_bar(self, head_o2_mol: float) -> float:
         return self._inert_sweep_transport_pO2_bar(head_o2_mol)
@@ -4314,7 +4314,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         physical = self._headspace_equilibrated_pO2_bar(max(
             float(ledger_pO2_bar), self._headspace_control_floor_pO2_bar(),
         ))
-        return physical if self.melt.body == 'mars' else max(physical, self._oxygen_numerical_floor_bar())
+        return physical
 
     def _refresh_oxygen_reservoir_transport_pO2_for_vapor(
         self,
@@ -4351,8 +4351,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if reaction is not None:
             # The closure owns this physical coordinate. Cache quantization
             # must never change the accepted root on its way to a consumer.
-            return float(reaction)
-        pO2_bar = max(self._vapor_pressure_transport_pO2_bar(), self._oxygen_numerical_floor_bar())
+            return self._reaction_oxygen_pO2_bar()
+        pO2_bar = self._vapor_pressure_transport_pO2_bar()
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'quantize_live_controls', False):
             return float(store.quantized_pO2_bar(self, pO2_bar=pO2_bar))
@@ -7311,14 +7311,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.overhead.turbine_flow_kg_hr * 0.02
         )
 
-    def _compute_capacity_coupling_shadow(self, equilibrium):
+    def _compute_capacity_coupling_shadow(self, equilibrium, *, fixed_evaporation_flux_kg_hr=None,
+                                          fixed_overhead_source_mol_hr=None):
         degraded_before = copy.deepcopy(self._degraded_path_engagement)
         try:
-            return self._compute_capacity_coupling_shadow_impl(equilibrium)
+            return self._compute_capacity_coupling_shadow_impl(equilibrium,
+                fixed_evaporation_flux_kg_hr=fixed_evaporation_flux_kg_hr,
+                fixed_overhead_source_mol_hr=fixed_overhead_source_mol_hr)
         finally:
             self._degraded_path_engagement = degraded_before
 
-    def _compute_capacity_coupling_shadow_impl(self, equilibrium):
+    def _compute_capacity_coupling_shadow_impl(self, equilibrium, *, fixed_evaporation_flux_kg_hr=None,
+                                               fixed_overhead_source_mol_hr=None):
         from engines.builtin.evaporation_flux import (
             BuiltinEvaporationFluxProvider,
         )
@@ -7373,7 +7377,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             overhead_partials_Pa=initial_partials,
             vapour_batch_flux_pressures_Pa=batch_flux_pressures,
         )
-        for species in pre_holdup:
+        for species in pre_holdup.keys() | (fixed_overhead_source_mol_hr or {}).keys():
             molar_masses.setdefault(
                 species,
                 resolve_species_formula(
@@ -7413,6 +7417,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         rates_cache = {}
 
         def flux_at_partials(partials_Pa):
+            if fixed_evaporation_flux_kg_hr is not None:
+                # C7 supplies its accepted source at frozen upstream partials.
+                # C8 will couple source and removal within the interval.
+                return dict(fixed_evaporation_flux_kg_hr)
             cache_key = tuple(sorted(
                 (str(species), float(pressure))
                 for species, pressure in partials_Pa.items()
@@ -7468,6 +7476,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return rates
 
         def overhead_source_at_partials(partials_Pa):
+            if fixed_overhead_source_mol_hr is not None:
+                # Full signed gas delta includes capture and finite settlement;
+                # native formation already belongs to pre_holdup, exactly once.
+                return dict(fixed_overhead_source_mol_hr)
             return self._project_evaporation_overhead_source_mol_hr(
                 flux_at_partials(partials_Pa),
                 controls['stoich_by_species'],
@@ -10281,6 +10293,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._last_high_t_melt_activity = {}
                 self._last_high_t_melt_activity_temperature_K = None
                 return
+        zero_reason = (self._evaporation_carrier_zero_reason(result)
+                       if getattr(self, '_reaction_pO2_bar', None) == 0.0 else None)
+        if zero_reason:
+            result.vapor_pressures_Pa = {}
+            result.vapor_pressures_source = {}
+            self._last_vapor_pressures_source = {}
+            self._last_vapor_pressure_diagnostic = {
+                'status': 'ok', 'vapor_pressures_Pa': {},
+                'vapor_pressure_zero_reason': zero_reason,
+            }
+            self._last_high_t_melt_activity = {}
+            self._last_high_t_melt_activity_temperature_K = None
+            return
+
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
@@ -14319,6 +14345,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # diagnostics and return a detached snapshot without clearing evidence.
         if self.paused_for_decision:
             return self._make_snapshot()
+        self._reaction_pO2_bar = None
+        self._last_surface_oxygen_diagnostic = {}
         self._last_imcc_activity_shadow = {}
         o2_bubbler_refusal = self._o2_bubbler_control_refusal()
         if o2_bubbler_refusal is not None:
@@ -14468,90 +14496,52 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 4. Thermodynamic equilibrium ---
         # Query the melt backend for phase assemblage, activities,
         # and vapor pressures at the post-source, post-native composition.
+        boundary = self._solve_evaporative_oxygen_boundary() if evaporation_campaign else None
+        if boundary is not None:
+            self._reaction_pO2_bar = boundary.reaction_pO2_bar
         equilibrium = self._get_equilibrium()
-
-        # --- 4b. Evaporation flux ---
-        # Hertz-Knudsen-Langmuir: how fast each species leaves the melt.
-        # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
-        # Not during MRE (C5) — electrolysis produces O₂ at the anode.
         evap_flux = EvaporationFlux()
         capacity_result = None
-        if evaporation_campaign:
-            if (
-                self._overhead_headspace_enabled()
-                and hasattr(equilibrium, 'vapor_pressures_Pa')
-            ):
-                from simulator.capacity_coupling import (
-                    CapacityCouplingRefusalError,
-                    CapacityShadowRefusal,
-                )
-
-                from simulator.thermal_train import FiniteCapacity
-
-                capacity, cold_train = self._cold_train_capacity_policy()
-                if isinstance(capacity, FiniteCapacity):
-                    assert cold_train is not None
-                    capacity_result = (
-                        self._compute_capacity_coupling_shadow(equilibrium)
-                    )
-                    if isinstance(capacity_result, CapacityShadowRefusal):
-                        raise CapacityCouplingRefusalError(capacity_result)
-            if capacity_result is not None:
+        if boundary is not None:
+            evap_flux, predicted_amounts, projected, _, oxygen_series = boundary.payload
+            # Re-enter the real flux controls at the accepted coordinate for
+            # live diagnostics. A changed source is a refusal, never a re-solve.
+            live_flux = self._apply_analytic_evaporation_depletion(self._calculate_evaporation(equilibrium))
+            planned_rates = dict(evap_flux.species_kg_hr)
+            achieved_rates = dict(live_flux.species_kg_hr)
+            self._verify_evaporation_projection(
+                (planned_rates, {key: math.ulp(value) for key, value in planned_rates.items()}),
+                (achieved_rates, {key: math.ulp(value) for key, value in achieved_rates.items()}))
+            terms = boundary.balance_terms
+            gross = math.fsum(abs(value) for value in terms)
+            self._last_surface_oxygen_diagnostic = {
+                'reaction_pO2_bar': boundary.reaction_pO2_bar,
+                'gas_face_pO2_bar': boundary.gas_face_pO2_bar,
+                'bulk_pO2_bar': boundary.bulk_pO2_bar,
+                'intrinsic_melt_fO2_log': self.melt.oxygen_reservoir.melt_intrinsic_fO2_log,
+                'source_terms_mol_m2_s': dict(boundary.source_terms_mol_m2_s),
+                'ferric_rate_mol_m2_s': boundary.ferric_rate_mol_m2_s,
+                'other_oxygen_mol_m2_s': boundary.other_oxygen_mol_m2_s,
+                'storage_mol_m2_s': boundary.storage_mol_m2_s,
+                'oxygen_flux_mol_m2_s': boundary.oxygen_flux_mol_m2_s,
+                'relative_residual': abs(boundary.residual) / gross if gross else 0.0,
+                'oxygen_series': oxygen_series,
+                'oxygen_alpha_source': 'declared alpha_O2=1 sensitivity; unmeasured',
+                'melt_resistance_status': 'R_melt=0 upper bound; missing species/state inputs',
+                'coupling': 'C7 frozen pre-batch bulk/removal; C8 transient unresolved',
+            }
+            from simulator.thermal_train import FiniteCapacity
+            capacity, cold_train = self._cold_train_capacity_policy()
+            if self._overhead_headspace_enabled() and isinstance(capacity, FiniteCapacity):
+                from simulator.capacity_coupling import CapacityCouplingRefusalError, CapacityShadowRefusal
+                assert cold_train is not None
+                capacity_result = self._compute_capacity_coupling_shadow(equilibrium,
+                    fixed_evaporation_flux_kg_hr=projected._ledger_committed_evap_flux_this_tick.species_kg_hr,
+                    fixed_overhead_source_mol_hr={key.removeprefix('gas:'): value
+                        for key, value in predicted_amounts[0].items() if key.startswith('gas:')})
+                if isinstance(capacity_result, CapacityShadowRefusal):
+                    raise CapacityCouplingRefusalError(capacity_result)
                 self._sweep_transport_step['capacity_result'] = capacity_result
-                live_raw_flux = self._calculate_evaporation(
-                    equilibrium,
-                    overhead_partials_override_Pa=(
-                        capacity_result.partial_pressures_Pa
-                    ),
-                )
-                live_effective_flux = (
-                    self._apply_analytic_evaporation_depletion(live_raw_flux)
-                )
-                solved_rates = {
-                    species: float(rate)
-                    for species, rate in (
-                        capacity_result.evaporation_flux_kg_hr.items()
-                    )
-                    if float(rate) > 1.0e-12
-                }
-                live_rates = {
-                    species: float(rate)
-                    for species, rate in live_effective_flux.species_kg_hr.items()
-                    if float(rate) > 1.0e-12
-                }
-                assert set(live_rates) == set(solved_rates)
-                assert all(
-                    math.isclose(
-                        live_rates[species],
-                        solved_rates[species],
-                        rel_tol=1.0e-12,
-                        abs_tol=1.0e-15,
-                    )
-                    for species in solved_rates
-                )
-                evap_flux.species_kg_hr = {
-                    species: float(rate)
-                    for species, rate in (
-                        solved_rates.items()
-                    )
-                    if float(rate) > 1.0e-12
-                }
-                evap_flux.alpha_authority_status_by_species = {
-                    species: status
-                    for species, status in (
-                        live_effective_flux.alpha_authority_status_by_species.items()
-                    )
-                    if species in evap_flux.species_kg_hr
-                }
-                evap_flux.carrier_authority_by_species = copy.deepcopy(
-                    live_effective_flux.carrier_authority_by_species
-                )
-                evap_flux.update_totals()
-            else:
-                evap_flux = self._calculate_evaporation(equilibrium)
-                evap_flux = self._apply_analytic_evaporation_depletion(
-                    evap_flux
-                )
         if self.melt.ambient_pressure_mbar > 0.0 or sweep_initial_mol is not None:
             full_source = self._project_evaporation_overhead_source_mol_hr(evap_flux.species_kg_hr, {})
             chamber_flow = None
@@ -14566,20 +14556,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 full_source, evap_flux=evap_flux, chamber_mol_per_s=chamber_flow,
             )
         overhead_flux = evap_flux
-        effective_transport_capacity = (
-            self._controlled_o2_transport_capacity(evap_flux)
-        )
-        self._effective_transport_capacity_this_tick = (
-            effective_transport_capacity
-        )
 
         # --- 5. Condensation routing ---
         # Send evaporated species through the 8-stage train.
         # Each stage collects species based on its temperature.
-        routed_batch = evap_flux.total_kg_hr > 0 or bool(evap_flux.carrier_authority_by_species)
+        transition_start = len(self.atom_ledger.transitions)
+        buffer_before = self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(OXYGEN_SPECIES, 0.0)
         evap_flux, overhead_flux = self._apply_evaporation_carrier_batch(evap_flux)
-        if routed_batch:
-            effective_transport_capacity = self._effective_transport_capacity_this_tick
+        if boundary is not None:
+            self._verify_evaporation_projection(predicted_amounts,
+                self._evaporation_signed_amounts(transition_start, buffer_before))
+        effective_transport_capacity = self._effective_transport_capacity_this_tick
         if evap_flux.alpha_authority_status_by_species:
             engaged_alpha_authority = dict(
                 getattr(

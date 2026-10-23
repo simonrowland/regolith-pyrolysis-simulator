@@ -89,7 +89,6 @@ from simulator.melt_backend.alphamelts_contract import (
 )
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.environment import (
-    DEFAULT_VACUUM_FLOOR_BAR,
     vacuum_floor_bar_for_environment,
 )
 from simulator.feedstock_composition import iron_oxide_values, total_fe
@@ -1054,7 +1053,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._last_normalization_warnings: List[str] = []
         self._vapor_pressure_table: Optional[dict] = None
         self._subprocess_vapor_pressure_provider = None
-        self._vapor_transport_pO2_bar = DEFAULT_VACUUM_FLOOR_BAR
+        self._vapor_transport_pO2_bar = None
         self._vapor_transport_pO2_admission = 'environment'
         self._configured_vapor_transport_pO2_bar = self._vapor_transport_pO2_bar
         self._vapor_transport_floor_bar = vacuum_floor_bar_for_environment()
@@ -1071,8 +1070,10 @@ class _MELTSBackendSupport(MeltBackend):
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
-        if admission not in ('environment', 'observation'):
+        if admission not in ('environment', 'observation', 'surface_closure'):
             raise ValueError(f'unsupported vapor_transport_pO2_admission={admission!r}')
+        if value is None:
+            raise ValueError('vapor_transport_pO2_bar requires an explicit physical oxygen boundary')
         request = IntentRequest(
             intent=ChemistryIntent.VAPOR_PRESSURE,
             account_view=ProviderAccountView(
@@ -1089,19 +1090,19 @@ class _MELTSBackendSupport(MeltBackend):
             resolved_pO2 = resolve_transport_pO2_bar(request)
         except ValueError as exc:
             raise ValueError(
-                'vapor_transport_pO2_bar must be finite and > 0 and at least '
-                f'the active environment floor; {exc}'
+                f'vapor_transport_pO2_bar must be finite and nonnegative; {exc}'
             ) from exc
         self._vapor_transport_pO2_bar = resolved_pO2
         self._vapor_transport_floor_bar = resolved_floor
         self._vapor_transport_pO2_admission = admission
 
     def _initialize_vapor_transport(self, config: Mapping[str, object]) -> None:
-        self._set_vapor_transport_pO2_bar(config.get(
-            'vapor_transport_pO2_bar', DEFAULT_VACUUM_FLOOR_BAR,
-        ), floor_bar=config.get(
-            'vapor_transport_floor_bar', vacuum_floor_bar_for_environment(),
-        ))
+        # Availability initialization does not invent a gas boundary. A live
+        # equilibrium call supplies solved oxygen, or an explicit diagnostic
+        # configuration supplies its declared boundary.
+        if 'vapor_transport_pO2_bar' in config:
+            self._set_vapor_transport_pO2_bar(config['vapor_transport_pO2_bar'], floor_bar=config.get(
+                'vapor_transport_floor_bar', vacuum_floor_bar_for_environment()))
         self._configured_vapor_transport_pO2_bar = self._vapor_transport_pO2_bar
         self._configured_vapor_transport_floor_bar = self._vapor_transport_floor_bar
 

@@ -346,74 +346,38 @@ def resolve_transport_pO2_bar(
     *,
     floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
-    """Resolve transport oxygen; observations bypass simulated-headspace floors.
+    """Admit physical oxygen unchanged; the surface closure owns its root.
 
-    ``pO2_admission='observation'`` admits only finite positive oxygen, as
-    measured/commanded. It does not change intrinsic/source pressure controls
-    or an engine's calibration notices.
+    The legacy floor keyword is reference metadata for callers, never a
+    physical substitute. Observations require a positive measured value;
+    simulated source-free boundaries retain exact zero.
     """
-
     controls = request.control_inputs or {}
-    observation = controls.get('pO2_admission') == 'observation'
-    surface_closure = controls.get('pO2_admission') == 'surface_closure'
-    floor_bar = (
-        0.0 if observation or surface_closure
-        else resolve_request_vacuum_floor_bar(request, floor_bar=floor_bar)
-    )
-    if "pO2_bar" in controls and controls.get("pO2_bar") is not None:
-        raw_pO2 = controls.get("pO2_bar")
+    admission = controls.get('pO2_admission')
+    observation = admission == 'observation'
+    if admission not in ('observation', 'surface_closure'):
+        # Preserve validation of legacy reference metadata without using its
+        # magnitude to alter the physical oxygen supplied by the caller.
+        resolve_request_vacuum_floor_bar(request, floor_bar=floor_bar)
+    if controls.get('pO2_bar') is not None:
+        oxygen = control_float(controls, 'pO2_bar')
+    elif request.fO2_log is not None:
+        if not is_declared_real_scalar(request.fO2_log, allow_numeric_str=True):
+            raise ValueError('fO2_log must be numeric')
+        log_oxygen = float(request.fO2_log)
+        if not math.isfinite(log_oxygen):
+            raise ValueError('fO2_log must be finite')
         try:
-            pO2_bar = control_float(controls, "pO2_bar")
-        except (TypeError, ValueError) as exc:
-            raise ValueError(
-                f"pO2_bar must be numeric, got {raw_pO2!r}"
-            ) from exc
-        if not math.isfinite(pO2_bar) or (pO2_bar < 0.0 if surface_closure else pO2_bar <= 0.0):
-            raise ValueError(
-                f"pO2_bar must be finite and > 0, got {raw_pO2!r}"
-            )
-        if pO2_bar < floor_bar:
-            raise ValueError(
-                f"explicit pO2_bar={pO2_bar:g} below transport model floor "
-                f"{floor_bar:g}; request the floor explicitly by using "
-                f"pO2_bar={floor_bar:g}"
-            )
-        return pO2_bar
-
-    if request.fO2_log is not None:
-        try:
-            if not is_declared_real_scalar(
-                request.fO2_log,
-                allow_numeric_str=True,
-            ):
-                raise TypeError
-            fO2_log = float(request.fO2_log)
-        except (TypeError, ValueError) as exc:
-            raise ValueError(
-                f"fO2_log must be numeric, got {request.fO2_log!r}"
-            ) from exc
-        try:
-            pO2_bar = 10.0 ** fO2_log
+            oxygen = 10.0 ** log_oxygen
+            if oxygen == 0.0:
+                raise ValueError('fO2_log underflows the physical oxygen range')
         except OverflowError as exc:
-            raise ValueError(
-                f"fO2_log={fO2_log:g} resolves outside finite pO2_bar range"
-            ) from exc
-        if not math.isfinite(pO2_bar) or pO2_bar <= 0.0:
-            raise ValueError(
-                f"fO2_log resolved to invalid pO2_bar={pO2_bar!r}"
-            )
-        if pO2_bar < floor_bar:
-            raise ValueError(
-                f"fO2_log={fO2_log:g} resolves to "
-                f"pO2_bar={pO2_bar:g} below transport model floor "
-                f"{floor_bar:g}; request the floor explicitly by using "
-                f"pO2_bar={floor_bar:g}"
-            )
-        return pO2_bar
-
-    if observation:
-        raise ValueError('observation oxygen requires pO2_bar or fO2_log')
-    return floor_bar
+            raise ValueError('fO2_log resolves outside finite oxygen range') from exc
+    else:
+        raise ValueError('transport oxygen requires explicit pO2_bar or fO2_log')
+    if not math.isfinite(oxygen) or oxygen < 0.0 or (observation and oxygen == 0.0):
+        raise ValueError('pO2_bar must be finite and nonnegative (positive for observations)')
+    return oxygen
 
 
 def resolve_request_vacuum_floor_bar(

@@ -31,7 +31,6 @@ from typing import Any, Mapping, Optional
 
 from engines.builtin._common import (
     reject_wrong_intent,
-    resolve_request_vacuum_floor_bar,
     resolve_transport_pO2_bar,
 )
 from engines.vaporock.result import VapoRockDiagnostics
@@ -253,16 +252,10 @@ class VapoRockProvider(ChemistryProvider):
     @staticmethod
     def _resolve_fO2_log(request: IntentRequest) -> float:
         """Convert commanded vapor pO2 into the adapter's gas fO2_log."""
-        controls = request.control_inputs or {}
-        if controls.get('pO2_bar') is not None:
-            return float(
-                math.log10(resolve_transport_pO2_bar(request))
-            )
-        if request.fO2_log is not None:
-            return float(
-                math.log10(resolve_transport_pO2_bar(request))
-            )
-        return math.log10(resolve_request_vacuum_floor_bar(request))
+        oxygen = resolve_transport_pO2_bar(request)
+        # log10(p/bar) tends to -infinity at exact physical zero. Preserve
+        # that native-coordinate limit; no finite epsilon represents it.
+        return math.log10(oxygen) if oxygen > 0.0 else -math.inf
 
     @staticmethod
     def _control_audit(

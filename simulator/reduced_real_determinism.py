@@ -2915,12 +2915,15 @@ def canonical_replay_key(
     # non-finite input, so a non-finite commanded pO2 would otherwise encode a
     # None straight into the cache key. Commanded 0.0 (controlled-O2 off) is
     # finite and preserved; only NaN/inf is refused.
-    commanded_pO2_bar = float(sim._commanded_pO2_bar())
-    quantized_pO2_bar = _sigfig(
-        commanded_pO2_bar,
-        quantization.composition_sig_figs,
-    )
-    if quantized_pO2_bar is None:
+    reaction = (getattr(sim, '_reaction_pO2_bar', None)
+                if intent != ChemistryIntent.GATE_LIQUID_FRACTION else None)
+    commanded_pO2_bar = float(sim._commanded_pO2_bar() if reaction is None else reaction)
+    # The closure's actual input crosses the engine boundary unrounded. Its
+    # cache key must retain that same coordinate; rounding only the key could
+    # merge two distinct pressure laws. Other controls retain their policy.
+    quantized_pO2_bar = (_sigfig(commanded_pO2_bar, quantization.composition_sig_figs)
+                         if reaction is None else commanded_pO2_bar)
+    if quantized_pO2_bar is None or not math.isfinite(quantized_pO2_bar):
         raise PT0InvalidControls(
             "non-finite commanded pO2 passed to PT-0 cache key quantization: "
             f"{commanded_pO2_bar!r} bar"

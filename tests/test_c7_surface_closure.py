@@ -86,6 +86,9 @@ def test_hot_empty_parent_inventory_proves_zero_without_pressure_evaluation():
         result = EquilibriumResult(temperature_C=1600.0, liquid_fraction=1.0)
         solved = sim._solve_evaporative_oxygen_boundary(result)
         assert solved.reaction_pO2_bar == solved.residual == 0.0
+        # Re-enter the real legacy/backend + kernel refresh path at that zero.
+        sim._reaction_pO2_bar = solved.reaction_pO2_bar
+        assert sim._get_equilibrium().vapor_pressures_Pa == {}
     finally:
         close_test_owned_magemin_backend(sim)
 
@@ -111,10 +114,9 @@ def test_projection_is_read_only_and_commits_the_same_signed_amounts():
         sim._reset_redox_source_diagnostics_for_hour()
         sim._establish_melt_redox_gate_authority_for_current_hour()
         sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
-        equilibrium = sim._get_equilibrium()
         before = (sim.atom_ledger.mol_by_account(), len(sim.atom_ledger.transitions),
                   deepcopy(sim.melt.oxygen_reservoir), deepcopy(sim.train))
-        solved = sim._solve_evaporative_oxygen_boundary(equilibrium)
+        solved = sim._solve_evaporative_oxygen_boundary()
         assert solved.reaction_pO2_bar > solved.gas_face_pO2_bar >= sim._vapor_pressure_transport_pO2_bar()
         assert (sim.atom_ledger.mol_by_account(), len(sim.atom_ledger.transitions),
                 sim.melt.oxygen_reservoir, sim.train) == before
@@ -122,6 +124,8 @@ def test_projection_is_read_only_and_commits_the_same_signed_amounts():
         assert trial.atom_ledger is not sim.atom_ledger
         assert trial.cost_ledger is not sim.cost_ledger
         assert trial._chem_kernel is not sim._chem_kernel
+        sim._reaction_pO2_bar = solved.reaction_pO2_bar
+        sim._get_equilibrium()
         start = len(sim.atom_ledger.transitions)
         stored = sim.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
         sim._apply_evaporation_carrier_batch(flux)
@@ -138,5 +142,30 @@ def test_projection_is_read_only_and_commits_the_same_signed_amounts():
         changed[0]['storage'] += 1.0
         with pytest.raises(EvaporationFluxRefusal, match='oxygen_projection_commit_mismatch'):
             sim._verify_evaporation_projection(predicted, changed)
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
+@pytest.mark.parametrize('finite_capacity', (False, True))
+def test_real_hour_closes_current_sources_and_preserves_oxygen_atoms(monkeypatch, finite_capacity):
+    sim = simulation()
+    try:
+        if finite_capacity:
+            from simulator.thermal_train import FiniteCapacity
+            _, cold_train = sim._cold_train_capacity_policy()
+            monkeypatch.setattr(sim, '_cold_train_capacity_policy',
+                                lambda: (FiniteCapacity(1.0), cold_train))
+        sim.melt.temperature_C = 1600.0
+        sim.campaign_mgr.overrides['C2A'] = {'ramp_rate': 0.0, 'min_hold_hr': 24.0, 'max_hours': 24.0}
+        def oxygen_atoms():
+            return math.fsum(sim.atom_ledger.atom_moles_by_account(account).get('O', 0.0)
+                             for account in sim.atom_ledger.mol_by_account())
+        before = oxygen_atoms()
+        sim.step()
+        assert sim.melt.hour == 1
+        diagnostic = sim._last_surface_oxygen_diagnostic
+        assert diagnostic['reaction_pO2_bar'] > 0.0
+        assert diagnostic['relative_residual'] < math.sqrt(math.ulp(1.0))
+        assert oxygen_atoms() == pytest.approx(before, rel=0.0, abs=8.0 * math.ulp(before))
     finally:
         close_test_owned_magemin_backend(sim)

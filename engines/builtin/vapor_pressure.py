@@ -2671,7 +2671,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         from simulator.state import GAS_CONSTANT
         from simulator.vapour_rail.channels import (
             REACTION_PLANE_MELT_INTERFACE,
-            REACTION_PLANE_TRANSPORT_HEADSPACE,
             channel_linear_mass_action_factor,
             o2_potential_from_pO2_bar,
         )
@@ -2715,10 +2714,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         )
         melt_dissociation_pO2_bar = transport_pO2_bar
         melt_dissociation_pO2_clamped = False
-        if intrinsic_fO2_log is not None:
-            melt_dissociation_pO2_bar, melt_dissociation_pO2_clamped = (
-                physical_melt_dissociation_pO2_bar(float(intrinsic_fO2_log))
-            )
+        # The supplied reaction-plane oxygen owns every mass-action channel.
+        # Intrinsic melt fO2 remains an independent finite Fe/activity input.
         comp_wt = composition_wt_pct_from_account_view(
             request.account_view, self.DECLARED_ACCOUNT
         )
@@ -2809,7 +2806,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         transport_o2 = o2_potential_from_pO2_bar(
             pO2_bar=transport_pO2_bar,
             temperature_K=T_K,
-            reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+            reaction_plane=REACTION_PLANE_MELT_INTERFACE,
         )
         transport_notice = transport_o2.observation_or_setpoint_receipt.get(
             "extrapolation_notice"
@@ -2821,19 +2818,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 f"certified_band={transport_notice['certified_band']!r} "
                 "authority_level=extrapolated"
             )
-        if melt_dissociation_pO2_clamped and intrinsic_fO2_log is not None:
-            # Visible, non-authoritative: redox returned a non-physical fO2;
-            # mass action uses the physical envelope edge so oxygen-dependent
-            # carriers (AlO2, CrO2, CrO3, …) cannot invent multi-GPa vapor
-            # from a float clamp (b-148).
-            warnings.append(
-                "melt_dissociation_pO2_clamped_to_physical_envelope: "
-                f"fO2_log={float(intrinsic_fO2_log):.6g} "
-                f"pO2_bar={melt_dissociation_pO2_bar:g} "
-                f"envelope_bar=[{MELT_DISSOCIATION_PO2_MIN_BAR:g}, "
-                f"{MELT_DISSOCIATION_PO2_MAX_BAR:g}]"
-            )
-
         metals_data = self._vapor_pressure_data.get('metals', {}) or {}
         for species in _ELLINGHAM_THERMO:
             n_M, n_ox = ellingham_stoichiometry(species)
@@ -3525,17 +3509,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="K_decomp",
             )
-            dissociation_pO2_bar = (
-                transport_pO2_bar
-                if parent_oxide == 'FeO'
-                else melt_dissociation_pO2_bar
-            )
+            dissociation_pO2_bar = transport_pO2_bar
             if parent_oxide != 'FeO':
                 # t-571: the Ellingham O2 denominator is sourced from the
                 # owner-gated O2 channel potential (melt_interface plane).
                 # The potential retains the actual oxygen, including a domain
-                # notice beyond the evaluator band. FeO retains its transport
-                # denominator (Kress91 activity already carries melt redox).
+                # notice beyond the evaluator band. FeO uses the same solved
+                # coordinate; Kress91 activity separately carries melt redox.
                 dissociation_pO2_bar = o2_potential_from_pO2_bar(
                     pO2_bar=dissociation_pO2_bar,
                     temperature_K=T_K,
@@ -3557,7 +3537,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             # co-evolution is a separate reaction-basis validation, not a
             # runtime boundary condition solved by that subtraction.
             # FeO already carries melt redox through its Kress91 activity and
-            # intentionally retains the legacy transport denominator here.
+            # uses the same solved reaction denominator here.
             numerator = _require_finite_vapor_value(
                 K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar,
                 species=species,
@@ -3949,15 +3929,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 pO2_reference_bar = max(
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
-                # t-571: transport-plane O2 through channel #1.  The legacy
-                # form uses the actual transport oxygen; the channel factory
-                # records a notice outside its stated evaluator band.
+                # Source mass action consumes the accepted reaction oxygen.
+                # The channel factory records extrapolation outside its band.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
                     pO2_bar=transport_pO2_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
-                    reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
                 )
                 P_eq_Pa = _require_finite_vapor_value(
                     P_eq_Pa
@@ -3974,12 +3953,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             #   P = P_ref * a_SiO2 * sqrt(p_ref / pO2)
             # applied once on BOTH sides of p_ref (boost below ref, suppress
             # above). Unit check: bar/bar is dimensionless. Sanity: at
-            # pO2=p_ref the factor is 1; at the legal lunar floor 1.3e-12 bar
-            # the factor is sqrt(1e-9/1.3e-12)≈27.735 — a silent clip to
-            # unity below p_ref was an under-extraction bug. Transport pO2
-            # is already fail-loud gated at the body/request vacuum floor
-            # (resolve_transport_pO2_bar); no additional silent pO2 floor
-            # belongs here. Body floors must not retune the SiO fit itself.
+            # pO2=p_ref the factor is 1; at reaction oxygen 1.3e-12 bar
+            # the factor is sqrt(1e-9/1.3e-12)≈27.735. The published reference
+            # numerator remains fixed; no physical oxygen floor belongs here.
             if name == 'SiO' and not pO2_exponent:
                 sio_reference_bar = max(
                     1e-30,
@@ -3989,13 +3965,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     ),
                 )
                 # t-571: the sqrt mass action consumes the owner-gated O2
-                # channel potential (transport_headspace plane).  The exact
+                # channel potential (melt_interface plane). The exact
                 # legacy expression sqrt(p_ref / p) is preserved — only the
                 # scalar source is validated and receipted without substitution.
                 sio_o2_potential = o2_potential_from_pO2_bar(
                     pO2_bar=transport_pO2_bar,
                     temperature_K=T_K,
-                    reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
                     pO2_reference_bar=sio_reference_bar,
                 )
                 from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
@@ -4163,10 +4139,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 "reference_temperature_K": None,
                 "component_basis": "raoultian_pure_endmember",
             },
-            # Exact intrinsic-melt oxygen channel used above for metal-source
-            # dissociation. Catalog activity evaluation must consume this solve
-            # input, never reconstruct it from a later EquilibriumResult or
-            # substitute transport/headspace pO2.
+            # Accepted reaction oxygen for source mass action. Intrinsic melt
+            # redox remains the independent logarithmic Fe-activity input below.
+            # Catalog evaluation must preserve this exact solved scalar.
             "source_reaction_fO2_bar": (
                 melt_dissociation_pO2_bar
                 if intrinsic_fO2_log_supplied
@@ -4297,9 +4272,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         :meth:`EquilibriumMixin._commanded_pO2_bar` and passes it through
         ``control_inputs['pO2_bar']`` to keep parity with the legacy
         ``_internal_analytical_equilibrium``. If that explicit transport channel is
-        absent, preserve the old fallback to the standard ``fO2_log``
-        channel; if neither is supplied, fall back to the
-        numerical vacuum floor.
+        absent, use an explicitly supplied finite ``fO2_log``. Missing oxygen
+        is refused; the published vacuum reference never supplies molecules.
         """
 
         return resolve_transport_pO2_bar(request)

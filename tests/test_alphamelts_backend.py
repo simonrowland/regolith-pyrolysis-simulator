@@ -10128,7 +10128,7 @@ def _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, config):
     return backend.initialize(config)
 
 
-@pytest.mark.parametrize('gas_bar', [1e-9, 2e-9, 1e-6])
+@pytest.mark.parametrize('gas_bar', [0.0, 1e-10, 1e-9, 2e-9, 1e-6])
 def test_alphamelts_transport_config_pin_before_shared_validation(
     monkeypatch, gas_bar,
 ):
@@ -10139,7 +10139,7 @@ def test_alphamelts_transport_config_pin_before_shared_validation(
     assert backend._vapor_transport_pO2_bar == gas_bar
 
 
-@pytest.mark.parametrize('gas_bar', [0.0, 1e-10, float('nan'), float('inf')])
+@pytest.mark.parametrize('gas_bar', [-1.0, float('nan'), float('inf')])
 def test_alphamelts_transport_config_refusal_pin_before_shared_validation(
     monkeypatch, gas_bar,
 ):
@@ -10170,7 +10170,7 @@ def test_thermoengine_public_config_reaches_gas_resolver(backend_cls, monkeypatc
 
 
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
-@pytest.mark.parametrize('gas_bar', [0.0, 1e-10, float('nan'), float('inf')])
+@pytest.mark.parametrize('gas_bar', [-1.0, float('nan'), float('inf')])
 def test_melts_public_config_rejects_invalid_transport_oxygen(
     backend_cls, monkeypatch, gas_bar,
 ):
@@ -10340,8 +10340,8 @@ def test_battery_melts_invalid_observation_refuses_before_native(
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 @pytest.mark.parametrize('route', ['direct', 'kernel'])
 @pytest.mark.parametrize('raw_oxygen,expected', [
-    # Production routing at f2ee412fa, before the C7 value flip.
-    (0.0, 1.3e-12), (1.3e-12, 1.3e-12), (1e-9, 1e-9), (1e-6, 1e-6),
+    # Physical routing retains zero and every positive value unchanged.
+    (0.0, 0.0), (1.3e-12, 1.3e-12), (1e-9, 1e-9), (1e-6, 1e-6),
 ])
 def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, raw_oxygen, expected, monkeypatch):
     from simulator.state import Atmosphere
@@ -10427,7 +10427,7 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, raw_oxy
     if route == 'kernel':
         # Diagnostic MELTS vapour is discarded before the builtin refresh.
         assert result.vapor_pressures_Pa == {}
-    assert helper.calls[-1]['fO2_log'] == pytest.approx(math.log10(expected))
+    assert helper.calls[-1]['fO2_log'] == pytest.approx(math.log10(expected) if expected > 0.0 else -math.inf)
     backend.equilibrate(
         temperature_C=1600.0,
         composition_kg={'SiO2': 49.0, 'Al2O3': 15.0, 'FeO': 10.0,
@@ -10438,18 +10438,13 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, raw_oxy
 
 
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
-def test_live_transport_refuses_below_active_environment_floor(backend_cls, monkeypatch):
+def test_live_transport_preserves_below_environment_reference(backend_cls, monkeypatch):
     from simulator.environment import vacuum_floor_bar_for_environment
-
     backend = backend_cls()
     assert _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, {})
-    floor = vacuum_floor_bar_for_environment(body='moon')
-    with pytest.raises(ValueError, match='floor'):
-        backend.equilibrate(
-            temperature_C=1600.0, fO2_log=-12.0,
-            vapor_transport_pO2_bar=floor / 2,
-            vapor_transport_floor_bar=floor,
-        )
+    reference = vacuum_floor_bar_for_environment(body='moon')
+    backend._set_vapor_transport_pO2_bar(reference / 2, floor_bar=reference)
+    assert backend._vapor_transport_pO2_bar == reference / 2
 
 
 def test_core_direct_alphamelts_dispatch_keeps_isothermal(monkeypatch):
@@ -10464,13 +10459,15 @@ def test_core_direct_alphamelts_dispatch_keeps_isothermal(monkeypatch):
         return equilibrate(self, *args, **kwargs)
 
     monkeypatch.setattr(AlphaMELTSBackend, 'equilibrate', record_call)
-    test_live_lunar_transport_input_reaches_vaporock(AlphaMELTSBackend, 'direct', monkeypatch)
+    test_live_lunar_transport_input_reaches_vaporock(
+        AlphaMELTSBackend, 'direct', 1e-6, 1e-6, monkeypatch,
+    )
     assert calls == ['isothermal', None]
 
 
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
-@pytest.mark.parametrize('gas_bar', [0.0, -1.0, float('nan'), float('inf')])
-def test_live_transport_refuses_nonpositive_or_nonfinite_oxygen(
+@pytest.mark.parametrize('gas_bar', [-1.0, float('nan'), float('inf')])
+def test_live_transport_refuses_negative_or_nonfinite_oxygen(
     backend_cls, monkeypatch, gas_bar,
 ):
     from simulator.environment import vacuum_floor_bar_for_environment

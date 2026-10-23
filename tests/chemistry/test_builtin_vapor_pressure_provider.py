@@ -2120,26 +2120,20 @@ def test_legacy_sio_continues_below_reference(vapor_pressure_data, monkeypatch):
 
 
 @pytest.mark.parametrize("body", ("moon", "mars"))
-def test_legacy_sio_zero_oxygen_uses_flagged_body_guard(
+def test_legacy_sio_zero_oxygen_requires_closed_boundary(
     vapor_pressure_data, monkeypatch, body
 ):
-    model = _LegacyInternalAnalyticalModel(vapor_pressure_data, melt=_SiOnlyMelt())
+    from simulator.chemistry.ellingham_graph import EllinghamPressureRefusal
+    data = copy.deepcopy(vapor_pressure_data)
+    data['metals'] = {}  # Isolate the SiO guard's active inverse-pressure law.
+    model = _LegacyInternalAnalyticalModel(data, melt=_SiOnlyMelt())
     model.melt.body = body
     monkeypatch.setattr(model, "_headspace_transport_pO2_bar", lambda: 0.0)
-    result = model._internal_analytical_equilibrium()
-    guard = model._oxygen_numerical_floor_bar()
-    assert math.isfinite(result.vapor_pressures_Pa["SiO"])
-    assert result.vapor_pressures_Pa["SiO"] > 0.0
+    # This pressure-only fixture has no finite source/storage projection.
+    # It must refuse the singular active source rather than invent oxygen.
+    with pytest.raises(EllinghamPressureRefusal, match="finite and positive"):
+        model._internal_analytical_equilibrium()
     assert model._headspace_transport_pO2_bar() == 0.0
-    assert (
-        "SiO: pO2 closure missing (C7); "
-        "authority_level=numerical guard, not physics; "
-        f"guard_pO2_bar={guard!r}"
-    ) in result.warnings
-    monkeypatch.setattr(model, "_headspace_transport_pO2_bar", lambda: guard)
-    guarded = model._internal_analytical_equilibrium()
-    assert result.vapor_pressures_Pa["SiO"].hex() == guarded.vapor_pressures_Pa["SiO"].hex()
-    assert not any("pO2 closure missing (C7)" in warning for warning in guarded.warnings)
 
 
 @pytest.mark.parametrize("oxygen,expected_hex", (
@@ -2945,7 +2939,7 @@ def test_default_in_range_builtin_provider_keeps_fe_and_adds_status_bearing_feo(
     )
 
 
-def test_request_level_fo2_below_transport_floor_is_rejected(
+def test_request_level_fo2_below_reference_is_preserved(
     vapor_pressure_data,
 ):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
@@ -2961,8 +2955,9 @@ def test_request_level_fo2_below_transport_floor_is_rejected(
         control_inputs={},
     )
 
-    with pytest.raises(ValueError, match="fO2_log=-20.*transport model floor"):
-        provider.dispatch(request)
+    assert provider._resolve_transport_pO2_bar(request) == 1e-20
+    result = provider.dispatch(request)
+    assert result.diagnostic['pO2_bar'] == 1e-20
 
 
 def test_interval_required_foulant_vapor_row_is_not_certifying(
@@ -3105,8 +3100,8 @@ def test_al2o_provider_applies_single_cation_activity_square_once(
     )
 
 
-@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0, 1e-12])
-def test_explicit_transport_po2_rejects_invalid_or_subfloor_values(
+@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0, float('nan'), float('inf')])
+def test_active_pressure_law_rejects_invalid_or_zero_oxygen(
     vapor_pressure_data,
     pO2_bar,
 ):
