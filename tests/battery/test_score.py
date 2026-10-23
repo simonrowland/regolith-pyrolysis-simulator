@@ -12511,9 +12511,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert {row.reference for row in allibert_rows} == allibert_admitted
         assert all(row.status is ResidualStatus.REFUSED for row in allibert_rows)
         # b-617 types Allibert's printed per-point phases: the two xCaO = 0.80
-        # "CaO + melt" points refuse as two-phase bulk compositions; the 14
-        # single-phase points lack the pressure set required by the in-cell
-        # fallback and refuse as an unverified effusion regime.
+        # "CaO + melt" points refuse as two-phase bulk compositions. Under
+        # d-274, the 14 single-phase points with uncomputable pressure sums
+        # reach the test predictor with an unverified-apparatus notice.
         assert all(row.refusal is not None for row in allibert_rows)
         assert (
             sum(
@@ -12525,6 +12525,17 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert (
             sum(
                 row.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+                for row in allibert_rows
+            )
+            == 0
+        )
+        assert (
+            sum(
+                row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+                and any(
+                    notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                    for notice in row.notices
+                )
                 for row in allibert_rows
             )
             == 14
