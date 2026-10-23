@@ -377,10 +377,21 @@ def charge_moles_by_species(
         if observation.experiment_id != experiment.experiment_id:
             raise ValueError("Observation belongs to a different experiment")
         conditions = observation.point_conditions or {}
-        fields = {field: conditions[key] for field, key in (
-            ("mass_kg", "mass_kg"), ("initial_composition", "composition"),
-            ("printed_composition", "printed_composition"),
-        ) if key in conditions}
+        fields = {
+            field: conditions[key]
+            for field, key in (
+                ("mass_kg", "mass_kg"),
+                ("printed_composition", "printed_composition"),
+            )
+            if key in conditions
+        }
+        row_composition = conditions.get("composition")
+        if (
+            isinstance(row_composition, Located)
+            and row_composition.state.is_value
+            and isinstance(row_composition.state.value, Composition)
+        ):
+            fields["initial_composition"] = row_composition
         if fields:
             scoped = replace(experiment, sample=replace(experiment.sample, **fields))
             result = charge_moles_by_species(scoped, bench)
@@ -802,6 +813,19 @@ def normalized_composition(
             absent.append(path)
             continue
         raw = located.state.value
+        if field == "initial_composition" and not isinstance(raw, Composition):
+            unsupported = True
+            missing.append(path)
+            located = experiment.sample.initial_composition
+            path = "experiment.sample.initial_composition"
+            if located is None or not located.state.is_value:
+                absent.append(path)
+                continue
+            raw = located.state.value
+            if not isinstance(raw, Composition):
+                unsupported = True
+                missing.append(path)
+                continue
         basis_exempt: set[str] = set()
         basis_notice: str | None = None
         basis_inference: Derivation | None = None
