@@ -135,6 +135,8 @@ def _series_resistance_reference_flux(
             T_surface_K=T_K,
             molar_mass_kg_mol=M_kg_mol,
             alpha_i=alpha,
+            melt_surface_area_m2=sim.melt.melt_surface_area_m2,
+            surface_flow=getattr(sim, "surface_flow", None),
             pipe_diameter_m=float(getattr(sim.overhead_model, "pipe_diameter_m", 0.12)),
             overhead_pressure_pa=float(getattr(sim.overhead, "pressure_mbar", 0.0) or 0.0) * 100.0,
             axial_stir_factor=sim.melt.stir_state.axial,
@@ -1600,7 +1602,7 @@ def test_evaporation_caller_keeps_missing_alpha_unavailable_without_aborting(
         ({"alpha": 0.0}, None),
         ({"alpha": {"Na": 0.0}}, None),
         ({"alpha": 1.0e-20}, None),
-        ({"pipe_diameter_m": 0.0}, None),
+        ({"pipe_diameter_m": 0.0}, "Na"),
         ({"hkl_upper_bound_transport_species": ("Na",)}, "Na"),
     ),
     ids=(

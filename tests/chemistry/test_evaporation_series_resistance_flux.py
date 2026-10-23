@@ -25,6 +25,7 @@ from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
 _K_BASE = {
     "species": "K",
+    "melt_surface_area_m2": 0.2,
     "P_eq_pa": 80.0,
     "P_bulk_pa": 5.0,
     "T_surface_K": 1800.0,
@@ -179,7 +180,7 @@ def test_resistances_move_monotonically_with_kn_and_stir_axes():
         ).r_gas
         for radial in (0.0, 1.0, 4.0, MAX_STIR_FACTOR, 1000.0)
     ]
-    assert gas_by_radial == sorted(gas_by_radial, reverse=True)
+    assert gas_by_radial == [gas_by_radial[0]] * len(gas_by_radial)
 
 
 def test_axial_stir_does_not_multiply_hkl_or_add_unphysical_melt_resistance():
@@ -204,13 +205,13 @@ def test_universal_melt_renewal_conductance_is_uncertified_and_refused():
         )
 
 
-def test_transition_and_free_molecular_regimes_do_not_apply_continuum_gas_film():
+def test_transitional_prediction_retains_film_and_free_molecular_limit_is_hk():
     transitional = _evap(knudsen_number=1.0)
     free_molecular = _evap(knudsen_number=FREE_MOLECULAR_KNUDSEN_MIN)
 
-    assert transitional.r_gas == 0.0
+    assert transitional.r_gas > 0.0
     assert free_molecular.r_gas == 0.0
-    assert transitional.gas_resistance_weight == 0.0
+    assert transitional.gas_resistance_weight == 1.0
     assert free_molecular.gas_resistance_weight == 0.0
 
 

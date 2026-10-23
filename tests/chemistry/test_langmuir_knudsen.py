@@ -26,6 +26,7 @@ from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
 _K_BASE = {
     "species": "K",
+    "melt_surface_area_m2": 0.2,
     "p_eq_pa": 80.0,
     "p_bulk_pa": 5.0,
     "T_surface_K": 1800.0,
@@ -137,6 +138,7 @@ def test_series_flux_continuum_limit_is_gas_transport_limited():
         alpha=1.0,
         knudsen_number=1.0e-7,
         overhead_pressure_pa=1000.0,
+        melt_surface_area_m2=_K_BASE["melt_surface_area_m2"],
         axial_stir_factor=0.0,
         radial_stir_factor=1.0,
         melt_resistance_enabled=False,

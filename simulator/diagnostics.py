@@ -1689,6 +1689,8 @@ def pressure_coating_pareto_diagnostic(
             continue
         flux_kwargs = {
             "species": name,
+            "melt_surface_area_m2": getattr(getattr(sim, "melt", None), "melt_surface_area_m2", None),
+            "surface_flow": getattr(sim, "surface_flow", None),
             "P_eq_pa": _first_finite(series.get("P_eq_Pa"), 0.0),
             "P_bulk_pa": _first_finite(series.get("P_bulk_Pa"), 0.0),
             "T_surface_K": max(

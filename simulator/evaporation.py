@@ -3615,6 +3615,7 @@ class EvaporationMixin:
             'stoich_by_species': stoich_by_species,
             'available_oxide_kg': available_oxide_kg,
             'melt_surface_area_m2': float(self.melt.melt_surface_area_m2),
+            'surface_flow': getattr(self, 'surface_flow', None),
             'stir_factor': {
                 'axial': clamp_stir_factor(self.melt.stir_state.axial),
                 'radial': clamp_stir_factor(self.melt.stir_state.radial),

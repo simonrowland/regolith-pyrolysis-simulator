@@ -8144,6 +8144,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         try:
             series_flux = _series_resistance_evaporation_flux_kg_m2_s(
                 species='Fe',
+                melt_surface_area_m2=self.melt.melt_surface_area_m2,
+                surface_flow=getattr(self, "surface_flow", None),
                 P_eq_pa=P_reference_Pa,
                 P_bulk_pa=P_bulk_Pa,
                 T_surface_K=T_K,
@@ -14295,6 +14297,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_native_fe_saturation_event = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._last_partial_melt_offgassing_diagnostic = {}
+        self._last_evaporation_flux_diagnostic = {}
         self._silent_zero_notes = []
         self._last_extraction_completeness_diagnostic = {}
         self._last_target_inventory_diagnostic = {}
@@ -14836,7 +14839,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         snapshot.melt_headspace_composition_mbar = dict(
             self._melt_headspace_composition_mbar
         )
-        snapshot.evap_plane_selectivity = evap_plane_selectivity
+        snapshot.evap_plane_selectivity = dict(evap_plane_selectivity)
+        snapshot.evap_plane_selectivity['surface_transport_by_species'] = copy.deepcopy(
+            self._last_evaporation_flux_diagnostic.get('evaporation_series_resistance', {})
+        )
         snapshot.partial_melt_offgassing_diagnostic = dict(
             self._last_partial_melt_offgassing_diagnostic
         )

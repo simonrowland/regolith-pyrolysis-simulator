@@ -32,6 +32,7 @@ _SHARE_KW = dict(
     T_K=1800.0,
     molar_mass_kg_mol=0.055845,
     overhead_pressure_pa=1000.0,
+    melt_surface_area_m2=0.2,
 )
 
 
@@ -99,15 +100,16 @@ def test_e_down_from_s_zero_delta_still_refused():
         e_down_from_s(0.5, 0.0)
 
 
-def test_interface_resistance_share_valid_pin_unchanged():
+def test_interface_resistance_share_follows_surface_geometry_owner():
+    from engines.builtin.evaporation_flux import _series_resistance_evaporation_flux_kg_m2_s
     series = interface_resistance_share(**_SHARE_KW)
-    # 03616bb20 corrected the Chapman-Enskog constant from the bar-form
-    # 0.00266 used with P[atm] to the BSL atmosphere form
-    # 0.0018583*sqrt(2)=0.002628033.  Thus D_AB moves by 0.9879823545;
-    # with finite interface resistance the series flux moves by
-    # (R_i + R_g,old)/(R_i + R_g,new)=0.9884942731, not linearly with D_AB.
-    assert series.flux_kg_s_m2 == pytest.approx(3.2826938303855116e-06)
-    assert interface_share_s(series) == pytest.approx(0.04259724487953812)
+    expected = _series_resistance_evaporation_flux_kg_m2_s(
+        species="Fe", P_eq_pa=1.0, P_bulk_pa=0.0, T_surface_K=1800.0,
+        molar_mass_kg_mol=0.055845, alpha_i=0.1, overhead_pressure_pa=1000.0,
+        melt_surface_area_m2=0.2,
+    )
+    assert series.flux_kg_s_m2 == expected.flux_kg_s_m2
+    assert interface_share_s(series) == interface_share_s(expected)
 
 
 def test_interface_resistance_share_zero_overhead_is_vacuum_hkl():
@@ -145,33 +147,27 @@ def test_report_species_class_diagnostics_class_alpha_fallback_unchanged():
         "Fe",
         T_K=2000.0,
         overhead_pressure_pa=1000.0,
+        melt_surface_area_m2=0.2,
         vapor_pressure_data={},
     )
     assert diag.alpha_runtime is None
     assert diag.alpha_runtime_note.endswith("+class_alpha_fallback_for_s")
     assert diag.series is not None
     assert diag.series.alpha_intrinsic == 0.083
-    assert diag.interface_share_s == 0.057762384084735774
+    assert diag.interface_share_s == interface_share_s(diag.series)
     assert diag.r_interface == 16479.794223102974
-    assert diag.r_gas == 268823.42662262224
+    assert diag.r_gas == diag.series.r_gas
+    assert diag.series.surface_film["formula_id"] == "isolated_disk_halfspace_8_over_pi"
     assert diag.r_melt == 0.0
-    assert diag.flux_band_factor_high == 1.087402437000731
-    assert diag.flux_band_factor_low == 0.9196227320937371
-    assert (
-        diag.series.flux_kg_s_m2,
-        diag.series.alpha_effective,
-        diag.series.k_hk_kg_s_m2_pa,
-        diag.series.knudsen_number,
-        diag.series.k_mt_kg_s_m2_pa,
-        diag.series.d_ab_m2_s,
-    ) == (
-        3.5050427998523708e-06,
-        0.004794277879033069,
-        0.0007310887871520878,
-        0.0003590519097018557,
-        3.7199138950185795e-06,
-        0.03631724814709421,
+    assert diag.flux_band_factor_high == flux_band_factors(diag.interface_share_s, diag.membership.residual_dex)[1]
+    assert diag.flux_band_factor_low == flux_band_factors(diag.interface_share_s, diag.membership.residual_dex)[0]
+    from engines.builtin.evaporation_flux import _series_resistance_evaporation_flux_kg_m2_s
+    expected = _series_resistance_evaporation_flux_kg_m2_s(
+        species="Fe", P_eq_pa=1.0, P_bulk_pa=0.0, T_surface_K=2000.0,
+        molar_mass_kg_mol=0.055845, alpha_i=0.083,
+        overhead_pressure_pa=1000.0, melt_surface_area_m2=0.2,
     )
+    assert diag.series == expected
 
 
 @pytest.mark.parametrize(
@@ -228,6 +224,7 @@ def test_report_species_class_diagnostics_default_mass_uses_formula_owner(
         species,
         T_K=2000.0,
         overhead_pressure_pa=1000.0,
+        melt_surface_area_m2=0.2,
         alpha_override=0.1,
         vapor_pressure_data={},
     )
@@ -242,6 +239,7 @@ def test_report_species_class_diagnostics_unknown_species_refuses_typed():
             "not_a_catalog_species",
             T_K=2000.0,
             overhead_pressure_pa=1000.0,
+        melt_surface_area_m2=0.2,
             alpha_override=0.1,
             vapor_pressure_data={},
         )

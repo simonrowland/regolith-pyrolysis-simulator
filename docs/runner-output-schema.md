@@ -819,6 +819,28 @@ incident, stuck, re-evaporated, and net continuous flux and has
   Na/K route; it does not claim closure for C6 Mg recovery or other
   routes/species. Consumers must name any additional non-train account before
   applying an identity elsewhere.
+* Surface transport diagnostics (C11) are additive under
+  `vapour_batch_summary.metadata.surface_transport_by_species`, keyed by vapour
+  species. The same computed records are retained in the existing snapshot
+  `evap_plane_selectivity.surface_transport_by_species` diagnostic payload.
+  `R_interface_fraction`, `R_gas_fraction`, `R_melt_fraction` and
+  `limiting_resistance_label` report HK / gas-film / disabled-melt shares
+  (Dg05). `surface_film` contains `geometry`, `formula_id`, `u_m_s`,
+  `length_m`, `rho_kg_m3`, `mu_Pa_s`, `D_m2_s`, `Re`, `Sc`, `Pe`, `Sh`,
+  `Kn_film`, `Kn_geometry`, `Mach`, provenance and `domain_flags` (Dg06).
+  An undeclared surface field carries the literal notice
+  `surface flow undeclared: still-gas floor`. A film share above 0.9
+  describes film-limited transport; no recommendation is computed.
+  The stagnant-disk binary Stefan correction reports its model, multiplier
+  and gas-face fraction; `dilute_flux_kg_s_m2` retains the study reference.
+  Large vapour fractions retain a flagged dilute estimate while coupled
+  multicomponent/blowing closure remains unresolved. `transport_length_m`
+  is the actual correlation length; `source_film_length_m` retains the
+  historical supplied 0.08/0.16 m operand as provenance only.
+  Rarefied open-vacuum HK records mark gas-only groups as not applicable.
+  These fields confer no certification: disabled melt resistance remains
+  an upper-bound assumption and out-of-domain correlations predict and flag.
+  They add no recipe control, optimizer dimension or top-level output field.
 * Lab-schedule runs may include `pO2_enforcement` on each affected
   per-hour row: `{hour, schedule_id, schedule_time_h, setpoint_mbar,
   achieved_mbar, p_total_mbar, limited_by_total_pressure, status}`.

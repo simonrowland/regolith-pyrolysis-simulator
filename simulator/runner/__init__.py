@@ -2765,6 +2765,11 @@ def build_per_hour_summary(
                     summary["wall_deposit_cumulative_kg"], wall_notice,
                 )
             )
+        surface_transport = (getattr(snapshot, "evap_plane_selectivity", {}) or {}).get(
+            "surface_transport_by_species", {}
+        )
+        if surface_transport:
+            metadata["surface_transport_by_species"] = _json_safe(surface_transport)
         if metadata:
             summary["vapour_batch_summary"]["metadata"] = metadata
     overlay = dict(getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {})

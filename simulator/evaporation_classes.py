@@ -17,6 +17,8 @@ Design authority:
 
 from __future__ import annotations
 
+from simulator.transport_regime import SurfaceFlow
+
 import math
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -999,6 +1001,8 @@ def interface_resistance_share(
     pipe_diameter_m: float = 0.12,
     carrier_gas: str = "N2",
     radial_stir_factor: float = 1.0,
+    melt_surface_area_m2: float | None = None,
+    surface_flow: SurfaceFlow | None = None,
 ) -> SeriesEvaporationFlux:
     """Compute series-resistance diagnostics including interface share ``s``.
 
@@ -1016,8 +1020,8 @@ def interface_resistance_share(
     ``s=1``), non-finite diameter to the helper default 0.12 m, and
     non-finite ``P_eq`` to a typed zero-flux series. ``overhead_pressure_pa
     == 0`` is the vacuum case the helper already treats as ``r_gas=0``.
-    Finite ``p_eq_pa`` is still floored at 1.0 Pa so a caller that only
-    wants ``s`` has a defined driving force.
+    Supplied pressures are preserved because the Stefan secant resistance
+    depends on the actual gas-face fraction.
     """
 
     if not math.isfinite(alpha) or alpha <= 0.0:
@@ -1047,11 +1051,10 @@ def interface_resistance_share(
             f"got {radial_stir_factor!r}"
         )
 
-    # Ensure a positive driving force so resistances are well-defined even
-    # when the caller only wants s (share is independent of delta_p once
-    # both resistances are finite).
-    p_eq = max(float(p_eq_pa), 1.0)
-    p_bulk = max(0.0, min(float(p_bulk_pa), p_eq * 0.5))
+    # The Stefan secant film depends on both actual partials. Never invent
+    # a positive drive to compute a state-independent dilute share.
+    p_eq = float(p_eq_pa)
+    p_bulk = float(p_bulk_pa)
 
     return _series_resistance_evaporation_flux_kg_m2_s(
         species=str(species),
@@ -1060,6 +1063,8 @@ def interface_resistance_share(
         T_surface_K=float(T_K),
         molar_mass_kg_mol=float(molar_mass_kg_mol),
         alpha_i=float(alpha),
+        melt_surface_area_m2=melt_surface_area_m2,
+        surface_flow=surface_flow,
         pipe_diameter_m=float(pipe_diameter_m),
         overhead_pressure_pa=float(overhead_pressure_pa),
         radial_stir_factor=float(radial_stir_factor),
@@ -1157,6 +1162,8 @@ def report_species_class_diagnostics(
     vapor_pressure_data: Mapping[str, Any] | None = None,
     pipe_diameter_m: float = 0.12,
     carrier_gas: str = "N2",
+    melt_surface_area_m2: float | None = None,
+    surface_flow: SurfaceFlow | None = None,
 ) -> SpeciesClassDiagnostic:
     """Classify ``species`` and optionally compute interface share at conditions.
 
@@ -1228,6 +1235,8 @@ def report_species_class_diagnostics(
         series = interface_resistance_share(
             species=species,
             alpha=float(alpha_for_s),
+            melt_surface_area_m2=melt_surface_area_m2,
+            surface_flow=surface_flow,
             T_K=float(T_K),
             molar_mass_kg_mol=M,
             overhead_pressure_pa=float(overhead_pressure_pa),

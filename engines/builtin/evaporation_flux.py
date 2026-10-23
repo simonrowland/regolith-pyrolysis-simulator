@@ -74,6 +74,7 @@ from simulator.transport_regime import (
     _EVAPORATION_LJ_PROXY_PARAMS,
     EvaporationFluxConfigurationError,
     SeriesEvaporationFlux,
+    SurfaceFlow,
     _finite_float,
     hertz_knudsen_mass_conductance,
     series_evaporation_flux,
@@ -331,6 +332,8 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     melt_surface_renewal_source: str = DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
     gas_resistance_enabled: bool = True,
     extrapolate_continuum: bool = False,
+    melt_surface_area_m2: float | None = None,
+    surface_flow: SurfaceFlow | None = None,
 ) -> SeriesEvaporationFlux:
     """Translate operator controls to the shared L1 series owner."""
     from simulator.state import clamp_stir_factor
@@ -350,6 +353,8 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         melt_surface_renewal_source=melt_surface_renewal_source,
         gas_resistance_enabled=gas_resistance_enabled,
         extrapolate_continuum=extrapolate_continuum,
+        melt_surface_area_m2=melt_surface_area_m2,
+        surface_flow=surface_flow,
         stir_diagnostic={
             "axial_stir_applied": applied, "radial_stir_applied": radial_clamped,
             "axial_stir_clamped": _stir_was_clamped(axial, axial_clamped),
@@ -511,7 +516,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 )
 
         try:
-            raw_melt_surface_area_m2 = controls.get("melt_surface_area_m2", 0.0)
+            raw_melt_surface_area_m2 = controls.get("melt_surface_area_m2")
             if not is_declared_real_scalar(
                 raw_melt_surface_area_m2,
                 allow_numeric_str=True,
@@ -528,7 +533,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 control_audit=control_audit,
                 diagnostic={
                     "evaporation_flux_kg_hr": {},
-                    "reason": "invalid_melt_surface_area_m2",
+                    "reason": ("missing_melt_surface_area_m2" if controls.get("melt_surface_area_m2") is None else "invalid_melt_surface_area_m2"),
                     "value": repr(controls.get("melt_surface_area_m2")),
                 },
             )
@@ -848,6 +853,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             uses_gas_resistance = (
                 gas_resistance_enabled
                 and species not in hkl_upper_bound_transport_species
+                and melt_surface_area_m2 > 0.0
             )
             # The reconstructed HKL upper bound is a free-evaporation boundary:
             # when gas resistance is disabled, viscous Poiseuille P_bulk is not
@@ -894,6 +900,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 T_surface_K=T_K,
                 molar_mass_kg_mol=M_kg_mol,
                 alpha_i=1.0,
+                melt_surface_area_m2=melt_surface_area_m2,
+                surface_flow=controls.get("surface_flow"),
                 knudsen_number=math.inf,
                 pipe_diameter_m=pipe_diameter_m,
                 overhead_pressure_pa=overhead_pressure_pa,
@@ -947,6 +955,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     T_surface_K=T_K,
                     molar_mass_kg_mol=M_kg_mol,
                     alpha_i=alpha,
+                    melt_surface_area_m2=melt_surface_area_m2,
+                    surface_flow=controls.get("surface_flow"),
                     pipe_diameter_m=pipe_diameter_m,
                     overhead_pressure_pa=overhead_pressure_pa,
                     axial_stir_factor=axial_stir_factor,
@@ -1031,7 +1041,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     "evaporation_series_resistance": series_flux_diagnostics,
                 },
                 warnings=(
-                    "missing Chapman-Enskog transport parameters for sampled species: "
+                    ("missing Chapman-Enskog transport parameters for sampled species: "
+                     if all("Chapman-Enskog" in record["reason"] for record in missing_transport_parameters.values())
+                     else "unavailable surface transport parameters for sampled species: ")
                     + ", ".join(sorted(missing_transport_parameters)),
                 ),
             )

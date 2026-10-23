@@ -1726,6 +1726,8 @@ class SeriesEvaporationFlux:
     k_mt_kg_s_m2_pa: float
     d_ab_m2_s: float
     transport_length_m: float
+    source_film_length_m: float | None = None
+    surface_film: Mapping[str, Any] | None = None
 
     def as_diagnostic(self) -> dict[str, float | str | bool]:
         denominator = self.r_interface + self.r_gas + self.r_melt
@@ -1781,6 +1783,8 @@ class SeriesEvaporationFlux:
             "k_mt_kg_s_m2_pa": self.k_mt_kg_s_m2_pa,
             "d_ab_m2_s": self.d_ab_m2_s,
             "transport_length_m": self.transport_length_m,
+            "source_film_length_m": self.source_film_length_m,
+            "surface_film": dict(self.surface_film or {}),
             # HKL upper-bound authority (matrix policy i): R_m=0 until
             # species/state melt-transfer inputs exist. Not certified flux.
             "authority_class": "upper-bound",
@@ -1825,6 +1829,7 @@ def _zero_series_evaporation_flux(
     k_mt_kg_s_m2_pa: float = 0.0,
     d_ab_m2_s: float = 0.0,
     transport_length_m: float = 0.0,
+    source_film_length_m: float | None = None,
 ) -> SeriesEvaporationFlux:
     return SeriesEvaporationFlux(
         flux_kg_s_m2=0.0,
@@ -1850,254 +1855,310 @@ def _zero_series_evaporation_flux(
         k_mt_kg_s_m2_pa=max(0.0, k_mt_kg_s_m2_pa),
         d_ab_m2_s=max(0.0, d_ab_m2_s),
         transport_length_m=max(0.0, transport_length_m),
+        source_film_length_m=source_film_length_m,
     )
 
 
-def series_evaporation_flux(
-    species: str,
-    P_eq_pa: float,
-    P_bulk_pa: float,
-    T_surface_K: float,
-    molar_mass_kg_mol: float,
-    alpha_i: float,
-    knudsen_number: float | None = None,
-    pipe_diameter_m: float = 0.12,
-    overhead_pressure_pa: float | None = None,
-    axial_stir_factor: float | None = 0.0,
-    radial_stir_factor: float | None = 1.0,
-    cold_skull_envelope: Mapping[str, float] | None = None,
-    carrier_gas: str = "N2",
-    *,
-    T_gas_K: float | None = None,
-    melt_resistance_enabled: bool = False,
-    melt_surface_renewal_base_kg_s_m2_pa: float = (
-        DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA
-    ),
-    melt_surface_renewal_source: str = DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
-    gas_resistance_enabled: bool = True,
-    extrapolate_continuum: bool = False,
-    stir_diagnostic: Mapping[str, object],
-) -> SeriesEvaporationFlux:
-    """Series-resistance evaporation source in kg/(m^2*s).
+@dataclass(frozen=True)
+class SurfaceFlow:
+    """Declared measured gas field; independent of net sweep and melt stirring.
 
-    The sole driving pressure is ``max(0, P_eq_pa - P_bulk_pa)``. External
-    pressure regime and stirring terms only add or remove resistances; they
-    never inflate the intrinsic Hertz-Knudsen alpha.
+    Planar length/width describe the swept footprint; round length is the
+    nozzle diameter; slot width is the full physical slot width B (S=2B).
+    Velocity location/profile and provenance describe the measured field,
+    rather than claiming that a fan speed or net exit flow determines it.
     """
+    geometry: str
+    velocity_m_s: float
+    provenance: str
+    velocity_location: str
+    velocity_profile: str
+    length_m: float | None = None
+    width_m: float | None = None
+    standoff_m: float | None = None
+    footprint_radius_m: float | None = None
+    slot_width_m: float | None = None
+    averaging_half_span_m: float | None = None
 
-    alpha_intrinsic = max(0.0, _finite_float(alpha_i, 0.0))
-    P_eq = _finite_float(P_eq_pa, 0.0)
-    P_bulk = _finite_float(P_bulk_pa, 0.0)
-    T_surface = _finite_float(T_surface_K, 0.0)
-    M_kg_mol = _finite_float(molar_mass_kg_mol, 0.0)
-    diameter_m = _finite_float(pipe_diameter_m, 0.12)
-    overhead_pa = _finite_float(overhead_pressure_pa, 0.0)
-    effective_T_gas_K = _finite_float(T_gas_K, T_surface)
 
-    axial_stir_applied = stir_diagnostic["axial_stir_applied"]
-    radial_stir_applied = stir_diagnostic["radial_stir_applied"]
-    axial_was_clamped = stir_diagnostic["axial_stir_clamped"]
-    radial_was_clamped = stir_diagnostic["radial_stir_clamped"]
-    frozen_skull_clamped = stir_diagnostic["frozen_skull_stir_clamped"]
-    ceiling_diag = stir_diagnostic["frozen_skull_stir_ceiling"]
+def _surface_scalar(value, name, *, zero_allowed=False):
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise EvaporationFluxConfigurationError(f'missing_input: {name} must be declared numeric')
+    result = float(value)
+    if not math.isfinite(result) or result < 0 or (not zero_allowed and result == 0):
+        raise EvaporationFluxConfigurationError(f'invalid_input: {name} must be finite and positive' if not zero_allowed else f'invalid_input: {name} must be finite and nonnegative')
+    return result
 
-    if (
-        P_eq <= 0.0
-        or T_surface <= 0.0
-        or M_kg_mol <= 0.0
-        or alpha_intrinsic <= 0.0
-        or diameter_m <= 0.0
-    ):
-        return _zero_series_evaporation_flux(
-            alpha_intrinsic=alpha_intrinsic,
-            axial_stir_applied=axial_stir_applied,
-            radial_stir_applied=radial_stir_applied,
-            axial_stir_clamped=axial_was_clamped,
-            radial_stir_clamped=radial_was_clamped,
-            frozen_skull_stir_clamped=frozen_skull_clamped,
-            frozen_skull_stir_ceiling=ceiling_diag,
-            melt_resistance_enabled=melt_resistance_enabled,
-            melt_surface_renewal_base_kg_s_m2_pa=(
-                melt_surface_renewal_base_kg_s_m2_pa
-            ),
-            melt_surface_renewal_source=melt_surface_renewal_source,
-            transport_length_m=max(0.0, diameter_m),
-        )
 
-    delta_p_pa = max(0.0, P_eq - P_bulk)
-    k_hk_kg_s_m2_pa = hertz_knudsen_mass_conductance(M_kg_mol, T_surface)
-    r_interface = 1.0 / (alpha_intrinsic * k_hk_kg_s_m2_pa)
-    if delta_p_pa <= 0.0:
-        return _zero_series_evaporation_flux(
-            alpha_intrinsic=alpha_intrinsic,
-            k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
-            r_interface=r_interface,
-            axial_stir_applied=axial_stir_applied,
-            radial_stir_applied=radial_stir_applied,
-            axial_stir_clamped=axial_was_clamped,
-            radial_stir_clamped=radial_was_clamped,
-            frozen_skull_stir_clamped=frozen_skull_clamped,
-            frozen_skull_stir_ceiling=ceiling_diag,
-            melt_resistance_enabled=melt_resistance_enabled,
-            melt_surface_renewal_base_kg_s_m2_pa=(
-                melt_surface_renewal_base_kg_s_m2_pa
-            ),
-            melt_surface_renewal_source=melt_surface_renewal_source,
-            transport_length_m=max(0.0, diameter_m),
-        )
+def carrier_dynamic_viscosity_Pa_s(carrier, temperature_K):
+    """LJ dilute gas, NIST TN1949 eqs. 6–7; mu=5 sqrt(m kBT/pi)/(16 sigma² Omega22).
 
-    base_k_melt = _finite_float(melt_surface_renewal_base_kg_s_m2_pa, 0.0)
-    if melt_resistance_enabled:
-        # Premise: liquid transport is J=M_i*k_L,i*(C_b-C_s). Linearising
-        # p_eq(C) with H_i=dp_eq/dC_i gives the pressure-basis conductance
-        # k_m,i=M_i*k_L,i/H_i [kg Pa^-1 m^-2 s^-1 = s/m], hence
-        # R_m,i=H_i/(M_i*k_L,i) [m/s]. k_L,i itself requires a species- and
-        # composition-dependent D_i plus measured melt renewal/geometry.
-        # None of D_i, H_i, C_i, or a physical renewal rate exists in this
-        # request, so any positive universal coefficient (formerly 1e-4 s/m)
-        # is dimensionally shaped but ungrounded. Refuse it; R_m=0 below is
-        # explicitly the reconstructible HKL upper bound, consistent with
-        # Hashimoto/Fedkin vacuum free-evaporation being interface-controlled.
-        raise EvaporationFluxConfigurationError(
-            "authoritative melt resistance requires species- and state-specific "
-            "D_i, k_L,i, and dp_eq/dC_i; universal pressure conductance disabled"
-        )
+    Units kg/(m s)=Pa s; pressure cancels. Caller reports the T* domain.
+    """
+    from simulator.physical_constants import AVOGADRO
+    p = carrier_gas_properties(carrier)
+    ts = temperature_K / p.lennard_jones_epsilon_over_k_K
+    omega = (1.16145 * ts ** -0.14874 + 0.52487 * math.exp(-0.77320 * ts)
+             + 2.16178 * math.exp(-2.43787 * ts))
+    return 5 * math.sqrt(p.molar_mass_kg_mol / AVOGADRO * BOLTZMANN * temperature_K / math.pi) / (16 * p.collision_diameter_m ** 2 * omega)
 
-    if knudsen_number is None:
-        knudsen = _knudsen_number(
-            overhead_pa,
-            max(effective_T_gas_K, 1.0),
-            diameter_m,
-            carrier_gas=str(carrier_gas or DEFAULT_CARRIER_GAS),
-        )
+
+def surface_gas_film(*, area_m2, flow, temperature_K, pressure_pa, carrier, diffusivity_m2_s):
+    """Area-mean surface law; no net-sweep or radial-stir velocity inference.
+
+    Disk: half-space Laplace solution N=4Da*delta_c gives k=4D/(pi*a),
+    Sh_(2a)=8/pi. The bulk owner, including finite-inventory saturation,
+    supplies the far-field sink concentration; this floor creates no outlet.
+    Plate: area-mean Blasius 0.664 sqrt(Re) Sc^(1/3). Round/slot: Martin
+    1977, Zuckerman–Lior 2006 appendix A. Evaluate endpoint power laws
+    outside source ranges and flag, without clamping Re or blending laws.
+    Re=rho*u*L/mu; Sc=mu/(rho*D), k=Sh*D/L [m/s], Rg=RT/(M*k).
+    D is proportional to 1/P, so Sc is pressure independent at fixed T.
+    """
+    area = _surface_scalar(area_m2, 'melt_surface_area_m2')
+    temperature_K = _surface_scalar(temperature_K, 'gas_temperature_K')
+    pressure_pa = _surface_scalar(pressure_pa, 'overhead_pressure_pa')
+    D = _surface_scalar(diffusivity_m2_s, 'diffusivity_m2_s')
+    carrier = _canonical_carrier_gas_key(carrier)
+    props = carrier_gas_properties(carrier)
+    rho = pressure_pa * props.molar_mass_kg_mol / (GAS_CONSTANT * temperature_K)
+    mu = carrier_dynamic_viscosity_Pa_s(carrier, temperature_K)
+    sc = mu / (rho * D)
+    diameter = math.sqrt(4 * area / math.pi)
+    flags = []
+    parameters = {"pool_area_m2": area}
+    if flow is None:
+        geometry, u, length = 'stagnant_disk', 0.0, diameter
+        flags.append('surface flow undeclared: still-gas floor')
     else:
-        try:
-            knudsen = float(knudsen_number)
-        except (TypeError, ValueError):
-            knudsen = math.inf
+        if not isinstance(flow, SurfaceFlow):
+            raise EvaporationFluxConfigurationError('missing_input: surface_flow must be typed SurfaceFlow hardware')
+        geometry = flow.geometry
+        if geometry not in ('planar', 'round', 'slot'):
+            raise EvaporationFluxConfigurationError('missing_input: surface_flow.geometry must be planar, round or slot')
+        u = _surface_scalar(flow.velocity_m_s, 'surface_flow.velocity_m_s', zero_allowed=True)
+        for name in ('provenance', 'velocity_location', 'velocity_profile'):
+            if not isinstance(getattr(flow, name), str) or not getattr(flow, name).strip():
+                raise EvaporationFluxConfigurationError(f'missing_input: surface_flow.{name}')
+        if geometry == 'planar':
+            length = _surface_scalar(flow.length_m, 'surface_flow.length_m')
+            width = _surface_scalar(flow.width_m, 'surface_flow.width_m')
+            coverage = length * width / area
+            if flow.velocity_profile != 'uniform_free_stream':
+                flags.append('nonuniform planar velocity profile')
+        elif geometry == 'round':
+            length = _surface_scalar(flow.length_m, 'surface_flow.nozzle_diameter_m')
+            height = _surface_scalar(flow.standoff_m, 'surface_flow.standoff_m')
+            radius = _surface_scalar(flow.footprint_radius_m, 'surface_flow.footprint_radius_m')
+            coverage = math.pi * radius ** 2 / area
+            if not 2.5 <= radius / length <= 7.5:
+                flags.append('Martin round r/d outside [2.5,7.5]')
+            if not 2 <= height / length <= 12:
+                flags.append('Martin round H/d outside [2,12]')
+        else:
+            width = _surface_scalar(flow.slot_width_m, 'surface_flow.slot_width_m')
+            length = 2 * width  # physical B -> hydraulic S=2B [m].
+            height = _surface_scalar(flow.standoff_m, 'surface_flow.standoff_m')
+            halfspan = _surface_scalar(flow.averaging_half_span_m, 'surface_flow.averaging_half_span_m')
+            span = _surface_scalar(flow.width_m, 'surface_flow.span_m')
+            coverage = 2 * halfspan * span / area
+            if not 2 <= halfspan / length <= 25:
+                flags.append('Martin slot x/S outside [2,25]')
+            if not 2 <= height / length <= 10:
+                flags.append('Martin slot H/S outside [2,10]')
+        parameters.update(coverage=coverage, declared_length_m=length)
+        if geometry == 'round':
+            parameters.update(H_over_d=height / length, r_over_d=radius / length)
+        elif geometry == 'slot':
+            parameters.update(H_over_S=height / length, x_over_S=halfspan / length)
+        if abs(coverage - 1) > 0.01:
+            flags.append('declared flow footprint differs from pool area')
+    re = rho * u * length / mu
+    pe = re * sc
+    if u == 0:
+        length, sh = diameter, 8 / math.pi
+        formula = 'isolated_disk_halfspace_8_over_pi'
+        if flow is not None:
+            flags.append('declared zero flow: isolated-disk halfspace')
+    elif geometry == 'planar':
+        sh = 0.664 * math.sqrt(re) * sc ** (1 / 3)
+        formula = 'Blasius_plate_area_mean_0.664'
+        if re < 2500:
+            flags.append('momentum layer exceeds 10% of flow length')
+        if re > 5e5:
+            flags.append('plate Re exceeds laminar range 5e5')
+        if sc < 0.6:
+            flags.append('plate Sc below 0.6')
+        if pe < 100:
+            flags.append('plate Pe below 100')
+    elif geometry == 'round':
+        f = 1.36 * re ** 0.574 if re <= 30000 else 0.54 * re ** 0.667 if re <= 120000 else 0.151 * re ** 0.775
+        ratio = length / radius
+        sh = sc ** 0.42 * ratio * (1 - 1.1 * ratio) * f / (1 + 0.1 * (height / length - 6) * ratio)
+        formula = 'Martin_1977_round_area_mean'
+        if not 2000 <= re <= 400000:
+            flags.append('Martin round Re outside [2000,400000]')
+        flags.append('Martin Sc certification interval unverified')
+    else:
+        xs, hs = halfspan / length, height / length
+        exponent = 0.695 - 1 / (xs + hs ** 1.33 + 3.06)
+        sh = 1.53 * sc ** 0.42 * re ** exponent / (xs + hs + 1.39)
+        formula = 'Martin_slot_area_mean_Zuckerman_Lior_appendix_A'
+        if not 3000 <= re <= 90000:
+            flags.append('Martin slot Re outside [3000,90000]')
+        flags.append('Martin slot source-provenance limited; Sc interval unverified')
+    if not math.isfinite(sh) or sh <= 0:
+        raise EvaporationFluxConfigurationError('invalid_input: geometry produces nonpositive transfer')
+    k = sh * D / length
+    mfp = _mean_free_path_m(pressure_pa, temperature_K, carrier_gas=carrier)
+    kn_film, kn_geometry = mfp * k / D, mfp / length
+    gamma = 5 / 3 if carrier in ('He', 'Ar', 'Kr') else 1.4
+    mach = u / math.sqrt(gamma * GAS_CONSTANT * temperature_K / props.molar_mass_kg_mol)
+    if not 0.3 <= temperature_K / props.lennard_jones_epsilon_over_k_K <= 100:
+        flags.append('viscosity reduced temperature outside [0.3,100]')
+    if mach > 0.3:
+        flags.append('Mach exceeds incompressible range 0.3')
+    if max(kn_film, kn_geometry) >= VISCOUS_KNUDSEN_MAX:
+        flags.append('continuum surface film extrapolated at actual Kn')
+    return dict(geometry=geometry, formula_id=formula, u_m_s=u, length_m=length,
+                rho_kg_m3=rho, mu_Pa_s=mu, D_m2_s=D, Re=re, Sc=sc, Pe=pe,
+                Sh=sh, k_g_m_s=k, Kn_film=kn_film, Kn_geometry=kn_geometry,
+                Mach=mach, domain_flags=flags, authority_status='status_bearing_non_authoritative',
+                velocity_provenance=flow.provenance if flow else 'undeclared',
+                geometry_parameters=parameters)
 
-    if math.isnan(knudsen) or knudsen < 0.0:
+
+def _binary_stefan_series_flux(eq, bulk, total, kinetic_resistance, dilute_gas_resistance):
+    """Solve J=P/Rg0*ln[(1-yb)/(1-ys)], ps=peq-J*Rhk, without a second alpha.
+
+    P/Rg0 has units kg/(m² s). Monotone Jgas(J)-J brackets ps in
+    [pbulk, min(peq,P)). As y->0, log difference -> (ps-pbulk)/P and
+    the dilute series returns. As Rg0->0, the unique HK limit returns.
+    """
+    low = max(0.0, (eq - total) / kinetic_resistance)
+    high = (eq - bulk) / kinetic_resistance
+    for _ in range(80):
+        trial = (low + high) * 0.5
+        ps = eq - trial * kinetic_resistance
+        if ps >= total:
+            low = trial
+            continue
+        jgas = total / dilute_gas_resistance * (math.log1p(-bulk / total) - math.log1p(-ps / total))
+        if jgas > trial:
+            low = trial
+        else:
+            high = trial
+    flux = (low + high) * 0.5
+    return (flux, max(0.0, (eq - flux * kinetic_resistance - bulk) / flux)) if flux > 0 else (0.0, dilute_gas_resistance)
+
+
+def series_evaporation_flux(
+    species: str, P_eq_pa: float, P_bulk_pa: float, T_surface_K: float,
+    molar_mass_kg_mol: float, alpha_i: float,
+    knudsen_number: float | None = None, pipe_diameter_m: float = 0.12,
+    overhead_pressure_pa: float | None = None,
+    axial_stir_factor: float | None = 0.0, radial_stir_factor: float | None = 1.0,
+    cold_skull_envelope: Mapping[str, float] | None = None, carrier_gas: str = 'N2', *,
+    T_gas_K: float | None = None, melt_resistance_enabled: bool = False,
+    melt_surface_renewal_base_kg_s_m2_pa: float = DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
+    melt_surface_renewal_source: str = DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
+    gas_resistance_enabled: bool = True, extrapolate_continuum: bool = False,
+    stir_diagnostic: Mapping[str, object], melt_surface_area_m2: float | None = None,
+    surface_flow: SurfaceFlow | None = None,
+) -> SeriesEvaporationFlux:
+    """One HK interface and one geometry film; melt transport stays disabled.
+
+    Historical pipe length is retained only as a source-operand diagnostic.
+    It never sets the melt film or its Kn. Radial stirring never sets gas Sh.
+    Positive-pressure continuum predictions require the actual source area.
+    """
+    alpha = max(0.0, _finite_float(alpha_i, 0.0))
+    eq, bulk = _finite_float(P_eq_pa, 0.0), _finite_float(P_bulk_pa, 0.0)
+    ts, mass = _finite_float(T_surface_K, 0.0), _finite_float(molar_mass_kg_mol, 0.0)
+    tg = _finite_float(T_gas_K, ts)
+    pressure = _finite_float(overhead_pressure_pa, 0.0)
+    if melt_resistance_enabled:
         raise EvaporationFluxConfigurationError(
-            "knudsen_number must be finite non-negative or positive infinity"
+            'authoritative melt resistance requires species- and state-specific '
+            'D_i, k_L,i, and dp_eq/dC_i; universal pressure conductance disabled'
         )
-
-    gas_weight = 0.0
-    if gas_resistance_enabled:
-        if knudsen < VISCOUS_KNUDSEN_MAX or (
-            extrapolate_continuum
-            and VISCOUS_KNUDSEN_MAX <= knudsen < FREE_MOLECULAR_KNUDSEN_MIN
-        ):
-            gas_weight = 1.0
-        # Premise: an open free-molecular vacuum has no stagnant carrier-gas
-        # film. Therefore R_g=0 locally. Continuum branch: k_g=M*Sh*D/(L*R*T)
-        # [s/m], R_g=1/k_g [m/s], only for Kn < VISCOUS_KNUDSEN_MAX (0.01).
-        # The provider and its Pareto replay may continue this same finite
-        # continuum expression into transitional Kn, carrying extrapolated
-        # authority. This is not a transitional conductance fit. Keep the
-        # existing free-molecular HKL branch and unflagged diagnostic sweeps.
-
-    r_gas = 0.0
-    k_mt_kg_s_m2_pa = 0.0
-    d_ab_m2_s = 0.0
-    if gas_weight > 0.0:
-        sherwood_eff = pipe_wall_sherwood(radial_stir_applied)
-        if overhead_pa <= 0.0:
-            raise EvaporationFluxConfigurationError(
-                "gas resistance requires positive overhead_pressure_pa"
-            )
-        d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
-            species,
-            max(effective_T_gas_K, 1.0),
-            overhead_pa,
-            carrier=str(carrier_gas or DEFAULT_CARRIER_GAS),
+    if eq <= 0 or ts <= 0 or mass <= 0 or alpha <= 0:
+        return _zero_series_evaporation_flux(alpha_intrinsic=alpha, **stir_diagnostic)
+    k_hk = hertz_knudsen_mass_conductance(mass, ts)
+    ri = 1.0 / (alpha * k_hk)
+    delta = max(0.0, eq - bulk)
+    if delta == 0.0:
+        # Saturation proves zero net evaporation without requiring a transport
+        # model, hardware declaration or diffusion row for an inactive species.
+        return _zero_series_evaporation_flux(
+            alpha_intrinsic=alpha, k_hk_kg_s_m2_pa=k_hk, r_interface=ri,
+            source_film_length_m=pipe_diameter_m, **stir_diagnostic,
+        )
+    rg, k_mt, diffusion, weight, length = 0.0, 0.0, 0.0, 0.0, 0.0
+    kn = math.inf
+    film = {'geometry': 'free_molecular', 'formula_id': 'HK_open_vacuum',
+            'domain_flags': [], 'Re': None, 'Sc': None, 'Sh': None,
+            'Kn_film': None, 'Mach': None}
+    if knudsen_number is not None:
+        try:
+            kn = float(knudsen_number)
+        except (ValueError, TypeError) as exc:
+            raise EvaporationFluxConfigurationError('invalid knudsen_number') from exc
+        if math.isnan(kn) or kn < 0:
+            raise EvaporationFluxConfigurationError('knudsen_number must be non-negative or positive infinity')
+    if gas_resistance_enabled and pressure > 0 and (knudsen_number is None or kn < FREE_MOLECULAR_KNUDSEN_MIN):
+        diffusion = _chapman_enskog_d_ab_m2_s(
+            species, tg, pressure, carrier=carrier_gas,
             species_params=_EVAPORATION_LJ_PROXY_PARAMS.get(species),
         )
-        if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
+        if not math.isfinite(diffusion) or diffusion <= 0:
             raise EvaporationFluxConfigurationError(
-                "missing Chapman-Enskog transport parameters for "
-                f"species={species!r} carrier_gas={carrier_gas!r}"
+                f'missing Chapman-Enskog transport parameters for species={species!r} carrier_gas={carrier_gas!r}'
             )
-        k_mt_mol_s_m2_pa = (
-            film_pressure_conductance(sherwood_eff, d_ab_m2_s, diameter_m,
-                                      max(effective_T_gas_K, 1.0))
-        )
-        k_mt_kg_s_m2_pa = k_mt_mol_s_m2_pa * M_kg_mol
-        if not math.isfinite(k_mt_kg_s_m2_pa) or k_mt_kg_s_m2_pa <= 0.0:
-            return _zero_series_evaporation_flux(
-                alpha_intrinsic=alpha_intrinsic,
-                k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
-                r_interface=r_interface,
-                knudsen_number=knudsen,
-                gas_resistance_weight=gas_weight,
-                axial_stir_applied=axial_stir_applied,
-                radial_stir_applied=radial_stir_applied,
-                axial_stir_clamped=axial_was_clamped,
-                radial_stir_clamped=radial_was_clamped,
-                frozen_skull_stir_clamped=frozen_skull_clamped,
-                frozen_skull_stir_ceiling=ceiling_diag,
-                melt_resistance_enabled=melt_resistance_enabled,
-                melt_surface_renewal_base_kg_s_m2_pa=(
-                    melt_surface_renewal_base_kg_s_m2_pa
-                ),
-                melt_surface_renewal_source=melt_surface_renewal_source,
-                d_ab_m2_s=d_ab_m2_s,
-                transport_length_m=diameter_m,
-            )
-        r_gas = gas_weight / k_mt_kg_s_m2_pa
-
-    r_melt = 0.0
-
-    denominator = r_interface + r_gas + r_melt
-    if not math.isfinite(denominator) or denominator <= 0.0:
-        return _zero_series_evaporation_flux(
-            alpha_intrinsic=alpha_intrinsic,
-            k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
-            r_interface=r_interface,
-            r_gas=r_gas,
-            r_melt=r_melt,
-            knudsen_number=knudsen,
-            gas_resistance_weight=gas_weight,
-            axial_stir_applied=axial_stir_applied,
-            radial_stir_applied=radial_stir_applied,
-            axial_stir_clamped=axial_was_clamped,
-            radial_stir_clamped=radial_was_clamped,
-            frozen_skull_stir_clamped=frozen_skull_clamped,
-            frozen_skull_stir_ceiling=ceiling_diag,
-            melt_resistance_enabled=melt_resistance_enabled,
-            melt_surface_renewal_base_kg_s_m2_pa=base_k_melt,
-            melt_surface_renewal_source=melt_surface_renewal_source,
-            k_mt_kg_s_m2_pa=k_mt_kg_s_m2_pa,
-            d_ab_m2_s=d_ab_m2_s,
-            transport_length_m=diameter_m,
-        )
-
-    k_total_kg_s_m2_pa = 1.0 / denominator
-    flux_kg_s_m2 = delta_p_pa * k_total_kg_s_m2_pa
-    alpha_effective = k_total_kg_s_m2_pa / k_hk_kg_s_m2_pa
-    if not math.isfinite(flux_kg_s_m2) or not math.isfinite(alpha_effective):
-        flux_kg_s_m2 = 0.0
-        alpha_effective = 0.0
-
+        film = surface_gas_film(area_m2=melt_surface_area_m2, flow=surface_flow,
+                                temperature_K=tg, pressure_pa=pressure,
+                                carrier=carrier_gas, diffusivity_m2_s=diffusion)
+        length = film['length_m']
+        if knudsen_number is None:
+            kn = film['Kn_geometry']
+    if gas_resistance_enabled and kn < FREE_MOLECULAR_KNUDSEN_MIN:
+        if pressure <= 0:
+            raise EvaporationFluxConfigurationError('gas resistance requires positive overhead_pressure_pa')
+        weight = 1.0
+        k_mt = film_pressure_conductance(film['Sh'], diffusion, length, tg) * mass
+        rg = 1.0 / k_mt
+    denominator = ri + rg
+    dilute_flux = delta * (1.0 / denominator)
+    flux = dilute_flux
+    if rg > 0:
+        gas_face = eq - flux * ri
+        film['stefan_model'] = 'dilute_passive_scalar'
+        if max(gas_face, bulk) / pressure >= 0.1:
+            film['domain_flags'].append('high vapour fraction/blowing: dilute prediction; coupled Stefan-Maxwell unresolved')
+        elif dilute_flux > 0 and film['formula_id'] == 'isolated_disk_halfspace_8_over_pi':
+            # Transform the disk diffusion potential to -ln(1-y). Only the
+            # unforced binary disk uses this closure; forced flow retains
+            # the study's dilute passive-scalar law (no validated blowing fit).
+            old_rg = rg
+            flux, rg = _binary_stefan_series_flux(eq, bulk, pressure, ri, rg)
+            k_mt = 1.0 / rg
+            film['stefan_model'] = 'binary_stagnant_carrier_logarithmic'
+            film['stefan_conductance_multiplier'] = old_rg / rg
+        film['gas_face_partial_pressure_pa'] = eq - flux * ri
+        film['gas_face_vapour_fraction'] = (eq - flux * ri) / pressure
+        film['dilute_flux_kg_s_m2'] = dilute_flux
+        film['binary_approximation'] = 'independent dilute species; not coupled multicomponent certification'
+    # J/delta = 1/(Ri+Rg); use conductances directly so subnormal vapour
+    # drives cannot underflow delta*k_HK to zero in the alpha diagnostic.
+    alpha_eff = (1.0 / (ri + rg)) / k_hk
     return SeriesEvaporationFlux(
-        flux_kg_s_m2=max(0.0, flux_kg_s_m2),
-        alpha_intrinsic=alpha_intrinsic,
-        alpha_effective=max(0.0, min(alpha_intrinsic, alpha_effective)),
-        k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
-        r_interface=r_interface,
-        r_gas=r_gas,
-        r_melt=r_melt,
-        knudsen_number=knudsen,
-        gas_resistance_weight=gas_weight,
-        axial_stir_applied=axial_stir_applied,
-        radial_stir_applied=radial_stir_applied,
-        axial_stir_clamped=axial_was_clamped,
-        radial_stir_clamped=radial_was_clamped,
-        frozen_skull_stir_clamped=frozen_skull_clamped,
-        frozen_skull_stir_ceiling=ceiling_diag,
-        melt_resistance_enabled=bool(melt_resistance_enabled),
-        melt_surface_renewal_base_kg_s_m2_pa=base_k_melt,
+        flux_kg_s_m2=flux, alpha_intrinsic=alpha,
+        alpha_effective=min(alpha, max(0.0, alpha_eff)), k_hk_kg_s_m2_pa=k_hk,
+        r_interface=ri, r_gas=rg, r_melt=0.0, knudsen_number=kn,
+        gas_resistance_weight=weight, **stir_diagnostic,
+        melt_resistance_enabled=False,
+        melt_surface_renewal_base_kg_s_m2_pa=_finite_float(melt_surface_renewal_base_kg_s_m2_pa, 0.0),
         melt_surface_renewal_source=melt_surface_renewal_source,
-        k_mt_kg_s_m2_pa=k_mt_kg_s_m2_pa,
-        d_ab_m2_s=d_ab_m2_s,
-        transport_length_m=diameter_m,
+        k_mt_kg_s_m2_pa=k_mt, d_ab_m2_s=diffusion, transport_length_m=length,
+        source_film_length_m=pipe_diameter_m, surface_film=film,
     )

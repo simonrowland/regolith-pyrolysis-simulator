@@ -21,6 +21,8 @@ analytical functions. The series physics is delegated to
 
 from __future__ import annotations
 
+from simulator.transport_regime import SurfaceFlow
+
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -238,6 +240,8 @@ def series_flux(
     T_gas_K: float | None = None,
     melt_resistance_enabled: bool = False,
     gas_resistance_enabled: bool = True,
+    melt_surface_area_m2: float | None = None,
+    surface_flow: SurfaceFlow | None = None,
 ) -> LangmuirKnudsenDiagnostics:
     """Full three-resistance flux with explicit limit diagnostics.
 
@@ -257,6 +261,8 @@ def series_flux(
         T_surface_K=T_surface_K,
         molar_mass_kg_mol=molar_mass_kg_mol,
         alpha_i=alpha,
+        melt_surface_area_m2=melt_surface_area_m2,
+        surface_flow=surface_flow,
         knudsen_number=knudsen_number,
         pipe_diameter_m=pipe_diameter_m,
         overhead_pressure_pa=overhead_pressure_pa,
