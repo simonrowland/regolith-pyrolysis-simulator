@@ -653,14 +653,27 @@ def test_lee_1976_table3_cells_match_render_and_unprinted_conditions_stay_unknow
     assert len(rows) == 16
     rendered = {
         "lee1976_table3_porosity_0_018_T1745C": Decimal("39.9"),
+        "lee1976_table3_porosity_0_018_T1635C": Decimal("5.62"),
+        "lee1976_table3_porosity_0_018_T1575C": Decimal("1.62"),
+        "lee1976_table3_porosity_0_018_T1457C": Decimal("0.114"),
+        "lee1976_table3_porosity_0_250_T1745C": Decimal("42.3"),
         "lee1976_table3_porosity_0_250_T1635C": Decimal("6.66"),
+        "lee1976_table3_porosity_0_250_T1575C": Decimal("1.84"),
+        "lee1976_table3_porosity_0_250_T1457C": Decimal("0.141"),
+        "lee1976_table3_porosity_0_300_T1745C": Decimal("45.1"),
+        "lee1976_table3_porosity_0_300_T1635C": Decimal("6.89"),
         "lee1976_table3_porosity_0_300_T1575C": Decimal("2.19"),
+        "lee1976_table3_porosity_0_300_T1457C": Decimal("0.186"),
+        "lee1976_table3_porosity_0_380_T1745C": Decimal("47.6"),
+        "lee1976_table3_porosity_0_380_T1635C": Decimal("7.27"),
+        "lee1976_table3_porosity_0_380_T1575C": Decimal("2.47"),
         "lee1976_table3_porosity_0_380_T1457C": Decimal("0.322"),
     }
     source_rows = {row["observation_id"]: row for row in rows}
     for observation_id, expected in rendered.items():
         row = source_rows[observation_id]
         assert row["locator"]["page"] == 3
+        assert row["locator"]["published_page"] == 580
         assert Decimal(row["values"]["evaporation_flux"]) == expected
 
     migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
@@ -691,6 +704,10 @@ def test_lee_1976_table3_cells_match_render_and_unprinted_conditions_stay_unknow
         assert observation.point_conditions is not None
         assert observation.point_conditions["pO2_atm"].state.is_value
         assert observation.point_conditions["pO2_atm"].state.value == Decimal("1e-9")
+        oxygen = row["point_conditions"]["pO2_atm"]
+        assert oxygen["state"]["approximate"] is True
+        assert oxygen["locator"]["page"] == 4
+        assert oxygen["locator"]["published_page"] == 581
         assert observation.provenance["printed_unit"] == "μg·cm^-2·sec^-1"
         assert observation.provenance["flow"] == {
             "flow_rate": {"state": "not_printed"},

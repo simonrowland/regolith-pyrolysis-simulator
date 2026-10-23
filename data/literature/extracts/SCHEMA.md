@@ -313,7 +313,7 @@ Printed identity and conditions:
 | `T_C` or `T_K` | Temperature |
 | `values.P_total` with `values.P_total_unit` | Total pressure, as printed |
 | `values.atmosphere` or `values.carrier` | Atmosphere or carrier gas |
-| `values.flow` | Gas-flow conditions. The block is required even when the source omits a member |
+| `values.flow` | Gas-flow conditions, when printed. If no complete flow/geometry block is printed, omit this field; the row refuses `missing_input` when scored. |
 
 When `values.flow` is printed, it has four members: `flow_rate`, `velocity`,
 `geometry`, `crucible_or_sample_area`. A printed member is copied with its
