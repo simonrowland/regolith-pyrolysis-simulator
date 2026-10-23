@@ -3658,10 +3658,13 @@ class ExtractionMixin:
                 'r_transport': 0.0,
                 'transport_ca_mol': 0.0,
                 'c7_ca_alpha_intrinsic': ca_alpha,
-                'c7_ca_p_sat_pa': 0.0,
                 'c7_transport_refusal': refusal,
                 'notices': antoine_notices,
             }
+            # Keep the legacy empty-record sentinel only when no coefficients
+            # were supplied; a partial record has no resolved saturation P.
+            if not antoine:
+                diagnostic['c7_ca_p_sat_pa'] = 0.0
             if _c7_sz_notes:
                 diagnostic['silent_zero_notes'] = [
                     dict(n) for n in _c7_sz_notes

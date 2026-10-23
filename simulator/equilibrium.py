@@ -383,6 +383,7 @@ class EquilibriumMixin:
             _metadata_value,
             _o2_channel_term_and_potential,
             _pow10_pressure_or_raise,
+            _raise_invalid_antoine_coefficient,
             _range_tuple,
             _require_finite_vapor_value,
             _standard_reaction_pressure_Pa,
@@ -709,7 +710,11 @@ class EquilibriumMixin:
                         A, B, C = _read_antoine_coefficients(antoine)
                     except _AntoineCoefficientRefusal as exc:
                         if not _is_missing_antoine_intercept(exc):
-                            raise
+                            _raise_invalid_antoine_coefficient(
+                                exc,
+                                species=species,
+                                field="P_reference_Antoine_Pa",
+                            )
                         _append_antoine_skip_notice(
                             warnings,
                             antoine_skip_notice_keys,
@@ -877,7 +882,13 @@ class EquilibriumMixin:
                     A_l, B_l, C_l = _read_antoine_coefficients(antoine_liq)
                 except _AntoineCoefficientRefusal as exc:
                     if not _is_missing_antoine_intercept(exc):
-                        raise
+                        _raise_invalid_antoine_coefficient(
+                            exc,
+                            species=species,
+                            field=(
+                                "P_reference_liquid_oxide_standard_reaction_Pa"
+                            ),
+                        )
                     _append_antoine_skip_notice(
                         warnings,
                         antoine_skip_notice_keys,
@@ -979,7 +990,13 @@ class EquilibriumMixin:
                     A_g, B_g, C_g = _read_antoine_coefficients(antoine_gas)
                 except _AntoineCoefficientRefusal as exc:
                     if not _is_missing_antoine_intercept(exc):
-                        raise
+                        _raise_invalid_antoine_coefficient(
+                            exc,
+                            species=species,
+                            field=(
+                                "P_reference_gas_rail_standard_reaction_Pa"
+                            ),
+                        )
                     _append_antoine_skip_notice(
                         warnings,
                         antoine_skip_notice_keys,
@@ -1338,7 +1355,11 @@ class EquilibriumMixin:
                 A, B, C = _read_antoine_coefficients(antoine)
             except _AntoineCoefficientRefusal as exc:
                 if not _is_missing_antoine_intercept(exc):
-                    raise
+                    _raise_invalid_antoine_coefficient(
+                        exc,
+                        species=str(name),
+                        field="P_sat",
+                    )
                 _append_antoine_skip_notice(
                     warnings,
                     antoine_skip_notice_keys,

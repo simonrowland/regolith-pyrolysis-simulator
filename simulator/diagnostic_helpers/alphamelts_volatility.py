@@ -18,6 +18,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 
 from engines.antoine import (
     _AntoineCoefficientRefusal,
+    _is_missing_antoine_intercept,
     _antoine_skip_notices_for_omitted_species,
     _append_antoine_skip_notice,
     _antoine_log10_pressure,
@@ -34,6 +35,7 @@ from engines.builtin.vapor_pressure import (
     VaporPressureComputationError,
     _ELLINGHAM_THERMO,
     _is_noncertifying_pseudo_vapor_pressure_runtime,
+    _raise_invalid_antoine_coefficient,
     _range_tuple,
     vapor_pressure_antoine_coefficients,
     vapor_pressure_source_label,
@@ -385,6 +387,12 @@ def _analytical_vapor_pressures_from_activities(
         try:
             A, B, C = _read_antoine_coefficients(antoine)
         except _AntoineCoefficientRefusal as exc:
+            if not _is_missing_antoine_intercept(exc):
+                _raise_invalid_antoine_coefficient(
+                    exc,
+                    species=str(species),
+                    field="P_reference_Antoine_Pa",
+                )
             _append_antoine_skip_notice(
                 warnings,
                 antoine_skip_notice_keys,
@@ -518,6 +526,12 @@ def _analytical_vapor_pressures_from_activities(
         try:
             A, B, C = _read_antoine_coefficients(antoine)
         except _AntoineCoefficientRefusal as exc:
+            if not _is_missing_antoine_intercept(exc):
+                _raise_invalid_antoine_coefficient(
+                    exc,
+                    species=str(species),
+                    field="P_reference_Antoine_Pa",
+                )
             _append_antoine_skip_notice(
                 warnings,
                 antoine_skip_notice_keys,

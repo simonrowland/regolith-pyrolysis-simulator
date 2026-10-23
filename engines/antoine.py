@@ -168,9 +168,11 @@ def _read_antoine_coefficients(
         coefficients = nested_coefficients
 
     def read(name: str) -> float:
-        raw = coefficients.get(name)
+        if name not in coefficients:
+            raise _AntoineCoefficientRefusal(name, None, "missing_input")
+        raw = coefficients[name]
         if raw is None:
-            raise _AntoineCoefficientRefusal(name, raw, "missing_input")
+            raise _AntoineCoefficientRefusal(name, raw, "invalid_input")
         if isinstance(raw, bool):
             raise _AntoineCoefficientRefusal(name, raw, "invalid_input")
         try:
@@ -188,8 +190,7 @@ def _read_antoine_coefficients(
     # A is a logarithmic intercept; its sign depends on the source pressure unit.
     A = read("A")
     B = read("B")
-    raw_C = coefficients.get("C")
-    if raw_C is None:
+    if "C" not in coefficients:
         declared_form = (
             record.get("runtime_form")
             or record.get("form")
@@ -199,7 +200,7 @@ def _read_antoine_coefficients(
             or coefficients.get("source_form")
         )
         if not _is_two_parameter_antoine_form(declared_form):
-            raise _AntoineCoefficientRefusal("C", raw_C, "missing_input")
+            raise _AntoineCoefficientRefusal("C", None, "missing_input")
         # In the declared A-B/T form, C is zero by definition.
         C = 0.0
     else:
