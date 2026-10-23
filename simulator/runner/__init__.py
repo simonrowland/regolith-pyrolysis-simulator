@@ -4747,15 +4747,22 @@ def _sio_tsweep_row(
     diagnostics: Mapping[str, float],
     mass_kg: float,
 ) -> dict[str, Any]:
-    stage3_silica_kg = float(
-        report.get("sio_to_silica_fume_kg", {}).get(
-            "stage_3_sio_zone_product", 0.0
-        )
+    sio_to_silica_fume_kg = report.get("sio_to_silica_fume_kg", {})
+    stage3_silica_kg = _safe_failure_value(
+        lambda: _clean_report_float(
+            float(sio_to_silica_fume_kg.get("stage_3_sio_zone_product", 0.0))
+        ),
+        section="sio_tsweep.stage3_silica_kg",
+        upstream=sio_to_silica_fume_kg,
     )
-    terminal_offgas_kg = float(
-        report.get("sio_to_silica_fume_kg", {}).get(
-            "terminal_offgas_escape", 0.0
-        )
+    terminal_offgas_escape_pct = _safe_failure_value(
+        lambda: _clean_report_float(
+            float(sio_to_silica_fume_kg.get("terminal_offgas_escape", 0.0))
+            / float(mass_kg)
+            * 100.0
+        ),
+        section="sio_tsweep.terminal_offgas_escape_pct",
+        upstream=sio_to_silica_fume_kg,
     )
     return {
         "cell_id": cell_id,
@@ -4765,10 +4772,8 @@ def _sio_tsweep_row(
         "sio_yield_pct_of_feedstock": _clean_report_float(
             float(report["sio_yield_pct_of_feedstock"])
         ),
-        "terminal_offgas_escape_pct": _clean_report_float(
-            terminal_offgas_kg / float(mass_kg) * 100.0
-        ),
-        "stage3_silica_kg": _clean_report_float(stage3_silica_kg),
+        "terminal_offgas_escape_pct": terminal_offgas_escape_pct,
+        "stage3_silica_kg": stage3_silica_kg,
         "mass_balance_err_pct": _clean_report_float(
             abs(
                 _required_mass_balance_value(
@@ -4811,6 +4816,11 @@ def _recommend_sio_tsweep_rows(
 
 
 def _sio_tsweep_table(rows: list[Mapping[str, Any]]) -> str:
+    def format_metric(value: Any) -> str:
+        if isinstance(value, Mapping) and value.get("status") == "unavailable":
+            return "unavailable"
+        return f"{float(value):.12g}"
+
     headers = (
         "rank",
         "cell_id",
@@ -4834,8 +4844,8 @@ def _sio_tsweep_table(rows: list[Mapping[str, Any]]) -> str:
             f"{float(row['T_hold_C']):g}",
             f"{float(row['ramp_C_per_hr']):g}",
             f"{float(row['sio_yield_pct_of_feedstock']):.12g}",
-            f"{float(row['terminal_offgas_escape_pct']):.12g}",
-            f"{float(row['stage3_silica_kg']):.12g}",
+            format_metric(row["terminal_offgas_escape_pct"]),
+            format_metric(row["stage3_silica_kg"]),
             f"{float(row['mass_balance_err_pct']):.12g}",
         ]
         lines.append("| " + " | ".join(values) + " |")
@@ -5101,10 +5111,13 @@ def _sio_wall_sweep_row(
     wall_deposit = report.get("wall_deposit_kg", {})
     sio_wall_kg = float(wall_deposit.get("SiO", 0.0))
     total_wall_kg = sum(float(value) for value in wall_deposit.values())
-    stage3_silica_kg = float(
-        report.get("sio_to_silica_fume_kg", {}).get(
-            "stage_3_sio_zone_product", 0.0
-        )
+    sio_to_silica_fume_kg = report.get("sio_to_silica_fume_kg", {})
+    stage3_silica_kg = _safe_failure_value(
+        lambda: _clean_report_float(
+            float(sio_to_silica_fume_kg.get("stage_3_sio_zone_product", 0.0))
+        ),
+        section="sio_wall_sweep.stage3_silica_kg",
+        upstream=sio_to_silica_fume_kg,
     )
     return {
         "cell_id": cell_id,
@@ -5123,7 +5136,7 @@ def _sio_wall_sweep_row(
         ),
         "sio_wall_deposit_kg": _clean_report_float(sio_wall_kg),
         "total_wall_deposit_kg": _clean_report_float(total_wall_kg),
-        "stage3_silica_kg": _clean_report_float(stage3_silica_kg),
+        "stage3_silica_kg": stage3_silica_kg,
         "sio_evolved_kg": _clean_report_float(float(report["sio_evolved_kg"])),
         "sio_yield_pct_of_feedstock": _clean_report_float(
             float(report["sio_yield_pct_of_feedstock"])
