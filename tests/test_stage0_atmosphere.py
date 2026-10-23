@@ -1,11 +1,14 @@
 from copy import deepcopy
+import json
 from pathlib import Path
 
 import pytest
 import yaml
 
 from simulator.core import Atmosphere, CampaignPhase, PyrolysisSimulator
+from simulator.campaigns import c0_exit_run_notice
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.runner import build_per_hour_summary
 
 
 C0_SETPOINTS = {
@@ -87,6 +90,99 @@ def test_c0_start_predicts_exit_from_live_flux_and_caps_the_ramp():
         CampaignPhase.C0, 0, sim.melt
     )
     assert target_C == prediction["T_exit_C"]
+
+
+def _canonical_bytes(value):
+    return json.dumps(
+        value,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=str,
+    ).encode("utf-8")
+
+
+def _short_c0_trajectory(feedstocks, prediction=None):
+    sim = _sim(feedstocks)
+    sim.load_batch("lunar_mare_low_ti", 1000.0)
+    if prediction is not None:
+        sim._predict_c0_exit = lambda **_kwargs: deepcopy(prediction)
+    sim.start_campaign(CampaignPhase.C0)
+    startup_phase_context = deepcopy(
+        getattr(sim, "_last_phase_context_diagnostic", None)
+    )
+    per_hour_payloads = []
+    for _ in range(3):
+        snapshot = sim.step()
+        per_hour_payloads.append(build_per_hour_summary(sim, snapshot))
+    return sim, startup_phase_context, per_hour_payloads
+
+
+def test_c0_forecast_and_supplied_decision_have_identical_realized_trajectory():
+    feedstocks = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "feedstocks.yaml").read_text()
+    )
+    forecasted, forecast_phase_context, forecast_payloads = _short_c0_trajectory(
+        feedstocks
+    )
+    decision = deepcopy(forecasted.campaign_mgr.c0_exit_prediction)
+    supplied, supplied_phase_context, supplied_payloads = _short_c0_trajectory(
+        feedstocks,
+        prediction=decision,
+    )
+
+    assert _canonical_bytes(forecast_phase_context) == _canonical_bytes(
+        supplied_phase_context
+    )
+    assert _canonical_bytes(forecasted.atom_ledger.close_report()) == (
+        _canonical_bytes(supplied.atom_ledger.close_report())
+    )
+    assert _canonical_bytes(
+        {
+            "c0_exit": c0_exit_run_notice(forecasted),
+            "sulfur": forecasted.sulfur_saturation_run_notice(),
+            "commissioning": forecasted.engine_commissioning_run_notice(),
+        }
+    ) == _canonical_bytes(
+        {
+            "c0_exit": c0_exit_run_notice(supplied),
+            "sulfur": supplied.sulfur_saturation_run_notice(),
+            "commissioning": supplied.engine_commissioning_run_notice(),
+        }
+    )
+    assert _canonical_bytes(vars(forecasted.backend)) == _canonical_bytes(
+        vars(supplied.backend)
+    )
+    assert _canonical_bytes(forecast_payloads) == _canonical_bytes(
+        supplied_payloads
+    )
+
+
+def test_c0_cached_replay_forecast_preserves_live_sulfur_and_authority_state():
+    feedstocks = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "feedstocks.yaml").read_text()
+    )
+    sim = _sim(feedstocks)
+    sim.load_batch("lunar_mare_low_ti", 1000.0)
+    sulfur_result = object()
+    sim._last_sulfur_saturation_result = sulfur_result
+    sim._backend_authoritative = True
+
+    class ReplayStore:
+        replay_enabled = True
+
+        def clone_for_replay(self):
+            return ReplayStore()
+
+        def replay_equilibrium(self, forecast_sim):
+            forecast_sim._last_sulfur_saturation_result = "forecast replay"
+            forecast_sim._backend_authoritative = False
+            return forecast_sim._internal_analytical_equilibrium()
+
+    sim.configure_pt0_determinism_store(ReplayStore())
+    sim._predict_c0_exit()
+
+    assert sim._last_sulfur_saturation_result is sulfur_result
+    assert sim._backend_authoritative is True
 
 
 def test_c0_comet_missing_alkali_inventory_does_not_predict_zero_loss():
