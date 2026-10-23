@@ -92,6 +92,9 @@ class Quantity(StrEnum):
     EVAPORATION_RATE = "evaporation_rate"
     MASS_LOSS_RATE = "mass_loss_rate"
     WALL_DEPOSIT_MASS = "wall_deposit_mass"
+    WALL_DEPOSIT_AREAL_MASS = "wall_deposit_areal_mass"
+    WALL_DEPOSITION_FLUX = "wall_deposition_flux"
+    WALL_DEW_TEMPERATURE = "wall_dew_temperature"
     TRANSITION_TEMPERATURE = "transition_temperature"
     VISCOSITY = "viscosity"
     DENSITY = "density"
@@ -566,6 +569,9 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.EVAPORATION_RATE: "kg_per_s",
     Quantity.MASS_LOSS_RATE: "kg_per_s",
     Quantity.WALL_DEPOSIT_MASS: "kg",
+    Quantity.WALL_DEPOSIT_AREAL_MASS: "kg_per_m2",
+    Quantity.WALL_DEPOSITION_FLUX: "kg_per_m2_per_s",
+    Quantity.WALL_DEW_TEMPERATURE: "K",
     Quantity.TRANSITION_TEMPERATURE: "K",
     Quantity.VISCOSITY: "Pa_s",
     Quantity.DENSITY: "kg_per_m3",

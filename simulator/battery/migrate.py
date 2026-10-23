@@ -2119,6 +2119,10 @@ def _geometry_from_plain(payload: object) -> ApparatusGeometry | None:
         "orifice_to_sample_area_ratio",
         "exposed_area_m2",
         "chamber_length_m",
+        "pipe_inner_diameter_m",
+        "segment_length_m",
+        "segment_position_m",
+        "line_of_sight_view_factor",
     ):
         if payload.get(name) is not None:
             kwargs[name] = _located_from_plain(
@@ -2141,6 +2145,10 @@ def _geometry_from_plain(payload: object) -> ApparatusGeometry | None:
             )
     if payload.get("orifice_shape") is not None:
         kwargs["orifice_shape"] = _located_from_plain(payload["orifice_shape"], str)
+    if payload.get("flow_orientation") is not None:
+        kwargs["flow_orientation"] = _located_from_plain(
+            payload["flow_orientation"], str
+        )
     return ApparatusGeometry(**kwargs) if kwargs else None
 
 
@@ -11378,6 +11386,11 @@ def _merge_geometry(
             "orifice_channel_length_m",
             "orifice_count",
             "orifice_shape",
+            "pipe_inner_diameter_m",
+            "segment_length_m",
+            "segment_position_m",
+            "flow_orientation",
+            "line_of_sight_view_factor",
         )
     }
     kwargs["cell_internal_dimensions"] = _merge_located_mapping(

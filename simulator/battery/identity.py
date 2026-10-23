@@ -954,6 +954,55 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "sample_mass_kg",
             "wall",
         )
+    elif q in {
+        Quantity.WALL_DEPOSIT_AREAL_MASS,
+        Quantity.WALL_DEPOSITION_FLUX,
+    }:
+        req(
+            "temperature_K",
+            "reservoir",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "wall",
+        )
+        # Source state and carrier can be explicitly not applicable for an
+        # upstream partial-pressure source or carrier-free ballistic flow.
+        na("temperature_K", "reservoir", "composition", "fO2_Pa", "sweep_gas")
+        if q is Quantity.WALL_DEPOSIT_AREAL_MASS:
+            req("exposure")
+        else:
+            na("exposure")
+        na(
+            "per",
+            "sample_mass_kg",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "subtype",
+        )
+    elif q is Quantity.WALL_DEW_TEMPERATURE:
+        # The result is a wall temperature; wall identity and transport
+        # conditions are optional for the local equilibrium inverse.
+        na(
+            "temperature_K",
+            "per",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "exposure",
+            "sample_mass_kg",
+            "wall",
+            "subtype",
+        )
     elif q in KINETIC_YIELD_QUANTITIES:
         req(
             "temperature_K",
@@ -1245,6 +1294,25 @@ def _uncompared_axes_for(identity: Identity) -> frozenset[str]:
 
     if quantity_token(identity) is Quantity.P_PARTIAL:
         return _P_PARTIAL_UNCOMPARED_AXES
+    if quantity_token(identity) is Quantity.WALL_DEPOSITION_FLUX:
+        # Exposure duration may document a derived rate, but the normalized
+        # instantaneous flux identity is independent of that integration span.
+        return frozenset({"exposure"})
+    if quantity_token(identity) is Quantity.WALL_DEW_TEMPERATURE:
+        # Local-pressure dew inversion does not depend on transport metadata;
+        # retain any printed source/wall state without making it an identity.
+        return frozenset(
+            {
+                "temperature_K",
+                "reservoir",
+                "composition",
+                "fO2_Pa",
+                "total_pressure_Pa",
+                "sweep_gas",
+                "exposure",
+                "wall",
+            }
+        )
     return _melt_activity_uncompared_axes((identity,))
 
 

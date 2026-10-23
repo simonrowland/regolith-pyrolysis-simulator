@@ -1156,6 +1156,234 @@ def background_pressure_high(
     )
 
 
+_WALL_DEPOSITION_AREAL_QUANTITIES = frozenset(
+    {Quantity.WALL_DEPOSIT_AREAL_MASS, Quantity.WALL_DEPOSITION_FLUX}
+)
+
+
+def wall_deposition_input_gate(
+    identity: Identity,
+    point_conditions: Mapping[str, Located[Any]] | None,
+    experiment: Experiment,
+) -> GateOutcome:
+    """Require located wall-source and transport inputs for d-275 observables."""
+
+    quantity = quantity_token(identity)
+    if quantity not in _WALL_DEPOSITION_AREAL_QUANTITIES | {
+        Quantity.WALL_DEW_TEMPERATURE
+    }:
+        return _pass([])
+    conditions = point_conditions or {}
+    geometry = None if experiment.apparatus is None else experiment.apparatus.geometry
+    missing: list[str] = []
+
+    def positive_state(state: State[Any] | None) -> bool:
+        if state is None or not state.is_value or state.value is None:
+            return False
+        try:
+            value = as_decimal(state.value)
+        except (TypeError, ValueError):
+            return False
+        return value.is_finite() and value > 0
+
+    def located_decimal(located: Located[Any] | None) -> Decimal | None:
+        try:
+            return _located_decimal(located)
+        except (TypeError, ValueError):
+            return None
+
+    def condition(
+        key: str, *, positive: bool = False, nonempty_text: bool = False
+    ) -> Any | None:
+        located = conditions.get(key)
+        if (
+            not isinstance(located, Located)
+            or located.locator is None
+            or not located.state.is_value
+            or located.state.value is None
+        ):
+            missing.append(f"point_conditions.{key}")
+            return None
+        value = located.state.value
+        if positive:
+            number = located_decimal(located)
+            if number is None or not number.is_finite() or number <= 0:
+                missing.append(f"point_conditions.{key}")
+                return None
+        if nonempty_text and (not isinstance(value, str) or not value.strip()):
+            missing.append(f"point_conditions.{key}")
+            return None
+        return value
+
+    def geometry_field(name: str, *, strictly_positive: bool = True) -> None:
+        located = None if geometry is None else getattr(geometry, name, None)
+        value = located_decimal(located)
+        if (
+            located is None
+            or located.locator is None
+            or value is None
+            or not value.is_finite()
+            or (value <= 0 if strictly_positive else value < 0)
+        ):
+            missing.append(f"apparatus.geometry.{name}")
+
+    def require_line_of_sight_for_molecular_flow() -> None:
+        pressure_env = experiment.pressure_environment
+        regime = None if pressure_env is None else pressure_env.regime
+        regime_state = None if regime is None else regime.regime_class
+        if regime_state is None or not regime_state.is_value or regime_state.value.value != "molecular":
+            return
+        los = None if geometry is None else geometry.line_of_sight_view_factor
+        value = located_decimal(los)
+        if (
+            los is None
+            or los.locator is None
+            or value is None
+            or not value.is_finite()
+            or value < 0
+            or value > 1
+        ):
+            missing.append("apparatus.geometry.line_of_sight_view_factor")
+
+    def require_total_pressure() -> None:
+        pressure = identity.total_pressure_Pa
+        if not positive_state(pressure):
+            missing.append("identity.total_pressure_Pa")
+
+    def require_carrier() -> None:
+        if identity.sweep_gas is None or not identity.sweep_gas.is_value:
+            if condition("carrier_mode", nonempty_text=True) != "none":
+                missing.append("identity.sweep_gas or point_conditions.carrier_mode=none")
+            return
+        for field in ("flow_sccm", "partial_pressure_Pa"):
+            state = getattr(identity.sweep_gas.value, field)
+            if not positive_state(state):
+                missing.append(f"identity.sweep_gas.{field}")
+
+    def require_transport_geometry() -> None:
+        condition("gas_temperature_K", positive=True)
+        for field in ("pipe_inner_diameter_m", "segment_length_m"):
+            geometry_field(field)
+        geometry_field("segment_position_m", strictly_positive=False)
+        orientation = None if geometry is None else geometry.flow_orientation
+        if (
+            orientation is None
+            or orientation.locator is None
+            or not orientation.state.is_value
+            or not isinstance(orientation.state.value, str)
+            or not orientation.state.value.strip()
+        ):
+            missing.append("apparatus.geometry.flow_orientation")
+        require_line_of_sight_for_molecular_flow()
+
+    wall = identity.wall.value if identity.wall is not None and identity.wall.is_value else None
+    wall_required = quantity in _WALL_DEPOSITION_AREAL_QUANTITIES
+    if wall_required:
+        if wall is None:
+            missing.append("identity.wall")
+        else:
+            for field in ("temperature_K", "material", "location", "area_m2"):
+                state = getattr(wall, field, None)
+                invalid = state is None or not state.is_value or state.value is None
+                if not invalid and field in {"temperature_K", "area_m2"}:
+                    invalid = not positive_state(state)
+                if not invalid and field == "material":
+                    invalid = not isinstance(state.value, str) or not state.value.strip()
+                if not invalid and field == "location":
+                    invalid = not isinstance(state.value, str) or not state.value.strip()
+                if invalid:
+                    missing.append(f"identity.wall.{field}")
+        require_total_pressure()
+
+    if quantity in _WALL_DEPOSITION_AREAL_QUANTITIES:
+        source_kind = condition("vapour_source_kind", nonempty_text=True)
+        if source_kind == "melt":
+            for field in ("temperature_K", "reservoir", "composition"):
+                state = getattr(identity, field)
+                if state is None or not state.is_value or state.value is None:
+                    missing.append(f"identity.{field}")
+        elif source_kind == "upstream_partial_pressure":
+            condition("source_partial_pressure_Pa", positive=True)
+            condition("source_location", nonempty_text=True)
+        elif source_kind is not None:
+            missing.append("point_conditions.vapour_source_kind")
+
+        require_carrier()
+        require_transport_geometry()
+        if quantity is Quantity.WALL_DEPOSIT_AREAL_MASS:
+            exposure = identity.exposure
+            if (
+                exposure is None
+                or not exposure.is_value
+                or not positive_state(exposure.value.duration_s)
+            ):
+                missing.append("identity.exposure.duration_s")
+        elif identity.exposure is not None and identity.exposure.is_value:
+            duration = identity.exposure.value.duration_s
+            if not positive_state(duration):
+                missing.append("identity.exposure.duration_s")
+    else:
+        local = conditions.get("wall_species_partial_pressure_Pa")
+        local_value = None
+        if (
+            isinstance(local, Located)
+            and local.locator is not None
+            and local.state.is_value
+            and local.state.value is not None
+        ):
+            try:
+                local_value = located_decimal(local)
+            except (TypeError, ValueError):
+                local_value = None
+        local_was_reported = (
+            isinstance(local, Located)
+            and local.locator is not None
+            and local.state.is_value
+            and local.state.value is not None
+        )
+        if local_value is not None and local_value.is_finite() and local_value > 0:
+            pass
+        elif local_was_reported:
+            missing.append("point_conditions.wall_species_partial_pressure_Pa")
+        elif (
+            isinstance(conditions.get("vapour_source_kind"), Located)
+            and conditions["vapour_source_kind"].locator is not None
+            and conditions["vapour_source_kind"].state.is_value
+            and conditions["vapour_source_kind"].state.value
+            == "upstream_partial_pressure"
+        ):
+            condition("vapour_source_kind", nonempty_text=True)
+            condition("source_partial_pressure_Pa", positive=True)
+            condition("source_location", nonempty_text=True)
+            require_total_pressure()
+            require_carrier()
+            require_transport_geometry()
+            if (
+                wall is None
+                or wall.location is None
+                or not wall.location.is_value
+                or not isinstance(wall.location.value, str)
+                or not wall.location.value.strip()
+            ):
+                missing.append("identity.wall.location")
+        else:
+            condition("wall_species_partial_pressure_Pa", positive=True)
+
+    if not missing:
+        return _pass(
+            [GateCheck("wall_deposition_inputs", True, {"quantity": quantity.value})]
+        )
+    first = missing[0]
+    checks = [
+        GateCheck(
+            "wall_deposition_inputs",
+            False,
+            {"missing": missing, "quantity": quantity.value},
+        )
+    ]
+    return _fail(RefusalReason.UNDERDETERMINED_APPARATUS, checks, first)
+
+
 def run_validity_gates(
     experiment: Experiment,
     observation: Observation,
@@ -1198,6 +1426,13 @@ def run_validity_gates(
             )
         )
     if quantity is not None:
+        absorb(
+            wall_deposition_input_gate(
+                observation.identity,
+                observation.point_conditions,
+                experiment,
+            )
+        )
         evidence_class = observation.evidence.class_
         if (
             evidence_class.is_value

@@ -704,7 +704,12 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         or quantity in VAPORIZATION_ENTHALPIES
     ):
         return Rail.THERMOCHEMISTRY
-    if quantity is Quantity.WALL_DEPOSIT_MASS:
+    if quantity in {
+        Quantity.WALL_DEPOSIT_MASS,
+        Quantity.WALL_DEPOSIT_AREAL_MASS,
+        Quantity.WALL_DEPOSITION_FLUX,
+        Quantity.WALL_DEW_TEMPERATURE,
+    }:
         return Rail.WALL_DEPOSITION
     if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
         return Rail.REDOX
