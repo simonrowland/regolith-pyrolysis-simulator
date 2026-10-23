@@ -209,6 +209,7 @@ def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
 
 def test_sossi_worker_start_failure_after_residue_scoring_worker(
     monkeypatch: pytest.MonkeyPatch,
+    _close_openimcc_worker_between_tests,
 ) -> None:
     pytest.importorskip("openimcc")
     import simulator.battery.residue as residue
@@ -244,11 +245,13 @@ def test_sossi_worker_start_failure_after_residue_scoring_worker(
     )
 
     assert residue._OPENIMCC_EVALUATION_WORKER is not None
+    _close_openimcc_worker_between_tests()
     _assert_sossi_worker_start_failure_recorded(monkeypatch)
 
 
 def test_sossi_worker_start_failure_is_recorded_as_transport_error(
     monkeypatch: pytest.MonkeyPatch,
+    _close_openimcc_worker_between_tests,
 ) -> None:
     _assert_sossi_worker_start_failure_recorded(monkeypatch)
 
