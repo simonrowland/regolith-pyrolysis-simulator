@@ -156,9 +156,16 @@ def test_stolyarova_1991_x036_to_x040_rows_stay_numeric(
         for observation in contested
         if internal_analytical_residuals[observation.observation_id].numeric is not None
     ]
-    # Green: 14 internal-analytical numeric residuals on these 44 rows
-    # (t-1123 proposal section 4: 40 single-liquid numeric = 26 openimcc + 14 here).
-    assert len(numeric) == 14
+    # 14 of these were already numeric before the alias stack: Ca(g) matched
+    # the exact key "Ca" (8 rows, both 1993 K series, x = 0.36/0.38/0.39/0.40)
+    # and SiO(g) matched "SiO" (6 rows, both 1933 K series, x = 0.38/0.39/0.40).
+    # 0c5b7486a accepts one vapour alias, formula + "_gas", when the adapter
+    # renames an oxide gas that collides with the melt oxide. That is the same
+    # closed formula, not a Berman polymorph (d-243 does not score these gas
+    # rows; oxide activity still ignores the suffix). The nine added rows are
+    # CaO(g) via "CaO_gas" (8: both 1993 K series, the same four x) and
+    # SiO2(g) via "SiO2_gas" (1: 1933 K ion comparison, x = 0.40).
+    assert len(numeric) == 23
     assert all(residual.status is not ResidualStatus.REFUSED for residual in numeric)
 
 
@@ -342,7 +349,9 @@ def test_stolyarova_1991_contested_numeric_rows_are_flagged_out_of_certified_lin
         if _x_sio2(observation) in CONTESTED_X
     ]
     numeric = [residual for residual in contested if residual.numeric is not None]
-    assert len(numeric) == 14
+    # Same 23 as test_stolyarova_1991_x036_to_x040_rows_stay_numeric.
+    # The nine above the old pin of 14 are the CaO_gas and SiO2_gas rows.
+    assert len(numeric) == 23
     assert all(
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED in flagged_strata(residual.notices)
         for residual in contested
