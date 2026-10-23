@@ -2184,35 +2184,23 @@ def wall_condensation_antoine_coefficients(
     pressures. When a standard-reaction row carries a pure-component sidecar,
     wall re-evaporation selects that block and leaves coefficient and pressure
     validation to the wall consumer. A partial block must not be hidden by a
-    legacy-fit fallback at a deposition/refusal boundary.
+    legacy-fit fallback at a deposition/refusal boundary. Non-standard rows
+    retain the runtime selector's projection gate and selection behavior.
     """
 
-    standard_reaction = _fit_target(row) == FIT_TARGET_STANDARD_REACTION
+    if _fit_target(row) != FIT_TARGET_STANDARD_REACTION:
+        return vapor_pressure_antoine_coefficients(row, temperature_K)
     if not bool((row or {}).get("interval_required")):
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
-            if selected:
-                try:
-                    _A, _B, C = _read_antoine_coefficients(selected)
-                except _AntoineCoefficientRefusal:
-                    return selected, COEFF_BLOCK_PURE_COMPONENT
-                if temperature_K is None:
-                    return selected, COEFF_BLOCK_PURE_COMPONENT
-                try:
-                    denominator = float(temperature_K) + C
-                except (OverflowError, TypeError, ValueError):
-                    return selected, COEFF_BLOCK_PURE_COMPONENT
-                if denominator > 0.0 or not math.isfinite(denominator):
-                    return selected, COEFF_BLOCK_PURE_COMPONENT
+            if _pure_segment_usable(selected, temperature_K):
+                return selected, COEFF_BLOCK_PURE_COMPONENT
             # A grounded pure-species wall answer exists but not at this
             # temperature: fail closed so the caller types a refusal rather
             # than extrapolate through a pole or substitute the melt term.
-            if standard_reaction:
-                return {}, COEFF_BLOCK_PURE_COMPONENT
-    if standard_reaction:
-        return {}, COEFF_BLOCK_PURE_COMPONENT
-    return vapor_pressure_antoine_coefficients(row, temperature_K)
+            return {}, COEFF_BLOCK_PURE_COMPONENT
+    return {}, COEFF_BLOCK_PURE_COMPONENT
 
 
 def _raise_invalid_antoine_coefficient(
