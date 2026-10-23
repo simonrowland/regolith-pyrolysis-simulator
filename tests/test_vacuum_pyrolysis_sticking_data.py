@@ -371,6 +371,7 @@ def test_wall_deposit_reactivity_classes_are_explicit():
 
     assert set(classes) == {
         "SiO",
+        "SiO2_gas",
         "Na",
         "K",
         "Fe",
@@ -383,6 +384,7 @@ def test_wall_deposit_reactivity_classes_are_explicit():
         "CrO2",
     }
     assert classes["SiO"] == "reactive"
+    assert classes["SiO2_gas"] == "physisorbing"
     for species in ("Na", "K", "Fe", "Mg", "Ca", "Mn", "Cr", "Al", "Ti"):
         assert classes[species] == "physisorbing"
     assert classes["CrO2"] == "physisorbing"
