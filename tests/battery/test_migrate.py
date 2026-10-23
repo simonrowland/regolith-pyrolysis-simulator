@@ -7415,7 +7415,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # F15 merge 2544107c9 adds Mendybaev 2013 (4e07bd649, 96), Florin 2025
     # (0f4e598e4, 50), Renggli 2022 (7a90bab6a, 36), and Lu 2024 (21d1ee8d7, 27):
     # 4110->4319.
-    assert census.get("residue_component_composition") == 4319
+    # Yakovlev 2017 (fc7c11533, merge F20 23a54e9b3) adds 34 printed residue
+    # cells: 4319->4353.
+    assert census.get("residue_component_composition") == 4353
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
