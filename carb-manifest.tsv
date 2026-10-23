@@ -1,0 +1,73 @@
+car	sha	source	review_evidence	on_base	action	result	note
+F15	42797dfa8a00ad1327d037931a98066348af49d2	ledger 1819	ledger 1578 ror-fam15c LAND	no	merged	2544107c9d29ed9db6e2cfcb68f55bf79af69e21	canonical offer-21 line start; base of that line is F14 f6b72676c
+t-1410	ff19b2adb63e0d68c2f4bb0e02859320ed9e1708	ledger 1819	ledger 1816 ror-t1410 LAND	no	merged	0dc2df1da3b6cac439fbfeeff24d3f9dbe38f973	carries F16 and replaces o21fixA
+t-1367	3f6f94f968659b8a474ce7c105106fb56134b375	ledger 1566; resume rev 45 line 278	ledger 1566 F17 must land with/after t-1367	no	merged	cbe38eb7b829ae2316ec6db8d698095a71bdc449	merged before F17
+F17	3f51d8f009825aaf5a3f7d14b8bdfd1d9fd68a78	ledger 1819	ledger 1566 ror-fam17b LAND	no	merged	b4c270a968998ae45b271f6c82d76d5d5ff0001e	after t-1367
+F18	5c9fb4246e85ab2e53529eccfd185a64ba219e70	ledger 1819	ledger 1580 ror-fam18b LAND	no	merged	571b5052b071e6caa86573d1da9a6921b17144f1	
+F19	7469d7b122ca47ceb3fb4d5c71926ce0e595720c	ledger 1819	ledger 1580 family LAND list; ledger 1583 F19 done	no	merged	dafa128987d53922ace23559d824238ce2f9b382	
+F20	aaa86ca6ac1e962292f215bbd01e0d902d994817	ledger 1819	ledger 1589 ror-fam20b LAND	no	merged	23a54e9b370ff951a9ee6359edbc40419436eb60	
+t-1372	9a3d42c710248b11aaa61ae3633bc622bd623503	ledger 1819	ledger 1638 ACCEPTED for offer 21	no	merged	47584c5cb6748e93421365a76c745c74563caafd	
+t-1374	66b6589c7ab6c7040cd3638b8804943b81824401	ledger 1703; brief known-members	ledger 1703 ACCEPTED into offer 21	no	merged	a733c7e04146db00b4e05e2b084aa8bc095034f7	named in the brief and ledger 1703; ledger 1819's semicolon list omits the name and does not retract 1703
+shorn26b	df3d3891c8cd9cf5a988bb76a705844732298915	ledger 1819	ledger 1819 shorn26b LAND	no	merged	d357e86db4876f7d9e5ec7854d7c89238211c250	carries w2 and F21
+t1382neuman	e0aa58904fc02a7734dee144387814208d3ce24e	ledger 1819; plan item 4	ledger 1819 F21 line	no	merged	41625bf441c84179413cbefab996f86507b1a6a2	
+F22	c69eda0643132b7e0605b921e166097b5b035a59	ledger 1819	ledger 1623 ror-fam22b LAND	no	merged	1b5b567611cf34deb2ee58fd67975a65f2273ad2	
+F23	bad62ef4db1fdb52564ba903b9268946692abead	ledger 1819	ledger 1645 ror-fam23b LAND	no	merged	08b552a36c1e8acb573303f91604ca4f794178ca	
+t1382morris3	6ddcb1413a5b3688c2b10d64a60ef45f7ff22641	ledger 1819; plan item 4	ledger 1807 ror-t1382morris3 LAND	no	merged	5b947287a9704712f996f9e7d8429b7b724c4ca2	with F23
+F24	605d62065abe0313b72d536394fe964209ba2987	ledger 1819	ledger 1670 ror-fam24c LAND	no	merged	2bb15e2b0b1724f776c041bed54c85e660e1a009	
+t1382he3	b35dde1ea44cb6ae540ea187c2a89b16c77e68ae	ledger 1819; plan item 4	ledger 1797 ror-t1382he3 LAND	no	merged	5e89587b9b5ce6291ebb57e865e4f0b3f97e5f03	with F24
+F25	f9d033085cb1134d12f548366e5da4757fb1d768	ledger 1819	ledger 1680 ror-fam25d LAND	no	merged	f07058ca167398591690b760397a6b69881fa358	
+F26	9dd7fe8323dfa3996e87ebae5f9dc3c51f7509bb	ledger 1819	ledger 1668 ror-fam26c LAND	no	merged	519a54318049eac205e494f738ca9201bc8f1047	
+F27	415023f24a1c9392eeb8f4e6c69d95a1b1b44253	ledger 1819	ledger 1666 ror-fam27b LAND	no	merged	0f9d348e7f491a850960b925a179283e607e7e57	
+o21fixB2	8f262a497a02a09cd62230329a975fa2f8e1e950	ledger 1819	ledger 1782 ror-o21fixB2 LAND	no	merged	33f08227bfa9f6f17c1a8559c9d2afc2be88df71	replaces F28 e7d7949c4 and 45fe44875
+t-1358b	ddf17594020c19abcacfffaa157231a22feca08e	resume rev 45 line 278	ledger 1470 ror-t1358c LAND ddf175940	no	merged	29cb26fcbd700d34ffd4322ede13f2842daa039c	ledger 1470 labels this sha ror-t1358c; resume lists t-1358b/c/d; this sha is the borisov capture
+t-1358c	c00db1723054b17311e7e7ace3102c0aa8f551c9	resume rev 45 line 278	resume rev 45 t-1358b/c/d	no	merged	9feac4103a20e102c67c358dcdd471f50d7a0671	Aithala fix; WIP 33d42c220 remains an ancestor; not squashed
+t-1358d	47376a466f8115b4b3b1019364ffe7ce3b4a3d73	resume rev 45 line 278; ledger 1580	ledger 1580 lists t-1358d with the family cars	no	merged	4de38cf26eb136ade14ae1ee40fb93b456e35a4b	
+t-1359	1eb76101929078a3110f76a836f6601c24ad00a8	resume rev 45 line 278	ledger 1461 ror-t1359b LAND	no	merged	a09bdddb792c3b7012625aa4deefed8ab62dcacd	
+t-1362	477a8c0a8ec5c5c4471e4d7e608f87bce1b43731	resume rev 45 line 278	ledger 1480 ror-t1362b LAND	no	merged	d5186098c84f748474776bb384a11f4d28c55183	
+gate2d	3ad936ca8da3f61994f905059a14552c7af04ca5	ledger 1516	ledger 1424 ror-gate2d LAND	no	merged	430dfa1d96afa5710f300752964fb11b67c8fa66	merged immediately before t-1361 so the identity check can replace its transition-composition helper
+t-1361	a29ec91759fb5055154c9c01802e66937a01f83f	resume rev 45 line 278; ledger 1516	ledger 1516 ror-t1361g LAND	no	merged	0c77ddb11ad0f3381f88b3e8f040ce205be0af09	reconciled with gate2d
+t-1363b	4000d10b60c23236044e1aa4ec74394a0b5a754f	resume rev 45 line 278	ledger 1537 ror-t1363b LAND	no	merged	4cec870a942dab6ee8b52b3c58ade312932b6941	
+t-1353h	2ce3cdb869cf0aa3af390c5fcbe3e21cdef565dc	resume rev 45 line 278	ledger 1548 ror-t1353h LAND	no	merged	c13a5976e13a88e2d747e30119c871aee152c7dc	
+b-954	d96480dd7c5c8bddd95216c06ba31a5f113c8dad	resume rev 45 line 278	ledger 1566 b954 done	no	merged	de71c19432a10131583e1edd743f6241001d52e3	
+t-1366	8e50ca7958df5d8eec2a6c4482ae3629849400ee	resume rev 45 line 278	ledger 1572 ror-t1366 LAND	no	merged	39ece1038c8f041b2bb97442af9e69f342bcb38c	
+F29	0a9f0c29b44c359a1bba8093ce683294fd46b860	ledger 1819 later-family	ledger 1731 ror-fam29c LAND	no	merged	f3b48ce0928c54883c9ac201935d2f4d73b6bc67	
+F30	b1d92327612d707b111a022d3a41b3e71970cf0e	ledger 1819 later-family	ledger 1731 with F29	no	merged	0b821485991d9f57cf5f5e9d0a0d38a53d702766	
+F31	fe4527aa804e22f8512f0ebaee03242593f0a5eb	ledger 1819 later-family	ledger 1717 ror-fam31c LAND	no	merged	fa0b30b768e1754ee5cdf826da59ce248a612814	
+F32	b787a45881f16f2cc812b8a3b4de36dabf5cae80	ledger 1819 later-family	ledger 1780 ror-fam32d LAND	no	merged	bfd5ecf5e9a9b7fd3c337c101a7ae1b8a16c619a	
+F33	2455216ab8ddf399bd6f59ba845c1fd5ba9f5c4e	ledger 1819 later-family	ledger 1793 ror-fam33d LAND	no	merged	8cbfbab7713425f6f9170561ff9f3487a91556e9	
+F34	c9d209ef7772b19ed868da8954c4c999f022680e	ledger 1819 later-family	ledger 1793 later-family list	no	merged	2542dbb4481a957dfd079f00c836c49911753ada	
+F35b	0a1c9ab4c2f6c2cadf5323d017ec3745f546948f	plan item 4	ledger 1875 ror-fam35r2 LAND	no	merged	8dbfb6fd0dac558345e4eff81a07eb1a7029264a	supersedes F35 8092a24f7; later LAND sha wins
+F36b	b72b8ac1698bcf37f8e8a3f55f669c9232a8a430	plan item 4	ledger 1833 ror-fam36r2 LAND	no	merged	c3a6e4548908220f1099e70612221848d53ab9c0	supersedes F36 982d1bfe5, which is an ancestor of F36b
+F37b	c00756e3868f3990916cc83b221fb343a10d251c	plan item 4	ledger 1834 ror-fam37r2 LAND	no	merged	b3b36fb1fe7ef3a58b1ff0aae16cd02809f84300	supersedes F37 2fdcaf7d8, which is an ancestor of F37b
+F38c	aa5c9712ff4fff82df8d03ae9deb3d9fad3c5aca	plan item 4	ledger 1891 ror-fam38r3 LAND	no	merged	ddf069b0595b0046b9a945c1bdb92e88e16e64ec	supersedes F38 3f948a82d, which is an ancestor of F38c
+r17a3	04e03ba08a062261868935a2a1259b1e649bd04b	plan item 5	ledger 1855 ror-r17a3 LAND	no	merged	4679aa7d9a2e232fbe483002c4b2220ba6233b76	kems-012 left at the pre-merge text; locator hunks did not line up with the t-1363b split
+r17b4	2f342093c77f650e2748f6c945437b5b24faf775	plan item 5	ledger 1828 ror-r17b4 LAND	no	merged	51081a546d71792a90dfee4e113dba63e3e8a915	
+L1	72c25f4470c9072266e00b6e8406fc591599264a	plan item 5	ledger 1899 ALL FOUR lunar lines LAND	no	merged	40d6a298cfce7298e62f12045ee98aa3d9c19c61	Markova VI/V observation-level T_range_K left off
+L1d	4ee22964af4af7308f35feb2ca566c3761c8546d	plan item 5	ledger 1899 ror-lunarL1d LAND	no	merged	aec86da48fa1124ba64a828af8b5979e434532a2	
+L2b	47919bb97289573cbc89673d999533da8fcfaf7e	plan item 5	ledger 1899 L2 47919bb97	no	merged	5fcb91c3b05222da57ec2b0c1491864e37aab9e8	
+L3c	be4de18a771f2712fe08a867df98a1295a0ce043	plan item 5	ledger 1888 ror-lunarL3r3 LAND	no	held-out-add-add	data/literature/extracts/wang-2001-solar-melt-evaporation-residues.yaml	also add/add on tests/test_wang_2001_solar_melt_evaporation_residues_extract.py; merge aborted
+resox	1c4e65ad01c005798656e51bdc53ad1a43201cc1	plan item 5	ledger 1899 resox LAND	no	merged	5344ed0d2da4abdeab4470e81b8cfed5208b94e5	after L3c in the plan; L3c was held, resox still merged; emitter kept HEAD's six-slot ids
+t1415a2	4e0819f6d627fc3c80278f2fe2a3809bdaec14bc	plan item 5	ledger 1901 ror-t1415a2 LAND	no	merged	394c37f4747d4eb3f4f366677b4e9f421b5e2621	
+t1415b2	2cb08370de33dde4383d4493cc664a6eee3227d2	plan item 5	ledger 1859 ror-t1415b2 LAND	no	merged	76c04d3fafb700d16c4c842b779d68f95cb13296	
+berman88c	929c072401a55ea481ed00865eed48cc94fca064	plan item 5	ledger 1881 ror-berman88r3 LAND	no	merged	4847b6c905502720cc1d5f7d18889cf7cf160d7e	tip of this assembly
+kc91b	a4ef7adde4c4ec1f02331bcdd3bd938b23933d97	plan item 5; ledger 1971	ledger 1940 ror-kc91b LAND	no	held-out	t-1442	duplicates Kress-Carmichael 1991; family copy owns the path
+L4b	1dc54a96fe1143de8a8f0fe8d4bdd155c4910cc5	plan item 5; ledger 1971	ledger 1883 ror-lunarL4r2 LAND	no	held-out	t-1442	duplicates Mendybaev 2013; family copy owns the path
+t-1357b	69bab2e28dc286ece08a99f8bd2bdb7abf22b3cb	ledger 1538	ledger 1538 ror-t1357b LAND	no	excluded	lands-after-offer-21	brief: own car after offer 21
+t-1380	81f5a34e861c6e3cc76eb67fa3a5a2c87d13a100	ledger 1698	ledger 1698 ACCEPTED into offer 21	no	excluded	later-list-omits	ledger 1819 and the brief known-members omit it; later list wins
+t1317	d5407cb3b7962f23bbe8412b3bfc87a7da9c4bc4	ledger 1176	ledger 1176 ror-t1317b LAND	no	excluded	not-in-later-lists	not an ancestor of F15 or of this tip
+F13	936f045e13d321224ec8b37d20c9ab739bb81782	resume rev 45 line 278	ledger 1466 ror-fam13d LAND	no	excluded	later-list-omits	ledger 1819 starts at F15 on base F14 and does not name F13; F13 is not an ancestor of F14, F15, or this tip; its extracts are absent
+dg46	7b67f2b68afdbd1f2e2662dbf0cf695cdeb722d2	ledger 1093	ledger 1105 dg46j = offer-21 car	yes	skipped-already-on-base		ancestor of d8c894343
+F16	6bce684b18911f68ac13954fc100762d2476db14	ledger 1819	ledger 1566 ror-fam16c LAND	no	carried-by	t-1410	ancestor of ff19b2adb
+o21fixA	dce4722e78cdecd71b1b10d114945e6e613fcc2c	ledger 1769	ledger 1769 ror-o21fixA LAND	no	replaced-by	t-1410	ledger 1816; ancestor of ff19b2adb
+w2	a60ebf14045ae00c17689aebd2ad17d699aedba0	ledger 1819	ledger 1819 inside shorn26b	no	carried-by	shorn26b	ancestor of df3d3891c
+F21	f2e9b34ee6c045e884e66a1c7782e9fc76a6c248	ledger 1819	ledger 1626 ror-fam21c LAND	no	carried-by	shorn26b	ancestor of df3d3891c
+F28	e7d7949c48675808a3effc6a1df1618d9ec4cc55	ledger 1668	ledger 1668 ror-fam28b LAND	no	replaced-by	o21fixB2	ancestor of 8f262a497
+F28-tip	45fe44875275a385fb0ba0fb976b4392cddbd91b	ledger 1681	ledger 1681 offer-21 car F28 = 45fe44875	no	replaced-by	o21fixB2	later LAND 1782; ancestor of 8f262a497
+F35	8092a24f777195ac5a484d5c701f39a518e6a018	ledger 1824	ledger 1824 F35 pushed, not the later LAND	no	superseded	F35b	not an ancestor of F35b or of this tip
+F36	982d1bfe5e140189ff706f00588ef9ca1162fdc2	ledger 1805	ledger 1805 F36 pushed	no	superseded	F36b	ancestor of F36b
+F37	2fdcaf7d8499a967d7763feb82da25208b6333d7	ledger 1803	ledger 1803 F37 2fdcaf7d8	no	superseded	F37b	ancestor of F37b
+F38	3f948a82d5f437fc317a5bc15efe85affd5bef70	ledger 1814	ledger 1814 F38 pushed	no	superseded	F38c	ancestor of F38c
+F14	f6b72676c60f9a6fa12a8af52822914e2516545b	ledger 1819 base	ledger 1580 F14 in the family LAND list	no	carried-by	F15	ancestor of F15 and of this tip
+o21asm	28af098ed04b8ca99f569381a2f38330cb66d7cd	ledger 1819 ancestry	2026-10-19 assembly inside F15	no	carried-by	F15	ancestor of this tip
+gatefix	f98e7d9dfa375771e2890ed6c46945c513ff217e	ledger 1341	ledger 1341 gatefix DONE, supersedes w4a/w7/w8	no	carried-by	F15	ancestor of this tip
+retype	n/a	plan Offer-21 re-type step	plan lines 25-30	n/a	not-done		brief forbids changing extracted values; F31/F37/Taniguchi re-type was not applied
