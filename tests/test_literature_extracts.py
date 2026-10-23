@@ -603,6 +603,13 @@ def test_ni_2021_conditions_and_starting_composition_reach_identity() -> None:
     assert len(observations) == 53
     assert migrator.result.validation is not None
     assert not migrator.result.validation.hard_issues
+    experiment = next(
+        row
+        for row in migrator.result.experiments.values()
+        if row.experiment_id.endswith("::experiment::table1-cu_1_12")
+    )
+    assert experiment.pressure_environment.sweep_gas.state.value.species == "Ar"
+    assert all("atmosphere" not in (o.point_conditions or {}) for o in observations)
     unheated = [o for o in observations if not o.identity.temperature_K.is_value]
     assert len(unheated) == 5
     for observation in observations:
