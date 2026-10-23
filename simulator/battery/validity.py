@@ -786,21 +786,7 @@ def effusion_regime_unverified(
             observation,
             point_observations,
         )
-    if pressure_sum is None:
-        checks.append(
-            GateCheck(
-                "in_cell_partial_pressure_sum",
-                False,
-                {**pressure_detail, "route": "in_cell_fallback"},
-            )
-        )
-        return _fail(
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-            checks,
-            "in_cell_partial_pressure_sum",
-        )
     pressure_limit = _in_cell_pressure_limit(experiment)
-    passed = pressure_sum <= pressure_limit
     diameter_basis = (
         "printed_orifice_diameter_p_over_d"
         if diameter is not None
@@ -814,6 +800,20 @@ def effusion_regime_unverified(
             "route": "in_cell_fallback",
         }
     )
+    if pressure_sum is None:
+        checks.append(
+            GateCheck(
+                "in_cell_partial_pressure_sum",
+                False,
+                pressure_detail,
+            )
+        )
+        return _fail(
+            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+            checks,
+            "in_cell_partial_pressure_sum",
+        )
+    passed = pressure_sum <= pressure_limit
     if passed:
         missing_orifice = "orifice Kn not printed" if diameter is not None else "orifice not printed"
         pressure_detail["flag"] = (

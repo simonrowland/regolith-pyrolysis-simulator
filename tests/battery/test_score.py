@@ -3615,7 +3615,7 @@ def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> N
     assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
-def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> None:
+def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures() -> None:
     experiment = F.kems_experiment(calibrated=True, kn=None)
     experiment = replace(
         experiment,
@@ -3643,6 +3643,11 @@ def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> No
             original_method_class="measured_direct",
         ),
     )
+    gates = run_validity_gates(experiment, reference)
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
     prediction = _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
     context = _context(F.work(), experiment, reference, review="reviewed")
     residual, _ = compile_residual(
@@ -3651,12 +3656,26 @@ def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> No
         context=context,
         prediction=prediction,
     )
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
     assert residual.score_eligible is False
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-    assert residual.refusal.detail["primary_check"] == "in_cell_partial_pressure_sum"
+    assert residual.refusal is None
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+    )
+    assert (
+        "original_reason=incomplete printed species coverage; pressure sum is only a lower bound"
+        in notice.reason
+    )
+    assert "authority=extrapolated" in notice.reason
+    pressure_limit = pressure_check.detail["pressure_limit_Pa"]
+    assert f"regime_limit={pressure_limit} Pa" in notice.reason
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.band == (
+        f"free-molecular in-cell pressure sum <= {pressure_limit} Pa"
+    )
 
     missing = replace(
         reference,

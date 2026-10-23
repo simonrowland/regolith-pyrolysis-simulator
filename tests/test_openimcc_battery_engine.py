@@ -2425,13 +2425,13 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
 
 
 
-def test_allibert_single_phase_table_ii_refuses_without_in_cell_pressures() -> None:
-    """The 14 printed-melt rows lack the evidence needed for the flow fallback."""
+def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures() -> None:
+    """Rows pass the effusion gate when other inputs let them be scored."""
 
     import tempfile
     from pathlib import Path
 
-    from simulator.battery.enums import RefusalReason
+    from simulator.battery.enums import NoticeKind, RefusalReason
     from simulator.battery.identity import quantity_token
     from tests.battery.test_migrate import _migrate_real_extract
 
@@ -2469,13 +2469,21 @@ def test_allibert_single_phase_table_ii_refuses_without_in_cell_pressures() -> N
         include_diagnostics=True,
     )
     assert len(residuals) == 14
-    assert all(residual.status is ResidualStatus.REFUSED for residual in residuals)
-    assert all(residual.numeric is None for residual in residuals)
-    assert all(
+    assert not any(
         residual.refusal is not None
         and residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-        and residual.refusal.detail["primary_check"] == "in_cell_partial_pressure_sum"
         for residual in residuals
+    )
+    scored = [residual for residual in residuals if residual.numeric is not None]
+    assert scored
+    assert all(
+        residual.score_eligible is False
+        and any(
+            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            and "in_cell_partial_pressure_sum" in notice.reason
+            for notice in residual.notices
+        )
+        for residual in scored
     )
 
 
