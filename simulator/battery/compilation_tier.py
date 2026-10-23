@@ -1209,6 +1209,43 @@ def _neutral_species_charge_refusal(
     return None
 
 
+def _openimcc_pressure_refusal(
+    identity: Identity,
+    quantity: Quantity,
+    origin: str,
+    *,
+    allow_non_catalog_pressure: bool = False,
+) -> ThermoAttempt | None:
+    """Validate the observation pressure against OpenIMCC's catalog basis."""
+
+    pressure_state = identity.standard_pressure_Pa
+    if not isinstance(pressure_state, State) or not pressure_state.is_value or pressure_state.value is None:
+        return _refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "standard-pressure-unknown",
+            quantity=quantity,
+            origin=origin,
+        )
+    pressure = as_decimal(pressure_state.value)
+    catalog_pressure = _janaf_catalog_standard_pressure_Pa()
+    if pressure <= 0 or catalog_pressure is None:
+        return _refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "standard-pressure-unknown",
+            quantity=quantity,
+            origin=origin,
+        )
+    if not allow_non_catalog_pressure and pressure != catalog_pressure:
+        return _refuse(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            "openimcc-condensed-card-standard-pressure-mismatch",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.OPENIMCC.value, "standard_pressure_Pa": str(pressure)},
+        )
+    return None
+
+
 @lru_cache(maxsize=2)
 def _openimcc_datapack(vaporock_root: str | None):
     """Reuse the pinned OpenIMCC tables while respecting its explicit override."""
@@ -1407,31 +1444,14 @@ def _openimcc_pure_phase_attempt(
     if charge_refusal is not None:
         return charge_refusal
 
-    pressure_state = identity.standard_pressure_Pa
-    if not isinstance(pressure_state, State) or not pressure_state.is_value or pressure_state.value is None:
-        return _refuse(
-            RefusalReason.IDENTITY_UNKNOWN,
-            "standard-pressure-unknown",
-            quantity=quantity,
-            origin=origin,
-        )
-    pressure = as_decimal(pressure_state.value)
-    catalog_pressure = _janaf_catalog_standard_pressure_Pa()
-    if pressure <= 0 or catalog_pressure is None:
-        return _refuse(
-            RefusalReason.IDENTITY_UNKNOWN,
-            "standard-pressure-unknown",
-            quantity=quantity,
-            origin=origin,
-        )
-    if phase != "g" and pressure != catalog_pressure:
-        return _refuse(
-            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
-            "openimcc-condensed-card-standard-pressure-mismatch",
-            quantity=quantity,
-            origin=origin,
-            extra={"engine": Engine.OPENIMCC.value, "standard_pressure_Pa": str(pressure)},
-        )
+    pressure_refusal = _openimcc_pressure_refusal(
+        identity,
+        quantity,
+        origin,
+        allow_non_catalog_pressure=phase == "g",
+    )
+    if pressure_refusal is not None:
+        return pressure_refusal
 
     card, datapack, refusal = _openimcc_card(
         identity.species.formula,
@@ -1573,22 +1593,9 @@ def _openimcc_fusion_attempt(
     if charge_refusal is not None:
         return charge_refusal
 
-    pressure_state = identity.standard_pressure_Pa
-    catalog_pressure = _janaf_catalog_standard_pressure_Pa()
-    if (
-        isinstance(pressure_state, State)
-        and pressure_state.is_value
-        and pressure_state.value is not None
-        and catalog_pressure is not None
-        and as_decimal(pressure_state.value) != catalog_pressure
-    ):
-        return _refuse(
-            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
-            "openimcc-fusion-card-standard-pressure-mismatch",
-            quantity=quantity,
-            origin=origin,
-            extra={"standard_pressure_Pa": str(pressure_state.value)},
-        )
+    pressure_refusal = _openimcc_pressure_refusal(identity, quantity, origin)
+    if pressure_refusal is not None:
+        return pressure_refusal
     solid, _datapack, refusal = _openimcc_card(
         identity.species.formula,
         "cr",
@@ -1610,6 +1617,30 @@ def _openimcc_fusion_attempt(
     if refusal is not None:
         return refusal
     assert solid is not None and liquid is not None
+    solid_dataset = getattr(solid, "source_table_id", None)
+    liquid_dataset = getattr(liquid, "source_table_id", None)
+    if not isinstance(solid_dataset, str) or not isinstance(liquid_dataset, str):
+        return _refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "openimcc-fusion-endmember-dataset-unknown",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "solid_source_table_id": solid_dataset,
+                "liquid_source_table_id": liquid_dataset,
+            },
+        )
+    if solid_dataset != liquid_dataset:
+        return _refuse(
+            RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+            "openimcc-fusion-endmember-datasets-mismatch",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "solid_source_table_id": solid_dataset,
+                "liquid_source_table_id": liquid_dataset,
+            },
+        )
     if not _openimcc_polymorph_matches(solid, identity):
         return _refuse(
             RefusalReason.OUTSIDE_SUPPORTED_SPECIES,

@@ -32,7 +32,7 @@ def _observation(
     temperature_K: str = "1600",
     polymorph: Polymorph | None = None,
     fusion: bool = False,
-    pressure_Pa: str | None = "100000",
+    pressure_Pa: str | State[Decimal] | None = "100000",
     charge: State[int] | int | None = None,
 ):
     identity = F.o2_identity(Decimal(temperature_K))
@@ -45,7 +45,9 @@ def _observation(
             else State.of(PerBasis.MOL_SPECIES)
         ),
         standard_pressure_Pa=(
-            State.not_applicable("standard fusion reference")
+            pressure_Pa
+            if isinstance(pressure_Pa, State)
+            else State.not_applicable("standard fusion reference")
             if pressure_Pa is None
             else State.of(Decimal(pressure_Pa))
         ),
@@ -234,14 +236,10 @@ def test_openimcc_apparent_formation_properties_are_never_routed(
 
 
 @pytest.mark.parametrize(
-    ("quantity", "expected"),
-    [
-        (Quantity.ENTHALPY_OF_FUSION, "H"),
-        (Quantity.ENTROPY_OF_FUSION, "S"),
-    ],
+    "quantity", [Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION]
 )
-def test_openimcc_fusion_uses_both_cards_at_the_transition_temperature(
-    quantity: Quantity, expected: str
+def test_openimcc_fusion_refuses_mixed_source_cards_at_the_transition_temperature(
+    quantity: Quantity,
 ) -> None:
     temperature = 1986.0
     observation = _observation(
@@ -250,20 +248,63 @@ def test_openimcc_fusion_uses_both_cards_at_the_transition_temperature(
         quantity,
         temperature_K=str(temperature),
         fusion=True,
-        pressure_Pa=None,
+        pressure_Pa="100000",
     )
-    solid = species_thermo("SiO2", "cr", temperature)
-    liquid = species_thermo("SiO2", "l", temperature)
-    if expected == "H":
-        reference = liquid.H_app_kJ_mol - solid.H_app_kJ_mol
-    else:
-        reference = liquid.S_J_molK - solid.S_J_molK
 
     attempt = predict_thermo_attempt(Engine.OPENIMCC, observation)
 
-    assert attempt.value is not None
-    assert float(attempt.value) == pytest.approx(reference)
-    assert len(attempt.coefficient_sources) == 2
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+    assert attempt.refusal_detail["reason"] == "openimcc-fusion-endmember-datasets-mismatch"
+    assert (
+        attempt.refusal_detail["solid_source_table_id"]
+        != attempt.refusal_detail["liquid_source_table_id"]
+    )
+
+
+@pytest.mark.parametrize(
+    "pressure_Pa",
+    [None, State.unknown("fusion standard pressure not reported")],
+)
+def test_openimcc_fusion_requires_known_standard_pressure_before_card_lookup(
+    monkeypatch: pytest.MonkeyPatch, pressure_Pa: str | State[Decimal] | None
+) -> None:
+    def unexpected_call(*_args, **_kwargs):
+        pytest.fail("unknown pressure must be refused before OpenIMCC card lookup")
+
+    monkeypatch.setattr(openimcc.gas, "species_thermo", unexpected_call)
+    observation = _observation(
+        "SiO2",
+        Phase.CR,
+        Quantity.ENTHALPY_OF_FUSION,
+        fusion=True,
+        pressure_Pa=pressure_Pa,
+    )
+
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, observation)
+
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert attempt.refusal_detail["reason"] == "standard-pressure-unknown"
+
+
+def test_openimcc_fusion_refuses_non_catalog_standard_pressure_before_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unexpected_call(*_args, **_kwargs):
+        pytest.fail("non-catalog pressure must be refused before card lookup")
+
+    monkeypatch.setattr(openimcc.gas, "species_thermo", unexpected_call)
+    observation = _observation(
+        "SiO2", Phase.CR, Quantity.ENTHALPY_OF_FUSION, fusion=True,
+        pressure_Pa="101325",
+    )
+
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, observation)
+
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert attempt.refusal_detail["reason"] == "openimcc-condensed-card-standard-pressure-mismatch"
 
 
 def test_openimcc_fusion_refuses_when_a_phase_card_is_missing() -> None:
@@ -274,7 +315,7 @@ def test_openimcc_fusion_refuses_when_a_phase_card_is_missing() -> None:
         temperature_K="1986",
         polymorph=Polymorph.PERICLASE,
         fusion=True,
-        pressure_Pa=None,
+        pressure_Pa="100000",
     )
 
     attempt = predict_thermo_attempt(Engine.OPENIMCC, observation)
