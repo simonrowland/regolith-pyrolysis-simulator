@@ -225,6 +225,29 @@ def _with_activity_reference_polymorph(
     )
 
 
+def _without_activity_reference_polymorph(identity: Identity) -> Identity:
+    """Pure solid whose polymorph axis was never set.
+
+    An omitted source polymorph (``State.unknown``) stays on the printed
+    number (d-165, c1ec62344). ``polymorph is None`` is the melt-benchmark
+    solid, and 800194114 still converts it with the stable JANAF crystal.
+    """
+
+    reference_state = identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value is not None
+    endmember = reference_state.value.endmember
+    return replace(
+        identity,
+        reference_state=State.of(
+            replace(
+                reference_state.value,
+                endmember=replace(endmember, polymorph=None),
+            )
+        ),
+    )
+
+
 def _predict(value: Decimal, identity, **kwargs) -> EnginePrediction:
     quantity = quantity_token(identity)
     assert quantity is not None
@@ -9915,6 +9938,409 @@ def test_unnamed_cao_reference_phase_is_not_converted() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("temperature", "expected_shift_dex"),
+    (
+        (Decimal("1823"), Decimal("-0.96857")),
+        (Decimal("1873"), Decimal("-0.90911")),
+    ),
+)
+def test_unknown_cao_polymorph_converts_via_unique_janaf_solid_table(
+    temperature: Decimal,
+    expected_shift_dex: Decimal,
+) -> None:
+    """The sole eligible CaO(cr) JANAF table fixes the unnamed solid reference.
+
+    For the same chemical potential, mu = G° + RT ln(a) gives
+    log10(a_l/a_s) = -DeltaG_fus/(RT ln(10)). JANAF's DeltaG_fus is in
+    kJ/mol, so convert by 1000 and use R = 8.314462618 J/(mol K). The
+    interpolated JANAF values are 33.80370 kJ/mol at 1823 K and 32.59870
+    kJ/mol at 1873 K, giving shifts -0.96857 and -0.90911 dex. As a
+    sanity check, DeltaH_fus(1 - T/Tm), with Tm = 3200 K, gives 34.208 and
+    32.966 kJ/mol at those temperatures, close to the JANAF interpolations.
+
+    b150r applied this shift to an omitted polymorph. c1ec62344 (d-165)
+    leaves that record on the printed number, and dropped the
+    "source polymorph is unknown" clause from the conversion notice.
+    800194114 keeps the same shift for a polymorph axis that was never set.
+    """
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        )
+    )
+    reference = F.observation(
+        f"cao-unknown-polymorph-at-{temperature}K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.25"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-unknown-cao-polymorph",
+    )
+    assert reference.admission.status is AdmissionStatus.ADMITTED
+
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert converted.value.point != reference.value.point
+    assert abs(
+        (converted.value.point / reference.value.point).log10() - expected_shift_dex
+    ) < Decimal("0.0005")
+    notice = next(
+        item
+        for item in converted.notices
+        if item.kind is NoticeKind.DERIVATION_USES_COMPILATION
+    )
+    assert "reference_converted_via_fusion" in notice.reason
+    assert "source polymorph is unknown" not in notice.reason
+
+
+@pytest.mark.parametrize(
+    (
+        "formula",
+        "temperature_K",
+        "crossing_K",
+        "default_solid_table",
+        "selected_solid_table",
+        "liquid_table",
+    ),
+    (
+        (
+            "Al2O3",
+            Decimal("2400"),
+            Decimal("2326.528497409326424870466321"),
+            "Al-096",
+            "Al-096",
+            "Al-100",
+        ),
+        (
+            "Al2O3",
+            Decimal("2500"),
+            Decimal("2289.031679617453676031081889"),
+            "Al-096",
+            "Al-098",
+            "Al-100",
+        ),
+        (
+            "SiO2",
+            Decimal("2000"),
+            Decimal("1994.469026548672566371681416"),
+            "O-035",
+            "O-035",
+            "O-038",
+        ),
+    ),
+)
+def test_inferred_solid_activity_above_crossing_is_converted_with_selected_pair(
+    formula: str,
+    temperature_K: Decimal,
+    crossing_K: Decimal,
+    default_solid_table: str,
+    selected_solid_table: str,
+    liquid_table: str,
+) -> None:
+    """Above the crossing the printed activity stays, on the selected pair.
+
+    b150r converted these unnamed solids numerically (activities
+    0.3583233854709349838426386125, 0.4337601535097755115490675312 and
+    0.3004513633937164890006667638, with engine residuals of those
+    converted values). c1ec62344 stopped that shift: liquid is the natural
+    reference above the JANAF crossing, so the activity pin is the printed
+    0.3. The selected pair is unchanged and is now on the domain notice.
+    """
+    from simulator.battery.generators.janaf import janaf_fusion_energy
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula=formula,
+            T_K=temperature_K,
+            endmember_phase=Phase.CR,
+            component_basis=formula,
+        )
+    )
+    reference = F.observation(
+        f"inferred-{formula}-activity-at-{temperature_K}-K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-inferred-solid-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    domain_notice = next(
+        notice
+        for notice in comparison.notices
+        if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+    )
+
+    assert temperature_K > crossing_K
+    assert janaf_fusion_energy(formula, temperature_K).crystal_table == (
+        default_solid_table
+    )
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert domain_notice.reason == (
+        f"solid reference recorded at T={temperature_K} K >= "
+        f"JANAF T_fus={crossing_K} K; "
+        "no numeric reference-state conversion applied because liquid is natural"
+    )
+    assert domain_notice.band == (
+        f"JANAF fusion crossing {crossing_K} K; "
+        f"tables={selected_solid_table}/{liquid_table}"
+    )
+    assert not any(
+        notice.reason.startswith("reference_converted_via_fusion;")
+        for notice in comparison.notices
+    )
+
+
+def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() -> None:
+    import json
+
+    from simulator.battery.generators.janaf import (
+        _fusion_table_points,
+        _interpolate_formation_gibbs,
+    )
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        )
+    )
+    reference = F.observation(
+        "silica-unknown-polymorph-with-multiple-solid-tables",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    inference = next(
+        item
+        for item in comparison.notices
+        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
+    )
+    detail = json.loads(inference.reason.split(": ", 1)[1])
+    table_gibbs = {}
+    for table_id in ("O-035", "O-037"):
+        points, _sha = _fusion_table_points(table_id)
+        table_gibbs[table_id] = _interpolate_formation_gibbs(
+            points, Decimal("1823")
+        )
+
+    assert detail["chosen_table"] == min(table_gibbs, key=table_gibbs.get)
+    assert detail["chosen_polymorph"] == "cristobalite_high"
+    assert detail["alternatives"] == [{"polymorph": "quartz", "table": "O-037"}]
+    assert detail["maximum_alternative"] == {
+        "polymorph": "quartz",
+        "table": "O-037",
+    }
+    assert Decimal(detail["bound_dex"]) == Decimal("0.03871558648583859430554675770")
+    assert detail["bound_exceeds_row_band"] is None
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+
+
+def test_unknown_polymorph_activity_conversion_has_numeric_golden_pin() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        )
+    )
+    reference = F.observation(
+        "silica-unknown-polymorph-activity-golden",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference)
+
+    assert comparison.value.point == Decimal("0.2859156906189812475869526078")
+    assert float(comparison.value.point).hex() == "0x1.24c715327cb38p-2"
+
+
+def test_unknown_alumina_activity_notice_lists_all_dictionary_crystals() -> None:
+    import json
+
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula="Al2O3",
+            T_K=Decimal("1800"),
+            endmember_phase=Phase.CR,
+            component_basis="Al2O3",
+        )
+    )
+    reference = F.observation(
+        "alumina-unknown-polymorph-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference)
+    notice = next(
+        item
+        for item in comparison.notices
+        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
+    )
+    detail = json.loads(notice.reason.split(": ", 1)[1])
+
+    assert detail["chosen_table"] == "Al-096"
+    assert {item["table"] for item in detail["alternatives"]} == {
+        "Al-097",
+        "Al-098",
+        "Al-099",
+    }
+
+
+def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> None:
+    import json
+
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        )
+    )
+    reference = F.observation(
+        "silica-inference-bound-exceeds-row-band",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-solid-reference-with-band",
+    )
+    reference = replace(
+        reference,
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="0.01 dex",
+            value=Decimal("0.01"),
+            basis="log10_dex",
+        ),
+    )
+
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    inference = next(
+        item
+        for item in comparison.notices
+        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
+    )
+    detail = json.loads(inference.reason.split(": ", 1)[1])
+
+    assert Decimal(detail["bound_dex"]) > Decimal("0.01")
+    assert detail["row_decision_band_dex"] == "0.01"
+    assert detail["row_decision_band_refusal"] is None
+    assert any(
+        item.reason == "confidence_level_not_stated"
+        for item in comparison.notices
+    )
+
+    unmapped = replace(
+        reference,
+        observation_id="silica-inference-bound-unmapped-unit",
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="1 furlong",
+            value=Decimal("1"),
+            basis="furlong",
+        ),
+        notices=(),
+    )
+    refused_comparison = fusion_comparison_reference(
+        unmapped, engine=Engine.OPENIMCC
+    )
+    refused_inference = next(
+        item
+        for item in refused_comparison.notices
+        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
+    )
+    refused_detail = json.loads(refused_inference.reason.split(": ", 1)[1])
+    assert refused_detail["row_decision_band_dex"] is None
+    assert refused_detail["row_decision_band_refusal"]["reason"] == (
+        "printed_uncertainty_unit_unmapped"
+    )
+    assert detail["bound_exceeds_row_band"] is True
+    assert comparison.value.point != reference.value.point
+
+
+def test_single_table_cao_conversion_keeps_its_value_and_flag_byte_identical() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        )
+    )
+    reference = F.observation(
+        "single-table-cao-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-cao-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+
+    assert comparison.value.point == Decimal("0.03698396471321415622463886555")
+    # c1ec62344 removed "source polymorph is unknown" from this notice.
+    # The activity, offset, DeltaG and table hashes are the b150r pin.
+    assert tuple(notice.reason for notice in comparison.notices) == (
+        "reference_converted_via_fusion; "
+        "reference-state conversion (not model error); oxide=CaO; "
+        "source_activity_solid=0.3; "
+        "converted_activity_liquid=0.03698396471321415622463886555; "
+        "offset_dex=+0.9091077886543268821557037928; "
+        "DeltaG_fus=32.59870 kJ/mol; T=1873 K; JANAF_Tm=3200.0 K; "
+        "distance_below_JANAF_Tm=1327.0 K; accepted_Tm~2886 K; "
+        "JANAF_minus_accepted_Tm=314.0 K; "
+        "table/accepted melting-point mismatch adds uncertainty to the "
+        "metastable-liquid reference; tables=Ca-027/Ca-028; "
+        "source_sha256=b6a05e07aa1156d58ec9fa701a4c3e338dbbde38c0c6c16660a23c57aac7563d/"
+        "44546e962fd516f7e9cf035429593916440008b7f81c06b5915da86b1203d072",
+    )
+
+
 def test_rejected_cao_reference_polymorph_is_not_converted_or_scored() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
@@ -10717,10 +11143,26 @@ def test_magemin_without_native_activity_keeps_reference_for_unsupported_route()
     )
 
     result = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
+    prediction = replace(
+        _predict(reference.value.point, identity), engine=Engine.MAGEMIN
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.MAGEMIN,
+        context=_context(F.work(), experiment, reference),
+        prediction=prediction,
+    )
 
+    # c883dfb0a put MAGEMin on the melt-activity list, so the b150r
+    # "engine reference is unestablished for magemin" notice is gone.
+    # CaO has no native activity and the printed solid value stays.
     assert result.value.point == reference.value.point
     assert result.identity.reference_state.value.endmember.phase.value is Phase.CR
     assert not result.notices
+    assert not any(
+        "unestablished for magemin" in notice.reason
+        for notice in residual.notices
+    )
     assert _engine_reports_formula("magemin", "CaO") == (
         False,
         "typed-refusal:magemin_no_native_activity:CaO",
