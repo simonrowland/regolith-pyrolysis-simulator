@@ -108,7 +108,7 @@ def _domain_composition() -> dict[str, float]:
     ),
     ids=("metal-site", "oxide-vapor-site"),
 )
-def test_antoine_A_skip_is_reported_in_volatility_diagnostic(
+def test_antoine_A_refusal_or_finite_nonpositive_compute_in_volatility_diagnostic(
     a_value, reason, section, species, parent_oxide, site
 ) -> None:
     coefficients = {"B": 0.0, "C": 0.0}
@@ -134,13 +134,25 @@ def test_antoine_A_skip_is_reported_in_volatility_diagnostic(
         vapor_pressure_data=vapor_data,
     )
 
-    expected = (
-        "antoine_species_skipped: "
-        f"species={species} site={site} reason={reason} "
-        "temperature_K=1773.150"
+    if a_value is None:
+        expected = (
+            "antoine_species_skipped: "
+            f"species={species} site={site} reason={reason} "
+            "temperature_K=1773.150"
+        )
+        assert expected in diagnostic["warnings"]
+        assert species not in diagnostic["grid"][0]["species"]
+        return
+
+    assert species in diagnostic["grid"][0]["species"]
+    resolved = diagnostic["grid"][0]["species"][species]
+    assert resolved["P_reference_Antoine_Pa"] == pytest.approx(0.1)
+    assert not any(
+        warning.startswith(
+            f"antoine_species_skipped: species={species} site={site} "
+        )
+        for warning in diagnostic["warnings"]
     )
-    assert expected in diagnostic["warnings"]
-    assert species not in diagnostic["grid"][0]["species"]
 
 
 def test_default_activity_source_uses_explicit_reference_pressure(monkeypatch):
