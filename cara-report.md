@@ -323,3 +323,40 @@ An earlier isolated re-run had passed Steurer. This one did not. Neither test wa
 ### Still red, outside this fix round
 
 r16/r17 freshness, the handle-close count, the Plante defaulted-row fO2 fence, the legacy bench digest, LiquidMelts, the OpenIMCC hash pin, the Sossi worker-start failure, and the migrate-census timeouts. The store prediction above is unchanged.
+
+## Train merges on the fix tip
+
+Controller instruction `final-merge.md`, on top of `68d3876b8`. Two of the three requested merges are in. The third is stopped.
+
+### famcar-r3 `8910347f64` — merge `3986fa63e`
+
+Clean merge onto `68d3876b8`. Merge-base is offer 20 r9 `d8c894343`. Seven paths changed on both sides. The auto-merge keeps both hunks.
+
+- `SCHEMA.md`, `tools/validate_literature_extracts.py`, `tests/test_literature_extracts.py`: `chloride_capacity` plus the Muan 1 atm inference test. Existing type checks stay.
+- `docs/running-from-shell.md`: pinned-engine install section. Existing shell notes stay.
+- `scripts/check_store_freshness.py`: ack-directory receipts beside `STORE_NEUTRAL_INPUT_COMMITS`. The frozenset is unchanged.
+- `simulator/battery/migrate.py`: `kbar_to_Pa` (1 kbar = 100 MPa), V2O5 and V2O3 components, and row-level `total_pressure_Pa` for phase composition ahead of the printed experiment pressure. The experiment fallback remains.
+- `tests/battery/test_migrate.py`: kbar pin and the printed Fe3/Fe2 census order. Existing migrate tests stay.
+
+`INDEX.yaml` and `INDEX.md` come from famcar-r3, the only side that changed them. No other derived-store file conflicted.
+
+### phase-aliases `28dd1e2fc` — merge `13f6d3211`
+
+Three content conflicts. Each keeps both sides. No derived-store path changed against the famcar tip, so the laptop INDEX stays.
+
+- `simulator/battery/identity.py`: `_identity_equal` keeps `ignore_fO2` and gains `knudsen_residue_extent`.
+- `simulator/battery/score.py`: `_predict_fe_redox` is the stack's rewrite (Kress91 helpers, OpenIMCC `evaluate_redox`, MELTS ferric split). The identity stamp at all three `fO2_Pa` sites, including the new MELTS site, is `log10_fo2_to_pa`. `compile_residual` tries the Knudsen extent comparison first and the intrinsic-mode `ignore_fO2` comparison next. The score loop still requests a Knudsen residue prediction and still records `intrinsic_redox_activity`.
+- `tests/battery/test_redox_extract_scoring.py`: MELTS ratio helpers and `log10_fo2_to_pa` both stay. Both are called.
+
+Auto-merged without a dropped hunk: Antoine phase boundaries, freshness receipts, Ellingham and VapoRock gas basis, sample-source phase labels on partial pressure, canonical element allotropes, battery-cell payload fields, and the gas-suffix and Stolyarova phase tests. The fo2_mode key parser and the melt-activity `**_kwargs` stubs stay.
+
+### b-979 `9fb179254` — stopped, not committed
+
+`git merge --no-ff` conflicted in `data/literature/extracts/SCHEMA.md`, `simulator/battery/records.py`, and `simulator/battery/validate.py`. The merge was aborted. The tip is still `13f6d3211`.
+
+The two sides contradict on `model_derived` plus `raw_inputs: not_printed`.
+
+- Car A has `d5455b9e1` (2026-10-19, "Allow located raw inputs for model-derived evidence"). A model-derived row may declare `not_printed` when the method has a nonempty value, an equation, a physical page, and at least one named reference. That declaration supplies lineage, so `derived_from` is not required, and it contradicts a present `derived_from`. Tests: `test_model_derived_unprinted_inputs_with_located_method_passes`, `test_production_migration_accepts_model_derived_raw_input_method`.
+- b-979 has `e830456b8` and `3e59430b3` (2026-10-21). `not_printed` is invalid on model-derived evidence. Model-derived rows use `printed_unresolved`, which is located and flagged and does not supply lineage. Tests: `test_model_derived_rejects_raw_inputs_not_printed`, `test_production_migration_rejects_model_derived_raw_input_declaration`.
+
+b-979's branch does not contain `d5455b9e1`, so the later date is not an override of the located-method rule. `printed_unresolved` is its own status and is not on car A. The schema sentences disagree about whether model-derived `not_printed` is valid. Validation of the finished assembly is waiting on that choice. No test or migrator run was started for this stopped merge.
