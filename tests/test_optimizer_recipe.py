@@ -90,8 +90,12 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
+    # Recomputed 2026-10-22 (t-1441 stirring labels): 4 description strings
+    # changed, no values. Paths: campaigns.C2A_continuous.adaptive_control.
+    # induction_stirring; endpoint_criteria.control.surface_renewal;
+    # endpoint_criteria.general; furnace.induction_stirring.note.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
+        "6e96c06bd07493a6db66db50de75fc9599b8a0353c5d08ae37d68f09ec90ccb6"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.

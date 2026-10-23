@@ -21,7 +21,10 @@ from engines.builtin.vapor_pressure import (
     VaporPressureNumericalOverflowError,
     VaporPressureRangeError,
 )
-from simulator.furnace_materials import setpoints_furnace_ceiling_C
+from simulator.furnace_materials import (
+    resolve_furnace_temperature_caps,
+    setpoints_furnace_ceiling_C,
+)
 from simulator.thermal_window import resolve_thermal_preheat_interval
 from simulator.accounting import OverdraftError, resolve_species_formula
 from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
@@ -714,6 +717,10 @@ class EvaluationInputError(ValueError):
     """Raised when optimizer evaluation inputs or config references are invalid."""
 
 
+class _CandidateAdmissionError(EvaluationInputError):
+    """Raised when a candidate violates a pre-run admission limit."""
+
+
 def evaluate(
     patch: RecipePatch,
     feedstock_id: str,
@@ -734,14 +741,7 @@ def evaluate(
     try:
         validated_patch = patch.validated(active_schema)
     except RecipeValidationError as exc:
-        return ScoredResult(
-            candidate_id=candidate_id,
-            eval_spec=None,
-            cache_key=None,
-            feasible=False,
-            failure_category=FailureCategory.INVALID_PATCH,
-            notes=(str(exc),),
-        )
+        return _invalid_patch_result(candidate_id, str(exc))
 
     try:
         active_constraints = _composition_target_constraints(
@@ -764,6 +764,8 @@ def evaluate(
         if _is_stale_profile_refusal(exc):
             return _stale_profile_result(candidate_id, str(exc))
         raise
+    except _CandidateAdmissionError as exc:
+        return _invalid_patch_result(candidate_id, str(exc))
     except EvaluationInputError as exc:
         if _is_zero_input_basis_breach_message(str(exc)):
             return _zero_input_basis_result(candidate_id, str(exc))
@@ -3672,7 +3674,7 @@ def _profile_lab_schedule(
         for point in schedule["melt_temperature_C"]
     )
     if scheduled_peak > ceiling_C:
-        raise EvaluationInputError(
+        raise _CandidateAdmissionError(
             f"lab_schedule_temperature_exceeds_{ceiling_bound}: "
             f"{scheduled_peak:g} C > {ceiling_C:g} C"
         )
@@ -3768,7 +3770,7 @@ def _profile_thermal_window_schedule(
         recipe_patch=recipe_patch,
     )
     if high_C > ceiling_C:
-        raise EvaluationInputError(
+        raise _CandidateAdmissionError(
             f"{campaign}.temp_range_C high {high_C:g} C exceeds "
             f"{ceiling_bound} {ceiling_C:g} C"
         )
@@ -3791,7 +3793,7 @@ def _profile_thermal_window_schedule(
         recipe_patch=recipe_patch,
     )
     if max_hold_hr is not None and float(total_hours) > max_hold_hr:
-        raise EvaluationInputError(
+        raise _CandidateAdmissionError(
             f"{campaign} thermal_window_{max_hold_bound} refusal: "
             f"requires {total_hours:g} h "
             f"(preheat {preheat_hours:g} h + hold {duration_h:g} h) but "
@@ -3865,33 +3867,81 @@ def _furnace_ceiling_C(
         campaign,
         recipe_patch=recipe_patch,
     )
-    # Was float(setpoints.get("furnace_max_T_C", 1800.0)): a hardcoded ceiling
-    # that never consulted the pipe material, so an unpatched evaluation
-    # scheduled against 1800 C on a vessel the catalog rates to 2200 C. The
-    # .get() default also fired only on an ABSENT key, so the explicit
-    # `furnace_max_T_C: null` that spells "inherit" reached float(None) (b-329).
-    hardware_ceiling_C = setpoints_furnace_ceiling_C(setpoints)
+    # Keep the requested ceiling for existing precedence, then resolve the
+    # material-applied ceiling separately so admission cannot exceed it.
+    try:
+        hardware_ceiling_C = setpoints_furnace_ceiling_C(setpoints)
+    except (TypeError, ValueError) as exc:
+        raise EvaluationInputError(
+            f"invalid furnace temperature ceiling: {exc}"
+        ) from exc
+    material = setpoints.get("furnace_material")
+    material_caps = None
+    if material:
+        requested_ceiling_C = (
+            recipe_patch.values[FURNACE_MAX_T_C_PATH]
+            if recipe_patch is not None
+            and FURNACE_MAX_T_C_PATH in recipe_patch.values
+            else setpoints.get("furnace_max_T_C")
+        )
+        try:
+            material_caps = resolve_furnace_temperature_caps(
+                str(material),
+                requested_ceiling_C,
+            )
+        except ValueError as exc:
+            raise EvaluationInputError(
+                f"invalid applied furnace ceiling for {material!r}: {exc}"
+            ) from exc
     if constraints is None:
         if local_ceiling is not None:
-            return local_ceiling[0], "recipe_local_furnace_max_T_C"
-        return hardware_ceiling_C, "profile_default_furnace_max_T_C"
-    threshold = getattr(constraints, "furnace_T_max_C", None)
-    value = getattr(threshold, "value", None)
-    if local_ceiling is not None:
-        if value is None or _is_default_furnace_threshold(threshold):
-            return local_ceiling[0], "recipe_local_furnace_max_T_C"
-        if float(value) <= local_ceiling[0]:
-            return float(value), str(
+            ceiling_C = local_ceiling[0]
+            ceiling_bound = "recipe_local_furnace_max_T_C"
+        else:
+            ceiling_C = hardware_ceiling_C
+            ceiling_bound = "profile_default_furnace_max_T_C"
+    else:
+        threshold = getattr(constraints, "furnace_T_max_C", None)
+        value = getattr(threshold, "value", None)
+        if local_ceiling is not None:
+            if value is None or _is_default_furnace_threshold(threshold):
+                ceiling_C = local_ceiling[0]
+                ceiling_bound = "recipe_local_furnace_max_T_C"
+            elif float(value) <= local_ceiling[0]:
+                ceiling_C = float(value)
+                ceiling_bound = str(
+                    getattr(threshold, "id", None) or "furnace_T_max_C"
+                )
+            else:
+                ceiling_C = local_ceiling[0]
+                ceiling_bound = "recipe_local_furnace_max_T_C"
+        elif value is None:
+            ceiling_C = hardware_ceiling_C
+            ceiling_bound = "profile_default_furnace_max_T_C"
+        elif _is_default_furnace_threshold(threshold):
+            ceiling_C = float(value)
+            ceiling_bound = "profile_default_furnace_max_T_C"
+        else:
+            ceiling_C = float(value)
+            ceiling_bound = str(
                 getattr(threshold, "id", None) or "furnace_T_max_C"
             )
-        return local_ceiling[0], "recipe_local_furnace_max_T_C"
-    if value is None:
-        return hardware_ceiling_C, "profile_default_furnace_max_T_C"
-    if _is_default_furnace_threshold(threshold):
-        return float(value), "profile_default_furnace_max_T_C"
-    return float(value), str(
-        getattr(threshold, "id", None) or "furnace_T_max_C"
-    )
+
+    if material_caps is not None:
+        applied_ceiling_C = material_caps["effective_applied_ceiling_T_C"]
+        if applied_ceiling_C < ceiling_C:
+            if (
+                material_caps["requested_ceiling_T_C"]
+                >= material_caps["service_rating_T_C"]
+            ):
+                ceiling_bound = (
+                    f"furnace_material[{material}]."
+                    "effective_applied_ceiling_T_C"
+                )
+            else:
+                ceiling_bound = "profile_default_furnace_max_T_C"
+            return applied_ceiling_C, ceiling_bound
+    return ceiling_C, ceiling_bound
 
 
 def _recipe_local_furnace_ceiling_C(
@@ -5763,6 +5813,20 @@ def _stale_profile_result(
         cache_key=None,
         feasible=False,
         failure_category=FailureCategory.STALE_PROFILE,
+        notes=(error_message,),
+    )
+
+
+def _invalid_patch_result(
+    candidate_id: str | None,
+    error_message: str,
+) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=False,
+        failure_category=FailureCategory.INVALID_PATCH,
         notes=(error_message,),
     )
 
