@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 
+# These gases pass the C0 traps to the pump (d-247). Oxygen retains its
+# separate terminal policy and is never booked as cryo condensate.
+C0_NONCONDENSABLES = frozenset({"H2", "He", "He3", "He4", "N2", "CO", "CH4", "O2", "Ne", "Ar"})
+
+
 STAGE_KEY_BY_NUMBER: dict[int, str] = {
     1: 'stage_1_fe_condenser',
     2: 'stage_2_cr_oxide_harvest',

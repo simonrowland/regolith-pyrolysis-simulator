@@ -117,7 +117,7 @@ write):
   oxidant kg before dispatch.
 * ``reservoir.stage0_process_gas`` -- debit; loaded with the Boudouard
   CO2 atmospheric source kg before dispatch.
-* ``terminal.offgas`` -- credit; carbonaceous CO2/H2O/N2 + sulfate
+* ``process.overhead_gas`` -- credit; carbonaceous CO2/H2O/N2 + sulfate
   SO2/CO + Boudouard CO go here.
 * ``terminal.stage0_chloride_salt_phase`` -- credit; perchlorate Cl-
   product lands here (separated chloride salt at fouling risk).
@@ -209,7 +209,7 @@ OXYGEN_STAGE0_ACCOUNT = "terminal.oxygen_stage0_stored"
 FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
 CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
 METAL_PHASE_ACCOUNT = "process.metal_phase"
-OFFGAS_ACCOUNT = "terminal.offgas"
+OFFGAS_ACCOUNT = "process.overhead_gas"
 STAGE0_FOULANT_ACCOUNT = "process.stage0_foulant"
 
 # Association carriers consume the landed monomer salt reservoir.  The tuple is
@@ -253,7 +253,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
     #   reservoir.stage0_process_gas   (atmospheric CO2 carrier gas)
     # Terminal sinks (credited; canonical commit path supports terminal
     # credits per AtomLedger._validate_terminal_debits):
-    #   terminal.offgas                (CO2/H2O/N2/SO2/CO offgas)
+    #   process.overhead_gas                (CO2/H2O/N2/SO2/CO offgas)
     #   terminal.stage0_chloride_salt_phase (perchlorate Cl- product;
     #       separated chloride salt at re-condensation/fouling risk)
     #   terminal.oxygen_stage0_stored  (perchlorate + carbonaceous O2)
@@ -272,7 +272,6 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         "reservoir.stage0_oxidant",
         "reservoir.stage0_process_gas",
         FO2_BUFFER_ACCOUNT,
-        "terminal.offgas",
         "terminal.stage0_salt_phase",
         "terminal.stage0_chloride_salt_phase",
         "terminal.stage0_sulfide_matte",
@@ -422,7 +421,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
     # species (CH4, NH3, organic_macromolecule, ...).  Mirrors
     # _record_stage0_oxidation_transitions line-for-line per legacy
     # spec entry: debit feed (and oxidant when O2-deficient) + credit
-    # terminal.offgas (CO2/H2O/N2) + credit
+    # process.overhead_gas (CO2/H2O/N2) + credit
     # terminal.oxygen_stage0_stored (O2 coproduct when feed is
     # O2-surplus).
     # ------------------------------------------------------------------
@@ -473,7 +472,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         # Separate O2 from the products: the legacy
         # _record_stage0_oxidation_transitions credits O2 to
         # terminal.oxygen_stage0_stored and the remaining products
-        # (CO2/H2O/N2) to terminal.offgas.
+        # (CO2/H2O/N2) to process.overhead_gas.
         o2_credit_kg = max(0.0, float(products_kg.pop(OXYGEN_SPECIES, 0.0)))
 
         debits: dict[str, dict[str, float]] = {
@@ -849,7 +848,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         Both families share the legacy
         ``_record_stage0_carbon_cleanup_transitions`` shape: a list of
         (account, {species: kg}) debits + a single credit to
-        ``terminal.offgas`` carrying ``products_kg`` (SO2+CO for
+        ``process.overhead_gas`` carrying ``products_kg`` (SO2+CO for
         sulfate_carbon; CO for boudouard).  The control payload is the
         legacy ``spec`` dict (``debits`` tuple + ``products_kg``).
         """
@@ -1738,7 +1737,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             tar_formula = resolve_species_formula("organic_tar", registry)
             mol_tar = tar_kg / tar_formula.molar_mass_kg_per_mol()
             if mol_tar > 0.0:
-                credits["process.overhead_gas"] = {"organic_tar": mol_tar}
+                credits.setdefault("process.overhead_gas", {})["organic_tar"] = mol_tar
         if wall_tar_kg > 1e-12:
             tar_formula = resolve_species_formula("organic_tar", registry)
             mol_wall = wall_tar_kg / tar_formula.molar_mass_kg_per_mol()

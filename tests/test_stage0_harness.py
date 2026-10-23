@@ -10,12 +10,14 @@ import yaml
 from simulator.backends import BackendSelectionPolicy, CachedRealBackend, CachedRealConfig
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.core import PyrolysisSimulator
+from simulator.condensation import DepositionInputRefusal
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.session import SimSession, SimSessionConfig
 from simulator.stage0_harness import (
     FOULANT_GROUPS,
     Stage0HarnessError,
     _capture_cleaned_melt_kg,
+    _pending_diagnostic_events_by_phase,
     default_max_stage0_hours,
     run_stage0_harness,
     run_stage0_harness_from_config,
@@ -348,14 +350,24 @@ def test_mars_sulfate_diagnostic_splits_land_in_timeline():
     assert any(event.get("source") == "diagnostic" for event in sulfate_events)
 
 
-def test_comet_runtime_emits_uncertain_carbon_partition_interval():
-    result = run_stage0_harness_from_config(_session_config("comet_nucleus"))
+def test_comet_refusal_preserves_uncertain_carbon_partition_interval():
+    session = SimSession()
+    with pytest.raises(DepositionInputRefusal) as refused:
+        session.start(_session_config("comet_nucleus"))
+    assert refused.value.parameter == "molar_mass_g_mol"
+    assert refused.value.value == "CH4_NH3_HCN"
+    assert "no usable molar mass" in refused.value.reason
+    sim = session.simulator
+    pending = _pending_diagnostic_events_by_phase(
+        sim._stage0_foulant_diagnostics, sim._load_foulant_registry_cached(),
+    )
 
     events = [
         event
-        for entry in result.disposition_timeline
-        for event in entry.by_group["refractory_carbon"]
-        if event.get("reaction_family") == "partition_carbon"
+        for phase_events in pending.values()
+        for event in phase_events
+        if event.get("group") == "refractory_carbon"
+        and event.get("reaction_family") == "partition_carbon"
     ]
     uncertain = [
         event

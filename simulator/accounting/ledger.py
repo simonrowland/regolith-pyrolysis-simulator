@@ -29,6 +29,7 @@ from simulator.accounting.lots import (
     allocate_pool_withdrawal,
 )
 from simulator.account_ids import (
+    C0_CRYO_BIN_ACCOUNTS,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
     SOLID_CHAR_CARBON_ACCOUNT,
@@ -71,6 +72,7 @@ TERMINAL_ACCOUNT_ALLOWED_SPECIES = {
     "terminal.chromium_condensed_oxide_stored": frozenset({"Cr2O3"}),
 }
 KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
+    *C0_CRYO_BIN_ACCOUNTS.values(),
     "process.cleaned_melt",
     "process.c7_al_credit",
     "process.condensation_train",

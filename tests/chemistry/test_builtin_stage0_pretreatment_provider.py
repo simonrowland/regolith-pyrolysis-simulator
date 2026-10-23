@@ -141,7 +141,6 @@ def test_provider_declares_exactly_twenty_one_stage0_accounts():
         "reservoir.stage0_oxidant",
         "reservoir.stage0_process_gas",
         "reservoir.fo2_buffer",
-        "terminal.offgas",
         "terminal.stage0_salt_phase",
         "terminal.stage0_chloride_salt_phase",
         "terminal.stage0_sulfide_matte",
@@ -356,7 +355,7 @@ def test_kernel_commit_rejects_atom_unbalanced_sulfate_carbon_proposal(
         },
         credits={
             # 1 SO2 instead of 2 -> S short by 1, O short by 2.
-            "terminal.offgas": {"SO2": 1.0, "CO": 1.0},
+            "process.overhead_gas": {"SO2": 1.0, "CO": 1.0},
         },
         reason="malformed_sulfate_carbon_proposal_for_test",
         atom_balance_proof={"S": 0.0, "C": 0.0, "O": 0.0},
@@ -909,8 +908,8 @@ def test_sulfate_carbon_matches_legacy_stoich(
     proposal = result.transition
     assert proposal is not None
     _atom_check(proposal, sim.species_formula_registry, tol=1e-9)
-    so2_mol = proposal.credits["terminal.offgas"]["SO2"]
-    co_mol = proposal.credits["terminal.offgas"]["CO"]
+    so2_mol = proposal.credits["process.overhead_gas"]["SO2"]
+    co_mol = proposal.credits["process.overhead_gas"]["CO"]
     # Expected: SO2 = extent_mol = 2.0; CO = extent_mol = 2.0.
     assert abs(so2_mol - extent_mol) < 1e-12
     assert abs(co_mol - extent_mol) < 1e-12
@@ -977,7 +976,7 @@ def test_boudouard_matches_legacy_stoich(
     proposal = result.transition
     assert proposal is not None
     _atom_check(proposal, sim.species_formula_registry, tol=1e-9)
-    co_mol = proposal.credits["terminal.offgas"]["CO"]
+    co_mol = proposal.credits["process.overhead_gas"]["CO"]
     # Expected: CO = 2 * extent_mol = 6.0.
     assert abs(co_mol - 2.0 * extent_mol) < 1e-12
     assert result.diagnostic["reagent_consumed_kg"] == pytest.approx(
@@ -1096,8 +1095,8 @@ def test_complete_oxidation_matches_legacy_stoich(
     assert proposal is not None
     _atom_check(proposal, sim.species_formula_registry, tol=1e-9)
     # CO2 mol = 1.0; H2O mol = 2.0.
-    co2_mol = proposal.credits["terminal.offgas"]["CO2"]
-    h2o_mol = proposal.credits["terminal.offgas"]["H2O"]
+    co2_mol = proposal.credits["process.overhead_gas"]["CO2"]
+    h2o_mol = proposal.credits["process.overhead_gas"]["H2O"]
     assert abs(co2_mol - 1.0) < 1e-12
     assert abs(h2o_mol - 2.0) < 1e-12
 
@@ -1210,7 +1209,7 @@ def test_full_batch_stage0_kernel_credits_asteroid_offgas_to_declared_accounts(
 ):
     """Carbonaceous-chondrite Stage 0 cleanup runs complete-oxidation
     (organic volatiles -> CO2 + H2O + N2 + O2).  After the flip the
-    offgas lands in ``terminal.offgas`` -- inside the provider's
+    offgas lands in ``process.overhead_gas`` -- inside the provider's
     declared accounts.
     """
 
@@ -1220,7 +1219,7 @@ def test_full_batch_stage0_kernel_credits_asteroid_offgas_to_declared_accounts(
         feedstocks_data,
         setpoints_data,
     )
-    offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
+    offgas = sim.atom_ledger.kg_by_account("process.overhead_gas")
     # Carbonaceous chondrite produces CO2 (from organics) and H2O
     # (from H-bearing organics).
     assert offgas.get("CO2", 0.0) > 0.0 or offgas.get("H2O", 0.0) > 0.0

@@ -91,7 +91,7 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.account_ids import CONDENSATION_RETAINED_HOLDUP_ACCOUNT
+from simulator.account_ids import C0_CRYO_BIN_ACCOUNTS, CONDENSATION_RETAINED_HOLDUP_ACCOUNT
 from simulator.condensation import (
     C4B_WALL_ROUTE_ORDER,
     WALL_DEPOSIT_ACCOUNT,
@@ -117,6 +117,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     RETAINED_HOLDUP_ACCOUNT = CONDENSATION_RETAINED_HOLDUP_ACCOUNT
 
     BASE_DECLARED_ACCOUNTS = frozenset({
+        *C0_CRYO_BIN_ACCOUNTS.values(),
         "process.overhead_gas",
         "process.condensation_train",
         RETAINED_HOLDUP_ACCOUNT,
@@ -288,7 +289,25 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             )
         )
 
-        credits = self._credits_by_product_account(condensed_product_mol, sp_data)
+        bin_fractions = dict(controls.get("condensation_bin_fractions") or {})
+        if bin_fractions:
+            if (
+                any(
+                    account not in C0_CRYO_BIN_ACCOUNTS.values()
+                    or not is_declared_real_scalar(fraction)
+                    or not math.isfinite(float(fraction))
+                    or not 0.0 < float(fraction) <= 1.0
+                    for account, fraction in bin_fractions.items()
+                )
+                or not math.isclose(
+                    math.fsum(bin_fractions.values()), 1.0,
+                    rel_tol=0.0, abs_tol=1e-12,
+                )
+            ):
+                raise ValueError("invalid C0 condensation bin fractions")
+        credits = self._credits_by_product_account(
+            condensed_product_mol, sp_data, bin_fractions,
+        )
         # Prior retained vapor retries only through stable baffle chemistry;
         # newly arriving vapor keeps this tick's physical wall split. Merging
         # identical product/account components lets prior+current cross the
@@ -301,7 +320,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             resolve_species_formula,
         )
         prior_credits = self._credits_by_product_account(
-            prior_product_mol, sp_data
+            prior_product_mol, sp_data, bin_fractions
         )
         prior_credits_materializable = bool(prior_credits) and all(
             float(mol)
@@ -1316,12 +1335,20 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         self,
         condensed_product_mol: Mapping[str, float],
         sp_data: Mapping[str, Any],
+        bin_fractions: Mapping[str, float] | None = None,
     ) -> dict[str, dict[str, float]]:
         product_accounts = dict(
             sp_data.get("condensation_product_accounts") or {}
         )
         credits: dict[str, dict[str, float]] = {}
         for product, mol in condensed_product_mol.items():
+            if bin_fractions and product not in self.GASEOUS_CONDENSATION_COPRODUCTS:
+                for account, fraction in bin_fractions.items():
+                    species_mol = credits.setdefault(account, {})
+                    species_mol[str(product)] = (
+                        species_mol.get(str(product), 0.0) + mol * fraction
+                    )
+                continue
             account = str(
                 product_accounts.get(product) or "process.condensation_train"
             )

@@ -2898,7 +2898,6 @@ class CampaignManager:
             return CampaignPhase.C0B
 
         elif current == CampaignPhase.C0B:
-            # Seal volatiles train gate valve
             # Decision needed: Path A or B
             if self._is_noninteractive_test_batch(record):
                 record.path = 'A_staged'

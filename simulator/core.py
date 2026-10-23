@@ -370,6 +370,7 @@ def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
         ) from exc
 
 from simulator.account_ids import (
+    C0_CRYO_BIN_ACCOUNTS,
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
@@ -792,6 +793,7 @@ FLOW_MASS_ACCOUNTS = (
     SOLID_CHAR_CARBON_ACCOUNT,
     'process.raw_feedstock',
     'process.condensation_train',
+    *C0_CRYO_BIN_ACCOUNTS.values(),
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     WALL_DEPOSIT_ACCOUNT,
     *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
@@ -1565,6 +1567,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         self._apply_stage0_carbon_reductant_reactions(fs, ledger_additives)
         self._apply_stage0_perchlorate_reactions(fs)
+        self.train.volatiles_gate_sealed = True
         self._seed_atom_ledger(feedstock_key, fs, ledger_additives)
         self._project_cleaned_melt_from_atom_ledger()
         # NOTE: ``_seed_atom_ledger`` now rebuilds ``self._chem_kernel``
@@ -1604,6 +1607,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Reset condensation train
         self.train = CondensationTrain.create_default()
+        self._condensation_model = None
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
@@ -2635,6 +2639,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         thin pass-through.
         """
         kernel = self._require_chem_kernel()
+        from simulator.overhead import record_headspace_origin_mixing
+
         balances_before = self.atom_ledger.kg_by_account()
         transition = kernel.commit_batch(
             intent,
@@ -2642,6 +2648,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             transition_source=transition_source,
             transition_meta=transition_meta,
         )
+        record_headspace_origin_mixing(self.atom_ledger, transition)
         self._observe_o2_bubbler_external_o2_transition(
             intent,
             transition,
@@ -3339,7 +3346,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # current invariants.
             self._chem_no_op_dispatch_count += 1
             return result
-        self._commit_proposal(
+        transition = self._commit_proposal(
             intent,
             proposal,
             diagnostic=result.diagnostic,
@@ -3347,6 +3354,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             transition_source=transition_source,
             transition_meta=transition_meta,
         )
+        if (
+            intent == ChemistryIntent.STAGE0_PRETREATMENT
+            and self.melt.campaign == CampaignPhase.C0
+            and not self.train.volatiles_gate_sealed
+        ):
+            evolved_gases: Dict[str, float] = {}
+            for lot in transition.credits:
+                if lot.account == 'process.overhead_gas':
+                    self._merge_masses(evolved_gases, lot.species_kg)
+            if evolved_gases:
+                self._route_stage0_volatiles_to_cryo(evolved_gases)
         return result
 
     def _o2_bubbler_external_o2_overhead_mol(self) -> float:
@@ -8583,7 +8601,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             source=f'{label} Stage 0 residual',
         )
         self._load_ledger_account(
-            'terminal.offgas',
+            'process.overhead_gas',
             terminal_offgas_external,
             source=f'{label} Stage 0 volatiles',
         )
@@ -8770,7 +8788,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         one :class:`LedgerTransitionProposal` per spec entry
         (per-species) debiting ``process.stage0_volatile_feed`` (and
         ``reservoir.stage0_oxidant`` when O2-deficient) and crediting
-        ``terminal.offgas`` (CO2/H2O/N2) + ``terminal.oxygen_stage0_stored``
+        ``process.overhead_gas`` (CO2/H2O/N2) + ``terminal.oxygen_stage0_stored``
         (O2 coproduct when the feed is O2-surplus, e.g. peroxides).
         :meth:`ChemistryKernel.commit_batch` is the sole writable path
         into the ledger for this intent after the flip; the legacy
@@ -8898,7 +8916,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         SO2 + CO) or ``boudouard`` (C + CO2 -> 2 CO) family based on
         the legacy spec name; the provider emits a
         :class:`LedgerTransitionProposal` debiting the spec's feed
-        accounts and crediting ``terminal.offgas`` with the reactions'
+        accounts and crediting ``process.overhead_gas`` with the reactions'
         products.  :meth:`ChemistryKernel.commit_batch` is the sole
         writable path into the ledger for this intent after the flip;
         the legacy ``self.atom_ledger.record`` direct mutation is gone.
@@ -9723,6 +9741,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ChemistryIntent.BACKEND_EQUILIBRIUM,
                 transition,
             )
+            from simulator.overhead import record_headspace_origin_mixing
+
+            record_headspace_origin_mixing(self.atom_ledger, transition)
             self._observe_reagent_provenance_transition(
                 transition,
                 balances_before,
@@ -12866,6 +12887,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         freeze_gate_config = self._resolve_freeze_gate_config(campaign)
 
+        self.train.volatiles_gate_sealed = campaign != CampaignPhase.C0
         self.melt.campaign = campaign
         self.melt.campaign_hour = 0
         self.paused_for_decision = False
@@ -12893,6 +12915,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._refresh_oxygen_reservoir_without_exchange(
             exchange_direction='none:campaign_start',
         )
+
+        if campaign == CampaignPhase.C0:
+            self._route_stage0_volatiles_to_cryo()
+        # Pretreatment source terms are already evolved at initialization.
+        # Route the remaining noncondensables through the existing pump owner;
+        # never reclaim an escaped terminal lot to populate a cold trap.
+        if self.melt.hour == 0 and self.atom_ledger.mol_by_account('process.overhead_gas'):
+            self._dispatch_overhead_bleed(force_drain_all=True)
 
         # Initialize shuttle inventory when entering C3 phases
         if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
@@ -14342,6 +14372,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or self._check_campaign_endpoint(evap_flux)
         )
         if campaign_done:
+            if self.melt.campaign == CampaignPhase.C0:
+                # d-247: current exit event; replace this trigger with t_evac
+                # when the evacuation-bound engine lands (d-239).
+                self.train.volatiles_gate_sealed = True
             # Capture campaign summary before transitioning
             finishing_campaign = self.melt.campaign.name
             self._last_campaign_summary = self._capture_campaign_summary(

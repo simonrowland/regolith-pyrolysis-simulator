@@ -4399,6 +4399,40 @@ class EvaporationMixin:
             'native_fe_uncondensed_mol': float(remaining_kg / fe_molar_mass),
         }
 
+    def _route_stage0_volatiles_to_cryo(
+        self, evolved_gases: Mapping[str, float] | None = None,
+    ) -> None:
+        from simulator.condensation import DepositionInputRefusal, _species_vapor_data
+
+        gases = self._positive_species_kg(
+            self.atom_ledger.kg_by_account('process.overhead_gas')
+            if evolved_gases is None else evolved_gases,
+        )
+        if not gases:
+            return
+        # This source batch enters the existing one-hour process step (the
+        # condensation kernel below also uses dt_hr=1). kg / h is a stream;
+        # integrating its captured kg/h over the same step returns batch kg.
+        dt_hr = 1.0
+        flux = EvaporationFlux(species_kg_hr={species: kg / dt_hr for species, kg in gases.items()})
+        flux.update_totals()
+        self._configure_condensation_operating_conditions(flux)
+        route = self.condensation_model.route(flux, self.melt)
+        for species in gases:
+            if route.retained_in_source_by_species.get(species, 0.0) > 0.0:
+                # Already-evolved headspace cannot be retained in the melt.
+                # Stop before the initialization pump instead of inventing a route.
+                refusal = route.condensation_refusals_by_species[species]
+                raise DepositionInputRefusal('condensation_route', species, refusal['reason'])
+        for species in gases:
+            captured = route.condensed_for_species(species) * dt_hr
+            data = _species_vapor_data(
+                species, vapor_pressure_data=self.vapor_pressures, stage0=True,
+            )
+            self._dispatch_condensation_route(
+                species, captured, data, route,
+            )
+
     def _dispatch_condensation_route(
         self,
         species: str,
@@ -4420,6 +4454,18 @@ class EvaporationMixin:
         actually deposited onto ``process.condensation_train``, used by
         the caller to drive ``_project_condensed_stage_collection``.
         """
+        bin_accounts = getattr(route_result, 'cryo_bin_accounts', {})
+        bin_masses = {
+            account: route_result.condensed_by_stage_species.get(stage, {}).get(species, 0.0)
+            for stage, account in bin_accounts.items()
+        }
+        total_bin_mass = sum(bin_masses.values())
+        # Each mass is kg of this same vapor, so kg/kg equals its mol fraction.
+        # Dividing by the sum conserves all routed atoms; one nonempty bin gets 1.
+        bin_fractions = {
+            account: mass / total_bin_mass for account, mass in bin_masses.items()
+            if mass > 0.0
+        } if total_bin_mass > 0.0 else {}
         wall_deposit_fraction = float(
             route_result.wall_deposit_fraction_by_species.get(species, 0.0)
         )
@@ -4444,6 +4490,7 @@ class EvaporationMixin:
                 'species': species,
                 'condensed_kg': float(condensed_kg),
                 'sp_data': dict(sp_data or {}),
+                'condensation_bin_fractions': bin_fractions,
                 'wall_deposit_fraction': wall_deposit_fraction,
                 'wall_deposit_account_fractions': wall_deposit_account_fractions,
                 'wall_temperature_K': (
@@ -4954,6 +5001,8 @@ class EvaporationMixin:
         product_kg_by_species: dict | None = None,
     ) -> None:
         if credited_condensed_kg <= 1e-12:
+            return
+        if getattr(route_result, 'cryo_bin_accounts', {}):
             return
         product_kg_by_species = product_kg_by_species or {
             species: credited_condensed_kg}

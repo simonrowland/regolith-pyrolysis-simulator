@@ -96,7 +96,7 @@ campaigns:
     temp_range_C: [1180, 1320]
     dT_dt_C_per_hr: null                 # isothermal hold; IR-endpoint controlled
     atmosphere: "controlled_O2_flow"     # flow/sweep or mild bubbling
-    pO2_mbar: [3.0, 15.0]               # suppresses Na/K/SiO; only volatiles train open
+    pO2_mbar: [3.0, 15.0]               # suppresses Na/K/SiO; C0 cryo valve already closed
     pO2_mbar_default: 9.0
     p_total_mbar_default: 9.0
     target_species: ["PO", "POx"]
@@ -1070,10 +1070,26 @@ condensation_train:
   volatiles_train:
     gate_valve: true                     # isolates from metals train
     stages:
-      - label: "CHNOPS cold traps"
-        temp_range_C: [50, 400]
-        products: ["H2O", "CO2", "S2", "hydrocarbons"]
-        note: "Solar-wind implanted volatiles from C0"
+      - label: "CHNOPS warm-end cold trap"
+        bin: warm
+        temp_range_C: [50, 400]           # existing CHNOPS warm-end setting
+        products: ["Na", "K", "S", "S2", "salts", "organic_tar"]
+        capture_area_key: terminal
+        capture_area_note: "design setpoint, unsourced: reuse existing terminal capture-area sizing for this C0 branch; not a measured cryotrap area"
+      - label: "CHNOPS water cryotrap"
+        bin: water
+        temp_range_C: [-93.15, -93.15]    # 180 K
+        products: ["H2O"]
+        capture_area_key: terminal
+        capture_area_note: "design setpoint, unsourced: reuse existing terminal capture-area sizing for this C0 branch; not a measured cryotrap area"
+        note: "design setpoint, unsourced; deposition uses the existing H2O saturation curve"
+      - label: "CHNOPS CO2/SO2 cryotrap"
+        bin: co2_so2
+        temp_range_C: [-173.15, -173.15]  # 100 K
+        products: ["CO2", "SO2"]
+        capture_area_key: terminal
+        capture_area_note: "design setpoint, unsourced: reuse existing terminal capture-area sizing for this C0 branch; not a measured cryotrap area"
+        note: "design setpoint, unsourced; deposition uses the existing CO2/SO2 saturation curves"
       - label: "P-carrier pass-through (C0b)"
         temp_range_C: [350, 650]
         material: "CaO/MgO sorbent bed"

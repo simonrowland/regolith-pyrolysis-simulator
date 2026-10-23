@@ -828,14 +828,13 @@ class CondensationTrain:
     Stage 6: Turbine/compressor — pressure regulation
     Stage 7: O₂ accumulator (~3 bar)
 
-    The volatiles train (C0/C0b) is handled separately and sealed
-    after devolatilisation.
+    The existing volatiles train is open during C0 and sealed at C0 exit.
     """
     stages: List[CondensationStage] = field(default_factory=list)
 
-    # Volatiles train (sealed after C0/C0b)
+    # Volatiles train (sealed at C0 exit, before C0B)
     volatiles_collected_kg: Dict[str, float] = field(default_factory=dict)
-    volatiles_gate_sealed: bool = False
+    volatiles_gate_sealed: bool = True
 
     def total_by_species(self) -> Dict[str, float]:
         """Sum collected mass across all stages, per species."""

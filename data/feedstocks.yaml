@@ -224,8 +224,10 @@ lunar_mare_low_ti:
       source: "Gibson & Johnson 1971 stepped heating; corroborates matchett-2006 Table 1 (in-house OCR capture, docs-private/research/2026-06-29-grounding-ocr)"
     capture_note: >
       C0 bakeout evolves H2/He near-quantitatively (release window sits inside the 20-950 C ramp), but
-      the volatiles-train CHNOPS cold traps (50-400 C) hold only H2O/S/salt species: H2, He, He-3, N2
-      and CO/CO2 pass to the pump stream, so capture needs a cryogenic trap stage (FB-33 equipment add).
+      the C0-only CHNOPS train has a warm-end trap (50-400 C), a water bin (180 K), and a
+      CO2/SO2 bin (100 K). Cryogenic temperatures are unsourced design setpoints declared in
+      setpoints.yaml, not measured hardware. H2, He, He-3, N2, CO and CH4 pass to the pump.
+      The gate closes at C0 exit; C0B products use the metals train.
       Favourable capture window (owner note 2026-07-07): during the C0 volatiles bakeout no kg-scale O2
       is being emitted -- pyrolytic metal decomposition has not started -- so the noble-gas stream is not
       diluted by bulk oxygen; the cryo stage sees a clean, low-O2 feed.

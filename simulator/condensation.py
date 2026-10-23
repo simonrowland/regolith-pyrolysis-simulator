@@ -43,8 +43,8 @@ Train topology (metals train, active C2A onward):
     Stage 6  Turbine-compressor      — pressure regulation, pO₂ control
     Stage 7  Turbine outlet monitor — terminal ledger owns O2 storage
 
-A separate volatiles train handles C0/C0b products and is sealed
-by a gate valve after devolatilisation.
+The existing volatiles train handles C0 products and is sealed at C0 exit.
+C0B uses the normal metals train.
 
 Key physics:
     Live stage efficiency averages 33 series-resistance deposition-flux
@@ -139,6 +139,7 @@ from simulator.lab_geometry import (
     require_lab_pipe_diameter,
 )
 from simulator.condensation_routing import (
+    C0_NONCONDENSABLES,
     STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_number,
     coproduct_species_for_stage_number,
@@ -161,6 +162,7 @@ BOLTZMANN_CONSTANT_J_K = BOLTZMANN
 AVOGADRO_MOL = AVOGADRO
 HKL_BAND_SAMPLES = 33
 DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
+_CONDENSATION_PROCESS_PHASE = ContextVar("condensation_process_phase", default=None)
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 WALL_DEPOSIT_SEGMENT_ACCOUNTS = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
 DEFAULT_PIPE_TEMPERATURE_C = 1500.0
@@ -1948,6 +1950,7 @@ class CondensationRouteResult:
     """Per-hour routing plan; quantities are projections until ledger credit."""
 
     remaining_by_species: Dict[str, float] = field(default_factory=dict)
+    cryo_bin_accounts: Dict[int, str] = field(default_factory=dict)
     retained_in_source_by_species: Dict[str, float] = field(default_factory=dict)
     condensed_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
     wall_deposit_by_species: Dict[str, float] = field(default_factory=dict)
@@ -2121,6 +2124,7 @@ class CondensationModel:
         self.condensation_temperatures_C: dict[str, float] = dict(
             CONDENSATION_TEMPS_C
         )
+        self.c0_cryo_stages: list[dict[str, Any]] = []
         self.wall_surface_area_m2 = (
             float(wall_surface_area_m2)
             if wall_surface_area_m2 is not None
@@ -2620,6 +2624,29 @@ class CondensationModel:
         """
         if not setpoints:
             return
+        from simulator.account_ids import C0_CRYO_BIN_ACCOUNTS
+
+        volatiles = (setpoints.get('condensation_train', {}) or {}).get('volatiles_train', {}) or {}
+        self.c0_cryo_stages = []
+        for index, row in enumerate(volatiles.get('stages', ())):
+            key = row.get('bin')
+            if key not in C0_CRYO_BIN_ACCOUNTS:
+                continue
+            band = row.get('temp_range_C')
+            if not isinstance(band, (list, tuple)) or len(band) != 2:
+                raise DepositionInputRefusal('temp_range_C', band, 'C0 bin needs two temperatures')
+            band = tuple(_deposition_finite_scalar('temp_range_C', value) for value in band)
+            if band[0] > band[1] or band[0] <= -CELSIUS_TO_KELVIN_OFFSET:
+                raise DepositionInputRefusal('temp_range_C', band, 'C0 bin temperatures must be ordered and physical')
+            self.c0_cryo_stages.append({
+                **row,
+                'stage': CondensationStage(
+                    8 + index, str(row['label']), band, [],
+                ),
+                'account': C0_CRYO_BIN_ACCOUNTS[key],
+            })
+        if volatiles and {row['bin'] for row in self.c0_cryo_stages} != set(C0_CRYO_BIN_ACCOUNTS):
+            raise DepositionInputRefusal('volatiles_train', volatiles, 'C0 needs warm, water and CO2/SO2 bins')
         self.upstream_hot_wall_min_C = _stage0_hot_wall_min_C_from_setpoints(
             setpoints,
             default_C=self.upstream_hot_wall_min_C,
@@ -2718,6 +2745,10 @@ class CondensationModel:
 
     def _stage_area_m2_for_stage_number(self, stage_number: int) -> float | None:
         key = STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number))
+        for row in self.c0_cryo_stages:
+            if row['stage'].stage_number == stage_number:
+                key = row.get('capture_area_key')
+                break
         raw = None if key is None else self.stage_area_m2_by_stage.get(key)
         if raw is None:
             raw = self.stage_area_m2_by_stage.get(f'stage_{stage_number}')
@@ -2863,18 +2894,194 @@ class CondensationModel:
     def route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """Route one flux batch with mutation-checked catalog reuse."""
         data = self.vapor_pressure_data
-        if not isinstance(data, VaporPressureCompatibilityView):
-            return self._route(evap_flux, melt)
+        compatibility_view = isinstance(data, VaporPressureCompatibilityView)
         missing = object()
         previous = getattr(data, '_route_catalog', missing)
-        data._route_catalog = None
+        if compatibility_view:
+            data._route_catalog = None
+        c0_open = bool(self.c0_cryo_stages) and not self.train.volatiles_gate_sealed
         try:
+            if c0_open:
+                return self._route_c0_volatiles(evap_flux, melt)
             return self._route(evap_flux, melt)
         finally:
-            if previous is missing:
-                del data._route_catalog
-            else:
-                data._route_catalog = previous
+            if compatibility_view:
+                if previous is missing:
+                    del data._route_catalog
+                else:
+                    data._route_catalog = previous
+
+    def _route_c0_volatiles(self, evap_flux: EvaporationFlux, melt: MeltState):
+        """Walk the existing C0 traps with the existing deposition law."""
+        from simulator.accounting.formulas import resolve_species_formula
+        from simulator.chemistry.organics_pyrolysis import tar_fate
+        from simulator.vapour_rail.instrumentation import (
+            VAPOUR_CARRIER_AUTHORITY_MISSING, vapour_carrier_authority_status,
+        )
+
+        remaining = {
+            species: _finite_nonnegative_value(rate, label=f'{species} rate_kg_hr')
+            for species, rate in evap_flux.species_kg_hr.items()
+        }
+        retained = {}
+        condensed = {}
+        authorities = {}
+        refusals = {}
+        alpha_provenance = {}
+        extrapolations = {}
+        extrapolation_warnings = []
+        cleanup_offgas = set()
+        for species in remaining:
+            authority = dict(evap_flux.carrier_authority_by_species.get(species, {}) or {})
+            status = (vapour_carrier_authority_status(authority, expected_species_id=species)
+                      if authority else VAPOUR_CARRIER_AUTHORITY_MISSING)
+            evidence = {}
+            reason = None
+            if authority:
+                promoted, reason = _promote_non_debiting_carrier_status(
+                    species, status, vapor_pressure_data=self.vapor_pressure_data,
+                )
+                evidence = _stage0_cleanup_offgas_evidence(
+                    species, status, reason, authority, str(melt.campaign.name),
+                    self.vapor_pressure_data,
+                )
+                if not evidence:
+                    status = promoted
+            authorities[species] = {
+                'status': status,
+                'authoritative_for_condensation': False,
+                'carrier_authority': authority,
+                'mass_disposition': 'c0_cryo_train',
+            }
+            if evidence:
+                cleanup_offgas.add(species)
+                authorities[species].update({
+                    'mass_disposition': 'declared_cleanup_offgas',
+                    'routing_authorization': evidence,
+                })
+            if status in {'refused', 'proven_zero'}:
+                retained[species] = remaining[species]
+                remaining[species] = 0.0
+                authorities[species]['mass_disposition'] = 'retained_in_source_pending_authority'
+                refusals[species] = {
+                    'status': 'refused',
+                    'reason': reason or status,
+                    'output_status': 'refused',
+                    'upstream_authority_status': status,
+                    'retained_in_source_mass_kg_hr': retained[species],
+                }
+            elif species in C0_NONCONDENSABLES:
+                authorities[species]['mass_disposition'] = 'pump_offgas'
+        total_pressure_pa = self.overhead_pressure_mbar * 100.0
+        inlet_pressures = _flowing_species_partial_pressures_pa(
+            evap_flux.species_kg_hr, total_pressure_pa,
+            reported_partial_pressures_mbar=self.species_partial_pressures_mbar,
+        )
+        self.wall_species_partial_pressures_pa = inlet_pressures
+        token = _CONDENSATION_PROCESS_PHASE.set('stage0')
+        try:
+            for row in self.c0_cryo_stages:
+                stage = row['stage']
+                stage_key = str(stage.stage_number)
+                _deposition_finite_scalar(
+                    'stage_area_m2', self._stage_area_m2_for_stage_number(stage.stage_number),
+                )
+                pressures = _segment_species_partial_pressures_pa(
+                    inlet_pressures, total_pressure_pa, evap_flux.species_kg_hr,
+                    {stage_key: remaining},
+                )[stage_key]
+                for species, rate in tuple(remaining.items()):
+                    if species in C0_NONCONDENSABLES or species in cleanup_offgas or rate <= 1e-15:
+                        continue
+                    outcomes = []
+                    if species == 'organic_tar':
+                        # The tar chemistry owner supplies the lumped coating law.
+                        formula = resolve_species_formula(species, self.species_formula_registry)
+                        atoms = formula.atom_moles(rate / formula.molar_mass_kg_per_mol())
+                        eta = tar_fate(
+                            atoms, melt.temperature_C, sum(stage.temp_range_C) / 2,
+                        ).coat_frac
+                    else:
+                        try:
+                            _molecular_mass_kg_per_molecule(
+                                species, vapor_pressure_data=self.vapor_pressure_data,
+                            )
+                        except MolarMassUnavailable as exc:
+                            raise DepositionInputRefusal(
+                                'molar_mass_g_mol', species, str(exc),
+                            ) from exc
+                        record = _stage_alpha_record(stage, species, self.materials)
+                        alpha_provenance.setdefault(species, {})[stage_key] = record
+                        residence_s = self.residence_time_s.get(stage.stage_number, 1.0)
+                        try:
+                            eta = self._condensation_efficiency(
+                                stage=stage, species=species,
+                                # This is the reactive-product temperature gate;
+                                # each surface sample is below the upper setpoint.
+                                T_cond_C=float(stage.temp_range_C[1]),
+                                residence_s=residence_s,
+                                # The helper consumes parcel kg, not kg/h:
+                                # m_parcel = rate[kg/h] * tau[s] / 3600[s/h].
+                                # eta=(J*A*tau)/(rate*tau/(3600*M)), so rate*eta
+                                # is min(rate,3600*J*A*M) kg/h, independent of tau.
+                                # Zero uptake stays zero; complete uptake clips at supply.
+                                available_kg=rate * residence_s / 3600.0,
+                                alpha_s_value=_required_record_alpha_s(
+                                    record, species=species, site='c0_cryo_deposition',
+                                ),
+                                alpha_record=record, antoine_extrapolations=extrapolations,
+                                antoine_extrapolation_warnings=extrapolation_warnings,
+                                efficiency_outcomes=outcomes,
+                                flowing_partial_pressure_pa=pressures[species],
+                            )
+                        except WallSaturationPressureRefusal as exc:
+                            # No numeric route is justified for this species.
+                            # Discard tentative upstream capture as well as pump flow.
+                            for by_species in condensed.values():
+                                by_species.pop(species, None)
+                            retained[species] = evap_flux.species_kg_hr[species]
+                            remaining[species] = 0.0
+                            authorities[species].update({
+                                'mass_disposition': 'retained_in_source_pending_authority',
+                                'authoritative_for_terminal_offgas': False,
+                            })
+                            refusals[species] = {
+                                'status': 'refused', 'output_status': 'refused',
+                                'refusal_type': type(exc).__name__, 'reason': exc.reason,
+                                'wall_temperature_K': exc.temperature_K,
+                                'authoritative_for_condensation': False,
+                                'authoritative_for_terminal_offgas': False,
+                                'mass_disposition': 'retained_in_source_pending_authority',
+                                'retained_in_source_mass_kg_hr': retained[species],
+                            }
+                            continue
+                    captured = rate * eta
+                    remaining[species] = max(0.0, rate - captured)
+                    if captured > 1e-15:
+                        condensed.setdefault(stage.stage_number, {})[species] = captured
+                    authorities[species].update({
+                        'capture_area_note': row['capture_area_note'],
+                    })
+                    if outcomes:
+                        refusals.setdefault(species, {'stage_outcomes': []})['stage_outcomes'].extend(outcomes)
+        finally:
+            _CONDENSATION_PROCESS_PHASE.reset(token)
+        self.last_condensation_authority_by_species = copy.deepcopy(authorities)
+        self.last_condensation_refusals_by_species = copy.deepcopy(refusals)
+        return CondensationRouteResult(
+            remaining_by_species=remaining,
+            retained_in_source_by_species=retained,
+            condensed_by_stage_species=condensed,
+            cryo_bin_accounts={
+                row['stage'].stage_number: row['account']
+                for row in self.c0_cryo_stages
+            },
+            condensation_authority_by_species=authorities,
+            condensation_refusals_by_species=refusals,
+            antoine_extrapolations=extrapolations,
+            antoine_extrapolation_warnings=tuple(extrapolation_warnings),
+            sticking_alpha_provenance_notice={'alpha_s_provenance_by_species': alpha_provenance},
+        )
 
     def _route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """
@@ -4395,6 +4602,7 @@ class CondensationModel:
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
         antoine_extrapolation_warnings: list[str] | None = None,
         efficiency_outcomes: list[dict[str, Any]] | None = None,
+        flowing_partial_pressure_pa: float | None = None,
     ) -> float:
         """
         Condensation efficiency for one species in one stage.
@@ -4454,13 +4662,23 @@ class CondensationModel:
         # Resolve Antoine (or catalog) Psat at T_cond; uncovered segments and
         # range errors are typed refusals (b-127), never a fabricated 100 Pa.
         psat_notices = antoine_extrapolations if antoine_extrapolations is not None else {}
-        P_local_pa, psat_refused = _try_antoine_psat_pa(
-            species,
-            T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
-            vapor_pressure_data=self.vapor_pressure_data,
-            antoine_extrapolations=psat_notices,
-            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-        )
+        if flowing_partial_pressure_pa is None:
+            P_local_pa, psat_refused = _try_antoine_psat_pa(
+                species,
+                T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
+                vapor_pressure_data=self.vapor_pressure_data,
+                antoine_extrapolations=psat_notices,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            )
+        else:
+            P_local_pa = _deposition_finite_scalar(
+                'flowing_partial_pressure_pa', flowing_partial_pressure_pa,
+            )
+            if P_local_pa < 0.0:
+                raise DepositionInputRefusal(
+                    'flowing_partial_pressure_pa', P_local_pa, 'pressure must be nonnegative',
+                )
+            psat_refused = False
         domain_outcome = None
         if psat_refused or P_local_pa is None:
             notice = psat_notices.get(
@@ -4661,6 +4879,14 @@ class CondensationModel:
                 raise RuntimeError(
                     "wall saturation-pressure refusal produced positive flux"
                 )
+            if (
+                flowing_partial_pressure_pa is not None
+                and rate_diagnostic.get('wall_saturation_pressure_refused')
+            ):
+                raise WallSaturationPressureRefusal(
+                    species, T_surface_K,
+                    rate_diagnostic['wall_saturation_pressure_refusal_reason'],
+                )
             band_flux_mol_m2_s += flux
         band_flux_mol_m2_s /= HKL_BAND_SAMPLES
         if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
@@ -4756,6 +4982,7 @@ def _species_vapor_data(
     species: str,
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
+    stage0: bool = False,
 ) -> Mapping[str, Any]:
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
@@ -4765,13 +4992,18 @@ def _species_vapor_data(
     if vapor_pressure_data is not None:
         vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
     global_data: Mapping[str, Any] = {}
-    for family in ('metals', 'oxide_vapors'):
+    families = (
+        ('metals', 'oxide_vapors', 'foulant_vapor')
+        if stage0 or _CONDENSATION_PROCESS_PHASE.get() == 'stage0'
+        else ('metals', 'oxide_vapors')
+    )
+    for family in families:
         data = (VAPOR_PRESSURE_DATA.get(family, {}) or {}).get(species, {})
         if data and isinstance(data, Mapping):
             global_data = data
             break
     if vapor_pressure_data is not None:
-        for family in ('metals', 'oxide_vapors'):
+        for family in families:
             group = vapor_pressure_data.get(family, {}) or {}
             if not isinstance(group, Mapping):
                 continue
@@ -5011,9 +5243,18 @@ def _assert_condensation_applicable(
     catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
     if catalog_payload is None:
         return
-    _condensation_catalog(
-        vapor_pressure_data, catalog_payload
-    ).assert_hot_train_applicable(species)
+    catalog = _condensation_catalog(vapor_pressure_data, catalog_payload)
+    compiled = catalog.species.get(species)
+    if (
+        _CONDENSATION_PROCESS_PHASE.get() == 'stage0'
+        and compiled is not None
+        and compiled.code_metadata.request_rule == 'stage0_only'
+    ):
+        # The cold C0 branch consumes the declared Stage-0 pressure row.
+        # hot_train_applicability describes the separate metal-train consumer;
+        # its admission remains unchanged when the cryo valve is closed.
+        return
+    catalog.assert_hot_train_applicable(species)
 
 
 def _condensation_admission_refusal(

@@ -316,6 +316,9 @@ def test_provider_declares_condensation_accounts():
     provider = BuiltinCondensationRouteProvider()
     profile = provider.capability_profile()
     assert profile.declared_accounts == frozenset({
+        "terminal.c0_cryo_warm",
+        "terminal.c0_cryo_water",
+        "terminal.c0_cryo_co2_so2",
         "process.overhead_gas",
         "process.condensation_train",
         "process.condensation_retained_holdup",
@@ -534,6 +537,9 @@ def test_kernel_filters_provider_to_declared_accounts_only(
 
     assert seen_accounts, "provider was never dispatched"
     expected = frozenset({
+        "terminal.c0_cryo_warm",
+        "terminal.c0_cryo_water",
+        "terminal.c0_cryo_co2_so2",
         "process.overhead_gas",
         "process.condensation_train",
         "process.condensation_retained_holdup",

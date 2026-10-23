@@ -1442,6 +1442,8 @@ class PyrolysisRun:
                 "backend_authoritative": bool(execution.backend_authoritative),
             }
         )
+        if self.campaign == "C0":
+            run_metadata["c0_cryo_alkali_purity"] = AccountingQueries(sim).c0_cryo_alkali_purity()
         _attach_engine_commissioning_notice(run_metadata, sim)
         _attach_engine_binding_admission_notice(run_metadata, sim)
         _attach_diagnostic_gate_authority_notice(run_metadata, sim)

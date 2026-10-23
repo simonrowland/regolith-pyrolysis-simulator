@@ -1734,6 +1734,8 @@ def test_stage0_yield_disposition_closes_from_typed_origin(
     vacuum organics source term, so the reagent-cycle O row is gone.
     Complete-oxidation fixtures that still declare an oxidant keep the
     O2 credit (see ``test_feedstock_inventory``).
+    Mars's mixed-origin headspace uses the CSTR pool ratio for C and O;
+    CI's single-origin streams retain tracked attribution.
     """
     payload = _run_scenario(scenario)
     disposition = payload["yield_disposition"]
@@ -1744,22 +1746,21 @@ def test_stage0_yield_disposition_closes_from_typed_origin(
     assert {
         row["element"] for row in disposition["reagent_cycle"]["rows"]
     } == reagent_elements
-    assert {
-        row["attribution_method"]
-        for row in disposition["fraction_table"]["rows"]
-    } == {"tracked"}
-    assert {
-        row["attribution_method"]
-        for row in disposition["links"]
-    } == {"tracked"}
+    expected_methods = {"tracked", "pool_ratio"} if reagent_elements else {"tracked"}
+    for rows in (disposition["fraction_table"]["rows"], disposition["links"]):
+        assert {row["attribution_method"] for row in rows} == expected_methods
+        assert {
+            row["element"] for row in rows
+            if row["attribution_method"] == "pool_ratio"
+        } == reagent_elements
     assert {
         row["attribution_method"]
         for row in disposition["terminal_species_streams"]
-    } == {"tracked"}
+    } == expected_methods
     assert {
         row["attribution_method"]
         for row in disposition["reagent_cycle"]["rows"]
-    } == ({"tracked"} if reagent_elements else set())
+    } == ({"pool_ratio"} if reagent_elements else set())
 
 
 def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):

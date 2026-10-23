@@ -101,6 +101,29 @@ DEFAULT_PIPE_M_AVG_KG_MOL = 0.040  # kg/mol — fallback mole-weighted pipe gas 
 COMPRESSIBLE_POISEUILLE_DENOMINATOR = 256.0  # dimensionless — integrated mean-pressure factor
 
 
+def record_headspace_origin_mixing(ledger: Any, transition: Any) -> None:
+    """Record CSTR origin mixing only for elements credited into the gas pool."""
+    account = 'process.overhead_gas'
+    entering_elements = {
+        element
+        for lot in transition.credits if lot.account == account
+        for element, amount in lot.atom_moles_for(ledger.registry).items()
+        if amount > 0.0
+    }
+    if not entering_elements:
+        return
+    origins = ledger.origin_atom_moles_by_account().get(account, {})
+    mixed_elements = {
+        element for element in entering_elements
+        if sum(amount > 0.0 for amount in origins.get(element, {}).values()) > 1
+    }
+    if mixed_elements:
+        # continuous_sweep_balance treats this headspace as a well-mixed CSTR.
+        # Partial withdrawals therefore retain each origin's pool-ratio share;
+        # species identity cannot distinguish origins of the mixed element.
+        ledger.mark_amalgamated_pool(account, mixed_elements)
+
+
 def gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
     """Return the provisional N₂-like dynamic viscosity at temperature T_K."""
     return 1.8e-5 * (T_K / 300.0) ** 0.7

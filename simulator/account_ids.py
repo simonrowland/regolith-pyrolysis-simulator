@@ -1,5 +1,11 @@
 """Shared process account identifiers."""
 
+C0_CRYO_BIN_ACCOUNTS = {
+    "warm": "terminal.c0_cryo_warm",
+    "water": "terminal.c0_cryo_water",
+    "co2_so2": "terminal.c0_cryo_co2_so2",
+}
+
 OXYGEN_SPECIES = "O2"
 METAL_PHASE_ACCOUNT = "process.metal_phase"
 METAL_BOTTOM_POOL_ACCOUNT = "process.metal_phase_bottom_pool"

@@ -9,6 +9,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Any, Callable
 
+from simulator.account_ids import C0_CRYO_BIN_ACCOUNTS
 from simulator.accounting.exceptions import OriginUnresolvedError
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.lots import allocate_pool_withdrawal
@@ -38,6 +39,7 @@ MELT_RETAINED_SUBDISPOSITIONS: tuple[str, ...] = (
 )
 
 _ACCOUNT_TO_BIN: Mapping[str, str] = {
+    **{account: "cleanup_volatile_product" for account in C0_CRYO_BIN_ACCOUNTS.values()},
     "process.cleaned_melt": "melt_retained",
     "process.c7_al_credit": "charge_unprocessed",
     "process.condensation_retained_holdup": "overhead_terminal_inventory",
@@ -72,7 +74,7 @@ _ACCOUNT_TO_BIN: Mapping[str, str] = {
     "vent": "offgas_vented",
 }
 _CONDENSATION_ACCOUNT = "process.condensation_train"
-_CLEANUP_CAMPAIGNS = frozenset({"C0", "C0B"})
+_CLEANUP_CAMPAIGNS = frozenset({"C0"})
 _CONDENSATION_AMALGAMATED_ELEMENTS = frozenset({"Na", "K"})
 _WALL_PREFIX = "process.wall_deposit_segment_"
 _CLOSURE_LIMIT_FRACTION = 5.0e-14
@@ -698,6 +700,9 @@ def _account_portions(
                 reagent_atoms=reagent_atoms,
                 origin_unattributed_atoms=origin_unattributed_atoms,
                 attribution_method_by_element=attribution_methods,
+                campaign_scope=(
+                    "C0" if account in C0_CRYO_BIN_ACCOUNTS.values() else "terminal"
+                ),
                 subdisposition=subdisposition,
             )
         ]
@@ -888,7 +893,7 @@ def _condensation_portions(
                     )
                     for element in set(cleanup_feedstock) | set(cleanup_reagent)
                 },
-                campaign_scope="C0/C0B",
+                campaign_scope="C0",
             )
         )
     if main_species:

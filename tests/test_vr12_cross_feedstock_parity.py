@@ -41,6 +41,7 @@ import pytest
 import yaml
 
 from simulator.account_ids import (
+    C0_CRYO_BIN_ACCOUNTS,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
     OXYGEN_MRE_ANODE_ACCOUNT,
@@ -50,6 +51,7 @@ from simulator.account_ids import (
 )
 from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
+from simulator.condensation import DepositionInputRefusal
 from simulator.evaporation import _pre_rg_effective_pressure_source
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.session import SimSessionConfig
@@ -551,6 +553,16 @@ def _step_hot(sim: PyrolysisSimulator, n: int = 3) -> None:
             continue
         sim.step()
         sim.melt.temperature_C = 1600.0
+
+
+def _assert_unresolved_carbon_refuses_hot_step(sim: PyrolysisSimulator) -> None:
+    before = sim.atom_ledger.mol_by_account()
+    with pytest.raises(DepositionInputRefusal) as refused:
+        _step_hot(sim)
+    assert refused.value.parameter == "molar_mass_g_mol"
+    assert refused.value.value == "C"
+    assert "no usable molar mass" in refused.value.reason
+    assert sim.atom_ledger.mol_by_account() == before
 
 
 def _parity_surface(sim: PyrolysisSimulator) -> dict[str, Any]:
@@ -1191,6 +1203,9 @@ def test_cross_feedstock_activity_verdicts_and_condensation_routing(
     )
 
     # Drive evaporate+condense so routing / ledger proposals fire.
+    if body_class == "asteroid":
+        _assert_unresolved_carbon_refuses_hot_step(sim)
+        return
     _step_hot(sim, n=3)
 
     transitions = list(sim.atom_ledger.transitions)
@@ -1216,30 +1231,17 @@ def test_cross_feedstock_activity_verdicts_and_condensation_routing(
         f"{feedstock_id}: condensation ledger proposals lack mol-native credits"
     )
 
-    # Condensation train: stages + non-empty collected mass (F1 teeth).
+    # The open C0 valve sends deposits to cryo accounts, before metal stages.
     assert sim.train is not None, f"{feedstock_id}: missing condensation train"
     assert sim.train.stages, f"{feedstock_id}: missing condensation stages"
-    totals = sim.train.total_by_species
-    if callable(totals):
-        totals = totals()
-    assert isinstance(totals, Mapping) and totals, (
-        f"{feedstock_id}: condensation total_by_species empty after steps"
-    )
-    assert any(float(v) > 0.0 for v in totals.values()), (
-        f"{feedstock_id}: condensation collected mass is zero"
-    )
-    stage_with_mass = 0
-    for stage in sim.train.stages:
-        collected = getattr(stage, "collected_kg", None)
-        if collected is None:
-            collected = getattr(stage, "collected_mol", None)
-        assert collected is not None or hasattr(stage, "collected_kg")
-        if isinstance(collected, Mapping) and any(
-            float(v) > 0.0 for v in collected.values() if v is not None
-        ):
-            stage_with_mass += 1
-    assert stage_with_mass >= 1, (
-        f"{feedstock_id}: no condensation stage holds collected mass"
+    assert not sim.train.volatiles_gate_sealed
+    assert sim.train.total_by_species() == {}
+    assert any(
+        amount > 0.0
+        for account in C0_CRYO_BIN_ACCOUNTS.values()
+        for amount in sim.atom_ledger.mol_by_account(account).values()
+    ), (
+        f"{feedstock_id}: no C0 cryo bin holds condensed mol"
     )
 
     # O2 outlets: process path populates at least one; identities distinct.
@@ -1282,10 +1284,16 @@ def test_cross_feedstock_o2_outlet_separation_and_mass_closure(
 
     assert body_class in {"lunar", "mars", "asteroid", "carbonaceous"}
     sim = _build_hot_sim(feedstock_id, mass_kg=50.0)
-    _step_hot(sim, n=5)
+    if body_class == "asteroid":
+        _assert_unresolved_carbon_refuses_hot_step(sim)
+    else:
+        _step_hot(sim, n=5)
 
     o2_before = _o2_outlet_snapshot(sim)
-    _assert_o2_outlet_separation(o2_before, feedstock_id=feedstock_id)
+    _assert_o2_outlet_separation(
+        o2_before, feedstock_id=feedstock_id,
+        require_populated_outlet=body_class != "asteroid",
+    )
 
     # Mass closure + atom drift on the **pre-inject** process path (fail
     # closed if the snapshot omits the field — P2-2). External inject below

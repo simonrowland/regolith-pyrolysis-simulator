@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from simulator.account_ids import (
+    C0_CRYO_BIN_ACCOUNTS,
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
@@ -62,6 +63,7 @@ FREE_ANALYZER_OXYGEN_ACCOUNTS = (
 )
 PLUME_PRODUCT_SIO2_SPECIES = "SiO2"
 PRODUCT_LEDGER_ACCOUNTS = (
+    *C0_CRYO_BIN_ACCOUNTS.values(),
     "terminal.offgas",
     "terminal.stage0_salt_phase",
     "terminal.stage0_chloride_salt_phase",
@@ -305,6 +307,38 @@ class AccountingQueries:
             oxygen_measured=any(value is not None for value in oxygen_series),
             vented_measured=any(value is not None for value in vented_series),
         )
+
+    def c0_cryo_alkali_purity(self) -> dict[str, Any]:
+        ledger = self.sim.atom_ledger
+        by_bin = {
+            name: ledger.atom_moles_by_account(account)
+            for name, account in C0_CRYO_BIN_ACCOUNTS.items()
+        }
+        captured = math.fsum(
+            atoms.get(element, 0.0)
+            for atoms in by_bin.values() for element in ("Na", "K")
+        )
+        feed = ledger.external_origin_atom_moles().get("feedstock", {})
+        denominator = math.fsum(feed.get(element, 0.0) for element in ("Na", "K"))
+        # Both operands are mol-atoms: the ratio is dimensionless. Without
+        # feed alkali the fraction is undefined, rather than a measured zero.
+        fraction = captured / denominator if denominator > 0.0 else None
+        return {
+            "Na_K_mol_atoms": captured,
+            "feed_Na_K_mol_atoms": denominator,
+            "fraction_of_feed": fraction,
+            "limit_fraction": 1e-3,
+            "exceeds_limit": fraction is not None and fraction > 1e-3,
+            "status": "no_feed_alkali" if fraction is None else (
+                "purity_limit_exceeded" if fraction > 1e-3 else "within_limit"
+            ),
+            "by_bin_mol_atoms": by_bin,
+            "capture_authority": "status_bearing_non_authoritative",
+            "design_setpoint_notice": (
+                "Cryogenic temperatures and C0 capture-area reuse are design "
+                "setpoints, unsourced; see condensation_train.volatiles_train."
+            ),
+        }
 
     def product_ledger(self) -> dict[str, float]:
         products: dict[str, float] = {}
