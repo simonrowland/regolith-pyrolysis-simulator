@@ -2682,7 +2682,13 @@ def test_thermoengine_numeric_activity_outside_band_is_gamma_extrapolated(
         takes_fo2=False,
         supports_intrinsic_fo2=True,
     )
-    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: handle)
+    opened: list[str] = []
+
+    def open_probe_engine(name: str) -> EngineHandle:
+        opened.append(name)
+        return handle
+
+    monkeypatch.setattr(battery, "open_battery_engine", open_probe_engine)
 
     def successful_cell(engine_handle, pot, **kwargs):
         return EquilibrateCell(
@@ -2702,27 +2708,42 @@ def test_thermoengine_numeric_activity_outside_band_is_gamma_extrapolated(
             hostname="test",
         )
 
-    monkeypatch.setattr(battery, "equilibrate_cell", successful_cell)
-    prediction = predict_with_engine(
-        Engine.THERMOENGINE,
-        reference,
-        experiment=experiment,
-        handles={Engine.THERMOENGINE.value: handle},
-        isolated=False,
+    calls = 0
+
+    def count_successful_cell(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        return successful_cell(*args, **kwargs)
+
+    monkeypatch.setattr(battery, "equilibrate_cell", count_successful_cell)
+    handles: dict[str, object] = {}
+    predictions = tuple(
+        predict_with_engine(
+            Engine.THERMOENGINE,
+            reference,
+            experiment=experiment,
+            handles=handles,
+            isolated=False,
+        )
+        for _ in range(2)
     )
 
-    assert prediction.value == Decimal("0.9"), prediction.refusal_detail
-    assert prediction.authority is Authority.EXTRAPOLATED
-    assert any(
-        notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
-        and notice.authority is Authority.EXTRAPOLATED
-        for notice in prediction.notices
-    )
-    assert not any(
-        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-        and notice.origin == "engine:thermoengine"
-        for notice in prediction.notices
-    )
+    assert len(opened) == 1
+    assert handles[Engine.THERMOENGINE.value] is handle
+    assert calls == 2
+    for prediction in predictions:
+        assert prediction.value == Decimal("0.9"), prediction.refusal_detail
+        assert prediction.authority is Authority.EXTRAPOLATED
+        assert any(
+            notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+            and notice.authority is Authority.EXTRAPOLATED
+            for notice in prediction.notices
+        )
+        assert not any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and notice.origin == "engine:thermoengine"
+            for notice in prediction.notices
+        )
 
 
 def test_metric_domain_refuses_zero_and_negative_dex() -> None:
