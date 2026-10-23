@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 from pathlib import Path
@@ -13,7 +14,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from tests.test_runner_smoke import FIXTURES_DIR, SCENARIOS, _run_scenario
+from tests.test_runner_smoke import FIXTURES_DIR, SCENARIOS, SCENARIO_FLUX_LEDGER_PINS, _run_scenario, _flux_ledger_pins
 from tests.binding_admission_fixtures import isolate_engine_local_config
 
 
@@ -41,6 +42,9 @@ def _atomic_write_json(path: Path, payload: dict) -> None:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Report pins and check fixtures without writing")
+    args = parser.parse_args()
     from simulator import engine_local_config
 
     source_path = engine_local_config.config_path()
@@ -52,11 +56,11 @@ def main() -> int:
             source_path=source_path,
         ):
             generated = [
-                (scenario, _run_scenario(scenario)) for scenario in SCENARIOS
+                (scenario, *_run_scenario(scenario, capture=True)) for scenario in SCENARIOS
             ]
     failures = [
         (scenario["name"], payload.get("status"), payload.get("reason", ""))
-        for scenario, payload in generated
+        for scenario, payload, capture in generated
         if payload.get("status") != "ok"
     ]
     if failures:
@@ -66,9 +70,14 @@ def main() -> int:
         )
         raise RuntimeError(f"runner golden regeneration refused: {details}")
 
-    for scenario, payload in generated:
+    for scenario, payload, capture in generated:
         output = FIXTURES_DIR / scenario["fixture"]
-        _atomic_write_json(output, payload)
+        print(json.dumps({"scenario": scenario["name"], **_flux_ledger_pins(capture)}))
+        if args.check:
+            assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
+            assert output.read_text(encoding="utf-8") == json.dumps(payload, indent=2, allow_nan=False) + "\n"
+        else:
+            _atomic_write_json(output, payload)
         print(output.relative_to(ROOT))
     return 0
 

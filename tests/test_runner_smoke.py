@@ -28,6 +28,7 @@ import subprocess
 import sys
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import pytest
 
@@ -761,8 +762,8 @@ SCENARIOS = [
 ]
 
 
-def _run_scenario(scenario: dict) -> dict:
-    """Run a scenario and return the resulting JSON document.
+def _run_scenario(scenario: dict, *, capture: bool = False):
+    """Run once; optionally return raw flux and ledger preimages with the payload.
 
     Run metadata overrides pin started_at_utc + kernel_commit_sha to
     fixture-stable values so a fresh machine reproduces the goldens
@@ -781,7 +782,39 @@ def _run_scenario(scenario: dict) -> dict:
             "kernel_commit_sha": "goal-18-fixture",
         },
     )
-    return run.run()
+    if not capture:
+        return run.run()
+
+    flux_maps = []
+    dispatch = BuiltinEvaporationFluxProvider.dispatch
+
+    def capture_flux_maps(provider, request):
+        result = dispatch(provider, request)
+        flux_maps.append((result.diagnostic or {}).get("evaporation_flux_kg_hr"))
+        return result
+
+    with patch.object(BuiltinEvaporationFluxProvider, "dispatch", capture_flux_maps):
+        payload = run.run()
+    ledger_output = {
+        "product_ledger_kg_at_hour": [
+            row.get("product_ledger_kg_at_hour", {})
+            for row in payload["per_hour_summary"]
+        ],
+        "final_state": payload["final_state"],
+    }
+    return payload, {"flux_maps": flux_maps, "ledger_output": ledger_output}
+
+
+def _flux_ledger_pins(capture: dict) -> dict[str, str]:
+    def canonical_json(value):
+        return json.dumps(
+            value, sort_keys=True, separators=(",", ":"), allow_nan=False
+        ).encode("utf-8")
+
+    return {
+        "flux_maps_sha256": hashlib.sha256(canonical_json(capture["flux_maps"])).hexdigest(),
+        "ledger_sha256": hashlib.sha256(canonical_json(capture["ledger_output"])).hexdigest(),
+    }
 
 
 def test_o2_bubbler_engine_evidence_uses_effective_zero_override():
@@ -1604,7 +1637,7 @@ def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels():
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
-def test_runner_golden_fixture_matches(scenario, isolated_engine_config, monkeypatch):
+def test_runner_golden_fixture_matches(scenario, isolated_engine_config):
     """A live run must reproduce the committed golden fixture exactly."""
 
     # lunar_mare_low_ti_C0_24h.json + mars_basalt_C2A_12h.json: regenerated
@@ -1614,20 +1647,8 @@ def test_runner_golden_fixture_matches(scenario, isolated_engine_config, monkeyp
     # after repair: melt_redox_gate_floor_fallback_engagement = {engaged:
     # false, total_count: 0}. ci_carbonaceous_chondrite_C2B_12h.json was
     # unchanged. docs-private/research/2026-08-02-train13-adjudication.md
-    fixture_path = FIXTURES_DIR / scenario["fixture"]
-    expected = json.loads(fixture_path.read_text())
-    flux_maps = []
-    dispatch = BuiltinEvaporationFluxProvider.dispatch
-
-    def capture_flux_maps(provider, request):
-        result = dispatch(provider, request)
-        flux_maps.append((result.diagnostic or {}).get("evaporation_flux_kg_hr"))
-        return result
-
-    monkeypatch.setattr(
-        BuiltinEvaporationFluxProvider, "dispatch", capture_flux_maps
-    )
-    actual = _run_scenario(scenario)
+    expected = json.loads((FIXTURES_DIR / scenario["fixture"]).read_text())
+    actual, capture = _run_scenario(scenario, capture=True)
 
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
@@ -1637,22 +1658,7 @@ def test_runner_golden_fixture_matches(scenario, isolated_engine_config, monkeyp
         "`python3 scripts/regenerate_runner_goldens.py` if the change is "
         "intentional; the bare simulator.runner CLI omits scenario inputs."
     )
-    def canonical_json(value):
-        return json.dumps(
-            value, sort_keys=True, separators=(",", ":"), allow_nan=False
-        ).encode("utf-8")
-
-    ledger_output = {
-        "product_ledger_kg_at_hour": [
-            row.get("product_ledger_kg_at_hour", {})
-            for row in actual["per_hour_summary"]
-        ],
-        "final_state": actual["final_state"],
-    }
-    assert {
-        "flux_maps_sha256": hashlib.sha256(canonical_json(flux_maps)).hexdigest(),
-        "ledger_sha256": hashlib.sha256(canonical_json(ledger_output)).hexdigest(),
-    } == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
+    assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
 
 
 def test_runner_golden_output_ignores_host_binding_receipts(
