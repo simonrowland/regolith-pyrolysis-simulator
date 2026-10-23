@@ -140,7 +140,7 @@ def _force_fast_redox_liquidus_floor(sim) -> None:
             liquidus_status="unavailable",
         )
 
-    sim._melt_redox_liquidus_gate_curve = floor_authority
+    sim._melt_redox_liquidus_gate_record = floor_authority
 
 
 def test_fast_redox_liquidus_floor_overrides_gate_record(
