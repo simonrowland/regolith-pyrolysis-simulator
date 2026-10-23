@@ -199,19 +199,23 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     na2o_left = sim.melt.composition_kg.get("Na2O", 0.0)
     reduced_pct = (feo_initial - feo_left) / feo_initial * 100.0
 
+    assert sim.melt.campaign == CampaignPhase.COMPLETE
+    assert result.failure_exception is None
+    assert result.error_message == ""
+    assert result.reason == ""
+    assert result.status in {"ok", "partial"}
     assert feo_initial > 100.0
     assert reduced_pct > 80.0
-    # 793f897 made the Nernst quotient parent-oxide stoichiometric: Na2O uses
-    # the square of single-cation activity. At the 1575 C C5 hold its effective
-    # requirement is 2.15044 V, so the 1.6 V cap cannot consume the remaining
-    # Na2O. The scheduler now skips that unreachable rung instead of spending
-    # the full C5 hold there; this residual is therefore mechanism-backed.
-    # Pin = the provisioned configured-engine path (MAGEMin liquid-fraction
-    # authority). The earlier 4.094548078976671 pin was measured with MAGEMin
-    # unavailable (Kress91 liquidus-floor fallback) and is not this test's
-    # environment contract; bit-deterministic across the 0.6.2 merge chain
-    # (see docs-private/research/2026-07-17-t262-attrib/findings.md).
-    assert na2o_left == pytest.approx(4.093990327892507, abs=1e-6)
+    # The declared Na2O rung is about 0.409 V, but its effective Nernst
+    # requirement at 1575 C is 2.15044 V: the parent-oxide quotient squares
+    # the single-cation activity (793f897dd). C5 applies the 1.6 V cap, so the
+    # Na2O voltage margin is -0.55044 V and that rung reduces no Na2O. This
+    # track reduces FeO by >80%; its lower final Na2O reflects Na(g) loss in
+    # C0-C4, routed to Stage-4 capture, reagent inventory, and terminal offgas.
+    # The fixture is internal-analytical/HKL-only (163e87a3b; 0504626061 only
+    # canonicalized its former "stub" input). The 4.09 kg MAGEMin-era pin was
+    # stale for this fixture after the t-1135 Fe-redox reader merge (2b1f87418).
+    assert na2o_left == pytest.approx(1.7259342571884222, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT
