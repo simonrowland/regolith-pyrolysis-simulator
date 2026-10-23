@@ -7,9 +7,9 @@ source:
   corpus_asset: raw/saini-2023-sulfur-vanadium-borosilicate-structure/saini-2023-sulfur-vanadium-borosilicate-structure.pdf
 extraction:
   method: >-
-    Born-digital journal article; pdftotext-layout is primary and MinerU table draft found no table blocks. Tables 1, 2, and 3 on PDF pages 3, 7, and 8 were rendered at 600 dpi and transcribed from the render. The ten figures were reviewed at 600 dpi and are deferred without numeric points. The paper reports qualitative V redox inferences and XPS binding-energy shifts, but no numeric V valence fractions or ratios. Glass-composition vectors, room-temperature structural descriptors, and binding energies are retained in context because no matching quantity token describes them.
+    Born-digital journal article; pdftotext-layout is primary and MinerU table draft found no table blocks. Tables 1, 2, and 3 on PDF pages 3, 7, and 8 were rendered at 600 dpi and transcribed from the render. The ten figures were reviewed at 600 dpi and are deferred without numeric points. The paper reports qualitative V redox inferences and XPS binding-energy shifts, but no numeric V valence fractions or ratios. Measured parenthesized oxide cells in Table 1 are typed as equilibrium_phase_composition; batch figures and unreported sulfur-free SO3 cells remain context. Tables 2-3 structural descriptors and binding energies remain context.
   table_dispositions:
-    table_1: context-only; measured whole-glass composition vectors and SO3 solubility have no matching battery quantity token
+    table_1: typed; measured parenthesized oxide cells are equilibrium_phase_composition observations; batch formulations and unreported sulfur-free SO3 cells remain context
     table_2: context-only; room-temperature Al coordination and NMR parameters have no matching quantity token
     table_3: context-only; room-temperature B coordination and NMR parameters have no matching quantity token
     redox: no numeric measured V valence fraction or ratio is printed; XPS binding-energy values and qualitative interpretation are context
@@ -17,6 +17,10 @@ extraction:
   date: '2026-10-20'
   worker: fam31-1020
 review_status: draft
+fidelity_samples:
+- path: species.Na2O.observations[saini_2023_1_na2o_composition].values.points[0].value
+  value: '28.95'
+  locator: {page: 3, published_page: 3, pdf_page_index: 2, table: '1', row: 0V, column: Na2O}
 species:
   V:
     observations: []
@@ -26,8 +30,7 @@ species:
       locator: {page: 3, pdf_page_index: 2, table: '1'}
       attribution: present work
       units: wt.% oxides as printed; xV-yS labels give batched mol.% V2O5 and SO3
-      candidate_tokens: [equilibrium_phase_composition, liquidus_composition, sulfur_solubility_and_sulfate_capacity_series]
-      reason: Table 1 reports multicomponent bulk-glass composition vectors and SO3 solubility limits; no store token fits a glass composition vector or sulfur concentration.
+      reason: Measured composition cells are typed as equilibrium_phase_composition; batch formulations and sulfur-free unreported SO3 cells remain context.
       values:
         formulation_as_printed: '[30 Na2O – 5 Al2O3 – 15 B2O3 – 50 SiO2](100-x) – xV2O5 mol.%; sulfur-containing batches replace x mol.% Na2O by x mol.% Na2SO4 to keep total Na2O constant.'
         method_as_printed: ICP-OES; reported compositions are within ±0.2 wt.%
@@ -35,18 +38,18 @@ species:
         atmosphere_as_printed: not stated for the synthesis procedure
         columns: [glass_id, batch_Na2O_wt_pct, measured_Na2O_wt_pct, batch_B2O3_wt_pct, measured_B2O3_wt_pct, batch_SiO2_wt_pct, measured_SiO2_wt_pct, batch_Al2O3_wt_pct, measured_Al2O3_wt_pct, batch_V2O5_wt_pct, measured_V2O5_wt_pct, batch_SO3_wt_pct, measured_SO3_wt_pct]
         sulfur_free_rows:
-        - {glass_id: 0V, batch: {Na2O: 28.97, B2O3: 16.27, SiO2: 46.81, Al2O3: 7.94, V2O5: 0, SO3: 0}, measured: {Na2O: 28.95, B2O3: 16.26, SiO2: 46.82, Al2O3: 7.94}}
-        - {glass_id: 1V, batch: {Na2O: 28.16, B2O3: 15.82, SiO2: 45.51, Al2O3: 7.72, V2O5: 2.78, SO3: 0}, measured: {Na2O: 28.14, B2O3: 15.83, SiO2: 45.52, Al2O3: 7.73, V2O5: 2.77}}
-        - {glass_id: 2.5V, batch: {Na2O: 27.00, B2O3: 15.17, SiO2: 43.62, Al2O3: 7.40, V2O5: 6.77, SO3: 0}, measured: {Na2O: 27.01, B2O3: 15.16, SiO2: 43.61, Al2O3: 7.40, V2O5: 6.76}}
-        - {glass_id: 5V, batch: {Na2O: 25.21, B2O3: 14.16, SiO2: 40.74, Al2O3: 6.91, V2O5: 12.98, SO3: 0}, measured: {Na2O: 25.20, B2O3: 14.16, SiO2: 40.73, Al2O3: 6.92, V2O5: 12.98}}
-        - {glass_id: 7.5V, batch: {Na2O: 23.56, B2O3: 13.23, SiO2: 38.07, Al2O3: 6.46, V2O5: 18.68, SO3: 0}, measured: {Na2O: 23.57, B2O3: 13.24, SiO2: 38.06, Al2O3: 6.46, V2O5: 18.67}}
-        - {glass_id: 9V, batch: {Na2O: 22.63, B2O3: 12.71, SiO2: 36.56, Al2O3: 6.20, V2O5: 21.89, SO3: 0}, measured: {Na2O: 22.64, B2O3: 12.71, SiO2: 36.56, Al2O3: 6.20, V2O5: 21.88}}
+        - {glass_id: 0V, batch: {Na2O: 28.97, B2O3: 16.27, SiO2: 46.81, Al2O3: 7.94, V2O5: 0, SO3: 0}}
+        - {glass_id: 1V, batch: {Na2O: 28.16, B2O3: 15.82, SiO2: 45.51, Al2O3: 7.72, V2O5: 2.78, SO3: 0}}
+        - {glass_id: 2.5V, batch: {Na2O: 27.00, B2O3: 15.17, SiO2: 43.62, Al2O3: 7.40, V2O5: 6.77, SO3: 0}}
+        - {glass_id: 5V, batch: {Na2O: 25.21, B2O3: 14.16, SiO2: 40.74, Al2O3: 6.91, V2O5: 12.98, SO3: 0}}
+        - {glass_id: 7.5V, batch: {Na2O: 23.56, B2O3: 13.23, SiO2: 38.07, Al2O3: 6.46, V2O5: 18.68, SO3: 0}}
+        - {glass_id: 9V, batch: {Na2O: 22.63, B2O3: 12.71, SiO2: 36.56, Al2O3: 6.20, V2O5: 21.89, SO3: 0}}
         sulfur_containing_rows:
-        - {glass_id: 1V-1.25S, batch: {Na2O: 26.89, B2O3: 15.76, SiO2: 45.35, Al2O3: 7.70, V2O5: 2.77, SO3: 1.53}, measured: {Na2O: 26.87, B2O3: 15.77, SiO2: 45.36, Al2O3: 7.71, V2O5: 2.78, SO3: 1.51}}
-        - {glass_id: 2.5V-1.75S, batch: {Na2O: 25.27, B2O3: 15.10, SiO2: 43.44, Al2O3: 7.37, V2O5: 6.74, SO3: 2.08}, measured: {Na2O: 25.25, B2O3: 15.11, SiO2: 43.45, Al2O3: 7.38, V2O5: 6.75, SO3: 2.06}}
-        - {glass_id: 5V-3S, batch: {Na2O: 22.38, B2O3: 14.05, SiO2: 40.42, Al2O3: 6.86, V2O5: 12.88, SO3: 3.40}, measured: {Na2O: 22.37, B2O3: 14.06, SiO2: 40.42, Al2O3: 6.86, V2O5: 12.89, SO3: 3.39}}
-        - {glass_id: 7.5V-6S, batch: {Na2O: 18.19, B2O3: 13.04, SiO2: 37.51, Al2O3: 6.36, V2O5: 18.41, SO3: 6.48}, measured: {Na2O: 18.17, B2O3: 13.05, SiO2: 37.52, Al2O3: 6.37, V2O5: 18.41, SO3: 6.47}}
-        - {glass_id: 9V-6.5S, batch: {Na2O: 16.97, B2O3: 12.51, SiO2: 36.00, Al2O3: 6.11, V2O5: 21.55, SO3: 6.81}, measured: {Na2O: 16.95, B2O3: 12.51, SiO2: 36.01, Al2O3: 6.12, V2O5: 21.53, SO3: 6.83}}
+        - {glass_id: 1V-1.25S, batch: {Na2O: 26.89, B2O3: 15.76, SiO2: 45.35, Al2O3: 7.70, V2O5: 2.77, SO3: 1.53}}
+        - {glass_id: 2.5V-1.75S, batch: {Na2O: 25.27, B2O3: 15.10, SiO2: 43.44, Al2O3: 7.37, V2O5: 6.74, SO3: 2.08}}
+        - {glass_id: 5V-3S, batch: {Na2O: 22.38, B2O3: 14.05, SiO2: 40.42, Al2O3: 6.86, V2O5: 12.88, SO3: 3.40}}
+        - {glass_id: 7.5V-6S, batch: {Na2O: 18.19, B2O3: 13.04, SiO2: 37.51, Al2O3: 6.36, V2O5: 18.41, SO3: 6.48}}
+        - {glass_id: 9V-6.5S, batch: {Na2O: 16.97, B2O3: 12.51, SiO2: 36.00, Al2O3: 6.11, V2O5: 21.55, SO3: 6.81}}
         note: SO3 for sulfur-containing samples is the dissolved concentration at the glass's solubility limit; sulfur-free table cells with no parenthesized measured entry are not inferred as measured zero.
     - observation_id: saini_2023_table_2_aluminum_structure
       type: measured_table_context
@@ -268,3 +271,1793 @@ species:
         series: [{name: panel a glass spectra, marker: trace, marker_count: 2}, {name: panel b xV glasses, marker: circle, marker_count: 4}, {name: panel b xV-1.25S glasses, marker: square, marker_count: 4}]
         points: []
       digitisation: deferred to a figure pass
+  Na2O:
+    observations:
+    - observation_id: saini_2023_1_na2o_composition
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        column: Na2O
+        note: Table 1 measured composition values (parenthesized) for the identified glass sample.
+      phase: glass
+      units: wt.% as printed
+      uncertainty:
+        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Na2O
+        basis_as_published: ICP-OES measured oxide wt.% as printed.
+        component_as_published: Na2O
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - sample: 0V
+          sample_material_as_published: glass sample
+          species_as_printed: Na2O
+          row_as_printed: 0V
+          value_as_published: '28.95'
+          value: '28.95'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 0V
+                column: Na2O (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 0V
+            column: Na2O (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 1V
+          sample_material_as_published: glass sample
+          species_as_printed: Na2O
+          row_as_printed: 1V
+          value_as_published: '28.14'
+          value: '28.14'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 1V
+                column: Na2O (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 1V
+            column: Na2O (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 2.5V
+          sample_material_as_published: glass sample
+          species_as_printed: Na2O
+          row_as_printed: 2.5V
+          value_as_published: '27.01'
+          value: '27.01'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 2.5V
+                column: Na2O (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 2.5V
+            column: Na2O (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 5V
+          sample_material_as_published: glass sample
+          species_as_printed: Na2O
+          row_as_printed: 5V
+          value_as_published: '25.20'
+          value: '25.20'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 5V
+                column: Na2O (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 5V
+            column: Na2O (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 7.5V
+          sample_material_as_published: glass sample
+          species_as_printed: Na2O
+          row_as_printed: 7.5V
+          value_as_published: '23.57'
+          value: '23.57'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 7.5V
+                column: Na2O (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 7.5V
+            column: Na2O (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 9V
+          sample_material_as_published: glass sample
+          species_as_printed: Na2O
+          row_as_printed: 9V
+          value_as_published: '22.64'
+          value: '22.64'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 9V
+                column: Na2O (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 9V
+            column: Na2O (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 1V-1.25S
+          sample_material_as_published: glass sample
+          species_as_printed: Na2O
+          row_as_printed: 1V-1.25S
+          value_as_published: '26.87'
+          value: '26.87'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 1V-1.25S
+                column: Na2O (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 1V-1.25S
+            column: Na2O (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 2.5V-1.75S
+          sample_material_as_published: glass sample
+          species_as_printed: Na2O
+          row_as_printed: 2.5V-1.75S
+          value_as_published: '25.25'
+          value: '25.25'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 2.5V-1.75S
+                column: Na2O (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 2.5V-1.75S
+            column: Na2O (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 5V-3S
+          sample_material_as_published: glass sample
+          species_as_printed: Na2O
+          row_as_printed: 5V-3S
+          value_as_published: '22.37'
+          value: '22.37'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 5V-3S
+                column: Na2O (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 5V-3S
+            column: Na2O (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 7.5V-6S
+          sample_material_as_published: glass sample
+          species_as_printed: Na2O
+          row_as_printed: 7.5V-6S
+          value_as_published: '18.17'
+          value: '18.17'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 7.5V-6S
+                column: Na2O (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 7.5V-6S
+            column: Na2O (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 9V-6.5S
+          sample_material_as_published: glass sample
+          species_as_printed: Na2O
+          row_as_printed: 9V-6.5S
+          value_as_published: '16.95'
+          value: '16.95'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 9V-6.5S
+                column: Na2O (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 9V-6.5S
+            column: Na2O (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+  B2O3:
+    observations:
+    - observation_id: saini_2023_1_b2o3_composition
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        column: B2O3
+        note: Table 1 measured composition values (parenthesized) for the identified glass sample.
+      phase: glass
+      units: wt.% as printed
+      uncertainty:
+        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: B2O3
+        basis_as_published: ICP-OES measured oxide wt.% as printed.
+        component_as_published: B2O3
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - sample: 0V
+          sample_material_as_published: glass sample
+          species_as_printed: B2O3
+          row_as_printed: 0V
+          value_as_published: '16.26'
+          value: '16.26'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 0V
+                column: B2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 0V
+            column: B2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 1V
+          sample_material_as_published: glass sample
+          species_as_printed: B2O3
+          row_as_printed: 1V
+          value_as_published: '15.83'
+          value: '15.83'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 1V
+                column: B2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 1V
+            column: B2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 2.5V
+          sample_material_as_published: glass sample
+          species_as_printed: B2O3
+          row_as_printed: 2.5V
+          value_as_published: '15.16'
+          value: '15.16'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 2.5V
+                column: B2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 2.5V
+            column: B2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 5V
+          sample_material_as_published: glass sample
+          species_as_printed: B2O3
+          row_as_printed: 5V
+          value_as_published: '14.16'
+          value: '14.16'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 5V
+                column: B2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 5V
+            column: B2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 7.5V
+          sample_material_as_published: glass sample
+          species_as_printed: B2O3
+          row_as_printed: 7.5V
+          value_as_published: '13.24'
+          value: '13.24'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 7.5V
+                column: B2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 7.5V
+            column: B2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 9V
+          sample_material_as_published: glass sample
+          species_as_printed: B2O3
+          row_as_printed: 9V
+          value_as_published: '12.71'
+          value: '12.71'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 9V
+                column: B2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 9V
+            column: B2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 1V-1.25S
+          sample_material_as_published: glass sample
+          species_as_printed: B2O3
+          row_as_printed: 1V-1.25S
+          value_as_published: '15.77'
+          value: '15.77'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 1V-1.25S
+                column: B2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 1V-1.25S
+            column: B2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 2.5V-1.75S
+          sample_material_as_published: glass sample
+          species_as_printed: B2O3
+          row_as_printed: 2.5V-1.75S
+          value_as_published: '15.11'
+          value: '15.11'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 2.5V-1.75S
+                column: B2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 2.5V-1.75S
+            column: B2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 5V-3S
+          sample_material_as_published: glass sample
+          species_as_printed: B2O3
+          row_as_printed: 5V-3S
+          value_as_published: '14.06'
+          value: '14.06'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 5V-3S
+                column: B2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 5V-3S
+            column: B2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 7.5V-6S
+          sample_material_as_published: glass sample
+          species_as_printed: B2O3
+          row_as_printed: 7.5V-6S
+          value_as_published: '13.05'
+          value: '13.05'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 7.5V-6S
+                column: B2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 7.5V-6S
+            column: B2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 9V-6.5S
+          sample_material_as_published: glass sample
+          species_as_printed: B2O3
+          row_as_printed: 9V-6.5S
+          value_as_published: '12.51'
+          value: '12.51'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 9V-6.5S
+                column: B2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 9V-6.5S
+            column: B2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+  SiO2:
+    observations:
+    - observation_id: saini_2023_1_sio2_composition
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        column: SiO2
+        note: Table 1 measured composition values (parenthesized) for the identified glass sample.
+      phase: glass
+      units: wt.% as printed
+      uncertainty:
+        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        basis_as_published: ICP-OES measured oxide wt.% as printed.
+        component_as_published: SiO2
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - sample: 0V
+          sample_material_as_published: glass sample
+          species_as_printed: SiO2
+          row_as_printed: 0V
+          value_as_published: '46.82'
+          value: '46.82'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 0V
+                column: SiO2 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 0V
+            column: SiO2 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 1V
+          sample_material_as_published: glass sample
+          species_as_printed: SiO2
+          row_as_printed: 1V
+          value_as_published: '45.52'
+          value: '45.52'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 1V
+                column: SiO2 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 1V
+            column: SiO2 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 2.5V
+          sample_material_as_published: glass sample
+          species_as_printed: SiO2
+          row_as_printed: 2.5V
+          value_as_published: '43.61'
+          value: '43.61'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 2.5V
+                column: SiO2 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 2.5V
+            column: SiO2 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 5V
+          sample_material_as_published: glass sample
+          species_as_printed: SiO2
+          row_as_printed: 5V
+          value_as_published: '40.73'
+          value: '40.73'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 5V
+                column: SiO2 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 5V
+            column: SiO2 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 7.5V
+          sample_material_as_published: glass sample
+          species_as_printed: SiO2
+          row_as_printed: 7.5V
+          value_as_published: '38.06'
+          value: '38.06'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 7.5V
+                column: SiO2 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 7.5V
+            column: SiO2 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 9V
+          sample_material_as_published: glass sample
+          species_as_printed: SiO2
+          row_as_printed: 9V
+          value_as_published: '36.56'
+          value: '36.56'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 9V
+                column: SiO2 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 9V
+            column: SiO2 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 1V-1.25S
+          sample_material_as_published: glass sample
+          species_as_printed: SiO2
+          row_as_printed: 1V-1.25S
+          value_as_published: '45.36'
+          value: '45.36'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 1V-1.25S
+                column: SiO2 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 1V-1.25S
+            column: SiO2 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 2.5V-1.75S
+          sample_material_as_published: glass sample
+          species_as_printed: SiO2
+          row_as_printed: 2.5V-1.75S
+          value_as_published: '43.45'
+          value: '43.45'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 2.5V-1.75S
+                column: SiO2 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 2.5V-1.75S
+            column: SiO2 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 5V-3S
+          sample_material_as_published: glass sample
+          species_as_printed: SiO2
+          row_as_printed: 5V-3S
+          value_as_published: '40.42'
+          value: '40.42'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 5V-3S
+                column: SiO2 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 5V-3S
+            column: SiO2 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 7.5V-6S
+          sample_material_as_published: glass sample
+          species_as_printed: SiO2
+          row_as_printed: 7.5V-6S
+          value_as_published: '37.52'
+          value: '37.52'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 7.5V-6S
+                column: SiO2 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 7.5V-6S
+            column: SiO2 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 9V-6.5S
+          sample_material_as_published: glass sample
+          species_as_printed: SiO2
+          row_as_printed: 9V-6.5S
+          value_as_published: '36.01'
+          value: '36.01'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 9V-6.5S
+                column: SiO2 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 9V-6.5S
+            column: SiO2 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+  Al2O3:
+    observations:
+    - observation_id: saini_2023_1_al2o3_composition
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        column: Al2O3
+        note: Table 1 measured composition values (parenthesized) for the identified glass sample.
+      phase: glass
+      units: wt.% as printed
+      uncertainty:
+        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        basis_as_published: ICP-OES measured oxide wt.% as printed.
+        component_as_published: Al2O3
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - sample: 0V
+          sample_material_as_published: glass sample
+          species_as_printed: Al2O3
+          row_as_printed: 0V
+          value_as_published: '7.94'
+          value: '7.94'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 0V
+                column: Al2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 0V
+            column: Al2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 1V
+          sample_material_as_published: glass sample
+          species_as_printed: Al2O3
+          row_as_printed: 1V
+          value_as_published: '7.73'
+          value: '7.73'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 1V
+                column: Al2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 1V
+            column: Al2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 2.5V
+          sample_material_as_published: glass sample
+          species_as_printed: Al2O3
+          row_as_printed: 2.5V
+          value_as_published: '7.40'
+          value: '7.40'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 2.5V
+                column: Al2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 2.5V
+            column: Al2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 5V
+          sample_material_as_published: glass sample
+          species_as_printed: Al2O3
+          row_as_printed: 5V
+          value_as_published: '6.92'
+          value: '6.92'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 5V
+                column: Al2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 5V
+            column: Al2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 7.5V
+          sample_material_as_published: glass sample
+          species_as_printed: Al2O3
+          row_as_printed: 7.5V
+          value_as_published: '6.46'
+          value: '6.46'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 7.5V
+                column: Al2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 7.5V
+            column: Al2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 9V
+          sample_material_as_published: glass sample
+          species_as_printed: Al2O3
+          row_as_printed: 9V
+          value_as_published: '6.20'
+          value: '6.20'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 9V
+                column: Al2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 9V
+            column: Al2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 1V-1.25S
+          sample_material_as_published: glass sample
+          species_as_printed: Al2O3
+          row_as_printed: 1V-1.25S
+          value_as_published: '7.71'
+          value: '7.71'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 1V-1.25S
+                column: Al2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 1V-1.25S
+            column: Al2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 2.5V-1.75S
+          sample_material_as_published: glass sample
+          species_as_printed: Al2O3
+          row_as_printed: 2.5V-1.75S
+          value_as_published: '7.38'
+          value: '7.38'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 2.5V-1.75S
+                column: Al2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 2.5V-1.75S
+            column: Al2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 5V-3S
+          sample_material_as_published: glass sample
+          species_as_printed: Al2O3
+          row_as_printed: 5V-3S
+          value_as_published: '6.86'
+          value: '6.86'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 5V-3S
+                column: Al2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 5V-3S
+            column: Al2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 7.5V-6S
+          sample_material_as_published: glass sample
+          species_as_printed: Al2O3
+          row_as_printed: 7.5V-6S
+          value_as_published: '6.37'
+          value: '6.37'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 7.5V-6S
+                column: Al2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 7.5V-6S
+            column: Al2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 9V-6.5S
+          sample_material_as_published: glass sample
+          species_as_printed: Al2O3
+          row_as_printed: 9V-6.5S
+          value_as_published: '6.12'
+          value: '6.12'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 9V-6.5S
+                column: Al2O3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 9V-6.5S
+            column: Al2O3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+  V2O5:
+    observations:
+    - observation_id: saini_2023_1_v2o5_composition
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        column: V2O5
+        note: Table 1 measured composition values (parenthesized) for the identified glass sample.
+      phase: glass
+      units: wt.% as printed
+      uncertainty:
+        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O5
+        basis_as_published: ICP-OES measured oxide wt.% as printed.
+        component_as_published: V2O5
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - sample: 1V
+          sample_material_as_published: glass sample
+          species_as_printed: V2O5
+          row_as_printed: 1V
+          value_as_published: '2.77'
+          value: '2.77'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 1V
+                column: V2O5 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 1V
+            column: V2O5 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 2.5V
+          sample_material_as_published: glass sample
+          species_as_printed: V2O5
+          row_as_printed: 2.5V
+          value_as_published: '6.76'
+          value: '6.76'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 2.5V
+                column: V2O5 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 2.5V
+            column: V2O5 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 5V
+          sample_material_as_published: glass sample
+          species_as_printed: V2O5
+          row_as_printed: 5V
+          value_as_published: '12.98'
+          value: '12.98'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 5V
+                column: V2O5 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 5V
+            column: V2O5 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 7.5V
+          sample_material_as_published: glass sample
+          species_as_printed: V2O5
+          row_as_printed: 7.5V
+          value_as_published: '18.67'
+          value: '18.67'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 7.5V
+                column: V2O5 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 7.5V
+            column: V2O5 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 9V
+          sample_material_as_published: glass sample
+          species_as_printed: V2O5
+          row_as_printed: 9V
+          value_as_published: '21.88'
+          value: '21.88'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 9V
+                column: V2O5 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 9V
+            column: V2O5 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 1V-1.25S
+          sample_material_as_published: glass sample
+          species_as_printed: V2O5
+          row_as_printed: 1V-1.25S
+          value_as_published: '2.78'
+          value: '2.78'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 1V-1.25S
+                column: V2O5 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 1V-1.25S
+            column: V2O5 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 2.5V-1.75S
+          sample_material_as_published: glass sample
+          species_as_printed: V2O5
+          row_as_printed: 2.5V-1.75S
+          value_as_published: '6.75'
+          value: '6.75'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 2.5V-1.75S
+                column: V2O5 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 2.5V-1.75S
+            column: V2O5 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 5V-3S
+          sample_material_as_published: glass sample
+          species_as_printed: V2O5
+          row_as_printed: 5V-3S
+          value_as_published: '12.89'
+          value: '12.89'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 5V-3S
+                column: V2O5 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 5V-3S
+            column: V2O5 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 7.5V-6S
+          sample_material_as_published: glass sample
+          species_as_printed: V2O5
+          row_as_printed: 7.5V-6S
+          value_as_published: '18.41'
+          value: '18.41'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 7.5V-6S
+                column: V2O5 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 7.5V-6S
+            column: V2O5 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 9V-6.5S
+          sample_material_as_published: glass sample
+          species_as_printed: V2O5
+          row_as_printed: 9V-6.5S
+          value_as_published: '21.53'
+          value: '21.53'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 9V-6.5S
+                column: V2O5 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 9V-6.5S
+            column: V2O5 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+  SO3:
+    observations:
+    - observation_id: saini_2023_1_so3_composition
+      type: equilibrium_phase_composition
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        column: SO3
+        note: Table 1 measured composition values (parenthesized) for the identified glass sample.
+      phase: glass
+      units: wt.% as printed
+      uncertainty:
+        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SO3
+        basis_as_published: ICP-OES measured oxide wt.% as printed.
+        component_as_published: SO3
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - sample: 1V-1.25S
+          sample_material_as_published: glass sample
+          species_as_printed: SO3
+          row_as_printed: 1V-1.25S
+          value_as_published: '1.51'
+          value: '1.51'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 1V-1.25S
+                column: SO3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 1V-1.25S
+            column: SO3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 2.5V-1.75S
+          sample_material_as_published: glass sample
+          species_as_printed: SO3
+          row_as_printed: 2.5V-1.75S
+          value_as_published: '2.06'
+          value: '2.06'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 2.5V-1.75S
+                column: SO3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 2.5V-1.75S
+            column: SO3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 5V-3S
+          sample_material_as_published: glass sample
+          species_as_printed: SO3
+          row_as_printed: 5V-3S
+          value_as_published: '3.39'
+          value: '3.39'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 5V-3S
+                column: SO3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 5V-3S
+            column: SO3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 7.5V-6S
+          sample_material_as_published: glass sample
+          species_as_printed: SO3
+          row_as_printed: 7.5V-6S
+          value_as_published: '6.47'
+          value: '6.47'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 7.5V-6S
+                column: SO3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 7.5V-6S
+            column: SO3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
+        - sample: 9V-6.5S
+          sample_material_as_published: glass sample
+          species_as_printed: SO3
+          row_as_printed: 9V-6.5S
+          value_as_published: '6.83'
+          value: '6.83'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 3
+                published_page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: 9V-6.5S
+                column: SO3 (wt.%)
+                note: Table 1 measured value in parentheses; batch value is retained in context.
+          T_C: '1200'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: 9V-6.5S
+            column: SO3 (wt.%)
+            note: Table 1 measured value in parentheses; batch value is retained in context.
