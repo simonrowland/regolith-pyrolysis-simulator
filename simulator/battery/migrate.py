@@ -19624,6 +19624,21 @@ class Migrator:
         t = _compilation_temperature_state(doc)
         p_std = None
         column_series = compilation_column_series_from_record(doc)
+        # For mapped thermodynamic quantities, a non-"as_published" trail means
+        # the converter recognized a molar/gfw denominator.
+        molar_series_per = {
+            series.quantity: PerBasis.MOL_SPECIES
+            for series in column_series or ()
+            if series.source_units
+            and all(
+                unit is not None
+                and (converted := _convert_compilation_amount(
+                    Decimal("1"), series.quantity, unit
+                )) is not None
+                and converted[1] != "as_published"
+                for unit in series.source_units
+            )
+        }
         series_summary = False
         if column_series:
             mapped_quantities = {series.quantity for series in column_series}
@@ -19673,6 +19688,7 @@ class Migrator:
                     evidence=evidence,
                     temperature_K=series.temperature_K,
                     standard_pressure_Pa=p_std,
+                    per=molar_series_per.get(series.quantity),
                     method=State.of(MethodToken.TABULATION),
                     derivation=_compilation_conversion_derivation(
                         series.unit_trail,
@@ -19773,6 +19789,11 @@ class Migrator:
             evidence=evidence,
             temperature_K=t,
             standard_pressure_Pa=p_std,
+            per=(
+                molar_series_per.get(quantity.value)
+                if quantity.is_value
+                else None
+            ),
             method=State.of(MethodToken.TABULATION),
             derivation=_compilation_conversion_derivation(
                 sel.unit_trail,
