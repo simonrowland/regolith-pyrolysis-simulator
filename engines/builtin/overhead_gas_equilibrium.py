@@ -355,7 +355,10 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
             if isinstance(species_payload, Mapping):
                 species_map = cls._positive_float_mapping(species_payload)
             elif isinstance(species_payload, (list, tuple, set)):
-                species_map = {str(species): 1.0 for species in species_payload}
+                species_map = {
+                    str(species): 1.0
+                    for species in sorted(species_payload, key=str)
+                }
             else:
                 species_map = {}
             if species_map:

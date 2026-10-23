@@ -213,6 +213,205 @@ observations:
     pdf_page_index: 6
     figure: '3'
   read_from: pdf:sublimation-kinetics-2023-minerals
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4454917556583907461809776937'
+          - - FeO
+            - '0.1849027244706631278343171463'
+          - - MgO
+            - '0.16042013096379654385872894'
+          - - Al2O3
+            - '0.05490915921806480449788752472'
+          - - CaO
+            - '0.1055795091443572984791498064'
+          - - TiO2
+            - '0.04001287189512889262963651761'
+          - - Cr2O3
+            - '0.001344645271037509295110597272'
+          - - MnO
+            - '0.002182596425334022351282892584'
+          - - Na2O
+            - '0.0046963779953533810250393144'
+          - - K2O
+            - '0.0004602289578736738478695676035'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 6
+        pdf_page_index: 6
+        figure: '3'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.22'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '21.45'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.44'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.04'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '9.56'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '5.16'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.33'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.47'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.07'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        output_unit: mole_fraction
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_fig4_proxy_oxide_vs_demaria_figure_only
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -1300,6 +1499,205 @@ observations:
     pdf_page_index: 4
     table: '1'
   read_from: pdf:sublimation-kinetics-2023-minerals
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4454917556583907461809776937'
+          - - FeO
+            - '0.1849027244706631278343171463'
+          - - MgO
+            - '0.16042013096379654385872894'
+          - - Al2O3
+            - '0.05490915921806480449788752472'
+          - - CaO
+            - '0.1055795091443572984791498064'
+          - - TiO2
+            - '0.04001287189512889262963651761'
+          - - Cr2O3
+            - '0.001344645271037509295110597272'
+          - - MnO
+            - '0.002182596425334022351282892584'
+          - - Na2O
+            - '0.0046963779953533810250393144'
+          - - K2O
+            - '0.0004602289578736738478695676035'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.22'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '21.45'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.44'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.04'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '9.56'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '5.16'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.33'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.47'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.07'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        output_unit: mole_fraction
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1073.15:h=6f172ee26c63
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:

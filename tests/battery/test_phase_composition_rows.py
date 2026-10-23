@@ -45,6 +45,7 @@ from simulator.battery.records import (
 )
 from simulator.battery.score import (
     DECISION_BAND_RATCHET_RELATIVE_PATH,
+    EnginePrediction,
     ScoreContext,
     _ScorePayloadAccumulator,
     _alignment_axes,
@@ -57,6 +58,7 @@ from simulator.battery.score import (
     rail_for_quantity,
     refusal_census,
     residual_to_plain,
+    score_store,
 )
 from simulator.melt_backend.base import EquilibriumResult
 from tests.battery import factories as F
@@ -659,6 +661,77 @@ def test_phase_rows_score_component_dex_from_the_assemblage(
         )
         assert call["composition_kg"] == expected_kg
         assert set(call["composition_kg"]) == {"SiO2", "MgO"}
+
+
+def test_closed_phase_residual_keeps_derived_dex_decision_band(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.score as score_module
+
+    metric_operation = score_module.metric_operation
+    monkeypatch.setattr(
+        score_module,
+        "metric_operation",
+        lambda quantity: (
+            MetricOperation.ABSOLUTE
+            if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            else metric_operation(quantity)
+        ),
+    )
+    work = F.work()
+    experiment = F.tabulation_experiment()
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    observations = tuple(
+        F.observation(
+            f"phase-band-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=f"phase-source-{index}",
+        )
+        for index, value in enumerate(("10", "20", "40"))
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={row.observation_id: row for row in observations},
+        extract_review={row.source_id: "reviewed" for row in observations},
+        hostname="test",
+    )
+
+    def predict(engine, reference, **_kwargs):
+        return EnginePrediction(
+            engine=engine,
+            channel="test-phase",
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="phase-band-test",
+            ),
+            value=Decimal("5"),
+            unit=QUANTITY_UNITS[Quantity.EQUILIBRIUM_PHASE_COMPOSITION],
+            authority=Authority.CERTIFIED,
+            coefficient_sources=(),
+            lineage_complete=False,
+            identity=reference.identity,
+        )
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.MELT_ACTIVITY,
+        predict=predict,
+    )
+
+    residual = next(
+        row for row in residuals if row.reference == observations[0].observation_id
+    )
+    assert residual.numeric is not None
+    assert residual.numeric.operation is MetricOperation.DEX
+    assert residual.numeric.decision_band is not None
+    assert residual.numeric.decision_band.unit == "dimensionless"
 
 
 def test_distribution_ratio_dex_uses_both_phase_amounts(

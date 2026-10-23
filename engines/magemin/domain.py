@@ -21,6 +21,15 @@ from engines.domain_reason import OutOfDomainReason, reason_value
 from simulator.scalar_boundary import is_finite
 from simulator.state import OXIDE_SPECIES
 
+# Native melt activities exposed by the ig database. These are standard
+# states, not liquid-endmember activities: periclase for MgO and quartz for
+# SiO2 at the scorer's low-pressure default. Other formulas have no native
+# activity/reference pair in this adapter.
+MAGEMIN_NATIVE_MELT_ACTIVITIES = {
+    'MgO': ('aMgO', 'periclase'),
+    'SiO2': ('aSiO2', 'quartz'),
+}
+
 # Canonical MELTS 14-oxide basis, sourced from
 # ``simulator.state.OXIDE_SPECIES`` (the single source of truth; also the
 # basis declared in

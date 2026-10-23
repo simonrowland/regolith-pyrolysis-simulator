@@ -1,0 +1,128 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.isijint-2022-368
+  citation: Liu, B., Li, Z. and Kobayashi, Y. (2023), Activity of chromium oxide in calcium silicate bearing molten slag for
+    highly clean chromium steel refining, ISIJ International 63(2), 313-318.
+  source_ids:
+  - liu-2023-chromium-oxide-activity
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:liu-2023-chromium-oxide-activity
+      role: pdf
+      path: raw/liu-2023-chromium-oxide-activity/liu-2023-chromium-oxide-activity.pdf
+      sha256:
+        tag: value
+        value: 345a883ccb2b89a519d89eebe6e4b1dab80e76a477a2741620ff412697dc9678
+    - asset_id: pdftotext:liu-2023-chromium-oxide-activity
+      role: pdftotext
+      path: text/liu-2023-chromium-oxide-activity
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:liu-2023-chromium-oxide-activity
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.isijint-2022-368
+experiments:
+- experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2022-368
+  locator:
+    page: 3
+    published_page: 315
+    pdf_page_index: 2
+    table: '2'
+    note: Average post-equilibration slag compositions and separate CrO1.5 and CrO mass-percent columns.
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+context:
+- observation_id: liu23_table1_initial_compositions
+  type: composition
+  locator:
+    page: 2
+    published_page: 314
+    pdf_page_index: 1
+    table: '1'
+    note: Initial slag compositions before chemical-equilibrium experiments.
+  units: mass%
+  values:
+    quantity: initial_slag_composition_mass_percent_as_published
+    rows:
+    - row: '1'
+      composition_mass_percent_as_published:
+        CaO: '39.01'
+        CaF2: '4.98'
+        MgO: '0.00'
+        Al2O3: '10.01'
+        SiO2: '38.99'
+        MnO: '4.99'
+        Cr2O3: '2.02'
+        Total: '100'
+    - row: '2'
+      composition_mass_percent_as_published:
+        CaO: '33.99'
+        CaF2: '5.01'
+        MgO: '9.99'
+        Al2O3: '10.01'
+        SiO2: '34.00'
+        MnO: '5.00'
+        Cr2O3: '2.00'
+        Total: '100'
+    - row: '3'
+      composition_mass_percent_as_published:
+        CaO: '29.02'
+        CaF2: '4.99'
+        MgO: '19.98'
+        Al2O3: '9.99'
+        SiO2: '28.98'
+        MnO: '5.02'
+        Cr2O3: '2.02'
+        Total: '100'
+    - row: '4'
+      composition_mass_percent_as_published:
+        CaO: '26.50'
+        CaF2: '5.01'
+        MgO: '24.96'
+        Al2O3: '10.00'
+        SiO2: '26.49'
+        MnO: '5.02'
+        Cr2O3: '2.02'
+        Total: '100'
+  context_id: liu-2023-chromium-oxide-activity::context::liu23_table1_initial_compositions
+  work_id: 10.2355/isijinternational.isijint-2022-368
+  source_id: liu-2023-chromium-oxide-activity
+  species: Cr

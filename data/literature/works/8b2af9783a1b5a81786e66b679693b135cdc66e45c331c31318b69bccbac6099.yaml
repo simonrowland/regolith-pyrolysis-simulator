@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
     - asset_id: pdf:shornikov-2023-natural-cai-evaporation
       role: pdf
@@ -17,6 +17,18 @@ work:
       sha256:
         tag: value
         value: b426a6d15c161b200591f242fb3d47a9253b10c1e925df57d2e6ef5bd9aa0cb7
+    - asset_id: pdftotext:shornikov-2023-natural-cai-evaporation
+      role: pdftotext
+      path: text/shornikov-2023-natural-cai-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shornikov-2023-natural-cai-evaporation
+      role: table_csv
+      path: tables/shornikov-2023-natural-cai-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:shornikov-2023-natural-cai-evaporation
       role: pdftotext
       path: unknown

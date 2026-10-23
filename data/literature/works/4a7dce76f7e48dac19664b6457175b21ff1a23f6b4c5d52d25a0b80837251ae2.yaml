@@ -1,0 +1,107 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2
+  citation: Berry, A. J. and O’Neill, H. St. C. (2004), “A XANES determination of the oxidation state of chromium in silicate
+    glasses”, American Mineralogist 89:790-798.
+  source_ids:
+  - berry-oneill-2004-chromium-xanes
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:berry-oneill-2004-chromium-xanes
+      role: pdf
+      path: raw/berry-oneill-2004-chromium-xanes/berry-oneill-2004-chromium-xanes.pdf
+      sha256:
+        tag: value
+        value: a05f33cc7ec1375ab390444d04aee6fe8a21098849c18c8fe6ebe0d9efe743f4
+    - asset_id: pdftotext:berry-oneill-2004-chromium-xanes
+      role: pdftotext
+      path: text/berry-oneill-2004-chromium-xanes
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:berry-oneill-2004-chromium-xanes
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Cr K-edge XANES silicate glass redox' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2
+  locator:
+    published_page: 794
+    pdf_page_index: 5
+    table: '3'
+    record: Table 3 row -0.68*; AD; Cr2+/SumCr cell
+- experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar
+  kind: literature
+  method:
+    tag: unknown
+    reason: not_mapped
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        published_page: 791
+        pdf_page_index: 2
+        section: Experimental methods
+        record: Cr3C2/CO experiments at 1 bar
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 791
+        pdf_page_index: 2
+        section: Experimental methods
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2
+  locator:
+    published_page: 794
+    pdf_page_index: 5
+    table: '3'
+    record: Table 3 log fO2 -16.13 CO cells

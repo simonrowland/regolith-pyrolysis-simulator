@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
     - asset_id: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
       role: pdf
@@ -18,6 +18,18 @@ work:
       sha256:
         tag: value
         value: f8361b2d7ed1615213375472ee816ea7382981fc9208aefb354cd32383dd674e
+    - asset_id: pdftotext:shornikov-2002-alumina-silica-melt-thermodynamics
+      role: pdftotext
+      path: text/shornikov-2002-alumina-silica-melt-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shornikov-2002-alumina-silica-melt-thermodynamics
+      role: table_csv
+      path: tables/shornikov-2002-alumina-silica-melt-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:shornikov-2002-alumina-silica-melt-thermodynamics
       role: pdftotext
       path: unknown

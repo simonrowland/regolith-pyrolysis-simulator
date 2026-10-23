@@ -509,6 +509,95 @@ def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
     return ln_fO2 / math.log(10.0)
 
 
+def _published_intrinsic_melt_fO2(
+    raw_fO2_log: float,
+    account_mol: Mapping[str, float],
+    temperature_K: float,
+) -> dict[str, object]:
+    """Bound the vapour-facing potential without respeciating the ledger."""
+    from simulator.chemistry.ellingham_graph import dissociation_pO2_threshold
+    from simulator.chemistry.ellingham_thermo import (
+        ELLINGHAM_METAL_PHASE_GAS,
+        ELLINGHAM_THERMO,
+        ellingham_authority_limit,
+        ellingham_metal_phase_kind,
+    )
+    from simulator.chemistry.melt_activity import melt_oxide_activity
+    from simulator.state import OXIDE_TO_METAL
+
+    raw = float(raw_fO2_log)
+    temperature = float(temperature_K)
+    if not math.isfinite(raw) or not math.isfinite(temperature) or temperature <= 0.0:
+        raise Kress91InvalidControls('intrinsic publication requires finite fO2 and positive T_K')
+    candidates = {}
+    for oxide, (metal, cations, _) in OXIDE_TO_METAL.items():
+        # The Fe thermochemistry is Fe/FeO, never Fe/Fe2O3. In particular,
+        # a Kress-implied ferrous fraction must not invent a missing ledger
+        # FeO inventory when ferric_divergence says respeciation is pending.
+        if oxide == 'Fe2O3' or metal not in ELLINGHAM_THERMO:
+            continue
+        if ellingham_metal_phase_kind(metal, temperature) == ELLINGHAM_METAL_PHASE_GAS:
+            # A gaseous metal's unit standard activity is 1 bar, not the
+            # onset of metal precipitation. It supplies no condensed buffer.
+            continue
+        activity = melt_oxide_activity(oxide, account_mol, temperature_K=temperature)
+        if activity is None or activity.activity <= 0.0:
+            continue
+        # Below a reduction buffer the oxide reduces to metal, buffering fO2.
+        # FeO(l) = Fe(s,l) + 1/2 O2: K = a_Fe*sqrt(fO2/bar)/a_FeO,
+        # a_Fe=1 at first metal saturation, so log10(fO2/bar)=2 log10(K*a_FeO).
+        # feo_iw_log10_fO2_bar owns K through Holzheid's liquid-FeO dG (J/mol),
+        # divided by R*T (J/mol). For other oxides the existing Ellingham
+        # owner solves n_M M + O2 = n_ox oxide, giving fO2/bar =
+        # exp(dG_formation/(R*T))*a_parent**n_ox at a_M=1. Its dG is kJ/mol O2.
+        # Activities here are single-cation: a_parent=a_MOx**cations, because
+        # mu_parent=cations*mu_MOx. Every activity and logarithm is dimensionless.
+        # The ledger projection's activity assumptions and thermochemical
+        # extrapolations remain non-certifying; no new T range is invented for
+        # the Holzheid line (its owner specifies none). Ellingham carries its
+        # own range notice. As a_FeO -> 0 its log bound -> -inf and the maximum
+        # hands over continuously to Si/SiO2 (or the next oxide still present).
+        # Green does not precipitate metal at this publication site: that
+        # missing transition remains a model limitation, not a ledger mutation.
+        if oxide == 'FeO':
+            bound = feo_iw_log10_fO2_bar(temperature, a_feo=activity.activity)
+            authority = FE_FEO_BUFFER_STANDARD
+            authority_limit = None
+        else:
+            bound = math.log10(dissociation_pO2_threshold(
+                metal, temperature, a_oxide=activity.activity ** cations,
+            ))
+            authority = 'ellingham_metal_oxide_equilibrium'
+            authority_limit = ellingham_authority_limit(
+                temperature, species=metal, consumer='intrinsic_melt_reduction_buffer',
+            )
+        candidates[oxide] = {
+            'fO2_log_lower_bound': bound,
+            'activity': activity.activity,
+            'activity_basis': activity.activity_model,
+            'activity_notice': activity.warning,
+            'authority': authority,
+            'authority_limit': authority_limit,
+        }
+    oxide = max(candidates, key=lambda key: candidates[key]['fO2_log_lower_bound']) if candidates else None
+    floor = candidates[oxide]['fO2_log_lower_bound'] if oxide is not None else None
+    published = max(raw, floor) if floor is not None else raw
+    return {
+        'raw_reservoir_fO2_log': raw,
+        'published_intrinsic_fO2_log': published,
+        'buffer_oxide': oxide,
+        'fO2_log_lower_bound': floor,
+        'floor_binds': published > raw,
+        'authority_level': 'non_certifying_reduction_buffer',
+        'inventory_basis': 'ledger_oxide_inventory_not_kress_implied_split',
+        'candidates': candidates,
+        'notice': (
+            f'intrinsic fO2 below reduction buffer of {oxide}; buffer published'
+            if published > raw else ''
+        ),
+    }
+
+
 # This identifier follows the coded line's wustite-liquid standard. Holzheid
 # et al. (1997), Eq. 9, constructed it from O'Neill and Pownceby (1993) and
 # Barin (1989); the paper states no uncertainty for the line, and this code

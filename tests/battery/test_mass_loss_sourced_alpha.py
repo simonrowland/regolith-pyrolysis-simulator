@@ -96,7 +96,14 @@ def test_shrinking_area_numeric_pin_before_shared_formula_move(monkeypatch):
         return residue.ResidueInventoryResult(
             residue_mol={"MgO": removed},
             evaporated_mol={"Mg": removed, "O2": removed / 2.0},
-            pO2_bar_by_step=(None,), atom_closure_mol={"Mg": 0.0, "O": 0.0},
+            pO2_bar_by_step=(None,),
+            pO2_balance_bracket_boundary_by_step=(None,),
+            pO2_balance_floor_steps=0,
+            pO2_balance_floor_first_step=None,
+            pO2_balance_floor_time_fraction=0.0,
+            pO2_balance_floor_time_s=0.0,
+            pO2_balance_floor_pO2_bar=None,
+            atom_closure_mol={"Mg": 0.0, "O": 0.0},
         )
 
     monkeypatch.setattr(residue, "integrate_residue_inventory", half_inventory)

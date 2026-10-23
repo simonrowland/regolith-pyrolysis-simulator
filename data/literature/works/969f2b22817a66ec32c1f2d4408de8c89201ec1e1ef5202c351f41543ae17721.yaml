@@ -1,0 +1,152 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721
+  citation: Jayasuriya, K.D., O'Neill, H.St.C., Berry, A.J. & Campbell, S.J. (2004) A Mössbauer study of the oxidation state
+    of Fe in silicate melts. American Mineralogist 89, 1597–1609.
+  source_ids:
+  - jayasuriya-2004-iron-mossbauer
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:jayasuriya-2004-iron-mossbauer
+      role: pdf
+      path: raw/jayasuriya-2004-iron-mossbauer/jayasuriya-2004-iron-mossbauer.pdf
+      sha256:
+        tag: value
+        value: f2593608fef99c5241e6e762f386faf1d58885fb78a83694d41b7d492c5f65d9
+    - asset_id: pdftotext:jayasuriya-2004-iron-mossbauer
+      role: pdftotext
+      path: text/jayasuriya-2004-iron-mossbauer
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:jayasuriya-2004-iron-mossbauer
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.12'
+          CaO: '23.94'
+          Fe2O3: '1'
+          MgO: '10.46'
+          SiO2: '50.47'
+      locator:
+        page: 6
+        published_page: 1602
+        table: '3'
+  conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: condition composition is not a scalar numeric value
+      locator:
+        page: 2
+        published_page: 1598
+        section: Experimental Methods
+    temperature_C:
+      state:
+        tag: value
+        value: '1409'
+      locator:
+        page: 2
+        published_page: 1598
+        table: '1'
+        note: D60 is 1400 °C nominal.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1598
+        table: '1'
+        note: Uncertainty is stated as 0.02 bar; no setpoint is printed for gas-mixing runs.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721
+  locator:
+    page: 2
+    published_page: 1598
+    table: '1'
+- experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: condition composition is not a scalar numeric value
+      locator:
+        page: 7
+        published_page: 1603
+        table: '4'
+    temperature_C:
+      state:
+        tag: value
+        value: '1409'
+      locator:
+        page: 2
+        published_page: 1598
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1598
+        table: '1'
+        note: Uncertainty is stated as 0.02 bar; no setpoint is printed for gas-mixing runs.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721
+  locator:
+    page: 7
+    published_page: 1603
+    table: '4'

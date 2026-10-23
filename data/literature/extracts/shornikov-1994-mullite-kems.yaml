@@ -13,7 +13,7 @@ provenance:
   related_doklady_paper: "Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98."
   overlap: "Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O, and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain this paper's label and values, do not merge or silently rescale."
   sample_composition: "The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific mole fraction or weight percent."
-  sample_phase: "The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4 K; all Table 2 and Table 6 temperatures are below that value."
+  sample_phase: "The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478)."
   cell_and_orifice: "The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of 400:1; no separate orifice material is stated."
   table_6_derivation: "Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria; p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not printed as Table 2 pressure cells."
   oxygen_pressure_corroboration: "On p. 479 the authors calculate p_O from MoO3 ⇌ MoO2 + O (1), then calculate p_O2 from O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O, 2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check, not parents."
@@ -1884,9 +1884,10 @@ species:
     observations:
     - observation_id: shornikov_1994_al2o3_activity_1833k
       type: activity_coefficient
+      phase_locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: Introduction, note: "The source gives mullite's incongruent melting point as 2163 ± 4 K; this row is at 1833 K."}
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1833.0, 1833.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: condensed_solid
       standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1937,9 +1938,10 @@ species:
                   note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_al2o3_activity_1933k
       type: activity_coefficient
+      phase_locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: Introduction, note: "The source gives mullite's incongruent melting point as 2163 ± 4 K; this row is at 1933 K."}
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1933.0, 1933.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: condensed_solid
       standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1990,9 +1992,10 @@ species:
                   note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_al2o3_activity_1983k
       type: activity_coefficient
+      phase_locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: Introduction, note: "The source gives mullite's incongruent melting point as 2163 ± 4 K; this row is at 1983 K."}
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1983.0, 1983.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: condensed_solid
       standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -2043,9 +2046,10 @@ species:
                   note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_al2o3_activity_2033k
       type: activity_coefficient
+      phase_locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: Introduction, note: "The source gives mullite's incongruent melting point as 2163 ± 4 K; this row is at 2033 K."}
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [2033.0, 2033.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: condensed_solid
       standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -2098,9 +2102,10 @@ species:
     observations:
     - observation_id: shornikov_1994_sio2_activity_1833k
       type: activity_coefficient
+      phase_locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: Introduction, note: "The source gives mullite's incongruent melting point as 2163 ± 4 K; this row is at 1833 K."}
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1833.0, 1833.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: condensed_solid
       standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -2151,9 +2156,10 @@ species:
                   note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_sio2_activity_1933k
       type: activity_coefficient
+      phase_locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: Introduction, note: "The source gives mullite's incongruent melting point as 2163 ± 4 K; this row is at 1933 K."}
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1933.0, 1933.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: condensed_solid
       standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -2204,9 +2210,10 @@ species:
                   note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_sio2_activity_1983k
       type: activity_coefficient
+      phase_locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: Introduction, note: "The source gives mullite's incongruent melting point as 2163 ± 4 K; this row is at 1983 K."}
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1983.0, 1983.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: condensed_solid
       standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -2257,9 +2264,10 @@ species:
                   note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_sio2_activity_2033k
       type: activity_coefficient
+      phase_locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: Introduction, note: "The source gives mullite's incongruent melting point as 2163 ± 4 K; this row is at 2033 K."}
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [2033.0, 2033.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: condensed_solid
       standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
