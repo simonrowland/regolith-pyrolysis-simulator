@@ -6,6 +6,9 @@ from __future__ import annotations
 
 import json
 import math
+import gzip
+import hashlib
+import subprocess
 from pathlib import Path
 from urllib.parse import quote
 
@@ -225,20 +228,15 @@ def _validate_token(token):
             raise ValueError("malformed object")
 
 
-def check_manifest(old: dict[str, dict], new: dict[str, dict], manifest_raw: bytes,
-                   expected_raw: bytes, *, base_green: str) -> None:
-    """Exact one-offer D == M shadow check. Approval binding is the train owner.
-
-    This validates data/preconditions, never grants authority from a self-written
-    owner_decision. Batch composition and approval lookup belong to step 3.
-    """
+def manifest_rows(manifest_raw: bytes, expected_raw: bytes, *, base_green: str) -> tuple[dict, list]:
+    """Validate the shared single-offer/batch declaration format."""
     manifest = load_json(manifest_raw)
     if (manifest["format"] != "golden-moves-v1" or manifest["base_green"] != base_green
             or manifest["producer_contract"] != PRODUCER_CONTRACT
-            or manifest["expected_diff"] != "expected.jsonl" or not manifest["offer"]):
+            or Path(manifest["expected_diff"]).name != manifest["expected_diff"]
+            or not manifest["expected_diff"].endswith((".jsonl", ".jsonl.gz"))
+            or not manifest["offer"]):
         raise ValueError("manifest identity mismatch")
-    if set(old) != set(new):
-        raise ValueError("artifact inventory mismatch")
     classes = manifest["classes"]
     counts = dict.fromkeys(classes, 0)
     for cls in classes.values():
@@ -246,28 +244,274 @@ def check_manifest(old: dict[str, dict], new: dict[str, dict], manifest_raw: byt
                 or type(cls["count"]) is not int or cls["count"] < 0):
             raise ValueError("invalid class")
     rows = [load_json(line) for line in expected_raw.splitlines()]
-    old_nodes = {artifact: nodes(payload) for artifact, payload in old.items()}
-    seen, declared = set(), []
+    seen = set()
     for row in rows:
         if set(row) != {"artifact", "section", "path", "old", "new", "cause"}:
             raise ValueError("invalid expected row")
         key = row["artifact"], row["path"]
-        if key in seen or row["artifact"] not in old or row["cause"] not in classes:
+        if key in seen or row["cause"] not in classes:
             raise ValueError("duplicate, unknown artifact or unknown cause")
+        if (type(row["artifact"]) is not str or type(row["path"]) is not str
+                or type(row["section"]) is not str):
+            raise ValueError("invalid row address")
         seen.add(key)
         counts[row["cause"]] += 1
         _validate_token(row["old"])
         _validate_token(row["new"])
         if row["old"] == row["new"]:
             raise ValueError("no-op declaration")
-        if old_nodes[row["artifact"]].get(row["path"], MISSING) != row["old"]:
-            raise ValueError("wrong old value")
-        declared.append({k: v for k, v in row.items() if k != "cause"})
     if [(r["artifact"], r["path"]) for r in rows] != sorted(seen):
         raise ValueError("expected rows must be sorted")
     if any(counts[k] != cls["count"] for k, cls in classes.items()):
         raise ValueError("class count mismatch")
+    return manifest, rows
+
+
+def check_manifest(old: dict[str, dict], new: dict[str, dict], manifest_raw: bytes,
+                   expected_raw: bytes, *, base_green: str) -> None:
+    """Exact one-offer D == M; approval binding remains the train owner's job."""
+    _, rows = manifest_rows(manifest_raw, expected_raw, base_green=base_green)
+    if set(old) != set(new):
+        raise ValueError("artifact inventory mismatch")
+    old_nodes = {artifact: nodes(payload) for artifact, payload in old.items()}
+    for row in rows:
+        if row["artifact"] not in old:
+            raise ValueError("duplicate, unknown artifact or unknown cause")
+        if old_nodes[row["artifact"]].get(row["path"], MISSING) != row["old"]:
+            raise ValueError("wrong old value")
+    declared = [{k: v for k, v in row.items() if k != "cause"} for row in rows]
     observed = [row for artifact in sorted(old)
                 for row in diff_nodes(artifact, old[artifact], new[artifact])]
     if declared != observed:
         raise ValueError("D != M: undeclared, missing or different move")
+
+
+ROOT = Path(__file__).resolve().parents[1]
+RUNNER_DIR = "tests/fixtures/runner"
+COVERAGE_EXCEPTION = "COVERAGE-EXCEPTION: sio_yield (tolerant); non-runner families are outside this runner check"
+
+
+def runner_payloads(source: str) -> dict[str, dict]:
+    """Read legacy fixture bytes from a revision or a producer output directory.
+
+    Historical census directories use runner-<fixture>.json.gz. No physics runs
+    here: required-engine admission and approval binding remain train gates.
+    """
+    directory = Path(source)
+    if directory.is_dir() and (directory / RUNNER_DIR).is_dir():
+        directory /= RUNNER_DIR
+    names = {p.name for p in (ROOT / RUNNER_DIR).glob("*.json")}
+    raw = {}
+    if directory.is_dir():
+        for path in sorted(directory.iterdir()):
+            if not path.name.endswith((".json", ".json.gz")):
+                continue
+            name = path.name.removesuffix(".gz").removeprefix("runner-")
+            if path.name.startswith("sio-"):
+                continue
+            if name not in names or name in raw:
+                raise ValueError(f"unknown or duplicate runner fixture: {path}")
+            content = path.read_bytes()
+            raw[name] = gzip.decompress(content) if path.suffix == ".gz" else content
+    else:
+        inventory = subprocess.check_output(
+            ["git", "ls-tree", "-r", "--name-only", f"{source}:{RUNNER_DIR}"],
+            cwd=ROOT, stderr=subprocess.PIPE).decode().splitlines()
+        if set(inventory) != names:
+            raise ValueError(f"runner artifact inventory mismatch: {inventory}")
+        for name in sorted(names):
+            raw[name] = subprocess.check_output(
+                ["git", "show", f"{source}:{RUNNER_DIR}/{name}"], cwd=ROOT, stderr=subprocess.PIPE)
+    if set(raw) != names:
+        raise ValueError(f"runner artifact inventory mismatch: missing {sorted(names - raw.keys())}")
+    result = {"runner/" + Path(name).stem: load_json(content) for name, content in raw.items()}
+    for artifact, payload in result.items():
+        if type(payload) is not dict or payload.get("status") != "ok":
+            raise ValueError(f"runner output refused/unavailable: {artifact} status={payload.get('status') if isinstance(payload, dict) else None!r}")
+        nodes(payload)  # Reject overflow/nonfinite producer numbers before admission.
+    return result
+
+
+def snapshot_id(payloads: dict[str, dict]) -> str:
+    digest = hashlib.sha256()
+    for artifact, payload in sorted(payloads.items()):
+        digest.update(json_bytes([artifact, payload]))
+    return "sha256:" + digest.hexdigest()
+
+
+def source_id(source: str, payloads: dict[str, dict]) -> str:
+    if Path(source).is_dir():
+        return snapshot_id(payloads)
+    return subprocess.check_output(["git", "rev-parse", "--verify", source + "^{commit}"],
+                                   cwd=ROOT, stderr=subprocess.PIPE).decode().strip()
+
+
+def load_manifest(path: Path) -> tuple[dict, list, dict]:
+    """Accept a JSON summary or its JSONL[.gz] file; hash both original files."""
+    summary = (path.with_name(path.name.removesuffix(".gz").removesuffix(".jsonl") + ".json")
+               if path.name.endswith((".jsonl", ".jsonl.gz")) else path)
+    manifest_raw = summary.read_bytes()
+    manifest = load_json(manifest_raw)
+    name = manifest["expected_diff"]
+    if Path(name).name != name:
+        raise ValueError("expected_diff must be a sibling file")
+    rows_path = summary.parent / name
+    if path != summary and path != rows_path:
+        raise ValueError("summary does not reference selected JSONL")
+    expected_raw = rows_path.read_bytes()
+    identities = {str(p): hashlib.sha256(raw).hexdigest()
+                  for p, raw in ((summary, manifest_raw), (rows_path, expected_raw))}
+    _, rows = manifest_rows(manifest_raw, gzip.decompress(expected_raw)
+                            if rows_path.suffix == ".gz" else expected_raw,
+                            base_green=manifest["base_green"])
+    return manifest, rows, identities
+
+
+def _from_nodes(tokens):
+    """Rebuild an atomic offer and reject orphan/missing/ill-shaped descendants."""
+    used = set()
+
+    def build(pointer):
+        token = tokens[pointer]
+        used.add(pointer)
+        kind = token["kind"]
+        if kind == "object":
+            return {k: build(pointer + "/" + _pointer(k)) for k in token["keys"]}
+        if kind == "array":
+            return [build(pointer + "/" + str(i)) for i in range(token["length"])]
+        if kind == "null":
+            return None
+        if kind == "f64":
+            return float.fromhex(token["hex"])
+        return token["value"]
+
+    try:
+        result = build("")
+    except (KeyError, TypeError, RecursionError) as exc:
+        raise ValueError("incomplete declared structure") from exc
+    if used != set(tokens) or type(result) is not dict:
+        raise ValueError("orphan or invalid declared structure")
+    return result
+
+
+def _apply_rows(incoming, rows):
+    candidate = {a: dict(t) for a, t in incoming.items()}
+    for row in rows:
+        if row["new"] == MISSING:
+            candidate[row["artifact"]].pop(row["path"], None)
+        else:
+            candidate[row["artifact"]][row["path"]] = row["new"]
+    return {a: _from_nodes(t) for a, t in candidate.items()}
+
+
+def compare_manifests(old: dict, new: dict, offers: list[tuple[dict, list]]) -> dict:
+    """Compose measured offers atomically; compare complete typed D and E.
+
+    A base snapshot binds all preconditions, not just the overlapping token.
+    Independent offers may share green. A continuation must name a measured
+    predecessor snapshot; unrelated disjoint offers need not be in it. Causal truth
+    and digest-bound approvals still require worker review on the train.
+    """
+    if set(old) != set(new):
+        raise ValueError("artifact inventory mismatch")
+    current, initial_id = old, snapshot_id(old)
+    measured_states = {initial_id: old}
+    chains, classes = {}, []
+    report = {k: [] for k in ("UNDECLARED", "MISSING", "WRONG-OLD", "OVERLAP", "CANCELLED")}
+    for manifest, rows in offers:
+        classes.append({"offer": manifest["offer"], "classes": manifest["classes"]})
+        incoming_id = snapshot_id(current)
+        measured = manifest["base_green"]
+        if not measured.startswith("sha256:"):
+            measured = snapshot_id(runner_payloads(measured))
+        if not rows and measured not in measured_states:
+            raise ValueError("manifest base mismatch")
+        measured_nodes = {a: nodes(p) for a, p in measured_states.get(measured, {}).items()}
+        incoming = {a: nodes(p) for a, p in current.items()}
+        prior_errors = len(report["WRONG-OLD"]) + len(report["OVERLAP"])
+        for row in rows:
+            artifact, pointer = row["artifact"], row["path"]
+            if artifact not in incoming:
+                raise ValueError(f"unknown artifact: {artifact}")
+            key = artifact, pointer
+            actual_old = incoming[artifact].get(pointer, MISSING)
+            overlap = key in chains
+            wrong_base = (artifact not in measured_nodes
+                          or measured_nodes[artifact].get(pointer, MISSING) != row["old"]
+                          # Returning to green cannot license an independent
+                          # green-based overlap after a cancelled chain.
+                          or (overlap and measured == initial_id))
+            if actual_old != row["old"] or wrong_base:
+                violation = dict(row, offer=manifest["offer"], actual_old=actual_old,
+                                 measured_base=measured, incoming_base=incoming_id)
+                report["OVERLAP" if overlap else "WRONG-OLD"].append(violation)
+        if len(report["WRONG-OLD"]) + len(report["OVERLAP"]) != prior_errors:
+            continue
+        candidate = _apply_rows(incoming, rows)
+        # Reuse the single-offer owner for complete structure/section validation.
+        check_manifest(current, candidate, json_bytes(manifest),
+                       b"".join(json.dumps(r).encode() + b"\n" for r in rows),
+                       base_green=manifest["base_green"])
+        measured_candidate = candidate if measured == incoming_id else _apply_rows(measured_nodes, rows)
+        if measured != incoming_id:
+            check_manifest(measured_states[measured], measured_candidate, json_bytes(manifest),
+                           b"".join(json.dumps(r).encode() + b"\n" for r in rows),
+                           base_green=manifest["base_green"])
+        measured_states[snapshot_id(measured_candidate)] = measured_candidate
+        measured_states[snapshot_id(candidate)] = candidate
+        for row in rows:
+            chains.setdefault((row["artifact"], row["path"]), []).append(
+                dict(row, offer=manifest["offer"]))
+        current = candidate
+    observed = [r for a in sorted(old) for r in diff_nodes(a, old[a], new[a])]
+    expected = [r for a in sorted(old) for r in diff_nodes(a, old[a], current[a])]
+    d = {(r["artifact"], r["path"]): r for r in observed}
+    e = {(r["artifact"], r["path"]): r for r in expected}
+    report["UNDECLARED"] = [r for key, r in d.items() if e.get(key) != r]
+    report["MISSING"] = [r for key, r in e.items() if d.get(key) != r]
+    report["CANCELLED"] = [chain for key, chain in chains.items() if key not in e]
+    counts = {}
+    for key in d:
+        chain = chains.get(key, [])
+        label = (chain[-1]["offer"] + ":" + chain[-1]["cause"]) if chain else "UNDECLARED"
+        counts[label] = counts.get(label, 0) + 1
+    report.update(observed_count=len(d), expected_count=len(e), classes=classes,
+                  observed_classes=counts, chains=[c for c in chains.values() if len(c) > 1])
+    report["ok"] = not any(report[k] for k in ("UNDECLARED", "MISSING", "WRONG-OLD", "OVERLAP"))
+    return report
+
+
+def make_manifest(old: dict, new: dict, rules: dict, *, base_green: str, expected_diff: str):
+    """Classify the owner's measured rows, using ordered first-match rules.
+
+    Class IDs and causal prose come from the existing offer vocabulary. Rules
+    select artifact, path_prefix and/or old_kind/new_kind; they never set values.
+    """
+    classes = {k: dict(v, count=0) for k, v in rules["classes"].items()}
+    for rule in rules["rules"]:
+        if set(rule) - {"cause", "artifact", "path_prefix", "old_kind", "new_kind"}:
+            raise ValueError("unknown class-map selector")
+        if rule["cause"] not in classes:
+            raise ValueError("unknown class-map cause")
+    rows = []
+    if set(old) != set(new):
+        raise ValueError("artifact inventory mismatch")
+    for artifact in sorted(old):
+        for row in diff_nodes(artifact, old[artifact], new[artifact]):
+            for rule in rules["rules"]:
+                if (rule.get("artifact", artifact) == artifact
+                        and row["path"].startswith(rule.get("path_prefix", ""))
+                        and row["old"]["kind"] in rule.get("old_kind", [row["old"]["kind"]])
+                        and row["new"]["kind"] in rule.get("new_kind", [row["new"]["kind"]])):
+                    row["cause"] = rule["cause"]
+                    classes[row["cause"]]["count"] += 1
+                    rows.append(row)
+                    break
+            else:
+                raise ValueError(f"unclassified measured row: {artifact} {row['path']}")
+    manifest = {"format": "golden-moves-v1", "offer": rules["offer"],
+                "base_green": base_green, "producer_contract": PRODUCER_CONTRACT,
+                "expected_diff": expected_diff, "classes": classes}
+    raw = b"".join(json.dumps(r, allow_nan=False).encode() + b"\n" for r in rows)
+    check_manifest(old, new, json_bytes(manifest), raw, base_green=base_green)
+    return manifest, raw
