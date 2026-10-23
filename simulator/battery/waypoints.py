@@ -815,7 +815,8 @@ def normalized_composition(
         raw = located.state.value
         if field == "initial_composition" and not isinstance(raw, Composition):
             unsupported = True
-            missing.append(path)
+            if path not in missing:
+                missing.append(path)
             located = experiment.sample.initial_composition
             path = "experiment.sample.initial_composition"
             if located is None or not located.state.is_value:
@@ -824,7 +825,8 @@ def normalized_composition(
             raw = located.state.value
             if not isinstance(raw, Composition):
                 unsupported = True
-                missing.append(path)
+                if path not in missing:
+                    missing.append(path)
                 continue
         basis_exempt: set[str] = set()
         basis_notice: str | None = None
