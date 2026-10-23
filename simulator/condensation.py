@@ -153,6 +153,7 @@ from simulator.state import (
     PipeSegment,
     clamp_stir_factor,
 )
+from simulator.wall_advisor import advise_wall_materials
 
 
 # Single-sourced from the physical_constants leaf (SC-CONST pass-B); byte-identical
@@ -2159,6 +2160,9 @@ class CondensationModel:
             'upstream_hot_wall_warnings': [],
             'upstream_hot_wall_findings': [],
             'upstream_hot_wall_min_C': DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
+            'has_material_service_violation': False,
+            'material_service_warnings': [],
+            'material_service_findings': [],
         }
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.last_knudsen_pressure_adjustment: dict[str, Any] = {}
@@ -2462,6 +2466,45 @@ class CondensationModel:
                 segment.name: float(wall_temperature_C)
                 for segment in self.pipe_segments
             })
+        fe_partial_pressure_mbar = (
+            None
+            if species_partial_pressures_mbar is None
+            else self.species_partial_pressures_mbar.get('Fe')
+        )
+        if fe_partial_pressure_mbar is not None:
+            fe_dewpoint = antoine_dew_temperature_diagnostic(
+                'Fe',
+                float(fe_partial_pressure_mbar) * 100.0,
+                vapor_pressure_data=self.vapor_pressure_data,
+            )
+            if fe_dewpoint.get('status') == 'diagnostic_only':
+                try:
+                    fe_dewpoint_C = (
+                        float(fe_dewpoint['temperature_K'])
+                        - CELSIUS_TO_KELVIN_OFFSET
+                    )
+                except (KeyError, TypeError, ValueError):
+                    fe_dewpoint_C = math.nan
+                if math.isfinite(fe_dewpoint_C):
+                    # d-260 assigns the Fe dew-point floor to the existing
+                    # stage_0_to_stage_1 schedule. Stage 0 has no capture area,
+                    # so its configured flowing pFe is segment-local here.
+                    self.pipe_segments = [
+                        replace(
+                            segment,
+                            wall_temperature_C=max(
+                                segment.wall_temperature_C,
+                                fe_dewpoint_C,
+                            ),
+                        )
+                        if (
+                            segment.name == 'stage_0_to_stage_1'
+                            and segment.name
+                            not in self.wall_temperature_input_refusals
+                        )
+                        else segment
+                        for segment in self.pipe_segments
+                    ]
         self.last_knudsen_regime_diagnostic = copy.deepcopy(
             self._current_knudsen_diagnostic()
         )
@@ -7772,11 +7815,14 @@ def cold_spot_diagnostic(
     check. Upstream hot-wall fouling additionally uses local partial
     pressure versus the existing wall Antoine P_sat when that pressure
     is supplied; the uniform 1400 C floor remains as a coarse minimum.
+    The stage_0_to_stage_1 duct also reports dense-alumina service-limit
+    exceedance independently of the vapor-flow checks.
     """
 
     margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
     findings: list[dict[str, Any]] = []
     upstream_hot_wall_findings: list[dict[str, Any]] = []
+    material_service_findings: list[dict[str, Any]] = []
     hot_wall_threshold_C = (
         None
         if upstream_hot_wall_min_C is None
@@ -7888,11 +7934,60 @@ def cold_spot_diagnostic(
                 ),
             })
 
+    stage0_duct = next(
+        (
+            segment
+            for segment in pipe_segments
+            if segment.name == 'stage_0_to_stage_1'
+        ),
+        None,
+    )
+    if stage0_duct is not None:
+        dense_alumina = next(
+            (
+                assessment
+                for assessment in advise_wall_materials(
+                    [], zone_temperature_C=float(stage0_duct.wall_temperature_C)
+                )
+                if assessment.material_id == 'dense_alumina'
+            ),
+            None,
+        )
+        service_temperature_C = (
+            None
+            if dense_alumina is None
+            else dense_alumina.limiting_temperature_C
+        )
+        wall_temperature_C = float(stage0_duct.wall_temperature_C)
+        if (
+            service_temperature_C is not None
+            and wall_temperature_C > service_temperature_C
+        ):
+            reason = 'duct wall above material service T (unqualified hardware)'
+            material_service_findings.append({
+                'segment': stage0_duct.name,
+                'material_id': dense_alumina.material_id,
+                'wall_temperature_C': wall_temperature_C,
+                'service_temperature_C': service_temperature_C,
+                'citations': list(dense_alumina.service_temp.citations),
+                'reason': reason,
+                'output_status': 'status_bearing',
+                'authority_level': 'extrapolated',
+                'warning': (
+                    f'{reason}: {wall_temperature_C:.1f} C exceeds '
+                    f'dense alumina limit {service_temperature_C:.1f} C'
+                ),
+            })
+
     warnings = [str(finding['warning']) for finding in findings]
     upstream_hot_wall_warnings = [
         str(finding['warning'])
         for finding in upstream_hot_wall_findings
     ]
+    material_service_warnings = [
+        str(finding['warning']) for finding in material_service_findings
+    ]
+    warnings.extend(material_service_warnings)
     return {
         'has_cold_spot': bool(findings),
         'margin_C': margin_C,
@@ -7902,6 +7997,9 @@ def cold_spot_diagnostic(
         'upstream_hot_wall_min_C': hot_wall_threshold_C,
         'upstream_hot_wall_warnings': upstream_hot_wall_warnings,
         'upstream_hot_wall_findings': upstream_hot_wall_findings,
+        'has_material_service_violation': bool(material_service_findings),
+        'material_service_warnings': material_service_warnings,
+        'material_service_findings': material_service_findings,
     }
 
 
