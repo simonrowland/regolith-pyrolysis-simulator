@@ -739,6 +739,16 @@ class IdentityEqualOutcome:
         return self.kind is IdentityEqualKind.EQUAL
 
 
+def _wall_deposition_requires_fO2(identity: Identity) -> bool:
+    composition = identity.composition
+    if composition is None or not composition.is_value or composition.value is None:
+        return False
+    formula = identity.species.formula
+    if formula in {"Na", "K", "Mg", "Fe"}:
+        return True
+    return dict(formula_composition(formula)).get("O", 0) > 0
+
+
 def profile_for(identity: Identity) -> QuantityProfile:
     """Closed compared-axis profile for the declared quantity.
 
@@ -970,6 +980,11 @@ def profile_for(identity: Identity) -> QuantityProfile:
         # Source state and carrier can be explicitly not applicable for an
         # upstream partial-pressure source or carrier-free ballistic flow.
         na("temperature_K", "reservoir", "composition", "fO2_Pa", "sweep_gas")
+        if _wall_deposition_requires_fO2(identity):
+            # Melt-source oxygen chemistry cannot mark fugacity N/A. An
+            # upstream source is represented by composition=N/A and remains
+            # allowed to omit melt fugacity.
+            permitted_na.discard("fO2_Pa")
         if q is Quantity.WALL_DEPOSIT_AREAL_MASS:
             req("exposure")
         else:

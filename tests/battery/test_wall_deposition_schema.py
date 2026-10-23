@@ -16,7 +16,7 @@ from simulator.battery.identity import (
 )
 from simulator.battery.records import Apparatus, ApparatusGeometry, Located, Locator, State, Value
 from simulator.battery.score import metric_operation, rail_for_quantity
-from simulator.battery.validity import wall_deposition_input_gate
+from simulator.battery.validity import run_validity_gates, wall_deposition_input_gate
 from simulator.battery.migrate import _geometry_from_plain
 from tests.battery import factories as F
 
@@ -162,6 +162,62 @@ def test_d275_melt_source_refuses_each_missing_identity_input(identity_field):
 
 
 @pytest.mark.parametrize(
+    "fO2_state",
+    [None, State.unknown("not reported"), State.not_applicable("not printed")],
+    ids=["missing", "unknown", "not-applicable"],
+)
+@pytest.mark.parametrize(
+    "quantity", [Quantity.WALL_DEPOSIT_AREAL_MASS, Quantity.WALL_DEPOSITION_FLUX]
+)
+def test_d275_oxygen_dependent_melt_vapour_requires_fugacity(fO2_state, quantity):
+    identity, conditions, experiment = _complete_mass_inputs()
+    identity = replace(identity, quantity=quantity, fO2_Pa=fO2_state)
+
+    outcome = wall_deposition_input_gate(identity, conditions, experiment)
+
+    assert not outcome.passed
+    assert outcome.reason.value == "underdetermined_apparatus"
+    assert outcome.primary_check == "identity.fO2_Pa"
+    if fO2_state is not None and fO2_state.is_not_applicable:
+        assert validate_quantity_profile(identity).kind is IdentityEqualKind.INVALID_IDENTITY
+
+    observation = replace(
+        F.observation("wall-oxygen-required", experiment.experiment_id, identity, Decimal("1")),
+        point_conditions=conditions,
+    )
+    run_outcome = run_validity_gates(experiment, observation)
+    assert not run_outcome.passed
+    assert run_outcome.reason.value == "underdetermined_apparatus"
+    assert run_outcome.primary_check == "identity.fO2_Pa"
+
+
+@pytest.mark.parametrize("formula", ["Na", "K", "Mg", "Fe"])
+def test_d275_elemental_melt_vapours_require_fugacity(formula):
+    identity, conditions, experiment = _complete_mass_inputs()
+    identity = replace(
+        identity,
+        species=replace(identity.species, formula=formula),
+        fO2_Pa=None,
+    )
+
+    outcome = wall_deposition_input_gate(identity, conditions, experiment)
+
+    assert not outcome.passed
+    assert outcome.primary_check == "identity.fO2_Pa"
+
+
+def test_d275_nonoxygen_melt_source_does_not_require_fugacity():
+    identity, conditions, experiment = _complete_mass_inputs()
+    identity = replace(
+        identity,
+        species=replace(identity.species, formula="Cl"),
+        fO2_Pa=None,
+    )
+
+    assert wall_deposition_input_gate(identity, conditions, experiment).passed
+
+
+@pytest.mark.parametrize(
     "geometry_field",
     ["pipe_inner_diameter_m", "segment_position_m", "flow_orientation"],
 )
@@ -219,12 +275,14 @@ def test_d275_upstream_vapour_source_requires_located_pressure_and_location():
         temperature_K=State.not_applicable("upstream partial-pressure source"),
         reservoir=State.not_applicable("upstream partial-pressure source"),
         composition=State.not_applicable("upstream partial-pressure source"),
+        fO2_Pa=State.not_applicable("source chemistry is upstream"),
     )
     conditions["vapour_source_kind"] = _located("upstream_partial_pressure")
     conditions["source_partial_pressure_Pa"] = _located(Decimal("5"))
     conditions["source_location"] = _located("upstream-1")
 
     assert wall_deposition_input_gate(identity, conditions, experiment).passed
+    assert validate_quantity_profile(identity).kind is IdentityEqualKind.EQUAL
 
     conditions.pop("source_location")
     outcome = wall_deposition_input_gate(identity, conditions, experiment)
