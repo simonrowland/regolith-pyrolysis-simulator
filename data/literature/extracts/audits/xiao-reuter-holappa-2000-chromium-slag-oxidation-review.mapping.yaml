@@ -1,0 +1,89 @@
+source_id: xiao-reuter-holappa-2000-chromium-slag-oxidation-review
+source_identity:
+  title: Oxidation state of chromium in molten slag
+  venue: Sixth International Conference on Molten Slags, Fluxes and Salts (Molten Slags VI)
+  paper_number: '089'
+  pdf_sha256: 09d6972bcd1ee0d2eb638db60cf815d9cbb7595bff6eafe477637780efff0396
+duplicate_check:
+  doi: none printed or recorded in the source sidecar
+  title_author_year: no matching extract found for Xiao, Reuter, and Holappa (2000) or the exact title
+  review_w_branches: no matching extract found across origin/review/w* refs
+  source_pdf_identity: pdfinfo title metadata is 168.PDF; first page title/authors match the paper title and authors; corpus sidecar maps the byte-identical PDF to Molten Slags VI paper 089
+  corpus_pdf_sha256_matches_sidecar: true
+table_tool:
+  result: no MinerU directory or fragments are present; mineru_table_draft.py rejects pdftotext-only tables
+  disposition: no tool-emitted cells; both tables manually transcribed from pdftotext-layout.txt and fully render-checked
+manual_tables:
+  - table: 'I'
+    locator:
+      page: 10
+      pdf_page_index: 9
+      published_page: 10
+    disposition: context-only literature summary
+    candidate_quantity_tokens:
+      - equilibrium_phase_composition
+      - distribution_ratio
+    schema_gap: The base has no general valence-ratio quantity; Cr2+/TCr is not a between-phase distribution ratio, while generic CrOx ranges have mixed wt%/mol% bases and do not identify a scalar sample component.
+    row_count: 10
+    capture:
+      - systems investigated
+      - temperature ranges
+      - basicity ranges or saturation descriptions
+      - pO2 ranges or gas-ratio notation as printed
+      - CrOx contents and units
+      - Cr2+/TCr values
+      - attributions
+    cell_audit:
+      machine_text: pdftotext-layout.txt, physical PDF page 10
+      render: 600 dpi physical PDF page 10
+      checked: all body rows and columns, including the printed dash, units, exponents, and row/column assignments
+  - table: 'II'
+    locator:
+      page: 11
+      pdf_page_index: 10
+      published_page: 11
+    disposition: four component rows per sample typed as equilibrium_phase_composition; printed basicity ratios retained in context
+    candidate_quantity_tokens:
+      - equilibrium_phase_composition
+      - distribution_ratio
+    row_count: 21
+    typed_components:
+      - CaO
+      - SiO2
+      - CrO
+      - CrO1.5
+    typed_observation_count: 84
+    printed_basicity_ratio_count: 21
+    basis: printed mol% converted to mole_fraction; original mol% retained in value_as_published
+    assemblage: each sample id is shared by its four component rows; slag liquid equilibrated with solid metallic chromium in Ar at 1590 °C
+    cell_audit:
+      machine_text: pdftotext-layout.txt, physical PDF page 11
+      render: 600 dpi physical PDF page 11
+      checked: all 21 sample ids, 105 numeric cells, headings, units, and row/column assignments
+figures:
+  digitisation: deferred to a figure pass
+  render_checks: 600 dpi physical PDF pages 8-9
+  records:
+    - figure: '1'
+      page: 8
+      axes: Cr2+/TCr versus LogPo2, atm
+      series_count: 7
+      marker_counts_checked: true
+    - figure: '2'
+      page: 8
+      axes: Cr2+/TCr versus mol%CrOx
+      series_count: 6
+      marker_counts_checked: true
+    - figure: '3'
+      page: 9
+      description: sample A1 quenched slag micrograph; caption repeats Table II composition
+    - figure: '4'
+      page: 9
+      description: sample B1 quenched slag micrograph; caption repeats Table II composition
+    - figure: '5'
+      page: 9
+      description: sample B6 quenched slag micrograph; caption repeats Table II composition
+    - figure: '6'
+      page: 9
+      description: sample B6 naturally cooled slag micrograph
+triage_mismatch: The supplied triage description says Table II includes about 15 compositions with a Cr2+/Cr3+ split. The source PDF's Table II instead has 21 CaO-SiO2-CrO-CrO1.5 compositions; Cr2+/TCr is plotted in Figures 1-2 and remains deferred.

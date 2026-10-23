@@ -1,0 +1,3287 @@
+schema_version: literature_extract.v1
+source_id: kirschen-1999-si-ti-al-miscibility
+source:
+  citation: Kirschen, M., DeCapitani, C., Millot, F., Rifflet, J.-C., and Coutures, J.-P. (1999), “Immiscible silicate liquids
+    in the system SiO2-TiO2-Al2O3”, European Journal of Mineralogy, 11(3), 427–440.
+  doi: 10.1127/ejm/11/3/0427
+  year: 1999
+  corpus_asset: raw/kirschen-1999-si-ti-al-miscibility/kirschen-1999-si-ti-al-miscibility.pdf
+  corpus_sha256: 714867fedcdc30b14d4be52a07da85c826c0424d388806dfb1adf9587773190a
+review_status: draft
+extraction:
+  method: Image-only scanned article; MinerU Table 4 draft transcribed into scalar phase-composition records, with all 17
+    data rows and every populated component, uncertainty, total, n, temperature, and run cell checked against the 600 dpi
+    PDF page 10 render. The table tool cannot split a component and its parenthetical 1σ value in one cell into component_amount
+    and sigma, so the complete printed values were entered by hand; the draft CSV remains in the notes audit. Tables 1–3 are
+    retained as full printed model/reference context. Figures 1–6 are recorded without figure-only numeric points.
+  date: '2026-10-22'
+  worker: fam40-1022
+fidelity_samples:
+- path: species.SiO2.observations[kirschen_1999_t4_st_1_1h_phase1_sio2].values.component_amount.value
+  value: '57.49'
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: 600 dpi render transcription, ST 1-1H liquid 1, SiO2 column; printed 1σ 1.20.
+- path: species.SiO2.observations[kirschen_1999_t4_st_1_1h_phase1_tio2].values.component_amount.value
+  value: '42.16'
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: 600 dpi render transcription, ST 1-1H liquid 1, TiO2 column; printed 1σ 1.20.
+- path: species.SiO2.observations[kirschen_1999_t4_sta5_2h_phase1_al2o3].values.component_amount.value
+  value: '21.83'
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: 600 dpi render transcription, STA5-2H¹, Al2O3 column; printed 1σ 0.33.
+experiments:
+- experiment_id: kirschen_1999_t4_st_1_1h
+  method: quench_equilibration
+  regime: quench_equilibration
+  system_as_printed: SiO2-TiO2
+  sample_id_as_printed: ST 1-1H
+  method_as_printed: CO2 laser heating with aerodynamic levitation; quenched glass analyzed by electron microprobe
+  atmosphere_as_printed: pure oxygen as levitation gas
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: Table 4, run ST 1-1H.
+- experiment_id: kirschen_1999_t4_st_1_2h
+  method: quench_equilibration
+  regime: quench_equilibration
+  system_as_printed: SiO2-TiO2
+  sample_id_as_printed: ST 1-2H
+  method_as_printed: CO2 laser heating with aerodynamic levitation; quenched glass analyzed by electron microprobe
+  atmosphere_as_printed: pure oxygen as levitation gas
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: Table 4, run ST 1-2H.
+- experiment_id: kirschen_1999_t4_st_2_1h
+  method: quench_equilibration
+  regime: quench_equilibration
+  system_as_printed: SiO2-TiO2
+  sample_id_as_printed: ST 2-1H
+  method_as_printed: CO2 laser heating with aerodynamic levitation; quenched glass analyzed by electron microprobe
+  atmosphere_as_printed: pure oxygen as levitation gas
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: Table 4, run ST 2-1H.
+- experiment_id: kirschen_1999_t4_st_3_1h
+  method: quench_equilibration
+  regime: quench_equilibration
+  system_as_printed: SiO2-TiO2
+  sample_id_as_printed: ST 3-1H
+  method_as_printed: CO2 laser heating with aerodynamic levitation; quenched glass analyzed by electron microprobe
+  atmosphere_as_printed: pure oxygen as levitation gas
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: Table 4, run ST 3-1H.
+- experiment_id: kirschen_1999_t4_sta1_1h
+  method: quench_equilibration
+  regime: quench_equilibration
+  system_as_printed: SiO2-TiO2-Al2O3
+  sample_id_as_printed: STA1-1H
+  method_as_printed: CO2 laser heating with aerodynamic levitation; quenched glass analyzed by electron microprobe
+  atmosphere_as_printed: pure oxygen as levitation gas
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: Table 4, run STA1-1H.
+- experiment_id: kirschen_1999_t4_sta1_2h
+  method: quench_equilibration
+  regime: quench_equilibration
+  system_as_printed: SiO2-TiO2-Al2O3
+  sample_id_as_printed: STA1-2H
+  method_as_printed: CO2 laser heating with aerodynamic levitation; quenched glass analyzed by electron microprobe
+  atmosphere_as_printed: pure oxygen as levitation gas
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: Table 4, run STA1-2H.
+- experiment_id: kirschen_1999_t4_sta2_2h
+  method: quench_equilibration
+  regime: quench_equilibration
+  system_as_printed: SiO2-TiO2-Al2O3
+  sample_id_as_printed: STA2-2H¹
+  method_as_printed: CO2 laser heating with aerodynamic levitation; quenched glass analyzed by electron microprobe
+  atmosphere_as_printed: pure oxygen as levitation gas
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: Table 4, run STA2-2H¹.
+- experiment_id: kirschen_1999_t4_sta3_1h
+  method: quench_equilibration
+  regime: quench_equilibration
+  system_as_printed: SiO2-TiO2-Al2O3
+  sample_id_as_printed: STA3-1H¹
+  method_as_printed: CO2 laser heating with aerodynamic levitation; quenched glass analyzed by electron microprobe
+  atmosphere_as_printed: pure oxygen as levitation gas
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: Table 4, run STA3-1H¹.
+- experiment_id: kirschen_1999_t4_sta3_2h
+  method: quench_equilibration
+  regime: quench_equilibration
+  system_as_printed: SiO2-TiO2-Al2O3
+  sample_id_as_printed: STA3-2H¹
+  method_as_printed: CO2 laser heating with aerodynamic levitation; quenched glass analyzed by electron microprobe
+  atmosphere_as_printed: pure oxygen as levitation gas
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: Table 4, run STA3-2H¹.
+- experiment_id: kirschen_1999_t4_sta4_2h
+  method: quench_equilibration
+  regime: quench_equilibration
+  system_as_printed: SiO2-TiO2-Al2O3
+  sample_id_as_printed: STA4-2H¹
+  method_as_printed: CO2 laser heating with aerodynamic levitation; quenched glass analyzed by electron microprobe
+  atmosphere_as_printed: pure oxygen as levitation gas
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: Table 4, run STA4-2H¹.
+- experiment_id: kirschen_1999_t4_sta5_2h
+  method: quench_equilibration
+  regime: quench_equilibration
+  system_as_printed: SiO2-TiO2-Al2O3
+  sample_id_as_printed: STA5-2H¹
+  method_as_printed: CO2 laser heating with aerodynamic levitation; quenched glass analyzed by electron microprobe
+  atmosphere_as_printed: pure oxygen as levitation gas
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: '435'
+    table: '4'
+    note: Table 4, run STA5-2H¹.
+species:
+  SiO2:
+    observations:
+    - observation_id: kirschen_1999_t4_st_1_1h_phase1_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-1H, liquid 1, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id001
+          value: '2500'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2500±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id002
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id003
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '99.66'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run ST 1-1H, data row 2.
+        printed_sum: '99.66'
+        n_measurements: '49'
+        component_amount:
+          value: '57.49'
+          sigma: '1.20'
+      uncertainty:
+        sigma: '1.20'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_1_1h_phase1_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-1H, liquid 1, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id001
+        temperature_as_published: 2500±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id002
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id003
+        printed_sum: '99.66'
+        n_measurements: '49'
+        component_amount:
+          value: '42.16'
+          sigma: '1.20'
+      uncertainty:
+        sigma: '1.20'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_1_1h_phase1_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-1H, liquid 1, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id001
+        temperature_as_published: 2500±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id002
+        method_class: measured_direct
+        admission_status: typed_refusal
+        point_conditions: *id003
+        printed_sum: '99.66'
+        n_measurements: '49'
+        status: typed_refusal
+        reason: Table 4 leaves the Al2O3 component cell blank for this SiO2-TiO2 binary sample; the component amount is unknown
+          and is not reconstructed.
+        printed_cell_as_published: ''
+    - observation_id: kirschen_1999_t4_st_1_1h_phase2_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-1H, liquid 2, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id004
+          value: '2500'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2500±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id005
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id006
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.80'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run ST 1-1H, data row 3.
+        printed_sum: '100.80'
+        n_measurements: '47'
+        component_amount:
+          value: '28.70'
+          sigma: '5.34'
+      uncertainty:
+        sigma: '5.34'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_1_1h_phase2_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-1H, liquid 2, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id004
+        temperature_as_published: 2500±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id005
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id006
+        printed_sum: '100.80'
+        n_measurements: '47'
+        component_amount:
+          value: '72.10'
+          sigma: '5.23'
+      uncertainty:
+        sigma: '5.23'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_1_1h_phase2_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-1H, liquid 2, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id004
+        temperature_as_published: 2500±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id005
+        method_class: measured_direct
+        admission_status: typed_refusal
+        point_conditions: *id006
+        printed_sum: '100.80'
+        n_measurements: '47'
+        status: typed_refusal
+        reason: Table 4 leaves the Al2O3 component cell blank for this SiO2-TiO2 binary sample; the component amount is unknown
+          and is not reconstructed.
+        printed_cell_as_published: ''
+    - observation_id: kirschen_1999_t4_st_1_2h_phase1_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-2H, liquid 1, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id007
+          value: '2280'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2280±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-2H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id008
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id009
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.28'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run ST 1-2H, data row 4.
+        printed_sum: '100.28'
+        n_measurements: '50'
+        component_amount:
+          value: '67.91'
+          sigma: '2.58'
+      uncertainty:
+        sigma: '2.58'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_1_2h_phase1_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-2H, liquid 1, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id007
+        temperature_as_published: 2280±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-2H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id008
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id009
+        printed_sum: '100.28'
+        n_measurements: '50'
+        component_amount:
+          value: '32.37'
+          sigma: '2.28'
+      uncertainty:
+        sigma: '2.28'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_1_2h_phase1_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-2H, liquid 1, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id007
+        temperature_as_published: 2280±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-2H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id008
+        method_class: measured_direct
+        admission_status: typed_refusal
+        point_conditions: *id009
+        printed_sum: '100.28'
+        n_measurements: '50'
+        status: typed_refusal
+        reason: Table 4 leaves the Al2O3 component cell blank for this SiO2-TiO2 binary sample; the component amount is unknown
+          and is not reconstructed.
+        printed_cell_as_published: ''
+    - observation_id: kirschen_1999_t4_st_1_2h_phase2_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-2H, liquid 2, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id010
+          value: '2280'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2280±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-2H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id011
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id012
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.24'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run ST 1-2H, data row 5.
+        printed_sum: '100.24'
+        n_measurements: '28'
+        component_amount:
+          value: '5.55'
+          sigma: '1.79'
+      uncertainty:
+        sigma: '1.79'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_1_2h_phase2_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-2H, liquid 2, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id010
+        temperature_as_published: 2280±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-2H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id011
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id012
+        printed_sum: '100.24'
+        n_measurements: '28'
+        component_amount:
+          value: '94.51'
+          sigma: '1.72'
+      uncertainty:
+        sigma: '1.72'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_1_2h_phase2_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 1-2H, liquid 2, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id010
+        temperature_as_published: 2280±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 1-2H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id011
+        method_class: measured_direct
+        admission_status: typed_refusal
+        point_conditions: *id012
+        printed_sum: '100.24'
+        n_measurements: '28'
+        status: typed_refusal
+        reason: Table 4 leaves the Al2O3 component cell blank for this SiO2-TiO2 binary sample; the component amount is unknown
+          and is not reconstructed.
+        printed_cell_as_published: ''
+    - observation_id: kirschen_1999_t4_st_2_1h_phase1_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_2_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 2-1H, liquid 1, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id013
+          value: '2250'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2250±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 2-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 2-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id014
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id015
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.10'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run ST 2-1H, data row 6.
+        printed_sum: '100.10'
+        n_measurements: '67'
+        component_amount:
+          value: '74.61'
+          sigma: '5.97'
+      uncertainty:
+        sigma: '5.97'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_2_1h_phase1_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_2_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 2-1H, liquid 1, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id013
+        temperature_as_published: 2250±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 2-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 2-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id014
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id015
+        printed_sum: '100.10'
+        n_measurements: '67'
+        component_amount:
+          value: '25.49'
+          sigma: '6.21'
+      uncertainty:
+        sigma: '6.21'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_2_1h_phase1_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_2_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 2-1H, liquid 1, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id013
+        temperature_as_published: 2250±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 2-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 2-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id014
+        method_class: measured_direct
+        admission_status: typed_refusal
+        point_conditions: *id015
+        printed_sum: '100.10'
+        n_measurements: '67'
+        status: typed_refusal
+        reason: Table 4 leaves the Al2O3 component cell blank for this SiO2-TiO2 binary sample; the component amount is unknown
+          and is not reconstructed.
+        printed_cell_as_published: ''
+    - observation_id: kirschen_1999_t4_st_2_1h_phase2_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_2_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 2-1H, liquid 2, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id016
+          value: '2250'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2250±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 2-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 2-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id017
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id018
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.84'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run ST 2-1H, data row 7.
+        printed_sum: '100.84'
+        n_measurements: '30'
+        component_amount:
+          value: '18.47'
+          sigma: '2.45'
+      uncertainty:
+        sigma: '2.45'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_2_1h_phase2_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_2_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 2-1H, liquid 2, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id016
+        temperature_as_published: 2250±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 2-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 2-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id017
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id018
+        printed_sum: '100.84'
+        n_measurements: '30'
+        component_amount:
+          value: '82.23'
+          sigma: '3.04'
+      uncertainty:
+        sigma: '3.04'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_2_1h_phase2_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_2_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 2-1H, liquid 2, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id016
+        temperature_as_published: 2250±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 2-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 2-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id017
+        method_class: measured_direct
+        admission_status: typed_refusal
+        point_conditions: *id018
+        printed_sum: '100.84'
+        n_measurements: '30'
+        status: typed_refusal
+        reason: Table 4 leaves the Al2O3 component cell blank for this SiO2-TiO2 binary sample; the component amount is unknown
+          and is not reconstructed.
+        printed_cell_as_published: ''
+    - observation_id: kirschen_1999_t4_st_3_1h_phase1_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_3_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 3-1H, liquid 1, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id019
+          value: '2200'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2200±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 3-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 3-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id020
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id021
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.21'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run ST 3-1H, data row 8.
+        printed_sum: '100.21'
+        n_measurements: '43'
+        component_amount:
+          value: '68.81'
+          sigma: '1.46'
+      uncertainty:
+        sigma: '1.46'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_3_1h_phase1_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_3_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 3-1H, liquid 1, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id019
+        temperature_as_published: 2200±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 3-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 3-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id020
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id021
+        printed_sum: '100.21'
+        n_measurements: '43'
+        component_amount:
+          value: '31.40'
+          sigma: '1.49'
+      uncertainty:
+        sigma: '1.49'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_3_1h_phase1_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_3_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 3-1H, liquid 1, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id019
+        temperature_as_published: 2200±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 3-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: ST 3-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id020
+        method_class: measured_direct
+        admission_status: typed_refusal
+        point_conditions: *id021
+        printed_sum: '100.21'
+        n_measurements: '43'
+        status: typed_refusal
+        reason: Table 4 leaves the Al2O3 component cell blank for this SiO2-TiO2 binary sample; the component amount is unknown
+          and is not reconstructed.
+        printed_cell_as_published: ''
+    - observation_id: kirschen_1999_t4_st_3_1h_phase2_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_3_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 3-1H, liquid 2, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id022
+          value: '2200'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2200±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 3-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 3-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id023
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id024
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.76'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run ST 3-1H, data row 9.
+        printed_sum: '100.76'
+        n_measurements: '47'
+        component_amount:
+          value: '10.10'
+          sigma: '5.50'
+      uncertainty:
+        sigma: '5.50'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_3_1h_phase2_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_3_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 3-1H, liquid 2, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id022
+        temperature_as_published: 2200±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 3-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 3-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id023
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id024
+        printed_sum: '100.76'
+        n_measurements: '47'
+        component_amount:
+          value: '90.62'
+          sigma: '5.58'
+      uncertainty:
+        sigma: '5.58'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_st_3_1h_phase2_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_st_3_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run ST 3-1H, liquid 2, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id022
+        temperature_as_published: 2200±30 K
+        system_as_printed: SiO2-TiO2
+        sample_id_as_printed: ST 3-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: ST 3-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id023
+        method_class: measured_direct
+        admission_status: typed_refusal
+        point_conditions: *id024
+        printed_sum: '100.76'
+        n_measurements: '47'
+        status: typed_refusal
+        reason: Table 4 leaves the Al2O3 component cell blank for this SiO2-TiO2 binary sample; the component amount is unknown
+          and is not reconstructed.
+        printed_cell_as_published: ''
+    - observation_id: kirschen_1999_t4_sta1_1h_phase1_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-1H, liquid 1, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id025
+          value: '2080'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2080±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: STA1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id026
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id027
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.25'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run STA1-1H, data row 10.
+        printed_sum: '100.25'
+        n_measurements: '63'
+        component_amount:
+          value: '55.66'
+          sigma: '1.57'
+      uncertainty:
+        sigma: '1.57'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta1_1h_phase1_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-1H, liquid 1, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id025
+        temperature_as_published: 2080±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: STA1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id026
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id027
+        printed_sum: '100.25'
+        n_measurements: '63'
+        component_amount:
+          value: '40.36'
+          sigma: '1.67'
+      uncertainty:
+        sigma: '1.67'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta1_1h_phase1_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-1H, liquid 1, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id025
+        temperature_as_published: 2080±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-1H
+        phase_order: 1
+        assemblage_id: 'Table 4: STA1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id026
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id027
+        printed_sum: '100.25'
+        n_measurements: '63'
+        component_amount:
+          value: '4.22'
+          sigma: '0.95'
+      uncertainty:
+        sigma: '0.95'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta1_1h_phase2_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-1H, liquid 2, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id028
+          value: '2080'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2080±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: STA1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id029
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id030
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.99'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run STA1-1H, data row 11.
+        printed_sum: '100.99'
+        n_measurements: '28'
+        component_amount:
+          value: '10.90'
+          sigma: '1.51'
+      uncertainty:
+        sigma: '1.51'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta1_1h_phase2_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-1H, liquid 2, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id028
+        temperature_as_published: 2080±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: STA1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id029
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id030
+        printed_sum: '100.99'
+        n_measurements: '28'
+        component_amount:
+          value: '85.68'
+          sigma: '1.63'
+      uncertainty:
+        sigma: '1.63'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta1_1h_phase2_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-1H, liquid 2, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id028
+        temperature_as_published: 2080±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-1H
+        phase_order: 2
+        assemblage_id: 'Table 4: STA1-1H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id029
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id030
+        printed_sum: '100.99'
+        n_measurements: '28'
+        component_amount:
+          value: '4.41'
+          sigma: '0.87'
+      uncertainty:
+        sigma: '0.87'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta1_2h_phase1_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-2H, liquid 1, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id031
+          value: '2070'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2070±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-2H
+        phase_order: 1
+        assemblage_id: 'Table 4: STA1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id032
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id033
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.56'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run STA1-2H, data row 12.
+        printed_sum: '100.56'
+        n_measurements: '14'
+        component_amount:
+          value: '55.34'
+          sigma: '0.83'
+      uncertainty:
+        sigma: '0.83'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta1_2h_phase1_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-2H, liquid 1, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id031
+        temperature_as_published: 2070±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-2H
+        phase_order: 1
+        assemblage_id: 'Table 4: STA1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id032
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id033
+        printed_sum: '100.56'
+        n_measurements: '14'
+        component_amount:
+          value: '40.96'
+          sigma: '1.04'
+      uncertainty:
+        sigma: '1.04'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta1_2h_phase1_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-2H, liquid 1, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id031
+        temperature_as_published: 2070±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-2H
+        phase_order: 1
+        assemblage_id: 'Table 4: STA1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id032
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id033
+        printed_sum: '100.56'
+        n_measurements: '14'
+        component_amount:
+          value: '4.26'
+          sigma: '0.64'
+      uncertainty:
+        sigma: '0.64'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta1_2h_phase2_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-2H, liquid 2, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id034
+          value: '2070'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2070±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-2H
+        phase_order: 2
+        assemblage_id: 'Table 4: STA1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id035
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id036
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.80'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run STA1-2H, data row 13.
+        printed_sum: '100.80'
+        n_measurements: '29'
+        component_amount:
+          value: '11.53'
+          sigma: '3.00'
+      uncertainty:
+        sigma: '3.00'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta1_2h_phase2_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-2H, liquid 2, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id034
+        temperature_as_published: 2070±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-2H
+        phase_order: 2
+        assemblage_id: 'Table 4: STA1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id035
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id036
+        printed_sum: '100.80'
+        n_measurements: '29'
+        component_amount:
+          value: '84.78'
+          sigma: '3.04'
+      uncertainty:
+        sigma: '3.04'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta1_2h_phase2_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta1_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA1-2H, liquid 2, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id034
+        temperature_as_published: 2070±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA1-2H
+        phase_order: 2
+        assemblage_id: 'Table 4: STA1-2H'
+        phase_assemblage_as_printed: two coexisting liquids
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id035
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id036
+        printed_sum: '100.80'
+        n_measurements: '29'
+        component_amount:
+          value: '4.44'
+          sigma: '1.05'
+      uncertainty:
+        sigma: '1.05'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta2_2h_phase1_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta2_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA2-2H¹, liquid 1, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id037
+          value: '2050'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2050±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA2-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA2-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id038
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id039
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.11'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run STA2-2H¹, data row 14.
+        printed_sum: '100.11'
+        n_measurements: '36'
+        component_amount:
+          value: '13.64'
+          sigma: '0.53'
+      uncertainty:
+        sigma: '0.53'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta2_2h_phase1_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta2_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA2-2H¹, liquid 1, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id037
+        temperature_as_published: 2050±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA2-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA2-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id038
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id039
+        printed_sum: '100.11'
+        n_measurements: '36'
+        component_amount:
+          value: '72.70'
+          sigma: '0.66'
+      uncertainty:
+        sigma: '0.66'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta2_2h_phase1_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta2_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA2-2H¹, liquid 1, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id037
+        temperature_as_published: 2050±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA2-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA2-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id038
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id039
+        printed_sum: '100.11'
+        n_measurements: '36'
+        component_amount:
+          value: '13.77'
+          sigma: '0.39'
+      uncertainty:
+        sigma: '0.39'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta3_1h_phase1_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta3_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA3-1H¹, liquid 1, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id040
+          value: '2070'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2070±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA3-1H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA3-1H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id041
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id042
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.27'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run STA3-1H¹, data row 15.
+        printed_sum: '100.27'
+        n_measurements: '33'
+        component_amount:
+          value: '33.12'
+          sigma: '0.35'
+      uncertainty:
+        sigma: '0.35'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta3_1h_phase1_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta3_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA3-1H¹, liquid 1, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id040
+        temperature_as_published: 2070±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA3-1H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA3-1H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id041
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id042
+        printed_sum: '100.27'
+        n_measurements: '33'
+        component_amount:
+          value: '53.71'
+          sigma: '1.05'
+      uncertainty:
+        sigma: '1.05'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta3_1h_phase1_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta3_1h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA3-1H¹, liquid 1, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id040
+        temperature_as_published: 2070±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA3-1H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA3-1H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id041
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id042
+        printed_sum: '100.27'
+        n_measurements: '33'
+        component_amount:
+          value: '13.43'
+          sigma: '0.15'
+      uncertainty:
+        sigma: '0.15'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta3_2h_phase1_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta3_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA3-2H¹, liquid 1, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id043
+          value: '2050'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2050±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA3-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA3-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id044
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id045
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '99.93'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run STA3-2H¹, data row 16.
+        printed_sum: '99.93'
+        n_measurements: '40'
+        component_amount:
+          value: '33.05'
+          sigma: '0.31'
+      uncertainty:
+        sigma: '0.31'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta3_2h_phase1_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta3_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA3-2H¹, liquid 1, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id043
+        temperature_as_published: 2050±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA3-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA3-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id044
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id045
+        printed_sum: '99.93'
+        n_measurements: '40'
+        component_amount:
+          value: '53.70'
+          sigma: '0.59'
+      uncertainty:
+        sigma: '0.59'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta3_2h_phase1_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta3_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA3-2H¹, liquid 1, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id043
+        temperature_as_published: 2050±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA3-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA3-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id044
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id045
+        printed_sum: '99.93'
+        n_measurements: '40'
+        component_amount:
+          value: '13.17'
+          sigma: '0.16'
+      uncertainty:
+        sigma: '0.16'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta4_2h_phase1_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta4_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA4-2H¹, liquid 1, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id046
+          value: '1970'
+          units: K
+          sigma: '30'
+        temperature_as_published: 1970±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA4-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA4-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id047
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id048
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.01'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run STA4-2H¹, data row 17.
+        printed_sum: '100.01'
+        n_measurements: '58'
+        component_amount:
+          value: '51.53'
+          sigma: '0.73'
+      uncertainty:
+        sigma: '0.73'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta4_2h_phase1_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta4_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA4-2H¹, liquid 1, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id046
+        temperature_as_published: 1970±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA4-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA4-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id047
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id048
+        printed_sum: '100.01'
+        n_measurements: '58'
+        component_amount:
+          value: '34.65'
+          sigma: '0.54'
+      uncertainty:
+        sigma: '0.54'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta4_2h_phase1_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta4_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA4-2H¹, liquid 1, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id046
+        temperature_as_published: 1970±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA4-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA4-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id047
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id048
+        printed_sum: '100.01'
+        n_measurements: '58'
+        component_amount:
+          value: '13.82'
+          sigma: '0.17'
+      uncertainty:
+        sigma: '0.17'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta5_2h_phase1_sio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta5_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA5-2H¹, liquid 1, SiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: &id049
+          value: '2230'
+          units: K
+          sigma: '30'
+        temperature_as_published: 2230±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA5-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA5-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: &id050
+          page: 9
+          pdf_page_index: 8
+          published_page: '434'
+          note: Experimental methods and results; quench discussion.
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: &id051
+          gas_mix:
+            state:
+              tag: value
+              value: pure oxygen
+            locator:
+              page: 9
+              pdf_page_index: 8
+              published_page: '434'
+              note: 'Experimental methods: pure oxygen levitation gas.'
+          printed_sum:
+            state:
+              tag: value
+              value: '100.88'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: '435'
+              table: '4'
+              note: Table 4 total, run STA5-2H¹, data row 18.
+        printed_sum: '100.88'
+        n_measurements: '10'
+        component_amount:
+          value: '59.24'
+          sigma: '0.58'
+      uncertainty:
+        sigma: '0.58'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta5_2h_phase1_tio2
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta5_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA5-2H¹, liquid 1, TiO2 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id049
+        temperature_as_published: 2230±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA5-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA5-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id050
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id051
+        printed_sum: '100.88'
+        n_measurements: '10'
+        component_amount:
+          value: '19.81'
+          sigma: '0.44'
+      uncertainty:
+        sigma: '0.44'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    - observation_id: kirschen_1999_t4_sta5_2h_phase1_al2o3
+      type: composition_series
+      units: wt_percent
+      experiment: kirschen_1999_t4_sta5_2h
+      regime: quench_equilibration
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: '435'
+        table: '4'
+        note: Table 4, run STA5-2H¹, liquid 1, Al2O3 component; 600 dpi render checked.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: glass
+        basis: wt_percent
+        T_K: *id049
+        temperature_as_published: 2230±30 K
+        system_as_printed: SiO2-TiO2-Al2O3
+        sample_id_as_printed: STA5-2H¹
+        phase_order: 1
+        assemblage_id: 'Table 4: STA5-2H'
+        phase_assemblage_as_printed: one liquid (Table 4 footnote 1)
+        phase_as_analyzed: quenched glass analyzed by electron microprobe
+        quench_provenance_as_printed: Samples were completely molten during laser heating, then quenched. The authors exclude
+          formation of the two coexisting liquids by quench at 100 µm scale; they report secondary exsolution at 1 µm scale
+          in the TiO2-rich glass.
+        quench_status: asserted_preserved
+        quench_status_locator: *id050
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions: *id051
+        printed_sum: '100.88'
+        n_measurements: '10'
+        component_amount:
+          value: '21.83'
+          sigma: '0.33'
+      uncertainty:
+        sigma: '0.33'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical standard deviation as printed (1σ).
+    context:
+    - observation_id: kirschen_1999_table_1_context
+      type: table_context
+      units: as printed in table headers
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: '429'
+        table: '1'
+        note: Table 1; all cells checked against the 600 dpi render.
+      values:
+        table_title_as_printed: Standard-state thermodynamic properties of solid and liquid oxides.
+        candidate_tokens_considered:
+        - delta_fH
+        - S
+        disposition: context_model_reference
+        reason: The paper presents H0 and S0 as standard-state inputs used with Cp(T) to calculate solid Gibbs energies; the
+          table mixes this study and cited compilations, and H0 is not labelled delta_fH in the column header.
+        column_headers_as_printed:
+        - - Mineral
+          - abbrev.
+          - formula
+          - $H^0 [J/mol]$
+          - $S^0 [J/Kmol]$
+          - reference
+        rows_as_printed:
+        - - '"Tieilite"'
+          - A1T1
+          - $Al_2TiO_5$
+          - '-2617080.42'
+          - '109.6210'
+          - this study 1
+        - - Corundum
+          - Cor
+          - $Al_2O_3$
+          - '-1675699.95'
+          - '50.8200'
+          - Berman (1988)
+        - - α-Cristobalite
+          - a-Crist
+          - $SiO_2$
+          - '-907753.35'
+          - '43.3943'
+          - Berman (1988)
+        - - β-Cristobalite
+          - b-Crist
+          - $SiO_2$
+          - '-906377.23'
+          - '46.0288'
+          - Berman (1988)
+        - - Mullite (stoech.)
+          - Mul
+          - $Al_6Si_2O_{13}$
+          - '-6823487.97'
+          - '274.9000'
+          - this study 2
+        - - α-Quartz
+          - a-Qz
+          - $SiO_2$
+          - '-910699.95'
+          - '41.4600'
+          - Berman (1988)
+        - - β-Quartz
+          - b-Qz
+          - $SiO_2$
+          - '-908626.77'
+          - '44.2068'
+          - Berman (1988)
+        - - Rutile
+          - Rut
+          - $TiO_2$
+          - '-944750.00'
+          - '50.8800'
+          - Berman & Aranovich (1996)
+        - - low-Tridymite
+          - l-Trid
+          - $SiO_2$
+          - '-907749.56'
+          - '43.7702'
+          - Berman (1988)
+        - - high-Tridymite
+          - h-Trid
+          - $SiO_2$
+          - '-907045.12'
+          - '45.5237'
+          - Berman (1988)
+        - - $SiO_2$  liq
+          - ''
+          - $SiO_2$
+          - '-915982.73'
+          - '19.8613'
+          - this study
+        - - $TiO_2$  liq
+          - ''
+          - $TiO_2$
+          - '-943848.47'
+          - '16.5329'
+          - this study
+        - - $Al_2O_3$  liq
+          - ''
+          - $Al_2O_3$
+          - '-1667690.00'
+          - '0.2628'
+          - this study
+        - - $^1 S^0$  from Barin (1993),  $^2 S^0$  from Eriksson & Pelton (1993a),
+          - ''
+          - ''
+          - ''
+          - ''
+          - $T^0 = 298 K, p^0 = 10^5 Pa$
+        footnotes_as_printed: []
+    - observation_id: kirschen_1999_table_2_context
+      type: table_context
+      units: as printed in table headers
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: '430'
+        table: '2'
+        note: Table 2; all cells checked against the 600 dpi render.
+      values:
+        table_title_as_printed: Cp coefficients used in this study.
+        candidate_tokens_considered:
+        - cp
+        disposition: context_model
+        reason: These are coefficients of the fitted Cp(T) polynomial, not printed scalar heat-capacity measurements.
+        column_headers_as_printed:
+        - - Mineral
+          - k1
+          - k2
+          - k3
+          - k4
+          - k8
+          - reference
+        rows_as_printed:
+        - - '"Tieilite"'
+          - '249.2900'
+          - '0'
+          - '-4806100.'
+          - '-1350.100'
+          - '516030000.'
+          - Berman & Brown (1985)
+        - - Corundum
+          - '155.0189'
+          - '0'
+          - '-3861363.'
+          - '-828.387'
+          - '409083648.'
+          - Berman & Brown (1985)
+        - - $\alpha$ -Cristobalite
+          - '83.5136'
+          - '0'
+          - '-2455360.'
+          - '-374.693'
+          - '280072192.'
+          - Berman & Brown (1985)
+        - - $\beta$ -Cristobalite
+          - '83.5136'
+          - '0'
+          - '-2455360.'
+          - '-374.693'
+          - '280072192.'
+          - Berman & Brown (1985)
+        - - Mullite (stoech.)
+          - '634.8100'
+          - '0'
+          - '-17209900.'
+          - '-3373.500'
+          - '2122740000.'
+          - Berman & Brown (1985)
+        - - $\alpha$ -Quartz
+          - '80.0120'
+          - '0'
+          - '-3546684.'
+          - '-240.276'
+          - '491568384.'
+          - Berman & Brown (1985) $^{1}$
+        - - $\beta$ -Quartz
+          - '80.0120'
+          - '0'
+          - '-3546684.'
+          - '-240.276'
+          - '491568384.'
+          - Berman & Brown (1985)
+        - - Rutile
+          - '77.8376'
+          - '0'
+          - '-3367841.'
+          - '0'
+          - '402940672.'
+          - Berman & Brown (1985)
+        - - low-Tridymite
+          - '75.3727'
+          - '0'
+          - '-5958095.'
+          - '0'
+          - '958246144.'
+          - Berman (1988)
+        - - high-Tridymite
+          - '75.3727'
+          - '0'
+          - '-5958095.'
+          - '0'
+          - '958246144.'
+          - Berman (1988)
+        - - $SiO_{2}$  liq
+          - '81.3730'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+          - Richet et al. (1982)
+        - - $TiO_{2}$  liq
+          - '100.4160'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+          - Chase et al. (1985)
+        - - $Al_{2}O_{3}$  liq
+          - '130.2000'
+          - '0.0357'
+          - '0'
+          - '0'
+          - '0'
+          - Courtial & Richet (1993)
+        footnotes_as_printed:
+        - 'note: Cp function used in this study: Cp = k1 + k2T + k3/T² + k4/√T + k8/T³ in J/Kmol'
+        - '1: λ transition modelled with additional Cp = (-0.09186959 + 0.00024607 T)² between [373K, 848K],'
+        - Berman & Brown (1986).
+    - observation_id: kirschen_1999_table_3_context
+      type: table_context
+      units: as printed in table headers
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: '431'
+        table: '3'
+        note: Table 3; all cells checked against the 600 dpi render.
+      values:
+        table_title_as_printed: Margules excess parameters used in this study.
+        candidate_tokens_considered:
+        - interaction_parameter
+        disposition: context_model
+        reason: These are fitted Margules model parameters; no existing token represents this model form.
+        column_headers_as_printed:
+        - - ''
+          - $W_H$
+          - $W_S$
+          - k
+        - - $SiO_2-TiO_2$
+          - ''
+          - ''
+          - ''
+        rows_as_printed:
+        - - '112'
+          - '26054.226'
+          - '-5.456'
+          - '-3'
+        - - '122'
+          - '70487.320'
+          - '9.453'
+          - '-3'
+        - - $Al_2O_3-TiO_2$
+          - ''
+          - ''
+          - ''
+        - - '112'
+          - '-1330.153'
+          - '0'
+          - '1'
+        - - '122'
+          - '-2108.769'
+          - '0'
+          - '1'
+        - - $Al_2O_3-SiO_2$
+          - ''
+          - ''
+          - ''
+        - - '112'
+          - '620798.585'
+          - '288.902'
+          - '1'
+        - - '122'
+          - '179127.605'
+          - '90.331'
+          - '1'
+        - - 'note: the ternary excess Gibbs free energy is  $G^{xs} = \sum (x_1 + x_2)^{-k} [x_1x_2(W_{112}x_1 + W_{122}x_2)]$  where  $W
+            = W_H - TW_S$  in J/mol, T in K.'
+          - ''
+          - ''
+          - ''
+        footnotes_as_printed: []
+    - observation_id: kirschen_1999_fig1_whole_figure_figure_context
+      type: figure_context
+      units: phase-composition axes as printed; no figure-only numeric points extracted
+      locator:
+        page: 3
+        pdf_page_index: 1
+        published_page: '428'
+        figure: '1'
+        note: Figure 1; plotted numeric coordinates deferred.
+      values:
+        quantity: equilibrium_phase_composition
+        species_as_printed:
+        - SiO2
+        - TiO2
+        - Al2O3
+        - CaO
+        - MgO
+        phase_role: melt
+        basis: wt_percent
+        temperature_as_published: temperature axis as printed; figure data deferred
+        axes_as_printed: 'x: SiO2 content [wt%]; y: temperature [K]'
+        caption_as_printed: Fig. 1. SiO2 content of quenched coexisting liquids in the CaO-MgO-SiO2-TiO2-Al2O3 system. Open
+          symbols indicate quench of a homogeneous liquid. Addition of 3 wt% and 4 wt% Al2O3 reduces dramatically the consolute
+          temperature and the extension of the miscibility gap of the Al-free melt (filled circles). In bulk compositions
+          with 6 wt% Al2O3 no stable liquid-liquid boundary was found, and phase separation is rendered metastable.
+        panel_as_printed: whole figure
+        attribution: Kirschen et al. (1999), figure as cited; literature series attributions retained in the caption.
+        series:
+        - name: 'Open symbols: homogeneous-liquid quenches'
+          marker_count: not enumerated; deferred to figure pass
+        - name: 'Filled circles: coexisting-liquid compositions at 0, 3, and 4 wt% Al2O3'
+          marker_count: not enumerated; deferred to figure pass
+        digitisation: deferred to a figure pass
+        method_class: figure_only
+        admission_status: figure_only
+    - observation_id: kirschen_1999_fig2_panel_a_figure_context
+      type: figure_context
+      units: phase-composition axes as printed; no figure-only numeric points extracted
+      locator:
+        page: 7
+        pdf_page_index: 5
+        published_page: '432'
+        figure: '2'
+        note: Figure 2; plotted numeric coordinates deferred.
+      values:
+        quantity: equilibrium_phase_composition
+        species_as_printed:
+        - SiO2
+        - Al2O3
+        phase_role: melt
+        basis: mole_fraction
+        temperature_as_published: temperature and composition ranges as plotted; deferred
+        axes_as_printed: 'x: x(Al2O3); y: temperature [K]'
+        caption_as_printed: Fig. 2. Calculated phase diagrams for the Al2O3-SiO2 (a) and Al2O3-TiO2 (b) systems. Critical
+          quench experiments are considered from Aramaki & Roy (1959), fusion experiments from Bunting (1933), Lang et al.
+          (1952), Horibe & Kuwubara (1967), and mullite liquidus data from diffusion experiments (Davis & Pask, 1972). Slashed
+          triangles denote unmixing experiments in glasses from Galakhov et al. (1976). Open symbols indicate one liquid and
+          filled symbols liquid + crystalline phase stable. The dashed line indicates the calculated binodal of the solvus
+          at subliquidus temperatures. Numbers denote calculated temperatures of phase transitions. Klug et al. (1987) documented
+          the compositional shift of mullite from 2SiO2:3Al2O3 to 1SiO2:2Al2O3 at liquidus temperature, which is not modelled
+          with the stoichiometric approach in this calculation.
+        panel_as_printed: panel a
+        attribution: Kirschen et al. (1999), figure as cited; literature series attributions retained in the caption.
+        series:
+        - name: Critical quench and fusion data from cited works
+          marker_count: not enumerated; deferred to figure pass
+        - name: Liquidus data and calculated solvus/binodal
+          marker_count: not enumerated; deferred to figure pass
+        digitisation: deferred to a figure pass
+        method_class: figure_only
+        admission_status: figure_only
+    - observation_id: kirschen_1999_fig2_panel_b_figure_context
+      type: figure_context
+      units: phase-composition axes as printed; no figure-only numeric points extracted
+      locator:
+        page: 7
+        pdf_page_index: 5
+        published_page: '432'
+        figure: '2'
+        note: Figure 2; plotted numeric coordinates deferred.
+      values:
+        quantity: equilibrium_phase_composition
+        species_as_printed:
+        - TiO2
+        - Al2O3
+        phase_role: melt
+        basis: mole_fraction
+        temperature_as_published: temperature and composition ranges as plotted; deferred
+        axes_as_printed: 'x: x(TiO2); y: temperature [K]'
+        caption_as_printed: Fig. 2. Calculated phase diagrams for the Al2O3-SiO2 (a) and Al2O3-TiO2 (b) systems. Critical
+          quench experiments are considered from Aramaki & Roy (1959), fusion experiments from Bunting (1933), Lang et al.
+          (1952), Horibe & Kuwubara (1967), and mullite liquidus data from diffusion experiments (Davis & Pask, 1972). Slashed
+          triangles denote unmixing experiments in glasses from Galakhov et al. (1976). Open symbols indicate one liquid and
+          filled symbols liquid + crystalline phase stable. The dashed line indicates the calculated binodal of the solvus
+          at subliquidus temperatures. Numbers denote calculated temperatures of phase transitions. Klug et al. (1987) documented
+          the compositional shift of mullite from 2SiO2:3Al2O3 to 1SiO2:2Al2O3 at liquidus temperature, which is not modelled
+          with the stoichiometric approach in this calculation.
+        panel_as_printed: panel b
+        attribution: Kirschen et al. (1999), figure as cited; literature series attributions retained in the caption.
+        series:
+        - name: Critical quench and fusion data from cited works
+          marker_count: not enumerated; deferred to figure pass
+        - name: Calculated phase boundaries
+          marker_count: 0
+        digitisation: deferred to a figure pass
+        method_class: figure_only
+        admission_status: figure_only
+    - observation_id: kirschen_1999_fig3_whole_figure_figure_context
+      type: figure_context
+      units: phase-composition axes as printed; no figure-only numeric points extracted
+      locator:
+        page: 8
+        pdf_page_index: 6
+        published_page: '433'
+        figure: '3'
+        note: Figure 3; plotted numeric coordinates deferred.
+      values:
+        quantity: equilibrium_phase_composition
+        species_as_printed:
+        - SiO2
+        - TiO2
+        phase_role: melt
+        basis: mole_fraction
+        temperature_as_published: temperature axis as printed; figure data deferred
+        axes_as_printed: 'x: x(TiO2); y: temperature [K]'
+        caption_as_printed: Fig. 3. Calculated phase diagram for the SiO2-TiO2 system. Symbols refer to critical quench experiments
+          from DeVries et al. (1954), McTaggart & Andrews (1957) and Massazza & Sirchia (1958) that have been used to constrain
+          non-ideal solution parameters with liquidus and solvus data. Triangles point liquidus experiments from Galakhov
+          et al. (1974). Filled symbols indicate quenched crystalline + liquid phases stable, open symbols denote one liquid,
+          slashed symbols two liquids. Additional solvus data of this work are plotted within 1σ boxes in composition and
+          temperature. Numbers denote calculated temperatures of phase transitions.
+        panel_as_printed: whole figure
+        attribution: Kirschen et al. (1999), figure as cited; literature series attributions retained in the caption.
+        series:
+        - name: 'Filled symbols: quenched crystalline + liquid'
+          marker_count: not enumerated; deferred to figure pass
+        - name: 'Open symbols: one liquid'
+          marker_count: not enumerated; deferred to figure pass
+        - name: 'Slashed symbols: two liquids'
+          marker_count: not enumerated; deferred to figure pass
+        - name: 'Triangles: Galakhov et al. (1974) liquidus data'
+          marker_count: not enumerated; deferred to figure pass
+        - name: This study Table 4 two-liquid data
+          marker_count: 8
+        digitisation: deferred to a figure pass
+        method_class: figure_only
+        admission_status: figure_only
+    - observation_id: kirschen_1999_fig4_whole_image_figure_context
+      type: figure_context
+      units: phase-composition axes as printed; no figure-only numeric points extracted
+      locator:
+        page: 9
+        pdf_page_index: 7
+        published_page: '434'
+        figure: '4'
+        note: Figure 4; plotted numeric coordinates deferred.
+      values:
+        quantity: equilibrium_phase_composition
+        species_as_printed:
+        - SiO2
+        - TiO2
+        phase_role: glass
+        temperature_as_published: 2500 K quench, run ST1-1H
+        axes_as_printed: No plotted axes; 100 µm scale bar
+        caption_as_printed: Fig. 4. Back-scattered electron image of quench ST1-1H. The TiO2-rich liquid (bright) is clearly
+          separated from the SiO2-rich matrix (dark) by a sharp phase boundary. Small SiO2-rich inclusions indicate a secondary
+          exsolution while quenching from 2500 K. The TiO2-enriched rim of the spherical sample is seen at the lower right.
+        panel_as_printed: whole image
+        attribution: Kirschen et al. (1999), figure as cited; literature series attributions retained in the caption.
+        series:
+        - name: Back-scattered electron micrograph; no plotted marker series
+          marker_count: 0
+        digitisation: deferred to a figure pass
+        method_class: figure_only
+        admission_status: figure_only
+    - observation_id: kirschen_1999_fig5_whole_figure_figure_context
+      type: figure_context
+      units: phase-composition axes as printed; no figure-only numeric points extracted
+      locator:
+        page: 11
+        pdf_page_index: 9
+        published_page: '436'
+        figure: '5'
+        note: Figure 5; plotted numeric coordinates deferred.
+      values:
+        quantity: equilibrium_phase_composition
+        species_as_printed:
+        - SiO2
+        - TiO2
+        - Al2O3
+        phase_role: melt
+        basis: mole_fraction
+        temperature_as_published: 1773–2623 K
+        axes_as_printed: Ternary composition diagram; isotherms at 1773–2623 K
+        caption_as_printed: 'Fig. 5. Calculated phase diagram for the SiO2-TiO2-Al2O3 system. Isotherms are shown from T =
+          1773 K to 2623 K, with 50 K increments. Squares point reported ternary invariant compositions from Agamawi & White
+          (1952) (their Figure 10: E, 1743 K; R, 1753 K). Liquid-liquid unmixing is stable at temperatures above 2053 K.'
+        panel_as_printed: whole figure
+        attribution: Kirschen et al. (1999), figure as cited; literature series attributions retained in the caption.
+        series:
+        - name: Calculated isotherms
+          marker_count: 0
+        - name: 'Squares: Agamawi & White (1952) invariant compositions'
+          marker_count: 2
+        digitisation: deferred to a figure pass
+        method_class: figure_only
+        admission_status: figure_only
+    - observation_id: kirschen_1999_fig6_whole_figure_figure_context
+      type: figure_context
+      units: phase-composition axes as printed; no figure-only numeric points extracted
+      locator:
+        page: 12
+        pdf_page_index: 10
+        published_page: '437'
+        figure: '6'
+        note: Figure 6; plotted numeric coordinates deferred.
+      values:
+        quantity: equilibrium_phase_composition
+        species_as_printed:
+        - SiO2
+        - TiO2
+        - Al2O3
+        phase_role: melt
+        basis: mole_fraction
+        temperature_as_published: 2073 K; caption states 1 bar for the calculated diagram
+        axes_as_printed: Ternary composition diagram
+        caption_as_printed: Fig. 6. Comparison of calculated miscibility gaps with experiments at 2073 K, 1 bar for the SiO2-TiO2-Al2O3
+          system for different methods of extrapolation. Regions of liquid immiscibility are calculated (1) without correction
+          to binary excess parameters (k = 0, dashed line), (2) extrapolated with the Kohler (1960) method (k = 1, dotted
+          line), (3) with addition of ternary parameter W123 = -200 kJ/mol to binary excess parameters (dash-dotted line),
+          and with a generalized excess function (k = -3, solid line). Solid spheres point to compositions of quenched coexisting
+          liquids; open symbols denote quench of a homogeneous liquid. Mineral stability fields are omitted for clarity. Correction
+          of binary SiO2-TiO2 excess terms with an additional ternary parameter results in an asymmetric decrease of the ternary
+          miscibility gap, in disagreement with experiments.
+        panel_as_printed: whole figure
+        attribution: Kirschen et al. (1999), figure as cited; literature series attributions retained in the caption.
+        series:
+        - name: k = 0, dashed calculated boundary
+          marker_count: 0
+        - name: Kohler k = 1, dotted calculated boundary
+          marker_count: 0
+        - name: W123 = -200 kJ/mol, dash-dotted calculated boundary
+          marker_count: 0
+        - name: Generalized excess function k = -3, solid calculated boundary
+          marker_count: 0
+        - name: 'Solid spheres: quenched coexisting liquids'
+          marker_count: 2
+        - name: 'Open symbols: homogeneous-liquid quenches'
+          marker_count: 3
+        digitisation: deferred to a figure pass
+        method_class: figure_only
+        admission_status: figure_only

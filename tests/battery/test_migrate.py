@@ -54,6 +54,7 @@ from simulator.battery.migrate import (
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
     _convert_compilation_amount,
+    FE3_FE2_RATIO_PRINTED_FIELDS,
     fe3_fe2_ratio_from_ferric_fraction,
     MigrationResult,
     Migrator,
@@ -5523,6 +5524,9 @@ def test_g03_blank_pressure_unit_is_unknown() -> None:
     pa_ok, trail = convert_pressure_to_pa(1, "Pa")
     assert pa_ok == 1
     assert trail == "identity:Pa"
+    pressure_kbar, kbar_trail = convert_pressure_to_pa("0.001", "kbar")
+    assert pressure_kbar == Decimal("100000")
+    assert kbar_trail == "kbar_to_Pa"
     t, why_t = convert_temperature_to_k(1200, "")
     assert t is None
     assert why_t is not None and "unit" in why_t.lower()
@@ -6440,6 +6444,10 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
     if q_token == "log10_Kf":
         return _num(item.get("log10_Kf"))
     if q_token == "fe3_fe2_ratio":
+        # Same order as _fe3_fe2_ratio_selection: a printed ratio is the value.
+        for key in FE3_FE2_RATIO_PRINTED_FIELDS:
+            if key in item:
+                return _num(item.get(key))
         ratio = _num(item.get("Fe3_over_FeT"))
         if ratio is None:
             return None

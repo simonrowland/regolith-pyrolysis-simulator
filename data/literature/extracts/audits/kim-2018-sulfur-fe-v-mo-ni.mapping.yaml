@@ -1,0 +1,84 @@
+# Tables 1–3 map the printed linear L_S column; the printed metal [C], [S],
+# alloying-element, and slag (S) cells are emitted as phase-component rows in
+# the extract. The separate printed log L_S column is context-only because
+# distribution_ratio has no log-valued field.
+# Table 4 first-order epsilon rows use wagner_interaction_parameter; its
+# second-order r terms remain numeric fit context. Table 5 is whole-catalyst
+# composition, not a single equilibrium phase, and remains numeric context.
+source_id: kim-2018-sulfur-fe-v-mo-ni
+source:
+  citation: 'Kim, D.-H., Won, S.-Y., Han, J.-S., Nam, H.-S. and Pak, J.-J. (2018), “Thermodynamics of Sulfur in Carbon Saturated Liquid Ferro-alloys Containing Ni, Mo and V at 1 873 K”, ISIJ International, 58(3), 408–414.'
+  doi: 10.2355/isijinternational.ISIJINT-2017-509
+  year: 2018
+extraction:
+  method: MinerU table-tool drafts for Tables 1–3; Table 4 and figures retained as numeric context or deferred figure records.
+  date: '2026-10-22'
+  worker: codex-resume-7103-1792656483
+review_status: draft
+tables:
+  - page: 3
+    table_index: 1
+    published_page: 410
+    type: composition_series
+    quantity: distribution_ratio
+    unit: dimensionless
+    evidence_class: measured_direct
+    phase: l
+    experiment: kim2018-table1-fe-csat-s
+    regime: quench_equilibration
+    temperature:
+      as_printed: '1873'
+      unit: K
+      column_header: Table caption, temperature
+      locator: {page: 3, pdf_page_index: 2, published_page: 410, table: '1'}
+    conditions:
+      - key: gas_mix
+        state: {tag: value, value: CO, note: C–CO oxygen potential control; paper reports no numerical pO2}
+        locator: {page: 2, pdf_page_index: 1, published_page: 409}
+    values:
+      - column: 5
+        species: S
+  - page: 4
+    table_index: 2
+    published_page: 411
+    type: composition_series
+    quantity: distribution_ratio
+    unit: dimensionless
+    evidence_class: measured_direct
+    phase: l
+    experiment: kim2018-table2-fe-csat-i-s
+    regime: quench_equilibration
+    temperature:
+      as_printed: '1873'
+      unit: K
+      column_header: Table caption, temperature
+      locator: {page: 4, pdf_page_index: 3, published_page: 411, table: '2'}
+    conditions:
+      - key: gas_mix
+        state: {tag: value, value: CO, note: C–CO oxygen potential control; paper reports no numerical pO2}
+        locator: {page: 2, pdf_page_index: 1, published_page: 409}
+    values:
+      - column: 6
+        species: S
+  - page: 5
+    table_index: 3
+    published_page: 412
+    type: composition_series
+    quantity: distribution_ratio
+    unit: dimensionless
+    evidence_class: measured_direct
+    phase: l
+    experiment: kim2018-table3-fe-csat-v-ni-mo-s
+    regime: quench_equilibration
+    temperature:
+      as_printed: '1873'
+      unit: K
+      column_header: Table caption, temperature
+      locator: {page: 5, pdf_page_index: 4, published_page: 412, table: '3'}
+    conditions:
+      - key: gas_mix
+        state: {tag: value, value: CO, note: C–CO oxygen potential control; paper reports no numerical pO2}
+        locator: {page: 2, pdf_page_index: 1, published_page: 409}
+    values:
+      - column: 8
+        species: S

@@ -1,0 +1,3280 @@
+schema_version: literature_extract.v1
+source_id: vickerfalt-2024-al-si-v-phase-diagram
+source:
+  citation: Vickerfält A, Huss J, Martinsson J, Sichen D (2024). The Al2O3-SiO2-‘V2O3’ phase diagram at 1873 K.
+    Calphad 87, 102771.
+  doi: 10.1016/j.calphad.2024.102771
+  url: https://doi.org/10.1016/j.calphad.2024.102771
+  year: 2024
+  provenance_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+  note: Table 1 reports averaged WDS phase compositions from three analysis points; Table 2 prints the three mullite
+    analyses and means for samples 7 and 8. Vanadium valence was not determined.
+extraction:
+  method: manual_from_pdftotext_layout_and_600dpi_render_checks
+  date: '2026-10-22'
+  worker: codex-fam46-1022
+  note: Table 1's 13 liquid phase vectors are typed as one d-223 scalar row per oxide component. All measured solid
+    phase compositions are retained in table context because d-223 has no solid PhaseRole. Table 2 replicate values
+    and the repeated Table 1 means are retained in context. Figures 1-6 are deferred.
+review_status: draft
+fidelity_samples:
+- species: Al2O3
+  observation_id: vickerfalt_2024_table1_sample_03_liquid_al2o3
+  field: component_amount
+  value: '7.6'
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+- species: SiO2
+  observation_id: vickerfalt_2024_table1_sample_09_liquid_sio2
+  field: component_amount
+  value: '72.3'
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+- species: SiO2
+  observation_id: vickerfalt_2024_table1_sample_21_liquid_v2o3
+  field: component_amount
+  value: '1.8'
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+experiments:
+- experiment_id: vickerfalt_2024_sample_01
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 1 mixed composition, wt%: Al2O3 80; SiO2 10; V2O3 10'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_02
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 2 mixed composition, wt%: Al2O3 82; SiO2 13; V2O3 5'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_03
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 3 mixed composition, wt%: Al2O3 50; SiO2 45; V2O3 5'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_04
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 4 mixed composition, wt%: Al2O3 54; SiO2 6; V2O3 40'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_05
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 5 mixed composition, wt%: Al2O3 64; SiO2 16; V2O3 20'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_06
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 6 mixed composition, wt%: Al2O3 64; SiO2 16; V2O3 20'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_07
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 7 mixed composition, wt%: Al2O3 64; SiO2 16; V2O3 20'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_08
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 8 mixed composition, wt%: Al2O3 60; SiO2 10; V2O3 30'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_09
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 9 mixed composition, wt%: Al2O3 40; SiO2 35; V2O3 25'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_10
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 10 mixed composition, wt%: Al2O3 28; SiO2 32; V2O3 40'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_11
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 11 mixed composition, wt%: Al2O3 28; SiO2 32; V2O3 40'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_12
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 12 mixed composition, wt%: Al2O3 28; SiO2 32; V2O3 40'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_13
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 13 mixed composition, wt%: Al2O3 28; SiO2 32; V2O3 40'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_14
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 14 mixed composition, wt%: Al2O3 40; SiO2 35; V2O3 25'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_15
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 15 mixed composition, wt%: Al2O3 10; SiO2 65; V2O3 25'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_16
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 16 mixed composition, wt%: Al2O3 2; SiO2 48; V2O3 50'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_17
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 17 mixed composition, wt%: Al2O3 4; SiO2 66; V2O3 30'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_18
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 18 mixed composition, wt%: Al2O3 5; SiO2 55; V2O3 40'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_19
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 19 mixed composition, wt%: Al2O3 6; SiO2 44; V2O3 50'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_20
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 20 mixed composition, wt%: Al2O3 6; SiO2 54; V2O3 40'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+- experiment_id: vickerfalt_2024_sample_21
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+    pdf_page_index: 1
+    page: 2
+    section: 2.2. Experimental method
+    note: Powder charge equilibrated at 1873 K for 72 h in CO-CO2 gas and internally quenched into mineral oil;
+      solid-only charges were sintered twice.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 21 mixed composition, wt%: Al2O3 6; SiO2 44; V2O3 50'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        section: 2.2. Experimental method
+        note: The experiment temperature is printed as 1873 K; Table 1 and the article title identify the same temperature.
+species:
+  Al2O3:
+    observations:
+    - observation_id: vickerfalt_2024_table1_sample_03_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_03
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_03
+      phase_assemblage_as_printed: Mullite + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 3 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '7.6'
+        component_amount_as_published: 7.6 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id001
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id002
+            state:
+              tag: value
+              value: '0.00003343725'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '50'
+          SiO2: '45'
+          V2O3: '5'
+    - observation_id: vickerfalt_2024_table1_sample_03_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_03
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_03
+      phase_assemblage_as_printed: Mullite + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 3 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '91.4'
+        component_amount_as_published: 91.4 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id001
+          pO2_Pa: *id002
+        composition_wt_pct:
+          Al2O3: '50'
+          SiO2: '45'
+          V2O3: '5'
+    - observation_id: vickerfalt_2024_table1_sample_03_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_03
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_03
+      phase_assemblage_as_printed: Mullite + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 3 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '1.1'
+        component_amount_as_published: 1.1 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id001
+          pO2_Pa: *id002
+        composition_wt_pct:
+          Al2O3: '50'
+          SiO2: '45'
+          V2O3: '5'
+    context:
+    - observation_id: vickerfalt_2024_mullite_ratio_summary_context
+      type: table_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 4
+        page: 5
+        note: Discussion section 4.2, physical page 5; mullite composition ratio summarized from Table 1.
+      units: dimensionless molar ratio
+      values:
+        typed_quantity_as_printed: (Al2O3 + V2O3)/SiO2 molar ratio in mullite
+        candidate_tokens:
+        - distribution_ratio
+        schema_gap_or_disposition: This is a within-phase oxide-sum molar ratio, not the cross-phase distribution_ratio
+          token. Derivation pending a corpus table asset (controller, t-1382); solid composition inputs are in table1-solid-components.csv.
+        reported_minimum: '1.36'
+        reported_maximum: '1.68'
+        defining_expression: (Al2O3+V2O3)/SiO2 molar ratio
+    - observation_id: vickerfalt_2024_quoted_mullite_composition_context
+      type: table_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 0
+        page: 1
+        note: Introduction, physical page 1; literature mullite composition range attributed to references [11,13-15].
+      units: wt% and mol% Al2O3
+      values:
+        typed_quantity_as_printed: quoted mullite Al2O3 composition range
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Quoted solid-phase range; d-223 has no solid PhaseRole. Values are quoted from
+          the listed references, not current-work measurements.
+        attribution_as_printed: references [11,13-15]
+        T_K: '1873'
+        wt_percent_range_as_printed: approximately 72–74
+        mole_percent_range_as_printed: 60–63
+    - observation_id: vickerfalt_2024_quoted_nakano_v2o3_mullite_context
+      type: table_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 5
+        page: 6
+        note: Discussion section 4.2, physical page 6; comparison attributed to Nakano et al. [8].
+      units: wt% V2O3 in mullite
+      values:
+        typed_quantity_as_printed: quoted V2O3 concentration in mullite
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Quoted solid-phase composition; d-223 has no solid PhaseRole, so the literature
+          value remains context.
+        attribution_as_printed: Nakano et al. [8]
+        T_K: '1773'
+        pO2_as_printed: 10^-8 atm
+        V2O3_wt_percent_range_as_printed: 11–14
+    - observation_id: vickerfalt_2024_table1_al2o3_solid_compositions_context
+      type: table_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 solid-phase WDS compositions; every displayed solid row and component is retained.
+      units: printed component values are wt% oxide
+      values:
+        typed_quantity_as_printed: Table 1 solid-phase WDS compositions; every displayed solid row and component
+          is retained.
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Measured solid-phase compositions have no solid role in d-223 PhaseRole; they
+          cannot be typed as melt rows. Sample IDs, grouped mixed composition, pO2, assemblage, and all three printed
+          oxide values are retained per phase row.
+        rows_as_printed:
+        - sample_id_as_printed: '1'
+          sample_group: 1
+          mixed_Al2O3_wt_percent: '80'
+          mixed_SiO2_wt_percent: '10'
+          mixed_V2O3_wt_percent: '10'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '64.6'
+          SiO2_wt_percent: '27.2'
+          V2O3_wt_percent: '8.3'
+          assemblage_id: vickerfalt_2024_sample_01
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum
+        - sample_id_as_printed: '1'
+          sample_group: 1
+          mixed_Al2O3_wt_percent: '80'
+          mixed_SiO2_wt_percent: '10'
+          mixed_V2O3_wt_percent: '10'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: Al2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '87.5'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '12.5'
+          assemblage_id: vickerfalt_2024_sample_01
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum
+        - sample_id_as_printed: '2'
+          sample_group: 2
+          mixed_Al2O3_wt_percent: '82'
+          mixed_SiO2_wt_percent: '13'
+          mixed_V2O3_wt_percent: '5'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '69.2'
+          SiO2_wt_percent: '26.1'
+          V2O3_wt_percent: '4.7'
+          assemblage_id: vickerfalt_2024_sample_02
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum
+        - sample_id_as_printed: '2'
+          sample_group: 2
+          mixed_Al2O3_wt_percent: '82'
+          mixed_SiO2_wt_percent: '13'
+          mixed_V2O3_wt_percent: '5'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: Al2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '93.9'
+          SiO2_wt_percent: '0.0'
+          V2O3_wt_percent: '6.1'
+          assemblage_id: vickerfalt_2024_sample_02
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum
+        - sample_id_as_printed: '3'
+          sample_group: 3
+          mixed_Al2O3_wt_percent: '50'
+          mixed_SiO2_wt_percent: '45'
+          mixed_V2O3_wt_percent: '5'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '64.5'
+          SiO2_wt_percent: '28.5'
+          V2O3_wt_percent: '7.0'
+          assemblage_id: vickerfalt_2024_sample_03
+          phase_assemblage_as_printed: Mullite + Liquid
+        - sample_id_as_printed: '4'
+          sample_group: 4
+          mixed_Al2O3_wt_percent: '54'
+          mixed_SiO2_wt_percent: '6'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '63.7'
+          SiO2_wt_percent: '24.8'
+          V2O3_wt_percent: '11.5'
+          assemblage_id: vickerfalt_2024_sample_04
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '4'
+          sample_group: 4
+          mixed_Al2O3_wt_percent: '54'
+          mixed_SiO2_wt_percent: '6'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: Al2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '73.6'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '26.3'
+          assemblage_id: vickerfalt_2024_sample_04
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '5'
+          sample_group: 5
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '63.2'
+          SiO2_wt_percent: '25.7'
+          V2O3_wt_percent: '11.1'
+          assemblage_id: vickerfalt_2024_sample_05
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '5'
+          sample_group: 5
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: Al2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '75.1'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '24.8'
+          assemblage_id: vickerfalt_2024_sample_05
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '6'
+          sample_group: 6
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '61.7'
+          SiO2_wt_percent: '26.9'
+          V2O3_wt_percent: '11.4'
+          assemblage_id: vickerfalt_2024_sample_06
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '6'
+          sample_group: 6
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: Al2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '75.0'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '24.9'
+          assemblage_id: vickerfalt_2024_sample_06
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '7'
+          sample_group: 7
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '62.7'
+          SiO2_wt_percent: '26.1'
+          V2O3_wt_percent: '11.2'
+          assemblage_id: vickerfalt_2024_sample_07
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '7'
+          sample_group: 7
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: Al2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '75.6'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '24.4'
+          assemblage_id: vickerfalt_2024_sample_07
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '8'
+          sample_group: 8
+          mixed_Al2O3_wt_percent: '60'
+          mixed_SiO2_wt_percent: '10'
+          mixed_V2O3_wt_percent: '30'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '62.3'
+          SiO2_wt_percent: '26.6'
+          V2O3_wt_percent: '11.2'
+          assemblage_id: vickerfalt_2024_sample_08
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '8'
+          sample_group: 8
+          mixed_Al2O3_wt_percent: '60'
+          mixed_SiO2_wt_percent: '10'
+          mixed_V2O3_wt_percent: '30'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: Al2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '74.9'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '25.1'
+          assemblage_id: vickerfalt_2024_sample_08
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '9'
+          sample_group: 9
+          mixed_Al2O3_wt_percent: '40'
+          mixed_SiO2_wt_percent: '35'
+          mixed_V2O3_wt_percent: '25'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '61.9'
+          SiO2_wt_percent: '25.7'
+          V2O3_wt_percent: '12.4'
+          assemblage_id: vickerfalt_2024_sample_09
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+        - sample_id_as_printed: '10'
+          sample_group: 10
+          mixed_Al2O3_wt_percent: '28'
+          mixed_SiO2_wt_percent: '32'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '61.2'
+          SiO2_wt_percent: '25.9'
+          V2O3_wt_percent: '12.9'
+          assemblage_id: vickerfalt_2024_sample_10
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+        - sample_id_as_printed: '11'
+          sample_group: 11
+          mixed_Al2O3_wt_percent: '28'
+          mixed_SiO2_wt_percent: '32'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '57.6'
+          SiO2_wt_percent: '28.6'
+          V2O3_wt_percent: '13.9'
+          assemblage_id: vickerfalt_2024_sample_11
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+        - sample_id_as_printed: '12'
+          sample_group: 12
+          mixed_Al2O3_wt_percent: '28'
+          mixed_SiO2_wt_percent: '32'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '57.8'
+          SiO2_wt_percent: '27.8'
+          V2O3_wt_percent: '14.4'
+          assemblage_id: vickerfalt_2024_sample_12
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+        - sample_id_as_printed: '13'
+          sample_group: 13
+          mixed_Al2O3_wt_percent: '28'
+          mixed_SiO2_wt_percent: '32'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '57.0'
+          SiO2_wt_percent: '28.3'
+          V2O3_wt_percent: '14.7'
+          assemblage_id: vickerfalt_2024_sample_13
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+        - sample_id_as_printed: '14'
+          sample_group: 14
+          mixed_Al2O3_wt_percent: '40'
+          mixed_SiO2_wt_percent: '35'
+          mixed_V2O3_wt_percent: '25'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: Mullite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '59.0'
+          SiO2_wt_percent: '26.5'
+          V2O3_wt_percent: '14.5'
+          assemblage_id: vickerfalt_2024_sample_14
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+    - observation_id: vickerfalt_2024_table2_mullite_replicates_context
+      type: table_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 4
+        page: 5
+        table: '2'
+        note: Table 2; all three mullite analyses and the calculated averages for samples 7 and 8 retained. Table
+          2 averages repeat the Table 1 scored mullite rows for these samples.
+      units: printed component values are wt% oxide
+      values:
+        typed_quantity_as_printed: Table 2; all three mullite analyses and the calculated averages for samples 7
+          and 8 retained. Table 2 averages repeat the Table 1 scored mullite rows for these samples.
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Measured solid-phase replicates have no solid PhaseRole in d-223. Averages are
+          author-calculated from untyped replicate inputs and are retained as printed; derivation awaits a registered
+          corpus table asset under t-1382. The six underlying rows and printed means are in the seat CSV.
+        rows_as_printed:
+        - sample_id_as_printed: '7'
+          analysis_number: 1
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          analyzed_Al2O3_wt_percent: '62.3'
+          analyzed_SiO2_wt_percent: '26.5'
+          analyzed_V2O3_wt_percent: '11.2'
+          analysis_average_Al2O3_wt_percent: '62.7'
+          analysis_average_SiO2_wt_percent: '26.1'
+          analysis_average_V2O3_wt_percent: '11.2'
+          average_repeated_in_table1: true
+        - sample_id_as_printed: '7'
+          analysis_number: 2
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          analyzed_Al2O3_wt_percent: '62.7'
+          analyzed_SiO2_wt_percent: '26.1'
+          analyzed_V2O3_wt_percent: '11.3'
+          analysis_average_Al2O3_wt_percent: '62.7'
+          analysis_average_SiO2_wt_percent: '26.1'
+          analysis_average_V2O3_wt_percent: '11.2'
+          average_repeated_in_table1: true
+        - sample_id_as_printed: '7'
+          analysis_number: 3
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          analyzed_Al2O3_wt_percent: '63.2'
+          analyzed_SiO2_wt_percent: '25.8'
+          analyzed_V2O3_wt_percent: '11.0'
+          analysis_average_Al2O3_wt_percent: '62.7'
+          analysis_average_SiO2_wt_percent: '26.1'
+          analysis_average_V2O3_wt_percent: '11.2'
+          average_repeated_in_table1: true
+        - sample_id_as_printed: '8'
+          analysis_number: 1
+          mixed_Al2O3_wt_percent: '60'
+          mixed_SiO2_wt_percent: '10'
+          mixed_V2O3_wt_percent: '30'
+          analyzed_Al2O3_wt_percent: '62.4'
+          analyzed_SiO2_wt_percent: '26.4'
+          analyzed_V2O3_wt_percent: '11.2'
+          analysis_average_Al2O3_wt_percent: '62.3'
+          analysis_average_SiO2_wt_percent: '26.6'
+          analysis_average_V2O3_wt_percent: '11.2'
+          average_repeated_in_table1: true
+        - sample_id_as_printed: '8'
+          analysis_number: 2
+          mixed_Al2O3_wt_percent: '60'
+          mixed_SiO2_wt_percent: '10'
+          mixed_V2O3_wt_percent: '30'
+          analyzed_Al2O3_wt_percent: '62.5'
+          analyzed_SiO2_wt_percent: '26.4'
+          analyzed_V2O3_wt_percent: '11.1'
+          analysis_average_Al2O3_wt_percent: '62.3'
+          analysis_average_SiO2_wt_percent: '26.6'
+          analysis_average_V2O3_wt_percent: '11.2'
+          average_repeated_in_table1: true
+        - sample_id_as_printed: '8'
+          analysis_number: 3
+          mixed_Al2O3_wt_percent: '60'
+          mixed_SiO2_wt_percent: '10'
+          mixed_V2O3_wt_percent: '30'
+          analyzed_Al2O3_wt_percent: '61.9'
+          analyzed_SiO2_wt_percent: '26.9'
+          analyzed_V2O3_wt_percent: '11.2'
+          analysis_average_Al2O3_wt_percent: '62.3'
+          analysis_average_SiO2_wt_percent: '26.6'
+          analysis_average_V2O3_wt_percent: '11.2'
+          average_repeated_in_table1: true
+    - observation_id: vickerfalt_2024_wds_uncertainty_context
+      type: table_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 3
+        page: 4
+        note: Results text, physical page 4; general WDS analysis uncertainty.
+      units: wt% absolute uncertainty
+      values:
+        typed_quantity_as_printed: general WDS analysis uncertainty
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: The paper reports a method-wide uncertainty summary, not a per-observation uncertainty;
+          it is retained here and is not copied onto individual rows.
+        maximum_absolute_uncertainty_wt_percent: ≤1.3
+        average_absolute_uncertainty_wt_percent: '0.3'
+  SiO2:
+    observations:
+    - observation_id: vickerfalt_2024_table1_sample_09_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_09
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_09
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 9 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '24.1'
+        component_amount_as_published: 24.1 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id004
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id005
+            state:
+              tag: value
+              value: '0.00000344505'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.4 × 10^-11 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
+    - observation_id: vickerfalt_2024_table1_sample_09_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_09
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_09
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 9 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '72.3'
+        component_amount_as_published: 72.3 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id004
+          pO2_Pa: *id005
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
+    - observation_id: vickerfalt_2024_table1_sample_09_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_09
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_09
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 9 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '3.5'
+        component_amount_as_published: 3.5 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id004
+          pO2_Pa: *id005
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
+    - observation_id: vickerfalt_2024_table1_sample_10_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_10
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_10
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 10 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '24.0'
+        component_amount_as_published: 24.0 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id007
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id008
+            state:
+              tag: value
+              value: '0.00000344505'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.4 × 10^-11 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_10_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_10
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_10
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 10 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '72.4'
+        component_amount_as_published: 72.4 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id007
+          pO2_Pa: *id008
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_10_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_10
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_10
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 10 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '3.6'
+        component_amount_as_published: 3.6 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id007
+          pO2_Pa: *id008
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_11_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_11
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_11
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 11 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '14.3'
+        component_amount_as_published: 14.3 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id010
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id011
+            state:
+              tag: value
+              value: '0.00003343725'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_11_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_11
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_11
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 11 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '83.0'
+        component_amount_as_published: 83.0 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id010
+          pO2_Pa: *id011
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_11_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_11
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_11
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 11 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '2.8'
+        component_amount_as_published: 2.8 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id010
+          pO2_Pa: *id011
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_12_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_12
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_12
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 12 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '14.3'
+        component_amount_as_published: 14.3 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id013
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id014
+            state:
+              tag: value
+              value: '0.00003343725'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_12_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_12
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_12
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 12 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '82.8'
+        component_amount_as_published: 82.8 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id013
+          pO2_Pa: *id014
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_12_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_12
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_12
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 12 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '2.8'
+        component_amount_as_published: 2.8 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id013
+          pO2_Pa: *id014
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_13_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_13
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_13
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 13 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '6.3'
+        component_amount_as_published: 6.3 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id016
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id017
+            state:
+              tag: value
+              value: '0.000344505'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.4 × 10^-9 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_13_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_13
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_13
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 13 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '92.0'
+        component_amount_as_published: 92.0 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id016
+          pO2_Pa: *id017
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_13_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_13
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_13
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 13 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '1.7'
+        component_amount_as_published: 1.7 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id016
+          pO2_Pa: *id017
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_14_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_14
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_14
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 14 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '7.2'
+        component_amount_as_published: 7.2 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id019
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id020
+            state:
+              tag: value
+              value: '0.000344505'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.4 × 10^-9 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
+    - observation_id: vickerfalt_2024_table1_sample_14_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_14
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_14
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 14 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '91.0'
+        component_amount_as_published: 91.0 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id019
+          pO2_Pa: *id020
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
+    - observation_id: vickerfalt_2024_table1_sample_14_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_14
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_14
+      phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 14 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '1.8'
+        component_amount_as_published: 1.8 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id019
+          pO2_Pa: *id020
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
+    - observation_id: vickerfalt_2024_table1_sample_17_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_17
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_17
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 17 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '5.2'
+        component_amount_as_published: 5.2 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id022
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id023
+            state:
+              tag: value
+              value: '0.00000344505'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.4 × 10^-11 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '4'
+          SiO2: '66'
+          V2O3: '30'
+    - observation_id: vickerfalt_2024_table1_sample_17_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_17
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_17
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 17 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '93.1'
+        component_amount_as_published: 93.1 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id022
+          pO2_Pa: *id023
+        composition_wt_pct:
+          Al2O3: '4'
+          SiO2: '66'
+          V2O3: '30'
+    - observation_id: vickerfalt_2024_table1_sample_17_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_17
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_17
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 17 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '1.7'
+        component_amount_as_published: 1.7 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id022
+          pO2_Pa: *id023
+        composition_wt_pct:
+          Al2O3: '4'
+          SiO2: '66'
+          V2O3: '30'
+    - observation_id: vickerfalt_2024_table1_sample_18_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_18
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_18
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 18 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '5.0'
+        component_amount_as_published: 5.0 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id025
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id026
+            state:
+              tag: value
+              value: '0.00003343725'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '5'
+          SiO2: '55'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_18_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_18
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_18
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 18 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '93.6'
+        component_amount_as_published: 93.6 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id025
+          pO2_Pa: *id026
+        composition_wt_pct:
+          Al2O3: '5'
+          SiO2: '55'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_18_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_18
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_18
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 18 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '1.4'
+        component_amount_as_published: 1.4 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id025
+          pO2_Pa: *id026
+        composition_wt_pct:
+          Al2O3: '5'
+          SiO2: '55'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_19_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_19
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_19
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 19 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '5.3'
+        component_amount_as_published: 5.3 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id028
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id029
+            state:
+              tag: value
+              value: '0.00003343725'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
+    - observation_id: vickerfalt_2024_table1_sample_19_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_19
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_19
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 19 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '93.0'
+        component_amount_as_published: 93.0 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id028
+          pO2_Pa: *id029
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
+    - observation_id: vickerfalt_2024_table1_sample_19_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_19
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_19
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 19 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '1.7'
+        component_amount_as_published: 1.7 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id028
+          pO2_Pa: *id029
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
+    - observation_id: vickerfalt_2024_table1_sample_20_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_20
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_20
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 20 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '5.5'
+        component_amount_as_published: 5.5 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id031
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id032
+            state:
+              tag: value
+              value: '0.000344505'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.4 × 10^-9 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '54'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_20_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_20
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_20
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 20 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '93.1'
+        component_amount_as_published: 93.1 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id031
+          pO2_Pa: *id032
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '54'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_20_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_20
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_20
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 20 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '1.4'
+        component_amount_as_published: 1.4 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id031
+          pO2_Pa: *id032
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '54'
+          V2O3: '40'
+    - observation_id: vickerfalt_2024_table1_sample_21_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_21
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_21
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 21 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '5.2'
+        component_amount_as_published: 5.2 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id034
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id035
+            state:
+              tag: value
+              value: '0.000344505'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.4 × 10^-9 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
+    - observation_id: vickerfalt_2024_table1_sample_21_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_21
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_21
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 21 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '93.1'
+        component_amount_as_published: 93.1 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id034
+          pO2_Pa: *id035
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
+    - observation_id: vickerfalt_2024_table1_sample_21_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_21
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_21
+      phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 21 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '1.8'
+        component_amount_as_published: 1.8 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id034
+          pO2_Pa: *id035
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
+    context:
+    - observation_id: vickerfalt_2024_figure_1_context
+      type: figure_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 1
+        page: 2
+        figure: '1'
+        note: Figure 1 schematic on physical page 2; the apparatus is used for the 1873 K experiment; no plotted
+          data.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: furnace apparatus schematic
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: Al2O3-SiO2-V2O3 experimental system
+        phase: equilibration/quench apparatus
+        T_K: '1873'
+        axes_as_printed: no plotted axes; schematic labels
+        caption_as_printed: Schematic drawing of the furnace.
+        panels:
+        - single
+        series: []
+        marker_count_per_series: {}
+        attribution: present work
+        schema_gap_or_disposition: Figure values are not digitized in this wave.
+    - observation_id: vickerfalt_2024_figure_2_context
+      type: figure_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 3
+        page: 4
+        figure: '2'
+        note: Figure 2 panels a-h on physical page 4; samples were equilibrated at 1873 K; no plotted points.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: phase assemblage and microstructure
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: Al2O3-SiO2-V2O3 system
+        phase: quenched solid/liquid assemblages
+        T_K: '1873'
+        axes_as_printed: no numeric axes; 10 µm scale bars
+        caption_as_printed: BSE-micrographs of the different phase relationships found in the samples as well as
+          (f) an aluminum mapping of sample 18 which contains V2O3-corundum, cristobalite and liquid.
+        panels:
+        - 'a: sample 6'
+        - 'b: sample 1'
+        - 'c: sample 12'
+        - 'd: sample 3'
+        - 'e: sample 18 BSE'
+        - 'f: sample 18 Al map'
+        - 'g: sample 15'
+        - 'h: sample 16'
+        series: []
+        marker_count_per_series: {}
+        attribution: present work
+        schema_gap_or_disposition: Figure values are not digitized in this wave.
+    - observation_id: vickerfalt_2024_figure_3_context
+      type: figure_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 3
+        page: 4
+        figure: '3'
+        note: Figure 3 on physical page 4; the cristobalite and karelianite symbols identify peaks on the continuous
+          XRD trace; no numerical points are digitized.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: X-ray diffraction intensity and phase identification
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: V2O3 and SiO2
+        phase: post-quench crystalline phases after equilibration at 1873 K, sample 16
+        T_K: '1873'
+        axes_as_printed: 'x: 2θ (degrees); y: intensity (a.u.)'
+        caption_as_printed: The X-ray diffraction pattern of sample 16 indicates the presence of cristobalite and
+          V2O3-corundum.
+        panels:
+        - single
+        series:
+        - measured XRD trace
+        marker_count_per_series:
+          measured XRD trace: 0
+        attribution: present work
+        schema_gap_or_disposition: Figure values are not digitized in this wave.
+    - observation_id: vickerfalt_2024_figure_4_context
+      type: figure_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 4
+        page: 5
+        figure: '4'
+        note: Figure 4 on physical page 5; marker counts by legend series visually checked against the 600 dpi render.
+          Plotted values are deferred.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: equilibrium_phase_composition
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: SiO2-Al2O3-V2O3 system
+        phase: liquid and coexisting solid phases
+        T_K: '1873'
+        axes_as_printed: 'ternary composition axes: Al2O3, SiO2, V2O3 (wt%)'
+        caption_as_printed: The isothermal section diagram of the SiO2-Al2O3-V2O3 system at 1873 K and pO2 = 3.4
+          × 10^-9 atm.
+        panels:
+        - single
+        series:
+        - Mullite+V2O3+Al2O3 sample compositions
+        - Mullite+V2O3+Al2O3 invariant compositions
+        - Mullite+V2O3+liquid sample compositions
+        - Mullite+V2O3+liquid invariant points
+        - Liquid+V2O3+SiO2 sample compositions
+        - Liquid+V2O3+SiO2 invariant points
+        - Literature data [12-14]
+        - Phase boundary
+        - Tie line
+        marker_count_per_series:
+          Mullite+V2O3+Al2O3 sample compositions: 2
+          Mullite+V2O3+Al2O3 invariant compositions: 6
+          Mullite+V2O3+liquid sample compositions: 2
+          Mullite+V2O3+liquid invariant points: 6
+          Liquid+V2O3+SiO2 sample compositions: 2
+          Liquid+V2O3+SiO2 invariant points: 6
+          Literature data [12-14]: 2
+          Phase boundary: 0
+          Tie line: 0
+        attribution: present work
+        schema_gap_or_disposition: Figure values are not digitized in this wave.
+        pO2_as_printed: 3.4 × 10^-9 atm
+        quantity: equilibrium_phase_composition
+    - observation_id: vickerfalt_2024_figure_5_context
+      type: figure_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 5
+        page: 6
+        figure: '5'
+        note: Figure 5 on physical page 6; marker counts by legend series visually checked against the 600 dpi render.
+          Plotted values are deferred.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: equilibrium_phase_composition
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: SiO2-Al2O3-V2O3 system
+        phase: liquid and coexisting solid phases
+        T_K: '1873'
+        axes_as_printed: 'ternary composition axes: Al2O3, SiO2, V2O3 (wt%)'
+        caption_as_printed: The isothermal section diagram of the SiO2-Al2O3-V2O3 system at 1873 K and pO2 = 3.3
+          × 10^-10 atm.
+        panels:
+        - single
+        series:
+        - Mullite+V2O3+Al2O3 sample compositions
+        - Mullite+V2O3+Al2O3 invariant compositions
+        - Mullite+V2O3+liquid sample compositions
+        - Mullite+V2O3+liquid invariant points
+        - Liquid+V2O3+SiO2 sample compositions
+        - Liquid+V2O3+SiO2 invariant points
+        - Mullite+liquid sample compositions
+        - Mullite+liquid phase compositions
+        - Mullite+Al2O3 sample compositions
+        - Mullite+Al2O3 phase compositions
+        - Literature data [12-14]
+        - Phase boundary
+        - Tie line
+        marker_count_per_series:
+          Mullite+V2O3+Al2O3 sample compositions: 1
+          Mullite+V2O3+Al2O3 invariant compositions: 3
+          Mullite+V2O3+liquid sample compositions: 2
+          Mullite+V2O3+liquid invariant points: 6
+          Liquid+V2O3+SiO2 sample compositions: 2
+          Liquid+V2O3+SiO2 invariant points: 6
+          Mullite+liquid sample compositions: 1
+          Mullite+liquid phase compositions: 2
+          Mullite+Al2O3 sample compositions: 2
+          Mullite+Al2O3 phase compositions: 4
+          Literature data [12-14]: 2
+          Phase boundary: 0
+          Tie line: 0
+        attribution: present work
+        schema_gap_or_disposition: Figure values are not digitized in this wave.
+        pO2_as_printed: 3.3 × 10^-10 atm
+        quantity: equilibrium_phase_composition
+    - observation_id: vickerfalt_2024_figure_6_context
+      type: figure_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 5
+        page: 6
+        figure: '6'
+        note: Figure 6 on physical page 6; marker counts by legend series visually checked against the 600 dpi render.
+          Plotted values are deferred.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: equilibrium_phase_composition
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: SiO2-Al2O3-V2O3 system
+        phase: liquid and coexisting solid phases
+        T_K: '1873'
+        axes_as_printed: 'ternary composition axes: Al2O3, SiO2, V2O3 (wt%)'
+        caption_as_printed: The isothermal section diagram of the SiO2-Al2O3-V2O3 system at 1873 K and pO2 = 3.4
+          × 10^-11 atm.
+        panels:
+        - single
+        series:
+        - Mullite+V2O3+Al2O3 sample compositions
+        - Mullite+V2O3+Al2O3 invariant compositions
+        - Mullite+V2O3+liquid sample compositions
+        - Mullite+V2O3+liquid invariant points
+        - Liquid+V2O3+SiO2 sample compositions
+        - Liquid+V2O3+SiO2 invariant points
+        - V2O3+SiO2 sample composition
+        - V2O3+SiO2 phase compositions
+        - Literature data [12-14]
+        - Phase boundary
+        - Tie line
+        marker_count_per_series:
+          Mullite+V2O3+Al2O3 sample compositions: 2
+          Mullite+V2O3+Al2O3 invariant compositions: 6
+          Mullite+V2O3+liquid sample compositions: 2
+          Mullite+V2O3+liquid invariant points: 6
+          Liquid+V2O3+SiO2 sample compositions: 1
+          Liquid+V2O3+SiO2 invariant points: 3
+          V2O3+SiO2 sample composition: 1
+          V2O3+SiO2 phase compositions: 2
+          Literature data [12-14]: 2
+          Phase boundary: 0
+          Tie line: 0
+        attribution: present work
+        schema_gap_or_disposition: Figure values are not digitized in this wave.
+        pO2_as_printed: 3.4 × 10^-11 atm
+        quantity: equilibrium_phase_composition
+    - observation_id: vickerfalt_2024_table1_sio2_solid_compositions_context
+      type: table_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 solid-phase WDS compositions; every displayed solid row and component is retained.
+      units: printed component values are wt% oxide
+      values:
+        typed_quantity_as_printed: Table 1 solid-phase WDS compositions; every displayed solid row and component
+          is retained.
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Measured solid-phase compositions have no solid role in d-223 PhaseRole; they
+          cannot be typed as melt rows. Sample IDs, grouped mixed composition, pO2, assemblage, and all three printed
+          oxide values are retained per phase row.
+        rows_as_printed:
+        - sample_id_as_printed: '16'
+          sample_group: 16
+          mixed_Al2O3_wt_percent: '2'
+          mixed_SiO2_wt_percent: '48'
+          mixed_V2O3_wt_percent: '50'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: Cristobalite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '0.3'
+          SiO2_wt_percent: '98.7'
+          V2O3_wt_percent: '1.0'
+          assemblage_id: vickerfalt_2024_sample_16
+          phase_assemblage_as_printed: V2O3-corundum + Cristobalite
+        - sample_id_as_printed: '17'
+          sample_group: 17
+          mixed_Al2O3_wt_percent: '4'
+          mixed_SiO2_wt_percent: '66'
+          mixed_V2O3_wt_percent: '30'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: Cristobalite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '0.2'
+          SiO2_wt_percent: '99.3'
+          V2O3_wt_percent: '0.5'
+          assemblage_id: vickerfalt_2024_sample_17
+          phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+        - sample_id_as_printed: '18'
+          sample_group: 18
+          mixed_Al2O3_wt_percent: '5'
+          mixed_SiO2_wt_percent: '55'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: Cristobalite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '0.3'
+          SiO2_wt_percent: '99.3'
+          V2O3_wt_percent: '0.4'
+          assemblage_id: vickerfalt_2024_sample_18
+          phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+        - sample_id_as_printed: '19'
+          sample_group: 19
+          mixed_Al2O3_wt_percent: '6'
+          mixed_SiO2_wt_percent: '44'
+          mixed_V2O3_wt_percent: '50'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: Cristobalite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '0.1'
+          SiO2_wt_percent: '99.2'
+          V2O3_wt_percent: '0.6'
+          assemblage_id: vickerfalt_2024_sample_19
+          phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+        - sample_id_as_printed: '20'
+          sample_group: 20
+          mixed_Al2O3_wt_percent: '6'
+          mixed_SiO2_wt_percent: '54'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: Cristobalite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '0.1'
+          SiO2_wt_percent: '99.4'
+          V2O3_wt_percent: '0.5'
+          assemblage_id: vickerfalt_2024_sample_20
+          phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+        - sample_id_as_printed: '21'
+          sample_group: 21
+          mixed_Al2O3_wt_percent: '6'
+          mixed_SiO2_wt_percent: '44'
+          mixed_V2O3_wt_percent: '50'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: Cristobalite
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '0.1'
+          SiO2_wt_percent: '99.2'
+          V2O3_wt_percent: '0.7'
+          assemblage_id: vickerfalt_2024_sample_21
+          phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+  V2O3:
+    observations:
+    - observation_id: vickerfalt_2024_table1_sample_15_liquid_al2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_15
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_15
+      phase_assemblage_as_printed: V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 15 averaged WDS composition of the equilibrated liquid phase; Al2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '7.0'
+        component_amount_as_published: 7.0 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: &id037
+            state:
+              tag: value
+              value: '1873'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 1
+              page: 2
+              section: 2.2. Experimental method
+              note: Printed equilibration temperature 1873 K.
+          pO2_Pa: &id038
+            state:
+              tag: value
+              value: '0.00003343725'
+            locator:
+              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+              pdf_page_index: 2
+              page: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
+        composition_wt_pct:
+          Al2O3: '10'
+          SiO2: '65'
+          V2O3: '25'
+    - observation_id: vickerfalt_2024_table1_sample_15_liquid_sio2
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_15
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_15
+      phase_assemblage_as_printed: V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 15 averaged WDS composition of the equilibrated liquid phase; SiO2 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '91.1'
+        component_amount_as_published: 91.1 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id037
+          pO2_Pa: *id038
+        composition_wt_pct:
+          Al2O3: '10'
+          SiO2: '65'
+          V2O3: '25'
+    - observation_id: vickerfalt_2024_table1_sample_15_liquid_v2o3
+      type: composition_series
+      units: wt% oxide component as printed
+      experiment: vickerfalt_2024_sample_15
+      regime: quench_equilibration
+      assemblage_id: vickerfalt_2024_sample_15
+      phase_assemblage_as_printed: V2O3-corundum + Liquid
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 15 averaged WDS composition of the equilibrated liquid phase; V2O3 component.
+      phase: l
+      note: Table 1 reports averaged WDS analyses of the phase at 1873 K; samples were internally oil-quenched for
+        analysis. Vanadium valence was not determined.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V2O3
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1599.85'
+        component_amount: '1.9'
+        component_amount_as_published: 1.9 wt%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K: *id037
+          pO2_Pa: *id038
+        composition_wt_pct:
+          Al2O3: '10'
+          SiO2: '65'
+          V2O3: '25'
+    context:
+    - observation_id: vickerfalt_2024_table1_mo2o3_context
+      type: table_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 3
+        page: 4
+        note: Results discussion, physical page 4; Mo2O3 detected in V2O3-corundum phases.
+      units: wt% Mo2O3
+      values:
+        typed_quantity_as_printed: Mo2O3 impurity content in V2O3-corundum
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: The reported trace oxide contents are measured solid-phase components; d-223
+          has no solid PhaseRole. The stated upper bounds remain bounds, not points.
+        rows_as_printed:
+        - phase_as_printed: V2O3-corundum
+          sample_ids:
+          - 7
+          - 8
+          Mo2O3_wt_percent: up to 2.5
+          pO2_as_printed: 3.4 × 10^-9 atm
+        - phase_as_printed: V2O3-corundum
+          sample_ids:
+          - 9
+          - 10
+          Mo2O3_wt_percent: <0.2
+          pO2_as_printed: 3.4 × 10^-11 atm
+        - phase_as_printed: V2O3-corundum
+          sample_ids:
+          - 12
+          Mo2O3_wt_percent: <0.2
+          pO2_as_printed: 3.3 × 10^-10 atm
+        - phase_as_printed: V2O3-corundum
+          sample_ids:
+          - 14
+          Mo2O3_wt_percent: <0.2
+          pO2_as_printed: 3.4 × 10^-9 atm
+    - observation_id: vickerfalt_2024_table1_v2o3_solid_compositions_context
+      type: table_context
+      locator:
+        source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 solid-phase WDS compositions; every displayed solid row and component is retained.
+      units: printed component values are wt% oxide
+      values:
+        typed_quantity_as_printed: Table 1 solid-phase WDS compositions; every displayed solid row and component
+          is retained.
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Measured solid-phase compositions have no solid role in d-223 PhaseRole; they
+          cannot be typed as melt rows. Sample IDs, grouped mixed composition, pO2, assemblage, and all three printed
+          oxide values are retained per phase row.
+        rows_as_printed:
+        - sample_id_as_printed: '4'
+          sample_group: 4
+          mixed_Al2O3_wt_percent: '54'
+          mixed_SiO2_wt_percent: '6'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '21.4'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '78.5'
+          assemblage_id: vickerfalt_2024_sample_04
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '5'
+          sample_group: 5
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '21.9'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '78.0'
+          assemblage_id: vickerfalt_2024_sample_05
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '6'
+          sample_group: 6
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '21.2'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '78.7'
+          assemblage_id: vickerfalt_2024_sample_06
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '7'
+          sample_group: 7
+          mixed_Al2O3_wt_percent: '64'
+          mixed_SiO2_wt_percent: '16'
+          mixed_V2O3_wt_percent: '20'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '18.3'
+          SiO2_wt_percent: '0'
+          V2O3_wt_percent: '81.7'
+          assemblage_id: vickerfalt_2024_sample_07
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '8'
+          sample_group: 8
+          mixed_Al2O3_wt_percent: '60'
+          mixed_SiO2_wt_percent: '10'
+          mixed_V2O3_wt_percent: '30'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '19.4'
+          SiO2_wt_percent: '0'
+          V2O3_wt_percent: '80.6'
+          assemblage_id: vickerfalt_2024_sample_08
+          phase_assemblage_as_printed: Mullite + Al2O3-corundum + V2O3-corundum
+        - sample_id_as_printed: '9'
+          sample_group: 9
+          mixed_Al2O3_wt_percent: '40'
+          mixed_SiO2_wt_percent: '35'
+          mixed_V2O3_wt_percent: '25'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '14.1'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '85.8'
+          assemblage_id: vickerfalt_2024_sample_09
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+        - sample_id_as_printed: '10'
+          sample_group: 10
+          mixed_Al2O3_wt_percent: '28'
+          mixed_SiO2_wt_percent: '32'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '14.1'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '85.8'
+          assemblage_id: vickerfalt_2024_sample_10
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+        - sample_id_as_printed: '11'
+          sample_group: 11
+          mixed_Al2O3_wt_percent: '28'
+          mixed_SiO2_wt_percent: '32'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '11.4'
+          SiO2_wt_percent: '0.2'
+          V2O3_wt_percent: '88.4'
+          assemblage_id: vickerfalt_2024_sample_11
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+        - sample_id_as_printed: '12'
+          sample_group: 12
+          mixed_Al2O3_wt_percent: '28'
+          mixed_SiO2_wt_percent: '32'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '11.1'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '88.7'
+          assemblage_id: vickerfalt_2024_sample_12
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+        - sample_id_as_printed: '13'
+          sample_group: 13
+          mixed_Al2O3_wt_percent: '28'
+          mixed_SiO2_wt_percent: '32'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '10.5'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '89.3'
+          assemblage_id: vickerfalt_2024_sample_13
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+        - sample_id_as_printed: '14'
+          sample_group: 14
+          mixed_Al2O3_wt_percent: '40'
+          mixed_SiO2_wt_percent: '35'
+          mixed_V2O3_wt_percent: '25'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '10.3'
+          SiO2_wt_percent: '0.1'
+          V2O3_wt_percent: '89.6'
+          assemblage_id: vickerfalt_2024_sample_14
+          phase_assemblage_as_printed: Mullite + V2O3-corundum + Liquid
+        - sample_id_as_printed: '15'
+          sample_group: 15
+          mixed_Al2O3_wt_percent: '10'
+          mixed_SiO2_wt_percent: '65'
+          mixed_V2O3_wt_percent: '25'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '10.5'
+          SiO2_wt_percent: '0.4'
+          V2O3_wt_percent: '89.1'
+          assemblage_id: vickerfalt_2024_sample_15
+          phase_assemblage_as_printed: V2O3-corundum + Liquid
+        - sample_id_as_printed: '16'
+          sample_group: 16
+          mixed_Al2O3_wt_percent: '2'
+          mixed_SiO2_wt_percent: '48'
+          mixed_V2O3_wt_percent: '50'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '4.1'
+          SiO2_wt_percent: '0.2'
+          V2O3_wt_percent: '95.7'
+          assemblage_id: vickerfalt_2024_sample_16
+          phase_assemblage_as_printed: V2O3-corundum + Cristobalite
+        - sample_id_as_printed: '17'
+          sample_group: 17
+          mixed_Al2O3_wt_percent: '4'
+          mixed_SiO2_wt_percent: '66'
+          mixed_V2O3_wt_percent: '30'
+          pO2_atm_as_printed: 3.4 × 10^-11 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '7.7'
+          SiO2_wt_percent: '0.3'
+          V2O3_wt_percent: '92.0'
+          assemblage_id: vickerfalt_2024_sample_17
+          phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+        - sample_id_as_printed: '18'
+          sample_group: 18
+          mixed_Al2O3_wt_percent: '5'
+          mixed_SiO2_wt_percent: '55'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '7.7'
+          SiO2_wt_percent: '0.4'
+          V2O3_wt_percent: '91.9'
+          assemblage_id: vickerfalt_2024_sample_18
+          phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+        - sample_id_as_printed: '19'
+          sample_group: 19
+          mixed_Al2O3_wt_percent: '6'
+          mixed_SiO2_wt_percent: '44'
+          mixed_V2O3_wt_percent: '50'
+          pO2_atm_as_printed: 3.3 × 10^-10 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '8.6'
+          SiO2_wt_percent: '0.2'
+          V2O3_wt_percent: '91.3'
+          assemblage_id: vickerfalt_2024_sample_19
+          phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+        - sample_id_as_printed: '20'
+          sample_group: 20
+          mixed_Al2O3_wt_percent: '6'
+          mixed_SiO2_wt_percent: '54'
+          mixed_V2O3_wt_percent: '40'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '8.0'
+          SiO2_wt_percent: '0.2'
+          V2O3_wt_percent: '91.8'
+          assemblage_id: vickerfalt_2024_sample_20
+          phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite
+        - sample_id_as_printed: '21'
+          sample_group: 21
+          mixed_Al2O3_wt_percent: '6'
+          mixed_SiO2_wt_percent: '44'
+          mixed_V2O3_wt_percent: '50'
+          pO2_atm_as_printed: 3.4 × 10^-9 atm
+          phase_as_printed: V2O3-corundum
+          T_K_as_printed: '1873'
+          Al2O3_wt_percent: '8.4'
+          SiO2_wt_percent: '0.3'
+          V2O3_wt_percent: '91.3'
+          assemblage_id: vickerfalt_2024_sample_21
+          phase_assemblage_as_printed: V2O3-corundum + Liquid + Cristobalite

@@ -272,6 +272,7 @@ Exactly one of:
 | `phase_transition` | Calorimetrically resolved transition temperatures/intervals and scan-condition series (DSC/DTA peaks, crystallization-on-cooling). Distinct from `transition_point`: those are thermodynamic fixed points, these are method-conditioned measurements |
 | `gas_speciation` | Vapour/atmosphere/condensate composition: which gas-bearing species, how much, as published |
 | `sulfur_solubility_and_sulfate_capacity_series` | Measured sulfur solubility / sulfate capacity series, including ratio-conditioned variants |
+| `chloride_capacity` | Printed log10 chloride-capacity series with its defining equation |
 | `composition_series` | Measured composition series across runs/samples (per-sample rows as payload) |
 | `equilibrium_phase_composition` | Measured composition of an equilibrium gas or condensed phase at stated temperature and conditions; preserve the printed basis on `values.basis_as_published` and identify the phase on the row |
 
