@@ -15,6 +15,10 @@ extraction:
   date: '2026-10-21'
   worker: fam37-1021
 review_status: draft
+fidelity_samples:
+  - path: species.Fe.observations[henao_2001_t1_A-1_slag_Fe].values.component_amount
+    value: '42.5'
+    locator: {page: 2, pdf_page_index: 1, published_page: '1960', table: '1', row: '4'}
 experiments:
   - experiment_id: henao:A-1
     locator:

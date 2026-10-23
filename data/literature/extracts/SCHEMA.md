@@ -274,6 +274,7 @@ Exactly one of:
 | `sulfur_solubility_and_sulfate_capacity_series` | Measured sulfur solubility / sulfate capacity series, including ratio-conditioned variants |
 | `composition_series` | Measured composition series across runs/samples (per-sample rows as payload) |
 | `equilibrium_phase_composition` | Measured composition of an equilibrium gas or condensed phase at stated temperature and conditions; preserve the printed basis on `values.basis_as_published` and identify the phase on the row |
+| `distribution_ratio` | Printed distribution ratio between coexisting phases, with its numerator and denominator phase/component convention stated on the row |
 
 The battery quantity token `equilibrium_phase_composition` uses
 `units: subtype_defined`: units and basis are those printed (for example,
