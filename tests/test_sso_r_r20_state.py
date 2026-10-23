@@ -286,12 +286,27 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
     c6_hours = 0
     c6_redox_outcomes = {}
     campaign_steps = {}
+    campaign_route = []
+    last_campaign_name = None
     c6_moves_toward_gas_split = False
     transition_count = len(sim.atom_ledger.transitions)
     for result in drive_session(session, 400, DecisionPolicy.AUTO_APPLY):
         snapshot = result.snapshot
         campaign_name = sim.melt.campaign.name
         campaign_steps[campaign_name] = campaign_steps.get(campaign_name, 0) + 1
+        if campaign_name != last_campaign_name:
+            campaign_route.append(
+                (
+                    campaign_name,
+                    sim.record.path,
+                    sim.record.branch,
+                    tuple(
+                        (decision.name, choice)
+                        for decision, choice in sim.record.decisions
+                    ),
+                )
+            )
+            last_campaign_name = campaign_name
         assert abs(snapshot.mass_balance_error_pct) <= 5e-12
         if sim.melt.hour in (167, 168):
             hot_hours.add(sim.melt.hour)
@@ -352,6 +367,7 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
         "expected C6 Fe-redox O2 credits; "
         f"c6_hours={c6_hours}, c6_redox_outcomes={c6_redox_outcomes}, "
         f"campaign_steps={campaign_steps}, "
+        f"campaign_route={campaign_route}, "
         f"final_campaign={sim.melt.campaign.name}, "
         f"c4_refusal={sim._last_c4_refusal_diagnostic}"
     )
