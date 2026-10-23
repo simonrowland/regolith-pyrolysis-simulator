@@ -212,6 +212,24 @@ def test_foulant_consumer_refuses_missing_C_for_three_parameter_form():
         )
 
 
+def test_ellingham_consumer_computes_declared_two_parameter_source():
+    from pathlib import Path
+
+    import yaml
+
+    source_path = Path(__file__).resolve().parents[2] / "data/vapor_pressures.yaml"
+    payload = yaml.safe_load(source_path.read_text())
+    record = payload["families"]["oxide_trace_In2O_family"][
+        "physical_properties"
+    ]["species"]["In2O"]["t431_correlations"][0]
+
+    pressure_pa = _antoine_reference_pressure_Pa(record, 1000.0)
+
+    # Valderrama and Jacob report log10(p/atm) = -13150/T_K + 7.58;
+    # at 1000 K this is about 0.273 Pa after converting atm to Pa.
+    assert pressure_pa == pytest.approx(0.273, rel=0.01)
+
+
 def test_melt_effect_antoine_forms_keep_stull_pressure_pins():
     forms = WARN_TIER_ANALYTICAL_MODELS["cl_halide"]["forms"]
     result = _evaluate_analytical_forms(forms, T_K=1473.15)["vapor_pressure"]
