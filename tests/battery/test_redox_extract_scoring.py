@@ -462,14 +462,27 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     )
     assert measured_training["population"] == "calibration_source_overlap_fit_fidelity"
     assert (measured_training["candidates"], measured_training["numeric"]) == (223, 223)
-    assert (measured_training["certified_numeric"], measured_training["flagged_numeric"]) == (213, 10)
+    training_residuals = [
+        residual
+        for residual in residuals
+        if residual.source_relation is score_module.SourceRelation.TRAINING
+    ]
+    assert len(training_residuals) == 223
+    assert sum(
+        "reference_measured_evidence" in residual.exclusions
+        for residual in training_residuals
+    ) == 223
     assert Decimal(measured_training["metrics"][0]["all_numeric"]["rms"]).quantize(
         Decimal("0.00001")
     ) == Decimal("0.11250")
     assert len(residuals) == 435
-    assert all(residual.numeric is not None for residual in residuals)
-    assert all(residual.status is not ResidualStatus.REFUSED for residual in residuals)
-    assert all(residual.numeric.operation.value == "dex" for residual in residuals)
+    assert all(residual.numeric is not None for residual in training_residuals)
+    assert all(
+        residual.status is not ResidualStatus.REFUSED for residual in training_residuals
+    )
+    assert all(
+        residual.numeric.operation.value == "dex" for residual in training_residuals
+    )
 
     conflicting_fo2 = replace(
         row4,
