@@ -49,12 +49,12 @@ by a gate valve after devolatilisation.
 Key physics:
     Live stage efficiency averages 33 series-resistance deposition-flux
     samples over the stage temperature band, then computes:             [COND-1]
-        n_capture = J_band * A_stage * t_res
-        η_stage = clip(n_capture / n_available, 0, 1)
-    Premise: J_band is mol m^-2 s^-1. Unit check:
-    (mol m^-2 s^-1)(m^2)(s) = mol, and mol/mol makes η dimensionless.
+        m_dot_capture = J_band * A_stage * M
+        η_stage = clip(m_dot_capture / m_dot_feed, 0, 1)
+    Premise: steady flow and steady flux. Unit check:
+    (mol m^-2 s^-1)(m^2)(kg/mol) / (kg/s) is dimensionless.
     Sanity: no configured stage area means no physical capture area, so
-    η_stage = 0; enough area or residence time saturates at η_stage = 1.
+    η_stage = 0; enough area saturates at η_stage = 1.
 
     A separate total-capture regularizer uses
     ``1 - exp(-t_res / tau_s)``. It allocates a capture budget and is not
@@ -4388,10 +4388,13 @@ class CondensationModel:
         Reactive wall products use the product-P_sat floor in the shared
         driving-pressure helper instead of the vapor species' Antoine P_sat.
 
-        Chunk A keeps the existing stage residence-time surrogate for
-        geometry and integrates the H-K-L driving force across the actual
-        stage T-band. Chunk C replaces the constant regime factor with
-        pressure/Knudsen coupling.
+        Integrate the H-K-L driving force across the actual stage T-band.
+        The legacy ``available_kg`` argument is the incoming kg/hour RATE,
+        as supplied by route(), not a parcel inventory. Positive residence
+        does not enter the steady-flux efficiency. A nonpositive residence
+        retains the existing disabled-stage pass-through contract; residence
+        also belongs to the separately declared pressure-isolated empirical
+        regularizer, which models a dimensionless residence/tau exposure.
 
         VR-11 / B3: the finite early-zero exits (non-positive residence
         or alpha, nonpositive local pressure,
@@ -4399,9 +4402,8 @@ class CondensationModel:
         into ``efficiency_outcomes`` (when provided) rather than
         returning a silent 0.0 with no consumer channel. Non-finite
         ``residence_s`` or ``alpha_s_value`` raise; a later
-        available_kg / molar-mass non-finite or non-positive check
-        returns 0.0 without minting. Numeric eta for finite valid
-        inputs is unchanged. Unavailable SiO wall saturation uses the declared
+        available_kg non-finite or non-positive check returns 0.0 without
+        minting. Unavailable SiO wall saturation uses the declared
         reactive-product route and measured flowing pressure, with an
         extrapolated outcome; missing or invalid inputs remain terminal.
         """
@@ -4589,7 +4591,7 @@ class CondensationModel:
             # mol/(m^2 s). The shared owner clips the condensation part at
             # zero (re-evaporation has its own owner), then adds transport
             # resistance. Average the 33 midpoint j samples across this
-            # temperature band; j_bar*A*residence/available_mol is eta.
+            # temperature band; the rate-to-rate efficiency is computed below.
             # At p_actual=P_sat each reversible sample gives zero; for
             # p_actual >> P_sat its surface flux tends to alpha times the
             # incident impingement flux. Never use P_sat(T_cond) as p_actual.
@@ -4663,47 +4665,45 @@ class CondensationModel:
 
         stage_area_m2 = self._stage_area_m2_for_stage_number(stage.stage_number)
         if stage_area_m2 is not None:
-            molar_mass_kg_mol = (
-                _molecular_mass_kg_per_molecule(
-                    species,
-                    vapor_pressure_data=self.vapor_pressure_data,
-                )
-                * AVOGADRO_MOL
-            )
-            if (
-                not math.isfinite(available_kg)
-                or available_kg <= 0.0
-                or molar_mass_kg_mol <= 0.0
-            ):
+            if not math.isfinite(available_kg) or available_kg <= 0.0:
                 return 0.0
-            available_mol = available_kg / molar_mass_kg_mol
-            # HKL/transport flux is mol m^-2 s^-1. Integrating over physical
-            # baffle area and residence time gives capturable mol:
-            # (mol m^-2 s^-1)(m^2)(s) = mol. Dividing by available vapor mol
-            # makes eta dimensionless and lets configured Stage-3 area affect
-            # capture without inventing an area-normalized rate constant.
-            capturable_mol = (
-                max(0.0, band_flux_mol_m2_s)
-                * stage_area_m2
-                * residence_s
+            if not math.isfinite(band_flux_mol_m2_s):
+                raise ValueError(
+                    f'condensation efficiency for {species} in stage '
+                    f'{int(getattr(stage, "stage_number", -1))} is not finite'
+                )
+            from simulator.wall_deposition import _wall_deposition_flux_budget_kg_hr
+
+            # Premise: steady flow and steady band-mean deposition flux Jbar.
+            # Over an exposure t, eta = (Jbar*A*M*t)/(m_dot_feed*t)
+            # = Jbar*A*M/m_dot_feed: residence cancels, unlike a parcel model
+            # whose denominator is an actual inventory. Unit check:
+            # mol/(m² s) * m² * kg/mol / (kg/s) = dimensionless.
+            # The shared wall owner converts Jbar*A*M to kg/hour, matching
+            # route()'s available_kg feed RATE. Limits: J -> 0 gives eta=0;
+            # large J saturates at eta=1 through the supply clip below.
+            capturable_kg_hr = _wall_deposition_flux_budget_kg_hr(
+                species=species,
+                flux_mol_m2_s=max(0.0, band_flux_mol_m2_s),
+                surface_area_m2=stage_area_m2,
+                molar_mass_kg_mol=(
+                    _molecular_mass_kg_per_molecule(
+                        species, vapor_pressure_data=self.vapor_pressure_data,
+                    ) * AVOGADRO_MOL
+                ),
             )
-            eta = capturable_mol / available_mol
+            eta = capturable_kg_hr / available_kg
         else:
-            # Premise: ``band_flux_fraction = flux / reference_flux`` is
-            # dimensionless. Algebra requires capturable mol =
-            # flux(mol m^-2 s^-1) * area(m^2) * residence(s), then
-            # eta = capturable_mol / available_mol. Unit check: without a
-            # configured area there is no m^2 term, so treating the ratio as
-            # s^-1 invents a rate constant. Sanity: leave vapor un-baffled
-            # rather than create synthetic capture.
+            # Without configured area there is no m² factor to turn the
+            # molar flux into a capture rate; leave vapor un-baffled.
             eta = 0.0
         if not math.isfinite(eta):
             raise ValueError(
                 f'condensation efficiency for {species} in stage '
                 f'{int(getattr(stage, "stage_number", -1))} is not finite'
             )
-        # Supply-limited capture: band flux * area * time can exceed available
-        # vapour. Cap eta at 1 and surface a typed notice (Ferry V / V1-S13 P3).
+        # Supply-limited capture: deposited mass rate can exceed the feed rate.
+        # Cap eta at 1 and surface a typed notice (Ferry V / V1-S13 P3).
         eta_uncapped = float(eta)
         eta = max(0.0, min(1.0, eta))
         supply_limited = eta_uncapped > 1.0

@@ -46,7 +46,45 @@ def _sio_case():
 
 def test_sio_h120_scale_numeric_pin():
     model, inputs = _sio_case()
-    # Historical pin from b-1032 investigation, before correcting the time basis.
+    # Independent b-1032 investigation: 0.0667345651876 kg/hour / 12.70 kg/hour.
     assert model._condensation_efficiency(**inputs) == pytest.approx(
-        5.8385446358e-6, rel=2e-9,
+        0.00525469017225, rel=2e-9,
     )
+
+
+@pytest.mark.parametrize('residence_s', [2.0, 4.0, 8.0])
+def test_steady_stage_eta_uses_matching_time_bases(monkeypatch, residence_s):
+    from simulator.accounting.formulas import resolve_species_formula
+
+    model, inputs = _sio_case()
+    # Controlled steady molar flux: 1 mol/(m² s) on 1 m², with 2 mol/s
+    # inlet. Counting molecules gives eta=1/2, independent of time unit.
+    molar_mass = resolve_species_formula('SiO').molar_mass_kg_per_mol()
+    model.stage_area_m2_by_stage = {'3': 1.0}
+    monkeypatch.setattr(c, '_series_resistance_deposition_flux_mol_m2_s',
+                        lambda *args, **kwargs: 1.0)
+    feed_kg_s = 2.0 * molar_mass
+    inputs.update(available_kg=feed_kg_s * 3600.0, residence_s=residence_s)
+    eta_hourly = model._condensation_efficiency(**inputs)
+    # Same physical case as a parcel over this residence; seconds cancel.
+    captured_kg = molar_mass * residence_s
+    passing_kg = feed_kg_s * residence_s
+    eta_seconds = captured_kg / passing_kg
+    assert eta_hourly == pytest.approx(eta_seconds)
+    assert eta_hourly == pytest.approx(0.5)
+
+
+@pytest.mark.parametrize('species', ['SiO', 'Fe'])
+@pytest.mark.parametrize('flux, expected', [(0.0, 0.0), (1.0, 0.5), (10.0, 1.0)])
+def test_steady_stage_supply_limit_and_reversible_path(monkeypatch, species, flux, expected):
+    from simulator.accounting.formulas import resolve_species_formula
+
+    model, inputs = _sio_case()
+    model.wall_species_partial_pressures_pa[species] = 1000.0
+    molar_mass = resolve_species_formula(species).molar_mass_kg_per_mol()
+    model.stage_area_m2_by_stage = {'3': 1.0}
+    monkeypatch.setattr(c, '_series_resistance_deposition_flux_mol_m2_s',
+                        lambda *args, **kwargs: flux)
+    inputs.update(species=species, T_cond_C=1400.0 if species == 'Fe' else 1050.0,
+                  available_kg=2.0 * molar_mass * 3600.0)
+    assert model._condensation_efficiency(**inputs) == pytest.approx(expected)

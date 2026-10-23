@@ -654,7 +654,9 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
             },
         )
         return model.route(
-            EvaporationFlux(species_kg_hr={"Ca": 1.0}, total_kg_hr=1.0),
+            # One kg/s inlet expressed per hour keeps both collectors below
+            # their supply caps, so the test observes saturation-curve routing.
+            EvaporationFlux(species_kg_hr={"Ca": 3600.0}, total_kg_hr=3600.0),
             MeltState(temperature_C=1700.0),
         )
 
@@ -744,7 +746,8 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
     available_kg = (
         condensation_module._molecular_mass_kg_per_molecule("SiO")
         * condensation_module.AVOGADRO_MOL
-        * 10.0
+        * 10.0  # mol/s feed; convert to kg/hour to match the stage contract.
+        * 3600.0
     )
 
     def efficiency(area_m2: float) -> float:
@@ -785,7 +788,8 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
     available_kg = (
         condensation_module._molecular_mass_kg_per_molecule("SiO")
         * condensation_module.AVOGADRO_MOL
-        * 10.0
+        * 10.0  # mol/s feed; convert to kg/hour to match the stage contract.
+        * 3600.0
     )
 
     missing_area_efficiency = model._condensation_efficiency(

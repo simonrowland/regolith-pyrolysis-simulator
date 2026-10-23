@@ -460,6 +460,9 @@ def test_stage_deposition_refuses_metadata_only_alpha_entry():
             }
         }
     )
+    # Exercise Stage 1's invalid coefficient with vapor still reaching it;
+    # an explicitly configured Stage-0 collector can now exhaust the feed.
+    model.stage_area_m2_by_stage['0'] = 0.0
     with pytest.raises(
         condensation.DepositionInputRefusal,
         match="parameter=alpha_s",

@@ -433,7 +433,8 @@ def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
     available_kg = (
         condensation_module._molecular_mass_kg_per_molecule("SiO")
         * condensation_module.AVOGADRO_MOL
-        * 10.0
+        * 10.0  # mol/s feed; convert to kg/hour to match the stage contract.
+        * 3600.0
     )
     model.stage_area_m2_by_stage = {"sio_stage3": 1.0}
     outcomes: list[dict[str, Any]] = []
