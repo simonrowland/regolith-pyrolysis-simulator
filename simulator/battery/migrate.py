@@ -3910,7 +3910,6 @@ _COMPOSITION_MOL_META_KEYS = frozenset(
 )
 _DEFAULT_COMPOSITION_MOL_BASIS = "printed_mole_fraction"
 
-
 def _composition_mol_items(raw: object) -> Iterator[tuple[str, object]]:
     if not isinstance(raw, Mapping):
         return

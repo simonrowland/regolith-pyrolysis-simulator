@@ -46,45 +46,6 @@ _SCORED_SPECIES_QUANTITIES = frozenset(
 _COMPOSITION_META_KEYS = migrate._COMPOSITION_MOL_META_KEYS
 _LEGACY_LOCATOR_INDEX_CUTOFF = date(2026, 10, 18)
 
-# Derived from every extract composition basis at green 6edf21cb0: the 347
-# committed YAML extracts' Composition-shaped maps and composition_mol basis
-# fields. Keep the tokens that migrate.py preserves through
-# _composition_from_plain and _declared_composition_mol_basis.
-_SUPPORTED_COMPOSITION_BASES = frozenset(
-    {
-        "Fe pure standard",
-        "Fe-Mo binary alloy",
-        "Fe-Mo_alloy",
-        "Fe-Sn_alloy",
-        "Pd pure standard",
-        "Saratov chondrule oxide composition as printed",
-        "derived_from_formula",
-        "elemental",
-        "formula-derived composition from printed mullite stoichiometry",
-        "formula-unit mole fraction calculated from printed mullite formula",
-        "measured 5aN-3 composition used as the starting composition",
-        "measured_as_printed",
-        "normalized_mole_fraction_from_published_Fo93Fa7",
-        "normalized_mole_fraction_from_published_xA_over_xC_and_xS",
-        "printed Saratov chondrule oxide composition",
-        "printed_formula_stoichiometry",
-        "printed_initial_mole_fractions",
-        "printed_metals",
-        "printed_mole_fraction",
-        "printed_oxides",
-        "printed_quasi_binary",
-        "printed_species",
-        "printed_x_Mo_axis",
-        "printed_x_e_Al2O3_mol_percent_axis",
-        "simple_oxide_mole_fraction",
-        "sossi_2020_measured_oxide_mole_fraction",
-        "stoichiometric MgAl2O4 on the MgO–Al2O3 oxide-component basis",
-        "stoichiometric_Ca3SiO5_oxide_mole_fractions",
-        "total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled",
-    }
-)
-
-
 @dataclass(frozen=True)
 class Finding:
     check: str
@@ -112,6 +73,7 @@ class GateReport:
     refusal_reasons: dict[str, int] = field(default_factory=dict)
     migration_hard_issues: int = 0
     migration_error: str | None = None
+    composition_drops: list[str] = field(default_factory=list)
     tables: list[TableCoverage] = field(default_factory=list)
 
     @property
@@ -321,22 +283,11 @@ def _formula_count(names: object) -> int:
     )
 
 
-def _composition_basis_issues(doc: object) -> list[str]:
-    issues: list[str] = []
-    seen_bad: set[tuple[str, str]] = set()
+def _composition_issues(
+    doc: object, migration_drops: list[str] | None = None
+) -> list[str]:
+    issues = list(migration_drops or [])
     seen_percent: set[tuple[str, str]] = set()
-
-    def check_basis(basis: object, path: str) -> None:
-        if basis is None:
-            return
-        token = str(basis).strip()
-        if token not in _SUPPORTED_COMPOSITION_BASES:
-            key = (path, token)
-            if key not in seen_bad:
-                seen_bad.add(key)
-                issues.append(
-                    f"{path} uses unsupported composition basis {token!r}"
-                )
 
     def check_amounts(amounts: list[tuple[str, object]], path: str) -> None:
         numeric = [_as_decimal(value) for _, value in amounts]
@@ -359,27 +310,17 @@ def _composition_basis_issues(doc: object) -> list[str]:
     for mapping, path in _mappings(doc):
         raw = mapping.get("composition_mol")
         if isinstance(raw, Mapping):
-            basis = migrate._declared_composition_mol_basis(mapping, raw)
-            check_basis(basis, f"{path}.composition_mol.basis")
             check_amounts(_component_pairs(raw), f"{path}.composition_mol")
         elif isinstance(mapping.get("composition_mole_fraction"), Mapping):
             values = mapping["composition_mole_fraction"]
-            basis = values.get("basis", "printed_mole_fraction")
-            check_basis(basis, f"{path}.composition_mole_fraction.basis")
             check_amounts(
                 _component_pairs(values),
                 f"{path}.composition_mole_fraction",
             )
 
         if "components" in mapping and "amount_basis" in mapping:
-            basis = mapping.get("basis")
             amount_basis = str(mapping.get("amount_basis") or "")
             if amount_basis in {"", "mole_fraction"}:
-                # With no explicit amount_basis the migrator assumes a mole
-                # fraction. A declared inventory/mass basis carries its own
-                # interpretation, so its opaque provenance label is not an
-                # engine-basis token to reject here.
-                check_basis(basis, f"{path}.basis")
                 check_amounts(
                     _component_pairs(mapping),
                     path or "composition",
@@ -981,6 +922,9 @@ def _migrate_one(path: Path, doc: object, report: GateReport) -> list[str]:
             refusals[str(reason)] += 1
     for entry in result.queue:
         refusals[str(entry.why)] += 1
+        if entry.why.startswith("unusable composition component(s):"):
+            location = entry.observation_id or entry.source or entry.work_id
+            report.composition_drops.append(f"{location}: {entry.why}")
     if result.validation is not None:
         for issue in result.validation.hard_issues:
             refusals[str(issue.reason.value)] += 1
@@ -1174,7 +1118,12 @@ def evaluate_extract(
     _add(report, "locator-page-offset", "SOFT", locator_page_soft)
     _add(report, "locator-pdf", "SOFT", locator_pdf_soft)
     _add(report, "locator-legacy", "SOFT", locator_legacy_soft)
-    _add(report, "composition", "HARD", _composition_basis_issues(doc))
+    _add(
+        report,
+        "composition",
+        "HARD",
+        _composition_issues(doc, report.composition_drops),
+    )
     _add(report, "transition-composition", "HARD", _transition_composition_issues(doc))
     _add(report, "zero-uncertainty", "HARD", _uncertainty_issues(doc))
 

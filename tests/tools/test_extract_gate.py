@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
+import sys
+from contextlib import nullcontext
 from pathlib import Path
 
+import pytest
 import yaml
 
 import simulator.battery.extract_gate as gate
@@ -11,6 +15,10 @@ from simulator.battery.extract_gate import evaluate_extract
 from simulator.yaml_cache import load_cached_safe_yaml, yaml_mapping_source_issues
 from tools import validate_literature_extracts as validator
 from tools import extract_gate
+import simulator.yaml_cache as yaml_cache
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def _document() -> dict:
@@ -302,7 +310,7 @@ def test_absent_corpus_pdf_only_warns_about_page_count(tmp_path: Path):
     )
 
 
-def test_composition_rejects_unsupported_basis_and_percent_scale(tmp_path: Path):
+def test_composition_rejects_percent_scale(tmp_path: Path):
     doc = _document()
     doc["species"]["Fe"]["observations"][0]["values"]["composition_mol"] = {
         "basis": "printed_mole_percent",
@@ -315,7 +323,6 @@ def test_composition_rejects_unsupported_basis_and_percent_scale(tmp_path: Path)
     detail = next(
         item.detail for item in report.findings if item.check == "composition"
     )
-    assert "unsupported composition basis" in detail
     assert "percent-as-fraction" in detail
 
     doc["species"]["Fe"]["observations"][0]["values"]["composition_mol"] = {
@@ -327,6 +334,90 @@ def test_composition_rejects_unsupported_basis_and_percent_scale(tmp_path: Path)
     assert next(item for item in report.findings if item.check == "composition").severity == "HARD"
     assert "percent-as-fraction" in next(
         item.detail for item in report.findings if item.check == "composition"
+    )
+
+
+def test_pure_oxide_system_basis_passes_gate(tmp_path: Path):
+    doc = _document()
+    doc["species"]["Fe"]["observations"][0]["values"]["composition_mol"] = {
+        "basis": "pure_oxide_system",
+        "Na2O": "1",
+    }
+    report = _run_gate(tmp_path, doc)
+    assert "composition" not in _checks(report)
+    assert "isolated-migration" not in _checks(report)
+
+
+def test_migrator_supported_descriptive_basis_passes_gate(tmp_path: Path):
+    doc = _document()
+    doc["species"]["Fe"]["observations"][0]["values"]["composition_mol"] = {
+        "basis": "derived_mean_of_n_runs",
+        "CaO": "0.45",
+        "Al2O3": "0.35",
+        "SiO2": "0.20",
+    }
+    report = _run_gate(tmp_path, doc)
+    assert "composition" not in _checks(report)
+    assert "isolated-migration" not in _checks(report)
+
+
+def test_context_compositions_are_preserved_and_not_flagged(tmp_path: Path):
+    path = (
+        REPO_ROOT
+        / "data/literature/extracts/tyurnina-lopatin-stolyarova-2008-ba-borosilicate-kems.yaml"
+    )
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    report = evaluate_extract(path, doc, corpus=tmp_path)
+    assert "composition" not in _checks(report)
+
+    source_id = str(doc["source_id"])
+    source = doc.get("source") or {}
+    migrator = gate.migrate.Migrator(
+        root=gate.migrate.REPO_ROOT,
+        index={
+            source_id: {
+                "source_id": source_id,
+                "citation": str(source.get("citation") or source_id),
+                "doi": source.get("doi"),
+            }
+        },
+        aliases={},
+    )
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+
+    source_context = {
+        row["observation_id"]: row["values"]
+        for block in doc["species"].values()
+        for row in block.get("context", [])
+        if isinstance(row, dict) and isinstance(row.get("values"), dict)
+    }
+    migrated_context = {
+        row["observation_id"]: row["values"]
+        for rows in result.context_by_work.values()
+        for row in rows
+        if row.get("observation_id") in source_context
+    }
+    assert migrated_context == source_context
+
+    activity_points = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value.value
+        in {"activity", "activity_coefficient", "activity_coefficient_temperature_fit"}
+    ]
+    assert activity_points
+    assert all(
+        observation.point_conditions is not None
+        and "composition" in observation.point_conditions
+        and observation.point_conditions["composition"].state.is_value
+        and "BaO"
+        in dict(observation.point_conditions["composition"].state.value.components)
+        for observation in activity_points
     )
 
 
@@ -344,7 +435,7 @@ def test_explicit_inventory_basis_allows_descriptive_composition_label():
             }
         ]
     }
-    assert gate._composition_basis_issues(doc) == []
+    assert gate._composition_issues(doc) == []
 
 
 def test_fraction_sum_uses_numeric_siblings_and_rounding_band():
@@ -356,14 +447,14 @@ def test_fraction_sum_uses_numeric_siblings_and_rounding_band():
             "note": "oxides as printed",
         }
     }
-    issues = gate._composition_basis_issues(doc)
+    issues = gate._composition_issues(doc)
     assert any("sum to 98.6" in issue for issue in issues)
 
     doc["composition_mole_fraction"].update(SiO2="50", Al2O3="50")
-    assert any("sum to 100" in issue for issue in gate._composition_basis_issues(doc))
+    assert any("sum to 100" in issue for issue in gate._composition_issues(doc))
 
     doc["composition_mole_fraction"].update(SiO2="0.6", Al2O3="0.4")
-    assert not any("percent-as-fraction" in issue for issue in gate._composition_basis_issues(doc))
+    assert not any("percent-as-fraction" in issue for issue in gate._composition_issues(doc))
 
 
 def test_transition_composition_flags_nonliquidus_but_allows_liquidus(
@@ -596,26 +687,69 @@ def test_schema_fidelity_and_flow_guard_use_shared_validators(tmp_path: Path):
     assert next(item for item in report.findings if item.check == "yaml-source").severity == "HARD"
 
 
-def test_cli_audits_one_extract_by_source_id(tmp_path: Path, monkeypatch, capsys):
-    repo = tmp_path / "repo"
-    extracts = repo / "data/literature/extracts"
-    extracts.mkdir(parents=True)
-    path = extracts / "fixture-source.yaml"
-    path.write_text(yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8")
-    monkeypatch.setattr(extract_gate, "REPO_ROOT", repo)
+def test_cli_audits_extract_with_explicit_tree(tmp_path: Path, capsys):
+    path = tmp_path / "fixture-source.yaml"
+    doc = _document()
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation.update(
+        {
+            "type": "equilibrium_phase_composition",
+            "phase": "liquid",
+            "units": "wt%",
+            "point_conditions": {
+                "temperature_K": {
+                    "state": {"tag": "value", "value": 1773},
+                    "locator": {"pdf_page_index": 1, "table": "1"},
+                }
+            },
+            "values": {
+                "quantity": "equilibrium_phase_composition",
+                "method_class": "measured_direct",
+                "T_K": 1773,
+                "composition_mass_percent": {
+                    "CaO": 38.3,
+                    "Al2O3": 30.5,
+                    "SiO2": 18.4,
+                    "MgO": 12.7,
+                },
+                "rows": [
+                    {"analyte": "CaO", "value": 38.3},
+                    {"analyte": "Al2O3", "value": 30.5},
+                    {"analyte": "SiO2", "value": 18.4},
+                    {"analyte": "MgO", "value": 12.7},
+                ],
+            },
+        }
+    )
+    doc["fidelity_samples"][0].update(
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values.quantity",
+            "value": "equilibrium_phase_composition",
+        }
+    )
+    path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
 
-    status = extract_gate.main(["--ids", "fixture-source", "--corpus", str(tmp_path)])
+    status = extract_gate.main(
+        [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
+    )
 
     output = capsys.readouterr().out
-    assert status == 0
+    assert status == 0, output
+    assert f"TREE {REPO_ROOT} HEAD " in output
     assert "MIGRATION observations by ValueKind:" in output
+    assert "HARD schema/fidelity:" not in output
+    assert "HARD isolated-migration:" not in output
+    assert "unsupported quantity" not in output
 
     doc = _document()
     doc["extraction"]["date"] = "2026-10-18"
     doc["species"]["Fe"]["observations"][0]["locator"].pop("pdf_page_index")
     path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
-    status = extract_gate.main(["--ids", "fixture-source", "--corpus", str(tmp_path)])
+    status = extract_gate.main(
+        [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
+    )
     assert status == 1
+    assert f"TREE {REPO_ROOT} HEAD " in capsys.readouterr().out
 
 
 def test_cli_requires_corpus_or_environment_and_explains_option(capsys):
@@ -635,18 +769,219 @@ def test_cli_audits_changed_extracts(tmp_path: Path, monkeypatch, capsys):
         yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8"
     )
     (extracts / "_policy.yaml").write_text("ignored: true\n", encoding="utf-8")
-    monkeypatch.setattr(extract_gate, "REPO_ROOT", repo)
+    monkeypatch.setattr(extract_gate, "REPO_ROOT", REPO_ROOT)
+    monkeypatch.setattr(
+        extract_gate,
+        "_tree_head",
+        lambda _path: (repo, "test-head"),
+    )
+    monkeypatch.setattr(
+        extract_gate,
+        "_tree_modules",
+        lambda _tree: nullcontext(
+            (gate, validator, yaml_cache, yaml_cache.yaml_mapping_source_issues)
+        ),
+    )
 
     class Result:
         returncode = 0
         stderr = ""
         stdout = "data/literature/extracts/fixture-source.yaml\n"
 
+    original_run = extract_gate.subprocess.run
     monkeypatch.setattr(
-        extract_gate.subprocess, "run", lambda *args, **kwargs: Result()
+        extract_gate.subprocess,
+        "run",
+        lambda args, **kwargs: Result()
+        if args[:3] == ["git", "diff", "--name-only"]
+        else original_run(args, **kwargs),
     )
-    status = extract_gate.main(["--changed-since", "BASE", "--corpus", str(tmp_path)])
+    status = extract_gate.main(
+        ["--changed-since", "BASE", "--tree", str(repo), "--corpus", str(tmp_path)]
+    )
 
     output = capsys.readouterr().out
     assert status == 0
     assert "EXTRACT" in output and "fixture-source.yaml" in output
+
+
+def test_cli_audits_extract_by_source_id(tmp_path: Path, monkeypatch, capsys):
+    repo = tmp_path / "repo"
+    extracts = repo / "data/literature/extracts"
+    extracts.mkdir(parents=True)
+    (extracts / "fixture-source.yaml").write_text(
+        yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8"
+    )
+    monkeypatch.setattr(extract_gate, "REPO_ROOT", REPO_ROOT)
+    monkeypatch.setattr(extract_gate, "_tree_head", lambda _path: (repo, "test-head"))
+    monkeypatch.setattr(
+        extract_gate,
+        "_tree_modules",
+        lambda _tree: nullcontext(
+            (gate, validator, yaml_cache, yaml_cache.yaml_mapping_source_issues)
+        ),
+    )
+    status = extract_gate.main(
+        ["--ids", "fixture-source", "--tree", str(repo), "--corpus", str(tmp_path)]
+    )
+
+    output = capsys.readouterr().out
+    assert status == 0
+    assert "EXTRACT" in output and "fixture-source.yaml" in output
+
+
+def test_cli_uses_distinct_foreign_tree_and_restores_runner_modules(
+    tmp_path: Path, capsys
+):
+    tree = tmp_path / "foreign-tree"
+    shutil.copytree(REPO_ROOT / "simulator", tree / "simulator")
+    assert "SUPPORTED_COMPOSITION_MOL_BASES" not in (
+        tree / "simulator/battery/migrate.py"
+    ).read_text(encoding="utf-8")
+    (tree / "data").mkdir()
+    shutil.copy2(
+        REPO_ROOT / "data/optimize_costs.yaml",
+        tree / "data/optimize_costs.yaml",
+    )
+    literature = tree / "data/literature"
+    literature.mkdir()
+    shutil.copy2(
+        REPO_ROOT / "data/literature/lab_parameter_vocabulary.yaml",
+        literature / "lab_parameter_vocabulary.yaml",
+    )
+    (tree / "tools").mkdir(parents=True)
+    (tree / "tools/__init__.py").write_text("", encoding="utf-8")
+    (tree / "tools/_foreign_tree_marker.py").write_text(
+        "MARKER = 'foreign tree'\n", encoding="utf-8"
+    )
+    validator_source = (
+        REPO_ROOT / "tools/validate_literature_extracts.py"
+    ).read_text(encoding="utf-8")
+    assert '        "alpha",\n' in validator_source
+    (tree / "tools/validate_literature_extracts.py").write_text(
+        validator_source.replace(
+            "from __future__ import annotations\n",
+            "from __future__ import annotations\nimport tools._foreign_tree_marker\n",
+            1,
+        ).replace('        "alpha",\n', "", 1),
+        encoding="utf-8",
+    )
+    subprocess.run(["git", "init", str(tree)], check=True, capture_output=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(tree),
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.com",
+            "add",
+            "simulator",
+            "tools",
+            "data",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(tree),
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.com",
+            "commit",
+            "-m",
+            "fixture tree",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    runner_migrate = gate.migrate
+    runner_validator = validator
+    path = tmp_path / "fixture-source.yaml"
+    path.write_text(yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8")
+    runner_modules = {
+        name: module
+        for name, module in sys.modules.items()
+        if name == "simulator"
+        or name.startswith("simulator.")
+        or name == "tools"
+        or name.startswith("tools.")
+    }
+
+    status = extract_gate.main(
+        [str(path), "--tree", str(tree), "--corpus", str(tmp_path)]
+    )
+
+    output = capsys.readouterr().out
+    assert status == 1
+    assert "HARD schema/fidelity:" in output
+    assert "type must be one of" in output
+    assert "MIGRATION observations by ValueKind:" in output
+    assert f"TREE {tree} HEAD " in output
+    assert all(sys.modules.get(name) is module for name, module in runner_modules.items())
+    assert "tools._foreign_tree_marker" not in sys.modules
+    assert sys.modules["simulator.battery.migrate"] is runner_migrate
+    assert sys.modules["tools.validate_literature_extracts"] is runner_validator
+
+
+def test_internal_gate_attribute_error_is_not_a_tree_import_error(
+    tmp_path: Path, monkeypatch, capsys
+):
+    path = tmp_path / "fixture-source.yaml"
+    path.write_text(yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8")
+    monkeypatch.setattr(
+        extract_gate,
+        "_tree_modules",
+        lambda _tree: nullcontext(
+            (gate, validator, yaml_cache, yaml_cache.yaml_mapping_source_issues)
+        ),
+    )
+
+    def injected_gate_error(*_args, **_kwargs):
+        raise AttributeError("INJECTED_COMPOSITION_GATE_BUG")
+
+    monkeypatch.setattr(gate, "_composition_issues", injected_gate_error)
+    with pytest.raises(AttributeError, match="INJECTED_COMPOSITION_GATE_BUG"):
+        extract_gate.main(
+            [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
+        )
+    assert "HARD tree-import:" not in capsys.readouterr().out
+
+
+def test_tree_import_refuses_missing_migrator_without_fallback(tmp_path: Path, capsys):
+    tree = tmp_path / "tree"
+    tree.mkdir()
+    subprocess.run(["git", "init", str(tree)], check=True, capture_output=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(tree),
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.com",
+            "commit",
+            "--allow-empty",
+            "-m",
+            "test",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    extract = tmp_path / "fixture.yaml"
+    extract.write_text(yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8")
+
+    status = extract_gate.main(
+        [str(extract), "--tree", str(tree), "--corpus", str(tmp_path)]
+    )
+
+    assert status == 1
+    output = capsys.readouterr().out
+    assert "HARD tree-import:" in output
+    assert "simulator/battery/migrate.py" in output
