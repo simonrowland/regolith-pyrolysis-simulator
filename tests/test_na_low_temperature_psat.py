@@ -159,21 +159,42 @@ def test_melting_handover_and_independent_literature_anchor():
     assert right == pytest.approx(left, rel=1e-6)
 
 
-def test_original_high_temperature_fit_and_handover_uncertainty():
+def test_janaf_surface_is_continuous_at_every_segment_boundary():
     import math
     from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
 
-    # Independent output pins from REF-041 at924 and1118 K.
-    for temperature in (924., 1000., 1118.):
-        coefficients, _ = wall_condensation_antoine_coefficients(
-            condensation._species_vapor_data("Na"), temperature,
-        )
-        assert (coefficients["A"], coefficients["B"], coefficients["C"]) == (
-            7.46077, 1873.728, -416.372,
-        )
-    low = condensation._antoine_psat_pa("Na", 924 - 1e-6)
-    high = condensation._antoine_psat_pa("Na", 924)
-    assert abs(math.log10(low / high)) < 0.10
+    row = condensation._species_vapor_data("Na")
+    segments = row["pure_component_antoine"]["segments"]
+    assert segments[0]["valid_range_K"][0] == 250
+    assert segments[-1]["valid_range_K"][1] == 1600
+    for left, right in zip(segments, segments[1:]):
+        boundary = left["valid_range_K"][1]
+        assert boundary == right["valid_range_K"][0]
+        lo = math.nextafter(boundary, -math.inf)
+        hi = math.nextafter(boundary, math.inf)
+        assert wall_condensation_antoine_coefficients(row, lo)[0]["name"] == left["name"]
+        assert wall_condensation_antoine_coefficients(row, hi)[0]["name"] == right["name"]
+        log_lo = math.log10(condensation._antoine_psat_pa("Na", lo))
+        log_hi = math.log10(condensation._antoine_psat_pa("Na", hi))
+        # Only floating-point evaluation/interpolation discontinuity is allowed.
+        assert abs(log_hi - log_lo) <= 64 * math.ulp(max(1., abs(log_lo), abs(log_hi)))
+    # The old924 K source splice is now interior to a single JANAF segment.
+    assert wall_condensation_antoine_coefficients(row, 924 - 1e-6)[0] is (
+        wall_condensation_antoine_coefficients(row, 924 + 1e-6)[0]
+    )
+
+
+@pytest.mark.parametrize("temperature, log_pressure_pa", [
+    # Na-005 gas logK minus Na-003 liquid logK, p0=100000 Pa.
+    (1000, 4.256), (1100, 4.722), (1170.525, 5.),
+    (1200, 5.106), (1300, 5.429), (1400, 5.702), (1500, 5.937), (1600, 6.140),
+])
+def test_hot_wall_janaf_chemical_potential_cells(temperature, log_pressure_pa):
+    import math
+
+    assert math.log10(condensation._antoine_psat_pa("Na", temperature)) == pytest.approx(
+        log_pressure_pa, abs=1e-12,
+    )
 
 
 def test_original_lower_refusal_and_source_fit_are_preserved():
@@ -191,7 +212,7 @@ def test_original_lower_refusal_and_source_fit_are_preserved():
 def test_hot_liquid_extrapolation_does_not_claim_phase_mismatch():
     from simulator.battery.enums import Authority, Phase
 
-    prediction = _static_prediction(1200, Phase.L)
+    prediction = _static_prediction(1700, Phase.L)
     assert prediction.authority is Authority.EXTRAPOLATED
     assert any("extrapolated" in n.reason for n in prediction.notices)
     assert not any("phase_mismatch" in n.reason for n in prediction.notices)
