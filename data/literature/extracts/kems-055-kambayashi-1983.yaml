@@ -1,0 +1,3594 @@
+schema_version: literature_extract.v1
+source_id: kems-055-kambayashi-1983
+source:
+  citation: Kambayashi, S. and Kato, E. (1983), “A thermodynamic study of (magnesium oxide + silicon dioxide) by
+    mass spectrometry”, Journal of Chemical Thermodynamics 15, 701–707.
+  year: 1983
+  doi: 10.1016/0021-9614(83)90136-2
+  corpus_asset: raw/kems-055-kambayashi-1983/kems-055-kambayashi-1983.pdf
+  corpus_sha256: f17c015b4f7a87e6ad43f1386ad1636179fe01bea6b2a634366e79b6b4e1832b
+extraction:
+  method: Born-digital paper; pdftotext-layout is primary. Tables 1 and 2 were transcribed cell by cell and all
+    cells checked against 600 dpi physical-page renders (pp. 3 and 6). The source has no MinerU tables; the table
+    tool cannot emit from pdftotext alone. Figure records are deferred, with no plotted values estimated. The
+    printed ion-current and ratio numbers migrate as points, but their required identity subtype is not mapped
+    from extract text (existing KEMS subtype gap t-1329); no subtype is invented.
+  date: '2026-10-21'
+  worker: codex-resume-32763-1792554222
+  provenance_path: text/kems-055-kambayashi-1983/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+- path: species.SiO2.observations[kambayashi_1983_table1_ratio_01].values.ion_intensity_ratio
+  value: '18.40'
+  note: Table 1 first ratio cell, physical page 3 / published p. 703.
+  locator:
+    page: 3
+    published_page: 703
+    pdf_page_index: 2
+    table: '1'
+    row: '0.625'
+- path: species.SiO2.observations[kambayashi_1983_table2_sio2_activity_10].values.activity
+  value: '0.0261'
+  note: Table 2 last silica activity, physical page 6 / published p. 706.
+  locator:
+    page: 6
+    published_page: 706
+    pdf_page_index: 5
+    table: '2'
+    row: '0.220'
+- path: species.MgO.observations[kambayashi_1983_table2_mgo_activity_10].values.activity
+  value: '1'
+  note: Table 2 last MgO activity is printed as 1, physical page 6 / published p. 706.
+  locator:
+    page: 6
+    published_page: 706
+    pdf_page_index: 5
+    table: '2'
+    row: '0.220'
+experiments:
+  kambayashi_1983_kems_mgo_sio2:
+    method: knudsen_effusion
+    method_as_printed: high-temperature mass spectrometry with an effusion cell
+    locator:
+      page: 1
+      published_page: 701
+      pdf_page_index: 0
+      note: Experimental Procedure
+    conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1873 ± 1
+        locator:
+          page: 2
+          published_page: 702
+          pdf_page_index: 1
+          note: Experimental Procedure
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          published_page: 701
+          pdf_page_index: 0
+          note: The paper says high vacuum but reports no numerical total pressure.
+      apparatus:
+        state:
+          tag: value
+          value: platinum effusion cell; nominal 0.4 mm orifice, one 0.5 mm orifice
+        locator:
+          page: 2
+          published_page: 702
+          pdf_page_index: 1
+          note: Experimental Procedure
+species:
+  SiO2:
+    observations:
+    - observation_id: kambayashi_1983_table1_ratio_01
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.625'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless ion intensity ratio
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.625'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.625'
+              - - MgO
+                - '0.375'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.625'
+            note: x is the printed SiO2 mole fraction in (1−x)MgO+xSiO2.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid + SiO2(s)
+          locator:
+            page: 4
+            published_page: 704
+            pdf_page_index: 3
+            row: '0.625'
+            note: Liquid interval x=0.448–0.565 is printed in Results; assemblage assignment follows this interval.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(SiO+)/I(Mg+)
+        ion_intensity_ratio: '18.40'
+        T_K: 1873
+        x_SiO2_as_printed: '0.625'
+        system_as_printed: (1−x)MgO+xSiO2
+        method: high-temperature mass spectrometry, effusion cell
+        note: The composition and assemblage identify the condensed sample system; the measured ions are SiO+ and
+          Mg+.
+    - observation_id: kambayashi_1983_table1_ratio_02
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.569'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless ion intensity ratio
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.569'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.569'
+              - - MgO
+                - '0.431'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.569'
+            note: x is the printed SiO2 mole fraction in (1−x)MgO+xSiO2.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid + SiO2(s)
+          locator:
+            page: 4
+            published_page: 704
+            pdf_page_index: 3
+            row: '0.569'
+            note: Liquid interval x=0.448–0.565 is printed in Results; assemblage assignment follows this interval.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(SiO+)/I(Mg+)
+        ion_intensity_ratio: '18.01'
+        T_K: 1873
+        x_SiO2_as_printed: '0.569'
+        system_as_printed: (1−x)MgO+xSiO2
+        method: high-temperature mass spectrometry, effusion cell
+        note: The composition and assemblage identify the condensed sample system; the measured ions are SiO+ and
+          Mg+.
+    - observation_id: kambayashi_1983_table1_ratio_03
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.551'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless ion intensity ratio
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.551'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.551'
+              - - MgO
+                - '0.449'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.551'
+            note: x is the printed SiO2 mole fraction in (1−x)MgO+xSiO2.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator:
+            page: 4
+            published_page: 704
+            pdf_page_index: 3
+            row: '0.551'
+            note: Liquid interval x=0.448–0.565 is printed in Results; assemblage assignment follows this interval.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(SiO+)/I(Mg+)
+        ion_intensity_ratio: '16.74'
+        T_K: 1873
+        x_SiO2_as_printed: '0.551'
+        system_as_printed: (1−x)MgO+xSiO2
+        method: high-temperature mass spectrometry, effusion cell
+        note: The composition and assemblage identify the condensed sample system; the measured ions are SiO+ and
+          Mg+.
+    - observation_id: kambayashi_1983_table1_ratio_04
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.530'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless ion intensity ratio
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.530'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.530'
+              - - MgO
+                - '0.47'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.530'
+            note: x is the printed SiO2 mole fraction in (1−x)MgO+xSiO2.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator:
+            page: 4
+            published_page: 704
+            pdf_page_index: 3
+            row: '0.530'
+            note: Liquid interval x=0.448–0.565 is printed in Results; assemblage assignment follows this interval.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(SiO+)/I(Mg+)
+        ion_intensity_ratio: '13.37'
+        T_K: 1873
+        x_SiO2_as_printed: '0.530'
+        system_as_printed: (1−x)MgO+xSiO2
+        method: high-temperature mass spectrometry, effusion cell
+        note: The composition and assemblage identify the condensed sample system; the measured ions are SiO+ and
+          Mg+.
+    - observation_id: kambayashi_1983_table1_ratio_05
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.508'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless ion intensity ratio
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.508'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.508'
+              - - MgO
+                - '0.492'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.508'
+            note: x is the printed SiO2 mole fraction in (1−x)MgO+xSiO2.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator:
+            page: 4
+            published_page: 704
+            pdf_page_index: 3
+            row: '0.508'
+            note: Liquid interval x=0.448–0.565 is printed in Results; assemblage assignment follows this interval.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(SiO+)/I(Mg+)
+        ion_intensity_ratio: '10.56'
+        T_K: 1873
+        x_SiO2_as_printed: '0.508'
+        system_as_printed: (1−x)MgO+xSiO2
+        method: high-temperature mass spectrometry, effusion cell
+        note: The composition and assemblage identify the condensed sample system; the measured ions are SiO+ and
+          Mg+.
+    - observation_id: kambayashi_1983_table1_ratio_06
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: 0.508a
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless ion intensity ratio
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: 0.508a
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.508'
+              - - MgO
+                - '0.492'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: 0.508a
+            note: x is the printed SiO2 mole fraction in (1−x)MgO+xSiO2.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator:
+            page: 4
+            published_page: 704
+            pdf_page_index: 3
+            row: 0.508a
+            note: Liquid interval x=0.448–0.565 is printed in Results; assemblage assignment follows this interval.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(SiO+)/I(Mg+)
+        ion_intensity_ratio: '10.49'
+        T_K: 1873
+        x_SiO2_as_printed: 0.508a
+        system_as_printed: (1−x)MgO+xSiO2
+        method: high-temperature mass spectrometry, effusion cell
+        note: The composition and assemblage identify the condensed sample system; the measured ions are SiO+ and
+          Mg+.
+    - observation_id: kambayashi_1983_table1_ratio_07
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.485'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless ion intensity ratio
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.485'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.485'
+              - - MgO
+                - '0.515'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.485'
+            note: x is the printed SiO2 mole fraction in (1−x)MgO+xSiO2.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator:
+            page: 4
+            published_page: 704
+            pdf_page_index: 3
+            row: '0.485'
+            note: Liquid interval x=0.448–0.565 is printed in Results; assemblage assignment follows this interval.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(SiO+)/I(Mg+)
+        ion_intensity_ratio: '9.33'
+        T_K: 1873
+        x_SiO2_as_printed: '0.485'
+        system_as_printed: (1−x)MgO+xSiO2
+        method: high-temperature mass spectrometry, effusion cell
+        note: The composition and assemblage identify the condensed sample system; the measured ions are SiO+ and
+          Mg+.
+    - observation_id: kambayashi_1983_table1_ratio_08
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.459'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless ion intensity ratio
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.459'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.459'
+              - - MgO
+                - '0.541'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.459'
+            note: x is the printed SiO2 mole fraction in (1−x)MgO+xSiO2.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator:
+            page: 4
+            published_page: 704
+            pdf_page_index: 3
+            row: '0.459'
+            note: Liquid interval x=0.448–0.565 is printed in Results; assemblage assignment follows this interval.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(SiO+)/I(Mg+)
+        ion_intensity_ratio: '7.96'
+        T_K: 1873
+        x_SiO2_as_printed: '0.459'
+        system_as_printed: (1−x)MgO+xSiO2
+        method: high-temperature mass spectrometry, effusion cell
+        note: The composition and assemblage identify the condensed sample system; the measured ions are SiO+ and
+          Mg+.
+    - observation_id: kambayashi_1983_table1_ratio_09
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.400'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless ion intensity ratio
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.400'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.400'
+              - - MgO
+                - '0.6'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.400'
+            note: x is the printed SiO2 mole fraction in (1−x)MgO+xSiO2.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid + Mg2SiO4(s)
+          locator:
+            page: 4
+            published_page: 704
+            pdf_page_index: 3
+            row: '0.400'
+            note: Liquid interval x=0.448–0.565 is printed in Results; assemblage assignment follows this interval.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(SiO+)/I(Mg+)
+        ion_intensity_ratio: '7.55'
+        T_K: 1873
+        x_SiO2_as_printed: '0.400'
+        system_as_printed: (1−x)MgO+xSiO2
+        method: high-temperature mass spectrometry, effusion cell
+        note: The composition and assemblage identify the condensed sample system; the measured ions are SiO+ and
+          Mg+.
+    - observation_id: kambayashi_1983_table1_ratio_10
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.220'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless ion intensity ratio
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.220'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.220'
+              - - MgO
+                - '0.78'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.220'
+            note: x is the printed SiO2 mole fraction in (1−x)MgO+xSiO2.
+        phase_assemblage:
+          state:
+            tag: value
+            value: MgO(s) + Mg2SiO4(s)
+          locator:
+            page: 4
+            published_page: 704
+            pdf_page_index: 3
+            row: '0.220'
+            note: Liquid interval x=0.448–0.565 is printed in Results; assemblage assignment follows this interval.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(SiO+)/I(Mg+)
+        ion_intensity_ratio: '0.0611'
+        T_K: 1873
+        x_SiO2_as_printed: '0.220'
+        system_as_printed: (1−x)MgO+xSiO2
+        method: high-temperature mass spectrometry, effusion cell
+        note: The composition and assemblage identify the condensed sample system; the measured ions are SiO+ and
+          Mg+.
+    - observation_id: kambayashi_1983_table2_sio2_activity_01
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id001
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.625'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: cristobalite_high
+            component_basis: SiO2
+        inferred: true
+        note: Pure SiO2 is cristobalite at 1873 K, above the cristobalite transition (~1743 K; JANAF phase transition
+          basis).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id001
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.625'
+              - - MgO
+                - '0.375'
+          locator: *id001
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid + SiO2(s)
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: &id002
+      - kambayashi_1983_table1_ratio_01
+      - kambayashi_1983_table1_ratio_02
+      - kambayashi_1983_table1_ratio_03
+      - kambayashi_1983_table1_ratio_04
+      - kambayashi_1983_table1_ratio_05
+      - kambayashi_1983_table1_ratio_06
+      - kambayashi_1983_table1_ratio_07
+      - kambayashi_1983_table1_ratio_08
+      - kambayashi_1983_table1_ratio_09
+      - kambayashi_1983_table1_ratio_10
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id002
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: SiO2
+        activity: '1'
+        activity_as_printed: '1'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.625'
+          MgO: '0.375'
+        phase_assemblage_as_printed: liquid + SiO2(s)
+        reference_state_as_printed: pure SiO2(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_sio2_activity_02
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id003
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.569'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: cristobalite_high
+            component_basis: SiO2
+        inferred: true
+        note: Pure SiO2 is cristobalite at 1873 K, above the cristobalite transition (~1743 K; JANAF phase transition
+          basis).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.569'
+              - - MgO
+                - '0.431'
+          locator: *id003
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid + SiO2(s)
+          locator: *id003
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: &id004
+      - kambayashi_1983_table1_ratio_01
+      - kambayashi_1983_table1_ratio_02
+      - kambayashi_1983_table1_ratio_03
+      - kambayashi_1983_table1_ratio_04
+      - kambayashi_1983_table1_ratio_05
+      - kambayashi_1983_table1_ratio_06
+      - kambayashi_1983_table1_ratio_07
+      - kambayashi_1983_table1_ratio_08
+      - kambayashi_1983_table1_ratio_09
+      - kambayashi_1983_table1_ratio_10
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id004
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: SiO2
+        activity: '1'
+        activity_as_printed: '1'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.569'
+          MgO: '0.431'
+        phase_assemblage_as_printed: liquid + SiO2(s)
+        reference_state_as_printed: pure SiO2(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_sio2_activity_03
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id005
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.551'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: cristobalite_high
+            component_basis: SiO2
+        inferred: true
+        note: Pure SiO2 is cristobalite at 1873 K, above the cristobalite transition (~1743 K; JANAF phase transition
+          basis).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id005
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.551'
+              - - MgO
+                - '0.449'
+          locator: *id005
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id005
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: &id006
+      - kambayashi_1983_table1_ratio_01
+      - kambayashi_1983_table1_ratio_02
+      - kambayashi_1983_table1_ratio_03
+      - kambayashi_1983_table1_ratio_04
+      - kambayashi_1983_table1_ratio_05
+      - kambayashi_1983_table1_ratio_06
+      - kambayashi_1983_table1_ratio_07
+      - kambayashi_1983_table1_ratio_08
+      - kambayashi_1983_table1_ratio_09
+      - kambayashi_1983_table1_ratio_10
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id006
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: SiO2
+        activity: '0.933'
+        activity_as_printed: '0.933'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.551'
+          MgO: '0.449'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure SiO2(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_sio2_activity_04
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id007
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.530'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: cristobalite_high
+            component_basis: SiO2
+        inferred: true
+        note: Pure SiO2 is cristobalite at 1873 K, above the cristobalite transition (~1743 K; JANAF phase transition
+          basis).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id007
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.530'
+              - - MgO
+                - '0.47'
+          locator: *id007
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id007
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: &id008
+      - kambayashi_1983_table1_ratio_01
+      - kambayashi_1983_table1_ratio_02
+      - kambayashi_1983_table1_ratio_03
+      - kambayashi_1983_table1_ratio_04
+      - kambayashi_1983_table1_ratio_05
+      - kambayashi_1983_table1_ratio_06
+      - kambayashi_1983_table1_ratio_07
+      - kambayashi_1983_table1_ratio_08
+      - kambayashi_1983_table1_ratio_09
+      - kambayashi_1983_table1_ratio_10
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id008
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: SiO2
+        activity: '0.853'
+        activity_as_printed: '0.853'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.530'
+          MgO: '0.47'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure SiO2(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_sio2_activity_05
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id009
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.508'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: cristobalite_high
+            component_basis: SiO2
+        inferred: true
+        note: Pure SiO2 is cristobalite at 1873 K, above the cristobalite transition (~1743 K; JANAF phase transition
+          basis).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id009
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.508'
+              - - MgO
+                - '0.492'
+          locator: *id009
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id009
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: &id010
+      - kambayashi_1983_table1_ratio_01
+      - kambayashi_1983_table1_ratio_02
+      - kambayashi_1983_table1_ratio_03
+      - kambayashi_1983_table1_ratio_04
+      - kambayashi_1983_table1_ratio_05
+      - kambayashi_1983_table1_ratio_06
+      - kambayashi_1983_table1_ratio_07
+      - kambayashi_1983_table1_ratio_08
+      - kambayashi_1983_table1_ratio_09
+      - kambayashi_1983_table1_ratio_10
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id010
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: SiO2
+        activity: '0.770'
+        activity_as_printed: '0.770'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.508'
+          MgO: '0.492'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure SiO2(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_sio2_activity_06
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id011
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.500'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: cristobalite_high
+            component_basis: SiO2
+        inferred: true
+        note: Pure SiO2 is cristobalite at 1873 K, above the cristobalite transition (~1743 K; JANAF phase transition
+          basis).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id011
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.500'
+              - - MgO
+                - '0.5'
+          locator: *id011
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id011
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: &id012
+      - kambayashi_1983_table1_ratio_01
+      - kambayashi_1983_table1_ratio_02
+      - kambayashi_1983_table1_ratio_03
+      - kambayashi_1983_table1_ratio_04
+      - kambayashi_1983_table1_ratio_05
+      - kambayashi_1983_table1_ratio_06
+      - kambayashi_1983_table1_ratio_07
+      - kambayashi_1983_table1_ratio_08
+      - kambayashi_1983_table1_ratio_09
+      - kambayashi_1983_table1_ratio_10
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id012
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: SiO2
+        activity: '0.759'
+        activity_as_printed: '0.759'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.500'
+          MgO: '0.5'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure SiO2(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_sio2_activity_07
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id013
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.485'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: cristobalite_high
+            component_basis: SiO2
+        inferred: true
+        note: Pure SiO2 is cristobalite at 1873 K, above the cristobalite transition (~1743 K; JANAF phase transition
+          basis).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id013
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.485'
+              - - MgO
+                - '0.515'
+          locator: *id013
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id013
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: &id014
+      - kambayashi_1983_table1_ratio_01
+      - kambayashi_1983_table1_ratio_02
+      - kambayashi_1983_table1_ratio_03
+      - kambayashi_1983_table1_ratio_04
+      - kambayashi_1983_table1_ratio_05
+      - kambayashi_1983_table1_ratio_06
+      - kambayashi_1983_table1_ratio_07
+      - kambayashi_1983_table1_ratio_08
+      - kambayashi_1983_table1_ratio_09
+      - kambayashi_1983_table1_ratio_10
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id014
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: SiO2
+        activity: '0.721'
+        activity_as_printed: '0.721'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.485'
+          MgO: '0.515'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure SiO2(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_sio2_activity_08
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id015
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.459'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: cristobalite_high
+            component_basis: SiO2
+        inferred: true
+        note: Pure SiO2 is cristobalite at 1873 K, above the cristobalite transition (~1743 K; JANAF phase transition
+          basis).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id015
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.459'
+              - - MgO
+                - '0.541'
+          locator: *id015
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id015
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: &id016
+      - kambayashi_1983_table1_ratio_01
+      - kambayashi_1983_table1_ratio_02
+      - kambayashi_1983_table1_ratio_03
+      - kambayashi_1983_table1_ratio_04
+      - kambayashi_1983_table1_ratio_05
+      - kambayashi_1983_table1_ratio_06
+      - kambayashi_1983_table1_ratio_07
+      - kambayashi_1983_table1_ratio_08
+      - kambayashi_1983_table1_ratio_09
+      - kambayashi_1983_table1_ratio_10
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id016
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: SiO2
+        activity: '0.670'
+        activity_as_printed: '0.670'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.459'
+          MgO: '0.541'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure SiO2(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_sio2_activity_09
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id017
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.400'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: cristobalite_high
+            component_basis: SiO2
+        inferred: true
+        note: Pure SiO2 is cristobalite at 1873 K, above the cristobalite transition (~1743 K; JANAF phase transition
+          basis).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id017
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.400'
+              - - MgO
+                - '0.6'
+          locator: *id017
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid + Mg2SiO4(s)
+          locator: *id017
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: &id018
+      - kambayashi_1983_table1_ratio_01
+      - kambayashi_1983_table1_ratio_02
+      - kambayashi_1983_table1_ratio_03
+      - kambayashi_1983_table1_ratio_04
+      - kambayashi_1983_table1_ratio_05
+      - kambayashi_1983_table1_ratio_06
+      - kambayashi_1983_table1_ratio_07
+      - kambayashi_1983_table1_ratio_08
+      - kambayashi_1983_table1_ratio_09
+      - kambayashi_1983_table1_ratio_10
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id018
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: SiO2
+        activity: '0.649'
+        activity_as_printed: '0.649'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.400'
+          MgO: '0.6'
+        phase_assemblage_as_printed: liquid + Mg2SiO4(s)
+        reference_state_as_printed: pure SiO2(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_sio2_activity_10
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id019
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.220'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: cristobalite_high
+            component_basis: SiO2
+        inferred: true
+        note: Pure SiO2 is cristobalite at 1873 K, above the cristobalite transition (~1743 K; JANAF phase transition
+          basis).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id019
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.220'
+              - - MgO
+                - '0.78'
+          locator: *id019
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: MgO(s) + Mg2SiO4(s)
+          locator: *id019
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: &id020
+      - kambayashi_1983_table1_ratio_01
+      - kambayashi_1983_table1_ratio_02
+      - kambayashi_1983_table1_ratio_03
+      - kambayashi_1983_table1_ratio_04
+      - kambayashi_1983_table1_ratio_05
+      - kambayashi_1983_table1_ratio_06
+      - kambayashi_1983_table1_ratio_07
+      - kambayashi_1983_table1_ratio_08
+      - kambayashi_1983_table1_ratio_09
+      - kambayashi_1983_table1_ratio_10
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id020
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: SiO2
+        activity: '0.0261'
+        activity_as_printed: '0.0261'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.220'
+          MgO: '0.78'
+        phase_assemblage_as_printed: MgO(s) + Mg2SiO4(s)
+        reference_state_as_printed: pure SiO2(s)
+      regime: knudsen_effusion
+    context:
+    - observation_id: kambayashi_1983_fig2_ionization_efficiency
+      type: figure_record
+      locator:
+        figure: '2'
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+      units: figure axes as printed
+      values:
+        quantity: ion_intensity_ratio
+        method_class: figure_only
+        admission_status: context_only
+        species_as_printed: (1−x)MgO+xSiO2
+        phase_as_printed: gas over oxide mixture
+        temperature_K_as_printed: '1873'
+        axes_as_printed:
+          x: E/V
+          y: I(SiO+)/Ie or I(Mg+)/Ie; I(SiO+)/I(Mg+)
+        caption_as_printed: Ionization efficiency curves of Mg+, SiO+, and ion-current ratios for (0.5MgO + 0.5SiO2)
+          at 1873 K using Mo cell.
+        series_as_printed: Mg+; SiO+; I(SiO+)/I(Mg+)
+        marker_count_per_series:
+          Mg+: 8
+          SiO+: 8
+          I(SiO+)/I(Mg+): 9
+        digitisation: deferred to a figure pass
+      admission_status: context_only
+    - observation_id: kambayashi_1983_fig3_ratio_composition
+      type: figure_record
+      locator:
+        figure: '3'
+        page: 4
+        published_page: 704
+        pdf_page_index: 3
+      units: figure axes as printed
+      values:
+        quantity: ion_intensity_ratio
+        method_class: figure_only
+        admission_status: context_only
+        species_as_printed: (1−x)MgO+xSiO2
+        phase_as_printed: gas over oxide mixture
+        temperature_K_as_printed: '1873'
+        axes_as_printed:
+          x: x
+          y: I(SiO+)/I(Mg+)
+        caption_as_printed: Values of I(SiO+)/I(Mg+) as a function of x at 1873 K.
+        series_as_printed: 0.4 mm orifice; 0.5 mm orifice
+        marker_count_per_series:
+          0.4 mm orifice: 9
+          0.5 mm orifice: 1
+        digitisation: deferred to a figure pass
+      admission_status: context_only
+    - observation_id: kambayashi_1983_fig4_activity_integration
+      type: figure_record
+      locator:
+        figure: '4'
+        page: 5
+        published_page: 705
+        pdf_page_index: 4
+      units: figure axes as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: context_only
+        species_as_printed: (1−x)MgO+xSiO2
+        phase_as_printed: oxide mixture
+        temperature_K_as_printed: '1873'
+        axes_as_printed:
+          x: x
+          y: log10(I(Mg+)/I(SiO+))
+        caption_as_printed: The activity integration plot for {(1−x)MgO+xSiO2} at 1873 K.
+        series_as_printed: activity integration curve
+        marker_count_per_series:
+          activity integration curve: 10
+        digitisation: deferred to a figure pass
+      admission_status: context_only
+    - observation_id: kambayashi_1983_fig5_calculated_activities
+      type: figure_record
+      locator:
+        figure: '5'
+        page: 5
+        published_page: 705
+        pdf_page_index: 4
+      units: figure axes as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: context_only
+        species_as_printed: (1−x)MgO+xSiO2
+        phase_as_printed: silicate oxide melt and coexisting solids
+        temperature_K_as_printed: '1873'
+        axes_as_printed:
+          x: x
+          y: a(SiO2); a(MgO)
+        caption_as_printed: Calculated activities for {(1−x)MgO+xSiO2} at 1873 K.
+        series_as_printed: present authors; Rein and Chipman; Elliot et al.
+        marker_count_per_series:
+          present_authors_SiO2: 0
+          present_authors_MgO: 0
+          Rein_and_Chipman_SiO2: 0
+          Rein_and_Chipman_MgO: 0
+          Elliot_et_al_SiO2: 0
+          Elliot_et_al_MgO: 0
+        digitisation: deferred to a figure pass
+      admission_status: context_only
+    - observation_id: kambayashi_1983_fig6_proposed_liquidus
+      type: figure_record
+      locator:
+        figure: '6'
+        page: 7
+        published_page: 707
+        pdf_page_index: 6
+      units: figure axes as printed
+      values:
+        quantity: liquidus_composition
+        method_class: figure_only
+        admission_status: context_only
+        species_as_printed: (1−x)MgO+xSiO2
+        phase_as_printed: silicate oxide melt and coexisting solids
+        temperature_K_as_printed: liquidus diagram, 1800–1950 K; 1873 K marked
+        axes_as_printed:
+          x: x
+          y: T/K
+        caption_as_printed: Proposed liquidus lines in {(1−x)MgO+xSiO2} at 1873 K.
+        series_as_printed: Mg2SiO4 + liquid; liquid; MgSiO3 + Mg2SiO4; MgSiO3 + SiO2
+        marker_count_per_series:
+          This work boundary markers: 2
+          liquidus and phase-boundary lines: 0
+        digitisation: deferred to a figure pass
+      admission_status: context_only
+    - observation_id: kambayashi_1983_text_reaction1_gibbs_alternatives
+      type: thermochemistry
+      locator:
+        page: 5
+        published_page: 705
+        pdf_page_index: 4
+        note: Results, reaction (1) cross-section discussion
+      units: kJ mol−1 at 1873 K
+      values:
+        quantity: standard molar Gibbs free-energy change for reaction (1)
+        method_class: model_derived
+        schema_gap: No token for a reaction Gibbs-energy change; not formation from elements.
+        reaction_as_printed: SiO2(s,l in mixture) + Mg(g) = MgO(s,l in mixture) + SiO(g)
+        reported_results:
+        - value_as_printed: −(5.4 ± 1.3)
+          basis: Otvos and Stevenson relative ionization cross sections
+        - value_as_printed: +(2.2 ± 1.3)
+          basis: Mann relative ionization cross sections
+        temperature_K: 1873
+      admission_status: context_only
+    - observation_id: kambayashi_1983_text_reaction8_gibbs
+      type: thermochemistry
+      locator:
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        note: Results, reaction (8)
+      units: kJ mol−1 at 1873 K
+      values:
+        quantity: standard molar Gibbs free-energy change for reaction (8)
+        method_class: model_derived
+        schema_gap: No token for a reaction Gibbs-energy change; the reaction is formation from oxides, not delta_fG
+          from elements.
+        reaction_as_printed: SiO2(s,l in mixture) + 2MgO(s,l in mixture) = Mg2SiO4(s)
+        value_as_printed: −(56.8 ± 0.6)
+        temperature_K: 1873
+      admission_status: context_only
+    - observation_id: kambayashi_1983_text_reaction9_gibbs
+      type: thermochemistry
+      locator:
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        note: Results, reaction (9)
+      units: kJ mol−1 at 1873 K
+      values:
+        quantity: standard molar Gibbs free-energy change for reaction (9)
+        method_class: model_derived
+        schema_gap: No token for a reaction Gibbs-energy change; the reaction is formation from oxides, not delta_fG
+          from elements.
+        reaction_as_printed: SiO2(s,l in mixture) + MgO(s,l in mixture) = MgSiO3(l)
+        value_as_printed: −(31.5 ± 0.6)
+        temperature_K: 1873
+      admission_status: context_only
+    - observation_id: kambayashi_1983_table2_sensitivity_constant
+      type: tabulation
+      locator:
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+      units: dimensionless
+      values:
+        quantity: instrument sensitivity factor C
+        method_class: measured_reduced
+        schema_gap: No quantity token for the instrument sensitivity factor.
+        table_rows:
+        - x_SiO2: '0.625'
+          C_as_printed: '2.34'
+        - x_SiO2: '0.569'
+          C_as_printed: '2.29'
+        - x_SiO2: '0.551'
+          C_as_printed: '2.48'
+        - x_SiO2: '0.530'
+          C_as_printed: '2.43'
+        - x_SiO2: '0.508'
+          C_as_printed: '2.33'
+        - x_SiO2: '0.485'
+          C_as_printed: '2.36'
+        - x_SiO2: '0.459'
+          C_as_printed: '2.37'
+        - x_SiO2: '0.400'
+          C_as_printed: '2.34'
+        - x_SiO2: '0.220'
+          C_as_printed: '2.34'
+        note: The C cells are not activities. The blank C cell at x=0.500 is not filled.
+      admission_status: context_only
+    - observation_id: kambayashi_1983_liquid_phase_interval
+      type: phase_equilibrium
+      locator:
+        page: 1
+        published_page: 701
+        pdf_page_index: 0
+        note: Abstract; repeated in Results on physical page 4
+      units: mole fraction x(SiO2) at 1873 K
+      values:
+        quantity: liquid phase composition interval
+        method_class: measured_direct
+        schema_gap: The liquidus_composition token requires a component mole-fraction vector and cannot encode an
+          interval without inventing endpoint phase assignments.
+        x_interval_as_printed:
+        - '0.448'
+        - '0.565'
+        temperature_K: 1873
+        phase_as_printed: liquid phase observed between these x bounds
+        candidate_token: liquidus_composition
+      admission_status: context_only
+  MgO:
+    observations:
+    - observation_id: kambayashi_1983_table2_mgo_activity_01
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id021
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.625'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: periclase
+            component_basis: MgO
+        inferred: true
+        note: Pure MgO is solid periclase at 1873 K, below its melting point (JANAF).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id021
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.625'
+              - - MgO
+                - '0.375'
+          locator: *id021
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid + SiO2(s)
+          locator: *id021
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: *id002
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id002
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: MgO
+        activity: '0.127'
+        activity_as_printed: '0.127'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.625'
+          MgO: '0.375'
+        phase_assemblage_as_printed: liquid + SiO2(s)
+        reference_state_as_printed: pure MgO(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_mgo_activity_02
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id022
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.569'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: periclase
+            component_basis: MgO
+        inferred: true
+        note: Pure MgO is solid periclase at 1873 K, below its melting point (JANAF).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id022
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.569'
+              - - MgO
+                - '0.431'
+          locator: *id022
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid + SiO2(s)
+          locator: *id022
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: *id004
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id004
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: MgO
+        activity: '0.127'
+        activity_as_printed: '0.127'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.569'
+          MgO: '0.431'
+        phase_assemblage_as_printed: liquid + SiO2(s)
+        reference_state_as_printed: pure MgO(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_mgo_activity_03
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id023
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.551'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: periclase
+            component_basis: MgO
+        inferred: true
+        note: Pure MgO is solid periclase at 1873 K, below its melting point (JANAF).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id023
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.551'
+              - - MgO
+                - '0.449'
+          locator: *id023
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id023
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: *id006
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id006
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: MgO
+        activity: '0.138'
+        activity_as_printed: '0.138'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.551'
+          MgO: '0.449'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure MgO(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_mgo_activity_04
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id024
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.530'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: periclase
+            component_basis: MgO
+        inferred: true
+        note: Pure MgO is solid periclase at 1873 K, below its melting point (JANAF).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id024
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.530'
+              - - MgO
+                - '0.47'
+          locator: *id024
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id024
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: *id008
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id008
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: MgO
+        activity: '0.155'
+        activity_as_printed: '0.155'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.530'
+          MgO: '0.47'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure MgO(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_mgo_activity_05
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id025
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.508'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: periclase
+            component_basis: MgO
+        inferred: true
+        note: Pure MgO is solid periclase at 1873 K, below its melting point (JANAF).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id025
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.508'
+              - - MgO
+                - '0.492'
+          locator: *id025
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id025
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: *id010
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id010
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: MgO
+        activity: '0.170'
+        activity_as_printed: '0.170'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.508'
+          MgO: '0.492'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure MgO(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_mgo_activity_06
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id026
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.500'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: periclase
+            component_basis: MgO
+        inferred: true
+        note: Pure MgO is solid periclase at 1873 K, below its melting point (JANAF).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id026
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.500'
+              - - MgO
+                - '0.5'
+          locator: *id026
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id026
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: *id012
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id012
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: MgO
+        activity: '0.174'
+        activity_as_printed: '0.174'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.500'
+          MgO: '0.5'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure MgO(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_mgo_activity_07
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id027
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.485'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: periclase
+            component_basis: MgO
+        inferred: true
+        note: Pure MgO is solid periclase at 1873 K, below its melting point (JANAF).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id027
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.485'
+              - - MgO
+                - '0.515'
+          locator: *id027
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id027
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: *id014
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id014
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: MgO
+        activity: '0.183'
+        activity_as_printed: '0.183'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.485'
+          MgO: '0.515'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure MgO(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_mgo_activity_08
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id028
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.459'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: periclase
+            component_basis: MgO
+        inferred: true
+        note: Pure MgO is solid periclase at 1873 K, below its melting point (JANAF).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id028
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.459'
+              - - MgO
+                - '0.541'
+          locator: *id028
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid
+          locator: *id028
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: *id016
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id016
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: MgO
+        activity: '0.195'
+        activity_as_printed: '0.195'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.459'
+          MgO: '0.541'
+        phase_assemblage_as_printed: liquid
+        reference_state_as_printed: pure MgO(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_mgo_activity_09
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id029
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.400'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: periclase
+            component_basis: MgO
+        inferred: true
+        note: Pure MgO is solid periclase at 1873 K, below its melting point (JANAF).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id029
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.400'
+              - - MgO
+                - '0.6'
+          locator: *id029
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: liquid + Mg2SiO4(s)
+          locator: *id029
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: *id018
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id018
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: MgO
+        activity: '0.201'
+        activity_as_printed: '0.201'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.400'
+          MgO: '0.6'
+        phase_assemblage_as_printed: liquid + Mg2SiO4(s)
+        reference_state_as_printed: pure MgO(s)
+      regime: knudsen_effusion
+    - observation_id: kambayashi_1983_table2_mgo_activity_10
+      type: activity_coefficient
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator: &id030
+        page: 6
+        published_page: 706
+        pdf_page_index: 5
+        table: '2'
+        row: '0.220'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: periclase
+            component_basis: MgO
+        inferred: true
+        note: Pure MgO is solid periclase at 1873 K, below its melting point (JANAF).
+        locator:
+          page: 4
+          published_page: 704
+          pdf_page_index: 3
+          note: The paper states pure SiO2(s) and pure MgO(s) reference states at 1873 K.
+      units: dimensionless activity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator: *id030
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.220'
+              - - MgO
+                - '0.78'
+          locator: *id030
+          note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
+            composition.
+        phase_assemblage:
+          state:
+            tag: value
+            value: MgO(s) + Mg2SiO4(s)
+          locator: *id030
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 701
+            pdf_page_index: 0
+            note: The paper says high vacuum but reports no numerical total pressure.
+      derived_from: *id020
+      derivation:
+        relation: 'Eqs. (2)–(5), pp. 702–704: activity integration of the experimental ion-current-ratio versus
+          composition data in Table 1. The full Table 1 ratio series is the input to the numerical integrations.'
+        inputs: *id020
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: MgO
+        activity: '1'
+        activity_as_printed: '1'
+        temperature_K: 1873
+        composition_mole_fraction:
+          SiO2: '0.220'
+          MgO: '0.78'
+        phase_assemblage_as_printed: MgO(s) + Mg2SiO4(s)
+        reference_state_as_printed: pure MgO(s)
+      regime: knudsen_effusion
+    context: []
+  SiO:
+    observations:
+    - observation_id: kambayashi_1983_table1_si_ion_current_01
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.625'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.625'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '103.23'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.625'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_si_ion_current_02
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.569'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.569'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '168.56'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.569'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_si_ion_current_03
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.551'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.551'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '100.96'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.551'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_si_ion_current_04
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.530'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.530'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '122.29'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.530'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_si_ion_current_05
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.508'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.508'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '83.97'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.508'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_si_ion_current_06
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: 0.508a
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: 0.508a
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '147.92'
+        temperature_K: 1873
+        x_SiO2_as_printed: 0.508a
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_si_ion_current_07
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.485'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.485'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '102.83'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.485'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_si_ion_current_08
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.459'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.459'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '67.64'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.459'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_si_ion_current_09
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.400'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.400'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '89.80'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.400'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_si_ion_current_10
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.220'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.220'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '7.07'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.220'
+        system_as_printed: (1−x)MgO+xSiO2
+    context: []
+  Mg:
+    observations:
+    - observation_id: kambayashi_1983_table1_mg_ion_current_01
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.625'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.625'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: Mg(g)
+        ion_as_printed: Mg+
+        ion_intensity: '5.61'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.625'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_mg_ion_current_02
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.569'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.569'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: Mg(g)
+        ion_as_printed: Mg+
+        ion_intensity: '9.36'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.569'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_mg_ion_current_03
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.551'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.551'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: Mg(g)
+        ion_as_printed: Mg+
+        ion_intensity: '6.03'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.551'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_mg_ion_current_04
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.530'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.530'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: Mg(g)
+        ion_as_printed: Mg+
+        ion_intensity: '9.15'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.530'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_mg_ion_current_05
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.508'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.508'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: Mg(g)
+        ion_as_printed: Mg+
+        ion_intensity: '7.95'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.508'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_mg_ion_current_06
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: 0.508a
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: 0.508a
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: Mg(g)
+        ion_as_printed: Mg+
+        ion_intensity: '14.10'
+        temperature_K: 1873
+        x_SiO2_as_printed: 0.508a
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_mg_ion_current_07
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.485'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.485'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: Mg(g)
+        ion_as_printed: Mg+
+        ion_intensity: '11.02'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.485'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_mg_ion_current_08
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.459'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.459'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: Mg(g)
+        ion_as_printed: Mg+
+        ion_intensity: '8.50'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.459'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_mg_ion_current_09
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.400'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.400'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: Mg(g)
+        ion_as_printed: Mg+
+        ion_intensity: '11.89'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.400'
+        system_as_printed: (1−x)MgO+xSiO2
+    - observation_id: kambayashi_1983_table1_mg_ion_current_10
+      type: rate_series
+      experiment: kambayashi_1983_kems_mgo_sio2
+      locator:
+        page: 3
+        published_page: 703
+        pdf_page_index: 2
+        table: '1'
+        row: '0.220'
+      T_range_K:
+      - 1873
+      - 1873
+      phase: gas
+      regime: knudsen_effusion
+      units: relative ion current normalized to Ie (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 3
+            published_page: 703
+            pdf_page_index: 2
+            table: '1'
+            row: '0.220'
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        gas_species: Mg(g)
+        ion_as_printed: Mg+
+        ion_intensity: '115.75'
+        temperature_K: 1873
+        x_SiO2_as_printed: '0.220'
+        system_as_printed: (1−x)MgO+xSiO2
+    context: []
