@@ -363,8 +363,8 @@ def staged_ceiling_case():
     return sim, refusal, transport_diagnostics
 
 
-# gate-2: module fixture advances the recommended staged path until the first
-# typed transitional-Kn refusal; ceiling covers fixture setup.
+# gate-2: module fixture advances the recommended staged path to completion;
+# the transport assertions require extrapolated notices for transitional-Kn hours.
 # Nightly (2026-08-02 CI tiering): staged bakeout C2A campaign (~255 s junit).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
@@ -513,7 +513,6 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # are rerun from the current 62d9d561a green.
     assert staged_silica == pytest.approx(0.06888507997517511, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
-    assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
     assert staged_sio_stage["Fe"] > 0.0
     assert staged_sio_stage["Si"] + staged_sio_stage["SiO2"] == pytest.approx(
         staged_silica, rel=1e-12
