@@ -77,13 +77,20 @@ def test_all_wall_readers_share_the_certified_surface(temperature):
 
 
 def test_dew_at_c2a_incident_pressure_uses_printed_janaf_bracket():
+    from simulator.battery.enums import Authority, Phase
+
     # Fe-008:2100 K logK=-2.966,2200 K=-2.548. Reciprocal-T
     # interpolation at log10(154.6/100000) gives2136.052149172936 K.
     # K minus273.15 gives1862.902149 C (the brief's~1820 C is the old fit).
     inverse = condensation.antoine_dew_temperature_diagnostic("Fe", 154.6)
     assert inverse["status"] == "diagnostic_only"
     assert inverse["temperature_K"] == pytest.approx(2136.052149172936, abs=1e-9)
+    assert inverse["valid_range_K"] == [100.0, 4000.0]
+    assert "reason" not in inverse
     assert condensation._antoine_psat_pa("Fe", inverse["temperature_K"]) == pytest.approx(154.6, rel=1e-12)
+    prediction = _static_prediction(inverse["temperature_K"], Phase.L)
+    assert prediction.authority is Authority.CERTIFIED
+    assert prediction.notices == ()
 
 
 def test_every_segment_and_phase_node_is_continuous():
