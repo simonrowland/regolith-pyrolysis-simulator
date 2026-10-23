@@ -27,6 +27,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from fractions import Fraction
+from functools import lru_cache
 from pathlib import Path
 from typing import Callable, Iterable, Mapping, Sequence
 
@@ -119,6 +120,7 @@ _ENGINE_THERMO_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
     Engine.VAPOROCK: _ENGINE_PURE_PHASE_QUANTITIES,
     Engine.THERMOENGINE: _ENGINE_PURE_PHASE_QUANTITIES,
     Engine.MAGEMIN: _ENGINE_PURE_PHASE_QUANTITIES,
+    Engine.OPENIMCC: _ENGINE_PURE_PHASE_QUANTITIES,
 }
 _H298_K = 298.15
 _PA_PER_BAR = Decimal("100000")
@@ -1179,6 +1181,426 @@ def _printed_entropy_shift(identity: Identity) -> tuple[Decimal | None, str | No
     )
 
 
+@lru_cache(maxsize=2)
+def _openimcc_datapack(vaporock_root: str | None):
+    """Reuse the pinned OpenIMCC tables while respecting its explicit override."""
+
+    from openimcc.gas import load_gas_datapack
+
+    return load_gas_datapack()
+
+
+def _openimcc_h298_anchor_kJ_mol(
+    formula: str,
+    phase: str,
+    temperature_K: float,
+    card: object,
+    datapack: object,
+) -> Decimal | None:
+    """Read the anchor represented by an OpenIMCC card's selected source row."""
+
+    if phase == "g":
+        table_id = getattr(card, "source_table_id", None)
+        if not isinstance(table_id, str) or not re.fullmatch(r"[A-Za-z0-9-]+", table_id):
+            return None
+        from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+        document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+        table = document.get("table")
+        rows = table.get("values") if isinstance(table, Mapping) else None
+        if not isinstance(rows, list):
+            return None
+        for row in rows:
+            if not isinstance(row, Mapping):
+                continue
+            temperature = row.get("temperature")
+            enthalpy = row.get("formation_enthalpy")
+            if (
+                isinstance(temperature, Mapping)
+                and temperature.get("value") is not None
+                and as_decimal(temperature["value"]) == Decimal("298.15")
+                and isinstance(enthalpy, Mapping)
+                and enthalpy.get("value") is not None
+            ):
+                return as_decimal(enthalpy["value"])
+        return None
+
+    frame = getattr(datapack, "oxide_df", None)
+    species_name = f"{formula}({phase})"
+    if frame is None or species_name not in frame.index:
+        return None
+    indexed_rows = frame.loc[species_name]
+    rows = (indexed_rows,) if getattr(indexed_rows, "ndim", 1) == 1 else tuple(
+        indexed_rows.iloc[index] for index in range(len(indexed_rows))
+    )
+    source_row_id = getattr(card, "source_row_id", None)
+    low = getattr(card, "T_min", None)
+    high = getattr(card, "T_max", None)
+    matching_rows = tuple(
+        row
+        for row in rows
+        if str(row["Ref"]) == str(source_row_id)
+        and float(row["T_min"]) == float(low)
+        and float(row["T_max"]) == float(high)
+        and float(row["T_min"]) <= temperature_K <= float(row["T_max"])
+    )
+    if len(matching_rows) != 1:
+        return None
+    from openimcc.gas import R_J_MOL_K
+
+    # OpenIMCC stores condensate dH298_R in kelvin-equivalent units; multiplying
+    # by its own R gives the apparent-H anchor in kJ/mol.
+    return as_decimal(str(R_J_MOL_K * float(matching_rows[0]["dH298_R"])))
+
+
+def _openimcc_polymorph_matches(card: object, identity: Identity) -> bool:
+    observed = polymorph_token(identity.species)
+    if observed is None:
+        return True
+    from simulator.battery.generators.janaf import _JANAF_POLYMORPH_BY_TABLE
+
+    engine_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(
+        getattr(card, "source_table_id", None)
+    )
+    return _same_mineral(
+        None if engine_polymorph is None else engine_polymorph.value,
+        observed.value,
+    )
+
+
+def _openimcc_card(
+    formula: str,
+    phase: str,
+    temperature_K: float,
+    quantity: Quantity,
+    origin: str,
+    *,
+    fusion: bool = False,
+):
+    try:
+        from openimcc.gas import (
+            ImccGasSpeciesNotFoundError,
+            ImccGasTemperatureOutsideDomainError,
+            species_thermo,
+        )
+
+        datapack = _openimcc_datapack(os.environ.get("OPENIMCC_VAPOROCK_ROOT"))
+        card = species_thermo(
+            formula, phase, temperature_K, datapack=datapack
+        )
+    except ImportError as exc:
+        refusal = _refuse(
+            RefusalReason.OPENIMCC_NOT_IMPORTABLE,
+            "openimcc-not-importable",
+            quantity=quantity,
+            origin=origin,
+            extra={"detail": str(exc)},
+        )
+        return None, None, refusal
+    except (ImccGasSpeciesNotFoundError, ImccGasTemperatureOutsideDomainError) as exc:
+        reason = (
+            RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+            if fusion
+            else RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+        )
+        detail = (
+            "openimcc-fusion-endmember-card-unavailable-at-transition-temperature"
+            if fusion
+            else "openimcc-card-unavailable-for-species-phase-or-temperature"
+        )
+        refusal = _refuse(
+            reason,
+            detail,
+            quantity=quantity,
+            origin=origin,
+            extra={"formula": formula, "phase": phase, "detail": str(exc)},
+        )
+        return None, None, refusal
+    except Exception as exc:  # noqa: BLE001 - optional engine data boundary
+        refusal = _refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "openimcc-card-unavailable",
+            quantity=quantity,
+            origin=origin,
+            extra={"detail": str(exc)},
+        )
+        return None, None, refusal
+    return card, datapack, None
+
+
+def _openimcc_pure_phase_attempt(
+    identity: Identity,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    *,
+    origin: str,
+) -> ThermoAttempt:
+    if quantity not in _engine_thermo_quantities(Engine.OPENIMCC):
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "engine-thermo-does-not-emit",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.OPENIMCC.value},
+        )
+    phase_value = _state_value(identity.species.phase)
+    phase = {
+        Phase.G: "g",
+        Phase.L: "l",
+        Phase.CR: "cr",
+    }.get(phase_value)
+    if phase is None:
+        return _refuse(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            "openimcc-phase-not-supported",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.OPENIMCC.value, "phase": str(phase_value)},
+        )
+    if _state_value(identity.per) is not PerBasis.MOL_SPECIES:
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "openimcc-thermo-requires-mol-species-basis",
+            quantity=quantity,
+            origin=origin,
+        )
+    if quantity is Quantity.H_MINUS_H298 and _state_value(identity.subtype) != "H(T)-H(298.15 K)":
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "pure-phase-enthalpy-anchor-mismatch",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.OPENIMCC.value},
+        )
+
+    pressure_state = identity.standard_pressure_Pa
+    if not isinstance(pressure_state, State) or not pressure_state.is_value or pressure_state.value is None:
+        return _refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "standard-pressure-unknown",
+            quantity=quantity,
+            origin=origin,
+        )
+    pressure = as_decimal(pressure_state.value)
+    catalog_pressure = _janaf_catalog_standard_pressure_Pa()
+    if pressure <= 0 or catalog_pressure is None:
+        return _refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "standard-pressure-unknown",
+            quantity=quantity,
+            origin=origin,
+        )
+    if phase != "g" and pressure != catalog_pressure:
+        return _refuse(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            "openimcc-condensed-card-standard-pressure-mismatch",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.OPENIMCC.value, "standard_pressure_Pa": str(pressure)},
+        )
+
+    card, datapack, refusal = _openimcc_card(
+        identity.species.formula,
+        phase,
+        float(temperature_K),
+        quantity,
+        origin,
+    )
+    if refusal is not None:
+        return refusal
+    assert card is not None and datapack is not None
+
+    if phase == "cr" and not _openimcc_polymorph_matches(card, identity):
+        return _refuse(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            "openimcc-crystal-card-polymorph-mismatch-or-unknown",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "engine": Engine.OPENIMCC.value,
+                "species": identity.species.formula,
+                "phase": phase,
+                "source_table_id": card.source_table_id,
+                "polymorph": getattr(polymorph_token(identity.species), "value", None),
+            },
+        )
+
+    if quantity is Quantity.CP:
+        raw = card.Cp_J_molK
+    elif quantity is Quantity.S:
+        raw = card.S_J_molK
+    elif quantity is Quantity.H_MINUS_H298:
+        try:
+            anchor = _openimcc_h298_anchor_kJ_mol(
+                identity.species.formula, phase, float(temperature_K), card, datapack
+            )
+        except Exception as exc:  # noqa: BLE001 - source-anchor data boundary
+            return _refuse(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                "openimcc-h298-source-anchor-unavailable",
+                quantity=quantity,
+                origin=origin,
+                extra={"engine": Engine.OPENIMCC.value, "detail": str(exc)},
+            )
+        if anchor is None:
+            return _refuse(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                "openimcc-h298-source-anchor-unavailable",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "engine": Engine.OPENIMCC.value,
+                    "species": identity.species.formula,
+                    "phase": phase,
+                    "source_table_id": card.source_table_id,
+                    "source_row_id": card.source_row_id,
+                },
+            )
+        # OpenIMCC's apparent H includes a 298.15 K source anchor: gas cards
+        # fold JANAF ΔfH°(298.15) into Shomate F, while condensates are
+        # R*dH298_R + the temperature increment. Thus H(T)-H(298.15) is
+        # H_app(T) - anchor. Both terms are kJ/mol, so the result remains
+        # kJ/mol (the battery's declared enthalpy-increment unit). Sanity:
+        # K(g), 1600 K gives 116.064019836 - 89.000 = 27.064019836 kJ/mol.
+        raw = card.H_app_kJ_mol - float(anchor)
+    else:
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "engine-thermo-does-not-emit",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.OPENIMCC.value},
+        )
+
+    value = as_decimal(str(raw))
+    if quantity is Quantity.S and phase == "g":
+        shift, why = _printed_entropy_shift(identity)
+        if shift is None:
+            reason = (
+                RefusalReason.ATTEMPTED_UNAVAILABLE
+                if why == "janaf-catalog-standard-pressure-unknown"
+                else RefusalReason.IDENTITY_UNKNOWN
+            )
+            return _refuse(
+                reason,
+                why or "standard-pressure-unknown",
+                quantity=quantity,
+                origin=origin,
+                extra={"engine": Engine.OPENIMCC.value},
+            )
+        value += shift
+    if not value.is_finite():
+        return _refuse(
+            RefusalReason.METRIC_DOMAIN,
+            "nonfinite-engine-value",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.OPENIMCC.value},
+        )
+    return ThermoAttempt(
+        value=value,
+        unit=QUANTITY_UNITS[quantity],
+        authority=Authority.BRIDGE,
+        notices=(),
+        refusal_reason=None,
+        refusal_detail={},
+        call_evidence=(
+            f"openimcc:{identity.species.formula}({phase}):"
+            f"{card.source_table_id or card.source_row_id}:T={temperature_K}"
+        ),
+        coefficient_sources=(card.source_row_id,),
+    )
+
+
+def _openimcc_fusion_attempt(
+    identity: Identity,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    *,
+    origin: str,
+) -> ThermoAttempt:
+    if _state_value(identity.subtype) != "solid_to_liquid":
+        return _refuse(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            "fusion-transition-subtype-unknown",
+            quantity=quantity,
+            origin=origin,
+        )
+    if _state_value(identity.species.phase) is not Phase.CR:
+        return _refuse(
+            RefusalReason.IDENTITY_MISMATCH,
+            "fusion-solid-phase-must-be-crystal",
+            quantity=quantity,
+            origin=origin,
+        )
+    pressure_state = identity.standard_pressure_Pa
+    catalog_pressure = _janaf_catalog_standard_pressure_Pa()
+    if (
+        isinstance(pressure_state, State)
+        and pressure_state.is_value
+        and pressure_state.value is not None
+        and catalog_pressure is not None
+        and as_decimal(pressure_state.value) != catalog_pressure
+    ):
+        return _refuse(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            "openimcc-fusion-card-standard-pressure-mismatch",
+            quantity=quantity,
+            origin=origin,
+            extra={"standard_pressure_Pa": str(pressure_state.value)},
+        )
+    solid, _datapack, refusal = _openimcc_card(
+        identity.species.formula,
+        "cr",
+        float(temperature_K),
+        quantity,
+        origin,
+        fusion=True,
+    )
+    if refusal is not None:
+        return refusal
+    liquid, _datapack, refusal = _openimcc_card(
+        identity.species.formula,
+        "l",
+        float(temperature_K),
+        quantity,
+        origin,
+        fusion=True,
+    )
+    if refusal is not None:
+        return refusal
+    assert solid is not None and liquid is not None
+    if not _openimcc_polymorph_matches(solid, identity):
+        return _refuse(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            "openimcc-crystal-card-polymorph-mismatch-or-unknown",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "formula": identity.species.formula,
+                "source_table_id": solid.source_table_id,
+                "polymorph": getattr(polymorph_token(identity.species), "value", None),
+            },
+        )
+    if quantity is Quantity.ENTHALPY_OF_FUSION:
+        value = as_decimal(str(liquid.H_app_kJ_mol - solid.H_app_kJ_mol))
+    else:
+        value = as_decimal(str(liquid.S_J_molK - solid.S_J_molK))
+    return ThermoAttempt(
+        value=value,
+        unit=QUANTITY_UNITS[quantity],
+        authority=Authority.BRIDGE,
+        notices=(),
+        refusal_reason=None,
+        refusal_detail={},
+        call_evidence=(
+            f"openimcc-fusion:{solid.source_row_id}/{liquid.source_row_id}:"
+            f"T={temperature_K}"
+        ),
+        coefficient_sources=(solid.source_row_id, liquid.source_row_id),
+    )
+
+
 def _vaporock_gas_attempt(
     identity: Identity,
     quantity: Quantity,
@@ -1439,6 +1861,10 @@ def predict_thermo_attempt(
             origin=origin,
         )
     if quantity in {Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION}:
+        if engine is Engine.OPENIMCC:
+            return _openimcc_fusion_attempt(
+                identity, quantity, temperature_K, origin=origin
+            )
         if engine is not Engine.INTERNAL_ANALYTICAL:
             return _refuse(
                 RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
@@ -1676,6 +2102,10 @@ def predict_thermo_attempt(
         return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)
     if engine is Engine.VAPOROCK:
         return _vaporock_gas_attempt(identity, quantity, temperature_K, origin=origin)
+    if engine is Engine.OPENIMCC:
+        return _openimcc_pure_phase_attempt(
+            identity, quantity, temperature_K, origin=origin
+        )
     if engine in {Engine.THERMOENGINE, Engine.MAGEMIN}:
         return _pure_phase_attempt(
             engine,
