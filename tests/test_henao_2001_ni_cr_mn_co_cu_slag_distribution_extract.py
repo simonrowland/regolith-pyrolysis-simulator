@@ -44,7 +44,10 @@ def _assert_render_pins(document: dict) -> None:
     assert len(observations) == 431
     assert observations["henao_2001_t1_A-1_slag_Fe"]["values"]["component_amount"] == "42.5"
     assert observations["henao_2001_t1_A-1_slag_Ni"]["values"]["component_amount"] == "4.50"
+    assert observations["henao_2001_t1_A-1_slag_MgO"]["values"]["component_amount"] == "21.8"
+    assert observations["henao_2001_t1_A-1_slag_SiO2"]["values"]["component_amount"] == "11.3"
     assert observations["henao_2001_t1_A-1_alloy_Fe"]["values"]["component_amount"] == "11.2"
+    assert observations["henao_2001_t1_A-1_alloy_Ni"]["values"]["component_amount"] == "91.7"
     assert observations["henao_2001_t3_C-1_alloy_Co"]["values"]["component_amount"] == "91.2"
     assert observations["henao_2001_t1_A-1_alloy_Fe"]["values"]["phase_label"] == "metal"
     first = observations["henao_2001_t1_A-1_slag_Fe"]["values"]
@@ -55,6 +58,8 @@ def _assert_render_pins(document: dict) -> None:
     assert len(_table_rows(document, "2")) == 11
     assert len(_table_rows(document, "3")) == 29
     assert _table_rows(document, "1")[1][1:5] == ["A-1", "", "", ""]
+    assert _table_rows(document, "1")[1][7:10] == ["", "", "2.2"]
+    assert _table_rows(document, "1")[1][12:15] == ["0.78", "", ""]
     component_columns = {
         "1": (2, 3, 4, 5, 6, 7, 8, 13, 14, 15, 16),
         "2": (2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17),
@@ -113,12 +118,28 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
 
 
 def test_typed_cell_mutation_is_detected_by_independent_pdf_pins() -> None:
+    for observation_id, amount in (
+        ("henao_2001_t1_A-1_slag_Fe", "42.6"),
+        ("henao_2001_t1_A-1_slag_MgO", "21.9"),
+    ):
+        mutated = deepcopy(_document())
+        row = next(
+            observation
+            for observation in _observations(mutated)
+            if observation["observation_id"] == observation_id
+        )
+        row["values"]["component_amount"] = amount
+        with pytest.raises(AssertionError):
+            _assert_render_pins(mutated)
+
     mutated = deepcopy(_document())
-    row = next(
-        observation
-        for observation in _observations(mutated)
-        if observation["observation_id"] == "henao_2001_t1_A-1_slag_Fe"
+    rows = _table_rows(mutated, "1")
+    rows[1][9] = "2.3"
+    table = next(
+        row
+        for row in mutated["species"]["FeO"]["context"]
+        if row["locator"].get("table") == "1"
     )
-    row["values"]["component_amount"] = "42.6"
+    table["values"]["printed_rows_csv"] = "\n".join(",".join(value for value in row) for row in rows)
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)

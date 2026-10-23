@@ -18,6 +18,10 @@ extraction:
   date: '2026-10-21'
   worker: fam37-1021
 review_status: draft
+fidelity_samples:
+  - path: species.SiO2.observations[van_ende_2008_1-1_slag_SiO2].values.component_amount
+    value: '26.0'
+    locator: {page: 4, pdf_page_index: 3, published_page: '1334', table: '4', row: '1-1'}
 experiments:
   - experiment_id: van-ende:1-1
     locator:
@@ -1591,7 +1595,7 @@ species:
           phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 slag with liquid Fe–Cr–Mn stainless steel
           temperature_K: 1873 for experiments 1–5; 1823 for 6-1; 1853 for 6-2
           equilibrium_conditions: >-
-            Ar atmosphere at 1 atm; 20 h equilibration for the reported runs; samples
+            Ar atmosphere; 20 h equilibration for the reported runs; samples
             water-quenched before slag and steel analysis. Experiment groups 1–5 were
             conducted at 1873 K, 6-1 at 1823 K, and 6-2 at 1853 K.
           printed_rows_csv: |-
