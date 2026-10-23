@@ -1,0 +1,332 @@
+schema_version: literature_extract.v1
+source_id: ottonello-2000-polymeric-cao-feo-silica
+source:
+  citation: >-
+    Ottonello, G. (2000), “Thermodynamic constraints arising from the polymeric approach to
+    silicate slags: the system CaO–FeO–SiO2 as an example,” Sixth International Conference
+    on Molten Slags, Fluxes and Salts, paper 017, 31-page proceedings manuscript.
+  year: 2000
+  corpus_source_id: ottonello-2000-polymeric-cao-feo-silica
+extraction:
+  method: >-
+    Born-digital pdftotext-layout.txt was read as the primary source. The first page, Table 1,
+    and the figure pages 15–31 were checked against PDF renders. This is a thermodynamic
+    modelling paper with no new experiments or measured-data tables. Table 1's fitted model
+    parameters are retained as model-derived context. Figures 1–17 compare calculated curves
+    and surfaces with literature measurements or assessments; all are recorded with
+    digitisation deferred. No plotted values were estimated.
+  date: '2026-10-21'
+  worker: fam37-1021
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: ottonello_2000_table_1_polymeric_model_parameters
+        type: thermodynamic_model
+        locator: {page: 14, pdf_page_index: 13, published_page: '14', table: '1'}
+        units: model equations as printed; T in K
+        values:
+          method_class: model_derived
+          quantity_as_printed: fitted polymerization constants and temperature-dependent strain coefficients
+          phase_system: liquid CaO–SiO2 and liquid FeO–SiO2 binary slags
+          printed_parameters: |
+            ln Kp,FeO-SiO2 = -3600/T
+            chi1,FeO-SiO2 = -4.7469 + 0.002328 T
+            chi2,FeO-SiO2 = 29.316 - 0.01426 T
+            chi3,FeO-SiO2 = -45.828 + 0.021348 T
+            chi4,FeO-SiO2 = 32.129 - 0.013545 T
+            ln Kp,CaO-SiO2 = -15372/T
+            chi1,CaO-SiO2 = -3.075 + 0.0011465 T
+            chi2,CaO-SiO2 = 29.490 - 0.01147 T
+            chi3,CaO-SiO2 = -81.311 + 0.032785 T
+            chi4,CaO-SiO2 = 67.579 - 0.028095 T
+          note: >-
+            These are parameters of the paper's polymeric thermodynamic model, not measured
+            thermodynamic observations. They are not emitted as interaction_parameter points.
+      - observation_id: ottonello_2000_fig1_cao_activity
+        type: figure
+        locator: {page: 15, pdf_page_index: 14, published_page: '15', figure: '1'}
+        units: dimensionless activity as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: CaO activity in liquid CaO–SiO2 slag
+          quantity_as_printed: CaO activity relative to solid standard state
+          phase_system: liquid CaO–SiO2 slag
+          temperature_as_printed: 1500 °C and 1600 °C; cited measurements at 1773 K and 1873 K
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: aCaO(s)
+          caption_as_printed: Activity of CaO in CaO–SiO2 liquid slags at 1500 °C and 1600 °C (relative to the solid standard state).
+          panel: single
+          series: [{name: Carter and MacFarlane 1957, marker: circle, marker_count: unknown}, {name: Sharma and Richardson 1962, marker: triangle, marker_count: unknown}, {name: Zou et al. 1982, marker: square, marker_count: unknown}, {name: Toop–Samis model, marker: dashed line, marker_count: 0}, {name: this work at 1773 K and 1873 K, marker: solid and dashed lines, marker_count: 0}]
+          attribution: Carter and MacFarlane (1957); Sharma and Richardson (1962); Zou et al. (1982); model curves by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig2_sio2_activity
+        type: figure
+        locator: {page: 16, pdf_page_index: 15, published_page: '16', figure: '2'}
+        units: dimensionless activity as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: SiO2 activity in liquid CaO–SiO2 slag
+          quantity_as_printed: SiO2 activity relative to solid standard state
+          phase_system: liquid CaO–SiO2 slag
+          temperature_as_printed: 1550 °C and 1600 °C; cited measurements at 1773 K, 1823 K and 1873 K
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: aSiO2(s)
+          caption_as_printed: Activity of SiO2 in CaO–SiO2 liquid slags at 1550 °C and 1600 °C (relative to the solid standard state).
+          panel: single
+          series: [{name: Baird and Taylor 1958, marker: circle, marker_count: unknown}, {name: Rein and Chipman 1965, marker: triangle, marker_count: unknown}, {name: Kay and Taylor 1960, marker: diamond, marker_count: unknown}, {name: Zou et al. 1982, marker: square, marker_count: unknown}, {name: this work, marker: solid line, marker_count: 0}]
+          attribution: Baird and Taylor (1958); Rein and Chipman (1965); Kay and Taylor (1960); Zou et al. (1982); model by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig3_feo_activity
+        type: figure
+        locator: {page: 17, pdf_page_index: 16, published_page: '17', figure: '3'}
+        units: dimensionless activity as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: FeO activity in liquid FeO–SiO2 slag
+          quantity_as_printed: FeO activity relative to liquid standard state
+          phase_system: liquid FeO–SiO2 slag
+          temperature_as_printed: various; cited measurements at 1573, 1623, 2058, 2153 and 2233 K
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: aFeO(l)
+          caption_as_printed: Activity of FeO in FeO–SiO2 liquid slags at various temperatures (relative to liquid standard state); solid lines are model calculations at 100 K intervals.
+          panel: single
+          series: [{name: Distin et al. 1971, marker: symbols, marker_count: unknown}, {name: Schuhmann and Ensio 1951, marker: symbols, marker_count: unknown}, {name: Bodsworth 1959, marker: symbols, marker_count: unknown}, {name: model, marker: solid lines, marker_count: 0}]
+          attribution: Distin et al. (1971); Schuhmann and Ensio (1951); Bodsworth (1959); model by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig4_feo_activity_surface_elliott
+        type: figure
+        locator: {page: 18, pdf_page_index: 17, published_page: '18', figure: '4'}
+        units: dimensionless activity as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: FeO activity surface in liquid CaO–FeO–SiO2
+          quantity_as_printed: FeO activity surface relative to liquid standard state
+          phase_system: liquid CaO–FeO–SiO2
+          temperature_as_printed: 1600 °C
+          x_axis_as_printed: ternary CaO–FeO–SiO2 composition
+          y_axis_as_printed: aFeO
+          caption_as_printed: FeO activity surface at 1600 °C according to Elliott (1955), based essentially on Taylor and Chipman (1943) and Winkler and Chipman (1946); inverse-distance contouring of isoactivity lines.
+          panel: single
+          series: [{name: Elliott 1955 assessment based on cited measurements, marker: isoactivity contours, marker_count: unknown}]
+          attribution: Elliott (1955); underlying measurements by Taylor and Chipman (1943) and Winkler and Chipman (1946)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig5_silicate_polymerization_path
+        type: figure
+        locator: {page: 19, pdf_page_index: 18, published_page: '19', figure: '5'}
+        units: fraction and mean silicon atoms per polymer unit, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: singly bonded oxygen proportion and polymer unit size
+          quantity_as_printed: proportion of singly bonded oxygen atoms versus mean silicon atoms per polymer unit
+          phase_system: liquid CaO–SiO2 and FeO–SiO2 silicate melts
+          temperature_as_printed: 1600 °C
+          x_axis_as_printed: mean silicon atoms per polymer unit
+          y_axis_as_printed: proportion of singly bonded oxygen atoms
+          caption_as_printed: Plot of the proportion of singly bonded oxygen atoms in any silicate anion versus the mean number of silicon atoms per polymer unit.
+          panel: single
+          series: [{name: CaO–SiO2 path, marker: line, marker_count: 0}, {name: FeO–SiO2 path, marker: line, marker_count: 0}, {name: Toop and Samis 1962, marker: line, marker_count: 0}]
+          attribution: Toop and Samis (1962); model paths by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig6_cao_activity_assessments
+        type: figure
+        locator: {page: 20, pdf_page_index: 19, published_page: '20', figure: '6'}
+        units: dimensionless activity as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: CaO activity in liquid CaO–SiO2 slag
+          quantity_as_printed: model CaO activity relative to solid standard state
+          phase_system: liquid CaO–SiO2 slag
+          temperature_as_printed: 1500 °C
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: aCaO(s)
+          caption_as_printed: Model activity of CaO in CaO–SiO2 liquid slags at 1500 °C compared with various assessments.
+          panel: single
+          series: [{name: this work, marker: line, marker_count: 0}, {name: Hillert et al. 1990, marker: line, marker_count: 0}, {name: Kay and Taylor 1960, marker: line, marker_count: 0}, {name: Gaye and Welfringer 1984, marker: line, marker_count: 0}, {name: Pelton and Blander 1986, marker: line, marker_count: 0}]
+          attribution: Hillert et al. (1990); Kay and Taylor (1960); Gaye and Welfringer (1984); Pelton and Blander (1986); model by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig7_sio2_activity_assessments
+        type: figure
+        locator: {page: 21, pdf_page_index: 20, published_page: '21', figure: '7'}
+        units: dimensionless activity as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: SiO2 activity in liquid CaO–SiO2 slag
+          quantity_as_printed: model SiO2 activity relative to solid standard state
+          phase_system: liquid CaO–SiO2 slag
+          temperature_as_printed: 1550 °C
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: aSiO2(s)
+          caption_as_printed: Model activity of SiO2 in CaO–SiO2 liquid slags at 1550 °C compared with various assessments.
+          panel: single
+          series: [{name: this work, marker: line, marker_count: 0}, {name: Hillert et al. 1990, marker: line, marker_count: 0}, {name: Kay and Taylor 1960, marker: line, marker_count: 0}, {name: Gaye and Welfringer 1984, marker: line, marker_count: 0}, {name: Pelton and Blander 1986, marker: line, marker_count: 0}]
+          attribution: Hillert et al. (1990); Kay and Taylor (1960); Gaye and Welfringer (1984); Pelton and Blander (1986); model by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig8_cao_strain_energy
+        type: figure
+        locator: {page: 22, pdf_page_index: 21, published_page: '22', figure: '8'}
+        units: kJ/mol and bending term, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: elastic strain energy and bending term
+          quantity_as_printed: elastic strain energy and polymer-chain bending versus composition
+          phase_system: liquid CaO–SiO2 slag
+          temperature_as_printed: various, including 1500 °C and 1800 °C
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: strain energy (kJ/mol) and x/a bending term
+          caption_as_printed: Elastic strain energy contribution to bulk Gibbs free energy of mixing (heavy lines) and bending terms (thin lines) computed for CaO–SiO2 at various temperatures.
+          panel: single
+          series: [{name: strain energy, marker: heavy lines, marker_count: 0}, {name: bending term, marker: thin lines, marker_count: 0}]
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig9_cao_sio2_solvus
+        type: figure
+        locator: {page: 23, pdf_page_index: 22, published_page: '23', figure: '9'}
+        units: K and mole fraction, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: liquid miscibility gap boundary
+          quantity_as_printed: CaO–SiO2 solvus
+          phase_system: CaO–SiO2
+          temperature_as_printed: approximately 1600–2200 K, as plotted
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: temperature (K)
+          caption_as_printed: Solvus conformation along CaO–SiO2 compared with experimental observations of Tewhey and Hess (1979) and Olshanskii (1951).
+          panel: single
+          series: [{name: this work, marker: curve, marker_count: 0}, {name: Tewhey and Hess 1979, marker: symbols, marker_count: unknown}, {name: Olshanskii 1951, marker: symbols, marker_count: unknown}]
+          attribution: Tewhey and Hess (1979); Olshanskii (1951); model by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig10_cao_sio2_gibbs_energy
+        type: figure
+        locator: {page: 24, pdf_page_index: 23, published_page: '24', figure: '10'}
+        units: kJ/mol, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: Gibbs free energy of mixing
+          quantity_as_printed: model Gibbs free energy of mixing in liquid CaO–SiO2 slags
+          phase_system: liquid CaO–SiO2 slag
+          temperature_as_printed: 1000–2000 °C
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: Gibbs free energy of mixing (kJ/mol)
+          caption_as_printed: Model Gibbs free energy of mixing of liquid CaO–SiO2 slags at various temperatures compared with the modified quasi-chemical approach.
+          panel: single
+          series: [{name: this work, marker: curves, marker_count: 0}, {name: Pelton and Blander 1986, marker: curve, marker_count: 0}]
+          attribution: Pelton and Blander (1986); model by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig11_cao_sio2_excess_gibbs
+        type: figure
+        locator: {page: 25, pdf_page_index: 24, published_page: '25', figure: '11'}
+        units: dimensionless excess Gibbs energy, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: excess Gibbs free energy of mixing
+          quantity_as_printed: excess Gibbs free energy in liquid CaO–SiO2 slags
+          phase_system: liquid CaO–SiO2 slag
+          temperature_as_printed: 1600 °C
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: G excess/(2.303RT)
+          caption_as_printed: Excess Gibbs free energy of mixing of liquid CaO–SiO2 slags at 1600 °C; model calculations for different Kp are compared with various assessments.
+          panel: single
+          series: [{name: this work, marker: curves, marker_count: 0}, {name: Darken 1950, marker: curve, marker_count: 0}, {name: Elliott 1955, marker: curve, marker_count: 0}, {name: Pelton and Blander 1986, marker: curve, marker_count: 0}]
+          attribution: Darken (1950); Elliott (1955); Pelton and Blander (1986); model by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig12_feo_strain_energy
+        type: figure
+        locator: {page: 26, pdf_page_index: 25, published_page: '26', figure: '12'}
+        units: kJ/mol and bending term, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: elastic strain energy and bending term
+          quantity_as_printed: elastic strain energy and polymer-chain bending versus composition
+          phase_system: liquid FeO–SiO2 slag
+          temperature_as_printed: various, including 1500 °C and 1900 °C
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: strain energy (kJ/mol) and x/a bending term
+          caption_as_printed: Elastic strain energy contribution to bulk Gibbs free energy of mixing (heavy lines) and bending terms (thin lines) computed for FeO–SiO2 at various temperatures.
+          panel: single
+          series: [{name: strain energy, marker: heavy lines, marker_count: 0}, {name: bending term, marker: thin lines, marker_count: 0}]
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig13_feo_sio2_excess_gibbs
+        type: figure
+        locator: {page: 27, pdf_page_index: 26, published_page: '27', figure: '13'}
+        units: dimensionless excess Gibbs energy, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: excess Gibbs free energy of mixing
+          quantity_as_printed: excess Gibbs free energy in liquid FeO–SiO2 slags
+          phase_system: liquid FeO–SiO2 slag
+          temperature_as_printed: 1600 °C
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: G excess/(2.303RT)
+          caption_as_printed: Excess Gibbs free energy of mixing of liquid FeO–SiO2 slags at 1600 °C; model computations for different Kp are compared with existing assessments.
+          panel: single
+          series: [{name: this work, marker: curves, marker_count: 0}, {name: Elliott 1955, marker: curve, marker_count: 0}, {name: Pelton and Blander 1986, marker: curve, marker_count: 0}, {name: Pelton personal communication, marker: curve, marker_count: 0}]
+          attribution: Elliott (1955); Pelton and Blander (1986); Pelton (personal communication); model by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig14_feo_sio2_solvus
+        type: figure
+        locator: {page: 28, pdf_page_index: 27, published_page: '28', figure: '14'}
+        units: K and mole fraction, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: liquid miscibility gap boundary
+          quantity_as_printed: FeO–SiO2 solvus
+          phase_system: FeO–SiO2
+          temperature_as_printed: as plotted
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: temperature (K)
+          caption_as_printed: Solvus conformation along FeO–SiO2 compared with assessments based on the modified quasi-chemical approach.
+          panel: single
+          series: [{name: this work, marker: curve, marker_count: 0}, {name: modified quasi-chemical assessments, marker: curves, marker_count: 0}]
+          attribution: Pelton and Blander (1986) and other cited assessments; model by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig15_ternary_excess_gibbs
+        type: figure
+        locator: {page: 29, pdf_page_index: 28, published_page: '29', figure: '15'}
+        units: molar Gibbs energy, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: excess molar Gibbs free energy of mixing
+          quantity_as_printed: excess molar Gibbs free energy surface
+          phase_system: liquid FeO–SiO2–CaO
+          temperature_as_printed: 1600 °C
+          x_axis_as_printed: ternary FeO–SiO2–CaO composition
+          y_axis_as_printed: excess molar Gibbs energy
+          caption_as_printed: Excess molar Gibbs free energy of mixing surface for liquid FeO–SiO2–CaO at 1600 °C; computed values compared with Elliott's (1955) estimates.
+          panel: single
+          series: [{name: this work, marker: surface, marker_count: 0}, {name: Elliott 1955, marker: dashed contours, marker_count: 0}]
+          attribution: Elliott (1955); model by Ottonello (2000)
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig16_ternary_feo_activity
+        type: figure
+        locator: {page: 30, pdf_page_index: 29, published_page: '30', figure: '16'}
+        units: dimensionless activity as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: FeO activity in liquid FeO–SiO2–CaO
+          quantity_as_printed: FeO activity surface
+          phase_system: liquid FeO–SiO2–CaO
+          temperature_as_printed: 1600 °C
+          x_axis_as_printed: ternary FeO–SiO2–CaO composition
+          y_axis_as_printed: aFeO
+          caption_as_printed: FeO activity surface at 1600 °C calculated from the model; inverse-distance contouring of 9900 activity values, with strain-energy contributions included.
+          panel: single
+          series: [{name: this work, marker: surface, marker_count: 0}]
+          digitisation: deferred to a figure pass
+      - observation_id: ottonello_2000_fig17_feo_sio2_entropy
+        type: figure
+        locator: {page: 31, pdf_page_index: 30, published_page: '31', figure: '17'}
+        units: J/(mol K), as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: entropy contribution to Gibbs free energy of mixing
+          quantity_as_printed: entropic contributions along FeO–SiO2 join
+          phase_system: liquid FeO–SiO2 slag
+          temperature_as_printed: various, 1000–2000 °C
+          x_axis_as_printed: XSiO2
+          y_axis_as_printed: entropy contribution (J/(mol K))
+          caption_as_printed: Entropic contributions to Gibbs free energy of mixing along FeO–SiO2 at various temperatures, with Pelton and Blander (1986) configurational entropy at 1000 °C for comparison.
+          panel: single
+          series: [{name: this work, marker: curves, marker_count: 0}, {name: Pelton and Blander 1986, marker: red line, marker_count: 0}]
+          attribution: Pelton and Blander (1986); model by Ottonello (2000)
+          digitisation: deferred to a figure pass
