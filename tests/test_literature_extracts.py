@@ -2253,7 +2253,7 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
     migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(path)
     migrator.finalize()
-    assert len(migrator.result.validation.hard_issues) == 8
+    assert migrator.result.validation.hard_issues == ()
 
     for panel, experiment_suffix in (
         ("VI_lherzolite", "VI"),
@@ -2265,6 +2265,10 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
             if item.experiment_id.endswith(f"::experiment::{experiment_suffix}")
         )
         assert experiment.sample.mass_kg.state.tag == "unknown"
+        assert experiment.sample.mass_kg.state.value is None
+        total_pressure = experiment.pressure_environment.total_pressure_Pa
+        assert total_pressure.state.tag == "unknown"
+        assert total_pressure.state.value is None
         assert experiment.apparatus.geometry.orifice_area_m2.state.tag == "unknown"
         assert experiment.apparatus.geometry.orifice_diameter_m.state.tag == "unknown"
         assert experiment.apparatus.geometry.orifice_channel_length_m.state.tag == "unknown"
@@ -2279,6 +2283,20 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
         ]
         assert rows
         assert all(item.experiment_id == experiment.experiment_id for item in rows)
+        for item in rows:
+            for axis in ("sample_mass_kg", "total_pressure_Pa"):
+                state = getattr(item.identity, axis)
+                assert state.tag == "unknown"
+                assert state.value is None
+                matches = [
+                    issue
+                    for issue in migrator.result.validation.issues
+                    if issue.path
+                    == f"observation[{item.observation_id}].identity.{axis}"
+                ]
+                assert len(matches) == 1
+                assert matches[0].reason.value == "identity_incomplete"
+                assert "unknown" in matches[0].detail
 
 
 def test_richter_2007_table1_residues_link_to_their_runs() -> None:
