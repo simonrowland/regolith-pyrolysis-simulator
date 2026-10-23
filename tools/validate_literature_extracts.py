@@ -192,6 +192,9 @@ PATH_VALUE_KEYS = frozenset(
         "chapter_pdf",
         "corpus_asset",
         "provenance_file",
+        "audit_file",
+        "audit_files",
+        "calibration_audit",
     }
 )
 

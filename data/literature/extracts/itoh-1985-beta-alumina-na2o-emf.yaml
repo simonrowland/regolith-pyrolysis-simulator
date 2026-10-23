@@ -359,13 +359,11 @@ species:
           method_class: model_derived
           reason: Calculated from thermochemical data (29) and equations (7), (8), (16), and (17); no table asset can be registered in this run.
           derivation_note: derivation pending a corpus table asset (controller, t-1382)
-          inputs_csv: .agent-scratch/F28-tables/itoh-1985-beta-alumina-na2o-emf/table-2-inputs.csv
           inputs_as_printed:
             - equation 7: log aNa2O = -0.40 - 12140(K/T) for alpha+beta alumina
             - equation 8: log aNa2O = 0.85 - 11380(K/T) for beta+beta-double-prime alumina
             - thermochemical data source (29): JANAF Thermochemical Tables
             - SO2/SO3 condition: P_O2/P° = 0.21
-          data_csv: .agent-scratch/F28-tables/itoh-1985-beta-alumina-na2o-emf/table-2-values.csv
           rows_as_printed:
             - {T_K: 500, alpha_beta: {SO2: '1.41e-31', SO3: '1.66e-26', CO2: '1.32e-1'}, beta_beta_prime: {SO2: '2.40e-34', SO3: '2.82e-29', CO2: '2.24e-4'}}
             - {T_K: 600, alpha_beta: {SO2: '4.07e-24', SO3: '9.12e-21', CO2: '3.84e0'}, beta_beta_prime: {SO2: '1.26e-26', SO3: '2.82e-23', CO2: '1.17e-2'}}
