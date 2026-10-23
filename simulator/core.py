@@ -53,13 +53,19 @@ from dataclasses import dataclass
 import logging
 import math
 from pathlib import Path
-from types import MappingProxyType, ModuleType
+from types import MappingProxyType
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 
 from engines.antoine import _antoine_log10_pressure
 
 class RefusalStateSnapshotError(TypeError):
     """Typed refusal when rollback state contains an unsupported proxy graph."""
+
+
+class _C0ForecastSulfsatRefusal(RuntimeError):
+    """Typed refusal if a detached C0 forecast reaches the live SulfSat gate."""
+
+    prediction_status = 'unavailable_forecast_sulfsat'
 
 
 class _RefusalSnapshotHistoryPrefix:
@@ -9156,6 +9162,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         warning is preserved on the result; the caller is expected to
         log it but not redirect inventory.
         """
+        if getattr(self, '_c0_forecast_context', False):
+            raise _C0ForecastSulfsatRefusal(
+                'C0 forecast cannot invoke the Stage 0 SulfSat gate'
+            )
         s_input_ppm = self._stage0_sulfur_input_ppm()
         if s_input_ppm <= 0.0:
             self._last_sulfur_saturation_result = None
@@ -9202,6 +9212,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         is never mutated here — the gate has no ledger authority
         (binding spec §4 forbids it).
         """
+        if getattr(self, '_c0_forecast_context', False):
+            raise _C0ForecastSulfsatRefusal(
+                'C0 forecast cannot invoke the post-equilibrium SulfSat gate'
+            )
         s_input_ppm = self._stage0_sulfur_input_ppm()
         if s_input_ppm <= 0.0:
             return
@@ -13760,21 +13774,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             pO2_mbar=pO2_mbar,
         )
 
+    @staticmethod
+    def _c0_forecast_engine_name(backend: Any) -> str:
+        if backend is None:
+            return 'internal-analytical'
+        name = getattr(backend, 'backend_name', None)
+        if not name or str(name).strip().lower() == 'unknown':
+            name = getattr(backend, 'name', None)
+        return str(name or type(backend).__name__)
+
     def _build_c0_forecast_context(
         self,
     ) -> tuple['PyrolysisSimulator | None', str]:
         """Build an evaluator with private mutable owners for a C0 forecast."""
         backend_factory = getattr(self, '_c0_forecast_backend_factory', None)
         try:
-            if callable(backend_factory):
-                forecast_backend = backend_factory()
-                if forecast_backend is self.backend:
-                    return None, 'unavailable_forecast_backend'
-            elif self.backend is None:
+            if self.backend is None:
+                # backend=None is the live internal-analytical execution path;
+                # keep the forecast on that same path, not another engine.
                 forecast_backend = None
+                forecast_engine = 'internal-analytical'
             elif type(self.backend) is InternalAnalyticalBackend:
+                # This backend delegates equilibrium to the same core
+                # internal-analytical model, so give the forecast a fresh handle.
                 forecast_backend = InternalAnalyticalBackend()
                 forecast_backend.initialize({})
+                forecast_engine = 'internal-analytical'
+            elif callable(backend_factory):
+                forecast_backend = backend_factory()
+                if (
+                    forecast_backend is None
+                    or forecast_backend is self.backend
+                    or type(forecast_backend) is not type(self.backend)
+                    or self._c0_forecast_engine_name(forecast_backend)
+                    != self._c0_forecast_engine_name(self.backend)
+                ):
+                    return None, 'unavailable_forecast_backend'
+                forecast_engine = self._c0_forecast_engine_name(
+                    forecast_backend
+                )
             else:
                 return None, 'unavailable_forecast_backend'
         except Exception:
@@ -13797,21 +13835,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         try:
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
-            sulfur_module = getattr(
-                getattr(self, '_sulfsat_gate', None), '_module', None
-            )
-            if isinstance(sulfur_module, ModuleType):
-                # Imported code modules are process-owned namespaces, not
-                # mutable run state; preserve the optional SulfSat module while
-                # still copying the gate that refers to it.
-                memo[id(sulfur_module)] = sulfur_module
             if self.backend is not None:
                 memo[id(self.backend)] = forecast_backend
             if live_store is not None:
                 memo[id(live_store)] = forecast_store
+            forecast_state = dict(self.__dict__)
+            forecast_state['_sulfsat_gate'] = None
             context.__dict__.update(
-                _deepcopy_refusal_state(self.__dict__, memo)
+                _deepcopy_refusal_state(forecast_state, memo)
             )
+            context._c0_forecast_context = True
+            context._c0_forecast_engine = forecast_engine
             context._c0_forecast_backend_factory = None
             context._chem_kernel = context._build_chemistry_kernel()
         except Exception:
@@ -14104,6 +14138,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             selected['T_exit_resolution_C'] = 1.0
             return selected
         except Exception as exc:
+            prediction_status = getattr(
+                exc,
+                'prediction_status',
+                f'unavailable:{type(exc).__name__}:{exc}',
+            )
             return {
                 'T_exit_C': None,
                 't_evac_hr': None,
@@ -14125,7 +14164,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'phase_state': 'unknown; analytical liquid-law extrapolated',
                 'phase_state_ticket': 't-1460',
                 'release_curves': 'uncertified (t-1417)',
-                'prediction_status': f'unavailable:{type(exc).__name__}:{exc}',
+                'prediction_status': prediction_status,
             }
 
     def _cap_c0_joint_release_to_pipe_capacity(
