@@ -295,8 +295,11 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     # identity compare, so the identity_equal conjunct passes. Printed
     # uncertainty with an unmapped unit is printed_uncertainty_unit_unmapped
     # and carries the source unit text.
+    # b-979 / d-053: source_relation on all 18 residuals moves from
+    # independent to unknown. Kress attribution stays UNKNOWN unless both
+    # walks are complete. No numeric field moved.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "690007627c3e104224bad710c8c406dc6c7c12548f044f6bb0f309952e5f42de"
+        "08afbc44bd2416437d91f351d908e4f02a30c507804f147e1d7f8aaad390ef19"
     )
 
 
