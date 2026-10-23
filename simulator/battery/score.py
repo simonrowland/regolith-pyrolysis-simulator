@@ -5562,6 +5562,10 @@ class _FeRedoxMaterial:
     temperature: Decimal
     composition_state: State[Composition]
     composition_wt: dict[str, float]
+
+
+@dataclass(frozen=True)
+class _FeRedoxKressBasis:
     mol_fractions: dict[str, float]
     dropped_components: tuple[str, ...]
     dropped_mass_fraction: float | None
@@ -5619,16 +5623,11 @@ def _printed_condition_decimal(observation: Observation, key: str) -> Decimal | 
 def _fe_redox_material(
     observation: Observation, identity: Identity
 ) -> _FeRedoxMaterial | _FeRedoxRefusal:
-    """Temperature, oxide weights, and the Kress iron detector.
+    """Temperature and the full oxide weight map.
 
-    ``kress91_dropped_components`` is reported for the Kress notice only.
-    A MELTS pot is the full oxide weight map, not the Kress basis.
+    Kress mol fractions are ``_fe_redox_kress_basis``. OpenIMCC does not
+    call that helper. A MELTS pot is this weight map, not the Kress basis.
     """
-
-    from simulator.fe_redox import (
-        kress91_dropped_components,
-        melt_mol_fractions_for_kress91,
-    )
 
     temperature = temperature_of(identity) or _printed_condition_decimal(
         observation, "temperature_K"
@@ -5652,13 +5651,6 @@ def _fe_redox_material(
             {"reason": "missing_input", "input": "composition"},
         )
     composition = composition_state.value
-
-    # Premise: Borisov stores mole fractions of oxide formula units and the
-    # combined iron key is single-cation. Algebra: x_i -> w_i ∝ x_i M_i, then
-    # the production converter divides by M_i and renormalizes to x_i while
-    # treating FeO as FeOt. Unit check: (mol fraction × g/mol)/(g/mol) is a
-    # mole fraction. Sanity: no measured redox split is used, and the printed
-    # six-significant-figure composition remains closed after the FeOt rename.
     try:
         composition_wt = (
             {oxide: float(amount) for oxide, amount in composition.components}
@@ -5667,6 +5659,37 @@ def _fe_redox_material(
         )
         if composition_wt is None:
             raise ValueError("composition cannot be converted to oxide weights")
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        return _FeRedoxRefusal(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_redox_composition", "detail": str(exc)},
+        )
+    return _FeRedoxMaterial(
+        temperature=temperature,
+        composition_state=composition_state,
+        composition_wt=composition_wt,
+    )
+
+
+def _fe_redox_kress_basis(
+    composition_wt: Mapping[str, float],
+) -> _FeRedoxKressBasis | _FeRedoxRefusal:
+    """Kress91 mol fractions and the FeOt refusal.
+
+    Premise: Borisov stores mole fractions of oxide formula units and the
+    combined iron key is single-cation. Algebra: x_i -> w_i ∝ x_i M_i, then
+    the production converter divides by M_i and renormalizes to x_i while
+    treating FeO as FeOt. Unit check: (mol fraction × g/mol)/(g/mol) is a
+    mole fraction. Sanity: no measured redox split is used, and the printed
+    six-significant-figure composition remains closed after the FeOt rename.
+    """
+
+    from simulator.fe_redox import (
+        kress91_dropped_components,
+        melt_mol_fractions_for_kress91,
+    )
+
+    try:
         dropped_components, dropped_mass_fraction = kress91_dropped_components(
             composition_wt
         )
@@ -5681,10 +5704,7 @@ def _fe_redox_material(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "total_iron"},
         )
-    return _FeRedoxMaterial(
-        temperature=temperature,
-        composition_state=composition_state,
-        composition_wt=composition_wt,
+    return _FeRedoxKressBasis(
         mol_fractions=mol_fractions,
         dropped_components=tuple(dropped_components),
         dropped_mass_fraction=dropped_mass_fraction,
@@ -5840,7 +5860,8 @@ def _predict_fe_redox(
     """Predict Fe3+/Fe2+ from Kress91, OpenIMCC, or a MELTS ferric split.
 
     Internal-analytical keeps the Kress91 split. OpenIMCC calls
-    ``openimcc.evaluate_redox`` on the printed composition and fO2.
+    ``openimcc.evaluate_redox`` on the printed composition and fO2, and
+    does not apply the Kress FeOt gate.
     AlphaMELTS and ThermoEngine report the split they already compute; the
     battery ratio is ``fe3_fe2_ratio_from_oxide_wt_pct`` or
     ``fe3_fe2_ratio_from_ferric_fraction``. Other engines stay refused.
@@ -5904,6 +5925,14 @@ def _predict_fe_redox(
     material = _fe_redox_material(observation, identity)
     if isinstance(material, _FeRedoxRefusal):
         return refused(material.reason, material.detail)
+
+    # Offer 20 checks printed fO2 and Fe atoms before any Kress projection.
+    # Internal-analytical and MELTS keep the stack's FeOt gate here.
+    kress_basis: _FeRedoxKressBasis | None = None
+    if engine is not Engine.OPENIMCC:
+        kress_basis = _fe_redox_kress_basis(material.composition_wt)
+        if isinstance(kress_basis, _FeRedoxRefusal):
+            return refused(kress_basis.reason, kress_basis.detail)
 
     fo2_log = _printed_fe_redox_fo2_log(observation, identity)
     handle: object | None = None
@@ -6057,6 +6086,7 @@ def _predict_fe_redox(
     pressure_bar, pressure_pa = pressure
 
     if not melts:
+        assert kress_basis is not None
         from simulator.fe_redox import (
             KRESS91_LIQUID_CALIBRATION_MAX_T_C,
             KRESS91_LIQUID_CALIBRATION_MIN_T_C,
@@ -6072,7 +6102,7 @@ def _predict_fe_redox(
         try:
             split = kress91_split(
                 fO2_log=float(fo2_log),
-                mol_fractions=material.mol_fractions,
+                mol_fractions=kress_basis.mol_fractions,
                 T_K=float(material.temperature),
                 pressure_bar=pressure_bar,
             )
@@ -6102,21 +6132,21 @@ def _predict_fe_redox(
             f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
         )
         notices: tuple[Notice, ...] = ()
-        if material.dropped_components and material.dropped_mass_fraction is not None:
+        if kress_basis.dropped_components and kress_basis.dropped_mass_fraction is not None:
             notices = (
                 Notice(
                     kind=NoticeKind.COMPOSITION_PROJECTED,
                     affected_quantities=(Quantity.FE3_FE2_RATIO,),
                     reason=(
                         "Kress91 oxide basis omits composition components: "
-                        f"{', '.join(material.dropped_components)}; "
-                        f"dropped_mass_fraction={material.dropped_mass_fraction:.6g}; "
+                        f"{', '.join(kress_basis.dropped_components)}; "
+                        f"dropped_mass_fraction={kress_basis.dropped_mass_fraction:.6g}; "
                         f"authority={authority.value}; certified_band={certified_band_text}"
                     ),
                     origin="simulator.fe_redox:melt_mol_fractions_for_kress91",
                     band=certified_band_text,
-                    dropped=material.dropped_components,
-                    dropped_mass_fraction=Decimal(str(material.dropped_mass_fraction)),
+                    dropped=kress_basis.dropped_components,
+                    dropped_mass_fraction=Decimal(str(kress_basis.dropped_mass_fraction)),
                     authority=authority,
                 ),
             )
