@@ -3768,9 +3768,23 @@ def test_scalar_c0_temperature_range_patch_is_scored_by_c1() -> None:
         schema=schema,
     )
 
+    # 1d8018fbd deliberately admits consumed ranges only as pairs. Scalars
+    # fail before execution; an admitted pair still exercises C1 classification.
+    assert executor.calls == 0
+    assert executor.config is None
+    assert result.failure_category is FailureCategory.INVALID_PATCH
+    assert result.eval_spec is None
+    assert result.cache_key is None
+    assert any("requires [low, high] pair" in note for note in result.notes)
+    pair = [scalar, schema.spec_for(path).high]
+    result = evaluate(
+        RecipePatch({path: pair}), "lunar_mare_low_ti", "fast",
+        profile=PROFILE, executor=executor, schema=schema,
+    )
+
     assert executor.calls == 1
     assert executor.config is not None
-    assert executor.config.setpoints["campaigns"]["C0"]["temp_range_C"] == scalar
+    assert executor.config.setpoints["campaigns"]["C0"]["temp_range_C"] == pair
     assert not result.feasible
     assert result.failure_category is FailureCategory.INVALID_RECIPE
     assert result.eval_spec is not None
@@ -6145,7 +6159,18 @@ def test_out_of_domain_earned_rump_terminal_composition_target_scores_success(
 
 # Keep b151 parent expectations visible while owner-ruled value moves are classified.
 def test_missing_pumping_rollup_recomputes_and_refuses_subambient_flow_b151() -> None:
+    from simulator.pumping_cost import process_pressure_state
+    # 718d3d844: declare the chamber/pump state; hourly load still leaves
+    # transient feasibility unresolved, preserving the original refusal test.
+    pumping = dict(inlet_temperature_K=300.0, max_pump_speed_m3_s=1e10,
+                   validated_line_conductance_m3_s=1e10)
+    pressure = process_pressure_state(
+        requested_pressure_pa=1e-4, ambient_pressure_pa=MARS_SITE_PRESSURE_PA,
+        chamber_mol_per_s=0.02, chamber_temperature_K=300.0, pumping=pumping,
+    )
+    pressure.update(pumping=pumping, device_mol_per_s=0.02)
     pumping_snapshot = SimpleNamespace(
+        oxygen_reservoir={"process_pressure": pressure},
         hour=1,
         temperature_C=300.0,
         overhead=SimpleNamespace(
@@ -6181,7 +6206,20 @@ def test_missing_pumping_rollup_recomputes_and_refuses_subambient_flow_b151() ->
 
 
 def test_missing_pumping_rollup_certified_energy_reaches_objective_b151() -> None:
+    # 718d3d844: supply the required chamber/pump receipt; still prove recomputed
+    # pumping energy reaches the objective without mutating the missing rollup.
+    from simulator.pumping_cost import process_pressure_state
+    pumping = dict(inlet_temperature_K=300.0, max_pump_speed_m3_s=100.0,
+                   validated_line_conductance_m3_s=1.0)
+    pressure = process_pressure_state(
+        requested_pressure_pa=500.0, ambient_pressure_pa=MARS_SITE_PRESSURE_PA,
+        chamber_mol_per_s=0.02, chamber_temperature_K=500.0, pumping=pumping,
+    )
+    # This synthetic test specifies a steady flow, unlike hourly run samples.
+    pressure.pop('transient_feasibility')
+    pressure.update(pumping=pumping, device_mol_per_s=0.01)
     pumping_snapshot = SimpleNamespace(
+        oxygen_reservoir={"process_pressure": pressure},
         hour=1,
         temperature_C=300.0,
         overhead=SimpleNamespace(
@@ -6203,8 +6241,9 @@ def test_missing_pumping_rollup_certified_energy_reaches_objective_b151() -> Non
         target_pressure_pa=500.0,
         offgas_mol_per_s=0.01,
         duration_s=3600.0,
-        ambient_pressure_pa=MARS_DATUM_AMBIENT_PA,
+        ambient_pressure_pa=MARS_SITE_PRESSURE_PA,
         gas_temperature_K=300.0,
+        max_pump_speed_m3_s=100.0,
         validated_line_conductance_m3_s=1.0,
     )
 
@@ -6225,12 +6264,13 @@ def test_missing_pumping_rollup_certified_energy_reaches_objective_b151() -> Non
 
 
 def test_mars_deep_vacuum_pumping_gate_returns_typed_sc67_proposal_b151() -> None:
+    # 553567b74/c814b890a: this execution declares the 600 Pa site, not datum.
     execution = _execution(backend_status="ok", backend_authoritative=True)
     deep = estimate_subambient_pump_cost(
         target_pressure_pa=1.0e-4,  # 1e-9 bar deep-vacuum point
         offgas_mol_per_s=0.02,
         duration_s=7.0 * 3600.0,
-        ambient_pressure_pa=MARS_DATUM_AMBIENT_PA,
+        ambient_pressure_pa=MARS_SITE_PRESSURE_PA,
         gas_temperature_K=1500.0,
     )
     execution.simulator.record.cost_rollup = {
@@ -6239,7 +6279,7 @@ def test_mars_deep_vacuum_pumping_gate_returns_typed_sc67_proposal_b151() -> Non
             "status": "pumping_feasibility_unresolved",
             "feedstock_id": "mars_global_mgs1",
             "body": "mars",
-            "ambient_pressure_pa": MARS_DATUM_AMBIENT_PA,
+            "ambient_pressure_pa": MARS_SITE_PRESSURE_PA,
             "pumping_electrical_kWh": deep.energy_kWh,
             "feasible": None,
             "rows": [
@@ -6281,7 +6321,7 @@ def test_mars_deep_vacuum_pumping_gate_returns_typed_sc67_proposal_b151() -> Non
     assert proposal["requires_full_recipe_species_re_evaluation"] is True
     assert proposal["rows"][0]["requested_target_pressure_pa"] == pytest.approx(1.0e-4)
     assert proposal["rows"][0]["proposed_target_pressure_pa"] == pytest.approx(
-        MARS_DATUM_AMBIENT_PA
+        MARS_SITE_PRESSURE_PA
     )
     assert proposal["rows"][0]["pumping_cost_evidence"]["regime"] == "vent-free"
     assert proposal["rows"][0]["pumping_cost_evidence"]["energy_kWh"] == 0.0
