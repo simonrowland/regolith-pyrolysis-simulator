@@ -1,0 +1,556 @@
+schema_version: literature_extract.v1
+source_id: sugie-2021-sioc-mixed-bond-calorimetry
+source:
+  citation: Sugie, C., Navrotsky, A., Lauterbach, S., Kleebe, H.-J. & Mera, G. (2021). Structure and Thermodynamics
+    of Silicon Oxycarbide Polymer-Derived Ceramics with and without Mixed-Bonding. Materials 14, 4075.
+  doi: 10.3390/ma14154075
+  year: 2021
+extraction:
+  method: Born-digital pdftotext-layout and MinerU tables; table 6 and deferred figures reviewed against 600 dpi
+    renders
+  date: '2026-10-20'
+  worker: fam30-1020
+  source_note: Four Table 6 formation-from-elements values are typed with their printed reaction basis and gram-atom units. Drop-solution and oxidation enthalpies, and formation from the printed crystalline components, remain context because no matching token represents those quantities. Structural composition and spectroscopy tables and figures are context only.
+review_status: draft
+species:
+  SiOCH:
+    observations:
+    - observation_id: sugie2021_table6_hq4sg800c_delta_fH_elem
+      type: gibbs_table
+      locator: {page: 19, pdf_page_index: 18, table: '6', row: 'HQ4_SG 800 C'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: 'HQ4_SG 800 C'
+        sample_processing_temperature_C: 800
+        delta_f_H: -257.2
+        note: Formation from elements at 25 °C (Si + O2 + C + H2 -> the SiOC(H) sample); the printed unit is kJ/g-at; Table 6 defines one sample mole as one gram-atom (one mole of atoms).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 19, pdf_page_index: 18, table: '6'}
+      uncertainty: {reported_status: printed, value: 0.6, units: kJ/g-at}
+    - observation_id: sugie2021_table6_hq4sg1100c_delta_fH_elem
+      type: gibbs_table
+      locator: {page: 19, pdf_page_index: 18, table: '6', row: 'HQ4_SG 1100 C'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: 'HQ4_SG 1100 C'
+        sample_processing_temperature_C: 1100
+        delta_f_H: -265.8
+        note: Formation from elements at 25 °C (Si + O2 + C + H2 -> the SiOC(H) sample); the printed unit is kJ/g-at; Table 6 defines one sample mole as one gram-atom (one mole of atoms).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 19, pdf_page_index: 18, table: '6'}
+      uncertainty: {reported_status: printed, value: 0.6, units: kJ/g-at}
+    - observation_id: sugie2021_table6_phsio15sg800c_delta_fH_elem
+      type: gibbs_table
+      locator: {page: 19, pdf_page_index: 18, table: '6', row: 'PhSiO1.5_SG 800 C'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: 'PhSiO1.5_SG 800 C'
+        sample_processing_temperature_C: 800
+        delta_f_H: -93.2
+        note: Formation from elements at 25 °C (Si + O2 + C + H2 -> the SiOC(H) sample); the printed unit is kJ/g-at; Table 6 defines one sample mole as one gram-atom (one mole of atoms).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 19, pdf_page_index: 18, table: '6'}
+      uncertainty: {reported_status: printed, value: 3.3, units: kJ/g-at}
+    - observation_id: sugie2021_table6_phsio15sg1100c_delta_fH_elem
+      type: gibbs_table
+      locator: {page: 19, pdf_page_index: 18, table: '6', row: 'PhSiO1.5_SG 1100 C'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: 'PhSiO1.5_SG 1100 C'
+        sample_processing_temperature_C: 1100
+        delta_f_H: -116.4
+        note: Formation from elements at 25 °C (Si + O2 + C + H2 -> the SiOC(H) sample); the printed unit is kJ/g-at; Table 6 defines one sample mole as one gram-atom (one mole of atoms).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 19, pdf_page_index: 18, table: '6'}
+      uncertainty: {reported_status: printed, value: 3.9, units: kJ/g-at}
+    context:
+    - observation_id: sugie2021_table1_context
+      type: printed_table_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+      units: as printed
+      values:
+        quantity: printed_table_values_no_matching_token
+        table_number: 1
+        table_title: Analyzed full elemental composition of SiOC ceramic, wt% (at.%)
+        reason: 'Candidate tokens checked: residue_component_composition, equilibrium_phase_composition. These are
+          whole-sample bulk elemental analyses of polymer-derived multiphase ceramics, not a single phase composition;
+          the store has no elemental bulk composition quantity.'
+        printed_rows:
+        - - HQ4_SG 800 C
+          - Si 43.3 (28.6)
+          - O 53.4 (61.9)
+          - C 3.05 (4.71)
+          - H 0.26 (4.8)
+        - - HQ4_SG 1100 C
+          - Si 42.7 (28.3)
+          - O 50.5 (58.8)
+          - C 5.02 (7.78)
+          - H 0.28 (5.2)
+        - - PhSiO1.5_SG 800 C
+          - Si 24.8 (11.2)
+          - O 28.6 (22.7)
+          - C 44.36 (46.98)
+          - H 1.51 (19.1)
+        - - PhSiO1.5_SG 1100 C
+          - Si 27.2 (14.2)
+          - O 25.1 (23.0)
+          - C 46.51 (56.81)
+          - H 0.41 (6.0)
+    - observation_id: sugie2021_table2_context
+      type: printed_table_context
+      locator:
+        page: 10
+        pdf_page_index: 9
+        table: '2'
+      units: as printed
+      values:
+        quantity: printed_table_values_no_matching_token
+        table_number: 2
+        table_title: Percent SiOxC4-x Si species from 29Si MAS NMR
+        reason: 'Candidate tokens checked: equilibrium_phase_composition, valence_ratio. These are NMR-derived bond-environment
+          fractions in an amorphous ceramic, not a phase composition or oxidation-state ratio.'
+        printed_rows:
+        - - PhSiO1.5_SG 800 C
+          - SiO4 35.55%
+          - SiO3C 45.57%
+          - SiO2C2 16.44%
+          - SiOC3 0.51%
+          - SiC4 1.93%
+        - - PhSiO1.5_SG 1100 C
+          - SiO4 60.20%
+          - SiO3C 19.77%
+          - SiO2C2 16.23%
+          - SiOC3 0.61%
+          - SiC4 3.19%
+    - observation_id: sugie2021_table3_context
+      type: printed_table_context
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+      units: as printed
+      values:
+        quantity: printed_table_values_no_matching_token
+        table_number: 3
+        table_title: Percent Qn Si species from 29Si MAS NMR
+        reason: 'Candidate tokens checked: equilibrium_phase_composition, valence_ratio. These are NMR-derived bonding
+          and hydroxyl environments, not phase fractions or silicon oxidation-state ratios.'
+        printed_rows:
+        - - HQ4_SG 800 C
+          - SiO4 (Q4) 85.2%
+          - SiO3(OH) (Q3) 12.5%
+          - SiO2(OH)2 (Q2) 2.3%
+        - - HQ4_SG 1100 C
+          - SiO4 (Q4) 80.6%
+          - SiO3(OH) (Q3) 17.2%
+          - SiO2(OH)2 (Q2) 2.2%
+    - observation_id: sugie2021_table4_context
+      type: printed_table_context
+      locator:
+        page: 15
+        pdf_page_index: 14
+        table: '4'
+      units: as printed
+      values:
+        quantity: printed_table_values_no_matching_token
+        table_number: 4
+        table_title: Raman graphitization parameters for all samples
+        reason: 'Candidate tokens checked: electrical_conductivity and density. Raman band positions, area ratios
+          and carbon-domain sizes have no matching simulator quantity.'
+        printed_rows:
+        - - HQ4_SG 800 C
+          - omega_D 1345 cm-1
+          - omega_G 1599 cm-1
+          - A_D/A_G 0.9
+          - L_a 44.2 nm
+          - L_D 18.4 nm
+          - rho 0.0029 nm-2
+        - - HQ4_SG 1100 C
+          - omega_D 1350 cm-1
+          - omega_G 1601 cm-1
+          - A_D/A_G 2.9
+          - L_a 13.1 nm
+          - L_D 10.0 nm
+          - rho 0.0099 nm-2
+        - - PhSiO1.5_SG 800 C
+          - omega_D 1335 cm-1
+          - omega_G 1595 cm-1
+          - A_D/A_G 2.3
+          - L_a 16.2 nm
+          - L_D 11.1 nm
+          - rho 0.0080 nm-2
+        - - PhSiO1.5_SG 1100 C
+          - omega_D 1333 cm-1
+          - omega_G 1597 cm-1
+          - A_D/A_G 5.5
+          - L_a 6.8 nm
+          - L_D 7.2 nm
+          - rho 0.0190 nm-2
+    - observation_id: sugie2021_table5_context
+      type: printed_table_context
+      locator:
+        page: 19
+        pdf_page_index: 18
+        table: '5'
+      units: kJ/mol or kJ/g-at as printed
+      values:
+        quantity: printed_table_values_no_matching_token
+        table_number: 5
+        table_title: Thermodynamic cycles for SiOC(H) heat of formation
+        reason: 'Candidate tokens checked: delta_fH, H_minus_H298, heat_of_formation. Table 5 is a thermodynamic
+          calculation cycle, not a direct measured quantity; formation from crystalline components has a distinct
+          printed reaction basis and is not delta_fH. Numeric cycle inputs and reactions are kept here as context/model
+          calculation.'
+        printed_rows:
+        - - 'Oxidation cycle: measured Delta H1 = Delta Hds (kJ/g-at); corrections: Delta H2=50.1 kJ/mol, Delta
+            H3=73.1 kJ/mol, Delta H4=25.3 kJ/mol, Delta H5=37.5 kJ/mol. Reaction: ceramic + H2O + O2 -> SiO2(cristobalite)
+            + CO2 + H2O.'
+        - - 'Formation from elements at 25 C: reference values Delta H2(Si + O2 -> SiO2 cristobalite)=-908.4 +/-
+            2.1 kJ/mol; Delta H3(H2 + 1/2 O2 -> H2O liquid)=-285.8 +/- 0.1 kJ/mol; Delta H4(C + O2 -> CO2)=-393.5
+            +/- 0.1 kJ/mol.'
+        - - 'Formation from crystalline components at 25 C: reaction (a-b/2+d/4)SiC + (b/2-d/4)SiO2(cristobalite)
+            + (c-a+b/2-d/4)C + d/2 H2O(liquid) -> SiaOb-d/2Cc + d/2 H2O(solid). Reference values Delta H2(Si+C ->
+            SiC)=-73.2 +/- 6.3 kJ/mol; Delta H3(Si+O2 -> SiO2 cristobalite)=-908.4 +/- 2.1 kJ/mol; Delta H4(H2+O2
+            -> H2O liquid)=-285.83 +/- 0.04 kJ/mol.'
+    - observation_id: sugie2021_table6_context
+      type: printed_table_context
+      locator:
+        page: 19
+        pdf_page_index: 18
+        table: '6'
+      units: kJ/g-at as printed; sample mole is defined as one gram-atom (Avogadro number of Si+O+C+H atoms)
+      values:
+        quantity: printed_table_values_no_matching_token
+        table_number: 6
+        table_title: Measured drop solution, oxidation, and formation enthalpies for SiOC(H) samples
+        reason: 'Candidate tokens checked: delta_fH, H_minus_H298, heat_of_formation. The four Delta Hf,elem values are
+          typed as formation from elements above. Delta Hds and Delta Hox remain context because no matching quantity token
+          represents these drop-solution and oxidation enthalpies. Delta Hf,comp is formation from SiC, cristobalite, graphite
+          and liquid water and is not delta_fH. Reaction basis: from elements, Si + O2 + C + H2 -> SiaOb-d/2Cc + d/2 H2O;
+          from components, reaction printed in Table 5.'
+        printed_rows:
+        - - HQ4_SG 800 C
+          - a=0.286 b=0.619 c=0.047 d=0.048
+          - Delta Hds=-11.0 +/- 0.2 kJ/g-at
+          - Delta Hox=-28.0 +/- 0.2 kJ/g-at
+          - Delta Hf,elem=-257.2 +/- 0.6 kJ/g-at
+          - Delta Hf,comp=20.0 +/- 0.9 kJ/g-at
+        - - HQ4_SG 1100 C
+          - a=0.283 b=0.588 c=0.078 d=0.052
+          - Delta Hds=-12.3 +/- 0.2 kJ/g-at
+          - Delta Hox=-29.2 +/- 0.2 kJ/g-at
+          - Delta Hf,elem=-265.8 +/- 0.6 kJ/g-at
+          - Delta Hf,comp=-3.2 +/- 0.9 kJ/g-at
+        - - PhSiO1.5_SG 800 C
+          - a=0.112 b=0.227 c=0.470 d=0.191
+          - Delta Hds=-203.8 +/- 3.3 kJ/g-at
+          - Delta Hox=-221.0 +/- 3.3 kJ/g-at
+          - Delta Hf,elem=-93.2 +/- 3.3 kJ/g-at
+          - Delta Hf,comp=-2.5 +/- 3.4 kJ/g-at
+        - - PhSiO1.5_SG 1100 C
+          - a=0.142 b=0.230 c=0.568 d=0.060
+          - Delta Hds=-229.5 +/- 3.9 kJ/g-at
+          - Delta Hox=-244.7 +/- 3.9 kJ/g-at
+          - Delta Hf,elem=-116.4 +/- 3.9 kJ/g-at
+          - Delta Hf,comp=-13.9 +/- 3.9 kJ/g-at
+        schema_gap: Delta Hds and Delta Hox have no matching tokens and remain context. Delta Hf,comp is formation from SiC,
+          cristobalite, graphite and liquid water and is not delta_fH. Table 6 inputs and composition values remain in
+          .agent-scratch/oxide-thermochemistry-tables/sugie-2021-sioc-mixed-bond-calorimetry/table-6-input.csv.
+    - observation_id: sugie2021_figure1_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        figure: '1'
+      panel: whole_figure
+      units: axes and units as printed in figure
+      values:
+        quantity: unavailable
+        schema_gap: The figure reports structural or spectroscopic measurements for polymer-derived SiOC ceramics,
+          with no quantity token appropriate to the requested oxide thermochemistry.
+        species: polymer-derived SiOC(H), sample identity as printed
+        phase: amorphous multiphase ceramic; individual phase identity is not assigned
+        temperature_as_printed: sample pyrolysis at 800 C or 1100 C where noted; measurement temperature not stated
+          for each figure
+        axes_as_printed: not applicable (schematic)
+        caption: Synthesis of PhSiO1.5_SG and HQ4_SG preceramic polymers; schematic, no scored quantity.
+        series:
+        - name: (a) PhSiO1.5_SG and (b) HQ4_SG synthesis schemes
+          marker_count: not applicable (schematic)
+        digitisation: deferred to a figure pass
+        printed_quantity_as_published: polymer synthesis schematic
+    - observation_id: sugie2021_figure2_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        figure: '2'
+      panel: whole_figure
+      units: axes and units as printed in figure
+      values:
+        quantity: unavailable
+        schema_gap: The figure reports structural or spectroscopic measurements for polymer-derived SiOC ceramics,
+          with no quantity token appropriate to the requested oxide thermochemistry.
+        species: polymer-derived SiOC(H), sample identity as printed
+        phase: amorphous multiphase ceramic; individual phase identity is not assigned
+        temperature_as_printed: sample pyrolysis at 800 C or 1100 C where noted; measurement temperature not stated
+          for each figure
+        axes_as_printed: 2theta (degrees) vs. intensity
+        caption: X-ray diffraction patterns of PhSiO1.5_SG and HQ4_SG samples pyrolyzed at 800 and 1100 C; sample-holder
+          peaks marked with stars.
+        series:
+        - name: HQ4_SG 800 C; HQ4_SG 1100 C; PhSiO1.5_SG 800 C; PhSiO1.5_SG 1100 C
+          marker_count: not countable (continuous spectra)
+        digitisation: deferred to a figure pass
+        printed_quantity_as_published: X-ray diffraction intensity
+    - observation_id: sugie2021_figure3_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        figure: '3'
+      panel: whole_figure
+      units: axes and units as printed in figure
+      values:
+        quantity: unavailable
+        schema_gap: The figure reports structural or spectroscopic measurements for polymer-derived SiOC ceramics,
+          with no quantity token appropriate to the requested oxide thermochemistry.
+        species: polymer-derived SiOC(H), sample identity as printed
+        phase: amorphous multiphase ceramic; individual phase identity is not assigned
+        temperature_as_printed: sample pyrolysis at 800 C or 1100 C where noted; measurement temperature not stated
+          for each figure
+        axes_as_printed: wavenumber (cm−1) vs. absorbance/transmittance as printed
+        caption: FTIR spectra of HQ4_SG and PhSiO1.5_SG polymers.
+        series:
+        - name: HQ4_SG polymer; PhSiO1.5_SG polymer
+          marker_count: not countable (continuous spectra)
+        digitisation: deferred to a figure pass
+        printed_quantity_as_published: FTIR spectra
+    - observation_id: sugie2021_figure4_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        figure: '4'
+      panel: whole_figure
+      units: axes and units as printed in figure
+      values:
+        quantity: unavailable
+        schema_gap: The figure reports structural or spectroscopic measurements for polymer-derived SiOC ceramics,
+          with no quantity token appropriate to the requested oxide thermochemistry.
+        species: polymer-derived SiOC(H), sample identity as printed
+        phase: amorphous multiphase ceramic; individual phase identity is not assigned
+        temperature_as_printed: sample pyrolysis at 800 C or 1100 C where noted; measurement temperature not stated
+          for each figure
+        axes_as_printed: wavenumber (cm−1) vs. absorbance/transmittance as printed
+        caption: FTIR spectra of HQ4_SG and PhSiO1.5_SG pyrolyzed to (a) 800 C and (b) 1100 C.
+        series:
+        - name: HQ4_SG 800 C; HQ4_SG 1100 C; PhSiO1.5_SG 800 C; PhSiO1.5_SG 1100 C
+          marker_count: not countable (continuous spectra)
+        digitisation: deferred to a figure pass
+        printed_quantity_as_published: FTIR spectra
+    - observation_id: sugie2021_figure5_deferred
+      type: figure_record
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: '5'
+      panel: whole_figure
+      units: axes and units as printed in figure
+      values:
+        quantity: unavailable
+        schema_gap: The figure reports structural or spectroscopic measurements for polymer-derived SiOC ceramics,
+          with no quantity token appropriate to the requested oxide thermochemistry.
+        species: polymer-derived SiOC(H), sample identity as printed
+        phase: amorphous multiphase ceramic; individual phase identity is not assigned
+        temperature_as_printed: sample pyrolysis at 800 C or 1100 C where noted; measurement temperature not stated
+          for each figure
+        axes_as_printed: 29Si chemical shift (ppm) vs. intensity
+        caption: '29Si MAS NMR for PhSiO1.5_SG: (a) 800 C peaks near -102, -72, -38, -11 and 7 ppm; (b) 1100 C peaks
+          near -107, -72, -38, -11 and 7 ppm.'
+        series:
+        - name: PhSiO1.5_SG at 800 C and 1100 C; panels (a),(b)
+          marker_count: not countable (spectral peaks)
+        digitisation: deferred to a figure pass
+        printed_quantity_as_published: 29Si MAS NMR spectra
+    - observation_id: sugie2021_figure6_deferred
+      type: figure_record
+      locator:
+        page: 11
+        pdf_page_index: 10
+        figure: '6'
+      panel: whole_figure
+      units: axes and units as printed in figure
+      values:
+        quantity: unavailable
+        schema_gap: The figure reports structural or spectroscopic measurements for polymer-derived SiOC ceramics,
+          with no quantity token appropriate to the requested oxide thermochemistry.
+        species: polymer-derived SiOC(H), sample identity as printed
+        phase: amorphous multiphase ceramic; individual phase identity is not assigned
+        temperature_as_printed: sample pyrolysis at 800 C or 1100 C where noted; measurement temperature not stated
+          for each figure
+        axes_as_printed: 29Si chemical shift (ppm) vs. intensity
+        caption: 29Si MAS NMR for HQ4_SG samples with peaks near -110 ppm, -100 ppm and -92 ppm, corresponding to
+          SiO4, SiO3(OH) and SiO2(OH)2.
+        series:
+        - name: HQ4_SG at 800 C and 1100 C; panels (a),(b)
+          marker_count: not countable (spectral peaks)
+        digitisation: deferred to a figure pass
+        printed_quantity_as_published: 29Si MAS NMR spectra
+    - observation_id: sugie2021_figure7_deferred
+      type: figure_record
+      locator:
+        page: 12
+        pdf_page_index: 11
+        figure: '7'
+      panel: whole_figure
+      units: axes and units as printed in figure
+      values:
+        quantity: unavailable
+        schema_gap: The figure reports structural or spectroscopic measurements for polymer-derived SiOC ceramics,
+          with no quantity token appropriate to the requested oxide thermochemistry.
+        species: polymer-derived SiOC(H), sample identity as printed
+        phase: amorphous multiphase ceramic; individual phase identity is not assigned
+        temperature_as_printed: sample pyrolysis at 800 C or 1100 C where noted; measurement temperature not stated
+          for each figure
+        axes_as_printed: 13C chemical shift (ppm) vs. intensity
+        caption: '13C(1H) CPMAS NMR for PhSiO1.5_SG samples: (a) 800 C with isotropic peaks near 127 ppm, 103 ppm
+          and 28 ppm; (b) 1100 C with isotropic peaks near 127 ppm and 28 ppm.'
+        series:
+        - name: PhSiO1.5_SG at 800 C and 1100 C; panels (a),(b)
+          marker_count: not countable (spectral peaks)
+        digitisation: deferred to a figure pass
+        printed_quantity_as_published: 13C(1H) CPMAS NMR spectra
+    - observation_id: sugie2021_figure8_deferred
+      type: figure_record
+      locator:
+        page: 13
+        pdf_page_index: 12
+        figure: '8'
+      panel: whole_figure
+      units: axes and units as printed in figure
+      values:
+        quantity: unavailable
+        schema_gap: The figure reports structural or spectroscopic measurements for polymer-derived SiOC ceramics,
+          with no quantity token appropriate to the requested oxide thermochemistry.
+        species: polymer-derived SiOC(H), sample identity as printed
+        phase: amorphous multiphase ceramic; individual phase identity is not assigned
+        temperature_as_printed: sample pyrolysis at 800 C or 1100 C where noted; measurement temperature not stated
+          for each figure
+        axes_as_printed: 13C chemical shift (ppm) vs. intensity
+        caption: 13C(1H) CPMAS NMR of HQ4_SG samples with isotropic peaks near 127 ppm, 103 ppm and 28 ppm.
+        series:
+        - name: HQ4_SG at 800 C and 1100 C; panels (a),(b)
+          marker_count: not countable (spectral peaks)
+        digitisation: deferred to a figure pass
+        printed_quantity_as_published: 13C(1H) CPMAS NMR spectra
+    - observation_id: sugie2021_figure9_deferred
+      type: figure_record
+      locator:
+        page: 15
+        pdf_page_index: 14
+        figure: '9'
+      panel: whole_figure
+      units: axes and units as printed in figure
+      values:
+        quantity: unavailable
+        schema_gap: The figure reports structural or spectroscopic measurements for polymer-derived SiOC ceramics,
+          with no quantity token appropriate to the requested oxide thermochemistry.
+        species: polymer-derived SiOC(H), sample identity as printed
+        phase: amorphous multiphase ceramic; individual phase identity is not assigned
+        temperature_as_printed: sample pyrolysis at 800 C or 1100 C where noted; measurement temperature not stated
+          for each figure
+        axes_as_printed: Raman shift (cm−1) vs. intensity
+        caption: Raman spectra of the SiOC(H) samples; fitted Raman spectra with additional bands near 105 cm-1
+          are discussed in text.
+        series:
+        - name: HQ4_SG 800 C; HQ4_SG 1100 C; PhSiO1.5_SG 800 C; PhSiO1.5_SG 1100 C
+          marker_count: not countable (continuous measured and fitted spectra)
+        digitisation: deferred to a figure pass
+        printed_quantity_as_published: Raman spectra
+    - observation_id: sugie2021_figure10_deferred
+      type: figure_record
+      locator:
+        page: 17
+        pdf_page_index: 16
+        figure: '10'
+      panel: whole_figure
+      units: axes and units as printed in figure
+      values:
+        quantity: unavailable
+        schema_gap: The figure reports structural or spectroscopic measurements for polymer-derived SiOC ceramics,
+          with no quantity token appropriate to the requested oxide thermochemistry.
+        species: polymer-derived SiOC(H), sample identity as printed
+        phase: amorphous multiphase ceramic; individual phase identity is not assigned
+        temperature_as_printed: sample pyrolysis at 800 C or 1100 C where noted; measurement temperature not stated
+          for each figure
+        axes_as_printed: not applicable (micrographs)
+        caption: Bright-field (BF) and high-resolution transmission electron microscopy (HRTEM) images of (a,b)
+          HQ4_SG samples.
+        series:
+        - name: HQ4_SG 800 C micrographs; panels (a),(b)
+          marker_count: not applicable (micrographs)
+        digitisation: deferred to a figure pass
+        printed_quantity_as_published: transmission electron microscopy images
+    - observation_id: sugie2021_figure11_deferred
+      type: figure_record
+      locator:
+        page: 17
+        pdf_page_index: 16
+        figure: '11'
+      panel: whole_figure
+      units: axes and units as printed in figure
+      values:
+        quantity: unavailable
+        schema_gap: The figure reports structural or spectroscopic measurements for polymer-derived SiOC ceramics,
+          with no quantity token appropriate to the requested oxide thermochemistry.
+        species: polymer-derived SiOC(H), sample identity as printed
+        phase: amorphous multiphase ceramic; individual phase identity is not assigned
+        temperature_as_printed: sample pyrolysis at 800 C or 1100 C where noted; measurement temperature not stated
+          for each figure
+        axes_as_printed: not applicable (micrographs)
+        caption: High-resolution transmission electron microscopy images comparing HQ4_SG and PhSiO1.5_SG materials.
+        series:
+        - name: HQ4_SG and PhSiO1.5_SG micrographs; panels as captioned
+          marker_count: not applicable (micrographs)
+        digitisation: deferred to a figure pass
+        printed_quantity_as_published: high-resolution transmission electron microscopy images
+fidelity_samples:
+- path: species.SiOCH.observations[sugie2021_table6_hq4sg800c_delta_fH_elem].values.delta_f_H
+  value: -257.2
+  locator: {page: 19, pdf_page_index: 18, table: '6', row: 'HQ4_SG 800 C'}

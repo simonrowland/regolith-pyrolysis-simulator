@@ -1,0 +1,241 @@
+schema_version: literature_extract.v1
+source_id: lontchi-2024-metal-oxide-thermochemistry-thesis
+source:
+  citation: 'Lontchi, E. M. (2024). Computational Predictions of the Thermochemical Properties of Metal Oxides and Hydrolysis of Actinide Oxides. PhD dissertation, University of Alabama.'
+  year: 2024
+  corpus_asset: raw/lontchi-2024-metal-oxide-thermochemistry-thesis/lontchi-2024-metal-oxide-thermochemistry-thesis.pdf
+extraction:
+  method: Born-digital pdftotext-layout; Tables 3.2 and 3.7 were transcribed and checked against 600 dpi PDF renders.
+  date: '2026-10-20'
+  worker: fam30-1020
+  source_note: >-
+    Metal-oxide thermochemistry in this dissertation is calculated, not measured. Computed molecular and dimer heat-of-formation
+    values are retained as model_derived context. Experimental comparator values in Table 3.2 are quoted from its cited references,
+    not measured in this thesis, and remain attributed context. The dissertation's experimental Chapter 6 concerns ammonia-borane fuel
+    testing and is outside the oxide-thermochemistry scope. No thesis-only measured metal-oxide thermochemistry was found.
+review_status: draft
+species:
+  VO2:
+    observations: []
+    context:
+      - observation_id: lontchi2024_table32_metal_oxide_thermochemistry
+        type: printed_table_context
+        locator: {page: 116, published_page: 86, pdf_page_index: 115, table: '3.2'}
+        units: kcal/mol
+        values:
+          quantity: delta_fH
+          method_class: model_derived
+          evidence_class: model_derived
+          table_title: Total Atomization Energies and Heats of Formation at 0 K and 298 K at the CBS Level
+          reason: Candidate token delta_fH fits heat of formation, but the thesis values are computed predictions; retain as model-derived context.
+          printed_rows:
+            - [VO2, 'ΣD0(0 K)=286.8', 'ΔHf(0 K)=−46.5', 'ΔHf(298 K)=−46.9']
+            - [VO2+, 'ΣD0(0 K)=85.3', 'ΔHf(0 K)=155.1', 'ΔHf(298 K)=154.5']
+            - [VO3, 'ΣD0(0 K)=383.0', 'ΔHf(0 K)=−83.6', 'ΔHf(298 K)=−83.3']
+            - [VO3−, 'ΣD0(0 K)=473.8', 'ΔHf(0 K)=−174.4', 'ΔHf(298 K)=−174.2']
+            - ['VO2(OH)', 'ΣD0(0 K)=490.1', 'ΔHf(0 K)=−139.1', 'ΔHf(298 K)=−138.5']
+            - [NbO2, 'ΣD0(0 K)=337.2', 'ΔHf(0 K)=−44.8', 'ΔHf(298 K)=−45.5']
+            - [NbO2+, 'ΣD0(0 K)=150.7', 'ΔHf(0 K)=141.8', 'ΔHf(298 K)=141.1']
+            - [NbO3, 'ΣD0(0 K)=431.2', 'ΔHf(0 K)=−79.8', 'ΔHf(298 K)=−80.6']
+            - [NbO3−, 'ΣD0(0 K)=524.0', 'ΔHf(0 K)=−172.6', 'ΔHf(298 K)=−173.4']
+            - ['NbO2(OH)', 'ΣD0(0 K)=546.6', 'ΔHf(0 K)=−143.6', 'ΔHf(298 K)=−145.1']
+            - [TaO2, 'ΣD0(0 K)=342.4', 'ΔHf(0 K)=−37.6 (−38.5 at CBS Q5)', 'ΔHf(298 K)=−38.4 (−39.2 at CBS Q5)']
+            - [TaO2+, 'ΣD0(0 K)=140.6', 'ΔHf(0 K)=164.1', 'ΔHf(298 K)=163.3']
+            - [TaO3, 'ΣD0(0 K)=431.7', 'ΔHf(0 K)=−68.0', 'ΔHf(298 K)=−68.8']
+            - [TaO3−, 'ΣD0(0 K)=534.4', 'ΔHf(0 K)=−170.6', 'ΔHf(298 K)=−171.7']
+            - ['TaO2(OH)', 'ΣD0(0 K)=555.0', 'ΔHf(0 K)=−139.6', 'ΔHf(298 K)=−141.3']
+            - [PaO2, 'ΣD0(0 K)=400.0', 'ΔHf(0 K)=−145.8', 'ΔHf(298 K)=−144.8']
+            - [PaO2+, 'ΣD0(0 K)=390.2', 'ΔHf(0 K)=−0.1', 'ΔHf(298 K)=−0.7']
+            - [PaO3, 'ΣD0(0 K)=486.9', 'ΔHf(0 K)=−173.7', 'ΔHf(298 K)=−174.4']
+            - [PaO3−, 'ΣD0(0 K)=573.5', 'ΔHf(0 K)=−260.3', 'ΔHf(298 K)=−261.2']
+            - ['PaO2(OH)', 'ΣD0(0 K)=609.9', 'ΔHf(0 K)=−245.1', 'ΔHf(298 K)=−246.6']
+          quoted_experimental_comparators:
+            - {species: VO2, value_as_published: '−55.6 ± 10', attribution: 'Ref. 90'}
+            - {species: VO2, value_as_published: '−56.9', attribution: 'Ref. 93'}
+            - {species: NbO2, value_as_published: '−47.8 ± 5', attribution: 'Ref. 90'}
+            - {species: TaO2, value_as_published: '−48.0 ± 15', attribution: 'Ref. 90'}
+            - {species: TaO2, value_as_published: '−41.1 ± 15', attribution: 'Ref. 93'}
+            - {species: TaO2, value_as_published: '−46.2 ± 4.5', attribution: 'Ref. 105'}
+            - {species: PaO2, value_as_published: '−122.7 ± 4.0', attribution: 'Ref. 107'}
+            - {species: PaO2, value_as_published: '−122.6 ± 18', attribution: 'Ref. 106'}
+            - {species: PaO2+, value_as_published: '13.6 ± 14', attribution: 'Ref. 106'}
+          footnotes_as_published: 'PaO2 and related atomization energies use Pa+ and are corrected by IE(Pa), as specified in the table footnotes.'
+      - observation_id: lontchi2024_text_crystalline_oxide_heat_of_formation
+        type: textual_fact
+        locator: {page: 108, published_page: 78, pdf_page_index: 107, section: 'Heats of Formation: M2O5'}
+        units: kcal/mol
+        values:
+          quantity: delta_fH
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          reason: Values are literature experimental crystalline heats of formation cited in the dissertation; not measured by the thesis author.
+          attribution: 'Ref. 90'
+          phase: crystalline
+          printed_values: {V2O5: '−370.6 ± 1.5', Nb2O5: '−454.0 ± 1.0', Ta2O5: '−489.0 ± 1.0'}
+  V2O5:
+    observations: []
+    context:
+      - observation_id: lontchi2024_table37_metal_oxide_dimer_thermochemistry
+        type: printed_table_context
+        locator: {page: 119, published_page: 89, pdf_page_index: 118, table: '3.7'}
+        units: kcal/mol
+        values:
+          quantity: delta_fH
+          method_class: model_derived
+          evidence_class: model_derived
+          table_title: M2O5 Total Atomization Energies and Heats of Formation at 0 K and 298 K
+          reason: Candidate token delta_fH fits heat of formation, but all Table 3.7 values are FPD predictions; retain as model-derived context.
+          printed_rows:
+            - [V2O5, di-bridge, 'ΣD0(0 K)=790.8', 'ΔHf(0 K)=−251.1', 'ΔHf(298 K)=−248.2']
+            - [V2O5, tri-bridge, 'ΣD0(0 K)=783.9', 'ΔHf(0 K)=−244.2', 'ΔHf(298 K)=−241.3']
+            - [V2O5, mono-bridge, 'ΣD0(0 K)=768.4', 'ΔHf(0 K)=−228.7', 'ΔHf(298 K)=−225.8']
+            - [Nb2O5, di-bridge, 'ΣD0(0 K)=906.0', 'ΔHf(0 K)=−262.5', 'ΔHf(298 K)=−264.9']
+            - [Nb2O5, tri-bridge, 'ΣD0(0 K)=903.7', 'ΔHf(0 K)=−259.8', 'ΔHf(298 K)=−261.2']
+            - [Nb2O5, mono-bridge, 'ΣD0(0 K)=882.5', 'ΔHf(0 K)=−238.6', 'ΔHf(298 K)=−240.0']
+            - [Ta2O5, tri-bridge, 'ΣD0(0 K)=935.4', 'ΔHf(0 K)=−266.9', 'ΔHf(298 K)=−268.5']
+            - [Ta2O5, di-bridge, 'ΣD0(0 K)=928.7', 'ΔHf(0 K)=−260.2', 'ΔHf(298 K)=−261.8']
+            - [Ta2O5, mono-bridge, 'ΣD0(0 K)=899.1', 'ΔHf(0 K)=−230.6', 'ΔHf(298 K)=−232.2']
+            - [Pa2O5, tri-bridge, 'ΣD0(0 K)=1043.5', 'ΔHf(0 K)=−476.1', 'ΔHf(298 K)=−477.2']
+            - [Pa2O5, di-bridge, 'ΣD0(0 K)=1030.8', 'ΔHf(0 K)=−463.4', 'ΔHf(298 K)=−464.5']
+            - [Pa2O5, mono-bridge, 'ΣD0(0 K)=1009.2', 'ΔHf(0 K)=−441.8', 'ΔHf(298 K)=−442.9']
+          footnotes_as_published: 'Atomization energies are referenced to mono-bridge relative energies; Pa2O5 mono-bridge is calculated from Pa+ and corrected by IE(Pa).'
+      - observation_id: lontchi2024_figure31_deferred
+        type: figure_record
+        locator: {page: 120, published_page: 90, pdf_page_index: 119, figure: '3.1'}
+        units: geometry as published
+        values:
+          quantity: optimized_molecular_geometry
+          method_class: model_derived
+          evidence_class: model_derived
+          species_series: [VO2, VO2+, NbO2, NbO2+, TaO2, TaO2+, PaO2, PaO2+]
+          axes_as_published: none; molecular structure panels, no plotted axes
+          caption: Optimized geometries for MO2 and MO2+, M = V, Nb, Ta, and Pa species.
+          panel: all
+          series:
+            - {name: MO2 and MO2+ molecular structures, marker_count: 0, note: structural models; no plotted data markers}
+          digitisation: deferred to a figure pass
+      - observation_id: lontchi2024_figure32_deferred
+        type: figure_record
+        locator: {page: 120, published_page: 90, pdf_page_index: 119, figure: '3.2'}
+        units: geometry as published
+        values:
+          quantity: optimized_molecular_geometry
+          method_class: model_derived
+          evidence_class: model_derived
+          species_series: [VO3, VO3−, NbO3, NbO3−, TaO3, TaO3−, PaO3, PaO3−]
+          axes_as_published: none; molecular structure panels, no plotted axes
+          caption: Optimized geometries for MO3 and MO3−, M = V, Nb, Ta, and Pa species.
+          panel: all
+          series:
+            - {name: MO3 and MO3− molecular structures, marker_count: 0, note: structural models; no plotted data markers}
+          digitisation: deferred to a figure pass
+      - observation_id: lontchi2024_figure33_deferred
+        type: figure_record
+        locator: {page: 121, published_page: 91, pdf_page_index: 120, figure: '3.3'}
+        units: geometry as published
+        values:
+          quantity: optimized_molecular_geometry
+          method_class: model_derived
+          evidence_class: model_derived
+          species_series: [V2O5, Nb2O5]
+          axes_as_published: none; molecular structure panels, no plotted axes
+          caption: DFT optimized structures for V2O5 and Nb2O5 isomers.
+          panel: all
+          series:
+            - {name: 'V2O5 isomers Cs, C1, C2', marker_count: 0, note: structural models; no plotted data markers}
+            - {name: 'Nb2O5 isomers Cs, D3h, C2', marker_count: 0, note: structural models; no plotted data markers}
+          digitisation: deferred to a figure pass
+      - observation_id: lontchi2024_figure34_deferred
+        type: figure_record
+        locator: {page: 121, published_page: 91, pdf_page_index: 120, figure: '3.4'}
+        units: geometry as published
+        values:
+          quantity: optimized_molecular_geometry
+          method_class: model_derived
+          evidence_class: model_derived
+          species_series: [Ta2O5, Pa2O5]
+          axes_as_published: none; molecular structure panels, no plotted axes
+          caption: DFT optimized structures for Ta2O5 and Pa2O5 isomers.
+          panel: all
+          series:
+            - {name: 'Ta2O5 isomers D3h, Cs, C2', marker_count: 0, note: structural models; no plotted data markers}
+            - {name: 'Pa2O5 isomers C2, Cs, D2d', marker_count: 0, note: structural models; no plotted data markers}
+          digitisation: deferred to a figure pass
+      - observation_id: lontchi2024_figure72_deferred
+        type: figure_record
+        locator: {page: 320, published_page: 290, pdf_page_index: 319, figure: '7.2'}
+        units: geometry as published
+        values:
+          quantity: predicted_molecular_structure
+          method_class: model_derived
+          evidence_class: model_derived
+          species_series: [V2O5, Nb2O5, Ta2O5, Pa2O5]
+          axes_as_published: none; molecular structure figure, no plotted axes
+          caption: Predicted structures of M2O5, M = V, Nb, Ta, Pa molecules with the HOMO.
+          panel: all
+          series:
+            - {name: M2O5 molecular structures with HOMO, marker_count: 0, note: structural models; no plotted data markers}
+          digitisation: deferred to a figure pass
+      - observation_id: lontchi2024_table34_ionization_energy
+        type: printed_table_context
+        locator: {page: 118, published_page: 88, pdf_page_index: 117, table: '3.4'}
+        units: eV
+        values:
+          quantity_as_published: ionization energy of gas-phase MO2
+          quantity_token: unavailable
+          schema_gap: No ionization-energy quantity token is defined in the current battery enums.
+          reason: Gas-phase ionization energies do not measure oxide thermochemistry or condensed regolith behavior.
+          method_class: model_derived
+          evidence_class: model_derived
+          printed_rows:
+            - [VO2, 'calculated=8.74', 'experimental=12.7 ± 0.2 (Ref. 108); 10.0 ± 0.2 (Ref. 109)']
+            - [NbO2, 'calculated=8.09']
+            - [TaO2, 'calculated=8.75']
+            - [PaO2, 'calculated=6.32', 'experimental=5.9 ± 0.2 (Ref. 106)']
+      - observation_id: lontchi2024_table35_electron_affinity
+        type: printed_table_context
+        locator: {page: 118, published_page: 88, pdf_page_index: 117, table: '3.5'}
+        units: eV
+        values:
+          quantity_as_published: adiabatic electron affinity and vertical detachment energy of gas-phase MO3
+          quantity_token: unavailable
+          schema_gap: No electron-affinity or detachment-energy quantity token is defined in the current battery enums.
+          reason: Gas-phase electron-attachment energetics do not measure oxide thermochemistry or condensed regolith behavior.
+          method_class: model_derived
+          evidence_class: model_derived
+          printed_rows:
+            - [VO3, 'AEA=3.94', 'VDE=4.21']
+            - [NbO3, 'AEA=4.02', 'VDE=4.54']
+            - [TaO3, 'AEA=4.45', 'VDE=4.59']
+            - [PaO3, 'AEA=3.76']
+      - observation_id: lontchi2024_table36_fluoride_heat_of_formation
+        type: printed_table_context
+        locator: {page: 118, published_page: 88, pdf_page_index: 117, table: '3.6'}
+        units: kcal/mol
+        values:
+          quantity: delta_fH
+          method_class: model_derived
+          evidence_class: model_derived
+          reason: Metal fluoride heats of formation are outside this oxide-thermochemistry extract; calculations and cited experimental comparators are retained as context.
+          printed_rows:
+            - [VF5 (DKH3 basis), 'ΣD0(0 K)=557.4', 'ΔHf(0 K)=−342.6', 'ΔHf(298 K)=−344.1', 'experiment=−342.7 (Ref. 90)']
+            - [VF5 (ECP basis), 'ΣD0(0 K)=557.5', 'ΔHf(0 K)=−342.8', 'ΔHf(298 K)=−344.3', 'experiment=−343.25 ± 0.20 (Ref. 111)']
+            - [NbF5, 'ΣD0(0 K)=675.1', 'ΔHf(0 K)=−408.3', 'ΔHf(298 K)=−409.7', 'experiment=−415.8 (Ref. 90); −416.50 ± 0.34 (Ref. 91)']
+            - [TaF5, 'ΣD0(0 K)=710.1', 'ΔHf(0 K)=−431.0', 'ΔHf(298 K)=−432.3', 'experiment=−437 ± 3 (Ref. 91)']
+            - [PaF5, 'ΣD0(0 K)=750.0', 'ΔHf(0 K)=−521.5', 'ΔHf(298 K)=−522.4', 'experiment=−509 ± 12 (Ref. 92)']
+      - observation_id: lontchi2024_table39_bond_dissociation_energies
+        type: printed_table_context
+        locator: {page: 119, published_page: 89, pdf_page_index: 118, table: '3.9'}
+        units: kcal/mol
+        values:
+          quantity_as_published: average gas-phase M=O and M-O bond dissociation energies
+          quantity_token: unavailable
+          schema_gap: No bond-dissociation-energy quantity token is defined in the current battery enums.
+          reason: Gas-phase bond strengths do not measure bulk oxide thermochemistry or condensed regolith behavior.
+          method_class: model_derived
+          evidence_class: model_derived
+          printed_rows:
+            - [V, 'BDE(M=O, Eqn 3.9)=143', 'BDE(M-O, Eqn 3.10)=97']
+            - [Nb, 'BDE(M=O, Eqn 3.9)=169', 'BDE(M-O, Eqn 3.10)=104']
+            - [Ta, 'BDE(M=O, Eqn 3.9)=171', 'BDE(M-O, Eqn 3.10)=107']
+            - [Pa, 'BDE(M=O, Eqn 3.9)=200', 'BDE(M-O, Eqn 3.10)=105', 'literature BDE(M=O)=191 ± 12 (Ref. 106); 188.4 ± 4.1 (Ref. 107)']

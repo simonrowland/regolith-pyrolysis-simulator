@@ -5386,6 +5386,26 @@ def _migrate_supersedes_rows(
     return result
 
 
+def assert_extract_source_mutation_fails(
+    extract_path: Path,
+    old: str,
+    new: str,
+    *,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    assertion,
+) -> None:
+    """Run an extract assertion against a temporary file with one source cell changed."""
+    source = extract_path.read_text(encoding="utf-8")
+    assert source.count(old) == 1
+    mutated_path = tmp_path / extract_path.name
+    mutated_path.write_text(source.replace(old, new, 1), encoding="utf-8")
+    module = sys.modules[assertion.__module__]
+    monkeypatch.setattr(module, "EXTRACT", mutated_path)
+    with pytest.raises(AssertionError):
+        assertion()
+
+
 def _assert_superseded_targets_are_live(result: MigrationResult) -> None:
     observations = result.observations
     for observation in observations.values():
