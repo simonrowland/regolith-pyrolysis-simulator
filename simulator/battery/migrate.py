@@ -89,6 +89,7 @@ from simulator.battery.enums import (
     ReferenceStateConvention,
     RefusalReason,
     RegimeClass,
+    ScalarPrintedForm,
     StateTag,
     UncertaintyKind,
     ValueKind,
@@ -8902,6 +8903,7 @@ class SourceSelection:
     # b-686: an exact reduction of printed numbers into the declared quantity
     # (relation, ((printed name, printed amount), ...)). None = read as printed.
     reduction: tuple[str, tuple[tuple[str, Decimal], ...]] | None = None
+    printed_form: ScalarPrintedForm | None = None
 
     @property
     def available(self) -> bool:
@@ -9362,6 +9364,120 @@ def _point_selection(
         unused_ancillary=_unused_ancillary(payload, field_name),
         condition_ranges=condition_ranges,
     )
+
+
+def _printed_scalar_selection(
+    selection: SourceSelection,
+    quantity: Quantity | None,
+    payload: Mapping[str, Any],
+) -> SourceSelection:
+    if "printed_form" not in payload or payload.get("printed_form") is None:
+        return selection
+    raw_form = payload.get("printed_form")
+    try:
+        printed_form = ScalarPrintedForm(str(raw_form))
+    except ValueError:
+        return _unavailable_selection(
+            f"unknown printed_form {raw_form!r}; expected log10, neg_log10, or ln",
+            condition_ranges=selection.condition_ranges,
+            unused_ancillary=selection.unused_ancillary,
+            field_name=selection.field_name,
+        )
+    if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        return _unavailable_selection(
+            "printed_form is only supported for dimensionless activity values",
+            condition_ranges=selection.condition_ranges,
+            unused_ancillary=selection.unused_ancillary,
+            field_name=selection.field_name,
+        )
+    if selection.value.kind is not ValueKind.POINT or selection.amount is None:
+        return _unavailable_selection(
+            "printed_form requires a scalar point value",
+            condition_ranges=selection.condition_ranges,
+            unused_ancillary=selection.unused_ancillary,
+            field_name=selection.field_name,
+        )
+
+    printed = selection.amount
+    # Premise: the printed number is a logarithmic representation of a dimensionless
+    # activity, so its argument carries no units. Algebra: log10(a)=x gives
+    # a=10**x, -log10(a)=x gives a=10**(-x), and ln(a)=x gives a=exp(x).
+    # Unit check: a and both logarithm arguments are dimensionless. Sanity:
+    # -log10(a)=2.000 gives a=10**(-2.000)=0.0100.
+    try:
+        if printed_form is ScalarPrintedForm.LOG10:
+            linear = Decimal(10) ** printed
+        elif printed_form is ScalarPrintedForm.NEG_LOG10:
+            linear = Decimal(10) ** (-printed)
+        else:
+            linear = printed.exp()
+    except (ArithmeticError, InvalidOperation, ValueError):
+        return _unavailable_selection(
+            f"printed_form {printed_form.value!r} does not convert to a finite activity",
+            condition_ranges=selection.condition_ranges,
+            unused_ancillary=selection.unused_ancillary,
+            field_name=selection.field_name,
+        )
+    if not linear.is_finite() or linear <= 0:
+        return _unavailable_selection(
+            f"printed_form {printed_form.value!r} does not convert to a positive finite activity",
+            condition_ranges=selection.condition_ranges,
+            unused_ancillary=selection.unused_ancillary,
+            field_name=selection.field_name,
+        )
+    return replace(
+        selection,
+        value=Value(
+            ValueKind.POINT,
+            point=linear,
+            approximate=selection.value.approximate,
+        ),
+        amount=linear,
+        unit_trail=f"printed_{printed_form.value}_to_linear",
+        printed_form=printed_form,
+    )
+
+
+def _printed_scalar_provenance(
+    provenance: Mapping[str, Any] | None,
+    payload: Mapping[str, Any],
+    selection: SourceSelection,
+) -> Mapping[str, Any] | None:
+    if selection.printed_form is None:
+        return provenance
+    printed_value = payload.get(selection.field_name or "value")
+    if isinstance(printed_value, Mapping):
+        printed_value = printed_value.get("as_printed", printed_value.get("value"))
+    retained = dict(provenance or {})
+    retained["printed_value"] = printed_value
+    retained["printed_form"] = selection.printed_form.value
+    return retained
+
+
+def _log_width_in_dex(width: Decimal, printed_form: ScalarPrintedForm) -> Decimal:
+    return (
+        width / Decimal(10).ln()
+        if printed_form is ScalarPrintedForm.LN
+        else width
+    )
+
+
+def _uncertainty_as_log10_dex(
+    uncertainty: Uncertainty,
+    printed_form: ScalarPrintedForm | None,
+) -> Uncertainty:
+    if (
+        printed_form is None
+        or uncertainty.value is None
+        or uncertainty.basis == "log10_dex"
+    ):
+        return uncertainty
+    converted = (
+        tuple(_log_width_in_dex(width, printed_form) for width in uncertainty.value)
+        if isinstance(uncertainty.value, tuple)
+        else _log_width_in_dex(uncertainty.value, printed_form)
+    )
+    return replace(uncertainty, value=converted, basis="log10_dex")
 
 
 def _interval_selection(
@@ -10502,7 +10618,7 @@ def select_declared_source(
 
     named = _selection_from_named_field(payload, q_token, units, condition_ranges)
     if named is not None:
-        return named
+        return _printed_scalar_selection(named, q_token, payload)
 
     if payload.get("source_form") and payload.get("coefficients"):
         form = str(payload.get("source_form") or "").strip()
@@ -15672,6 +15788,9 @@ class Migrator:
         value, exploded, value_sel = empty_value_from_payload(
             values, obs_type, obs.get("units"), quantity=quantity
         )
+        observation_provenance = _printed_scalar_provenance(
+            observation_provenance, values, value_sel
+        )
         if (
             q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION
             and value_sel.field_name is not None
@@ -16935,7 +17054,9 @@ class Migrator:
                 observation_id=obs_id,
             )
 
-        uncertainty = uncertainty_for(obs.get("uncertainty"))
+        uncertainty = _uncertainty_as_log10_dex(
+            uncertainty_for(obs.get("uncertainty")), value_sel.printed_form
+        )
         t_m_unc = values.get("T_m_uncertainty_K") if isinstance(values, Mapping) else None
         if q_token is Quantity.TRANSITION_TEMPERATURE and t_m_unc is not None:
             verbatim = {"T_m_uncertainty_K": t_m_unc}
@@ -17642,6 +17763,9 @@ class Migrator:
                     "gas_species": parent_values["gas_species"],
                 }
             value_sel = select_declared_source(q_token, units, selection_payload)
+            provenance = _printed_scalar_provenance(
+                provenance, raw_item, value_sel
+            )
             val = value_sel.amount
             trail = value_sel.unit_trail
             if not value_sel.available:
@@ -18004,6 +18128,20 @@ class Migrator:
                     kind=UncertaintyKind.PRINTED,
                     verbatim=verbatim,
                 )
+            if value_sel is not None and value_sel.printed_form is not None:
+                numeric_extra_unc = _as_dec_or_none(extra_unc)
+                if numeric_extra_unc is not None:
+                    if extra_unc_k is not None:
+                        numeric_extra_unc /= Decimal(extra_unc_k)
+                    unc = replace(
+                        unc,
+                        value=_log_width_in_dex(
+                            numeric_extra_unc, value_sel.printed_form
+                        ),
+                        basis="log10_dex",
+                    )
+        if value_sel is not None:
+            unc = _uncertainty_as_log10_dex(unc, value_sel.printed_form)
         point_conditions = None
         if coord is not None:
             point_conditions = {

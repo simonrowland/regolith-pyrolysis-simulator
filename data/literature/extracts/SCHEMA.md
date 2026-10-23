@@ -357,6 +357,15 @@ Rules:
 - Pointer / bound-not-point / competing-observation rows must carry explicit
   structured content (e.g. `semantics: bound_not_point_ordering`,
   `semantics: competing_observation_do_not_average`).
+- A scalar `values` payload or `values.points[]` row for `activity` or
+  `activity_coefficient` may declare `printed_form: log10 | neg_log10 | ln`.
+  The selected scalar is converted to its linear activity; the migrated
+  observation provenance retains the printed number as `printed_value` and the
+  token as `printed_form`. A printed ± width on a base-10 log is retained in
+  `log10_dex`; for `ln`, divide the printed width by `ln(10)` to express it in
+  dex. The uncertainty width stays in log space. An unrecognized `printed_form`
+  is refused as a typed unavailable value and added to the migration queue; it
+  is never interpreted as one of the supported logarithms.
 
 #### Printed oxygen condition source
 
