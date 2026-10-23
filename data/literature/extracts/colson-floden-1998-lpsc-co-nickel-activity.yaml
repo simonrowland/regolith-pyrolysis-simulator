@@ -1,0 +1,52 @@
+schema_version: literature_extract.v1
+source_id: colson-floden-1998-lpsc-co-nickel-activity
+source:
+  citation: >-
+    Floden, A. M., Colson, R. O., Nermoe, M. K. B., & Hendrickson, T. R.
+    (1998). Effects of CO on the Activity of Nickel in a Simple Silicate Melt.
+    Lunar and Planetary Science Conference XXIX, abstract 1520, 2 pp.
+  year: 1998
+extraction:
+  method: >-
+    Conference abstract with printed experimental conditions and four figures.
+    Figure values are deferred without digitised numeric points. The activity
+    coefficient comparison and electrochemical peak positions occur in
+    figures and are not transcribed as scored observations.
+  date: '2026-10-20'
+  worker: codex
+  provenance_path: text/colson-floden-1998-lpsc-co-nickel-activity/mineru/p001-p002/out/colson-floden-1998-lpsc-co-nickel-activity-p001-p002/vlm/colson-floden-1998-lpsc-co-nickel-activity-p001-p002.md
+review_status: draft
+species:
+  Ni:
+    observations: []
+    context:
+      - observation_id: colson_floden_1998_experimental_conditions
+        type: methods_context
+        locator: {page: 1, pdf_page_index: 0, section: Experimental}
+        units: wt%; °C; atm; fO2 as reported in abstract
+        reason: >-
+          The abstract's measured activity effect is reported as a qualitative
+          figure result. These setup values bind the deferred plotted evidence;
+          no activity coefficient or peak-potential point is estimated from
+          figures.
+        values:
+          composition_wt_pct: {SiO2: '55.5', CaO: '25.9', MgO: '18.6', NiO: '0.3'}
+          temperature_C: ['1440', '1500', '1575']
+          total_pressure_atm: '1'
+          oxygen_fugacity_range_as_printed: ['1.8 × 10^-3', '3.0 × 10^-10']
+          scan_rates_mV_s: ['200', '500', '1200']
+          gas_species: [CO, CO2]
+      - observation_id: colson_floden_1998_figures_1_to_4
+        type: figure
+        locator: {page: 1, pdf_page_index: 0, section: Results, figure: '1'}
+        units: figure-only; no numeric points
+        reason: Figures carry the electrochemical peaks and relative Ni activity coefficients; figure digitisation is deferred.
+        values:
+          quantity_as_printed: electrochemical_Ni_reduction_peaks_and_activity_coefficient
+          method_class: figure_only
+          figures:
+            - {figure: '1', caption: 'Test of equilibrium for experiments in CO2 and CO2-CO gas mixtures.', panel: main, species: Ni, phase: melt, T: {state: unknown, reason: multiple_experiment_temperatures}, axes_as_printed: {x: square root of scan rate, y: peak current and peak potential}, series: [CO2, 20% CO2-80% CO], marker_counts: not_counted, locator: {page: 1, pdf_page_index: 0}, attribution: this_work, digitisation: deferred to a figure pass}
+            - {figure: '2', caption: 'Ni reduction peak position after correction for the fO2 effect.', panel: main, species: Ni, phase: melt, T: {state: unknown, reason: multiple_experiment_temperatures}, axes_as_printed: {x: electrode potential, y: current}, series: [CO2, CO-CO2 mixtures], marker_counts: not_counted, locator: {page: 2, pdf_page_index: 1}, attribution: this_work, digitisation: deferred to a figure pass}
+            - {figure: '3', caption: 'Projected equilibrium peak positions based on the time-dependent shift.', panel: main, species: Ni, phase: melt, T: {state: unknown, reason: multiple_experiment_temperatures}, axes_as_printed: {x: inverse square root of time, y: cathodic peak position}, series: [N experiments, N2 experiments], marker_counts: not_counted, locator: {page: 2, pdf_page_index: 1}, attribution: this_work, digitisation: deferred to a figure pass}
+            - {figure: '4', caption: 'Observed peak shift and relative Ni2+ activity coefficient with CO concentration.', panel: main, species: Ni, phase: melt, T: {state: unknown, reason: multiple_experiment_temperatures}, axes_as_printed: {x: CO/(CO+CO2), y: cathodic peak position and relative activity coefficient}, series: ['this study', 'Colson 1992'], marker_counts: not_counted, locator: {page: 2, pdf_page_index: 1}, attribution: mixed, digitisation: deferred to a figure pass}
+          digitisation: deferred to a figure pass

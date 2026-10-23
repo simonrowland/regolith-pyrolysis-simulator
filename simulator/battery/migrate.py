@@ -16345,6 +16345,17 @@ class Migrator:
             else (),
             skip_tables=True,
         )
+        if q_token is Quantity.DENSITY and (
+            "composition" not in ident_kwargs
+            or not ident_kwargs["composition"].is_value
+        ):
+            located_composition = (point_conditions or {}).get("composition")
+            if (
+                isinstance(located_composition, Located)
+                and located_composition.state.is_value
+                and isinstance(located_composition.state.value, Composition)
+            ):
+                ident_kwargs["composition"] = located_composition.state
         if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
             residue_conditions = dict(point_conditions or {})
             starting_ppm = _as_dec_or_none(values.get("starting_measured_ppm"))
