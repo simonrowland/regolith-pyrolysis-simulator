@@ -54,10 +54,16 @@ def test_runner_section_layout_matches_pinned_expectations(generated_runner_sect
         section_names = sorted(name for name in files if name != "index.json")
         index_digest = hashlib.sha256(files["index.json"]).hexdigest()
         names_digest = hashlib.sha256("\n".join(section_names).encode()).hexdigest()
+        content_pairs = sorted((name, hashlib.sha256(raw).hexdigest())
+                              for name, raw in files.items())
+        content_digest = hashlib.sha256(
+            json.dumps(content_pairs, separators=(",", ":")).encode()
+        ).hexdigest()
         assert expected[scenario] == {
             "section_count": len(section_names),
             "section_filenames_sha256": names_digest,
             "index_sha256": index_digest,
+            "content_sha256": content_digest,
         }
 
 
