@@ -72,6 +72,14 @@ def test_raw_zero_oxygen_remains_separate_from_vapor_guard():
     sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
     assert sim.melt.oxygen_reservoir.headspace_transport_pO2_bar == 0.0
     assert sim._vapor_pressure_dispatch_pO2_bar() > 0.0
+    sim.melt.temperature_C = 1600.0
+    before = sim.atom_ledger.mol_by_account()
+    result = sim._internal_analytical_equilibrium()
+    assert math.isfinite(result.vapor_pressures_Pa["SiO"])
+    assert any("pO2 closure missing (C7)" in warning for warning in result.warnings)
+    assert sim._headspace_transport_pO2_bar() == 0.0
+    assert sim.melt.oxygen_reservoir.headspace_transport_pO2_bar == 0.0
+    assert sim.atom_ledger.mol_by_account() == before
 
 
 def test_campaign_and_stage_flow_recipe_identity():

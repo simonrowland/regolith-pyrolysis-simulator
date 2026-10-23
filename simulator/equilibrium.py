@@ -1440,7 +1440,17 @@ class EquilibriumMixin:
             ):
                 from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
 
-                suppression = _sio_oxygen_pressure_factor(pO2_bar, sio_reference_bar)
+                sio_pO2_bar = pO2_bar
+                if sio_pO2_bar == 0.0:
+                    # d-259: C7 has not closed the zero-O2 sweep boundary.
+                    # Guard this evaluation only; retain raw state and positives.
+                    sio_pO2_bar = vacuum_floor_bar
+                    warnings.append(
+                        "SiO: pO2 closure missing (C7); "
+                        "authority_level=numerical guard, not physics; "
+                        f"guard_pO2_bar={sio_pO2_bar!r}"
+                    )
+                suppression = _sio_oxygen_pressure_factor(sio_pO2_bar, sio_reference_bar)
                 P_sat = _require_finite_vapor_value(
                     P_sat * suppression,
                     species=name,

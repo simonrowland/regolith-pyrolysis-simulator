@@ -614,6 +614,7 @@ class _FeBeyondEllinghamMelt:
 class _SiOnlyMelt:
     temperature_C = 1900.0 - 273.15
     p_total_mbar = 1e-3
+    sweep_mol_per_s = None
 
     def composition_wt_pct(self):
         return {"SiO2": 100.0}
@@ -2116,6 +2117,44 @@ def test_legacy_sio_continues_below_reference(vapor_pressure_data, monkeypatch):
     # Fixed source/temperature: the SiO reaction's -1/2 oxygen exponent must
     # continue below the reference, independently of the simulated body floor.
     assert answers[1.3e-12] / answers[1e-9] == pytest.approx((1.3e-12 / 1e-9) ** -0.5)
+
+
+@pytest.mark.parametrize("body", ("moon", "mars"))
+def test_legacy_sio_zero_oxygen_uses_flagged_body_guard(
+    vapor_pressure_data, monkeypatch, body
+):
+    model = _LegacyInternalAnalyticalModel(vapor_pressure_data, melt=_SiOnlyMelt())
+    model.melt.body = body
+    monkeypatch.setattr(model, "_headspace_transport_pO2_bar", lambda: 0.0)
+    result = model._internal_analytical_equilibrium()
+    guard = model._oxygen_numerical_floor_bar()
+    assert math.isfinite(result.vapor_pressures_Pa["SiO"])
+    assert result.vapor_pressures_Pa["SiO"] > 0.0
+    assert model._headspace_transport_pO2_bar() == 0.0
+    assert (
+        "SiO: pO2 closure missing (C7); "
+        "authority_level=numerical guard, not physics; "
+        f"guard_pO2_bar={guard!r}"
+    ) in result.warnings
+    monkeypatch.setattr(model, "_headspace_transport_pO2_bar", lambda: guard)
+    guarded = model._internal_analytical_equilibrium()
+    assert result.vapor_pressures_Pa["SiO"].hex() == guarded.vapor_pressures_Pa["SiO"].hex()
+    assert not any("pO2 closure missing (C7)" in warning for warning in guarded.warnings)
+
+
+@pytest.mark.parametrize("oxygen,expected_hex", (
+    (1.3e-12, "0x1.3a81beb655dcbp+7"),
+    (1e-9, "0x1.6adedc06bbbddp+2"),
+))
+def test_legacy_sio_positive_oxygen_keeps_b151_bits(
+    vapor_pressure_data, monkeypatch, oxygen, expected_hex
+):
+    # Captured from cb13f9f92's executable equilibrium owner for d-259 parity.
+    model = _LegacyInternalAnalyticalModel(vapor_pressure_data, melt=_SiOnlyMelt())
+    monkeypatch.setattr(model, "_headspace_transport_pO2_bar", lambda: oxygen)
+    result = model._internal_analytical_equilibrium()
+    assert result.vapor_pressures_Pa["SiO"].hex() == expected_hex
+    assert not any("pO2 closure missing (C7)" in warning for warning in result.warnings)
 
 
 def test_legacy_internal_analytical_oxide_antoine_pressure_pin(
