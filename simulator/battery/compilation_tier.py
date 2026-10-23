@@ -1246,9 +1246,9 @@ def _openimcc_pressure_refusal(
     return None
 
 
-@lru_cache(maxsize=2)
-def _openimcc_datapack(vaporock_root: str | None):
-    """Reuse the pinned OpenIMCC tables while respecting its explicit override."""
+@lru_cache(maxsize=1)
+def _openimcc_datapack():
+    """Reuse the OpenIMCC tables selected by the process environment."""
 
     from openimcc.gas import load_gas_datapack
 
@@ -1315,13 +1315,19 @@ def _openimcc_h298_anchor_kJ_mol(
 
     # OpenIMCC stores condensate dH298_R in kelvin-equivalent units; multiplying
     # by its own R gives the apparent-H anchor in kJ/mol.
-    return as_decimal(str(R_J_MOL_K * float(matching_rows[0]["dH298_R"])))
+    condensate_anchor_kJ_mol = R_J_MOL_K * float(matching_rows[0]["dH298_R"])
+    # Premise: OpenIMCC stores dH298_R = H298/R in kK, and its condensate
+    # H_app = R*dH298_R + H_increment, with H_app in kJ/mol. Thus the named
+    # anchor is R*dH298_R and H(T)-H(298.15) = H_app - anchor. Unit check:
+    # J/(mol K) × kK is kJ/mol. FeO(l) at 1800 K gives 90.88212998 kJ/mol,
+    # close to the JANAF value 90.858 kJ/mol within the fit residual.
+    return as_decimal(str(condensate_anchor_kJ_mol))
 
 
 def _openimcc_polymorph_matches(card: object, identity: Identity) -> bool:
     observed = polymorph_token(identity.species)
     if observed is None:
-        return True
+        return False
     from simulator.battery.generators.janaf import _JANAF_POLYMORPH_BY_TABLE
 
     engine_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(
@@ -1349,7 +1355,7 @@ def _openimcc_card(
             species_thermo,
         )
 
-        datapack = _openimcc_datapack(os.environ.get("OPENIMCC_VAPOROCK_ROOT"))
+        datapack = _openimcc_datapack()
         card = species_thermo(
             formula, phase, temperature_K, datapack=datapack
         )
@@ -1657,6 +1663,14 @@ def _openimcc_fusion_attempt(
         value = as_decimal(str(liquid.H_app_kJ_mol - solid.H_app_kJ_mol))
     else:
         value = as_decimal(str(liquid.S_J_molK - solid.S_J_molK))
+    if not value.is_finite():
+        return _refuse(
+            RefusalReason.METRIC_DOMAIN,
+            "nonfinite-engine-value",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.OPENIMCC.value},
+        )
     return ThermoAttempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],
@@ -1882,9 +1896,10 @@ def predict_thermo_attempt(
     """Thermochemistry from that engine's own thermo, or a typed refusal.
 
     Internal-analytical uses the Ellingham fit (JANAF-4th refit).
-    ThermoEngine and MAGEMin use pure-phase Cp, S, and H−H298.
-    Apparent G is not ΔfG(T) and is refused. Other engines have no
-    thermochemistry branch. A refusal carries no numeric value.
+    ThermoEngine and MAGEMin use pure-phase Cp, S, and H−H298. VapoRock
+    evaluates supported JANAF gas rows, while OpenIMCC uses card-backed
+    pure-phase S, Cp, H−H298, and supported fusion pairs. Apparent G is not
+    ΔfG(T) and is refused. Unsupported engines and quantities carry no value.
     """
 
     identity = observation.identity

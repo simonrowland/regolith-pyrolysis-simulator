@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from dataclasses import replace
 from decimal import Decimal
+from types import SimpleNamespace
 
 import openimcc.gas
 import pytest
 from openimcc.gas import species_thermo
 
+import simulator.battery.compilation_tier as compilation_tier
 from simulator.battery.compilation_tier import predict_thermo_attempt
 from simulator.battery.enums import (
     Engine,
@@ -174,6 +176,16 @@ def test_openimcc_neutral_al_still_uses_gas_card() -> None:
     assert "Al(g)" in attempt.call_evidence
 
 
+def test_openimcc_crystal_requires_an_observed_polymorph() -> None:
+    observation = _observation("SiO2", Phase.CR, Quantity.CP)
+
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, observation)
+
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert attempt.refusal_detail["reason"] == "openimcc-crystal-card-polymorph-mismatch-or-unknown"
+
+
 def test_openimcc_fusion_refuses_charged_species_before_card_lookup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -322,3 +334,36 @@ def test_openimcc_fusion_refuses_when_a_phase_card_is_missing() -> None:
 
     assert attempt.value is None
     assert attempt.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+
+
+def test_openimcc_fusion_refuses_nonfinite_result(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    solid = SimpleNamespace(
+        H_app_kJ_mol=float("nan"),
+        S_J_molK=0.0,
+        source_row_id="solid-row",
+        source_table_id="same-dataset",
+    )
+    liquid = SimpleNamespace(
+        H_app_kJ_mol=1.0,
+        S_J_molK=1.0,
+        source_row_id="liquid-row",
+        source_table_id="same-dataset",
+    )
+    cards = iter((solid, liquid))
+
+    def card(*_args, **_kwargs):
+        return next(cards), None, None
+
+    monkeypatch.setattr(compilation_tier, "_openimcc_card", card)
+    monkeypatch.setattr(compilation_tier, "_openimcc_polymorph_matches", lambda *_args: True)
+    observation = _observation(
+        "SiO2", Phase.CR, Quantity.ENTHALPY_OF_FUSION, fusion=True
+    )
+
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, observation)
+
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert attempt.refusal_detail["reason"] == "nonfinite-engine-value"
