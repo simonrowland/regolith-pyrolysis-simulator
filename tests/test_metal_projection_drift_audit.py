@@ -363,7 +363,8 @@ def test_stage_routed_metal_projection_only_mutation_fails_closed_after_rescope(
         },
     )
 
-    assert product_stage_number('C3', 'Fe') == 1
+    # MRE Fe remains stage-routed; C3 Fe now belongs to the bottom pool.
+    assert product_stage_number('MRE', 'Fe') == 1
     assert projection_only._audit_metal_projection_drift() == {
         'Fe': pytest.approx(-0.05),
     }
