@@ -800,8 +800,12 @@ def test_migrated_printed_fo2_source_is_excluded_by_scorer(tmp_path, monkeypatch
             row, Engine.OPENIMCC, context=context, handles=handles,
             point_observations=point_rows,
         )
+        # 45cea9498 types Table 3 O2 measured_reduced, so the row is the
+        # selected source-oxygen condition. That exclusion lists derived_from
+        # and does not set the printed-name match key (9c40ad728).
+        assert residual.refusal is not None
         assert residual.refusal.detail["reason"] == "used_as_scoring_condition"
-        assert residual.refusal.detail["match"] == "printed_fo2_names_observation"
+        assert row.observation_id in residual.refusal.detail["derived_from"]
         assert residual.numeric is None and candidate is None
     assert requests == []
     row = sample_row
