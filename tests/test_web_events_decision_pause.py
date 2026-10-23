@@ -382,15 +382,15 @@ def test_null_make_decision_while_parked_at_path_ab_is_rejected(client):
 
 
 # Nightly (2026-08-02 CI tiering): serial web full path (~391 s junit).
+# 2400s outer guard follows 1114s call at load ~79, Studio-2 (2026-10-23).
 @pytest.mark.nightly
-@pytest.mark.timeout(1200)
+@pytest.mark.timeout(2400)
 def test_pause_resume_around_every_gate_is_ledger_identical(client):
     """(b) pause/resume churn at every gate -> one gate each, correct routing, identical ledger.
 
-    Timeout is a hang-backstop, not a perf bar: measured 372s serial on
-    Studio 1 (ci-ydisp-final junit), so the 300s global default failed
-    deterministically there; 1200s ~= 3x measured per the contention-robust
-    ceiling policy."""
+    Timeout is a hang-backstop, not a perf bar: Studio 1 measured 372s serial
+    and Studio 2 measured 1114s at load ~79 (2026-10-23); 2400s gives roughly
+    2x margin over the loaded run."""
     base_decisions, base_counts, base_completion, _ = _drive_to_completion(
         _started(client))
     assert base_decisions == EXPECTED_DECISIONS
