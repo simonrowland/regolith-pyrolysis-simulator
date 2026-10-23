@@ -2181,11 +2181,11 @@ def wall_condensation_antoine_coefficients(
     """Return coefficients for local wall ``P_sat`` consumers.
 
     Melt-source standard-reaction terms are not pure-species saturation
-    pressures. When a standard-reaction row carries a pure-component sidecar,
-    wall re-evaporation selects that block and leaves coefficient and pressure
-    validation to the wall consumer. A partial block must not be hidden by a
-    legacy-fit fallback at a deposition/refusal boundary. Non-standard rows
-    retain the runtime selector's projection gate and selection behavior.
+    pressures. A standard-reaction row uses its pure-component sidecar when
+    the segment projection gate accepts it, or when the block is partial or
+    malformed with A present so the wall consumer can type the refusal. Other
+    unusable projections fail closed with an empty block. Non-standard rows
+    use the runtime selector unchanged.
     """
 
     if _fit_target(row) != FIT_TARGET_STANDARD_REACTION:
