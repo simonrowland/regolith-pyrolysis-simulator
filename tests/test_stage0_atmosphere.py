@@ -12,7 +12,7 @@ from simulator.core import (
     CampaignPhase,
     PyrolysisSimulator,
 )
-from simulator.campaigns import c0_exit_run_notice
+from simulator.campaigns import c0_exit_record, c0_exit_run_notice
 from simulator.accounting.ledger import snapshot_atom_ledger
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -304,9 +304,61 @@ def test_c0_forecast_rebuilds_registry_around_live_engine_pool_locks():
     ) is not fallback
     assert context._chem_registry.shadows_for(
         ChemistryIntent.VAPOR_PRESSURE
-    )[0] is not vaporock_shadow
+    ) == ()
+    assert sim._chem_registry.shadows_for(
+        ChemistryIntent.VAPOR_PRESSURE
+    )[0] is vaporock_shadow
     assert fallback._backend._subprocess_pool is subprocess_pool
     assert vaporock_shadow._backend._warm_pool is warm_pool
+
+
+def test_c0_forecast_does_not_touch_vaporock_session_backend_cache(monkeypatch):
+    from simulator.melt_backend import vaporock as vaporock_backend
+
+    class SentinelBackend:
+        def __init__(self):
+            self._warm_pool = SimpleNamespace(
+                _active_requests_lock=threading.Lock(),
+                _lifecycle_lock=threading.Lock(),
+            )
+            self.availability_checks = 0
+            self.pool_calls = 0
+
+        def is_available(self):
+            self.availability_checks += 1
+            return True
+
+        def equilibrate(self, **_kwargs):
+            with self._warm_pool._active_requests_lock:
+                self.pool_calls += 1
+            raise RuntimeError("sentinel live VapoRock pool was reached")
+
+    monkeypatch.setenv(vaporock_backend.SESSION_WARM_ENV, "1")
+    cache_key = vaporock_backend._session_backend_cache_key(
+        {"warm_worker": True}
+    )
+    sentinel = SentinelBackend()
+    monkeypatch.setitem(
+        vaporock_backend._SESSION_BACKEND_CACHE,
+        cache_key,
+        sentinel,
+    )
+
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    context.melt.temperature_C = 900.0
+    context._get_equilibrium(run_post_equilibrium_sulfsat=False)
+
+    assert sentinel.availability_checks == 0
+    assert sentinel.pool_calls == 0
+    assert not sentinel._warm_pool._active_requests_lock.locked()
+    assert context._chem_registry.shadows_for(ChemistryIntent.VAPOR_PRESSURE) == ()
 
 
 def test_c0_forecast_context_refusal_reports_snapshot_exception_detail():
@@ -325,6 +377,62 @@ def test_c0_forecast_context_refusal_reports_snapshot_exception_detail():
     assert "cannot pickle" in prediction["forecast_context_refusal_detail"][
         "exception_message"
     ]
+
+
+def test_c0_forecast_backend_factory_refusal_preserves_exception_detail():
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    sim.backend = SimpleNamespace(backend_name="alphamelts")
+
+    def fail_backend_factory():
+        raise RuntimeError("forecast backend factory failed")
+
+    sim._c0_forecast_backend_factory = fail_backend_factory
+    prediction = sim._predict_c0_exit()
+
+    assert prediction["prediction_status"] == "unavailable_forecast_backend"
+    assert prediction["forecast_context_refusal_detail"] == {
+        "exception_class": "RuntimeError",
+        "exception_message": "forecast backend factory failed",
+    }
+    notice = c0_exit_record(
+        "test",
+        backstop="maximum_hold",
+        ramp_C_per_hr=200.0,
+        prediction=prediction,
+    )
+    assert "forecast_context_refusal_detail" not in notice
+    assert "RuntimeError: forecast backend factory failed" in notice["message"]
+
+
+def test_c0_forecast_cache_clone_refusal_preserves_exception_detail():
+    class FailingForecastStore(PT0DeterminismStore):
+        def clone_for_forecast(self):
+            raise LookupError("forecast PT0 cache clone failed")
+
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    sim.configure_pt0_determinism_store(FailingForecastStore("capture"))
+
+    prediction = sim._predict_c0_exit()
+
+    assert prediction["prediction_status"] == "unavailable_forecast_cache"
+    assert prediction["forecast_context_refusal_detail"] == {
+        "exception_class": "LookupError",
+        "exception_message": "forecast PT0 cache clone failed",
+    }
+    notice = c0_exit_record(
+        "test",
+        backstop="maximum_hold",
+        ramp_C_per_hr=200.0,
+        prediction=prediction,
+    )
+    assert "forecast_context_refusal_detail" not in notice
+    assert "LookupError: forecast PT0 cache clone failed" in notice["message"]
 
 
 def test_c0_forecast_refuses_post_equilibrium_sulfsat_path():
