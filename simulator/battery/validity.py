@@ -689,94 +689,17 @@ def effusion_regime_unverified(
         )
         return _fail(RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "orifice_knudsen")
 
-    if not _calibration_grounded(calibration):
-        ungrounded_detail = (
-            _calibration_not_grounded_detail(calibration)
-            if quantity
-            in {
-                Quantity.P_PARTIAL,
-                Quantity.ACTIVITY,
-                Quantity.ACTIVITY_COEFFICIENT,
-            }
-            else None
-        )
-        if ungrounded_detail is None:
-            checks.append(
-                GateCheck(
-                    "in_cell_partial_pressure_sum",
-                    False,
-                    {
-                        "reason": "calibration is not grounded for the in-cell fallback",
-                        "route": "in_cell_fallback",
-                    },
-                )
-            )
-            return _fail(
-                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-                checks,
-                "in_cell_partial_pressure_sum",
-            )
-        if observation is None:
-            pressure_sum = None
-            pressure_detail = {"reason": "scored observation is unavailable"}
-        else:
-            pressure_sum, pressure_detail = _printed_in_cell_pressure_sum(
-                experiment,
-                observation,
-                point_observations,
-            )
-        pressure_limit = _in_cell_pressure_limit(experiment)
-        diameter_basis = (
-            "printed_orifice_diameter_p_over_d"
-            if diameter is not None
-            else "Drowart_standalone_usual_10_Pa_limit; no defensible d printed"
-        )
-        pressure_detail.update(
-            {
-                "pressure_limit_Pa": str(pressure_limit),
-                "limit_source": "Drowart et al. 2005, p. 689",
-                "limit_basis": diameter_basis,
-                "route": "in_cell_fallback",
-            }
-        )
-        if pressure_sum is None and quantity in {
+    ungrounded_detail = (
+        _calibration_not_grounded_detail(calibration)
+        if not _calibration_grounded(calibration)
+        and quantity
+        in {
+            Quantity.P_PARTIAL,
             Quantity.ACTIVITY,
             Quantity.ACTIVITY_COEFFICIENT,
-        }:
-            checks.append(
-                GateCheck(
-                    "in_cell_partial_pressure_sum",
-                    False,
-                    pressure_detail,
-                )
-            )
-            return _fail(
-                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-                checks,
-                "in_cell_partial_pressure_sum",
-            )
-        if pressure_sum is not None and pressure_sum > pressure_limit:
-            checks.append(
-                GateCheck("in_cell_partial_pressure_sum", False, pressure_detail)
-            )
-            return _fail(
-                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-                checks,
-                "in_cell_partial_pressure_sum",
-            )
-        checks.append(
-            GateCheck(
-                "in_cell_partial_pressure_sum",
-                True,
-                {
-                    **ungrounded_detail,
-                    "reason": "calibration is not grounded for the in-cell fallback",
-                    "route": "in_cell_fallback",
-                    "pressure_sum_detail": pressure_detail,
-                },
-            )
-        )
-        return _pass(checks)
+        }
+        else None
+    )
     if observation is None:
         pressure_sum = None
         pressure_detail = {"reason": "scored observation is unavailable"}
@@ -821,8 +744,23 @@ def effusion_regime_unverified(
             "(limit source: Drowart et al. 2005, p. 689; "
             f"{diameter_basis})"
         )
+    if ungrounded_detail is not None:
+        gate_detail = {
+            **pressure_detail,
+            **ungrounded_detail,
+        }
+        if passed:
+            gate_detail.update(
+                {
+                    "reason": "calibration is not grounded for the in-cell fallback",
+                    "route": "in_cell_fallback",
+                    "pressure_sum_detail": pressure_detail,
+                }
+            )
+    else:
+        gate_detail = pressure_detail
     checks.append(
-        GateCheck("in_cell_partial_pressure_sum", passed, pressure_detail)
+        GateCheck("in_cell_partial_pressure_sum", passed, gate_detail)
     )
     if not passed:
         return _fail(

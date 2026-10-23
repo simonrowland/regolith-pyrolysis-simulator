@@ -667,6 +667,7 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     from simulator.battery.validity import run_validity_gates
     from simulator.battery.score import (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         flagged_strata,
         flagged_stratum_rows,
         render_score_report_from_payloads,
@@ -695,15 +696,12 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     pressure_check = next(
         check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
     )
-    assert gates.passed
-    assert pressure_check.passed
-    assert pressure_check.detail["flag"] == "calibration_not_grounded"
+    assert gates.passed is False
+    assert pressure_check.passed is False
     assert pressure_check.detail["reason"] == (
-        "calibration is not grounded for the in-cell fallback"
+        "incomplete printed species coverage; pressure sum is only a lower bound"
     )
-    assert pressure_check.detail["calibration_record_status"] == (
-        "not_printed" if typed_not_printed else "not_recorded"
-    )
+    assert pressure_check.detail["pressure_limit_Pa"]
     residual, _ = compile_residual(
         reference,
         Engine.INTERNAL_ANALYTICAL,
@@ -715,30 +713,36 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     assert residual.numeric is not None
     assert residual.score_eligible is False
     notice = next(
-        item for item in residual.notices
-        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
+        item
+        for item in residual.notices
+        if item.reason.startswith("calibration_not_grounded:")
     )
     assert notice.reason == expected_reason
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
     )
 
     diagnostic = flagged_stratum_rows(
         (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
     )
-    assert diagnostic[0]["stratum"] == FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
-    assert diagnostic[0]["n"] == 1
-    assert diagnostic[0]["median_dex"] is not None
-    assert diagnostic[0]["rms_dex"] is not None
+    assert {row["stratum"]: row["n"] for row in diagnostic} == {
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED: 1,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS: 1,
+    }
+    assert all(row["median_dex"] is not None for row in diagnostic)
+    assert all(row["rms_dex"] is not None for row in diagnostic)
 
     payload = residual_to_plain(residual)
     summary_rows = flagged_stratum_payloads(
         (payload,), (Engine.INTERNAL_ANALYTICAL,)
     )
-    assert summary_rows[0]["stratum"] == FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
-    assert summary_rows[0]["n"] == 1
-    assert summary_rows[0]["median_dex"] is not None
-    assert summary_rows[0]["rms_dex"] is not None
+    assert {row["stratum"]: row["n"] for row in summary_rows} == {
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED: 1,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS: 1,
+    }
+    assert all(row["median_dex"] is not None for row in summary_rows)
+    assert all(row["rms_dex"] is not None for row in summary_rows)
     report = render_score_report_from_payloads(
         (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
     )
@@ -746,8 +750,11 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
 
 
 def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> None:
-    from simulator.battery.score import FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
-    from simulator.battery.score import flagged_strata
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_strata,
+    )
 
     experiment = F.kems_experiment(kn=None, calibrated=False)
     reference = _uncalibrated_kems_partial_row(
@@ -781,6 +788,7 @@ def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> 
     assert internal_analytical.numeric.decision_band is None
     assert flagged_strata(openimcc.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
     )
     assert flagged_strata(internal_analytical.notices) == flagged_strata(
         openimcc.notices
@@ -3596,6 +3604,7 @@ def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> N
     )
     assert pressure_check.passed is False
     assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
 
     context = _context(
         F.work(), experiment, activity, sodium, silicon, review="reviewed"
