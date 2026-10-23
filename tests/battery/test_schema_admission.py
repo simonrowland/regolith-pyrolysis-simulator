@@ -825,8 +825,8 @@ def test_real_sample_volume_and_unadopted_fugacity_are_preserved():
             assert all(o.value.kind.value == "unavailable" for o in rows)
 
 
-def test_fugacity_storage_cannot_open_or_score_engine(monkeypatch):
-    from simulator.battery.enums import Engine, Phase, SourceRelation
+def test_non_oxygen_fugacity_is_refused_before_opening_an_engine(monkeypatch):
+    from simulator.battery.enums import Engine, Phase, RefusalReason, SourceRelation
     from simulator.battery.records import Species, State
     from simulator.battery.score import SCORE_ENGINE_SET, ScoreContext, populate_numeric, predict_with_engine, score_store
 
@@ -842,9 +842,10 @@ def test_fugacity_storage_cannot_open_or_score_engine(monkeypatch):
     for engine in SCORE_ENGINE_SET:
         prediction = predict_with_engine(engine, reference)
         assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
         assert prediction.refusal_detail == {
-            "reason": "quantity_not_predicted",
-            "quantity": Quantity.FUGACITY.value,
+            "reason": "fugacity_requires_O2",
+            "species_formula": "Cl2",
         }
     residuals, _ = score_store(context, engines=(Engine.MAGEMIN,), include_diagnostics=False)
     assert residuals and all(not r.score_eligible and r.numeric is None for r in residuals)

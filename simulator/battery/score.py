@@ -41,6 +41,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    FO2Channel,
     FORMATION_QUANTITIES,
     FUSION_QUANTITIES,
     KINETIC_YIELD_QUANTITIES,
@@ -113,6 +114,7 @@ from simulator.battery.migrate import (
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
+    _log_fO2_to_pa,
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
@@ -707,6 +709,8 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
     if quantity is Quantity.WALL_DEPOSIT_MASS:
         return Rail.WALL_DEPOSITION
     if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+        return Rail.REDOX
+    if quantity is Quantity.FUGACITY:
         return Rail.REDOX
     if quantity in {
         Quantity.YIELD_FRACTION,
@@ -5539,6 +5543,290 @@ def _openimcc_element_inventory(
     return inventory
 
 
+def _predict_oxygen_fugacity(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    experiment: Experiment | None,
+) -> EnginePrediction:
+    """Predict only oxygen fugacity from a printed closed redox state."""
+
+    def refused(
+        reason: RefusalReason,
+        detail: Mapping[str, object],
+        *,
+        execution: ExecutionState = ExecutionState.NOT_PROBED,
+    ) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=execution),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=reason,
+            refusal_detail=detail,
+            identity=identity,
+        )
+
+    if identity.species.formula != "O2":
+        return refused(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            {
+                "reason": "fugacity_requires_O2",
+                "species_formula": identity.species.formula,
+            },
+        )
+    if engine is Engine.ALPHAMELTS:
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "engine_does_not_predict_oxygen_fugacity",
+                "detail": (
+                    "AlphaMELTS has no independent closed-system fO2 output; "
+                    "its default echo is circular."
+                ),
+            },
+            execution=ExecutionState.UNSUPPORTED,
+        )
+    if engine not in {Engine.OPENIMCC, Engine.THERMOENGINE}:
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "engine_does_not_predict_oxygen_fugacity",
+                "engine": engine.value,
+            },
+            execution=ExecutionState.UNSUPPORTED,
+        )
+    if experiment is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "experiment"},
+        )
+
+    control = experiment.fO2_control
+    if control is not None:
+        control_channel = control.channel
+        if not control_channel.is_value:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "fO2_control.channel"},
+            )
+        if control_channel.value is not FO2Channel.INTRINSIC:
+            return refused(
+                RefusalReason.CYCLIC_DERIVATION,
+                {
+                    "reason": "fugacity_imposed",
+                    "channel": control_channel.value.value,
+                },
+            )
+
+    temperature = temperature_of(identity)
+    if temperature is None or not temperature.is_finite() or temperature <= 0:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "temperature_K"},
+        )
+
+    composition: Composition | None = None
+    composition_state = identity.composition
+    if (
+        composition_state is not None
+        and composition_state.is_value
+        and isinstance(composition_state.value, Composition)
+    ):
+        composition = composition_state.value
+    if composition is None:
+        point_composition = _printed_point_composition(observation)
+        if point_composition is not None and point_composition.is_value:
+            composition = point_composition.value
+    source_reason: str | None = None
+    if composition is None:
+        initial = experiment.sample.initial_composition
+        if initial is not None and initial.inference is None:
+            if initial.state.is_value and isinstance(initial.state.value, Composition):
+                composition = initial.state.value
+            elif initial.state.is_unknown:
+                source_reason = initial.state.reason
+    if composition is None:
+        detail: dict[str, object] = {
+            "reason": "missing_input",
+            "input": "starting_composition",
+        }
+        if source_reason is not None:
+            detail["source_reason"] = source_reason
+        return refused(RefusalReason.IDENTITY_INCOMPLETE, detail)
+    if composition.proxy_flag is not None or composition.basis == "sample_catalog_proxy":
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {
+                "reason": "input_not_printed",
+                "input": "starting_composition",
+                "proxy_flag": composition.proxy_flag or composition.basis,
+            },
+        )
+    oxide_split = dict(composition.components)
+    if oxide_split.get("FeO", Decimal(0)) <= 0 or oxide_split.get(
+        "Fe2O3", Decimal(0)
+    ) <= 0:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {
+                "reason": "missing_input",
+                "input": "iron_oxidation_state",
+                "required": "printed FeO and Fe2O3 amounts",
+            },
+        )
+
+    if composition.amount_basis is AmountBasis.MASS_PERCENT:
+        composition_weight_percent = {
+            oxide: float(amount) for oxide, amount in composition.components
+        }
+    else:
+        composition_weight_percent = composition_wt_pct(composition)
+    if not composition_weight_percent:
+        return refused(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_starting_composition"},
+        )
+
+    pressure_bar = _printed_total_pressure_bar(
+        identity, observation, experiment=experiment
+    )
+    if pressure_bar is None:
+        pressure_detail: dict[str, object] = {
+            "reason": "missing_input",
+            "input": "total_pressure_Pa",
+        }
+        pressure = experiment.pressure_environment.total_pressure_Pa
+        if pressure.inference is None and pressure.state.is_unknown:
+            pressure_detail["source_reason"] = pressure.state.reason
+        return refused(RefusalReason.IDENTITY_INCOMPLETE, pressure_detail)
+    if engine is Engine.OPENIMCC and pressure_bar != Decimal("1"):
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "openimcc_closed_redox_requires_1_bar",
+                "printed_pressure_bar": str(pressure_bar),
+            },
+        )
+
+    if engine is Engine.OPENIMCC:
+        try:
+            inventory = _openimcc_element_inventory(composition_weight_percent)
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            return refused(
+                RefusalReason.INVALID_IDENTITY,
+                {"reason": "invalid_starting_composition", "detail": str(exc)},
+            )
+        if inventory.get("Fe", 0.0) <= 0.0 or inventory.get("O", 0.0) <= 0.0:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "iron_and_oxygen_inventory"},
+            )
+        try:
+            import openimcc
+        except ImportError as exc:
+            return refused(
+                RefusalReason.OPENIMCC_NOT_IMPORTABLE,
+                {
+                    "reason": RefusalReason.OPENIMCC_NOT_IMPORTABLE.value,
+                    "detail": str(exc),
+                },
+                execution=ExecutionState.UNSUPPORTED,
+            )
+        try:
+            result = openimcc.evaluate_redox(inventory, float(temperature), "closed")
+        except openimcc.ImccRefusal as exc:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "openimcc_closed_redox_refused", "detail": str(exc)},
+            )
+        lambda_ln_f_o2 = float(result.lambda_ln_f_o2)
+        if not math.isfinite(lambda_ln_f_o2):
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "openimcc_closed_redox_nonfinite_fugacity"},
+            )
+        log10_fO2_bar = Decimal(str(lambda_ln_f_o2 / math.log(10.0)))
+        predicted_pa = _log_fO2_to_pa(log10_fO2_bar)
+        authority = (
+            Authority.EXTRAPOLATED
+            if result.extrapolated_redox_rows
+            else Authority.BRIDGE
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="openimcc.evaluate_redox(closed)",
+            ),
+            value=predicted_pa,
+            unit="Pa",
+            authority=authority,
+            coefficient_sources=(
+                f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
+            ),
+            lineage_complete=False,
+            identity=identity,
+            version="openimcc-closed-redox-fugacity",
+        )
+
+    try:
+        result = _equilibrate_phase_assemblage(
+            engine,
+            temperature_C=float(temperature - Decimal("273.15")),
+            composition_kg={
+                oxide: amount / 1000.0
+                for oxide, amount in composition_weight_percent.items()
+            },
+            fO2_log=None,
+            pressure_bar=float(pressure_bar),
+        )
+    except Exception as exc:  # a backend failure is a counted refusal
+        return refused(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            {
+                "reason": "thermoengine_intrinsic_fO2_unavailable",
+                "detail": f"{type(exc).__name__}: {exc}",
+            },
+            execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
+        )
+    diagnostics = getattr(result, "diagnostics", {})
+    solved_fO2_log = (
+        diagnostics.get("solved_fO2_log")
+        if isinstance(diagnostics, Mapping)
+        else None
+    )
+    if (
+        getattr(result, "status", "ok") != "ok"
+        or solved_fO2_log is None
+        or not math.isfinite(float(solved_fO2_log))
+    ):
+        return refused(
+            RefusalReason.METRIC_DOMAIN,
+            {"reason": "thermoengine_intrinsic_solved_fO2_log_missing_or_invalid"},
+        )
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="thermoengine.solved_fO2_log",
+        ),
+        value=_log_fO2_to_pa(Decimal(str(solved_fO2_log))),
+        unit="Pa",
+        authority=Authority.BRIDGE,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        identity=identity,
+        version="thermoengine-intrinsic-closed-fugacity",
+    )
+
+
 def _predict_fe_redox(
     engine: Engine, observation: Observation, identity: Identity, channel: str
 ) -> EnginePrediction:
@@ -6801,7 +7089,7 @@ def _equilibrate_phase_assemblage(
     *,
     temperature_C: float,
     composition_kg: Mapping[str, float],
-    fO2_log: float,
+    fO2_log: float | None,
     pressure_bar: float,
     solute_fugacity_bar: float | None = None,
     solute_fugacity_parameter: str | None = None,
@@ -6852,7 +7140,10 @@ def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
 
 
 def _printed_total_pressure_bar(
-    identity: Identity, observation: Observation
+    identity: Identity,
+    observation: Observation,
+    *,
+    experiment: Experiment | None = None,
 ) -> Decimal | None:
     state = identity.total_pressure_Pa
     raw: object = None
@@ -6861,7 +7152,11 @@ def _printed_total_pressure_bar(
     else:
         located = (observation.point_conditions or {}).get("total_pressure_Pa")
         if located is None or located.inference is not None or not located.state.is_value:
-            return None
+            if experiment is None:
+                return None
+            located = experiment.pressure_environment.total_pressure_Pa
+            if located.inference is not None or not located.state.is_value:
+                return None
         raw = located.state.value
         if isinstance(raw, Value):
             raw = raw.point
@@ -7372,6 +7667,10 @@ def predict_with_engine(
             sources,
             experiment,
             observation,
+        )
+    if quantity is Quantity.FUGACITY:
+        return _predict_oxygen_fugacity(
+            engine, observation, identity, channel, sources, experiment
         )
     if quantity is Quantity.FE3_FE2_RATIO:
         return _predict_fe_redox(engine, observation, identity, channel)
