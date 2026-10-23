@@ -53,7 +53,7 @@ from dataclasses import dataclass
 import logging
 import math
 from pathlib import Path
-from types import MappingProxyType
+from types import MappingProxyType, ModuleType
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 
 from engines.antoine import _antoine_log10_pressure
@@ -13797,6 +13797,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         try:
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
+            sulfur_module = getattr(
+                getattr(self, '_sulfsat_gate', None), '_module', None
+            )
+            if isinstance(sulfur_module, ModuleType):
+                # Imported code modules are process-owned namespaces, not
+                # mutable run state; preserve the optional SulfSat module while
+                # still copying the gate that refers to it.
+                memo[id(sulfur_module)] = sulfur_module
             if self.backend is not None:
                 memo[id(self.backend)] = forecast_backend
             if live_store is not None:
