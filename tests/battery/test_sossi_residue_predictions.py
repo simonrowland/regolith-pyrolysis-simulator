@@ -207,7 +207,53 @@ def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
     )
 
 
+def test_sossi_worker_start_failure_after_residue_scoring_worker(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc")
+    import simulator.battery.residue as residue
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+    monkeypatch.setattr(
+        residue,
+        "integrate_residue_inventory",
+        lambda inventory, *_args, **_kwargs: SimpleNamespace(
+            residue_mol=dict(inventory), buffer_oxygen_exchange_mol=0.0
+        ),
+    )
+    source = yaml.safe_load(SOURCE.read_text())
+    experiment = source["experiments"][0]
+    starting_trace = {
+        element: source["species"][element]["observations"][0]["values"][
+            "starting_measured_ppm"
+        ]
+        for element in ("Mn", "Ti")
+    }
+    experiment_id = experiment["experiment_id"]
+
+    residue._predict_sossi_residue_cohort(
+        [experiment],
+        yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text()),
+        starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+        buffered_fO2_log_by_experiment={experiment_id: -10.0},
+        code_revision="sossi-worker-start-failure-order-test",
+        engine="openimcc",
+    )
+
+    assert residue._OPENIMCC_EVALUATION_WORKER is not None
+    _assert_sossi_worker_start_failure_recorded(monkeypatch)
+
+
 def test_sossi_worker_start_failure_is_recorded_as_transport_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _assert_sossi_worker_start_failure_recorded(monkeypatch)
+
+
+def _assert_sossi_worker_start_failure_recorded(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     pytest.importorskip("openimcc")
