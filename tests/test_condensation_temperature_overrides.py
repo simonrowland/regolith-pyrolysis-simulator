@@ -897,3 +897,54 @@ def test_shipped_setpoints_pass_the_override_guard_unchanged():
     before = dict(model.condensation_temperatures_C)
     model.apply_setpoints_overrides(setpoints)
     assert model.condensation_temperatures_C == before
+
+
+def _collector_sim(setpoints):
+    from simulator.core import PyrolysisSimulator
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    return PyrolysisSimulator(
+        backend, setpoints,
+        {'x': {'label': 'X', 'composition_wt_pct': {'SiO2': 100}}},
+        {'metals': {}, 'oxide_vapors': {}},
+    )
+
+
+def test_default_collector_band_contract_at_startup_reset_and_lazy_init():
+    """Refactor pin from cb13f9f92; species reference temperatures are separate."""
+    from simulator.config import load_config_bundle
+    from simulator.recipe import RecipeSchema
+    from simulator.thermal_train import condensation_stage_windows_K
+
+    setpoints = load_config_bundle().setpoints
+    expected = (
+        (1400, 1600), (1100, 1400), (1100, 1300), (900, 1200),
+        (350, 700), (200, 350), (50, 200), (20, 50),
+    )
+    sim = _collector_sim(setpoints)
+    for reset in (False, True, True):
+        if reset:
+            sim.load_batch('x', mass_kg=1.0)
+        assert tuple(stage.temp_range_C for stage in sim.train.stages) == expected
+        assert tuple(
+            stage.temp_range_C for stage in sim.condensation_model.train.stages
+        ) == expected
+    metals = setpoints['condensation_train']['metals_train']
+    assert tuple(tuple(metals[key]['temp_range_C']) for key in (
+        'stage_0_hot_duct', 'stage_1_fe_condenser', 'stage_2_cr_oxide_harvest',
+        'stage_3_sio_zone', 'stage_4_alkali_mg_cyclone', 'stage_5_vortex_dust_filter',
+    )) == expected[:6]
+    assert condensation_stage_windows_K(setpoints)['K'] == (623.15, 973.15)
+    schema = RecipeSchema(setpoints=setpoints)
+    assert tuple(
+        (schema.spec_for(tuple(
+            f'overhead_headspace.pipe_segment_temperatures_C.segments.{name}.default_C'
+            .split('.')
+        )).low, schema.spec_for(tuple(
+            f'overhead_headspace.pipe_segment_temperatures_C.segments.{name}.default_C'
+            .split('.')
+        )).high)
+        for name in ('stage_4_to_stage_5', 'stage_5_to_stage_6', 'stage_6_to_stage_7')
+    ) == ((200.0, 700.0), (50.0, 350.0), (20.0, 200.0))

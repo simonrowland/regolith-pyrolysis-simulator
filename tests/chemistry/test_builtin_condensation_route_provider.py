@@ -3099,3 +3099,40 @@ def test_split_path_end_state_matches_pre_flip_account_balances(
         f"{snapshot.mass_balance_error_pct:.3e} % exceeds the 5e-12 % "
         "kernel-path bound"
     )
+
+
+def test_deterministic_condensation_committed_lot_contract(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """Pre-owner-move pin: one materialized lot per credited account."""
+    sim = _build_sim('lunar_mare_low_ti', vapor_pressure_data,
+                     feedstocks_data, setpoints_data)
+    sim.atom_ledger.load_external_mol(
+        'process.overhead_gas', {'Na': 1.0}, source='pin seed',
+        material_origin='feedstock',
+    )
+    mw = resolve_species_formula(
+        'Na', sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    result = sim._chem_kernel.dispatch(
+        ChemistryIntent.CONDENSATION_ROUTE,
+        temperature_C=1500.0, pressure_bar=1e-6,
+        control_inputs={
+            'species': 'Na', 'condensed_kg': mw,
+            'sp_data': {}, 'dt_hr': 1.0,
+        },
+    )
+    assert result.status == 'ok'
+    assert dict(result.transition.debits['process.overhead_gas']) == {'Na': 1.0}
+    assert dict(result.transition.credits['process.condensation_train']) == {'Na': 1.0}
+    committed = sim._chem_kernel.commit_batch(
+        ChemistryIntent.CONDENSATION_ROUTE, result.transition,
+    )
+    assert tuple((lot.account, lot.meta['species_mol']) for lot in committed.debits) == (
+        ('process.overhead_gas', {'Na': 1.0}),
+    )
+    assert tuple((lot.account, lot.meta['species_mol']) for lot in committed.credits) == (
+        ('process.condensation_train', {'Na': 1.0}),
+    )
+    assert sim.atom_ledger.mol_by_account()['process.condensation_train']['Na'] == 1.0
+    _assert_atom_proof_closed(result.transition)
