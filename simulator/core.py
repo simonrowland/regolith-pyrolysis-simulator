@@ -6674,8 +6674,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             diagnostic['transition_name'] = transition.name
             self._project_cleaned_melt_from_atom_ledger()
             if passive_settlement:
+                # d-263: the first committed settlement consumes the allowance,
+                # regardless of finite-map extent or inventory quantization.
                 self._fe_redox_passive_o2_replenished_mol_this_hr = (
-                    replenished_mol + diagnostic.get('buffer_o2_credit_mol', 0.0))
+                    replenished_mol + exchange_release_mol)
             if oxygen_source == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS:
                 self._fe_redox_internal_o2_consumed_mol_this_hr = (
                     float(

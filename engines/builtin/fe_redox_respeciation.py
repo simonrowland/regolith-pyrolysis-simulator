@@ -325,15 +325,22 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
             o2_credit = 0.5 * fe2o3_debit_mol
             # 2 FeO + 1/2 O2 <-> Fe2O3: reducing d mol Fe2O3 releases
             # d/2 mol O2 (3d = 2d + 2*(d/2) mol O atoms). Passive exchange
-            # already released e mol from buffer to gas; replenish at most e,
-            # never the whole finite split. With e=0 all O2 reaches headspace;
-            # with e>=d/2 all settles the previously booked exchange.
+            # already released e mol from buffer to gas; d-263 settles exactly
+            # that parcel. At ~210 mol Fe2O3, ulp(inventory) ~2.8e-14 mol:
+            # (before-after)/2 loses 8.304e-15 mol O2 in the regression case.
+            # This sub-ulp subtraction quantization is not a second parcel.
+            # Preserve the finite Kress extent; route its signed difference
+            # d/2-e through overhead, so d/2+gas_debit=e+gas_credit (mol O2).
+            # This also closes genuine finite-map differences; e=0 sends all
+            # reaction O2 to overhead, and e=d/2 needs no overhead adjustment.
             buffer_o2_credit = (
-                min(o2_credit, max(0.0, float(
-                    controls.get("exchange_o2_mol", 0.0) or 0.0)))
+                max(0.0, float(controls.get("exchange_o2_mol", 0.0) or 0.0))
                 if oxygen_source == OXYGEN_SOURCE_FO2_BUFFER else 0.0
             )
-            overhead_o2_credit = o2_credit - buffer_o2_credit
+            overhead_o2_credit = max(0.0, o2_credit - buffer_o2_credit)
+            overhead_o2_debit = max(0.0, buffer_o2_credit - o2_credit)
+            if overhead_o2_debit > 0.0:
+                debits[OXYGEN_ACCOUNT] = {OXYGEN_SPECIES: overhead_o2_debit}
             credits = {
                 CLEANED_MELT_ACCOUNT: {"FeO": 2.0 * fe2o3_debit_mol},
             }

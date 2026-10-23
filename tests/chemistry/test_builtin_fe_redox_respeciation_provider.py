@@ -342,7 +342,8 @@ def test_reducing_split_settles_only_released_exchange_and_routes_excess_to_gas(
     result = BuiltinFeRedoxRespeciationProvider().dispatch(_request(
         formula_registry,
         {"process.cleaned_melt": {"Fe2O3": 4.0, "SiO2": 20.0},
-         "reservoir.fo2_buffer": {"O2": 1000.0}},
+         "reservoir.fo2_buffer": {"O2": 1000.0},
+         "process.overhead_gas": {"O2": max(0.0, exchange_mol)}},
         fO2_log=-20.0,
         control_inputs={"oxygen_source": "fo2_buffer",
                         "internal_o2_capacity_mol": 1000.0,
@@ -361,7 +362,12 @@ def test_reducing_split_settles_only_released_exchange_and_routes_excess_to_gas(
     released = proposal.debits["process.cleaned_melt"]["Fe2O3"] / 2
     buffered = proposal.credits.get("reservoir.fo2_buffer", {}).get("O2", 0.0)
     gas = proposal.credits.get("process.overhead_gas", {}).get("O2", 0.0)
-    assert buffered == min(released, max(0.0, exchange_mol))
-    assert gas == released - buffered
+    gas_debit = proposal.debits.get("process.overhead_gas", {}).get("O2", 0.0)
+    # d-263: settle the transferred parcel itself; the signed finite-map
+    # difference uses overhead, preserving oxygen even when the parcel is larger.
+    assert buffered == max(0.0, exchange_mol)
+    assert gas == max(0.0, released - buffered)
+    assert gas_debit == max(0.0, buffered - released)
+    assert released + gas_debit == buffered + gas
     assert result.diagnostic["buffer_o2_credit_mol"] == buffered
     assert result.diagnostic["overhead_o2_credit_mol"] == gas
