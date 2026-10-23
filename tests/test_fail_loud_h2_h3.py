@@ -174,13 +174,50 @@ def test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite() -> None:
     assert result.diagnostic["pO2_bar"] == pytest.approx(1.0e-9)
     assert all(math.isfinite(value) for value in pressures.values())
 
-    with pytest.raises(VaporPressureComputationError, match="out_of_validated_range"):
-        provider.dispatch(
-            _vapor_request(
-                temperature_c=3000.0,
-                pO2_bar=1.0e-9,
-            )
+    extreme_result = provider.dispatch(
+        _vapor_request(
+            temperature_c=3000.0,
+            pO2_bar=1.0e-9,
         )
+    )
+    extreme_pressures = dict(extreme_result.diagnostic["vapor_pressures_Pa"])
+    assert extreme_result.status == "ok"
+    assert all(math.isfinite(value) for value in extreme_pressures.values())
+
+    temperature_K = 3000.0 + 273.15
+    source_rows = {
+        **provider._vapor_pressure_data.get("metals", {}),
+        **provider._vapor_pressure_data.get("oxide_vapors", {}),
+    }
+    above_valid_high = {
+        species: row["valid_range_K"]
+        for species, row in source_rows.items()
+        if species in extreme_pressures
+        and row.get("valid_range_K") is not None
+        and temperature_K > row["valid_range_K"][1]
+    }
+    assert above_valid_high
+
+    extrapolation_notices = extreme_result.diagnostic[
+        "extrapolated_beyond_valid_range_K"
+    ]
+    for species, valid_range in above_valid_high.items():
+        notice = extrapolation_notices.get(species)
+        assert isinstance(notice, dict)
+        expected_reason = (
+            "metal_vapor_pressure_out_of_validated_range"
+            if species in provider._vapor_pressure_data.get("metals", {})
+            else "oxide_vapor_pressure_out_of_validated_range"
+        )
+        assert notice.get("reason") == expected_reason
+        assert notice.get("authority_level") == "extrapolated"
+        assert tuple(notice.get("valid_range_K") or ()) == tuple(valid_range)
+
+        provenance = extreme_result.diagnostic[
+            "vapor_pressure_numerator_provenance"
+        ].get(species)
+        assert isinstance(provenance, dict)
+        assert provenance.get("extrapolation_notice") == notice
 
 
 def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
