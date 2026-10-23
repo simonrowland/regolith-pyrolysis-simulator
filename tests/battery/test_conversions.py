@@ -37,6 +37,8 @@ def test_standard_pressure_0p1_mpa_vs_1_atm() -> None:
         1, Decimal("298.15"), bar_to_pa("1"), atm_to_pa("1")
     )
     assert Decimal("0.03") < delta < Decimal("0.04")
+    # Golden pin of this resolver before its ln is shared with the entropy shift.
+    assert delta == Decimal("0.0326304779798854678711434562")
 
 
 def test_celsius_to_kelvin_is_exact_no_rounding_band() -> None:

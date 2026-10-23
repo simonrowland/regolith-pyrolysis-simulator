@@ -8,6 +8,8 @@ on the missing-input refusal.
 from __future__ import annotations
 
 import json
+import math
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -17,6 +19,7 @@ from simulator.battery.compilation_tier import (
 )
 from simulator.battery.enums import Engine, PerBasis, Quantity, RefusalReason, ValueKind
 from simulator.battery.identity import atm_to_pa, bar_to_pa, quantity_token
+from simulator.physical_constants import GAS_CONSTANT
 from simulator.battery.migrate import (
     REPO_ROOT,
     _identity_from_plain,
@@ -230,10 +233,14 @@ def test_b592_alo_uses_printed_table6_basis(tmp_path: Path) -> None:
         result, B592, "table-006-0018", Quantity.S, contains="entropy_recommended"
     )
     assert heat_capacity.identity.per.value is PerBasis.MOL_SPECIES
-    assert "kelley-king-1961-usbm-b592-p001-p040.md:793" in heat_capacity.identity.per.reason
     assert "kelley-king-1961-usbm-b592-p101-p120.md:263" in heat_capacity.identity.per.reason
-    assert heat_capacity.identity.standard_pressure_Pa.value == atm_to_pa(1)
-    assert entropy.identity.per.reason == heat_capacity.identity.per.reason
+    assert "Heat capacities" in heat_capacity.identity.per.reason
+    # :793 states 1 atm for selected entropies only. Cp stays unmapped on pressure.
+    assert "p001-p040.md:793" not in heat_capacity.identity.per.reason
+    assert heat_capacity.identity.standard_pressure_Pa.is_unknown
+    assert "kelley-king-1961-usbm-b592-p001-p040.md:793" in entropy.identity.per.reason
+    assert "1 atm" in entropy.identity.per.reason
+    assert "kelley-king-1961-usbm-b592-p101-p120.md:263" in entropy.identity.per.reason
     assert entropy.identity.standard_pressure_Pa.value == atm_to_pa(1)
     document = _record_doc(B592, "table-006-0018.json")
     assert _b592_printed_raw(document, "cp_298_15_k") == "7.37"
@@ -361,3 +368,37 @@ def test_shornikov_solid_k2o_stays_missing_per_basis(tmp_path: Path) -> None:
     assert attempt.refusal_detail["reason"] == _MISSING_PER
 
 
+def _at_pressure(cell, pressure_Pa: Decimal):
+    return replace(
+        cell,
+        identity=replace(cell.identity, standard_pressure_Pa=State.of(pressure_Pa)),
+    )
+
+
+def test_catalog_entropy_shifts_between_one_atm_and_one_bar(tmp_path: Path) -> None:
+    """S°(1 atm) − S°(1 bar) = −R ln(1.01325). Cp and H−H298 do not move.
+
+    R is the project constant. The expected difference is not taken from
+    the shift helper under test.
+    """
+
+    result = _migrate_record(tmp_path, B677, "table-0096.json")
+    entropy = _cell_at(_observation(result, B677, "table-0096", Quantity.S), "1600")
+    heat = _cell_at(_observation(result, B677, "table-0096", Quantity.CP), "1600")
+    enthalpy = _cell_at(
+        _observation(result, B677, "table-0096", Quantity.H_MINUS_H298), "1600"
+    )
+    assert entropy.identity.standard_pressure_Pa.value == atm_to_pa(1)
+    one_bar = bar_to_pa(1)
+    entropy_atm = _attempt(Engine.VAPOROCK, entropy)
+    entropy_bar = _attempt(Engine.VAPOROCK, _at_pressure(entropy, one_bar))
+    assert entropy_atm.refusal_reason is None
+    assert entropy_bar.refusal_reason is None
+    expected = -Decimal(str(GAS_CONSTANT)) * Decimal(str(math.log(1.01325)))
+    assert entropy_atm.value - entropy_bar.value == expected
+    for cell in (heat, enthalpy):
+        at_atm = _attempt(Engine.VAPOROCK, cell)
+        at_bar = _attempt(Engine.VAPOROCK, _at_pressure(cell, one_bar))
+        assert at_atm.refusal_reason is None
+        assert at_bar.refusal_reason is None
+        assert at_atm.value == at_bar.value
