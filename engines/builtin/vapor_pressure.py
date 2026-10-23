@@ -2073,7 +2073,7 @@ def declared_antoine_segment_phase(block: Mapping[str, Any] | None) -> str | Non
 def _phase_boundary_gap(
     left: Mapping[str, Any], right: Mapping[str, Any]
 ) -> dict[str, Any] | None:
-    """Refusal when the gap between two segments crosses a declared phase."""
+    """Marker when the gap between two segments crosses a declared phase."""
 
     left_phase = declared_antoine_segment_phase(left)
     right_phase = declared_antoine_segment_phase(right)
@@ -2086,6 +2086,155 @@ def _phase_boundary_gap(
         "left_phase": left_phase,
         "right_phase": right_phase,
     }
+
+
+def _segment_antoine_finite(
+    segment: Mapping[str, Any], temperature_K: float
+) -> bool:
+    """True when A, B, and C are present and the Antoine form is finite."""
+
+    for key in ("A", "B", "C"):
+        if segment.get(key) is None:
+            return False
+        try:
+            value = float(segment[key])
+        except (TypeError, ValueError):
+            return False
+        if not math.isfinite(value):
+            return False
+    return _pure_segment_usable(segment, temperature_K)
+
+
+def _declared_join_temperature_K(
+    *segments: Mapping[str, Any],
+) -> float | None:
+    """Shared melting join, or None when the flanks do not agree."""
+
+    found: list[float] = []
+    for segment in segments:
+        if "join_anchor_K" not in segment:
+            continue
+        try:
+            value = float(segment["join_anchor_K"])
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            found.append(value)
+    if not found:
+        return None
+    if any(abs(value - found[0]) > 1e-9 for value in found[1:]):
+        return None
+    return found[0]
+
+
+def _phase_gap_extension(
+    left: Mapping[str, Any],
+    right: Mapping[str, Any],
+    *,
+    left_low: float,
+    left_high: float,
+    right_low: float,
+    right_high: float,
+    temperature_K: float,
+) -> dict[str, Any] | None:
+    """Extend one finite flank across a declared phase gap, and flag it.
+
+    Premise: a temperature between two certified Antoine segments of
+    different phases is out of domain, not a missing fit (CLAUDE.md
+    section 4). Predict from the segment on the physical side of a
+    declared transition and carry the original reason. Crystal is the
+    flank below the transition; liquid is the flank above it.
+
+    Si(cr) ``crystal_janaf`` is certified on [100, 1685] and declares
+    ``join_anchor_K`` 1685, the melting join. Si(l) ``liquid_janaf`` is
+    certified on [1700, 3500]. The open gap is (1685, 1700). 1688.3 K
+    and 1690 K are above 1685 K, so the extension is the liquid
+    segment. Limiting case: at 1700 K the request is inside that
+    segment, so the value is the segment's own Antoine value and this
+    helper does not run. At 1685 K the liquid formula equals the
+    crystal formula (``join_step_log10_dex`` is 0), so the extension
+    meets the crystal value at the boundary.
+
+    If the gap has no single declared join on its closure, use the
+    nearer certified edge and record that. An equal distance takes the
+    lower edge. If the physical flank has no finite Antoine triple,
+    use the other flank and say so. If neither flank is finite, return
+    None and the caller keeps the coefficient-free refusal.
+    """
+
+    gap = _phase_boundary_gap(left, right)
+    if gap is None:
+        return None
+    left_finite = _segment_antoine_finite(left, temperature_K)
+    right_finite = _segment_antoine_finite(right, temperature_K)
+    if not left_finite and not right_finite:
+        return None
+
+    def phase_segment(token: str) -> Mapping[str, Any] | None:
+        if gap["left_phase"] == token:
+            return left
+        if gap["right_phase"] == token:
+            return right
+        return None
+
+    transition = _declared_join_temperature_K(left, right)
+    on_gap = (
+        transition is not None
+        and left_high - 1e-9 <= transition <= right_low + 1e-9
+    )
+    crystal = phase_segment("cr")
+    liquid = phase_segment("l")
+    chosen: Mapping[str, Any] | None = None
+    choice = ""
+    if on_gap and crystal is not None and liquid is not None:
+        preferred = crystal if temperature_K <= transition else liquid
+        choice = (
+            "crystal_below_declared_transition"
+            if preferred is crystal
+            else "liquid_above_declared_transition"
+        )
+        preferred_finite = (
+            left_finite if preferred is left else right_finite
+        )
+        if preferred_finite:
+            chosen = preferred
+        elif left_finite or right_finite:
+            chosen = left if left_finite else right
+            choice = "only_finite_flank"
+    if chosen is None:
+        if left_finite and right_finite:
+            distance_left = temperature_K - left_high
+            distance_right = right_low - temperature_K
+            if distance_right < distance_left:
+                chosen = right
+                choice = "nearer_edge"
+            elif distance_left < distance_right:
+                chosen = left
+                choice = "nearer_edge"
+            else:
+                chosen = left
+                choice = "nearer_edge_tie_lower"
+        elif left_finite or right_finite:
+            chosen = left if left_finite else right
+            choice = "only_finite_flank"
+        else:
+            return None
+
+    chosen_low, chosen_high = (
+        (left_low, left_high) if chosen is left else (right_low, right_high)
+    )
+    extended = dict(chosen)
+    extended.update(gap)
+    extended["authority_level"] = "extrapolated"
+    extended["segment_used"] = str(chosen.get("name") or "")
+    extended["segment_choice"] = choice
+    extended["certified_band_K"] = (float(chosen_low), float(chosen_high))
+    extended["gap_band_K"] = (float(left_high), float(right_low))
+    extended["left_segment_band_K"] = (float(left_low), float(left_high))
+    extended["right_segment_band_K"] = (float(right_low), float(right_high))
+    if on_gap and transition is not None:
+        extended["transition_temperature_K"] = float(transition)
+    return extended
 
 
 def _selected_temperature_segment(
@@ -2131,7 +2280,16 @@ def _selected_temperature_segment(
         if temperature_K < low:
             gap = _phase_boundary_gap(previous[2], segment)
             if gap is not None:
-                return gap
+                extension = _phase_gap_extension(
+                    previous[2],
+                    segment,
+                    left_low=previous[0],
+                    left_high=previous[1],
+                    right_low=low,
+                    right_high=_high,
+                    temperature_K=temperature_K,
+                )
+                return extension if extension is not None else gap
             # Same declared phase, or a flank with no phase: today's
             # choice is the last segment, not a nearer edge.
             return ranged[-1][2]
@@ -2216,8 +2374,8 @@ def vapor_pressure_antoine_coefficients(
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
-            # A phase-boundary gap is not an unusable fit. Falling through
-            # to the legacy antoine block would reintroduce the other phase.
+            # The selector owns a phase-boundary gap. Falling through to
+            # the legacy antoine block would reintroduce the other phase.
             if selected.get("selection_refusal"):
                 return selected, COEFF_BLOCK_PURE_COMPONENT
             if not _pure_segment_usable(selected, temperature_K):
@@ -2286,8 +2444,9 @@ def wall_condensation_antoine_coefficients(
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
-            # Same guard as the runtime selector: do not replace a
-            # phase-boundary refusal with an empty block or another phase.
+            # Same guard as the runtime selector: do not replace the
+            # selector's phase-boundary result with an empty block or
+            # the other phase. An extension already carries its flank.
             if selected.get("selection_refusal"):
                 return selected, COEFF_BLOCK_PURE_COMPONENT
             if _pure_segment_usable(selected, temperature_K):

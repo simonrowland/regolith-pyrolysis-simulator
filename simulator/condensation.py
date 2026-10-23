@@ -5838,7 +5838,10 @@ def _record_antoine_extrapolation(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
     antoine_extrapolation_warnings: list[str] | None,
 ) -> None:
-    from engines.builtin.vapor_pressure import vapor_pressure_valid_range_K
+    from engines.builtin.vapor_pressure import (
+        _coefficient_mapping,
+        vapor_pressure_valid_range_K,
+    )
 
     valid_range = vapor_pressure_valid_range_K(
         data,
@@ -5868,6 +5871,36 @@ def _record_antoine_extrapolation(
         'reason': 'wall_saturation_pressure_out_of_validated_range',
         'status': 'extrapolated',
     }
+    # The selector already chose the flank and attached the gap flag.
+    # Copy that flag onto the extrapolation record. Do not re-decide
+    # which phase the temperature belongs to.
+    selected = _coefficient_mapping(
+        data,
+        coefficient_block,
+        temperature_K=T_K,
+    )
+    if isinstance(selected, Mapping) and selected.get("gap_band_K") is not None:
+        record["reason"] = str(
+            selected.get("selection_refusal") or record["reason"]
+        )
+        record["segment_used"] = selected.get("segment_used")
+        record["segment_choice"] = selected.get("segment_choice")
+        record["certified_band_K"] = tuple(
+            float(value) for value in selected["certified_band_K"]
+        )
+        record["gap_band_K"] = tuple(
+            float(value) for value in selected["gap_band_K"]
+        )
+        record["left_segment_band_K"] = tuple(
+            float(value) for value in selected["left_segment_band_K"]
+        )
+        record["right_segment_band_K"] = tuple(
+            float(value) for value in selected["right_segment_band_K"]
+        )
+        if selected.get("transition_temperature_K") is not None:
+            record["transition_temperature_K"] = float(
+                selected["transition_temperature_K"]
+            )
     if antoine_extrapolations is not None:
         existing_records = [
             existing
@@ -5981,16 +6014,23 @@ def _antoine_psat_pa(
     source_band = vapor_pressure_source_equation_range_K(
         data, coefficient_block, T_K,
     ) or vapor_pressure_valid_range_K(data, coefficient_block, T_K)
-    # A phase-boundary gap is a typed selector refusal, not a coefficient
-    # block. It has no A/B/C. Reading them hands None to the numeric owner
-    # (DepositionInputRefusal) and aborts the hour. The battery scorer
-    # already refuses this marker before evaluating A; wall Psat does the
-    # same, with the wall-saturation refusal the deposition path already
-    # records and continues past.
+    # A coefficient-free phase-gap marker has no flank to evaluate.
+    # That is a typed wall refusal. When the selector has already
+    # attached a finite flank, those coefficients are the prediction;
+    # the extrapolation record carries the selector's flag. Choosing
+    # the flank stays in the selector.
     selection_refusal = (
         antoine.get("selection_refusal") if isinstance(antoine, Mapping) else None
     )
-    if selection_refusal:
+    coefficients_finite = False
+    if isinstance(antoine, Mapping):
+        try:
+            coefficients_finite = all(
+                math.isfinite(float(antoine.get(key))) for key in ("A", "B", "C")
+            )
+        except (TypeError, ValueError):
+            coefficients_finite = False
+    if selection_refusal and not coefficients_finite:
         refusal = WallSaturationPressureRefusal(
             species,
             T_K,
