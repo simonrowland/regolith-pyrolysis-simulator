@@ -2057,6 +2057,35 @@ def _binary_stefan_series_flux(eq, bulk, total, kinetic_resistance, dilute_gas_r
     return (flux, max(0.0, (eq - flux * kinetic_resistance - bulk) / flux)) if flux > 0 else (0.0, dilute_gas_resistance)
 
 
+def _surface_film_series_flux(film, diffusion, length, tg, mass, ri, eq, bulk, pressure):
+    """Evaluate one film and the same HK interface; retain its Stefan diagnostics."""
+    delta = max(0.0, eq - bulk)
+    k_mt = film_pressure_conductance(film['Sh'], diffusion, length, tg) * mass
+    rg = 1.0 / k_mt
+    denominator = ri + rg
+    dilute_flux = delta * (1.0 / denominator)
+    flux = dilute_flux
+    if rg > 0:
+        gas_face = eq - flux * ri
+        film['stefan_model'] = 'dilute_passive_scalar'
+        if max(gas_face, bulk) / pressure >= 0.1:
+            film['domain_flags'].append('high vapour fraction/blowing: dilute prediction; coupled Stefan-Maxwell unresolved')
+        elif dilute_flux > 0 and film['formula_id'] == 'isolated_disk_halfspace_8_over_pi':
+            # Transform the disk diffusion potential to -ln(1-y). Only the
+            # unforced binary disk uses this closure; forced flow retains
+            # the study's dilute passive-scalar law (no validated blowing fit).
+            old_rg = rg
+            flux, rg = _binary_stefan_series_flux(eq, bulk, pressure, ri, rg)
+            k_mt = 1.0 / rg
+            film['stefan_model'] = 'binary_stagnant_carrier_logarithmic'
+            film['stefan_conductance_multiplier'] = old_rg / rg
+        film['gas_face_partial_pressure_pa'] = eq - flux * ri
+        film['gas_face_vapour_fraction'] = (eq - flux * ri) / pressure
+        film['dilute_flux_kg_s_m2'] = dilute_flux
+        film['binary_approximation'] = 'independent dilute species; not coupled multicomponent certification'
+    return flux, rg, k_mt
+
+
 def series_evaporation_flux(
     species: str, P_eq_pa: float, P_bulk_pa: float, T_surface_K: float,
     molar_mass_kg_mol: float, alpha_i: float,
@@ -2130,29 +2159,11 @@ def series_evaporation_flux(
         if pressure <= 0:
             raise EvaporationFluxConfigurationError('gas resistance requires positive overhead_pressure_pa')
         weight = 1.0
-        k_mt = film_pressure_conductance(film['Sh'], diffusion, length, tg) * mass
-        rg = 1.0 / k_mt
-    denominator = ri + rg
-    dilute_flux = delta * (1.0 / denominator)
-    flux = dilute_flux
-    if rg > 0:
-        gas_face = eq - flux * ri
-        film['stefan_model'] = 'dilute_passive_scalar'
-        if max(gas_face, bulk) / pressure >= 0.1:
-            film['domain_flags'].append('high vapour fraction/blowing: dilute prediction; coupled Stefan-Maxwell unresolved')
-        elif dilute_flux > 0 and film['formula_id'] == 'isolated_disk_halfspace_8_over_pi':
-            # Transform the disk diffusion potential to -ln(1-y). Only the
-            # unforced binary disk uses this closure; forced flow retains
-            # the study's dilute passive-scalar law (no validated blowing fit).
-            old_rg = rg
-            flux, rg = _binary_stefan_series_flux(eq, bulk, pressure, ri, rg)
-            k_mt = 1.0 / rg
-            film['stefan_model'] = 'binary_stagnant_carrier_logarithmic'
-            film['stefan_conductance_multiplier'] = old_rg / rg
-        film['gas_face_partial_pressure_pa'] = eq - flux * ri
-        film['gas_face_vapour_fraction'] = (eq - flux * ri) / pressure
-        film['dilute_flux_kg_s_m2'] = dilute_flux
-        film['binary_approximation'] = 'independent dilute species; not coupled multicomponent certification'
+        flux, rg, k_mt = _surface_film_series_flux(
+            film, diffusion, length, tg, mass, ri, eq, bulk, pressure,
+        )
+    else:
+        flux = delta * (1.0 / ri)
     # J/delta = 1/(Ri+Rg); use conductances directly so subnormal vapour
     # drives cannot underflow delta*k_HK to zero in the alpha diagnostic.
     # Both conductances have units kg/(m^2 s Pa), so their ratio is
