@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import hashlib
 from collections import defaultdict
+from dataclasses import replace
 import json
 import subprocess
 import sys
@@ -65,6 +66,7 @@ from simulator.runner import (
     _melt_redox_gate_floor_fallback_engagement,
     _runner_failure_result,
     _status_with_mass_balance_invariant,
+    build_sio_yield_report,
     _vapor_pressure_source_report,
 )
 from simulator.condensation import (
@@ -2515,6 +2517,146 @@ def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
     assert type(replay_error.value) is PoisonedHourError
     assert len(observed_errors) == 2
     assert observed_errors[-1] is replay_error.value
+
+
+@pytest.fixture
+def successful_short_run_for_reporting_failure():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-15T00:00:00Z",
+            "kernel_commit_sha": "reporting-failure-smoke",
+        },
+    )
+    session = run._start_session()
+    run._apply_lab_area_bridge(session.simulator, run._lab_area_bridge())
+    run._apply_sio_pre_run_controls(session.simulator)
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status not in {"failed", "refused"}
+    return run, execution
+
+
+def _build_completed_report_without_propagated_lookup_error(builder):
+    try:
+        return builder()
+    except LookupError as exc:
+        pytest.fail(f"completed-run reporting exception propagated: {exc}")
+
+
+@pytest.mark.parametrize(
+    ("target", "report_key", "section"),
+    [
+        (
+            "reduced_real_cache",
+            "reduced_real_cache",
+            "run_metadata.reduced_real_cache",
+        ),
+        (
+            "_alpha_authority_status_by_species_engaged",
+            "alpha_authority_status_by_species",
+            "run_metadata.alpha_authority_status_by_species",
+        ),
+        (
+            "_last_c3_na_hold_adjustment",
+            "c3_na_hold_adjustment",
+            "run_metadata.c3_na_hold_adjustment",
+        ),
+    ],
+    ids=("reduced-real-cache", "alpha-authority-status", "c3-na-hold-adjustment"),
+)
+def test_runner_completed_run_records_serialization_failure(
+    target,
+    report_key,
+    section,
+    successful_short_run_for_reporting_failure,
+    monkeypatch,
+):
+    class SerializationPoison(dict):
+        def items(self):
+            raise LookupError("report serialization unavailable")
+
+    run, execution = successful_short_run_for_reporting_failure
+    poisoned_value = SerializationPoison({"marker": True})
+    if target == "reduced_real_cache":
+        execution = replace(execution, reduced_real_cache=poisoned_value)
+    else:
+        monkeypatch.setattr(
+            execution.simulator,
+            target,
+            {"poison": poisoned_value},
+        )
+
+    payload = _build_completed_report_without_propagated_lookup_error(
+        lambda: run._build_output(execution)
+    )
+
+    assert payload["status"] == execution.status
+    assert payload["run_metadata"][report_key] == {
+        "status": "unavailable",
+        "section": section,
+        "exception_type": "LookupError",
+        "reason": "report serialization unavailable",
+    }
+
+
+def test_runner_completed_run_records_alkali_credit_failure(
+    successful_short_run_for_reporting_failure,
+    monkeypatch,
+):
+    run, execution = successful_short_run_for_reporting_failure
+
+    def raise_alkali_credit():
+        raise LookupError("alkali credit unavailable")
+
+    monkeypatch.setattr(
+        execution.simulator,
+        "_c3_alkali_credit_outstanding_kg_by_species",
+        raise_alkali_credit,
+    )
+
+    payload = _build_completed_report_without_propagated_lookup_error(
+        lambda: run._build_output(execution)
+    )
+
+    assert payload["status"] == execution.status
+    assert payload["run_metadata"][
+        "c3_alkali_credit_outstanding_kg_by_species"
+    ] == {
+        "status": "unavailable",
+        "section": "run_metadata.c3_alkali_credit_outstanding_kg_by_species",
+        "exception_type": "LookupError",
+        "reason": "alkali credit unavailable",
+    }
+
+
+def test_sio_yield_report_records_silica_fume_stage_failure(monkeypatch):
+    def raise_silica_fume(_sim):
+        raise LookupError("silica fume stage unavailable")
+
+    monkeypatch.setattr(
+        "simulator.runner._stage_silica_fume_kg",
+        raise_silica_fume,
+    )
+
+    report = _build_completed_report_without_propagated_lookup_error(
+        lambda: build_sio_yield_report(
+            feedstock_id="lunar_mare_low_ti",
+            hours=1,
+            allow_unmeasured_alpha_fallback=True,
+        )
+    )
+
+    assert report["sio_to_silica_fume_kg"] == {
+        "status": "unavailable",
+        "section": "sio_yield_report.sio_to_silica_fume_kg",
+        "exception_type": "LookupError",
+        "reason": "silica fume stage unavailable",
+    }
 
 
 def test_runner_preserves_primary_failure_when_poison_enrichment_fails(
