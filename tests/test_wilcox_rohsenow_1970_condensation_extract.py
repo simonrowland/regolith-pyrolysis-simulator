@@ -3,7 +3,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity, StateTag
+from simulator.battery.enums import Quantity, StateTag
 from simulator.battery.migrate import convert_temperature_to_k
 from tests.battery.factories import migrate_one_extract
 
@@ -58,8 +58,11 @@ def test_wilcox_rohsenow_table_one_cells_and_fahrenheit_migration():
         o.identity.quantity.value is Quantity.CONDENSATION_COEFFICIENT
         for o in migrated.values()
     )
+    # The shared conditional-reduction gate currently requires stored parent
+    # observations, which Table 1 does not provide as separate quantities.
     assert all(
-        o.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        o.evidence.class_.reason
+        == "author reduction requires an author derivation and admitted measured lineage"
         for o in migrated.values()
     )
     assert all(o.identity.temperature_K.tag is StateTag.VALUE for o in migrated.values())

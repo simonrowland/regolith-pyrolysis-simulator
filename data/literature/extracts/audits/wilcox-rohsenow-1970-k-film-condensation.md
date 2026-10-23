@@ -76,7 +76,12 @@ all rows store `method_class: calculated`. The migrator leaves the evidence
 class unknown on all 22 rows because this method class requires an author
 derivation plus admitted measured `derived_from` parent observations. The
 table prints each run's temperatures, heat flux, and pressures on the same
-row as `σ`; it does not provide separate parent observation rows. Creating
-those rows or changing the shared same-row evidence admission rule requires a
-scope ruling. The focused regression test pins the requested
-`measured_reduced` class and currently fails at this admission gate.
+row as `σ`; it does not provide separate parent observation rows. The exact
+gate is `conditional_reduced_lineage_is_measured()`: it returns false unless
+`observation.derived_from` is nonempty, an author derivation exists whose
+`inputs` include those parent IDs, and every parent is admitted with measured
+evidence (or has recursively admitted measured lineage). The current
+`Derivation.raw_inputs` type is `Located[RawInputStatus]`, and
+`RawInputStatus` only defines `not_printed`; it cannot cite printed columns.
+Accordingly, the focused test pins the present unknown-evidence reason rather
+than fabricating parent observations or declaring printed inputs unprinted.
