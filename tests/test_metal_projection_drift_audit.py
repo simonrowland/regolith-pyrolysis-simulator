@@ -241,9 +241,9 @@ def test_stage_routed_metal_credit_without_projection_fails_closed():
         train_kg_by_stage=[{}, {}],
     )
 
-    assert product_stage_number('C3', 'Fe') == 1
+    assert product_stage_number('MRE', 'Fe') == 1
     target._record_stage_routed_metal_credits(
-        'C3', _stage_routed_fe_credit(0.05)
+        'MRE', _stage_routed_fe_credit(0.05)
     )
 
     assert target._stage_collection_kg_by_source == {}
@@ -261,10 +261,10 @@ def test_second_stage_routed_credit_is_not_capped_by_first_projection():
         },
     )
     target._record_stage_routed_metal_credits(
-        'C3', _stage_routed_fe_credit(0.05)
+        'MRE', _stage_routed_fe_credit(0.05)
     )
     target._record_stage_routed_metal_credits(
-        'C3', _stage_routed_fe_credit(0.05)
+        'MRE', _stage_routed_fe_credit(0.05)
     )
 
     assert target._audit_metal_projection_drift() == {
@@ -279,7 +279,7 @@ def test_second_stage_routed_credit_is_not_capped_by_first_projection():
         ('_shuttle_inject_Na', 'shuttle_Na_inventory_kg'),
     ],
 )
-def test_c3_projection_uses_current_transition_credit_not_aggregate_metal(
+def test_c3_fe_transition_credit_stays_out_of_condenser_projection(
     monkeypatch,
     injector_name,
     inventory_attr,
@@ -332,10 +332,10 @@ def test_c3_projection_uses_current_transition_credit_not_aggregate_metal(
     assert sim._stage_collection_backing_kg('Fe') == pytest.approx(
         unrouted_kg + routed_kg
     )
-    assert sim._condensed_species_projected_kg('Fe') == pytest.approx(routed_kg)
-    assert sim._stage_collection_kg_by_source[
-        ('process.metal_phase', 1, 'Fe')
-    ] == pytest.approx(routed_kg)
+    assert product_stage_number('C3', 'Fe') is None
+    assert sim._condensed_species_projected_kg('Fe') == 0.0
+    assert sim._stage_collection_kg_by_source == {}
+    assert sim._stage_routed_metal_ledger_kg == {}
     assert sim._audit_metal_projection_drift() == {}
 
 
@@ -349,10 +349,9 @@ def test_stage_routed_bottom_pool_credit_with_destination_metadata_fails_closed(
         'C3', _stage_routed_fe_credit(0.05)
     )
 
-    assert product_stage_number('C3', 'Fe') == 1
-    assert target._audit_metal_projection_drift() == {
-        'Fe': pytest.approx(0.05),
-    }
+    assert product_stage_number('C3', 'Fe') is None
+    assert target._stage_routed_metal_ledger_kg == {}
+    assert target._audit_metal_projection_drift() == {}
 
 
 def test_stage_routed_metal_projection_only_mutation_fails_closed_after_rescope():

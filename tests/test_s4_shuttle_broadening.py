@@ -180,6 +180,55 @@ def test_c3_step_refreshes_equilibrium_after_shuttle_before_evaporation(
     assert calls.index("evaporation") > calls.index("equilibrium_post_shuttle")
 
 
+def test_staged_na_cleanup_records_k_thermodynamic_refusal_without_draw(
+    monkeypatch,
+):
+    sim = _build_provider_sim()
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.melt.campaign_hour = 1
+    sim.melt.hour = 32
+    sim.melt.temperature_C = 1150.0
+    sim.record.path = "A_staged"
+    sim.shuttle_Na_inventory_kg = 0.0
+
+    dispatches = []
+
+    def refuse_k(intent, control_inputs=None, **kwargs):
+        dispatches.append((intent, dict(control_inputs or {})))
+        return SimpleNamespace(
+            status="refused",
+            transition=None,
+            diagnostic={
+                "reason_refused": "thermodynamic_margin_nonpositive",
+                "margin_kJ_per_mol_O2": -1.0,
+            },
+        )
+
+    monkeypatch.setattr(sim, "_dispatch_only", refuse_k)
+    monkeypatch.setattr(sim, "_transfer_condensed_species", lambda species: 0.0)
+    monkeypatch.setattr(sim, "_top_up_c3_alkali_credit", lambda species: 0.0)
+
+    k_before = {
+        account: sim.atom_ledger.kg_by_account(account).get("K", 0.0)
+        for account in ("process.reagent_inventory", "reservoir.reagent.K")
+    }
+    sim._step_shuttle()
+
+    assert len(dispatches) == 1
+    assert dispatches[0][0] is ChemistryIntent.METALLOTHERMIC_STEP
+    assert dispatches[0][1]["reaction_family"] == REACTION_FAMILY_C3_K
+    assert len(sim._shuttle_refusal_history) == 1
+    assert sim._shuttle_refusal_history[0]["reaction_family"] == REACTION_FAMILY_C3_K
+    assert sim._shuttle_refusal_history[0]["diagnostic"]["reason_refused"] == (
+        "thermodynamic_margin_nonpositive"
+    )
+    assert sim._c3_alkali_credit_drawn_kg_by_species.get("K", 0.0) == 0.0
+    assert {
+        account: sim.atom_ledger.kg_by_account(account).get("K", 0.0)
+        for account in ("process.reagent_inventory", "reservoir.reagent.K")
+    } == k_before
+
+
 def _fe_element_kg(oxides_kg: dict[str, float]) -> float:
     return (
         oxides_kg.get("FeO", 0.0) * STOICH_RATIOS["FeO"][0]

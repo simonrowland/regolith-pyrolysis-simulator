@@ -13,6 +13,7 @@ from simulator.condensation_routing import (
     PRODUCT_DESTINATIONS,
     STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_number,
+    product_destination,
     product_stage_number,
     target_species_for_stage_number,
 )
@@ -44,6 +45,11 @@ def test_default_train_targets_use_canonical_registry(stage_number):
 def test_recipe_product_destinations_are_canonical(recipe, species, stage_number):
     assert recipe in PRODUCT_DESTINATIONS
     assert product_stage_number(recipe, species) == stage_number
+
+
+def test_c3_liquid_iron_is_reported_as_bottom_pool_product():
+    assert product_destination("C3", "Fe") == "metal_phase_bottom_pool"
+    assert product_stage_number("C3", "Fe") is None
 
 
 def test_stage_purity_report_empty_is_indeterminate_not_pure():
