@@ -6260,17 +6260,18 @@ def predict_with_engine(
                             authority=Authority.EXTRAPOLATED,
                         ),
                     )
-            # These intakes certify Na and SiO2 phase references. Preserve the
+            # These intakes certify Na, Fe and SiO2 phase references. Preserve the
             # pre-existing treatment of other elements' sidecars.
-            source_phase = coefficients.get("phase") if formula in {"Na", "SiO2"} else None
+            source_phase = coefficients.get("phase") if formula in {"Na", "Fe", "SiO2"} else None
             solid_reference = source_phase in {
-                "solid", "alpha_solid", "crystal", "crystalline", "quartz", "high_cristobalite",
+                "solid", "alpha_solid", "gamma_solid", "delta_solid",
+                "crystal", "crystalline", "quartz", "high_cristobalite",
             }
             phase_mismatch = (
                 (solid_reference and reservoir[1] != Phase.CR.value)
                 or (source_phase == "liquid" and reservoir[1] == Phase.CR.value)
             )
-            if formula == "SiO2" and source_phase == "liquid":
+            if formula in {"Fe", "SiO2"} and source_phase == "liquid":
                 phase_mismatch = reservoir[1] not in {Phase.L.value, Phase.SUPERCOOLED_L.value}
             if formula == "SiO2" and solid_reference and reservoir[1] == Phase.CR.value:
                 declared_polymorph = polymorph_token(identity.reservoir.value)
@@ -6280,6 +6281,17 @@ def predict_with_engine(
                     else {Polymorph.QUARTZ} if source_phase == "quartz"
                     else {Polymorph.CRISTOBALITE_HIGH}
                 )
+                phase_mismatch = (
+                    declared_polymorph is not None
+                    and declared_polymorph not in supported_polymorphs
+                )
+            if formula == "Fe" and solid_reference and reservoir[1] == Phase.CR.value:
+                declared_polymorph = polymorph_token(identity.reservoir.value)
+                supported_polymorphs = {
+                    "alpha_solid": {Polymorph.ALPHA, Polymorph.ALPHA_DELTA, Polymorph.BCC},
+                    "gamma_solid": {Polymorph.GAMMA},
+                    "delta_solid": {Polymorph.DELTA, Polymorph.ALPHA_DELTA, Polymorph.BCC},
+                }[source_phase]
                 phase_mismatch = (
                     declared_polymorph is not None
                     and declared_polymorph not in supported_polymorphs

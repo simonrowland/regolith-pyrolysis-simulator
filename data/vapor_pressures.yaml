@@ -1731,6 +1731,467 @@ families:
             A: 10.670336
             B: 17759.430841
             C: 0
+            # t-1484: wall-only JANAF assessed Fe surface, 100-4000 K.
+            # Fe-003 is the stable elemental reference; Fe-004 alpha/delta
+            # (bcc), Fe-005 gamma (fcc), Fe-006 liquid, Fe-007 condensed
+            # composite, Fe-008 neutral monatomic gas (NOT Fe-009 Fe+).
+            # Stable phases: alpha <1184 K, gamma 1184-1665 K, delta
+            # 1665-1809 K, liquid >1809 K; 1042 K is the Curie Cp node.
+            # mu_g^0+RT ln(P/p0)=mu_cond^0 gives log10(P/Pa)=5+logKf_g
+            # while the condensed phase is the elemental reference (p0=1e5 Pa).
+            # Above the 3133.345 K gas-reference switch use 5+logKf_g-logKf_l;
+            # Fe-006 ends at4000 K, fixing the common upper certified bound.
+            # Its compiled3200 K logKf_l=-0.121 repairs the printed positive
+            # tail sign, consistent with positive Gf_l=7.424 kJ/mol.
+            # At1042/1184/1665/1809 K gas Cp is linearly bracketed from
+            # Fe-008: Cp=a+bT, so H_g=415471+Hinc_g(T0)*1000
+            # +a*(T-T0)+b*(T^2-T0^2)/2 and S_g=S_g(T0)+a*ln(T/T0)+b*(T-T0).
+            # Subtract Fe-003 Hinc_ref*1000-T*S_ref; logKf=-Gf/(R*T*ln10),
+            # R=8.31441 J/mol/K. H,S,Cp are J/mol, J/mol/K, J/mol/K;
+            # Gf/(RT) is dimensionless. Shared nodes use the lower-phase
+            # printed H/S at coexistence; no separately rounded phase splice.
+            # At3133.345 K coexistence fixes log(P/p0)=0 exactly.
+            # Between nodes interpolate y=log10(P/Pa) in1/T: C=0,
+            # B=(y2-y1)/(1/T1-1/T2), A=y1+B/T1. B has units K;
+            # endpoints recover both pressures, equal mu gives P=p0.
+            # Below100 K refuse; above4000 K flag the last-segment continuation.
+            # Flat ABC above remain ONLY for melt-source/native-Fe release
+            # and the non-wall source-fit/NBP comparator, not wall readers.
+            default_segment: janaf_fe_1900_2000
+            segments:
+            - name: janaf_fe_100_200
+              extrapolation_policy: refuse
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [100.0, 200.0]
+              valid_range_K: [100.0, 200.0]
+              A: 12.895999999999958
+              B: 21679.799999999996
+              C: 0.0
+            - name: janaf_fe_200_250
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [200.0, 250.0]
+              valid_range_K: [200.0, 250.0]
+              A: 12.976999999999975
+              B: 21695.999999999996
+              C: 0.0
+            - name: janaf_fe_250_298.15
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [250.0, 298.15]
+              valid_range_K: [250.0, 298.15]
+              A: 13.000161993769552
+              B: 21701.790498442388
+              C: 0.0
+            - name: janaf_fe_298.15_300
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [298.15, 300.0]
+              valid_range_K: [298.15, 300.0]
+              A: 13.02281081080993
+              B: 21708.543243242977
+              C: 0.0
+            - name: janaf_fe_300_350
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [300.0, 350.0]
+              valid_range_K: [300.0, 350.0]
+              A: 12.998999999999953
+              B: 21701.399999999983
+              C: 0.0
+            - name: janaf_fe_350_400
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [350.0, 400.0]
+              valid_range_K: [350.0, 400.0]
+              A: 12.995000000000005
+              B: 21700.000000000004
+              C: 0.0
+            - name: janaf_fe_400_450
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [400.0, 450.0]
+              valid_range_K: [400.0, 450.0]
+              A: 12.988
+              B: 21697.2
+              C: 0.0
+            - name: janaf_fe_450_500
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [450.0, 500.0]
+              valid_range_K: [450.0, 500.0]
+              A: 12.962000000000032
+              B: 21685.500000000015
+              C: 0.0
+            - name: janaf_fe_500_600
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [500.0, 600.0]
+              valid_range_K: [500.0, 600.0]
+              A: 12.929000000000002
+              B: 21669.0
+              C: 0.0
+            - name: janaf_fe_600_700
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [600.0, 700.0]
+              valid_range_K: [600.0, 700.0]
+              A: 12.856999999999992
+              B: 21625.799999999996
+              C: 0.0
+            - name: janaf_fe_700_800
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [700.0, 800.0]
+              valid_range_K: [700.0, 800.0]
+              A: 12.779000000000007
+              B: 21571.200000000004
+              C: 0.0
+            - name: janaf_fe_800_900
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [800.0, 900.0]
+              valid_range_K: [800.0, 900.0]
+              A: 12.679999999999993
+              B: 21491.999999999993
+              C: 0.0
+            - name: janaf_fe_900_1000
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [900.0, 1000.0]
+              valid_range_K: [900.0, 1000.0]
+              A: 12.560000000000002
+              B: 21384.0
+              C: 0.0
+            - name: janaf_fe_1000_1042
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1000.0, 1042.0]
+              valid_range_K: [1000.0, 1042.0]
+              A: 12.45350445963741
+              B: 21277.50445963741
+              C: 0.0
+            - name: janaf_fe_1042_1100
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1042.0, 1100.0]
+              valid_range_K: [1042.0, 1100.0]
+              A: 12.352634701641875
+              B: 21172.39817180606
+              C: 0.0
+            - name: janaf_fe_1100_1184
+              phase: alpha_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1100.0, 1184.0]
+              valid_range_K: [1100.0, 1184.0]
+              A: 12.276518068755419
+              B: 21088.66987563096
+              C: 0.0
+            - name: janaf_fe_1184_1200
+              phase: gamma_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1184.0, 1200.0]
+              valid_range_K: [1184.0, 1200.0]
+              A: 12.154530139034145
+              B: 20944.236166840972
+              C: 0.0
+            - name: janaf_fe_1200_1300
+              phase: gamma_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1200.0, 1300.0]
+              valid_range_K: [1200.0, 1300.0]
+              A: 12.172999999999977
+              B: 20966.399999999972
+              C: 0.0
+            - name: janaf_fe_1300_1400
+              phase: gamma_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1300.0, 1400.0]
+              valid_range_K: [1300.0, 1400.0]
+              A: 12.103000000000003
+              B: 20875.400000000005
+              C: 0.0
+            - name: janaf_fe_1400_1500
+              phase: gamma_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1400.0, 1500.0]
+              valid_range_K: [1400.0, 1500.0]
+              A: 12.071999999999992
+              B: 20831.99999999999
+              C: 0.0
+            - name: janaf_fe_1500_1600
+              phase: gamma_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1500.0, 1600.0]
+              valid_range_K: [1500.0, 1600.0]
+              A: 12.00800000000001
+              B: 20736.000000000015
+              C: 0.0
+            - name: janaf_fe_1600_1665
+              phase: gamma_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1600.0, 1665.0]
+              valid_range_K: [1600.0, 1665.0]
+              A: 11.971431941461056
+              B: 20677.49110633769
+              C: 0.0
+            - name: janaf_fe_1665_1700
+              phase: delta_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1665.0, 1700.0]
+              valid_range_K: [1665.0, 1700.0]
+              A: 11.91305496585799
+              B: 20580.293441958584
+              C: 0.0
+            - name: janaf_fe_1700_1800
+              phase: delta_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1700.0, 1800.0]
+              valid_range_K: [1700.0, 1800.0]
+              A: 11.885000000000009
+              B: 20532.600000000013
+              C: 0.0
+            - name: janaf_fe_1800_1809
+              phase: delta_solid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1800.0, 1809.0]
+              valid_range_K: [1800.0, 1809.0]
+              A: 11.812143400161444
+              B: 20401.4581202906
+              C: 0.0
+            - name: janaf_fe_1809_1900
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1809.0, 1900.0]
+              valid_range_K: [1809.0, 1900.0]
+              A: 11.425172630753263
+              B: 19701.4279984312
+              C: 0.0
+            - name: janaf_fe_1900_2000
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [1900.0, 2000.0]
+              valid_range_K: [1900.0, 2000.0]
+              A: 11.356000000000012
+              B: 19570.000000000022
+              C: 0.0
+            - name: janaf_fe_2000_2100
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2000.0, 2100.0]
+              valid_range_K: [2000.0, 2100.0]
+              A: 11.293999999999986
+              B: 19445.999999999975
+              C: 0.0
+            - name: janaf_fe_2100_2200
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2100.0, 2200.0]
+              valid_range_K: [2100.0, 2200.0]
+              A: 11.230000000000004
+              B: 19311.600000000006
+              C: 0.0
+            - name: janaf_fe_2200_2300
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2200.0, 2300.0]
+              valid_range_K: [2200.0, 2300.0]
+              A: 11.192000000000005
+              B: 19228.00000000001
+              C: 0.0
+            - name: janaf_fe_2300_2400
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2300.0, 2400.0]
+              valid_range_K: [2300.0, 2400.0]
+              A: 11.136000000000006
+              B: 19099.200000000015
+              C: 0.0
+            - name: janaf_fe_2400_2500
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2400.0, 2500.0]
+              valid_range_K: [2400.0, 2500.0]
+              A: 11.103
+              B: 19020.0
+              C: 0.0
+            - name: janaf_fe_2500_2600
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2500.0, 2600.0]
+              valid_range_K: [2500.0, 2600.0]
+              A: 11.034999999999991
+              B: 18849.999999999978
+              C: 0.0
+            - name: janaf_fe_2600_2700
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2600.0, 2700.0]
+              valid_range_K: [2600.0, 2700.0]
+              A: 11.020999999999987
+              B: 18813.599999999962
+              C: 0.0
+            - name: janaf_fe_2700_2800
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2700.0, 2800.0]
+              valid_range_K: [2700.0, 2800.0]
+              A: 10.941000000000022
+              B: 18597.60000000006
+              C: 0.0
+            - name: janaf_fe_2800_2900
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2800.0, 2900.0]
+              valid_range_K: [2800.0, 2900.0]
+              A: 10.939999999999989
+              B: 18594.799999999967
+              C: 0.0
+            - name: janaf_fe_2900_3000
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [2900.0, 3000.0]
+              valid_range_K: [2900.0, 3000.0]
+              A: 10.888000000000002
+              B: 18444.000000000004
+              C: 0.0
+            - name: janaf_fe_3000_3100
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3000.0, 3100.0]
+              valid_range_K: [3000.0, 3100.0]
+              A: 10.847000000000008
+              B: 18321.000000000025
+              C: 0.0
+            - name: janaf_fe_3100_3133.345
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3100.0, 3133.345]
+              valid_range_K: [3100.0, 3133.345]
+              A: 10.856950067476363
+              B: 18351.845209176725
+              C: 0.0
+            - name: janaf_fe_3133.345_3200
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3133.345, 3200.0]
+              valid_range_K: [3133.345, 3200.0]
+              A: 10.809016577901158
+              B: 18201.6530492837
+              C: 0.0
+            - name: janaf_fe_3200_3300
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3200.0, 3300.0]
+              valid_range_K: [3200.0, 3300.0]
+              A: 10.796999999999986
+              B: 18163.199999999957
+              C: 0.0
+            - name: janaf_fe_3300_3400
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3300.0, 3400.0]
+              valid_range_K: [3300.0, 3400.0]
+              A: 10.766999999999971
+              B: 18064.199999999903
+              C: 0.0
+            - name: janaf_fe_3400_3500
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3400.0, 3500.0]
+              valid_range_K: [3400.0, 3500.0]
+              A: 10.739000000000054
+              B: 17969.000000000182
+              C: 0.0
+            - name: janaf_fe_3500_3600
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3500.0, 3600.0]
+              valid_range_K: [3500.0, 3600.0]
+              A: 10.680999999999987
+              B: 17765.999999999953
+              C: 0.0
+            - name: janaf_fe_3600_3700
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3600.0, 3700.0]
+              valid_range_K: [3600.0, 3700.0]
+              A: 10.703999999999983
+              B: 17848.799999999937
+              C: 0.0
+            - name: janaf_fe_3700_3800
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3700.0, 3800.0]
+              valid_range_K: [3700.0, 3800.0]
+              A: 10.629999999999992
+              B: 17574.999999999975
+              C: 0.0
+            - name: janaf_fe_3800_3900
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3800.0, 3900.0]
+              valid_range_K: [3800.0, 3900.0]
+              A: 10.64600000000003
+              B: 17635.800000000112
+              C: 0.0
+            - name: janaf_fe_3900_4000
+              phase: liquid
+              source: REF-020 JANAF Fe-008 gas, Fe-003 stable reference, Fe-006 liquid above3133.345 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [3900.0, 4000.0]
+              valid_range_K: [3900.0, 4000.0]
+              A: 10.603999999999973
+              B: 17471.99999999989
+              C: 0.0
           boiling_point_C: 2862
           notes: 'Prior 0.023 dex basalt-grid residual did not re-confirm against the
 

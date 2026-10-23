@@ -2055,6 +2055,11 @@ def _coefficient_mapping(
     if not _is_mapping(block):
         return {}
     if coefficient_block == COEFF_BLOCK_PURE_COMPONENT:
+        # Fe's flat construction still owns melt-source/native-metal release.
+        # Its JANAF segments certify walls only; wall callers supply the
+        # selected segment when asking for its metadata.
+        if (row or {}).get("formula") == "Fe":
+            return block
         return _selected_temperature_segment(block, temperature_K)
     return block
 
@@ -2122,7 +2127,9 @@ def vapor_pressure_antoine_coefficients(
     if not bool((row or {}).get("interval_required")):
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
-            selected = _selected_temperature_segment(pure, temperature_K)
+            selected = _coefficient_mapping(
+                row, COEFF_BLOCK_PURE_COMPONENT, temperature_K=temperature_K,
+            )
             if not _pure_segment_usable(selected, temperature_K):
                 antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
                 if _is_mapping(antoine):
@@ -2186,16 +2193,25 @@ def wall_condensation_antoine_coefficients(
     sidecar usable at this temperature, wall re-evaporation uses that sidecar;
     otherwise it fails closed (empty block -> caller types a refusal; never
     invents a fiat pressure) rather than serve the melt activity/pO2 term as
-    a local P_sat. Non-standard-reaction rows keep the runtime selector's
-    behavior byte-for-byte.
+    a local P_sat. Fe also has a wall-only JANAF surface, separate from its
+    retained melt-source/native-metal construction. Other non-standard rows
+    keep the runtime selector's behavior.
     """
 
-    if _fit_target(row) != FIT_TARGET_STANDARD_REACTION:
+    if (
+        _fit_target(row) != FIT_TARGET_STANDARD_REACTION
+        and (row or {}).get("formula") != "Fe"
+    ):
         return vapor_pressure_antoine_coefficients(row, temperature_K)
     if not bool((row or {}).get("interval_required")):
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
+            # Below a refusing first segment the generic selector retains
+            # flat ABC for non-wall compatibility readers. Fe's retained
+            # construction must never fill that missing wall domain.
+            if (row or {}).get("formula") == "Fe" and selected is pure and pure.get("segments"):
+                return {}, COEFF_BLOCK_PURE_COMPONENT
             if _pure_segment_usable(selected, temperature_K):
                 return selected, COEFF_BLOCK_PURE_COMPONENT
             # A grounded pure-species wall answer exists but not at this
@@ -2259,7 +2275,7 @@ def _liquid_reference_pressure_from_solid(
             return pressure, None
         return solid_pressure_pa, "fusion term unavailable: SiO2 pressure not finite positive"
 
-    table_id = {"Na": "Na-003"}.get(species)
+    table_id = {"Na": "Na-003", "Fe": "Fe-006"}.get(species)
     if table_id is None:
         return solid_pressure_pa, f"fusion term unavailable: no liquid table for {species}"
     try:
@@ -2269,7 +2285,7 @@ def _liquid_reference_pressure_from_solid(
 
     # Interpolate the printed liquid formation log Kf in reciprocal T,
     # the same coordinate as the pressure segments. Only bracketed numeric
-    # cells are usable; Na-003 has no liquid formation input below298.15 K.
+    # cells are usable; Na-003/Fe-006 have no liquid input below298.15 K.
     points = [
         (float(row["temperature"]["value"]),
          float(row["log10_formation_equilibrium_constant"]["value"]))
@@ -2279,7 +2295,7 @@ def _liquid_reference_pressure_from_solid(
     # The coexistence annotation establishes mu_l=mu_s, hence logKf,l=0.
     for annotation in table.get("parse_ambiguities", []):
         fields = annotation.get("raw_line", "").split("\t")
-        if fields[-1] in {"CRYSTAL <--> LIQUID", "BETA <--> LIQUID"}:
+        if fields[-1] in {"CRYSTAL <--> LIQUID", "BETA <--> LIQUID", "DELTA <--> LIQUID"}:
             points.append((float(fields[0]), 0.0))
     points.sort()
     for (t1, y1), (t2, y2) in zip(points, points[1:]):
