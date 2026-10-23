@@ -8,6 +8,7 @@ from typing import Any
 
 from engines.antoine import (
     _AntoineCoefficientRefusal,
+    _is_missing_antoine_intercept,
     _antoine_skip_reason_for_refusal,
     _antoine_skip_notices_for_omitted_species,
     _append_antoine_skip_notice,
@@ -707,6 +708,8 @@ class EquilibriumMixin:
                     try:
                         A, B, C = _read_antoine_coefficients(antoine)
                     except _AntoineCoefficientRefusal as exc:
+                        if not _is_missing_antoine_intercept(exc):
+                            raise
                         _append_antoine_skip_notice(
                             warnings,
                             antoine_skip_notice_keys,
@@ -873,6 +876,8 @@ class EquilibriumMixin:
                 try:
                     A_l, B_l, C_l = _read_antoine_coefficients(antoine_liq)
                 except _AntoineCoefficientRefusal as exc:
+                    if not _is_missing_antoine_intercept(exc):
+                        raise
                     _append_antoine_skip_notice(
                         warnings,
                         antoine_skip_notice_keys,
@@ -973,6 +978,8 @@ class EquilibriumMixin:
                 try:
                     A_g, B_g, C_g = _read_antoine_coefficients(antoine_gas)
                 except _AntoineCoefficientRefusal as exc:
+                    if not _is_missing_antoine_intercept(exc):
+                        raise
                     _append_antoine_skip_notice(
                         warnings,
                         antoine_skip_notice_keys,
@@ -1330,6 +1337,8 @@ class EquilibriumMixin:
             try:
                 A, B, C = _read_antoine_coefficients(antoine)
             except _AntoineCoefficientRefusal as exc:
+                if not _is_missing_antoine_intercept(exc):
+                    raise
                 _append_antoine_skip_notice(
                     warnings,
                     antoine_skip_notice_keys,

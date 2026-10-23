@@ -58,6 +58,7 @@ if TYPE_CHECKING:
 
 from engines.antoine import (
     _AntoineCoefficientRefusal,
+    _is_missing_antoine_intercept,
     _antoine_skip_notices_for_omitted_species,
     _append_antoine_skip_notice,
     _antoine_log10_pressure,
@@ -2149,8 +2150,11 @@ def _pure_segment_usable(
         return False
     try:
         A, B, C = _read_antoine_coefficients(selected)
-    except _AntoineCoefficientRefusal:
-        return False
+    except _AntoineCoefficientRefusal as exc:
+        # An absent A is an unusable source record and can select the legacy
+        # block. A partial block or malformed value must reach the consumer's
+        # typed refusal path instead of being hidden by that fallback.
+        return not _is_missing_antoine_intercept(exc)
     if temperature_K is None:
         return True
     try:
@@ -2177,27 +2181,55 @@ def wall_condensation_antoine_coefficients(
     """Return coefficients for local wall ``P_sat`` consumers.
 
     Melt-source standard-reaction terms are not pure-species saturation
-    pressures. When a standard-reaction row carries a grounded pure-component
-    sidecar usable at this temperature, wall re-evaporation uses that sidecar;
-    otherwise it fails closed (empty block -> caller types a refusal; never
-    invents a fiat pressure) rather than serve the melt activity/pO2 term as
-    a local P_sat. Non-standard-reaction rows keep the runtime selector's
-    behavior byte-for-byte.
+    pressures. When a standard-reaction row carries a pure-component sidecar,
+    wall re-evaporation selects that block and leaves coefficient and pressure
+    validation to the wall consumer. A partial block must not be hidden by a
+    legacy-fit fallback at a deposition/refusal boundary.
     """
 
-    if _fit_target(row) != FIT_TARGET_STANDARD_REACTION:
-        return vapor_pressure_antoine_coefficients(row, temperature_K)
+    standard_reaction = _fit_target(row) == FIT_TARGET_STANDARD_REACTION
     if not bool((row or {}).get("interval_required")):
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
-            if _pure_segment_usable(selected, temperature_K):
-                return selected, COEFF_BLOCK_PURE_COMPONENT
+            if selected:
+                try:
+                    _A, _B, C = _read_antoine_coefficients(selected)
+                except _AntoineCoefficientRefusal:
+                    return selected, COEFF_BLOCK_PURE_COMPONENT
+                if temperature_K is None:
+                    return selected, COEFF_BLOCK_PURE_COMPONENT
+                try:
+                    denominator = float(temperature_K) + C
+                except (OverflowError, TypeError, ValueError):
+                    return selected, COEFF_BLOCK_PURE_COMPONENT
+                if denominator > 0.0 or not math.isfinite(denominator):
+                    return selected, COEFF_BLOCK_PURE_COMPONENT
             # A grounded pure-species wall answer exists but not at this
             # temperature: fail closed so the caller types a refusal rather
             # than extrapolate through a pole or substitute the melt term.
-            return {}, COEFF_BLOCK_PURE_COMPONENT
-    return {}, COEFF_BLOCK_PURE_COMPONENT
+            if standard_reaction:
+                return {}, COEFF_BLOCK_PURE_COMPONENT
+    if standard_reaction:
+        return {}, COEFF_BLOCK_PURE_COMPONENT
+    return vapor_pressure_antoine_coefficients(row, temperature_K)
+
+
+def _raise_invalid_antoine_coefficient(
+    refusal: _AntoineCoefficientRefusal,
+    *,
+    species: str,
+    field: str,
+) -> None:
+    prefix = (
+        "vapor_pressure_nonfinite"
+        if refusal.invalid_kind == "nonfinite"
+        else "invalid_antoine_coefficient"
+    )
+    raise VaporPressureComputationError(
+        f"{prefix}: species={species} field={field} "
+        f"coefficient={refusal.coefficient} value={refusal.value!r}"
+    ) from refusal
 
 
 def vapor_pressure_valid_range_K(
@@ -2931,6 +2963,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     try:
                         A, B, C = _read_antoine_coefficients(antoine)
                     except _AntoineCoefficientRefusal as exc:
+                        if not _is_missing_antoine_intercept(exc):
+                            _raise_invalid_antoine_coefficient(
+                                exc,
+                                species=species,
+                                field="P_reference_Antoine_Pa",
+                            )
                         _append_antoine_skip_notice(
                             warnings,
                             antoine_skip_notice_keys,
@@ -3159,6 +3197,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 try:
                     A_l, B_l, C_l = _read_antoine_coefficients(antoine_liq)
                 except _AntoineCoefficientRefusal as exc:
+                    if not _is_missing_antoine_intercept(exc):
+                        _raise_invalid_antoine_coefficient(
+                            exc,
+                            species=species,
+                            field=(
+                                "P_reference_liquid_oxide_standard_reaction_Pa"
+                            ),
+                        )
                     _append_antoine_skip_notice(
                         warnings,
                         antoine_skip_notice_keys,
@@ -3280,6 +3326,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 try:
                     A_g, B_g, C_g = _read_antoine_coefficients(antoine_gas)
                 except _AntoineCoefficientRefusal as exc:
+                    if not _is_missing_antoine_intercept(exc):
+                        _raise_invalid_antoine_coefficient(
+                            exc,
+                            species=species,
+                            field=(
+                                "P_reference_gas_rail_standard_reaction_Pa"
+                            ),
+                        )
                     _append_antoine_skip_notice(
                         warnings,
                         antoine_skip_notice_keys,
@@ -3744,6 +3798,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 coefficients = _read_antoine_coefficients(antoine)
             except _AntoineCoefficientRefusal as exc:
                 coefficient_refusal = exc
+            if (
+                coefficient_refusal is not None
+                and not _is_missing_antoine_intercept(coefficient_refusal)
+                and not (
+                    coefficient_refusal.input_category == "missing_input"
+                    and coefficient_refusal.coefficient == "C"
+                )
+            ):
+                _raise_invalid_antoine_coefficient(
+                    coefficient_refusal,
+                    species=name,
+                    field="P_reference_Antoine_Pa",
+                )
             valid = data.get('valid_range_K', [0, 9999])
             compiled_evaluator = None
             compiled_species = None

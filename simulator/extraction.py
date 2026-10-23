@@ -3657,6 +3657,8 @@ class ExtractionMixin:
             diagnostic = {
                 'r_transport': 0.0,
                 'transport_ca_mol': 0.0,
+                'c7_ca_alpha_intrinsic': ca_alpha,
+                'c7_ca_p_sat_pa': 0.0,
                 'c7_transport_refusal': refusal,
                 'notices': antoine_notices,
             }

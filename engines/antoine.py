@@ -121,6 +121,16 @@ class _AntoineCoefficientRefusal(ValueError):
         super().__init__(f"{prefix}: coefficient={coefficient} value={value!r}")
 
 
+def _is_missing_antoine_intercept(
+    refusal: _AntoineCoefficientRefusal,
+) -> bool:
+    """Return whether a consumer may keep its legacy missing-A fallback."""
+    return (
+        refusal.input_category == "missing_input"
+        and refusal.coefficient == "A"
+    )
+
+
 def _antoine_skip_reason_for_refusal(
     refusal: _AntoineCoefficientRefusal,
 ) -> str:

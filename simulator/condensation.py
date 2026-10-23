@@ -6010,8 +6010,12 @@ def _antoine_psat_pa(
             exc.input_category,
         ) from exc
     T_K = _deposition_finite_scalar("T_wall_K", T_K)
-    if T_K <= 0.0:
-        raise DepositionInputRefusal(coefficient_block, T_K, "requires T > 0")
+    if T_K <= 0.0 or A <= 0.0:
+        raise DepositionInputRefusal(
+            coefficient_block,
+            (A, T_K),
+            "requires A > 0 and T > 0",
+        )
     if T_K + C <= 0.0:
         refusal = WallSaturationPressureRefusal(species, T_K,
             f"no extrapolation available: Antoine denominator T+C <= 0; valid_range_K={source_band}")

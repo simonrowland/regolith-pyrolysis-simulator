@@ -238,7 +238,12 @@ def chi_escape_salt(
             temperature_K,
             _valid_range_K(entry),
         )
-    except (KeyError, _AntoineCoefficientRefusal):
+    except (KeyError, _AntoineCoefficientRefusal) as exc:
+        if (
+            isinstance(exc, _AntoineCoefficientRefusal)
+            and exc.input_category != "missing_input"
+        ):
+            raise
         p_sat_pa, valid_range, compiled_status = _compiled_carrier_pressure(
             carrier_key,
             temperature_K,
