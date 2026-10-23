@@ -349,12 +349,10 @@ def test_stage0_to_stage1_wall_schedule_tracks_flowing_fe_dewpoint():
     )
     assert dewpoint["status"] == "diagnostic_only"
     assert dewpoint["temperature_K"] == pytest.approx(
-        2093.9943319069002, abs=1e-6
+        2136.052149172936, abs=1e-9
     )
-    assert dewpoint["reason"].startswith(
-        "Fe wall saturation relation uncertified (extrapolated)"
-    )
-    assert "REF-012" in dewpoint["reason"]
+    assert dewpoint["valid_range_K"] == [100.0, 4000.0]
+    assert "reason" not in dewpoint
     fe_dewpoint_C = float(dewpoint["temperature_K"]) - 273.15
     assert fe_dewpoint_C > 1650.0
 
