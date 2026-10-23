@@ -101,6 +101,8 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
 
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
+    # 718d3d844: terminal rollback preserves the constructor diagnostic state.
+    sim._process_pressure_diagnostic = {}
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.overhead = SimpleNamespace(pressure_mbar=2.0)
@@ -218,6 +220,8 @@ def test_terminal_refusal_restores_incremental_accounting_prefixes() -> None:
 
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
+    # 718d3d844: terminal rollback preserves the constructor diagnostic state.
+    sim._process_pressure_diagnostic = {}
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.record = BatchRecord(snapshots=[snapshot("Na", 1.0)])
@@ -465,6 +469,8 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
     proxy = MappingProxyType(backing)
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
+    # 718d3d844: terminal rollback preserves the constructor diagnostic state.
+    sim._process_pressure_diagnostic = {}
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.overhead = SimpleNamespace(pressure_mbar=2.0)
@@ -561,6 +567,8 @@ def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
 
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
+    # 718d3d844: terminal rollback preserves the constructor diagnostic state.
+    sim._process_pressure_diagnostic = {}
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.record = SimpleNamespace(snapshots=[])
@@ -621,6 +629,8 @@ def test_terminal_refusal_rolls_back_chemistry_registry_authority(
 
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
+    # 718d3d844: terminal rollback preserves the constructor diagnostic state.
+    sim._process_pressure_diagnostic = {}
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.record = SimpleNamespace(snapshots=[])
@@ -677,6 +687,8 @@ def test_terminal_refusal_rolls_back_metal_phase_authority() -> None:
 
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
+    # 718d3d844: terminal rollback preserves the constructor diagnostic state.
+    sim._process_pressure_diagnostic = {}
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.record = SimpleNamespace(snapshots=[])
@@ -726,6 +738,8 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
     registry = ProviderRegistry()
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
+    # 718d3d844: terminal rollback preserves the constructor diagnostic state.
+    sim._process_pressure_diagnostic = {}
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.record = SimpleNamespace(snapshots=[])
@@ -830,6 +844,8 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     committed = HistoricalSnapshot()
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
+    # 718d3d844: terminal rollback preserves the constructor diagnostic state.
+    sim._process_pressure_diagnostic = {}
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.record = BatchRecord(snapshots=[committed])
@@ -876,6 +892,8 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     )
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
+    # 718d3d844: terminal rollback preserves the constructor diagnostic state.
+    sim._process_pressure_diagnostic = {}
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.record = BatchRecord(snapshots=[committed])
@@ -1527,6 +1545,8 @@ def test_c6_acquisition_timeout_ends_as_transport_bound_refusal() -> None:
     )
     sim._last_c6_refusal_diagnostic = {}
     sim._c6_campaign_refused = False
+    # d-203: this timeout fixture has completed the C6 entry purge.
+    sim._c6_entry_purge_pending = False
 
     assert sim._check_campaign_endpoint(EvaporationFlux()) is True
     assert sim._c6_campaign_refused is True
@@ -1541,6 +1561,7 @@ def test_c6_acquisition_timeout_ends_as_transport_bound_refusal() -> None:
     # opportunity clock; this SimpleNamespace scenario sets none, so the
     # stamped defaults (0.0/0.0/"") ride along in the diagnostic copy.
     assert refusal["diagnostic"]["binding_transport_state"] == {
+        "c6_entry_purge_pending": False,
         "binding_cause": "controlled_o2_no_equipment",
         "saturation_pct": 202.0,
         "evap_exceeds_transport": True,
@@ -1556,6 +1577,9 @@ def test_uncontrolled_equilibrium_po2_ignores_downstream_residual() -> None:
         melt=SimpleNamespace(
             atmosphere=Atmosphere.HARD_VACUUM,
             pO2_mbar=0.0,
+            # c814b890a: ordinary MeltState defaults, no declared sweep.
+            sweep_mol_per_s=None,
+            body="",
         ),
         overhead=SimpleNamespace(composition={"O2": 500.0}),
         _melt_headspace_composition_mbar={"O2": 2.0},

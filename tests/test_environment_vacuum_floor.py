@@ -353,6 +353,8 @@ def test_controlled_co2_keeps_unselected_background_as_inert():
 
 # Keep b151 parent expectations visible while owner-ruled value moves are classified.
 def _mars_sim_b151():
+    from simulator.state import Atmosphere
+
     feedstocks = copy.deepcopy(_load_yaml("feedstocks.yaml"))
     # Reuse a fully declared silicate input to isolate the environment owner.
     feedstocks['lunar_mare_low_ti'].update({
@@ -361,6 +363,8 @@ def _mars_sim_b151():
     })
     sim = _sim(feedstocks)
     sim.load_batch('lunar_mare_low_ti', mass_kg=1000.0)
+    # c814b890a: explicitly connect the chamber to the declared ambient CO2.
+    sim.melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
     return sim
 
 
@@ -432,4 +436,5 @@ def test_earth_air_oxygen_is_a_mole_fraction_not_total_pressure_b151():
     sim.melt.body = 'earth'
     sim.melt.ambient_atmosphere = 'air'
     sim.melt.ambient_pressure_mbar = 1000.0
+    sim.melt.p_total_mbar = 1000.0
     assert sim._headspace_transport_pO2_bar_from_ledger(0.01) == pytest.approx(0.22)

@@ -4043,7 +4043,11 @@ def test_c2a_automatic_default_does_not_shadow_a_measured_window_cap():
 
 
 # Merge preservation: retain the distinct cb13f9f92 case and its assertions.
-def test_recipe_patch_max_hold_cannot_elevate_catalog_validated_cap() -> None:
+def test_recipe_patch_max_hold_cannot_elevate_catalog_validated_cap(monkeypatch) -> None:
+    # 8f5aa56df: stock deadlines are automatic; retain an explicit 30 h cap
+    # so this fixture still proves the finite cap cannot be borrowed/elevated.
+    monkeypatch.setattr(profiles_module, "_campaign_max_hold_hr_for_profile",
+                        lambda source, campaign: 30.0)
     profile = _c2a_window_profile(1050.0, 1600.0, 146)
 
     with pytest.raises(
@@ -4092,7 +4096,11 @@ def test_t155_bubbler_context_must_match_resolved_patch_b151(
         )
 
 
-def test_recipe_without_local_max_hold_does_not_borrow_other_seed_cap_b151() -> None:
+def test_recipe_without_local_max_hold_does_not_borrow_other_seed_cap_b151(monkeypatch) -> None:
+    # 8f5aa56df: stock deadlines are automatic; retain an explicit 30 h cap
+    # so this fixture still proves the finite cap cannot be borrowed/elevated.
+    monkeypatch.setattr(profiles_module, "_campaign_max_hold_hr_for_profile",
+                        lambda source, campaign: 30.0)
     profile = _c2a_window_profile(1050.0, 1600.0, 29)
     profile["seed_recipes"].append({
         "id": "other-seed",

@@ -99,6 +99,11 @@ def test_published_knudsen_transition_factor_at_unit_parameter():
 def test_equipment_and_overhead_use_one_owner(pressure_mbar):
     pipe = EquipmentDesigner().size_collection_pipe(0.01, pressure_mbar)
     overhead = OverheadGasModel({})
+    # 25c08e95b sizes the pipe: compare both callers at that actual geometry.
+    overhead.configure_condenser_geometry({
+        "initial_throat_area_m2": pipe.initial_throat_area_m2,
+    })
+    overhead.pipe_length_m = pipe.length_m
     assert pipe.conductance_kg_s == overhead._pipe_conductance(pressure_mbar * 100, 1500)
 
 
@@ -119,6 +124,7 @@ def test_no_forward_pressure_drop_has_zero_capacity(upstream, downstream):
 
 def test_interpolation_authority_reaches_existing_snapshot_warning_surface():
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim._process_pressure_diagnostic = {}
     sim._overhead_model = OverheadGasModel({})
     sim._overhead_model._pipe_conductance(40.0, 1500.0, species_kg_for_M_avg={"N2": 1.0})
     sim._condensation_model = SimpleNamespace(
@@ -134,7 +140,10 @@ def test_interpolation_authority_reaches_existing_snapshot_warning_surface():
 def test_interpolation_notice_does_not_label_limits_transitional():
     args = (0.12, 0.0280134, tr.gas_dynamic_viscosity_Pa_s(1773.15), 1773.15)
     assert tr.pipe_conductance_authority_notice(*args, 1000.0, 0.0) is None
-    assert tr.pipe_conductance_authority_notice(*args, 1e-6, 0.0) is None
+    # 9128bb7bb adds a molecular routing notice, not a transitional label.
+    notice = tr.pipe_conductance_authority_notice(*args, 1e-6, 0.0)
+    assert notice.startswith(tr.MOLECULAR_MIXTURE_ROUTING_APPROXIMATION)
+    assert "interpolated" not in notice
 
 
 @pytest.mark.parametrize("pressure_mbar", [1e-4, 1e-3, 0.1])
