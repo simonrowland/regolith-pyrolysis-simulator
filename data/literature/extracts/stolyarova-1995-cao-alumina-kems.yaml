@@ -507,21 +507,48 @@ species:
         locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
         T_range_K: [1933.0, 1933.0]
         phase: gas
+        reaction:
+          terms:
+            - species: {formula: MoO3, phase: g}
+              coefficient: -1
+            - species: {formula: MoO2, phase: g}
+              coefficient: 1
+            - species: {formula: O, phase: g}
+              coefficient: 1
+        reaction_as_printed: '(MoO3) = (MoO2) + (O), Eq. (2), p. 688'
         experiment: stolyarova-1995-mo-cell
         regime: kems_effusion
         units: atm as printed (p_O × 10^9)
-        derived_from: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
         derivation:
-          relation: 'Table 2 “Eqn 1” p(O) uses MoO2+ and MoO3+ ion currents with MoO3 = MoO2 + O; “Eqn 2” p(O) uses Al+ and AlO+ ion currents with AlO = Al + O. The paper says “MoO2+ and MoO3+” for the first route and “Al+ and AlO+” for the second (p. 688, Eqs. 2–6). The table labels these calculations Eqn 1 and Eqn 2.'
-          inputs: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
+          relation: >-
+            Table 2's Eqn 1 p(O) reduction is given by Eq. (5), p. 688, for the
+            MoO3 = MoO2 + O equilibrium in Eq. (2). Table 1 reports present-study
+            ion-current context at xCaO=0.86; row-wise partial-pressure parents
+            and numerical constants are not printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 687
+              published_page: 687
+              pdf_page_index: 1
+              table: '1'
+              note: >-
+                Present-study xCaO=0.86 spectrum: MoO2+ current 1.02 and MoO3+
+                current 0.27. These are context only; row-wise partial-pressure
+                parents are not printed. Eq. (5) is on p. 688.
           output_unit: atm
         values:
           quantity: partial_pressure
-          method_class: model_derived
-          evidence_class: model_derived
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
           admission_status: admitted
-          method: thermodynamic_equilibrium_calculation
-          method_as_printed: Calculation using Eqn 1
+          attribution: Stolyarova et al. (1995), Table 2 Eqn 1 and Eq. (5), p. 688
+          method: author reduction by the printed gas equilibrium
+          method_as_printed: >-
+            Table 2's Eqn 1 column is calculated using Eq. (5), p. 688, for
+            MoO3 = MoO2 + O (Eq. (2)). Table 1 reports the present-study
+            MoO2+ and MoO3+ currents at xCaO=0.86; row-wise inputs and
+            numerical constants are not printed.
           composition_component: CaO
           composition_basis: mole fraction
           temperature_K: 1933.0
@@ -641,21 +668,48 @@ species:
         locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
         T_range_K: [1933.0, 1933.0]
         phase: gas
+        reaction:
+          terms:
+            - species: {formula: AlO, phase: g}
+              coefficient: -1
+            - species: {formula: Al, phase: g}
+              coefficient: 1
+            - species: {formula: O, phase: g}
+              coefficient: 1
+        reaction_as_printed: '(AlO) = (Al) + (O), Eq. (3), p. 688'
         experiment: stolyarova-1995-mo-cell
         regime: kems_effusion
         units: atm as printed (p_O × 10^9)
-        derived_from: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
         derivation:
-          relation: 'Table 2 “Eqn 2” p(O) uses Al+ and AlO+ ion currents with AlO = Al + O (p. 688, Eqs. 3 and 6); the paper says “Al+ and AlO+”.'
-          inputs: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
+          relation: >-
+            Table 2's Eqn 2 p(O) reduction is given by Eq. (6), p. 688, for the
+            AlO = Al + O equilibrium in Eq. (3). Table 1 reports present-study
+            ion-current context at xCaO=0.86; row-wise partial-pressure parents
+            and numerical constants are not printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 687
+              published_page: 687
+              pdf_page_index: 1
+              table: '1'
+              note: >-
+                Present-study xCaO=0.86 spectrum: Al+ current 0.12 and AlO+
+                current 0.026. These are context only; row-wise partial-pressure
+                parents are not printed. Eq. (6) is on p. 688.
           output_unit: atm
         values:
           quantity: partial_pressure
-          method_class: model_derived
-          evidence_class: model_derived
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
           admission_status: admitted
-          method: thermodynamic_equilibrium_calculation
-          method_as_printed: Calculation using Eqn 2
+          attribution: Stolyarova et al. (1995), Table 2 Eqn 2 and Eq. (6), p. 688
+          method: author reduction by the printed gas equilibrium
+          method_as_printed: >-
+            Table 2's Eqn 2 column is calculated using Eq. (6), p. 688, for
+            AlO = Al + O (Eq. (3)). Table 1 reports the present-study Al+ and
+            AlO+ currents at xCaO=0.86; row-wise inputs and numerical
+            constants are not printed.
           composition_component: CaO
           composition_basis: mole fraction
           temperature_K: 1933.0
@@ -765,25 +819,46 @@ species:
         locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
         T_range_K: [1933.0, 1933.0]
         phase: gas
+        reaction:
+          terms:
+            - species: {formula: O2, phase: g}
+              coefficient: -1
+            - species: {formula: O, phase: g}
+              coefficient: 2
+        reaction_as_printed: '(O2) = 2 (O), Eq. (4), p. 688'
         experiment: stolyarova-1995-mo-cell
         regime: kems_effusion
         units: atm as printed (p_O2 × 10^11)
-        derived_from: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
         derivation:
-          relation: 'p(O2) is calculated from p(O) using the printed gas-phase equilibrium O2 = 2O (p. 688, Eq. 4); the paper prints “O2 = 2O”. The cited thermodynamic data are reference 42.'
-          inputs: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
+          relation: >-
+            Eq. (4), p. 688, states O2 = 2O, but the source does not identify
+            which of its two Table 2 p(O) estimates is the numerical input.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 688
+              published_page: 688
+              pdf_page_index: 2
+              section: Results and discussion
+              note: Source does not identify the O input to Eq. (4).
           output_unit: atm
         values:
           quantity: partial_pressure
-          method_class: model_derived
-          evidence_class: model_derived
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
           admission_status: admitted
-          method: thermodynamic_equilibrium_calculation
-          method_as_printed: calculated from thermodynamic data for vapor equilibria
+          attribution: Stolyarova et al. (1995), Table 2 and Eq. (4), p. 688
+          method: source-reported thermodynamic calculation
+          method_as_printed: >-
+            Partial pressures of O2 and O were calculated using available
+            thermodynamic data on vapor equilibria (p. 688). Eq. (4) prints
+            O2 = 2O, but the paper does not identify which Table 2 p(O) estimate
+            supplies the O input.
           composition_component: CaO
           composition_basis: mole fraction
           temperature_K: 1933.0
           pressure_scale_as_printed: p_O2 × 10^11 (atm)
+          note: Source does not identify which Table 2 p(O) estimate is the O input to Eq. (4), p. 688.
           series: Table 2 p_O2 column
           points:
             - CaO_mole_fraction_as_printed: '0.000'
