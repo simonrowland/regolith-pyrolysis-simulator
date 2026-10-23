@@ -188,3 +188,28 @@ def test_all_deferred_figure_records_have_separate_captions() -> None:
         figure = next(row for row in figures if row["locator"]["figure"] == str(number))
         assert figure["values"]["caption_as_printed"].startswith(f"Fig. {number}.")
     assert all(row["values"]["digitisation"] == "deferred to a figure pass" for row in figures)
+
+
+def test_unique_l4b_context_values_are_retained_with_source_locators() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    contexts = {
+        row["observation_id"]: row
+        for section in extract["species"].values()
+        for row in section.get("context", [])
+    }
+
+    factor = contexts["mendybaev_2013_abstract_unique_isotope_factor_context"]
+    assert factor["values"]["value"] == "0.98372 ± 0.00041"
+    assert factor["locator"]["page"] == 1
+    assert factor["locator"]["published_page"] == 368
+
+    rate_estimates = contexts["mendybaev_2013_printed_evaporation_rate_estimates_context"]
+    assert len(rate_estimates["values"]["estimates_as_printed"]) == 5
+    natural_estimates = contexts["mendybaev_2013_natural_cai_isotope_loss_estimates_context"]
+    assert len(natural_estimates["values"]["estimates_as_printed"]) == 2
+    for row in rate_estimates["values"]["estimates_as_printed"]:
+        assert row["locator"]["page"] == 15
+        assert row["locator"]["published_page"] == 382
+    for row in natural_estimates["values"]["estimates_as_printed"]:
+        assert "page" in row["locator"]
+        assert "published_page" in row["locator"]
