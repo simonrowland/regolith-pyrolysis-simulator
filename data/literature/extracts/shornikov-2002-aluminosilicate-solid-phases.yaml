@@ -1,0 +1,314 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2002-aluminosilicate-solid-phases
+source:
+  citation: Shornikov, S. I., Archakov, I. Yu., Shultz, M. M., and Borisova, N. V. (2002). Mass Spectrometric
+    Study of Evaporation and the Thermodynamic Properties of Solid Phases in the Al2O3–SiO2 System. Doklady
+    Chemistry, 383(1–3), 82–85. Translated from Doklady Akademii Nauk, 383(3), 358–361.
+  year: 2002
+  corpus_asset: raw/shornikov-2002-aluminosilicate-solid-phases/shornikov-2002-aluminosilicate-solid-phases.pdf
+extraction:
+  method: Prose values checked against pdftotext-layout and the 600 dpi page renders. No content_list
+    table exists. Figure 2 was inspected at 1200 dpi. Two filled diamonds on the panel (a) fit match
+    legend VIII and stay at the printed 84.14 mol% Al2O3. The diamond at (5892.5, 2993.5) is 0.144 dex
+    below that fit at nearly the same T. The caption says replica filled symbols are a changed composition
+    whose mole percent is not printed, so that point keeps T and p and its composition is unknown.
+    Other cores that survive a 2 px opening are dashes of
+    the dotted fit lines or symbols still crossed by those dashes; each has an audit row.
+    Figure 3 is a broken-axis schematic on S/M/A labels and was not digitized. The mullite
+    formation enthalpy keeps the printed least-squares lineage; the Gibbs-energy grid is not printed.
+  date: '2026-10-20'
+  worker: grok-resume-11242-1792500084
+  provenance_path: text/shornikov-2002-aluminosilicate-solid-phases/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+- path: species.Al6Si2O13.observations[shornikov_2002_mullite_delta_fH].values.value
+  value: '12.9'
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    paragraph: formation enthalpy
+    note: Prose 12.9 ± 0.8 kJ/mol, checked on the 600 dpi render of PDF page 3.
+experiments:
+- experiment_id: shornikov-2002-doklady-solid-kems
+  kind: kems
+  locator:
+    page: 1
+    published_page: 82
+    pdf_page_index: 0
+  method: Knudsen effusion mass spectrometry, molybdenum cells, eight compositions, 1676–2327 K. The paper
+    says the conditions match the melt study cited as [3].
+species:
+  Al6Si2O13:
+    observations:
+    - observation_id: shornikov_2002_mullite_delta_fH
+      type: gibbs_table
+      regime: kems_effusion
+      locator:
+        page: 3
+        published_page: 84
+        pdf_page_index: 2
+        equation: '6'
+        note: Least squares of ΔfG over 1676–2180 K. The same digits are later tabulated as this work
+          in shornikov-2003-mullite-thermodynamics (RJPC 77(7) 1044–1050) with a printed span 1720–2180
+          K and a 1950 K row label. This row keeps the Doklady wording and the 1676–2180 K span. No single
+          temperature is printed here, so none is invented.
+      units: kJ/mol
+      phase: cr
+      standard_state: 'The paper recommends the enthalpy of formation of mullite from oxides over 1676–2180
+        K (published page 84, equation (6)). It does not state whether those oxides are pure solid or
+        pure liquid endmembers. The reference phase is not stated. The 2026-10-20 pure-oxide phase inference
+        is not applied: equations (4) and (5) compare partial pressures between the heterogeneous regions
+        adjacent to mullite, not ion currents over a pure oxide in the cell.'
+      per: mol_species
+      experiment: shornikov-2002-doklady-solid-kems
+      derivation:
+        relation: Least squares of the Gibbs energies of formation from equations (4) and (5)
+          over 1676-2180 K. The Gibbs-energy grid is not printed.
+        output_unit: kJ/mol
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 84
+            pdf_page_index: 2
+            equation: '6'
+            note: Equations (4) and (5) supply the Gibbs energies. The grid is not printed.
+              Equation (6) is the least-squares result on published page 84.
+      values:
+        quantity: delta_fH
+        method_class: measured_reduced
+        value_as_printed: 12.9 ± 0.8
+        value: '12.9'
+        temperature_span_as_printed: 1676–2180
+        equation_as_printed: ΔfG_T(M) = ΔfH_T(M) − T ΔfS_T(M)
+        attribution: this work, least squares of the Gibbs energies from equations (4) and (5)
+      uncertainty:
+        value: '0.8'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      T_range_K:
+      - 1676.0
+      - 2180.0
+    context:
+    - observation_id: shornikov_2002_mullite_delta_fS_schema_gap
+      type: quoted_prose_schema_gap
+      locator:
+        page: 3
+        published_page: 84
+        pdf_page_index: 2
+        equation: '6'
+        note: Printed with the enthalpy. The extract schema has no token for formation entropy delta_fS,
+          so this is not a scored observation. The later mullite table stores the same digits as a typed_refusal
+          cell.
+      units: J/(mol K)
+      values:
+        value_as_printed: 11.6 ± 0.4
+        temperature_span_as_printed: 1676–2180
+        reason: The extract schema has no token for formation entropy delta_fS.
+    - observation_id: shornikov_2002_mullite_composition
+      type: quoted_derived_composition
+      locator:
+        page: 3
+        published_page: 84
+        pdf_page_index: 2
+        equation: 4–5
+        note: x solved from the equality of the two Gibbs-energy expressions.
+      units: mol% Al2O3
+      values:
+        x_Al2O3_mol_percent: 60 ± 5
+        formula_as_printed: 3Al2O3·2SiO2
+        temperature_spans_as_printed: 1676–1879 K and 1676–2160 K
+    - observation_id: shornikov_2002_transition_enthalpies
+      type: quoted_phase_transition_estimate
+      locator:
+        page: 3
+        published_page: 84
+        pdf_page_index: 2
+        note: Author estimates. The sentences are on published page 84, which is PDF page 3. Partial pressures below 10^−9 atm. Not fusion enthalpies of a pure endmember.
+      units: kJ/mol
+      values:
+        M_plus_S_to_M_plus_liquid_and_S_plus_liquid_maximum_kJ_mol: '5'
+        bound: do not exceed
+        M_plus_A_to_A_plus_liquid_kJ_mol: 13 ± 10
+        note_as_printed: The 13 ± 10 kJ/mol estimate exceeds published values, which are typically no
+          higher than 3 kJ/mol.
+    - observation_id: shornikov_2002_evaporation_coefficients_not_measured
+      type: quoted_assumption
+      locator:
+        page: 2
+        published_page: 83
+        pdf_page_index: 1
+      units: dimensionless
+      values:
+        reason: Direct experimental data on the partial evaporation coefficients for the aluminosilicate
+          system are unavailable. They were assumed equal to silica [11] and alumina [12]. Not stored
+          as alpha.
+    - observation_id: shornikov_2002_fig2_pressures_not_digitized
+      type: figure_partial_pressure_overlap
+      locator:
+        page: 2
+        published_page: 83
+        pdf_page_index: 1
+        figure: '2'
+        note: log p(SiO), log p(Al), and log p(O) versus T. Eight compositions, open symbols in silica–mullite
+          and filled symbols in mullite–alumina, plus changed-composition replicas. Symbols overlap. Lines
+          are silica [10], the S–M and M–A summaries, and alumina from Drowart [13] and Shornikov [14].
+      units: atm
+      values:
+        method_class: figure_only
+        reason: '1200 dpi PDF page 2. Panel frames, page pixels: (a) y-axis x=5430, y=1155-3541,
+          x-axis y=3541, x=5430-8913, T ticks 1700/1800/1900/2000/2100 at x=5692/6502/7232/7886/8478,
+          log10(p) ticks -3/-4/-5/-6 at y=1659.5/2277.5/2885.5/3508.5; (b) y-axis x=5522, y=3971-6238,
+          x-axis y=6238; (c) y-axis x=5430, y=6719-9130, x-axis y=9130. The low-T crop of panel (a),
+          x=5460-7000 and y=2300-3520, is the region of the claimed isolated VIII near 1740 K.
+          The diamond at the top of that crop is the legend entry, not a datum. A 2 px opening
+          leaves 24x24 dash cores of the dotted lines (area about 417) and a few larger cores
+          still crossed by dashes. Three filled diamonds at (5898.5, 2903.8), (6042.5, 2897.7) and (5892.5, 2993.5)
+          match legend VIII. The two on the fit, (5898.5, 2903.8) and (6042.5, 2897.7), are stored
+          on shornikov_2002_fig2a_sio_viii at the printed 84.14 mol% Al2O3. The diamond at
+          (5892.5, 2993.5) is 0.144 dex below the first of those at nearly the same T. It is stored
+          on shornikov_2002_fig2a_sio_replica. The caption says replica filled symbols refer to
+          samples with changed composition, and that mole percent is not printed, so the composition
+          is unknown. Every other core has its own audit row.
+          The same overlap holds on panels (b) and (c).'
+        sample_mol_percent_Al2O3: 1.19, 3.31, 12.84, 28.20, 60.00, 67.63, 70.21, 84.14
+        temperature_span_as_printed_K: 1676–2327
+    - observation_id: shornikov_2002_fig3_schematic
+      type: figure_partial_pressure_schematic
+      locator:
+        page: 3
+        published_page: 84
+        pdf_page_index: 2
+        figure: '3'
+        note: log p_1850(i). The y axis is broken between −4.0 and −8.5. The x axis is labelled S, M,
+          A only.
+      units: atm
+      values:
+        method_class: figure_only
+        reason: Schematic. The broken y axis leaves the SiO line uncalibrated, and S/M/A is not a numeric
+          composition.
+
+  SiO:
+    observations:
+    - observation_id: shornikov_2002_fig2a_sio_replica
+      type: partial_pressure
+      locator:
+        page: 2
+        published_page: 83
+        pdf_page_index: 1
+        figure: '2'
+        note: "Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). This filled diamond is at (5892.5, 2993.5). It is 0.144 dex below the legend-VIII diamond at (5898.5, 2903.8), at 1724.7 K against 1725.5 K. The caption on this page says: Replica filled symbols refer to data on samples with changed composition. The new mole percent is not printed, so the composition is unknown and 84.14 mol% is not stored. T is unchanged. T = 1700 + (x-5692.0)/8.105 from the labelled ticks 1700 at x=5692.0 and 1800 at x=6502.5. The -5 tick is the 8-row stub at y=2882-2889, centre 2885.5. The -6 tick is the same kind of stub at y=3505-3512, centre 3508.5. y=3442.5 is the top of the -6 glyph, not the tick. (3508.5-2885.5) = 623 px per log unit. neg_log10_p = 5 + (y-2885.5)/623. Example: y=2993.5 reads 5 + 108/623 = 5.173. The centre is the dark centroid inside a 30 px radius, threshold 70. Half the diamond, clear of the dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. Partial pressure is not an activity, so the pure-oxide rule is not applied."
+      T_range_K:
+      - 1724.7
+      - 1724.7
+      phase: gas
+      experiment: shornikov-2002-doklady-solid-kems
+      regime: kems_effusion
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        gas_species: SiO(g)
+        formula: SiO
+        points:
+        - temperature_K: 1724.7
+          neg_log10_p_as_read: '5.173'
+          pressure_atm: 6.714289e-06
+          read_uncertainty_dex: '0.039'
+          read_uncertainty_K: '3.0'
+          audit_read_id: shornikov_2002_f2a_sio_01
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: 'Caption, published page 83: Replica filled symbols refer to data on samples with changed composition. The new mole percent is not printed.'
+              locator:
+                published_page: 83
+                pdf_page_index: 1
+                page: 2
+                figure: '2'
+                note: Mean (5892.5, 2993.5); filled-diamond dark centroid; replica filled symbol, composition changed and not printed; audit shornikov_2002_f2a_sio_01.
+    - observation_id: shornikov_2002_fig2a_sio_viii
+      type: partial_pressure
+      locator:
+        page: 2
+        published_page: 83
+        pdf_page_index: 1
+        figure: '2'
+        note: "Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). Two filled diamonds lie on the fit and match legend VIII. The printed composition of numeral VIII is 84.14 mol% Al2O3. The offset diamond at (5892.5, 2993.5) is the replica and is stored on shornikov_2002_fig2a_sio_replica with unknown composition. T ticks bracketing these points: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105. Spacing further right is not uniform and was not used. Log ticks bracketing the points: -5 at y=2885.5 and -6 at y=3508.5, so (3508.5-2885.5) = 623 px per log unit and neg_log10_p = 5 + (y-2885.5)/623. Example: y=2903.8 reads 5 + 18.3/623 = 5.029. The -4 to -5 gap is 608 px and was not used. y=3442.5 is the top of the -6 glyph, not the tick. Centres are dark centroids inside a 30 px radius, threshold 70. The line-inflated component bbox is not the marker width. Half the diamond, clear of the dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. The diamond beside the VIII legend glyph is not a datum. Partial pressure is not an activity, so the pure-oxide rule is not applied."
+      T_range_K:
+      - 1725.5
+      - 1743.2
+      phase: gas
+      experiment: shornikov-2002-doklady-solid-kems
+      regime: kems_effusion
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        gas_species: SiO(g)
+        formula: SiO
+        curve_as_printed: VIII
+        points:
+        - temperature_K: 1725.5
+          neg_log10_p_as_read: '5.029'
+          pressure_atm: 9.354057e-06
+          read_uncertainty_dex: '0.039'
+          read_uncertainty_K: '3.0'
+          Al2O3_mole_percent_as_read: '84.14'
+          composition_mol:
+            Al2O3: '0.8414'
+            SiO2: '0.1586'
+          audit_read_id: shornikov_2002_f2a_sio_02
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.8414'
+                  - - SiO2
+                    - '0.1586'
+              locator:
+                published_page: 83
+                pdf_page_index: 1
+                page: 2
+                figure: '2'
+                note: Mean (5898.5, 2903.8); filled-diamond dark centroid; legend VIII, 84.14 mol% Al2O3, not an axis read; audit shornikov_2002_f2a_sio_02.
+        - temperature_K: 1743.2
+          neg_log10_p_as_read: '5.020'
+          pressure_atm: 9.549926e-06
+          read_uncertainty_dex: '0.039'
+          read_uncertainty_K: '3.0'
+          Al2O3_mole_percent_as_read: '84.14'
+          composition_mol:
+            Al2O3: '0.8414'
+            SiO2: '0.1586'
+          audit_read_id: shornikov_2002_f2a_sio_03
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.8414'
+                  - - SiO2
+                    - '0.1586'
+              locator:
+                published_page: 83
+                pdf_page_index: 1
+                page: 2
+                figure: '2'
+                note: Mean (6042.5, 2897.7); filled-diamond dark centroid; legend VIII, 84.14 mol% Al2O3, not an axis read; audit shornikov_2002_f2a_sio_03.
