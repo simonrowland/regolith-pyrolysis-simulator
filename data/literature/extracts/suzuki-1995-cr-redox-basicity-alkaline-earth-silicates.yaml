@@ -1,0 +1,83 @@
+schema_version: literature_extract.v1
+source_id: suzuki-1995-cr-redox-basicity-alkaline-earth-silicates
+source:
+  citation: >-
+    Suzuki, Y., Kawasaki, S., Ookawa, M. and Yokokawa, T. (1995). Basicity of
+    alkaline earth silicate melts based on the Cr6+/Cr3+ redox equilibria.
+    Materials Transactions, JIM 36(12), 1483–1486. DOI: 10.2320/matertrans1989.36.1483.
+  doi: 10.2320/matertrans1989.36.1483
+  year: 1995
+extraction:
+  method: >-
+    Scanned encrypted publisher PDF; MinerU machine text and tables were used.
+    Table 1 and Table 2 were checked against the 600 dpi PDF page 3 render.
+    No quantity token fits the measured Cr reduction potential or pO (negative
+    log Na2O activity). Whole magma compositions have no composition-vector
+    observation token. Their printed values are preserved in context; derived
+    basicities are identified as author estimates. Figures 1–5 are deferred.
+  date: '2026-10-20'
+  worker: codex
+  provenance_path: text/suzuki-1995-cr-redox-basicity-alkaline-earth-silicates/mineru/p001-p004/
+review_status: draft
+species:
+  Cr:
+    observations: []
+    context:
+      - observation_id: suzuki1995_table1_redox_potential_and_basicity
+        type: experiment_series
+        locator: {page: 3, pdf_page_index: 2, published_page: 1485, table: '1'}
+        units: E1/2 in mV; pO dimensionless
+        reason: >-
+          The measured Cr6+/Cr3+ reduction potential has no quantity token.
+          pO is printed as -log a*(Na2O); the schema has no scalar log-activity
+          form. Candidate tokens checked: valence_ratio, activity,
+          activity_coefficient, equilibrium_phase_composition. None matches
+          the printed voltage or logarithmic activity value.
+        values:
+          quantity: chromium_reduction_potential_and_basicity
+          method_class: model_derived
+          temperature_K: 1523
+          points:
+            - {material: Li2O·2SiO2, E1_2_mV: '66', pO: '10.3', attribution: prior_work_ref_11}
+            - {material: Na2O·2SiO2, E1_2_mV: '-101.2', pO: '9.1', attribution: prior_work_ref_11}
+            - {material: K2O·2SiO2, E1_2_mV: '-341.6', pO: '7.4', attribution: prior_work_ref_11}
+            - {material: Rb2O·2SiO2, E1_2_mV: '-451.8', pO: '7.1', attribution: prior_work_ref_11}
+            - {material: Cs2O·2SiO2, E1_2_mV: '-546.8', pO: '6.2', attribution: prior_work_ref_11}
+            - {material: MgO·2SiO2, E1_2_mV: '201', pO: '11.4', attribution: 'this work; endmember potential estimated by linear relation'}
+            - {material: CaO·2SiO2, E1_2_mV: '138', pO: '10.9', attribution: 'this work; endmember potential estimated by linear relation'}
+            - {material: BaO·2SiO2, E1_2_mV: '-4', pO: '9.9', attribution: 'this work; endmember potential estimated by linear relation'}
+      - observation_id: suzuki1995_table2_quoted_magma_compositions_and_estimated_basicity
+        type: experiment_series
+        locator: {page: 3, pdf_page_index: 2, published_page: 1485, table: '2'}
+        units: mole fractions as printed; pO dimensionless
+        reason: >-
+          Whole-magma oxide composition vectors have no quantity token and are
+          not phase compositions. The pO entries are author-estimated
+          negative-log activities with no matching scalar log-activity token.
+          Candidate tokens checked: composition, activity, equilibrium_phase_composition.
+        values:
+          quantity: quoted_magma_oxide_compositions_and_author_estimated_basicity
+          method_class: quoted_attributed
+          attribution: representative magma compositions quoted from Mysen (1980), p. 257; pO estimated in this work
+          composition_amount_basis: mole_fraction
+          points:
+            - {magma: Rhyolite, SiO2: '0.794', Al2O3: '0.089', Fe2O3: '0.008', FeO: '0.009', MgO: '0.007', CaO: '0.016', Na2O: '0.043', K2O: '0.031', pO: '11.8'}
+            - {magma: Dacite, SiO2: '0.720', Al2O3: '0.103', Fe2O3: '0.010', FeO: '0.023', MgO: '0.027', CaO: '0.054', Na2O: '0.039', K2O: '0.015', pO: '12.1'}
+            - {magma: Andesite, SiO2: '0.639', Al2O3: '0.112', Fe2O3: '0.013', FeO: '0.041', MgO: '0.057', CaO: '0.084', Na2O: '0.036', K2O: '0.011', pO: '11.8'}
+            - {magma: Tholeiite, SiO2: '0.527', Al2O3: '0.096', Fe2O3: '0.014', FeO: '0.070', MgO: '0.120', CaO: '0.118', Na2O: '0.029', K2O: '0.006', pO: '10.6'}
+            - {magma: Alkali Basalt, SiO2: '0.506', Al2O3: '0.096', Fe2O3: '0.019', FeO: '0.065', MgO: '0.132', CaO: '0.116', Na2O: '0.034', K2O: '0.009', pO: '10.5'}
+            - {magma: Basanite, SiO2: '0.483', Al2O3: '0.092', Fe2O3: '0.018', FeO: '0.067', MgO: '0.142', CaO: '0.124', Na2O: '0.038', K2O: '0.014', pO: '10.2'}
+      - observation_id: suzuki1995_figures_1_5
+        type: figure
+        locator: {page: 1, pdf_page_index: 0, figure: '1'}
+        units: figure-only; no numeric points
+        values:
+          quantity: redox_potential_and_silicate_basicity_figures
+          method_class: figure_only
+          figures:
+            - {figure: '1', page: 2, caption: Schematic diagram of the electrochemical cell., panel: main, species: Cr, phase: silicate melt, T: {state: {tag: unknown, reason: not_applicable}}, axes_as_printed: {x: none, y: none}, series: [cell electrodes], marker_counts: {cell electrodes: 0}, attribution: this_work}
+            - {figure: '2', page: 2, caption: Observed differential pulse voltammogram in 0.6Na2O·0.4BaO·2SiO2 melt at 1500 K., panel: main, species: Cr, phase: silicate melt, T: {state: {tag: value, value: 1500, units: K}}, axes_as_printed: {x: potential (mV), y: differential current (mA)}, series: [Cr6+ reduction wave, Si4+ solvent reduction wave], marker_counts: not_counted, attribution: this_work}
+            - {figure: '3', page: 2, caption: 'Composition dependences of the Cr6+/Cr3+ reduction potential in MgO, CaO and BaO silicate melts.', panel: main, species: Cr, phase: silicate melt, T: {state: {tag: value, value: 1550, units: K}}, axes_as_printed: {x: mole fraction alkaline-earth oxide, y: E1/2 (mV)}, series: [MgO series, CaO series, BaO series], marker_counts: not_counted, attribution: this_work}
+            - {figure: '4', page: 3, caption: Basicity pO of various disilicates versus optical basicities of the component oxides., panel: main, species: Cr, phase: silicate melt, T: {state: {tag: value, value: 1523, units: K}}, axes_as_printed: {x: optical basicity, y: pO = -log a*(Na2O)}, series: [disilicate materials], marker_counts: not_counted, attribution: mixed prior work and this work}
+            - {figure: '5', page: 4, caption: Composition and estimated basicities of six representative magmas., panel: main, species: Cr, phase: magma composition, T: {state: {tag: unknown, reason: not_applicable}}, axes_as_printed: {x: magma class, y: oxide composition and pO}, series: [Rhyolite, Dacite, Andesite, Tholeiite, Alkali Basalt, Basanite], marker_counts: {Rhyolite: 0, Dacite: 0, Andesite: 0, Tholeiite: 0, Alkali Basalt: 0, Basanite: 0}, attribution: quoted compositions; estimated pO}
+          digitisation: deferred to a figure pass
