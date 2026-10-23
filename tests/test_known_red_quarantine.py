@@ -29,7 +29,15 @@ def _run(
     known_red_only: bool,
     roster: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
-    command = [sys.executable, "-m", "pytest", "-q"]
+    command = [
+        sys.executable,
+        "-m",
+        "pytest",
+        "-q",
+        f"--rootdir={project_root}",
+        "-c",
+        str(project_root / "pytest.ini"),
+    ]
     if roster is not None and _PLUGIN_AVAILABLE:
         command.extend(("--known-red-roster", str(roster)))
     if known_red_only and _PLUGIN_AVAILABLE:
@@ -49,6 +57,7 @@ def _run(
 
 
 def _make_quarantine_project(project_root: Path) -> None:
+    (project_root / "pytest.ini").write_text("[pytest]\n", encoding="utf-8")
     (project_root / "test_quarantine.py").write_text(
         _SYNTHETIC_TESTS,
         encoding="utf-8",
