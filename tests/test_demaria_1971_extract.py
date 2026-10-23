@@ -94,11 +94,18 @@ def test_demaria_1971_table6_thermochemistry_values_match_render() -> None:
         "NAA": "38 ± 2",
     }
     assert rows["demaria_1971_table6_feo_dissociation"]["values"]["quantity"] == "reaction_enthalpy_3rd_law"
-    assert rows["demaria_1971_table6_feo_dissociation_second_law"]["values"]["second_law_delta_H0_kcal_mol"] == "38 ± 3"
+    feo_second_law = rows["demaria_1971_table6_feo_dissociation_second_law"]["values"]
+    assert feo_second_law["second_law_delta_H0_kcal_mol"] == {"BC": "38 ± 3"}
+    assert "NAA" not in feo_second_law["second_law_delta_H0_kcal_mol"]
+    assert feo_second_law["footnote"] == "a"
     assert rows["demaria_1971_table6_tio2_atomic_o"]["values"]["third_law_delta_H0_kcal_mol"] == {
         "BC": None,
         "NAA": "142 ± 3",
     }
+    tio2_second_law = rows["demaria_1971_table6_tio2_atomic_o_second_law"]["values"]
+    assert tio2_second_law["second_law_delta_H0_kcal_mol"] == {"NAA": "143 ± 8"}
+    assert "BC" not in tio2_second_law["second_law_delta_H0_kcal_mol"]
+    assert tio2_second_law["footnote"] == "a"
     assert rows["demaria_1971_table6_feo_dissociation"]["values"]["method_class"] == "quoted_attributed"
     assert "T_range_K" not in rows["demaria_1971_table6_feo_dissociation"]
 

@@ -784,7 +784,8 @@ species:
         method_class: quoted_attributed
         attribution: "De Maria et al. (1971), Table 6, second-law result"
         condensed_phase: lunar_basalt_melt
-        second_law_delta_H0_kcal_mol: 38 ± 3
+        second_law_delta_H0_kcal_mol:
+          BC: 38 ± 3
         footnote: a
         table: '6'
       uncertainty:
@@ -981,6 +982,7 @@ species:
       type: gibbs_table
       locator:
         table: '7'
+        published_page: 1377
         line_range: 330-334
         paragraph: Table 7 negative R ln Kp values
       T_range_K:
@@ -1027,6 +1029,7 @@ species:
       type: gibbs_table
       locator:
         table: '7'
+        published_page: 1377
         line_range: 330-334
         paragraph: Table 7 negative delta fef values
       T_range_K:
@@ -1333,7 +1336,8 @@ species:
         method_class: quoted_attributed
         attribution: "De Maria et al. (1971), Table 6, second-law result"
         condensed_phase: lunar_basalt_melt
-        second_law_delta_H0_kcal_mol: 143 ± 8
+        second_law_delta_H0_kcal_mol:
+          NAA: 143 ± 8
         footnote: a
         table: '6'
       uncertainty:
@@ -1658,6 +1662,7 @@ species:
       type: gibbs_table
       locator:
         table: '8'
+        published_page: 1377
         line_range: 337-341
         paragraph: Table 8 equilibrium constants
       T_range_K:
@@ -1686,6 +1691,7 @@ species:
       type: gibbs_table
       locator:
         table: '8'
+        published_page: 1377
         line_range: 337-341
         paragraph: Table 8 negative R ln Kp values
       T_range_K:
@@ -1714,6 +1720,7 @@ species:
       type: gibbs_table
       locator:
         table: '8'
+        published_page: 1377
         line_range: 337-341
         paragraph: Table 8 negative delta fef values
       T_range_K:
@@ -3030,12 +3037,23 @@ fidelity_samples:
   observable: gibbs_table
   observation_id: demaria_1971_table6_feo_dissociation_second_law
   field: second_law_delta_H0_kcal_mol
-  value: 38 ± 3
+  value:
+    BC: 38 ± 3
   locator:
     table: '6'
     published_page: 1376
     pdf_page_index: 10
     note: Table 6 reaction (4) second-law BC 38 ± 3 kcal/mole (footnote a)
+- species: Fe
+  observable: gibbs_table
+  observation_id: demaria_1971_table6_feo_dissociation_second_law
+  field: footnote
+  value: a
+  locator:
+    table: '6'
+    published_page: 1376
+    pdf_page_index: 10
+    note: Table 6 reaction (4), footnote a
 - species: O2
   observable: rate_series
   observation_id: demaria_1971_sample_masses_splits
@@ -3082,9 +3100,20 @@ fidelity_samples:
   observable: gibbs_table
   observation_id: demaria_1971_table6_tio2_atomic_o_second_law
   field: second_law_delta_H0_kcal_mol
-  value: 143 ± 8
+  value:
+    NAA: 143 ± 8
   locator:
     table: '6'
     published_page: 1376
     pdf_page_index: 10
     note: Table 6 reaction (6) second-law NAA 143 ± 8 kcal/mole (footnote a)
+- species: TiO2
+  observable: gibbs_table
+  observation_id: demaria_1971_table6_tio2_atomic_o_second_law
+  field: footnote
+  value: a
+  locator:
+    table: '6'
+    published_page: 1376
+    pdf_page_index: 10
+    note: Table 6 reaction (6), footnote a
