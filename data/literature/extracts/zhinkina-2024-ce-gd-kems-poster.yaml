@@ -1,0 +1,198 @@
+schema_version: literature_extract.v1
+source_id: zhinkina-2024-ce-gd-kems-poster
+source:
+  citation: 'Zhinkina, O. A., Shugurov, S. M., Balabanova, E. A., Repin, D. A. & Lopatin, S. I. (2024). Thermodynamic Properties of the CeO2–Gd2O3 System. XXIV International Conference on Chemical Thermodynamics in Russia (RCCT-2024), Ivanovo, 1–5 July 2024, conference poster.'
+  year: 2024
+  corpus_asset: raw/zhinkina-2024-ce-gd-kems-poster/zhinkina-2024-ce-gd-kems-poster.pdf
+extraction:
+  method: >-
+    Manual review of the one-page poster text and its 600 dpi render. The poster has no numeric table of measured activity points. Its explicit Gibbs-mixing-energy minimum and ion-to-molecule assignments are retained in context because the former has no matching quantity token and the latter are species assignments rather than measured pressures or intensities. Plotted points and fitted curves are recorded without digitisation.
+  date: '2026-10-20'
+  worker: codex-fam33-1020
+review_status: draft
+species:
+  CeO2:
+    observations: []
+    context:
+      - observation_id: zhinkina_2024_vapour_ion_assignments
+        type: textual_fact
+        locator: {page: 1, pdf_page_index: 0, section: Vapour composition}
+        units: m/z for ions; molecule assignments as printed
+        attribution: Zhinkina et al. (2024), present-work poster table.
+        values:
+          quantity_as_printed: mass-spectrometric ion-to-molecule assignments
+          quantity_token: unavailable
+          schema_gap: >-
+            Candidate tokens checked: partial_pressure and ion_intensity describe numeric physical quantities, but the poster table prints only ion labels, m/z values, and proposed neutral molecules. No token represents a qualitative ion-to-molecule assignment.
+          assignments:
+            - {ion: CeO+, m_z: 156, molecule_assignments: [CeO, CeO2]}
+            - {ion: CeO2+, m_z: 172, molecule_assignments: [CeO2]}
+            - {ion: GdO+, m_z: 176, molecule_assignments: [GdO]}
+          printed_ionization_reactions:
+            - CeO + e− = CeO+ + 2e−
+            - CeO2 + e− = CeO2+ + 2e−
+            - CeO2 + e− = CeO+ + O + 2e−
+      - observation_id: zhinkina_2024_gibbs_mixing_energy_minimum
+        type: textual_fact
+        locator: {page: 1, pdf_page_index: 0, section: Results}
+        units: kJ/mol
+        attribution: Zhinkina et al. (2024), present-work poster result.
+        values:
+          quantity_as_printed: minimum Gibbs energy of mixing, ΔGm(min)
+          quantity_token: unavailable
+          schema_gap: >-
+            Candidate token delta_fG represents formation Gibbs energy, not Gibbs energy of mixing; no quantity token represents this reported mixing-energy minimum.
+          value_as_printed: '−16.5 ± 1.4'
+          uncertainty_as_printed: '±1.4'
+          confidence_level: not stated
+          composition_as_printed: x(CeO2) = 0.53
+          temperature_K: 2150
+      - observation_id: zhinkina_2024_activity_measurement_method
+        type: textual_fact
+        locator: {page: 1, pdf_page_index: 0, section: Activities}
+        units: eV; instrument/model identifiers as printed
+        attribution: Zhinkina et al. (2024), present-work poster.
+        values:
+          quantity_as_printed: activity measurement method and reference basis
+          quantity_token: unavailable
+          schema_gap: The activity token exists, but the poster provides no tabulated numeric activity observations; its curves remain deferred figure records.
+          instrument: MS-1301 mass spectrometer
+          ionization_energy: 30 eV
+          effusion_cell: twin tungsten effusion cell
+          cell_heating: electron bombardment
+          temperature_measurement: EOP-66 optical pyrometer
+          pressure_relation_as_printed: p = kI/σ; k/σ is constant for a species during one experiment
+          CeO2_activity_basis_as_printed: p(CeO2)/p°(CeO2) = I(CeO2)/I°(CeO2)
+          Gd2O3_activity_method_as_printed: obtained from CeO2 activity by Gibbs–Duhem integration
+          activity_reference_phase: not specified on poster
+          activity_measurement_temperature_K: 2150
+      - observation_id: zhinkina_2024_synthesis_conditions
+        type: textual_fact
+        locator: {page: 1, pdf_page_index: 0, section: Synthesis}
+        units: °C; h
+        attribution: Zhinkina et al. (2024), present-work poster.
+        values:
+          quantity_as_printed: synthesis conditions for CeO2–Gd2O3 samples
+          composition_range_as_printed: x(CeO2) = 0.1 to 0.9 at 0.1 intervals
+          synthesis_temperature_C: 1400
+          synthesis_duration_h: 48
+      - observation_id: zhinkina_2024_figure_activities_ce_gd
+        type: figure_record
+        locator: {page: 1, pdf_page_index: 0, panel: CeO2–Gd2O3 activities}
+        attribution: Present-work activities; solid-solution boundaries cited to reference 1.
+        units: activity (dimensionless); x(CeO2) (mole fraction); T (K)
+        values:
+          quantity: activity
+          schema_gap: Plotted points are deferred; no numeric activity table is printed.
+          species: [CeO2, Gd2O3]
+          phase: CeO2–Gd2O3 solid solution; C, C+F, and F structure fields as labeled
+          temperature_K: 2150
+          axes_as_printed: {x: x(CeO2), y: a_i}
+          caption: The dependence of CeO2, Gd2O3 activities on ceria mole fraction at 2150 K with different structure solid solution boundaries.
+          series:
+            - {name: CeO2 activity, marker: filled circle, marker_count: 11, evidence_class: measured_direct}
+            - {name: Gd2O3 activity, marker: filled triangle, marker_count: 11, evidence_class: measured_reduced}
+          digitisation: deferred to a figure pass
+      - observation_id: zhinkina_2024_figure_gibbs_mixing_excess
+        type: figure_record
+        locator: {page: 1, pdf_page_index: 0, panel: Gibbs mixing and excess energies}
+        attribution: Present-work result; numeric minimum also stated in the poster text box and retained once in zhinkina_2024_gibbs_mixing_energy_minimum.
+        units: kJ/mol; x(CeO2) (mole fraction)
+        values:
+          quantity: unavailable
+          schema_gap: No store token represents Gibbs energy of mixing or excess Gibbs energy.
+          species: [CeO2, Gd2O3]
+          phase: CeO2–Gd2O3 solid solution
+          temperature_K: 2150
+          axes_as_printed: {x: x(CeO2), y: ΔG (kJ/mol)}
+          caption: The dependence of ΔGm and ΔGE on ceria mole fraction at 2150 K.
+          series:
+            - {name: ΔGm, marker: filled triangle, marker_count: 11, evidence_class: measured_reduced}
+            - {name: ΔGE, marker: filled circle, marker_count: 11, evidence_class: measured_reduced}
+          digitisation: deferred to a figure pass
+      - observation_id: zhinkina_2024_figure_activity_ce_zr_literature
+        type: figure_record
+        locator: {page: 1, pdf_page_index: 0, panel: CeO2–ZrO2 activity comparison}
+        attribution: Quoted literature comparison, reference 2 (J. Alloys Compd. 2019, 776, 194–201); not present-work CeO2–Gd2O3 data.
+        units: activity (dimensionless); x(CeO2) (mole fraction)
+        values:
+          quantity: activity
+          species: [CeO2, ZrO2]
+          phase: CeO2–ZrO2 system; phase not stated in poster
+          temperature_as_printed: not stated for this panel
+          axes_as_printed: {x: x(CeO2), y: a_i}
+          caption: The dependence of CeO2 (black), ZrO2 (red) activities on ceria mole fraction.
+          series:
+            - {name: CeO2 activity, marker: filled circle, marker_count: 6, evidence_class: quoted_attributed}
+            - {name: ZrO2 activity, marker: filled circle, marker_count: 11, evidence_class: quoted_attributed}
+          digitisation: deferred to a figure pass
+      - observation_id: zhinkina_2024_figure_activity_ce_y_literature
+        type: figure_record
+        locator: {page: 1, pdf_page_index: 0, panel: CeO2–Y2O3 activity comparison}
+        attribution: Quoted literature comparison, reference 3 (Ceram. Int. 2021, 47(8), 11072–11079); not present-work CeO2–Gd2O3 data.
+        units: activity (dimensionless); x(CeO2) (mole fraction)
+        values:
+          quantity: activity
+          species: [CeO2, Y2O3]
+          phase: CeO2–Y2O3 system; phase not stated in poster
+          temperature_as_printed: not stated for this panel
+          axes_as_printed: {x: x(CeO2), y: a_i}
+          caption: The dependence of activities CeO2 (black), Y2O3 (red) on ceria mole fraction.
+          series:
+            - {name: CeO2 activity, marker: filled circle, marker_count: 6, evidence_class: quoted_attributed}
+            - {name: Y2O3 activity, marker: filled triangle, marker_count: 6, evidence_class: quoted_attributed}
+          digitisation: deferred to a figure pass
+      - observation_id: zhinkina_2024_figure_excess_energy_model_comparisons
+        type: figure_record
+        locator: {page: 1, pdf_page_index: 0, panel: Excess Gibbs energy model comparisons}
+        attribution: Present-work experimental results and model fits as identified in the poster legend.
+        units: dimensionless ΔGE/RT; x(CeO2) (mole fraction)
+        values:
+          quantity: unavailable
+          schema_gap: No store token represents excess Gibbs energy or the model fit quality shown here.
+          species: [CeO2, Gd2O3]
+          phase: CeO2–Gd2O3 solid solution
+          temperature_K: 2150
+          axes_as_printed: {x: x(CeO2), y: ΔGE/RT}
+          caption: Approximation of experimental results by Redlich–Kister, strictly regular, and subregular models.
+          printed_fit_annotations: [r = 0.917, r = 0.994, r = 0.602]
+          series:
+            - {name: experimental values, marker: filled square, marker_count: 10, evidence_class: measured_reduced}
+            - {name: Redlich–Kister, marker: line, marker_count: 0, evidence_class: model_derived}
+            - {name: strictly regular, marker: line, marker_count: 0, evidence_class: model_derived}
+            - {name: subregular, marker: line, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: zhinkina_2024_figure_phase_diagram
+        type: figure_record
+        locator: {page: 1, pdf_page_index: 0, panel: theoretical phase diagram}
+        attribution: Theoretical phase diagram compared with experimental results; reference 4 (Phys. Chem. Chem. Phys. 2018, 20(17), 11805–11818).
+        units: temperature (K); x(CeO2) (mole fraction)
+        values:
+          quantity: unavailable
+          schema_gap: No numeric phase-boundary values are tabulated; the diagram is deferred without digitisation.
+          species: [CeO2, Gd2O3]
+          phase: CeO2–Gd2O3 system
+          axes_as_printed: {x: x(CeO2), y: temperature (K)}
+          caption: Theoretical phase diagram of the CeO2–Gd2O3 system compared to experimental results.
+          series:
+            - {name: theoretical phase boundaries, marker: line, marker_count: 0, evidence_class: model_derived}
+            - {name: experimental results, marker: unspecified symbols, marker_count: not counted, evidence_class: quoted_attributed}
+          digitisation: deferred to a figure pass
+      - observation_id: zhinkina_2024_figure_gibbs_minimum_ionic_radius_fit
+        type: figure_record
+        locator: {page: 1, pdf_page_index: 0, panel: ΔGm minimum versus Shannon ionic radius}
+        attribution: Literature comparison across CeO2-containing systems; source assignments are not itemized by point in the poster.
+        units: kJ/mol; r (Å)
+        values:
+          quantity: unavailable
+          schema_gap: No store token represents Gibbs energy of mixing minimum or the correlation fit.
+          species: [CeO2, Gd2O3, Y2O3, ZrO2]
+          phase: oxide systems as compared in the poster
+          axes_as_printed: {x: r (Å), y: ΔGm min (kJ/mol)}
+          caption: 'Comparison with similar CeO2-containing systems: possibility to predict thermodynamic properties (2150 K).'
+          fit_as_printed: ΔGm min [kJ/mol] = (116.96 ± 0.51) r Å − (126.17 ± 0.45)
+          printed_correlation: r = 0.602
+          series:
+            - {name: literature system values, marker: filled square, marker_count: 6, evidence_class: quoted_attributed}
+            - {name: linear fit, marker: line, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
