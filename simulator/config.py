@@ -223,31 +223,44 @@ def _load_required_yaml(
 
 def resolve_collector_bands_C(
     setpoints: Mapping[str, Any] | None = None,
+    *,
+    require_complete: bool = False,
 ) -> dict[int, tuple[float, float]]:
     """Resolve collector bands from YAML; partial callers inherit omitted stages.
 
     Species reference/dew temperatures are a different input. There is no
     in-code band fallback: even the no-argument train reads shipped setpoints.
-    Explicit malformed bands refuse rather than reverting to default physics.
+    File loaders require complete inputs; only in-memory callers may inherit
+    omitted stages. The inherited YAML is itself loaded and validated strictly.
     """
-    defaults, _ = _load_required_yaml(
-        DEFAULT_DATA_DIR / "setpoints.yaml", functional_digest=True,
+    defaults = (
+        _load_setpoints_file(DEFAULT_DATA_DIR / "setpoints.yaml")
+        if not require_complete or setpoints is None else setpoints
     )
-    default_stages = defaults["condensation_train"]["metals_train"]
-    train = (setpoints if setpoints is not None else defaults).get(
+    supplied = setpoints if setpoints is not None else defaults
+    if require_complete and "condensation_train" not in supplied:
+        raise ValueError("missing required config key: condensation_train")
+    train = supplied.get(
         "condensation_train", {},
     )
     if not isinstance(train, Mapping):
         raise ValueError("condensation_train must be a mapping")
+    if require_complete and "metals_train" not in train:
+        raise ValueError("missing required config key: condensation_train.metals_train")
     stages = train.get("metals_train", {})
     if not isinstance(stages, Mapping):
         raise ValueError("condensation_train.metals_train must be a mapping")
     bands = {}
+    default_stages = defaults["condensation_train"]["metals_train"]
     for number, key in COLLECTOR_STAGE_KEY_BY_NUMBER.items():
-        stage = stages.get(key, default_stages[key])
+        if require_complete and key not in stages:
+            raise ValueError(f"missing required config key: condensation_train.metals_train.{key}")
+        stage = stages.get(key, default_stages.get(key))
         label = f"condensation_train.metals_train.{key}.temp_range_C"
         if not isinstance(stage, Mapping):
             raise ValueError(f"{label} stage must be a mapping")
+        if require_complete and "temp_range_C" not in stage:
+            raise ValueError(f"missing required config key: {label}")
         band = stage.get("temp_range_C")
         if not isinstance(band, (list, tuple)) or len(band) != 2:
             raise ValueError(f"{label} must contain two finite temperatures")
@@ -270,6 +283,13 @@ def resolve_collector_bands_C(
                 raise ValueError(f"{label} exceeds declared max_service_T_C={limit}")
         bands[number] = (low, high)
     return bands
+
+
+def _load_setpoints_file(path: Path) -> dict[str, Any]:
+    """Read complete setpoints without inheriting missing collector inputs."""
+    setpoints, _ = _load_required_yaml(path, functional_digest=True)
+    resolve_collector_bands_C(setpoints, require_complete=True)
+    return setpoints
 
 
 def load_config_bundle(
@@ -321,7 +341,7 @@ def load_config_bundle(
         loaded["vapor_pressures"] = vapor_pressure_compatibility_view(
             loaded["vapor_pressures"]
         )
-    resolve_collector_bands_C(loaded["setpoints"])
+    resolve_collector_bands_C(loaded["setpoints"], require_complete=True)
     return ConfigBundle(
         setpoints=loaded["setpoints"],
         feedstocks=loaded["feedstocks"],

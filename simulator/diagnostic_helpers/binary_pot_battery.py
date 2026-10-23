@@ -56,6 +56,7 @@ from simulator.engine_pool import (
     WarmEngineWorker,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.config import _load_setpoints_file
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
 
@@ -2670,7 +2671,7 @@ def _new_internal_analytical_core() -> Any:
 
     return PyrolysisSimulator(
         InternalAnalyticalBackend(),
-        load_data("setpoints.yaml"),
+        _load_setpoints_file(REPO_ROOT / "data" / "setpoints.yaml"),
         {},
         load_data("vapor_pressures.yaml"),
     )

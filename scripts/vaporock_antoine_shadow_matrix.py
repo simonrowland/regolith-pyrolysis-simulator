@@ -37,6 +37,7 @@ from simulator.melt_backend.melt_envelope import (  # noqa: E402
 from simulator.melt_backend.vaporock import VapoRockBackend  # noqa: E402
 from simulator.fe_redox import intrinsic_melt_fO2  # noqa: E402
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+from simulator.config import _load_setpoints_file  # noqa: E402
 from simulator.optimize.canonical import (  # noqa: E402
     canonical_json_dumps,
     normalize_canonical_value,
@@ -395,7 +396,7 @@ def main() -> int:
     )
 
     feedstocks = load_yaml(REPO_ROOT / "data" / "feedstocks.yaml")
-    setpoints = load_yaml(REPO_ROOT / "data" / "setpoints.yaml")
+    setpoints = _load_setpoints_file(REPO_ROOT / "data" / "setpoints.yaml")
     cells = build_cells(
         selected_profiles,
         feedstocks=feedstocks,

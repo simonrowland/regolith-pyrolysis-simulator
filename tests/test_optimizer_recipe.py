@@ -344,7 +344,10 @@ def _write_c5_mre_cap_bound_yaml(data_dir: Path, high: float, mtime_ns: int) -> 
                     "C5": {
                         "allow_mre_voltage_cap_upper_bound_V": high,
                     }
-                }
+                },
+                "condensation_train": yaml.safe_load(SETPOINTS_PATH.read_text())[
+                    "condensation_train"
+                ],
             },
             sort_keys=True,
         ),

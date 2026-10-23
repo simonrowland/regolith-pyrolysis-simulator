@@ -30,6 +30,7 @@ from typing import Any, Mapping
 
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.config import _load_setpoints_file
 from simulator.backends import BackendSelectionPolicy
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun, _positive_mass_kg
@@ -47,6 +48,8 @@ SUPPORTED_FORMATS = ('markdown', 'json')
 
 
 def _load_yaml(data_dir: Path, name: str) -> dict:
+    if name == "setpoints.yaml":
+        return _load_setpoints_file(data_dir / name)
     with (data_dir / name).open() as f:
         return load_cached_safe_yaml(f.read()) or {}
 

@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+from simulator.config import _load_setpoints_file  # noqa: E402
 
 REPORT_PATH = ROOT / "studio-pin-report.json"
 
@@ -55,7 +56,7 @@ def _emit_capacity() -> dict:
         "lunar_mare_low_ti",
         load("vapor_pressures.yaml"),
         load("feedstocks.yaml"),
-        load("setpoints.yaml"),
+        _load_setpoints_file(data / "setpoints.yaml"),
     )
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0

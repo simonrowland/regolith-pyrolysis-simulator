@@ -12,14 +12,13 @@ from types import MappingProxyType
 from typing import Any, Literal, Mapping, Sequence
 import warnings
 
-from simulator.config import DEFAULT_DATA_DIR, resolve_collector_bands_C
+from simulator.config import DEFAULT_DATA_DIR, _load_setpoints_file, resolve_collector_bands_C
 from simulator.chemistry.kernel.config import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
 )
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.canonical import canonical_json_dumps
-from simulator.yaml_cache import load_cached_safe_yaml
 
 KeyPath = tuple[str, ...]
 
@@ -116,13 +115,7 @@ BOUNDS_DIGEST_SCHEMA_VERSION = "optimizer-bounds-digest-v1"
 
 def _c5_allow_mre_voltage_cap_upper_bound() -> float:
     path = DEFAULT_DATA_DIR / "setpoints.yaml"
-    try:
-        with path.open("r", encoding="utf-8") as handle:
-            loaded = load_cached_safe_yaml(handle.read()) or {}
-    except OSError:
-        return DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V
-    if not isinstance(loaded, Mapping):
-        return DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V
+    loaded = _load_setpoints_file(path)
     campaigns = loaded.get("campaigns")
     c5 = campaigns.get("C5") if isinstance(campaigns, Mapping) else None
     if not isinstance(c5, Mapping):
@@ -2766,13 +2759,7 @@ def _validate_pressure_pair(
 @lru_cache(maxsize=1)
 def _default_setpoints() -> Mapping[str, Any]:
     path = DEFAULT_DATA_DIR / "setpoints.yaml"
-    with path.open("r", encoding="utf-8") as handle:
-        loaded = load_cached_safe_yaml(handle.read()) or {}
-    if not isinstance(loaded, Mapping):
-        raise RecipeValidationError(
-            f"recipe default setpoints must be a mapping: {path}"
-        )
-    return loaded
+    return _load_setpoints_file(path)
 
 
 def _default_setpoint_value(path: KeyPath) -> Any:
