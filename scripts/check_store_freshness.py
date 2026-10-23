@@ -235,6 +235,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "7e0508bb5", "b37e28bac", "297df02b9",
     "2458a9f46",
     "3b4e68626",
+    "f1ddf0822",
 })
 
 

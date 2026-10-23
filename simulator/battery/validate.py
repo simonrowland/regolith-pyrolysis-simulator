@@ -2103,6 +2103,30 @@ def validate_corpus(
                 source_owners,
             )
         )
+    admitted_transition_points = [
+        observation
+        for observation in obs_map.values()
+        if observation.admission.status is AdmissionStatus.ADMITTED
+        and quantity_token(observation.identity) is Quantity.TRANSITION_TEMPERATURE
+        and observation.value.kind is ValueKind.POINT
+    ]
+    for index, left in enumerate(admitted_transition_points):
+        for right in admitted_transition_points[index + 1 :]:
+            equal = identity_equal(left.identity, right.identity)
+            if (
+                equal.kind is IdentityEqualKind.EQUAL
+                and left.value.point != right.value.point
+            ):
+                issues.append(
+                    _issue(
+                        f"observation[{left.observation_id},{right.observation_id}]",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "identity-equal admitted transition-temperature observations "
+                        f"have different point values: {left.observation_id}="
+                        f"{left.value.point} K, {right.observation_id}="
+                        f"{right.value.point} K",
+                    )
+                )
     for cycle in _ancestry_cycles(obs_map):
         issues.append(
             _issue(

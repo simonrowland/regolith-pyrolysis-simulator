@@ -476,6 +476,97 @@ def _migrate_real_extract(
     return migrate(root, write=write)
 
 
+def test_identity_equal_transition_temperature_conflict_and_green_unknown(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import Species
+
+    identity = Identity(
+        quantity=Quantity.TRANSITION_TEMPERATURE,
+        species=Species("Na", Phase.CR, polymorph=State.of("bcc")),
+        subtype=State.of("melting"),
+        total_pressure_Pa=State.of(Decimal("101325")),
+        composition=State.not_applicable("pure Na melting"),
+        fO2_Pa=State.not_applicable("not redox"),
+        temperature_K=State.not_applicable("T is the result"),
+        per=State.not_applicable("temperature quantity"),
+        standard_pressure_Pa=State.not_applicable("not a thermo table"),
+        reaction=State.not_applicable("not formation"),
+        formation_elements=State.not_applicable("not formation"),
+        reference_state=State.not_applicable("not activity"),
+        reservoir=State.not_applicable("not vapour"),
+        sweep_gas=State.not_applicable("not kinetic"),
+        exposure=State.not_applicable("not kinetic"),
+        sample_mass_kg=State.not_applicable("not extensive"),
+        wall=State.not_applicable("not deposit"),
+    )
+    assert identity_equal(identity, identity).kind is IdentityEqualKind.EQUAL
+
+    def pair_report(right_value: Decimal):
+        observations = {
+            observation_id: F.observation(
+                observation_id,
+                "missing-experiment",
+                identity,
+                value,
+                source_id="fixture-source",
+            )
+            for observation_id, value in (
+                ("transition-left", Decimal("1200")),
+                ("transition-right", right_value),
+            )
+        }
+        return validate_corpus({}, {}, observations)
+
+    unequal = pair_report(Decimal("1201"))
+    collision = [
+        issue
+        for issue in unequal.hard_issues
+        if issue.path == "observation[transition-left,transition-right]"
+    ]
+    assert len(collision) == 1
+    assert all(
+        observation_id in collision[0].detail
+        for observation_id in ("transition-left", "transition-right")
+    )
+    equal = pair_report(Decimal("1200"))
+    assert not any(
+        issue.path == "observation[transition-left,transition-right]"
+        for issue in equal.hard_issues
+    )
+
+    green = _migrate_real_extract(
+        tmp_path / "green",
+        "green-1971-apollo12-basalt-petrology.yaml",
+    )
+    green_pair = [
+        observation
+        for observation in green.observations.values()
+        if observation.observation_id.endswith(
+            (
+                "green1971_12022_pigeonite_in",
+                "green1971_12022_ilmenite_plagioclase_in",
+            )
+        )
+    ]
+    assert len(green_pair) == 2
+    assert identity_equal(green_pair[0].identity, green_pair[1].identity).kind is (
+        IdentityEqualKind.IDENTITY_UNKNOWN
+    )
+    assert not any(
+        issue.path.startswith("observation[")
+        and all(
+            token in issue.detail
+            for token in (
+                "green1971_12022_pigeonite_in",
+                "green1971_12022_ilmenite_plagioclase_in",
+            )
+        )
+        for issue in green.validation.hard_issues
+    )
+
+
 def test_extract_source_method_uncertainty_migrates_on_its_work(
     tmp_path: Path,
 ) -> None:
