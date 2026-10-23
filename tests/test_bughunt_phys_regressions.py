@@ -856,16 +856,7 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     assert isinstance(direct_snapshot.value.__cause__, AssertionError)
 
 
-def test_successful_step_shares_committed_target_inventory_history() -> None:
-    class HistoricalTargetInventory:
-        deepcopy_count = 0
-
-        def __deepcopy__(self, memo):
-            type(self).deepcopy_count += 1
-            copied = type(self)()
-            memo[id(self)] = copied
-            return copied
-
+def _refusal_step_sim() -> PyrolysisSimulator:
     class FakeLedger:
         def __init__(self) -> None:
             self._balances = {}
@@ -878,8 +869,6 @@ def test_successful_step_shares_committed_target_inventory_history() -> None:
         def transitions(self):
             return self._transitions
 
-    HistoricalTargetInventory.deepcopy_count = 0
-    committed = HistoricalTargetInventory()
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
@@ -889,88 +878,92 @@ def test_successful_step_shares_committed_target_inventory_history() -> None:
         operating_history=[],
         last_sticking_alpha_provenance_notice={},
     )
-    sim._target_inventory_by_hour = [committed]
+    sim.runtime_state = {"plain": {"value": 1}}
     sim.atom_ledger = FakeLedger()
     sim._chem_registry = object()
     sim._chem_kernel = object()
     sim._build_chemistry_kernel = lambda: object()
+    return sim
+
+
+def test_successful_step_shares_committed_yield_disposition_rows() -> None:
+    class CommittedRow:
+        deepcopy_count = 0
+
+        def __deepcopy__(self, memo):
+            type(self).deepcopy_count += 1
+            copied = type(self)()
+            memo[id(self)] = copied
+            return copied
+
+    CommittedRow.deepcopy_count = 0
+    row = CommittedRow()
+    key = (0, "C0", 0)
+    sim = _refusal_step_sim()
+    sim._yield_disposition_ledger_snapshots = {key: row}
     sim._step_one_hour = lambda: HourSnapshot(hour=4)
 
     assert sim.step().hour == 4
 
-    assert HistoricalTargetInventory.deepcopy_count == 0
-    assert sim._target_inventory_by_hour == [committed]
-    assert sim._target_inventory_by_hour[0] is committed
+    assert CommittedRow.deepcopy_count == 0
+    assert sim._yield_disposition_ledger_snapshots[key] is row
+    assert sim.runtime_state == {"plain": {"value": 1}}
 
 
-def test_terminal_refusal_does_not_leak_target_inventory_history_append(
+def test_terminal_refusal_restores_inserted_yield_rows_and_copies_other_roots(
     monkeypatch,
 ) -> None:
-    class TerminalRefusal(RuntimeError):
-        terminal_refusal = True
-
-    class FakeLedger:
-        def __init__(self) -> None:
-            self._balances = {}
-            self._policies = {}
-            self._transitions = []
-            self._terminal_debit_authorized_transition_ids = set()
-            self._external_loads = []
-
-        @property
-        def transitions(self):
-            return self._transitions
-
     def make_simulator():
-        committed = {"hour": 3, "targets": [{"remaining_kg": 1.0}]}
-        sim = object.__new__(PyrolysisSimulator)
-        sim._poisoned_hour = None
-        sim._pending_shuttle_bakeout_cycle_increment = ""
-        sim.melt = SimpleNamespace(hour=4)
-        sim.record = SimpleNamespace(snapshots=[])
-        sim._condensation_model = SimpleNamespace(
-            operating_history=[],
-            last_sticking_alpha_provenance_notice={},
+        key = (3, "C0", 3)
+        committed = {
+            "gross_events": [
+                {"account": "process.condensation_train", "n": 1},
+            ],
+        }
+        sim = _refusal_step_sim()
+        sim._yield_disposition_ledger_snapshots = {key: committed}
+        refusal = EvaporationFluxRefusal(
+            "terminal", {"reason": "yield-disposition-row"},
         )
-        sim.runtime_state = {"target_record": committed}
-        sim._target_inventory_by_hour = [committed]
-        sim.atom_ledger = FakeLedger()
-        sim._chem_registry = object()
-        sim._chem_kernel = object()
-        sim._build_chemistry_kernel = lambda: object()
-        refusal = TerminalRefusal("refused after recording target inventory")
 
         def refuse_after_append():
-            sim._target_inventory_by_hour.append(
-                {"hour": 4, "targets": [{"remaining_kg": 0.0}]}
-            )
+            sim._yield_disposition_ledger_snapshots[(4, "C0", 4)] = {
+                "gross_events": [],
+            }
             raise refusal
 
         sim._step_one_hour = refuse_after_append
-        return sim, committed, refusal
+        return sim, key, committed, refusal
 
-    def assert_refusal_rolls_back(sim, committed, refusal):
-        with pytest.raises(TerminalRefusal) as raised:
+    def assert_refusal_rolls_back(sim, key, committed, refusal):
+        with pytest.raises(EvaporationFluxRefusal) as raised:
             sim.step()
 
         assert raised.value is refusal
-        assert sim._target_inventory_by_hour == [
-            {"hour": 3, "targets": [{"remaining_kg": 1.0}]}
-        ]
-        assert sim._target_inventory_by_hour[0] is sim.runtime_state["target_record"]
-        assert sim._target_inventory_by_hour[0] is not committed
+        restored = sim._yield_disposition_ledger_snapshots
+        assert list(restored) == [key]
+        assert restored[key] == committed
+        assert restored[key] is not committed
+        assert restored[key]["gross_events"] is not committed["gross_events"]
+        assert (
+            restored[key]["gross_events"][0]
+            is not committed["gross_events"][0]
+        )
+        assert sim.runtime_state == {"plain": {"value": 1}}
 
-    sim, committed, refusal = make_simulator()
-    assert_refusal_rolls_back(sim, committed, refusal)
+    sim, key, committed, refusal = make_simulator()
+    assert_refusal_rolls_back(sim, key, committed, refusal)
 
-    sim, committed, refusal = make_simulator()
+    sim, key, committed, refusal = make_simulator()
     snapshot = sim._snapshot_terminal_refusal_hour_state
 
     def broken_snapshot(*, defer_committed_history=False):
         state, ledger, cost_state = snapshot(
             defer_committed_history=defer_committed_history,
         )
-        state["_target_inventory_by_hour"] = sim._target_inventory_by_hour
+        state["_yield_disposition_ledger_snapshots"] = (
+            sim._yield_disposition_ledger_snapshots
+        )
         return state, ledger, cost_state
 
     monkeypatch.setattr(
@@ -979,7 +972,7 @@ def test_terminal_refusal_does_not_leak_target_inventory_history_append(
         broken_snapshot,
     )
     with pytest.raises(AssertionError):
-        assert_refusal_rolls_back(sim, committed, refusal)
+        assert_refusal_rolls_back(sim, key, committed, refusal)
 
 
 def test_terminal_refusal_materializes_detached_committed_history() -> None:
