@@ -13,6 +13,7 @@ import pytest
 
 import simulator.battery.score as score_module
 from simulator.battery.enums import (
+    AmountBasis,
     Authority,
     Engine,
     MetricOperation,
@@ -38,7 +39,7 @@ from simulator.battery.score import (
     score_store,
     SCORE_ENGINE_SET,
 )
-from simulator.battery.records import Located, Locator, State, Value
+from simulator.battery.records import Composition, Located, Locator, State, Value
 from simulator.battery.score import headline_payload_records, residual_to_plain
 from tests.battery.factories import migrate_one_extract
 
@@ -256,6 +257,101 @@ def test_openimcc_redox_without_printed_fo2_still_refuses():
         "reason": "missing_input",
         "input": "printed_fO2",
     }
+
+
+def _openimcc_row_with_mass_composition(components):
+    """Sossi redox row with a replacement mass-percent composition."""
+
+    _context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    printed = observation.identity.composition
+    assert printed is not None and printed.is_value
+    composition = Composition(
+        basis=printed.value.basis,
+        components=components,
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+    return replace(
+        observation,
+        identity=replace(observation.identity, composition=State.of(composition)),
+    )
+
+
+def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
+    """Fe3O4 is iron for OpenIMCC and not a Kress FeOt component.
+
+    The merged helper refused ``total_iron`` from the Kress basis before
+    printed fO2 and before ``evaluate_redox``. Offer 20 converts weights,
+    reads printed fO2, then counts Fe atoms. OpenIMCC must not equilibrate.
+    """
+
+    row = _openimcc_row_with_mass_composition(
+        (("SiO2", Decimal("90")), ("Fe3O4", Decimal("10")))
+    )
+
+    def _boom(*_args, **_kwargs):
+        raise AssertionError("OpenIMCC redox must not open or equilibrate a cell")
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _boom,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _boom,
+    )
+    calls = []
+    try:
+        import openimcc
+    except ImportError:
+        openimcc = None
+    else:
+        original_evaluate_redox = openimcc.evaluate_redox
+
+        def capture_redox_call(*args, **kwargs):
+            calls.append((args, kwargs))
+            return original_evaluate_redox(*args, **kwargs)
+
+        monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_call)
+
+    prediction = predict_with_engine(Engine.OPENIMCC, row)
+
+    assert prediction.refusal_detail != {
+        "reason": "missing_input",
+        "input": "total_iron",
+    }
+    if openimcc is None:
+        assert prediction.refusal_reason is RefusalReason.OPENIMCC_NOT_IMPORTABLE
+        return
+    assert calls, prediction.refusal_detail
+    assert calls[0][0][0].get("Fe", 0.0) > 0.0
+    assert calls[0][2] == "imposed"
+
+
+def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
+    """Silica with no fO2 is a printed-oxygen refusal, not a Kress FeOt refusal."""
+
+    row = _openimcc_row_with_mass_composition((("SiO2", Decimal("100")),))
+    conditions = dict(row.point_conditions or {})
+    conditions.pop("fO2_log", None)
+    conditions.pop("fO2_Pa", None)
+    missing_fo2 = replace(
+        row,
+        point_conditions=conditions,
+        identity=replace(row.identity, fO2_Pa=None),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, missing_fo2)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "printed_fO2",
+    }
+    assert prediction.coefficient_sources == ()
 
 
 def test_openimcc_redox_predicts_and_flags_temperature_extrapolation():
@@ -1154,7 +1250,7 @@ def test_engines_without_a_ferric_split_do_not_equilibrate(monkeypatch):
         "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
         _boom,
     )
-    for engine in (Engine.MAGEMIN, Engine.VAPOROCK, Engine.OPENIMCC):
+    for engine in (Engine.MAGEMIN, Engine.VAPOROCK):
         prediction = predict_with_engine(engine, row4)
         assert prediction.value is None
         assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
