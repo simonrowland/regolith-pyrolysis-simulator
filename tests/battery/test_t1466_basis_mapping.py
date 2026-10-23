@@ -15,7 +15,7 @@ from simulator.battery.compilation_tier import (
     _iter_compilation_series_cells,
     predict_thermo_attempt,
 )
-from simulator.battery.enums import Engine, PerBasis, Quantity, RefusalReason
+from simulator.battery.enums import Engine, PerBasis, Quantity, RefusalReason, ValueKind
 from simulator.battery.identity import atm_to_pa, quantity_token
 from simulator.battery.migrate import (
     REPO_ROOT,
@@ -203,14 +203,50 @@ def test_b677_mgo_formation_maps_mol_species_without_a_reaction(tmp_path: Path) 
     assert below.refusal_detail["reason"] == "ellingham-formation-outside-segment"
 
 
-def test_b592_alo_refuses_missing_mol_basis(tmp_path: Path) -> None:
+def _b592_printed_raw(document: dict, column: str) -> str:
+    return str(document["rows"][0]["cells"][column]["raw"])
+
+
+def _reader_magnitude(document: dict, quantity: Quantity, temperature: str, *, key: str | None = None):
+    matched = [
+        series
+        for series in compilation_column_series_from_record(document)
+        if series.quantity is quantity and (key is None or key in series.series_key)
+    ]
+    assert len(matched) == 1
+    series = matched[0]
+    target = Decimal(temperature)
+    if series.value.kind is ValueKind.SERIES:
+        assert series.value.series is not None
+        return next(value for point_temperature, value in series.value.series if point_temperature == target)
+    assert series.temperature_K.value == target
+    return series.value.point
+
+
+def test_b592_alo_uses_printed_table6_basis(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B592, "table-006-0018.json")
     heat_capacity = _observation(result, B592, "table-006-0018", Quantity.CP)
-    assert _per_is_unknown(heat_capacity)
-    cell = _cell_at(heat_capacity, "298.15")
-    attempt = _attempt(Engine.VAPOROCK, cell)
-    assert attempt.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
-    assert attempt.refusal_detail["reason"] == _MISSING_GAS
+    entropy = _observation(
+        result, B592, "table-006-0018", Quantity.S, contains="entropy_recommended"
+    )
+    assert heat_capacity.identity.per.value is PerBasis.MOL_SPECIES
+    assert "kelley-king-1961-usbm-b592-p001-p040.md:793" in heat_capacity.identity.per.reason
+    assert "kelley-king-1961-usbm-b592-p101-p120.md:263" in heat_capacity.identity.per.reason
+    assert heat_capacity.identity.standard_pressure_Pa.value == atm_to_pa(1)
+    assert entropy.identity.per.reason == heat_capacity.identity.per.reason
+    assert entropy.identity.standard_pressure_Pa.value == atm_to_pa(1)
+    document = _record_doc(B592, "table-006-0018.json")
+    assert _b592_printed_raw(document, "cp_298_15_k") == "7.37"
+    assert _b592_printed_raw(document, "entropy_recommended") == "52.16±0.10"
+    assert _cell_at(heat_capacity, "298.15").value.point == _reader_magnitude(
+        document, Quantity.CP, "298.15"
+    )
+    assert entropy.value.point == _reader_magnitude(
+        document, Quantity.S, "298.15", key="entropy_recommended"
+    )
+    admitted = _attempt(Engine.VAPOROCK, _cell_at(heat_capacity, "298.15"))
+    assert admitted.refusal_reason is None
+    assert admitted.value is not None
 
 
 def test_b2131_cao_logkf_refuses_missing_per_basis(tmp_path: Path) -> None:

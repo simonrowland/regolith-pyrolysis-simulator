@@ -12352,7 +12352,9 @@ def discover_extracts(directory: Path | None = None) -> list[Path]:
 # ---------------------------------------------------------------------------
 
 _B677_SOURCE_ID = "pankratz-1984-usbm-b677"
+_B592_SOURCE_ID = "kelley-king-1961-usbm-b592"
 _B677_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S, Quantity.H_MINUS_H298})
+_B592_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S})
 _H_MINUS_H298_ANCHOR = "H(T)-H(298.15 K)"
 
 # Pankratz, L. B., 1984, Thermodynamic properties of elements and oxides,
@@ -12374,6 +12376,16 @@ _B677_FORMATION_BASIS_REASON = (
     "gases an ideally behaving gas at 1 atm. :130 1 atm = 101325 pascals; "
     ":137 mol = gram formula weight. The element phase changes with temperature "
     "and the extracted table prints only the product, so the reaction stays unmapped."
+)
+# Kelley, K. K., and King, E. G., 1961, Contributions to the data on
+# theoretical metallurgy, XIV, USBM Bulletin 592.
+_B592_GAS_BASIS_REASON = (
+    "kelley-king-1961-usbm-b592-p001-p040.md:793 prints all selected entropy "
+    "values for a constant pressure of 1 atm at 298.15 K, in defined calories "
+    "per degree per gram formula mass. "
+    "kelley-king-1961-usbm-b592-p101-p120.md:263 heads table 6 "
+    "\"Heat capacities, cal./deg.-mole\" and "
+    "\"Entropies at 298.15° K., cal./deg.-mole\"."
 )
 
 
@@ -12429,6 +12441,29 @@ def _b677_gas_basis(
     return cited
 
 
+def _b592_gas_basis(
+    formula: str,
+    phase: State,
+    quantity: Quantity,
+    temperatures_K: tuple[Decimal, ...],
+) -> dict[str, State]:
+    """Table 6 heat capacity and entropy: mol-species at 1 atm, catalog rows only."""
+
+    if quantity not in _B592_GAS_QUANTITIES:
+        return {}
+    species_name = _gas_catalog_name(formula, phase)
+    if species_name is None or not temperatures_K:
+        return {}
+    from simulator.battery.compilation_tier import vaporock_gas_has_one_coefficient_row
+
+    if not vaporock_gas_has_one_coefficient_row(species_name, temperatures_K):
+        return {}
+    return {
+        "per": _cited_state(PerBasis.MOL_SPECIES, _B592_GAS_BASIS_REASON),
+        "standard_pressure_Pa": _cited_state(atm_to_pa(1), _B592_GAS_BASIS_REASON),
+    }
+
+
 def _b677_formation_basis(formula: str) -> dict[str, State]:
     """Mol-species at 1 atm for an Ellingham oxide product. No invented reaction."""
 
@@ -12458,6 +12493,8 @@ def compilation_source_basis(
         return _b677_gas_basis(formula, phase, quantity, temperatures)
     if source_id == _B677_SOURCE_ID and quantity is Quantity.DELTA_FG:
         return _b677_formation_basis(formula)
+    if source_id == _B592_SOURCE_ID and quantity in _B592_GAS_QUANTITIES:
+        return _b592_gas_basis(formula, phase, quantity, temperatures)
     return {}
 
 
