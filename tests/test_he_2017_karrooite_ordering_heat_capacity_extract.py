@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import csv
+from decimal import Decimal
 import os
 from pathlib import Path
 import re
@@ -12,7 +14,8 @@ import pytest
 import yaml
 
 from tests.literature_extract_test_helpers import iter_locators
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import Migrator, load_index
+from data.literature.build_index import corpus_pointers, sha256_file
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -23,13 +26,7 @@ CORPUS_ROOT = Path(
     os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
 )
 PDF = CORPUS_ROOT / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
-T1382_CAPTURE_NOTE = (
-    "derivation pending a corpus table asset (controller, t-1382); 126.1 is "
-    "the X=0 extrapolation of the experimental S° totals, each of which is "
-    "Svib plus Sconfig from equation (1), and is not a calorimetric standard "
-    "entropy of ordered MgTi2O5."
-)
-
+TABLE5_CSV = CORPUS_ROOT / "tables" / SOURCE_ID / "table-5.csv"
 TABLE1_RENDER_GRID = [
     ("milling_time_h", (0, 0, 3, 3, 3, 3, 3)),
     ("sintering_temperature_K", (1373, 1473, 1173, 1273, 1373, 1473, 1473)),
@@ -61,6 +58,17 @@ def _context_by_id(document: dict) -> dict:
         for species in document["species"].values()
         for row in species["context"]
     }
+
+
+def _table5_total_entropies() -> tuple[Decimal, ...]:
+    with TABLE5_CSV.open(encoding="utf-8", newline="") as source:
+        rows = list(csv.DictReader(source))
+    return tuple(
+        Decimal(re.match(r"[+-]?[0-9]+(?:\.[0-9]+)?", row[
+            "S_total_J_mol-1_K-1_as_printed"
+        ]).group())
+        for row in rows
+    )
 
 
 def _assert_source_pins(document: dict, table1_grid=TABLE1_RENDER_GRID) -> None:
@@ -105,14 +113,12 @@ def _assert_source_pins(document: dict, table1_grid=TABLE1_RENDER_GRID) -> None:
     assert table5["S_total_X014_exp_J_mol-1_K-1"] == "132.4(4)"
     assert table5["S_total_X037_exp_J_mol-1_K-1"] == "142.8(2)"
     assert table5["S_vib_Xunknown_Todd_1952_J_mol-1_K-1"] == "127.2(8)"
-    pending_total = contexts["he2017_table5_standard_entropy_pending_asset"]["values"]
-    assert pending_total["candidate_token"] == "standard entropy"
-    assert pending_total["method_class"] == "measured_reduced"
-    assert pending_total["capture_note"] == T1382_CAPTURE_NOTE
-    assert [row["S_total_as_printed"] for row in pending_total["rows_as_printed"]] == [
-        "132.4(4)",
-        "142.8(2)",
-    ]
+    assert document["species"]["MgTi2O5"]["observations"][0]["values"][
+        "S_as_printed"
+    ] == "132.4(4)"
+    assert document["species"]["MgTi2O5"]["observations"][1]["values"][
+        "S_as_printed"
+    ] == "142.8(2)"
 
     prose_context = {
         "he2017_prose_vibrational_entropy_difference": ("4.6(2)", ["S"], 16),
@@ -134,14 +140,13 @@ def _assert_source_pins(document: dict, table1_grid=TABLE1_RENDER_GRID) -> None:
     extrapolated_total = contexts[
         "he2017_prose_extrapolated_ordered_standard_entropy"
     ]["values"]
-    assert extrapolated_total["capture_note"] == T1382_CAPTURE_NOTE
-    assert "schema_gap" not in extrapolated_total
+    assert extrapolated_total["value_as_printed"] == "126.1"
     table5_scope = next(
         table["reason"]
         for table in document["scope_assessment"]["tables"]
         if table["table"] == "5"
     )
-    assert T1382_CAPTURE_NOTE in table5_scope
+    assert "126.1" in table5_scope
 
     figures = [record for record in contexts.values() if record["type"] == "figure_record"]
     assert len(figures) == 13
@@ -193,15 +198,58 @@ def test_mutating_an_extrapolated_entropy_context_value_breaks_the_source_pins()
         _assert_source_pins(mutated)
 
 
-def test_isolated_migration_keeps_controller_ruled_context_unscored() -> None:
-    migrator = Migrator(root=ROOT, index={}, aliases={})
+def test_isolated_migration_types_both_experimental_entropy_rows() -> None:
+    index = load_index()
+    index[SOURCE_ID] = {
+        "source_id": SOURCE_ID,
+        "corpus": corpus_pointers(
+            CORPUS_ROOT,
+            SOURCE_ID,
+            sha256_file(PDF) if PDF.is_file() else None,
+            EXTRACT,
+            "c607a766",
+            extract_doc=_document(),
+        ),
+    }
+    assert index[SOURCE_ID]["corpus"]["tables"] == {
+        "path": f"tables/{SOURCE_ID}",
+        "exists": True,
+        "file_count": 2,
+    }
+    migrator = Migrator(root=ROOT, index=index, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
-    assert migrator.result.observations == {}
+    observations = migrator.result.observations
+    assert len(observations) == 2
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
-    assert sum(len(rows) for rows in migrator.result.context_by_work.values()) == 23
+    assert sum(len(rows) for rows in migrator.result.context_by_work.values()) == 22
+    by_id = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in observations.values()
+    }
+    table_totals = _table5_total_entropies()
+    assert by_id["he2017_table5_standard_entropy_x014"].value.point == table_totals[0]
+    assert by_id["he2017_table5_standard_entropy_x037"].value.point == table_totals[1]
+    expected_parent = (f"tables:{SOURCE_ID}",)
+    assert all(
+        observation.derived_from == expected_parent
+        for observation in observations.values()
+    )
+    assert all(
+        observation.derivation.inputs == expected_parent
+        for observation in observations.values()
+    )
+    assert all(
+        observation.identity.temperature_K.value == 298
+        for observation in observations.values()
+    )
+    if index[SOURCE_ID]["corpus"]["raw"]["present"]:
+        assert all(
+            observation.read_from == f"pdf:{SOURCE_ID}"
+            for observation in observations.values()
+        )
 
 
 def test_all_locators_match_physical_pdf_pages() -> None:
