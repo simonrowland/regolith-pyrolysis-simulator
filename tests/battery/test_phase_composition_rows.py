@@ -939,6 +939,37 @@ def test_non_phase_engines_refuse_and_the_refusal_is_counted(
     assert sum(accumulator.refusal_counts.values()) == 2
 
 
+def test_phase_rows_refuse_mass_percent_identity_as_engine_moles() -> None:
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    mass_percent_identity = replace(
+        identity,
+        composition=State.of(
+            Composition(
+                basis="printed_phase_composition",
+                components=(("SiO2", Decimal("60")), ("MgO", Decimal("40"))),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
+        ),
+    )
+    observation = F.observation(
+        "sio2-melt-mass-percent",
+        "sample-1",
+        mass_percent_identity,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.authority is Authority.REFUSED
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_detail["identity_amount_basis"] == "mass_percent"
+
+
 def test_printed_experiment_pressure_reaches_the_scorer(
     tmp_path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

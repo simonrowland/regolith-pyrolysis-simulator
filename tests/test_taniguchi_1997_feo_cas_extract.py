@@ -58,6 +58,16 @@ def test_extract_preserves_input_tables_and_all_41_activity_coefficients() -> No
         == observation["values"]["value_as_published"]
         for _, observation in observations
     )
+    for _, observation in observations:
+        oxygen_locator = observation["values"]["oxygen_partial_pressure"]["locator"]
+        assert oxygen_locator["page"] == observation["locator"]["page"]
+        assert oxygen_locator["published_page"] == observation["locator"]["published_page"]
+        if observation["locator"]["table"] == "1":
+            assert oxygen_locator["column"] == "pO2"
+        else:
+            assert oxygen_locator["section"] == (
+                f"Table {observation['locator']['table']} caption"
+            )
     experiments = {experiment["experiment_id"]: experiment for experiment in document["experiments"]}
     for experiment_id, experiment in experiments.items():
         if "sample" not in experiment:
@@ -69,6 +79,15 @@ def test_extract_preserves_input_tables_and_all_41_activity_coefficients() -> No
             if observation["experiment"] == experiment_id
         }
         assert sample_map == component_rows
+
+    sample_213_silica = next(
+        observation
+        for _, observation in observations
+        if observation["observation_id"]
+        == "taniguchi_1997_table4_sample_213_slag_sio2_composition"
+    )
+    assert sample_213_silica["values"]["component_amount"] == "6.52"
+    assert sample_213_silica["values"]["value_as_published"] == "6.52"
 
     contexts = _contexts(document)
     coefficient_record = next(
