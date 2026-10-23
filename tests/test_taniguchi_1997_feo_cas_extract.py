@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
@@ -34,7 +35,40 @@ def test_extract_preserves_input_tables_and_all_41_activity_coefficients() -> No
         pre_policy_ids=set(),
         check_fidelity_match=True,
     ) == []
-    assert all(not body["observations"] for body in document["species"].values())
+    observations = [
+        (species, observation)
+        for species, body in document["species"].items()
+        for observation in body["observations"]
+    ]
+    assert len(observations) == 141
+    assert Counter(
+        observation["locator"]["table"] for _, observation in observations
+    ) == {"1": 7, "4": 100, "5": 34}
+    assert all(
+        observation["type"] == "equilibrium_phase_composition"
+        and observation["values"]["quantity"] == "equilibrium_phase_composition"
+        and observation["values"]["basis"] == "wt_percent"
+        and observation["locator"]["page"]
+        and observation["locator"]["published_page"]
+        and observation["locator"]["pdf_page_index"] is not None
+        for _, observation in observations
+    )
+    assert all(
+        observation["values"]["component_amount"]
+        == observation["values"]["value_as_published"]
+        for _, observation in observations
+    )
+    experiments = {experiment["experiment_id"]: experiment for experiment in document["experiments"]}
+    for experiment_id, experiment in experiments.items():
+        if "sample" not in experiment:
+            continue
+        sample_map = experiment["sample"]["printed_composition"]["state"]["value"]
+        component_rows = {
+            ("Fe" if observation["values"]["component_as_published"] == "T.Fe" else observation["values"]["component_as_published"]): observation["values"]["component_amount"]
+            for _, observation in observations
+            if observation["experiment"] == experiment_id
+        }
+        assert sample_map == component_rows
 
     contexts = _contexts(document)
     coefficient_record = next(
@@ -86,23 +120,22 @@ def test_extract_preserves_input_tables_and_all_41_activity_coefficients() -> No
         for row in coefficients
     )
 
-    input_tables = {
-        context["locator"]["table"]: context
+    assert not any(context.get("schema_gap") == "t-1385" for context in contexts)
+    zero = next(
+        context
         for context in contexts
-        if context.get("schema_gap") == "t-1385"
-    }
-    assert set(input_tables) == {"1", "4", "5"}
-    assert {
-        table: len(input_tables[table]["values"]["rows"])
-        for table in input_tables
-    } == {"1": 7, "4": 20, "5": 7}
-    assert input_tables["4"]["values"]["rows"][12]["SiO2_mass_percent"] == "6.52"
-    assert input_tables["5"]["values"]["rows"][0]["CaF2_mass_percent"] == "0"
-    assert all(
-        row["T_K"] and row["pO2_atm"]
-        for context in input_tables.values()
-        for row in context["values"]["rows"]
+        if context["observation_id"]
+        == "taniguchi_1997_table5_row401_caf2_zero_context"
     )
+    assert zero["values"]["CaF2_mass_percent"] == "0"
+    assert zero["locator"]["published_page"] == 960
+    assert not any(
+        observation["locator"].get("table") == "5"
+        and observation["locator"].get("row") == "401"
+        and observation["values"]["component_as_published"] == "CaF2"
+        for _, observation in observations
+    )
+    assert len(document["experiments"]) == 64
 
     figures = [context for context in contexts if context.get("type") == "figure_record"]
     assert len(figures) == 8
@@ -114,11 +147,37 @@ def test_extract_preserves_input_tables_and_all_41_activity_coefficients() -> No
     )
 
 
-def test_isolated_migration_has_no_observations_or_hard_issues() -> None:
+def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
     migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
-    assert not migrator.result.observations
+    observations = list(migrator.result.observations.values())
+    assert len(observations) == 141
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
+    assert all(observation.admission.status.value == "admitted" for observation in observations)
+    assert all(
+        observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value.is_finite()
+        and observation.point_conditions["T_C"].locator is not None
+        and observation.point_conditions["T_C"].state.is_value
+        and observation.point_conditions["fO2_Pa"].locator is not None
+        and observation.point_conditions["fO2_Pa"].inference.relation == "atm_to_Pa"
+        and observation.identity.composition.is_value
+        and observation.identity.composition.value.amount_basis.value == "mass_percent"
+        and observation.identity.fO2_Pa.is_value
+        and observation.identity.total_pressure_Pa.is_unknown
+        and observation.identity.total_pressure_Pa.reason
+        == "no total_pressure_Pa mapped from source"
+        and observation.point_conditions["composition"].locator is not None
+        for observation in observations
+    )
+    for observation in observations:
+        experiment = migrator.result.experiments[observation.experiment_id]
+        printed_map = experiment.sample.printed_composition.state.value
+        expected = {
+            ("Fe" if name == "T.Fe" else name): Decimal(amount)
+            for name, amount in printed_map.items()
+        }
+        assert observation.identity.composition.value.as_map() == expected
