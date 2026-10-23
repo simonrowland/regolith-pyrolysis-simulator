@@ -26,6 +26,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from engines.antoine import _read_antoine_coefficients  # noqa: E402
 from simulator.vapour_rail.catalog import compile_vapour_rail_catalog  # noqa: E402
 from simulator.vapour_rail.channels import (  # noqa: E402
     ChannelCompositionRefusal,
@@ -768,6 +769,7 @@ def _catalog_self_row(
         if isinstance(landed_coefficients, Mapping) and all(
             key in landed_coefficients for key in ("A", "B")
         ):
+            A, B, C = _read_antoine_coefficients(correlation)
             model = {
                 "fit_target": "standard_reaction_term",
                 "pressure_kind": "equilibrium_partial_pressure",
@@ -776,9 +778,9 @@ def _catalog_self_row(
                 "provenance": provenance,
                 "evaluator_family": "antoine",
                 "coefficients": {
-                    "A": float(landed_coefficients["A"]),
-                    "B": float(landed_coefficients["B"]),
-                    "C": float(landed_coefficients.get("C", 0.0)),
+                    "A": A,
+                    "B": B,
+                    "C": C,
                 },
                 "activity_exponent": 0.0,
                 "pO2_reference_bar": 1.0,

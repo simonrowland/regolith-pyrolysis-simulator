@@ -7,9 +7,12 @@ from collections.abc import Mapping
 from typing import Any
 
 from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_skip_reason_for_refusal,
     _antoine_skip_notices_for_omitted_species,
     _append_antoine_skip_notice,
     _antoine_log10_pressure,
+    _read_antoine_coefficients,
 )
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
@@ -700,11 +703,10 @@ class EquilibriumMixin:
                         sp_data,
                         coefficient_block,
                     )
-                A = antoine.get('A', 0)
-                B = antoine.get('B', 0)
-                C = antoine.get('C', 0)
-                if P_reference_Pa is None and not (A > 0 and T_K > 300):
-                    if not A > 0:
+                if P_reference_Pa is None:
+                    try:
+                        A, B, C = _read_antoine_coefficients(antoine)
+                    except _AntoineCoefficientRefusal as exc:
                         _append_antoine_skip_notice(
                             warnings,
                             antoine_skip_notice_keys,
@@ -712,8 +714,11 @@ class EquilibriumMixin:
                             species=species,
                             site="equilibrium.internal_analytical.metal_antoine",
                             temperature_K=T_K,
+                            reason=_antoine_skip_reason_for_refusal(exc),
                         )
-                    continue
+                        continue
+                    if T_K <= 300.0:
+                        continue
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
                 )
@@ -865,22 +870,23 @@ class EquilibriumMixin:
             liquid_rxn = liquid_rxn_early
             if liquid_rxn is not None and fit_target != FIT_TARGET_STANDARD_REACTION:
                 antoine_liq = liquid_rxn.get("antoine", {}) or {}
-                A_l = float(antoine_liq.get("A", 0.0) or 0.0)
-                B_l = float(antoine_liq.get("B", 0.0) or 0.0)
-                C_l = float(antoine_liq.get("C", 0.0) or 0.0)
-                if not (A_l > 0.0 and T_K > 300.0):
-                    if not A_l > 0.0:
-                        _append_antoine_skip_notice(
-                            warnings,
-                            antoine_skip_notice_keys,
-                            antoine_liq,
-                            species=species,
-                            site=(
-                                "equilibrium.internal_analytical."
-                                "liquid_oxide_antoine"
-                            ),
-                            temperature_K=T_K,
-                        )
+                try:
+                    A_l, B_l, C_l = _read_antoine_coefficients(antoine_liq)
+                except _AntoineCoefficientRefusal as exc:
+                    _append_antoine_skip_notice(
+                        warnings,
+                        antoine_skip_notice_keys,
+                        antoine_liq,
+                        species=species,
+                        site=(
+                            "equilibrium.internal_analytical."
+                            "liquid_oxide_antoine"
+                        ),
+                        temperature_K=T_K,
+                        reason=_antoine_skip_reason_for_refusal(exc),
+                    )
+                    continue
+                if T_K <= 300.0:
                     continue
                 valid_liq = _range_tuple(liquid_rxn.get("valid_range_K"))
                 if valid_liq is not None:
@@ -964,19 +970,20 @@ class EquilibriumMixin:
             gas_rail_rxn = gas_rail_rxn_early
             if gas_standard_rail and gas_rail_rxn is not None:
                 antoine_gas = gas_rail_rxn.get("antoine", {}) or {}
-                A_g = float(antoine_gas.get("A", 0.0) or 0.0)
-                B_g = float(antoine_gas.get("B", 0.0) or 0.0)
-                C_g = float(antoine_gas.get("C", 0.0) or 0.0)
-                if not (A_g > 0.0 and T_K > 300.0):
-                    if not A_g > 0.0:
-                        _append_antoine_skip_notice(
-                            warnings,
-                            antoine_skip_notice_keys,
-                            antoine_gas,
-                            species=species,
-                            site="equilibrium.internal_analytical.gas_rail_antoine",
-                            temperature_K=T_K,
-                        )
+                try:
+                    A_g, B_g, C_g = _read_antoine_coefficients(antoine_gas)
+                except _AntoineCoefficientRefusal as exc:
+                    _append_antoine_skip_notice(
+                        warnings,
+                        antoine_skip_notice_keys,
+                        antoine_gas,
+                        species=species,
+                        site="equilibrium.internal_analytical.gas_rail_antoine",
+                        temperature_K=T_K,
+                        reason=_antoine_skip_reason_for_refusal(exc),
+                    )
+                    continue
+                if T_K <= 300.0:
                     continue
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
@@ -1320,12 +1327,25 @@ class EquilibriumMixin:
 
         for name, data in oxide_vapors_data.items():
             antoine = data.get('antoine', {})
-            A = antoine.get('A', 0)
-            B = antoine.get('B', 0)
-            C = antoine.get('C', 0)
+            try:
+                A, B, C = _read_antoine_coefficients(antoine)
+            except _AntoineCoefficientRefusal as exc:
+                _append_antoine_skip_notice(
+                    warnings,
+                    antoine_skip_notice_keys,
+                    antoine,
+                    species=name,
+                    site=(
+                        "equilibrium.internal_analytical."
+                        "oxide_vapor_antoine"
+                    ),
+                    temperature_K=T_K,
+                    reason=_antoine_skip_reason_for_refusal(exc),
+                )
+                continue
             valid = data.get('valid_range_K', [0, 9999])
 
-            if A > 0 and valid[0] <= T_K <= valid[1]:
+            if valid[0] <= T_K <= valid[1]:
                 log_P = _antoine_log10_pressure(A, B, C, T_K)
                 P_sat = _pow10_pressure_or_raise(
                     log_P,
@@ -1333,20 +1353,6 @@ class EquilibriumMixin:
                     field="P_sat",
                 )
             else:
-                # Out-of-range or A <= 0: omit without a silent-zero note
-                # on this path (the `_sz_omit` helpers are not called).
-                if not A > 0:
-                    _append_antoine_skip_notice(
-                        warnings,
-                        antoine_skip_notice_keys,
-                        antoine,
-                        species=name,
-                        site=(
-                            "equilibrium.internal_analytical."
-                            "oxide_vapor_antoine"
-                        ),
-                        temperature_K=T_K,
-                    )
                 continue
 
             parent_oxide = data.get('parent_oxide', '')

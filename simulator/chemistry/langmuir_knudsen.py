@@ -28,7 +28,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 from engines.builtin.evaporation_flux import (
     SeriesEvaporationFlux,
     _series_resistance_evaporation_flux_kg_m2_s,
@@ -325,23 +329,24 @@ def pseudo_antoine_p_eq_pa(species: str, T_K: float) -> float:
         )
     antoine, _ = vapor_pressure_antoine_coefficients(row, temperature_K=T_K)
     try:
-        A, B, C = (float(antoine[key]) for key in ("A", "B", "C"))
-    except KeyError as exc:
-        raise VaporPressureComputationError(
-            "missing_antoine_coefficient: "
-            f"species={species} coefficient={exc.args[0]}"
-        ) from exc
-    except (TypeError, ValueError, OverflowError) as exc:
-        raise VaporPressureComputationError(
-            f"invalid_antoine_coefficient: species={species}"
-        ) from exc
-
-    for name, value in (("A", A), ("B", B), ("C", C)):
-        if not math.isfinite(value):
-            raise VaporPressureComputationError(
-                "nonfinite_antoine_coefficient: "
-                f"species={species} coefficient={name} value={value!r}"
+        A, B, C = _read_antoine_coefficients(antoine)
+    except _AntoineCoefficientRefusal as exc:
+        if exc.input_category == "missing_input":
+            detail = (
+                "missing_antoine_coefficient: "
+                f"species={species} coefficient={exc.coefficient}"
             )
+        else:
+            prefix = (
+                "nonfinite_antoine_coefficient"
+                if exc.invalid_kind == "nonfinite"
+                else "invalid_antoine_coefficient"
+            )
+            detail = (
+                f"{prefix}: species={species} coefficient={exc.coefficient} "
+                f"value={exc.value!r}"
+            )
+        raise VaporPressureComputationError(detail) from exc
 
     try:
         valid_temperature = math.isfinite(T_K) and T_K > 0.0

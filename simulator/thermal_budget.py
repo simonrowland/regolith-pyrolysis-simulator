@@ -29,6 +29,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from engines.antoine import _read_antoine_coefficients
 from simulator.equipment import EquipmentDesigner, STEFAN_BOLTZMANN
 from simulator.furnace_materials import load_furnace_materials
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
@@ -886,8 +887,7 @@ def _composite_exchange_reaction_enthalpy(
         raise ValueError(
             f"analytical composite base coefficients unavailable for {species!r}"
         )
-    B = float(coefficients.get("B", 0.0))
-    C = float(coefficients.get("C", 0.0))
+    _A, B, C = _read_antoine_coefficients(base_model)
     if B <= 0.0 or T_K + C <= 0.0:
         raise ValueError(
             f"analytical composite base coefficients invalid for {species!r}"

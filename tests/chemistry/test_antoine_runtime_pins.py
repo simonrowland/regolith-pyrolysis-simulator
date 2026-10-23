@@ -231,6 +231,16 @@ def test_ellingham_consumer_computes_declared_two_parameter_source():
     assert pressure_pa == pytest.approx(0.273, rel=0.01)
 
 
+def test_ellingham_negative_denominator_regression_guard():
+    pressure_pa = _antoine_reference_pressure_Pa(
+        {"A": 5.0, "B": 1000.0, "C": -200.0},
+        100.0,
+    )
+
+    # Preserve existing algebra: log10(P/Pa) = 5 - 1000/(100 - 200).
+    assert pressure_pa == pytest.approx(1e15)
+
+
 def test_c7_ca_partial_antoine_block_is_omitted_with_notice(monkeypatch):
     from types import SimpleNamespace
 

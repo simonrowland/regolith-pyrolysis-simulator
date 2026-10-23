@@ -90,7 +90,11 @@ from typing import Any, Dict
 
 import yaml
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
@@ -5950,6 +5954,7 @@ def _antoine_psat_pa(
                 antoine_extrapolation_warnings.append(str(evaluation.status))
         return evaluation.pressure_pa
     from engines.builtin.vapor_pressure import (
+        VaporPressureComputationError,
         VaporPressureRangeError,
         _coefficient_mapping,
         reconstructed_vapor_pressure_authority_limit,
@@ -5974,10 +5979,15 @@ def _antoine_psat_pa(
             authority_limits[species] = dict(reconstructed_limit)
         return float(reconstructed_limit["pressure_Pa"])
 
-    antoine, coefficient_block = wall_condensation_antoine_coefficients(
-        data,
-        temperature_K=T_K,
-    )
+    try:
+        antoine, coefficient_block = wall_condensation_antoine_coefficients(
+            data,
+            temperature_K=T_K,
+        )
+    except VaporPressureComputationError as exc:
+        raise DepositionInputRefusal(
+            "antoine_coefficients", species, str(exc)
+        ) from exc
     source_band = vapor_pressure_source_equation_range_K(
         data, coefficient_block, T_K,
     ) or vapor_pressure_valid_range_K(data, coefficient_block, T_K)
@@ -5991,13 +6001,17 @@ def _antoine_psat_pa(
             f"valid_range_K={source_band}")
         refusal.valid_range_K = source_band
         raise refusal
-    A, B, C = (
-        _deposition_finite_scalar(f"{coefficient_block}.{key}", antoine.get(key))
-        for key in ("A", "B", "C")
-    )
+    try:
+        A, B, C = _read_antoine_coefficients(antoine)
+    except _AntoineCoefficientRefusal as exc:
+        raise DepositionInputRefusal(
+            f"{coefficient_block}.{exc.coefficient}",
+            exc.value,
+            exc.input_category,
+        ) from exc
     T_K = _deposition_finite_scalar("T_wall_K", T_K)
-    if T_K <= 0.0 or A <= 0.0:
-        raise DepositionInputRefusal(coefficient_block, (A, T_K), "requires A > 0 and T > 0")
+    if T_K <= 0.0:
+        raise DepositionInputRefusal(coefficient_block, T_K, "requires T > 0")
     if T_K + C <= 0.0:
         refusal = WallSaturationPressureRefusal(species, T_K,
             f"no extrapolation available: Antoine denominator T+C <= 0; valid_range_K={source_band}")

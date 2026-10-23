@@ -15,7 +15,11 @@ from typing import Any
 
 import yaml
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 from engines.yaml_loader import YAML12SafeLoader
 
 GAS_CONSTANT_J_PER_MOL_K = 8.314462618
@@ -95,12 +99,8 @@ def _pure_component_antoine_pa(entry: Mapping[str, Any], temperature_K: float) -
     coeff = entry.get("pure_component_antoine") or entry.get("antoine")
     if not coeff:
         raise KeyError("pure_component_antoine")
-    log_p = _antoine_log10_pressure(
-        float(coeff["A"]),
-        float(coeff["B"]),
-        float(coeff.get("C", 0.0)),
-        temperature_K,
-    )
+    A, B, C = _read_antoine_coefficients(coeff)
+    log_p = _antoine_log10_pressure(A, B, C, temperature_K)
     return 10.0**log_p
 
 
@@ -238,7 +238,7 @@ def chi_escape_salt(
             temperature_K,
             _valid_range_K(entry),
         )
-    except KeyError:
+    except (KeyError, _AntoineCoefficientRefusal):
         p_sat_pa, valid_range, compiled_status = _compiled_carrier_pressure(
             carrier_key,
             temperature_K,

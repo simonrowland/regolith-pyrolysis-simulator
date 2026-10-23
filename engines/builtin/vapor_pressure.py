@@ -57,9 +57,12 @@ if TYPE_CHECKING:
     )
 
 from engines.antoine import (
+    _AntoineCoefficientRefusal,
     _antoine_skip_notices_for_omitted_species,
     _append_antoine_skip_notice,
     _antoine_log10_pressure,
+    _antoine_skip_reason_for_refusal,
+    _read_antoine_coefficients,
 )
 from engines.builtin._common import (
     composition_wt_pct_from_account_view,
@@ -1880,10 +1883,11 @@ def _reconstructed_anchor_pressure_Pa(
         antoine = (gas_rail or {}).get("antoine", {}) or {}
         temperature_K = float(anchor["temperature_K"])
         try:
+            A, B, C = _read_antoine_coefficients(antoine)
             log10_pressure_Pa = _antoine_log10_pressure(
-                float(antoine["A"]),
-                float(antoine["B"]),
-                float(antoine.get("C", 0.0) or 0.0),
+                A,
+                B,
+                C,
                 temperature_K,
             )
         except (KeyError, TypeError, ValueError, ZeroDivisionError) as exc:
@@ -2141,18 +2145,24 @@ def _pure_segment_usable(
     Hartmann-Schneider fit has a pole at 594.6 K).
     """
 
+    if not selected:
+        return False
+    try:
+        A, B, C = _read_antoine_coefficients(selected)
+    except _AntoineCoefficientRefusal:
+        return False
     if temperature_K is None:
         return True
     try:
-        denominator = float(temperature_K) + float(selected.get("C", 0.0))
+        denominator = float(temperature_K) + C
         # Antoine's shifted inverse-temperature fit is calibrated on the
         # T + C > 0 branch; crossing its pole is not a physical continuation.
         if denominator <= 0.0:
             return False
         projected_log_pressure = _antoine_log10_pressure(
-            float(selected.get("A", 0.0)),
-            float(selected.get("B", 0.0)),
-            float(selected.get("C", 0.0)),
+            A,
+            B,
+            C,
             float(temperature_K),
         )
     except (TypeError, ValueError, ZeroDivisionError):
@@ -2917,11 +2927,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         sp_data,
                         coefficient_block,
                     )
-                A = antoine.get('A', 0)
-                B = antoine.get('B', 0)
-                C = antoine.get('C', 0)
-                if compiled_reference_Pa is None and not (A > 0 and T_K > 300):
-                    if not A > 0:
+                if compiled_reference_Pa is None:
+                    try:
+                        A, B, C = _read_antoine_coefficients(antoine)
+                    except _AntoineCoefficientRefusal as exc:
                         _append_antoine_skip_notice(
                             warnings,
                             antoine_skip_notice_keys,
@@ -2929,8 +2938,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                             species=species,
                             site="builtin_vapor_pressure.metal_antoine",
                             temperature_K=T_K,
+                            reason=_antoine_skip_reason_for_refusal(exc),
                         )
-                    continue
+                        continue
+                    if T_K <= 300.0:
+                        continue
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
                 )
@@ -3144,19 +3156,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             liquid_rxn = _liquid_oxide_standard_reaction_block(sp_data)
             if liquid_rxn is not None and fit_target != FIT_TARGET_STANDARD_REACTION:
                 antoine_liq = liquid_rxn.get("antoine", {}) or {}
-                A_l = float(antoine_liq.get("A", 0.0) or 0.0)
-                B_l = float(antoine_liq.get("B", 0.0) or 0.0)
-                C_l = float(antoine_liq.get("C", 0.0) or 0.0)
-                if not (A_l > 0.0 and T_K > 300.0):
-                    if not A_l > 0.0:
-                        _append_antoine_skip_notice(
-                            warnings,
-                            antoine_skip_notice_keys,
-                            antoine_liq,
-                            species=species,
-                            site="builtin_vapor_pressure.liquid_oxide_antoine",
-                            temperature_K=T_K,
-                        )
+                try:
+                    A_l, B_l, C_l = _read_antoine_coefficients(antoine_liq)
+                except _AntoineCoefficientRefusal as exc:
+                    _append_antoine_skip_notice(
+                        warnings,
+                        antoine_skip_notice_keys,
+                        antoine_liq,
+                        species=species,
+                        site="builtin_vapor_pressure.liquid_oxide_antoine",
+                        temperature_K=T_K,
+                        reason=_antoine_skip_reason_for_refusal(exc),
+                    )
+                    continue
+                if T_K <= 300.0:
                     continue
                 valid_liq = _range_tuple(liquid_rxn.get("valid_range_K"))
                 if valid_liq is not None:
@@ -3264,19 +3277,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             gas_rail_rxn = gas_rail_rxn_early
             if gas_standard_rail and gas_rail_rxn is not None:
                 antoine_gas = gas_rail_rxn.get("antoine", {}) or {}
-                A_g = float(antoine_gas.get("A", 0.0) or 0.0)
-                B_g = float(antoine_gas.get("B", 0.0) or 0.0)
-                C_g = float(antoine_gas.get("C", 0.0) or 0.0)
-                if not (A_g > 0.0 and T_K > 300.0):
-                    if not A_g > 0.0:
-                        _append_antoine_skip_notice(
-                            warnings,
-                            antoine_skip_notice_keys,
-                            antoine_gas,
-                            species=species,
-                            site="builtin_vapor_pressure.gas_rail_antoine",
-                            temperature_K=T_K,
-                        )
+                try:
+                    A_g, B_g, C_g = _read_antoine_coefficients(antoine_gas)
+                except _AntoineCoefficientRefusal as exc:
+                    _append_antoine_skip_notice(
+                        warnings,
+                        antoine_skip_notice_keys,
+                        antoine_gas,
+                        species=species,
+                        site="builtin_vapor_pressure.gas_rail_antoine",
+                        temperature_K=T_K,
+                        reason=_antoine_skip_reason_for_refusal(exc),
+                    )
+                    continue
+                if T_K <= 300.0:
                     continue
                 if _is_mapping(
                     sp_data.get(RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY)
@@ -3724,13 +3738,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     COEFF_BLOCK_ANTOINE,
                 )
             antoine = (data or {}).get('antoine', {}) or {}
-            A = antoine.get('A', 0)
-            B = antoine.get('B', 0)
-            C = antoine.get('C', 0)
+            coefficients = None
+            coefficient_refusal = None
+            try:
+                coefficients = _read_antoine_coefficients(antoine)
+            except _AntoineCoefficientRefusal as exc:
+                coefficient_refusal = exc
             valid = data.get('valid_range_K', [0, 9999])
             compiled_evaluator = None
             compiled_species = None
-            if not A > 0 and self._vapour_rail_catalog is not None:
+            if (
+                (coefficient_refusal is not None
+                 or (coefficients is not None and coefficients[0] <= 0.0))
+                and self._vapour_rail_catalog is not None
+            ):
                 try:
                     compiled_species = self._vapour_rail_catalog.species[name]
                     # b-189-exempt: applicability gated at loop top
@@ -3739,7 +3760,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     )
                 except (KeyError, ValueError):
                     pass
-            if not A > 0 and compiled_evaluator is None:
+            if coefficient_refusal is not None and compiled_evaluator is None:
                 _append_antoine_skip_notice(
                     warnings,
                     antoine_skip_notice_keys,
@@ -3747,8 +3768,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=name,
                     site="builtin_vapor_pressure.oxide_vapor_antoine",
                     temperature_K=T_K,
+                    reason=_antoine_skip_reason_for_refusal(
+                        coefficient_refusal
+                    ),
                 )
                 continue
+            if coefficients is not None:
+                A, B, C = coefficients
             coefficient_block = (
                 "compiled_reference_pressure_model"
                 if compiled_evaluator is not None
@@ -3924,6 +3950,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     # acquisition flag); the pressure remains continuous for every
                     # status-bearing compiled carrier.
             else:
+                assert coefficients is not None
                 # Premise: above-band SiO retains its source reaction fit.
                 # Algebra: log10(P_reference/Pa) = A - B/(T_K+C), unchanged;
                 # B and T_K+C carry K, so the exponent is dimensionless.

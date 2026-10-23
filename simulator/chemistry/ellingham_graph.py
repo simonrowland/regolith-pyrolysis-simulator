@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import _antoine_log10_pressure, _read_antoine_coefficients
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO,
@@ -197,7 +197,7 @@ def _antoine_reference_pressure_Pa(
     """Evaluate catalog Antoine reference pressure (Pa), or None if no number.
 
     Three-category rule (project doctrine):
-    (1) missing/corrupt input (A <= 0, non-coercible coeffs, non-finite log):
+    (1) missing/corrupt input (missing/non-coercible coeffs, non-finite log):
         return None → callers raise EllinghamPressureRefusal.
     (2) out-of-domain T (historical comfort band T_K <= 300 K) with evaluable
         coeffs: COMPUTE the value. This is non-authoritative extrapolation on
@@ -217,14 +217,11 @@ def _antoine_reference_pressure_Pa(
     computable cold-T diagnostics.
     """
     try:
-        A = float(antoine.get("A", 0) or 0)
-        B = float(antoine.get("B", 0) or 0)
-        C = float(antoine.get("C", 0) or 0)
+        A, B, C = _read_antoine_coefficients(antoine)
+        T_K = float(temperature_K)
     except (TypeError, ValueError):
         return None
-    T_K = float(temperature_K)
-    # Category (1): no positive A → coefficients cannot produce a pressure.
-    if not (A > 0) or not math.isfinite(T_K):
+    if not math.isfinite(T_K):
         return None
     # Category (2): T may be outside the historical comfort band; still evaluate.
     log_P = _antoine_log10_pressure(A, B, C, T_K)

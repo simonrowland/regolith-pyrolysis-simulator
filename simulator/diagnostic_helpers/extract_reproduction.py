@@ -30,7 +30,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _antoine_skip_reason_for_refusal,
+    _read_antoine_coefficients,
+)
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
@@ -976,18 +981,28 @@ def _literature_pressure_points(
     source_form = str(
         values.get("runtime_form") or values.get("source_form") or obs.units or ""
     )
-    has_A = isinstance(coef, Mapping) and (
-        coef.get("A") is not None or coef.get("A_Pa") is not None
+    coefficient_values = coef if isinstance(coef, Mapping) else {}
+    has_antoine_coefficients = any(
+        key in coefficient_values for key in ("A", "A_Pa", "B", "C")
     )
-    if has_A and coef.get("B") is not None:  # type: ignore[union-attr]
+    declares_antoine_form = "A" in source_form and "B" in source_form
+    if has_antoine_coefficients or declares_antoine_form:
+        record = {
+            "A": coefficient_values.get("A_Pa", coefficient_values.get("A")),
+            "B": coefficient_values.get("B"),
+            "C": coefficient_values.get("C"),
+            "runtime_form": source_form,
+        }
         try:
-            A = float(coef.get("A_Pa", coef.get("A")))  # type: ignore[union-attr]
-            B = float(coef["B"])  # type: ignore[index]
-            C = float(coef.get("C") or 0.0)  # type: ignore[union-attr]
-        except (TypeError, ValueError):
-            return None, "coefficients_not_numeric", drops
+            A, B, C = _read_antoine_coefficients(record)
+        except _AntoineCoefficientRefusal as exc:
+            return None, _antoine_skip_reason_for_refusal(exc), drops
         # Prefer runtime_coefficients which already convert to Pa.
-        use_pa = "A_Pa" in coef or "P_Pa" in source_form or "log10(P_Pa)" in source_form
+        use_pa = (
+            "A_Pa" in coefficient_values
+            or "P_Pa" in source_form
+            or "log10(P_Pa)" in source_form
+        )
         use_bar = (not use_pa) and ("P_bar" in source_form or "log10(P_bar)" in source_form)
         use_mmhg = (not use_pa) and (
             "mmHg" in source_form or "P_mmHg" in source_form or "mm Hg" in source_form
@@ -1023,7 +1038,7 @@ def _literature_pressure_points(
                 )
                 continue
             log10_p = _antoine_log10_pressure(A, B, C, T)
-            if use_pa or "A_Pa" in coef:
+            if use_pa or "A_Pa" in coefficient_values:
                 P = 10.0**log10_p
             elif use_bar:
                 P = (10.0**log10_p) * 1.0e5
@@ -1791,13 +1806,14 @@ def _invert_antoine_temperature_K(
     """
 
     try:
-        A = float(coeff["A"])
-        B = float(coeff["B"])
-        C = float(coeff.get("C") or 0.0)
+        A, B, C = _read_antoine_coefficients(coeff)
+    except _AntoineCoefficientRefusal as exc:
+        return None, _antoine_skip_reason_for_refusal(exc)
+    try:
         pressure = float(pressure_pa)
-    except (KeyError, TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None, "antoine_coefficients_not_numeric"
-    if not all(math.isfinite(v) for v in (A, B, C, pressure)):
+    if not math.isfinite(pressure):
         return None, "antoine_coefficients_non_finite"
     if pressure <= 0.0:
         return None, "target_pressure_non_positive"

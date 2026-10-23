@@ -6171,7 +6171,11 @@ def predict_with_engine(
                 identity=identity,
             )
         if engine is Engine.INTERNAL_ANALYTICAL:
-            from engines.antoine import _antoine_log10_pressure
+            from engines.antoine import (
+                _AntoineCoefficientRefusal,
+                _antoine_log10_pressure,
+                _read_antoine_coefficients,
+            )
             from engines.builtin.vapor_pressure import (
                 COEFF_BLOCK_PURE_COMPONENT,
                 VaporPressureComputationError,
@@ -6185,9 +6189,25 @@ def predict_with_engine(
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
             )
             row = vapor_pressure_data.get("metals", {}).get(formula)
-            coefficients, coefficient_block = wall_condensation_antoine_coefficients(
-                row, float(T)
-            )
+            try:
+                coefficients, coefficient_block = wall_condensation_antoine_coefficients(
+                    row, float(T)
+                )
+            except VaporPressureComputationError as exc:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.INVALID_IDENTITY,
+                    refusal_detail={
+                        "reason": "static_equilibrium_pressure_invalid",
+                        "detail": str(exc),
+                        "formula": formula,
+                    },
+                    identity=identity,
+                )
             if not coefficients or coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
                 return EnginePrediction(
                     engine=engine,
@@ -6202,19 +6222,20 @@ def predict_with_engine(
                     },
                     identity=identity,
                 )
-            log_pressure = _antoine_log10_pressure(
-                float(coefficients["A"]),
-                float(coefficients["B"]),
-                float(coefficients.get("C", 0.0)),
-                float(T),
-            )
             try:
+                A, B, C = _read_antoine_coefficients(coefficients)
+                log_pressure = _antoine_log10_pressure(A, B, C, float(T))
                 pressure = _pow10_pressure_or_raise(
                     log_pressure,
                     species=formula,
                     field="static_equilibrium_total_pressure_Pa",
                 )
-            except (OverflowError, VaporPressureComputationError):
+            except (
+                _AntoineCoefficientRefusal,
+                OverflowError,
+                VaporPressureComputationError,
+                ZeroDivisionError,
+            ) as exc:
                 return EnginePrediction(
                     engine=engine,
                     channel=channel,
@@ -6224,6 +6245,7 @@ def predict_with_engine(
                     refusal_reason=RefusalReason.INVALID_IDENTITY,
                     refusal_detail={
                         "reason": "static_equilibrium_pressure_invalid",
+                        "detail": str(exc),
                         "formula": formula,
                     },
                     identity=identity,
