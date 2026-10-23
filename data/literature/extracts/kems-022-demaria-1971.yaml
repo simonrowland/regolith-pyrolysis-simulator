@@ -710,8 +710,9 @@ species:
       values:
         reaction: FeO(g) = Fe(g) + 1/2 O2(g)
         reaction_number: 4
-        quantity: third_law_and_second_law_delta_H0
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -721,13 +722,9 @@ species:
         third_law_delta_H0_kcal_mol:
           BC: 39 ± 2
           NAA: 38 ± 2
-        second_law_delta_H0_kcal_mol:
-          BC: 38 ± 3
-          footnote: a
         table: '6'
       uncertainty:
-        note: printed ± on Table 6; third-law inclusive of calibration errors; second-law is the
-          standard deviation (authors)
+        note: printed ± on Table 6; third-law inclusive of calibration errors
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -746,6 +743,28 @@ species:
             published_page: 1368
             pdf_page_index: 2
             paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+    - observation_id: demaria_1971_table6_feo_dissociation_second_law
+      type: gibbs_table
+      locator:
+        table: '6'
+        published_page: 1376
+        pdf_page_index: 10
+        paragraph: Second-law heat for reaction (4), footnote a
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: kcal/mole as published
+      values:
+        reaction: FeO(g) = Fe(g) + 1/2 O2(g)
+        reaction_number: 4
+        quantity: reaction_enthalpy_2nd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, second-law result"
+        condensed_phase: lunar_basalt_melt
+        second_law_delta_H0_kcal_mol: 38 ± 3
+        footnote: a
+        table: '6'
+      uncertainty:
+        note: printed ±3; footnote a identifies the second-law value
     - observation_id: demaria_1971_silver_and_o_o2_calibration
       type: rate_series
       locator:
@@ -869,7 +888,9 @@ species:
       units: kcal/mol for ΔH0; -R ln Kp as published
       values:
         reaction: SiO2(g) = SiO(g) + 1/2 O2(g)
-        quantity: third_law_delta_H0_from_simultaneous_partial_pressures
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 7, third-law result"
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -883,57 +904,35 @@ species:
         points:
         - sample: '12022'
           T_K: 2060.0
-          minus_R_ln_Kp: 4.09
-          minus_delta_fef: 19.025
           delta_H0_kcal_mol: 47.6
         - sample: '12022'
           T_K: 2080.0
-          minus_R_ln_Kp: 3.8
-          minus_delta_fef: 19.02
           delta_H0_kcal_mol: 47.5
         - sample: '12022'
           T_K: 2120.0
-          minus_R_ln_Kp: 3.07
-          minus_delta_fef: 19.0
           delta_H0_kcal_mol: 46.8
         - sample: '12022'
           T_K: 2150.0
-          minus_R_ln_Kp: 3.07
-          minus_delta_fef: 18.99
           delta_H0_kcal_mol: 47.4
         - sample: '12022'
           T_K: 2170.0
-          minus_R_ln_Kp: 2.7
-          minus_delta_fef: 18.98
           delta_H0_kcal_mol: 47.0
         - sample: '12065'
           T_K: 1990.0
-          minus_R_ln_Kp: 4.62
-          minus_delta_fef: 19.05
           delta_H0_kcal_mol: 47.1
         - sample: '12065'
           T_K: 2035.0
-          minus_R_ln_Kp: 4.3
-          minus_delta_fef: 19.03
           delta_H0_kcal_mol: 47.5
         - sample: '12065'
           T_K: 2060.0
-          minus_R_ln_Kp: 3.98
-          minus_delta_fef: 19.02
           delta_H0_kcal_mol: 47.4
         - sample: '12065'
           T_K: 1850.0
-          minus_R_ln_Kp: 5.995
-          minus_delta_fef: 19.105
           delta_H0_kcal_mol: 46.4
           note: footnote b in table
-        mean_delta_H0_kcal_mol: 47.3
-        mean_delta_H0_sigma: 0.3
-        table6_summary_kcal_mol:
-          BC: 47 ± 2
-          NAA: 46 ± 2
+        mean_delta_H0_kcal_mol: 47.3 ± 0.3
       uncertainty:
-        note: std dev on mean ±0.3; third-law inclusive of calibration errors in Table 6 ±2
+        note: standard deviation on the mean is printed as ±0.3
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -954,6 +953,98 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_sio2_sio_o2_table7_minus_R_ln_Kp
+      type: gibbs_table
+      locator:
+        table: '7'
+        line_range: 330-334
+        paragraph: Table 7 negative R ln Kp values
+      T_range_K:
+      - 1850.0
+      - 2170.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: -R ln Kp as printed (kcal/mole)
+      values:
+        reaction: SiO2(g) = SiO(g) + 1/2 O2(g)
+        quantity: minus_R_ln_Kp
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 7"
+        points:
+        - sample: '12022'
+          T_K: 2060.0
+          value: 4.09
+        - sample: '12022'
+          T_K: 2080.0
+          value: 3.80
+        - sample: '12022'
+          T_K: 2120.0
+          value: 3.07
+        - sample: '12022'
+          T_K: 2150.0
+          value: 3.07
+        - sample: '12022'
+          T_K: 2170.0
+          value: 2.70
+        - sample: '12065'
+          T_K: 1990.0
+          value: 4.62
+        - sample: '12065'
+          T_K: 2035.0
+          value: 4.30
+        - sample: '12065'
+          T_K: 2060.0
+          value: 3.98
+        - sample: '12065'
+          T_K: 1850.0
+          value: 5.995
+          note: footnote b in table
+    - observation_id: demaria_1971_sio2_sio_o2_table7_minus_delta_fef
+      type: gibbs_table
+      locator:
+        table: '7'
+        line_range: 330-334
+        paragraph: Table 7 negative delta fef values
+      T_range_K:
+      - 1850.0
+      - 2170.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: -delta(fef) as printed (kcal/mole)
+      values:
+        reaction: SiO2(g) = SiO(g) + 1/2 O2(g)
+        quantity: minus_delta_fef
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 7"
+        points:
+        - sample: '12022'
+          T_K: 2060.0
+          value: 19.025
+        - sample: '12022'
+          T_K: 2080.0
+          value: 19.02
+        - sample: '12022'
+          T_K: 2120.0
+          value: 19.00
+        - sample: '12022'
+          T_K: 2150.0
+          value: 18.99
+        - sample: '12022'
+          T_K: 2170.0
+          value: 18.98
+        - sample: '12065'
+          T_K: 1990.0
+          value: 19.05
+        - sample: '12065'
+          T_K: 2035.0
+          value: 19.03
+        - sample: '12065'
+          T_K: 2060.0
+          value: 19.02
+        - sample: '12065'
+          T_K: 1850.0
+          value: 19.105
+          note: footnote b in table
     - observation_id: demaria_1971_table6_sio2_dissociation
       type: gibbs_table
       locator:
@@ -961,17 +1052,15 @@ species:
         published_page: 1376
         pdf_page_index: 10
         paragraph: Third-law heats of equilibrium reactions; reaction (1)
-      T_range_K:
-      - 1850.0
-      - 2170.0
       phase: lunar_basalt_melt_12022_12065
       regime: kems_effusion
       units: kcal/mole as published
       values:
         reaction: SiO2(g) = SiO(g) + 1/2 O2(g)
         reaction_number: 1
-        quantity: third_law_delta_H0_table6_summary
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -1124,17 +1213,15 @@ species:
         published_page: 1376
         pdf_page_index: 10
         paragraph: Third-law heats of equilibrium reactions; reaction (5)
-      T_range_K:
-      - 2000.0
-      - 2170.0
       phase: lunar_basalt_melt_12022_12065
       regime: kems_effusion
       units: kcal/mole as published
       values:
         reaction: TiO2(g) = TiO(g) + 1/2 O2(g)
         reaction_number: 5
-        quantity: third_law_delta_H0_table6
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_lunar_basalt
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -1172,17 +1259,15 @@ species:
         published_page: 1376
         pdf_page_index: 10
         paragraph: Third-law heats of equilibrium reactions; reaction (6)
-      T_range_K:
-      - 2000.0
-      - 2170.0
       phase: lunar_basalt_melt_12022_12065
       regime: kems_effusion
       units: kcal/mole as published
       values:
         reaction: TiO2(g) = TiO(g) + O(g)
         reaction_number: 6
-        quantity: third_law_and_second_law_delta_H0
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_lunar_basalt
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -1192,12 +1277,9 @@ species:
         third_law_delta_H0_kcal_mol:
           BC: null
           NAA: 142 ± 3
-        second_law_delta_H0_kcal_mol:
-          NAA: 143 ± 8
-          footnote: a
         table: '6'
       uncertainty:
-        note: printed ± on Table 6; second-law 143 ± 8 is footnote a under the NAA column
+        note: printed ±3; NAA is the reported third-law result
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -1210,6 +1292,28 @@ species:
             published_page: 1368
             pdf_page_index: 2
             paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+    - observation_id: demaria_1971_table6_tio2_atomic_o_second_law
+      type: gibbs_table
+      locator:
+        table: '6'
+        published_page: 1376
+        pdf_page_index: 10
+        paragraph: Second-law heat for reaction (6), footnote a
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: kcal/mole as published
+      values:
+        reaction: TiO2(g) = TiO(g) + O(g)
+        reaction_number: 6
+        quantity: reaction_enthalpy_2nd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, second-law result"
+        condensed_phase: lunar_basalt_melt
+        second_law_delta_H0_kcal_mol: 143 ± 8
+        footnote: a
+        table: '6'
+      uncertainty:
+        note: printed ±8; footnote a identifies the second-law value
         cell_material:
           value: Re
           locator:
@@ -1333,17 +1437,15 @@ species:
         published_page: 1376
         pdf_page_index: 10
         paragraph: Third-law heats of equilibrium reactions; reaction (3)
-      T_range_K:
-      - 2360.0
-      - 2500.0
       phase: lunar_basalt_melt_12022_12065
       regime: kems_effusion
       units: kcal/mole as published
       values:
         reaction: Al2O(g) + O(g) = 2 AlO(g)
         reaction_number: 3
-        quantity: third_law_delta_H0_table6
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_lunar_basalt
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -1462,7 +1564,9 @@ species:
       units: Kp dimensionless (partial P in atm standard); ΔH0 kcal/mol
       values:
         reaction: AlO(g) = Al(g) + O(g)
-        quantity: third_law_Kp_and_delta_H0
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 8, third-law result"
         material: Apollo_12_12065_BC
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -1475,32 +1579,16 @@ species:
         - demaria_1971_al_monatomic_figure7
         points:
         - T_K: 2360.0
-          Kp: 3.19e-05
-          minus_R_ln_Kp: 20.56
-          minus_delta_fef: 27.26
           delta_H0_kcal_mol: 112.8
         - T_K: 2395.0
-          Kp: 4.02e-05
-          minus_R_ln_Kp: 20.01
-          minus_delta_fef: 27.3
           delta_H0_kcal_mol: 113.4
         - T_K: 2425.0
-          Kp: 8.03e-05
-          minus_R_ln_Kp: 18.73
-          minus_delta_fef: 27.32
           delta_H0_kcal_mol: 111.6
         - T_K: 2465.0
-          Kp: 0.000133
-          minus_R_ln_Kp: 17.74
-          minus_delta_fef: 27.35
           delta_H0_kcal_mol: 111.1
         - T_K: 2500.0
-          Kp: 0.000158
-          minus_R_ln_Kp: 17.39
-          minus_delta_fef: 27.38
           delta_H0_kcal_mol: 111.9
-        mean_delta_H0_kcal_mol: 112.2
-        mean_delta_H0_sigma: 0.9
+        mean_delta_H0_kcal_mol: 112.2 ± 0.9
         literature_compare_kcal_mol: 112 ± 3 (this work BC Table 6) vs 115 ± 5 (Drowart et al. 1960)
         ratio_recoverable: Kp = p(Al)*p(O)/p(AlO) from simultaneous measurements — carrier ratios without
           absolute calibration
@@ -1526,6 +1614,90 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_alo_al_o_table8_Kp
+      type: gibbs_table
+      locator:
+        table: '8'
+        line_range: 337-341
+        paragraph: Table 8 equilibrium constants
+      T_range_K:
+      - 2360.0
+      - 2500.0
+      phase: lunar_basalt_melt_12065
+      regime: kems_effusion
+      units: dimensionless Kp as printed
+      values:
+        reaction: AlO(g) = Al(g) + O(g)
+        quantity: equilibrium_constant_Kp
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 8"
+        points:
+        - T_K: 2360.0
+          value: 3.19e-05
+        - T_K: 2395.0
+          value: 4.02e-05
+        - T_K: 2425.0
+          value: 8.03e-05
+        - T_K: 2465.0
+          value: 1.33e-04
+        - T_K: 2500.0
+          value: 1.58e-04
+    - observation_id: demaria_1971_alo_al_o_table8_minus_R_ln_Kp
+      type: gibbs_table
+      locator:
+        table: '8'
+        line_range: 337-341
+        paragraph: Table 8 negative R ln Kp values
+      T_range_K:
+      - 2360.0
+      - 2500.0
+      phase: lunar_basalt_melt_12065
+      regime: kems_effusion
+      units: -R ln Kp as printed (kcal/mole)
+      values:
+        reaction: AlO(g) = Al(g) + O(g)
+        quantity: minus_R_ln_Kp
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 8"
+        points:
+        - T_K: 2360.0
+          value: 20.56
+        - T_K: 2395.0
+          value: 20.01
+        - T_K: 2425.0
+          value: 18.73
+        - T_K: 2465.0
+          value: 17.74
+        - T_K: 2500.0
+          value: 17.39
+    - observation_id: demaria_1971_alo_al_o_table8_minus_delta_fef
+      type: gibbs_table
+      locator:
+        table: '8'
+        line_range: 337-341
+        paragraph: Table 8 negative delta fef values
+      T_range_K:
+      - 2360.0
+      - 2500.0
+      phase: lunar_basalt_melt_12065
+      regime: kems_effusion
+      units: -delta(fef) as printed (kcal/mole)
+      values:
+        reaction: AlO(g) = Al(g) + O(g)
+        quantity: minus_delta_fef
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 8"
+        points:
+        - T_K: 2360.0
+          value: 27.26
+        - T_K: 2395.0
+          value: 27.30
+        - T_K: 2425.0
+          value: 27.32
+        - T_K: 2465.0
+          value: 27.35
+        - T_K: 2500.0
+          value: 27.38
     - observation_id: demaria_1971_table6_alo_dissociation
       type: gibbs_table
       locator:
@@ -1533,17 +1705,15 @@ species:
         published_page: 1376
         pdf_page_index: 10
         paragraph: Third-law heats of equilibrium reactions; reaction (2)
-      T_range_K:
-      - 2360.0
-      - 2500.0
       phase: lunar_basalt_melt_12065
       regime: kems_effusion
       units: kcal/mole as published
       values:
         reaction: AlO(g) = Al(g) + O(g)
         reaction_number: 2
-        quantity: third_law_delta_H0_table6_summary
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_12065
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -2769,7 +2939,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     figure: '3'
     line_range: '111'
-- path: species.AlO.observations[demaria_1971_alo_al_o_kp_table8].values.points[0].Kp
+- path: species.AlO.observations[demaria_1971_alo_al_o_table8_Kp].values.points[0].value
   value: 3.19e-05
   note: 'Table 8: Kp(AlO=Al+O) at 2360 K = 3.19e-5'
   locator:
@@ -2818,11 +2988,9 @@ fidelity_samples:
     note: Table 6 reaction (3) BC 15.6 ± 2 kcal/mole
 - species: Fe
   observable: gibbs_table
-  observation_id: demaria_1971_table6_feo_dissociation
+  observation_id: demaria_1971_table6_feo_dissociation_second_law
   field: second_law_delta_H0_kcal_mol
-  value:
-    BC: 38 ± 3
-    footnote: a
+  value: 38 ± 3
   locator:
     table: '6'
     published_page: 1376
@@ -2872,11 +3040,9 @@ fidelity_samples:
     note: Table 6 reaction (2) BC 112 ± 3 kcal/mole
 - species: TiO2
   observable: gibbs_table
-  observation_id: demaria_1971_table6_tio2_atomic_o
+  observation_id: demaria_1971_table6_tio2_atomic_o_second_law
   field: second_law_delta_H0_kcal_mol
-  value:
-    NAA: 143 ± 8
-    footnote: a
+  value: 143 ± 8
   locator:
     table: '6'
     published_page: 1376
