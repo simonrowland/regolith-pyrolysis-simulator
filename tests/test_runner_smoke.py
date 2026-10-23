@@ -2589,6 +2589,7 @@ def test_runner_completed_run_records_serialization_failure(
             execution.simulator,
             target,
             {"poison": poisoned_value},
+            raising=False,
         )
 
     payload = _build_completed_report_without_propagated_lookup_error(
