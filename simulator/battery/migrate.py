@@ -5135,6 +5135,55 @@ def _phase_row_printed_fo2_pa(
         and not facts.rejected_log_fO2
     ):
         return _log_fO2_to_pa(facts.log_fO2.state.value, facts.log_fO2_reference_Pa)
+    if facts.rejected_log_fO2:
+        return None
+    return _phase_row_point_log_fO2_pa(values, obs, locator)
+
+
+def _phase_row_point_log_fO2_pa(
+    values: Mapping[str, Any],
+    obs: Mapping[str, Any],
+    locator: Locator,
+) -> Decimal | None:
+    """Point-condition log fO2, when the values payload did not land one.
+
+    A convention ``reference_pressure`` block is read by the printed-oxygen
+    walker. Units without that block are read as a ``log_fO2`` node, so the
+    unit map stays the only units-to-pascal reference. ``_log_fO2_to_pa`` is
+    the only conversion.
+    """
+
+    for raw in (obs.get("point_conditions"), values.get("point_conditions")):
+        if not isinstance(raw, Mapping):
+            continue
+        condition = raw.get("fO2_log")
+        if not isinstance(condition, Mapping):
+            continue
+        state = condition.get("state")
+        if not isinstance(state, Mapping) or str(state.get("tag") or "") != "value":
+            continue
+        if _point_condition_decimal(condition) is None:
+            continue
+        if "reference_pressure" in condition:
+            payload: Mapping[str, Any] = {"point_conditions": {"fO2_log": condition}}
+        else:
+            node: dict[str, Any] = {
+                "value": state.get("value"),
+                "units": condition.get("units") or condition.get("unit") or "",
+            }
+            if condition.get("locator") is not None:
+                node["locator"] = condition.get("locator")
+            payload = {"log_fO2": node}
+        facts = collect_printed_oxygen((payload,), locator, skip_tables=True)
+        located = facts.log_fO2
+        if (
+            facts.rejected_log_fO2
+            or located is None
+            or not located.state.is_value
+            or not isinstance(located.state.value, Decimal)
+        ):
+            continue
+        return _log_fO2_to_pa(located.state.value, facts.log_fO2_reference_Pa)
     return None
 
 
@@ -8470,6 +8519,39 @@ def _partial_pressure_point_condition(
     if not isinstance(total, State) or not total.is_value or total.value is None:
         return None
     return located_value(total.value, locator)
+
+
+def _phase_row_printed_total_pressure_pa(
+    values: Mapping[str, Any],
+    obs: Mapping[str, Any],
+) -> Decimal | None:
+    """Printed point-condition total, already in pascals. Unknown stays absent."""
+
+    for raw in (obs.get("point_conditions"), values.get("point_conditions")):
+        if not isinstance(raw, Mapping) or "total_pressure_Pa" not in raw:
+            continue
+        amount = _point_condition_decimal(raw.get("total_pressure_Pa"))
+        if amount is not None and amount > 0:
+            return amount
+    return None
+
+
+def _keeps_phase_composition_unknown_total(observation: Observation) -> bool:
+    """An equilibrium-phase row keeps a source-unknown point total.
+
+    The unprinted-total strip is the Knudsen in-cell rule: an unknown total
+    is not a set point and blocks same-point partial-pressure matching.
+    Equilibrium phase rows are not that case. Table 1 prose subtypes and
+    Table 2 wt% initial glasses both state the absence, and the point
+    condition is that statement. Identity still follows the profile.
+    """
+
+    identity = observation.identity
+    if not isinstance(identity, Identity):
+        return False
+    return (
+        _quantity_token(identity.quantity) is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
 
 
 def _without_unprinted_total_pressure(
@@ -15935,6 +16017,16 @@ class Migrator:
                 basis = str(values.get("basis") or "").strip()
                 if basis in PHASE_BASIS_TOKENS:
                     ident_kwargs["subtype"] = State.of(basis)
+                    printed_total = _phase_row_printed_total_pressure_pa(values, obs)
+                    existing_total = ident_kwargs.get("total_pressure_Pa")
+                    if printed_total is not None and (
+                        existing_total is None
+                        or (
+                            isinstance(existing_total, State)
+                            and existing_total.is_unknown
+                        )
+                    ):
+                        ident_kwargs["total_pressure_Pa"] = State.of(printed_total)
             if (
                 q_token is Quantity.DISTRIBUTION_RATIO
                 and counter_phase_role_token is not None
@@ -20789,6 +20881,8 @@ class Migrator:
 
     def _drop_unprinted_point_totals(self) -> None:
         for observation_id, observation in list(self.result.observations.items()):
+            if _keeps_phase_composition_unknown_total(observation):
+                continue
             stripped = _without_unprinted_total_pressure(observation.point_conditions)
             if stripped is not observation.point_conditions:
                 self.result.observations[observation_id] = replace(
