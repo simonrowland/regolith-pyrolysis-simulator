@@ -7457,7 +7457,13 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
-    assert n_numeric == 3136, (n_numeric, census, n_unavailable)
+    # Re-measured on the regeneration after the oracle fixes above.
+    # mismatches stays 0. The asserted quantities sum to 5535. The other
+    # 2716 cells are cp 1629 (Chen 736, Klemme 725, Beyer 168), S 279,
+    # activity 316, delta_fG 148, delta_fH 152, log10_Kf 78,
+    # fe3_fe2_ratio 51, valence_ratio 45, and mass_loss_areal_density 18.
+    # 3136->8251 because those series are in the regenerated store.
+    assert n_numeric == 8251, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
