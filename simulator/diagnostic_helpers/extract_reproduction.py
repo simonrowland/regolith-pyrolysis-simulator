@@ -987,12 +987,16 @@ def _literature_pressure_points(
     )
     declares_antoine_form = "A" in source_form and "B" in source_form
     if has_antoine_coefficients or declares_antoine_form:
-        record = {
-            "A": coefficient_values.get("A_Pa", coefficient_values.get("A")),
-            "B": coefficient_values.get("B"),
-            "C": coefficient_values.get("C"),
-            "runtime_form": source_form,
-        }
+        # In literature extracts, None marks an unreported coefficient. Keep
+        # those keys absent so the shared reader can apply the declared form.
+        record = {"runtime_form": source_form}
+        for name, value in (
+            ("A", coefficient_values.get("A_Pa", coefficient_values.get("A"))),
+            ("B", coefficient_values.get("B")),
+            ("C", coefficient_values.get("C")),
+        ):
+            if value is not None:
+                record[name] = value
         try:
             A, B, C = _read_antoine_coefficients(record)
         except _AntoineCoefficientRefusal as exc:
