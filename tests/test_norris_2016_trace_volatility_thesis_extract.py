@@ -153,6 +153,12 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         assert row.point_conditions["fO2_log"].locator.table == "5.4"
         assert row.point_conditions["atmosphere"].state.value == "CO/CO2"
         assert row.point_conditions["total_pressure_Pa"].locator.section == "5.2"
+        assert row.derivation is not None
+        assert "wt_pct_to_mole_fraction" in row.derivation.relation
+        assert any(
+            parameter.locator is not None and parameter.locator.page == 220
+            for _, parameter in row.derivation.parameters
+        )
     for observation_id, (ratio, sigma) in expected_table57.items():
         row = next(
             row for row in migrated_table57
@@ -161,7 +167,10 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         assert row.value.point == Decimal(ratio)
         assert row.uncertainty.verbatim["sigma"] == sigma
         assert len(row.derived_from) == 2
-        assert row.derivation.relation == "X_final/X_initial (Equation 5.1)"
+        assert row.derivation.relation == (
+            "X_final/X_initial (Equation 5.1); "
+            "identity.composition=wt_pct_to_mole_fraction"
+        )
 
     migrated_starting_trace = [
         row for row in result.observations.values()

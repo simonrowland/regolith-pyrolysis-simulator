@@ -9238,22 +9238,24 @@ def _element_amount_composition(raw: object) -> Composition | None:
     )
 
 
-def _composition_state_from_printed(raw: object, *, absent: str) -> State[Composition]:
+def _composition_located_from_printed(raw: object, *, absent: str) -> Located[Composition]:
     if raw in (None, ""):
-        return State.unknown(absent)
+        return Located(State.unknown(absent))
     if isinstance(raw, Mapping) and raw.get("state") == "not_printed":
-        return State.unknown(absent)
+        return Located(State.unknown(absent), locator=_locator_from_plain(raw.get("locator")))
     if _mass_percent_components(raw) is not None:
-        return _composition_located_from_plain(raw).state
+        return _composition_located_from_plain(raw)
     composition = _element_amount_composition(raw)
     if composition is not None:
-        return State.of(composition)
+        locator = _locator_from_plain(raw.get("locator")) if isinstance(raw, Mapping) else None
+        return Located(State.of(composition), locator=locator)
     text = raw if isinstance(raw, str) else None
     if text is None and isinstance(raw, Mapping):
         text = str(raw.get("value") or raw.get("text") or "")
     if text:
-        return State.unknown(f"printed composition is not a component map: {text}")
-    return State.unknown(absent)
+        locator = _locator_from_plain(raw.get("locator")) if isinstance(raw, Mapping) else None
+        return Located(State.unknown(f"printed composition is not a component map: {text}"), locator=locator)
+    return Located(State.unknown(absent))
 
 
 def _area_state_from_member(member: object, *, absent: str) -> State[Decimal]:
@@ -9503,7 +9505,7 @@ def t1473_identity_kwargs(
     obs: Mapping[str, Any],
     *,
     temperature_K: State[Decimal] | None,
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], Located[Composition] | None]:
     """Identity axes for the three t-1473 quantities. No number is recomputed."""
 
     kwargs: dict[str, Any] = {}
@@ -9525,7 +9527,7 @@ def t1473_identity_kwargs(
             )
         )
         kwargs["total_pressure_Pa"] = _t1473_total_pressure(values)
-        return kwargs
+        return kwargs, None
     if quantity is Quantity.EVAPORATION_FLUX:
         family = _flux_unit_family(
             str(obs.get("units")) if obs.get("units") not in (None, "") else None
@@ -9535,10 +9537,11 @@ def t1473_identity_kwargs(
             if family is not None
             else State.unknown("printed unit is not mol m-2 s-1 or kg m-2 s-1")
         )
-        kwargs["composition"] = _composition_state_from_printed(
+        composition = _composition_located_from_printed(
             values.get("composition_as_printed"),
             absent="melt composition not printed",
         )
+        kwargs["composition"] = composition.state
         kwargs["total_pressure_Pa"] = _t1473_total_pressure(values)
         flow = t1473_flow_block(values.get("flow"))
         kwargs["sweep_gas"] = _sweep_from_atmosphere(values, flow)
@@ -9551,7 +9554,7 @@ def t1473_identity_kwargs(
                 duration_s=State.unknown("duration is not an evaporation_flux identity"),
             )
         )
-        return kwargs
+        return kwargs, composition
     basis = values.get("basis")
     if basis in {"atom", "mass"}:
         kwargs["subtype"] = State.of(str(basis))
@@ -9566,10 +9569,11 @@ def t1473_identity_kwargs(
         kwargs["normalising_element"] = State.not_applicable(
             "source does not print a normalised ratio"
         )
-    kwargs["composition"] = _composition_state_from_printed(
+    composition = _composition_located_from_printed(
         values.get("starting_composition"),
         absent="starting composition not printed",
     )
+    kwargs["composition"] = composition.state
     kwargs["total_pressure_Pa"] = _t1473_total_pressure(values)
     kwargs["sample_mass_kg"] = _mass_state_from_printed(values.get("sample_mass"))
     flow = t1473_flow_block(values.get("flow"))
@@ -9587,7 +9591,7 @@ def t1473_identity_kwargs(
             ),
         )
     )
-    return kwargs
+    return kwargs, composition
 
 
 def _selection_from_named_field(
@@ -14949,15 +14953,15 @@ class Migrator:
             ident_kwargs["temperature_K"] = State.unknown(
                 f"source {name} [{lo}, {hi}]; no midpoint invented"
             )
+        t1473_composition: Located[Composition] | None = None
         if isinstance(q_token, Quantity) and q_token in _T1473_QUANTITIES:
-            ident_kwargs.update(
-                t1473_identity_kwargs(
-                    q_token,
-                    values if isinstance(values, Mapping) else {},
-                    obs,
-                    temperature_K=ident_kwargs.get("temperature_K"),
-                )
+            t1473_kwargs, t1473_composition = t1473_identity_kwargs(
+                q_token,
+                values if isinstance(values, Mapping) else {},
+                obs,
+                temperature_K=ident_kwargs.get("temperature_K"),
             )
+            ident_kwargs.update(t1473_kwargs)
         if p_std is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(p_std)
         if (
@@ -16001,6 +16005,27 @@ class Migrator:
         derivation_identity_provenance = _identity_provenance_for_value_derivation(
             identity_provenance, value_derivation
         )
+        if t1473_composition is not None and t1473_composition.inference is not None:
+            composition_inference = t1473_composition.inference
+            identity_provenance += (
+                f"identity.composition={composition_inference.relation}",
+            )
+            if value_derivation is None:
+                value_derivation = Derivation(
+                    relation=composition_inference.relation,
+                    inputs=(read_from,),
+                    parameters=composition_inference.parameters,
+                    output_unit=composition_inference.output_unit,
+                )
+            else:
+                value_derivation = replace(
+                    value_derivation,
+                    parameters=value_derivation.parameters
+                    + composition_inference.parameters,
+                )
+            derivation_identity_provenance = _identity_provenance_for_value_derivation(
+                identity_provenance, value_derivation
+            )
         if derivation_identity_provenance:
             identity_relation = "; ".join(derivation_identity_provenance)
             if value_derivation is None:
