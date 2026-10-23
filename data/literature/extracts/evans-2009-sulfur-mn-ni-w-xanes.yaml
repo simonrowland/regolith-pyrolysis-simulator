@@ -1,0 +1,405 @@
+schema_version: literature_extract.v1
+source_id: evans-2009-sulfur-mn-ni-w-xanes
+source:
+  citation: 'Evans KA, O’Neill HStC, Mavrogenes JA, Keller NS, Jang LY, Lee JF (2009). XANES evidence for sulphur speciation in Mn-, Ni- and W-bearing silicate melts. Geochimica et Cosmochimica Acta 73(22), 6847–6867.'
+  doi: 10.1016/j.gca.2009.08.013
+  year: 2009
+  corpus_asset: raw/evans-2009-sulfur-mn-ni-w-xanes/evans-2009-sulfur-mn-ni-w-xanes.pdf
+extraction:
+  method: >-
+    Born-digital journal article; pdftotext-layout is primary and MinerU table draft found no table blocks. Tables 1, 2a, 2b, 2c, 3, 4, 5, and 6 were transcribed from text and checked against 600 dpi renders. Figures 1-11 are recorded with deferred digitisation and no numeric points. The paper reports proportions of S-XANES peak components, not oxidation-state fractions: it explicitly rejects a one-to-one mapping between components and sulphur species. The battery has no matching quantity for these peak proportions, for whole-glass composition vectors, or for the sulfur concentration data.
+  table_dispositions:
+    table_1: context-only; run conditions include printed fugacity logs, but there are no scored observations to attach them to
+    table_2a: context-only; measured Mn-bearing whole-glass composition vectors have no matching store quantity
+    table_2b: context-only; measured W-bearing whole-glass composition vectors have no matching store quantity
+    table_2c: context-only; measured Ni-bearing whole-glass composition vectors have no matching store quantity
+    table_3: context-only; fitted S-XANES peak proportions are not sulfur oxidation-state fractions, and no peak-proportion quantity exists
+    table_4: context-only; correlation coefficients are derived statistics rather than measured quantities
+    table_5: context-only; EXAFS coordination and bond-distance fit parameters have no matching quantity token
+    table_6: context-only; Ni pre-edge energy offsets are structural/spectral descriptors without a matching quantity token
+    redox: no numeric Mn, Ni, or W valence fractions are printed; metal oxidation states are interpreted qualitatively from XANES
+    figures: eleven figure records are deferred without numeric points
+  date: '2026-10-20'
+  worker: fam31-1020
+review_status: draft
+species:
+  S:
+    observations: []
+    context:
+    - observation_id: evans_2009_table_1_run_conditions
+      type: measured_table_context
+      locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1'}
+      attribution: present work
+      units: additive concentrations wt.%; log10 fugacities as printed
+      candidate_tokens: [valence_ratio, equilibrium_phase_composition]
+      reason: Run conditions alone are not an observation; printed log10 fO2, fS2, and fSO2 are retained verbatim and are not converted or recomputed.
+      values:
+        experiment_as_printed: 'Silicate glass melts at 1400 °C and 1 bar; fO2 and fS2 controlled by supplied CO, CO2, and SO2 proportions. The log fugacity reference is not stated in this table.'
+        columns: [run, additive_metal, additive_concentration_wt_percent, log10_fO2, log10_fS2, log10_fSO2, DQFM]
+        rows_as_printed: |
+          B030106 | Mn | 1–10 | -9.60 | -1.91 | -3.06 | -3.2
+          B310706 | Mn | 1–10 | -9.60 | -1.91 | -3.06 | -3.2
+          B020806 | Mn | 1–10 | -7.18 | -0.84 | -0.61 | -0.7
+          B111006 | Mn | 0–1 | -7.59 | -2.80 | -1.50 | -1.2
+          B151106 | Mn | 0–1 | -9.60 | -1.91 | -3.06 | -3.2
+          B301205 | W | 0–1 | -9.60 | -1.91 | -3.06 | -3.2
+          B240306 | W | 1–10 | -9.60 | -1.91 | -3.06 | -3.2
+          B220806 | W | 1–10 | -9.60 | -1.91 | -3.06 | -3.2
+          B230806 | W | 1–10 | -7.18 | -1.85 | -0.61 | -0.7
+          B150906 | W | 0–1 | -9.60 | -1.91 | -3.06 | -3.2
+          B200906 | W | 1.5–10 | -3.09 | -10.85 | -0.52 | 3.3
+          B141106 | W | 1–10 | -9.60 | -1.91 | -3.06 | -3.2
+          B231205 | Ni | 0–1 | -9.60 | -1.91 | -3.06 | -3.2
+          B220306 | Ni | 1–10 | -9.60 | -1.91 | -3.06 | -3.2
+          B070406 | Ni | 10–30 | -9.60 | -1.91 | -3.06 | -3.2
+          B120406 | Ni | 1–10 | -7.18 | -1.85 | -0.61 | -0.7
+          B010806 | Ni | 0–1 | -9.60 | -1.91 | -3.06 | -3.2
+          B030806 | Ni | 0–1 | -7.18 | -1.85 | -0.61 | -0.7
+          B140906 | Ni | 0–1 | -9.60 | -1.91 | -3.06 | -3.2
+          B190906 | Ni | 1–10 | -3.09 | -11.88 | -1.52 | 3.3
+    - observation_id: evans_2009_table_2a_mn_glass_compositions
+      type: measured_table_context
+      locator: {page: 7, published_page: 6853, pdf_page_index: 6, table: '2a'}
+      attribution: present work
+      units: wt.% as printed; Edge eV
+      candidate_tokens: [equilibrium_phase_composition, liquidus_composition]
+      reason: Electron-microprobe rows are bulk compositions of multicomponent glasses; no store token represents the whole composition vector or its sulfur concentration.
+      values:
+        columns: [sample, Si, Al, Mg, Ca, Fe, S, Mn, O, total, edge]
+        note: Parenthesized digits are the printed uncertainty; bdl means below detection limit; n.a. means not available. Sample IDs bind rows to Table 1 run conditions. Glasses were melted at 1400 °C and 1 bar, then quenched before XANES analysis.
+        experiment_conditions_as_printed: 'Silicate glass melts at 1400 °C and 1 bar; run-specific fugacity logs are in Table 1, whose reference is unstated.'
+        rows_as_printed: |
+          B030106p2b | 19.93(8) | 6.64(4) | 5.07(3) | 24.54(5) | 0.73(1) | 0.224(1) | 0.381(3) | 42.31(1) | 99.9(2) | n.a.
+          B310706p1a | 20.3(1) | 6.98(6) | 5.43(5) | 25.32(9) | 0.018(1) | 0.196(3) | bdl | 43.2(2) | 101.5(5) | 2471.3
+          B310706p2a | 19.5(1) | 6.91(2) | 5.35(7) | 24.91(1) | 0.04(2) | 0.332(3) | 2.07(2) | 42.8(1) | 102.0(2) | 2470.4
+          B310706p3a | 18.9(2) | 6.58(9) | 5.17(7) | 24.2(2) | 0.043(9) | 0.480(2) | 3.74(5) | 42.0(4) | 101.1(8) | 2470.5
+          B310706p4a | 18.4(1) | 6.44(2) | 5.06(2) | 23.71(7) | 0.05(1) | 0.726(6) | 6.03(2) | 42.0(1) | 102.4(2) | 2470.4
+          B310706p5 | 18.2(1) | 6.3(1) | 4.87(7) | 23.24(7) | 0.07(3) | 0.879(4) | 7.15(2) | 41.8(1) | 102.5(3) | 2470.6
+          B310706p6a | 17.6(2) | 6.10(9) | 4.76(7) | 22.36(6) | 0.06(2) | 1.117(8) | 8.74(3) | 41.2(2) | 102.0(4) | 2470.9
+          B020806p1 | 17.6(2) | 6.19(3) | 4.75(1) | 22.62(5) | bdl | 0.088(3) | 9.008(1) | 40.5(2) | 100.8(4) | 2470.8
+          B020806p2a | 18.40(5) | 6.39(2) | 4.993(3) | 23.76(8) | 0.02(2) | 0.053(2) | 6.10(3) | 41.25(9) | 101.0(2) | 2471.4
+          B020806p3a | 17.93(5) | 6.3(1) | 4.92(8) | 23.29(3) | 0.040(7) | 0.12(1) | 7.27(2) | 40.8(2) | 100.7(3) | 2470.5
+          B020806p4 | 19.4(1) | 6.76(5) | 5.29(9) | 25.07(8) | bdl | 0.024(2) | 2.122(7) | 42.3(2) | 101.0(3) | 2470.5
+          B020806p5 | 19.12(5) | 6.69(4) | 5.09(8) | 24.62(6) | bdl | 0.039(2) | 3.902(7) | 42.10(5) | 101.6(1) | 2471
+          B020806p6b | 18.1(1) | 6.3(1) | 4.87(7) | 23.3(1) | bdl | 0.122(4) | 7.24(2) | 41.0(2) | 101.0(4) | 2471.2
+          B111006p2 | 20.2(5) | 7.6(7) | 4.9(8) | 24.(1) | bdl | 0.019(7) | 1.02(9) | 43.0(3) | 101.2(2) | n.a.
+          B151106p1 | 21.08(9) | 7.08(4) | 5.25(2) | 22.03(7) | 0.048(7) | 0.229(2) | 0.379(5) | 42.93(9) | 99.1(1) | 2471.2
+          B151106p4 | 20.84(5) | 6.95(6) | 5.20(2) | 21.93(6) | 0.05(2) | 0.274(5) | 1.070(6) | 42.7(1) | 99.2(2) | 2471.4
+          B151106p5 | 21.19(4) | 7.02(7) | 5.22(6) | 22.02(6) | 0.096(8) | 0.219(7) | 0.235(3) | 42.94(4) | 99.0(1) | 2471.2
+          B151106p6 | 20.89(7) | 6.95(3) | 5.18(6) | 21.82(6) | 0.065(4) | 0.251(4) | 0.840(7) | 42.62(9) | 98.7(1) | 2471.5
+    - observation_id: evans_2009_table_2b_w_glass_compositions
+      type: measured_table_context
+      locator: {page: 7, published_page: 6853, pdf_page_index: 6, table: '2b'}
+      attribution: present work
+      units: wt.% as printed; Edge eV
+      candidate_tokens: [equilibrium_phase_composition, liquidus_composition]
+      reason: Electron-microprobe rows are bulk compositions of multicomponent glasses; no store token represents the whole composition vector or its sulfur concentration.
+      values:
+        columns: [sample, Si, Al, Mg, Ca, Fe, S, W, O, total, edge]
+        note: Parenthesized digits are the printed uncertainty; bdl means below detection limit; n.a. means not available. Sample IDs bind rows to Table 1 run conditions. Glasses were melted at 1400 °C and 1 bar, then quenched before XANES analysis.
+        experiment_conditions_as_printed: 'Silicate glass melts at 1400 °C and 1 bar; run-specific fugacity logs are in Table 1, whose reference is unstated.'
+        rows_as_printed: |
+          B301205p3b | 19.8(1) | 6.65(6) | 5.15(5) | 24.38(2) | 0.486(7) | 0.208(2) | 0.740(6) | 42.1(2) | 99.6(3) | n.a.
+          B240306p1 | 20.60(6) | 7.32(6) | 5.55(1) | 15.53(3) | 0.06(1) | 0.075(4) | 7.74(4) | 41.97(9) | 98.9(2) | n.a.
+          B220806p2 | 21.59(1) | 7.63(9) | 5.80(5) | 16.03(5) | 0.048(1) | 0.064(4) | 5.86(4) | 43.23(1) | 100.3(2) | 2469
+          B220806p3 | 21.1(1) | 7.39(7) | 5.69(5) | 15.50(7) | 0.05(1) | 0.068(7) | 7.6(1) | 42.6(1) | 100.0(3) | 2468.8
+          B220806p4 | 23.08(5) | 8.14(5) | 6.14(7) | 16.77(2) | 0.020(7) | bdl | 2.23(3) | 44.92(9) | 101.4(2) | n.a.
+          B220806p5 | 22.8(2) | 7.89(3) | 6.09(6) | 19.73(2) | 0.06(2) | 0.073(5) | 0.223(7) | 45.0(2) | 101.9(4) | 2469
+          B220806p6 | 20.51(9) | 7.32(7) | 5.6(1) | 15.1(2) | 0.05(1) | 0.071(3) | 9.27(5) | 42.1(2) | 100.1(6) | 2470.6
+          B230806p5b | 22.8(2) | 8.00(8) | 6.2(1) | 16.6(1) | bdl | bdl | 2.34(4) | 44.4(4) | 100.3(9) | n.a.
+          B200906p5b | 19.2(1) | 6.61(8) | 5.31(7) | 24.46(4) | bdl | bdl | 2.67(4) | 41.7(1) | 100.0(3) | n.a.
+          B150906p1 | 19.7(2) | 7.0(3) | 5.5(5) | 25.1(3) | bdl | 0.3(1) | 0.70(9) | 42.9(2) | 101.4(4) | 2471.1
+          B150906p2 | 20.1(1) | 6.93(6) | 5.36(6) | 25.1(1) | 0.040(5) | 0.200(3) | 0.28(3) | 42.9(2) | 101.0(4) | 2471.2
+          B150906p3 | 19.7(1) | 6.83(5) | 5.39(9) | 24.95(7) | 0.18(2) | 0.206(4) | 0.89(3) | 42.5(2) | 100.7(3) | 2471.4
+          B150906p4 | 19.9(1) | 6.89(6) | 5.4(1) | 25.14(9) | 0.17(2) | 0.202(5) | 0.49(5) | 42.7(2) | 101.0(3) | 2471.2
+          B150906p5 | 21.16(3) | 7.32(1) | 5.80(8) | 22.80(9) | 0.163(7) | 0.134(2) | bdl | 43.7(1) | 101.1(3) | 2471.4
+          B141106p1a | 18.4(3) | 6.6(2) | 5.16(5) | 22.0(3) | 0.07(2) | 0.14(2) | 6.4(2) | 40.9(7) | 100.(2) | 2468.9
+          B141106p2a | 19.5(2) | 6.8(4) | 5.2(3) | 24.8(8) | bdl | 0.10(2) | 2.4(2) | 42.1(6) | 101.(1) | 2469.0
+          B141106p3 | 20.2(7) | 6.7(4) | 5.1(8) | 23.5(8) | 0.01(2) | 0.05(4) | 3.8(1) | 42.7(6) | 102.(2) | 2469.5
+          B141106p4 | 17.57(8) | 6.22(4) | 5.27(5) | 20.55(9) | 0.05(3) | 0.18(5) | 10.1(4) | 40.1(2) | 100.0(6) | 2470.6
+    - observation_id: evans_2009_table_2c_ni_glass_compositions
+      type: measured_table_context
+      locator: {page: 8, published_page: 6854, pdf_page_index: 7, table: '2c'}
+      attribution: present work
+      units: wt.% as printed; Edge eV
+      candidate_tokens: [equilibrium_phase_composition, liquidus_composition]
+      reason: Electron-microprobe rows are bulk compositions of multicomponent glasses; no store token represents the whole composition vector or its sulfur concentration.
+      values:
+        columns: [sample, Si, Al, Mg, Ca, Fe, S, Ni, O, total, edge]
+        note: Parenthesized digits are the printed uncertainty; bdl means below detection limit; n.a. means not available. Sample IDs bind rows to Table 1 run conditions. Glasses were melted at 1400 °C and 1 bar, then quenched before XANES analysis.
+        experiment_conditions_as_printed: 'Silicate glass melts at 1400 °C and 1 bar; run-specific fugacity logs are in Table 1, whose reference is unstated.'
+        rows_as_printed: |
+          B231205p1 | 19.81(8) | 6.64(2) | 5.14(3) | 24.96(2) | 0.374(7) | 0.214(2) | 0.016(2) | 42.2(1) | 99.3(2) | n.a.
+          B231205p5 | 19.8(2) | 6.74(5) | 5.15(7) | 24.82(3) | 0.521(4) | 0.214(2) | bdl | 42.3(2) | 99.5(4) | n.a.
+          B220306p3 | 19.5(1) | 7.22(9) | 5.5(1) | 24.63(3) | 0.10(1) | 0.188(5) | 0.021(3) | 42.3(3) | 99.5(7) | n.a.
+          B070406p6 | 22.717(8) | 8.46(6) | 6.5(1) | 16.89(8) | 0.04(2) | 0.058(5) | 0.033(2) | 44.50(6) | 99.2(2) | n.a.
+          B120406p6b | 18.7(9) | 6.9(3) | 5.3(2) | 24.6(2) | 0.02(2) | 0.022(3) | 0.312(9) | 41.(1) | 97.(3) | n.a.
+          B010806p1a | 20.04(8) | 7.00(9) | 5.50(5) | 25.80(9) | 0.04(1) | 0.180(4) | 0.016(4) | 43.2(1) | 101.8(3) | 2470.5
+          B010806p2 | 23.73(4) | 8.28(4) | 6.47(7) | 17.26(3) | 0.03(1) | bdl | 0.132(8) | 45.64(7) | 101.7(1) | n.a.
+          B010806p4 | 23.6(1) | 7.9(2) | 6.4(2) | 17.37(9) | 0.018(7) | bdl | 0.091(4) | 45.2(2) | 100.7(4) | 2469
+          B010806p5 | 20.1(1) | 7.02(1) | 5.47(7) | 25.53(9) | 0.032(9) | 0.021(9) | 0.10(4) | 43.1(2) | 101.5(4) | 2468.5
+          B030806p2 | 20.2(1) | 7.04(1) | 5.4(1) | 25.71(5) | 0.05(2) | 0.021(8) | 0.38(4) | 43.2(3) | 101.9(6) | n.a.
+          B030806p5 | 20.0(1) | 6.98(9) | 5.4(2) | 25.3(2) | 0.02(2) | 0.016(2) | 0.354(5) | 42.7(4) | 100.7(9) | n.a.
+          B140906p4 | 20.2(1) | 6.96(7) | 5.3(1) | 25.68(6) | 0.08(1) | 0.203(3) | 0.025(6) | 43.2(2) | 101.6(5) | 2471.2
+          B140906p5 | 20.18(9) | 7.00(2) | 5.28(6) | 25.641(8) | 0.104(7) | 0.199(3) | bdl | 43.16(8) | 101.6(1) | 2471.2
+          B190906p5 | 19.8(1) | 6.84(8) | 5.40(4) | 24.1(1) | 0.020(5) | bdl | 2.473(7) | 42.4(2) | 101.0(4) | n.a.
+    - observation_id: evans_2009_table_3_s_xanes_peak_proportions
+      type: measured_table_context
+      locator: {page: 10, published_page: 6856, pdf_page_index: 9, table: '3'}
+      attribution: present work
+      units: proportions of normalized S-XANES signal; additive metal and S in wt.%; Metal:Ca molar; storage days; chi-squared
+      candidate_tokens: [valence_ratio]
+      reason: The authors define P(x) as the signal proportion assigned to a fitted peak, and explicitly do not map the peaks one-to-one to sulfur species; no store quantity represents fitted peak proportions.
+      values:
+        columns: [sample, additive, additive_metal_wt_percent, S_wt_percent, metal_Ca_molar, storage_days, P_W, P_2473_1, P_2474_9, P_2476_2, P_2481_4, chi_squared]
+        note: Parenthesized digits are printed fit uncertainties; n.a. means not available. Sample suffixes are retained as printed and link to the composition rows in Tables 2a-c and run conditions in Table 1. Glasses were melted at 1400 °C and 1 bar, then quenched before XANES analysis.
+        rows_as_printed: |
+          B310706p1 | Mn | 0 | 0.196 | 0.0000 | 113 | n.a. | 0.11(3) | 0.34(7) | 0.36(5) | 0.19(2) | 1.548
+          B310706p2 | Mn | 2.07 | 0.332 | 0.0606 | 113 | n.a. | 0.33(3) | 0.21(5) | 0.44(4) | 0.020(6) | 0.355
+          B310706p3 | Mn | 3.74 | 0.48 | 0.1127 | 113 | n.a. | 0.26(3) | 0.26(6) | 0.36(4) | 0.11(1) | 0.396
+          B310706p4 | Mn | 6.03 | 0.726 | 0.1855 | 113 | n.a. | 0.31(3) | 0.19(4) | 0.44(4) | 0.06(1) | 1.553
+          B310706p6 | Mn | 8.74 | 1.117 | 0.2852 | 113 | n.a. | 0.03(4) | 0.22(7) | 0.06(4) | 0.68(6) | 1.124
+          B151106p1 | Mn | 0.379 | 0.229 | 0.0126 | 16 | n.a. | 0.10(3) | 0.22(6) | 0.27(5) | 0.41(5) | 0.283
+          B151106p1N | Mn | 0.378 | 0.229 | 0.0125 | 16 | n.a. | 0.13(4) | 0.45(10) | 0.40(7) | 0.02(1) | 0.284
+          B151106p4 | Mn | 1.07 | 0.274 | 0.0356 | 16 | n.a. | 0.19(4) | 0.40(9) | 0.41(6) | n.a. | 0.289
+          B151106p5 | Mn | 0.235 | 0.219 | 0.0078 | 15 | n.a. | 0.15(4) | 0.43(9) | 0.40(6) | 0.03(1) | 0.261
+          B151106p6 | Mn | 0.84 | 0.251 | 0.0281 | 16 | n.a. | 0.16(4) | 0.44(10) | 0.40(7) | n.a. | 0.24
+          B150906p1 | W | 0.7 | 0.3 | 0.0203 | 70 | n.a. | 0.14(4) | 0.36(9) | 0.45(7) | 0.05(2) | 0.784
+          B150906p2 | W | 0.28 | 0.2 | 0.0081 | 70 | n.a. | 0.15(3) | 0.38(8) | 0.47(6) | n.a. | 1.865
+          B150906p3 | W | 0.89 | 0.206 | 0.0260 | 71 | n.a. | 0.17(4) | 0.34(8) | 0.46(6) | 0.04(1) | 0.636
+          B150906p4 | W | 0.49 | 0.202 | 0.0142 | 71 | n.a. | 0.22(3) | 0.25(6) | 0.52(6) | 0.01(2) | 1.536
+          B150906p5 | W | 0 | 0.134 | 0.0000 | 71 | n.a. | 0.16(3) | 0.34(8) | 0.49(6) | n.a. | 0.742
+          B141106p1 | W | 6.4 | 0.14 | 0.0634 | 11 | 0.07(1) | 0.11(4) | 0.3(1) | 0.49(8) | n.a. | 1.401
+          B141106p2a | W | 2.4 | 0.1 | 0.0211 | 11 | 0.09(1) | 0.13(3) | 0.24(7) | 0.46(6) | 0.09(2) | 0.588
+          B141106p2b | W | 2.4 | 0.1 | 0.0223 | 11 | 0.08(1) | 0.07(3) | 0.32(9) | 0.43(8) | 0.10(2) | 0.952
+          B140906p4 | Ni | 0.03 | 0.203 | 0.0008 | 71 | n.a. | 0.15(3) | 0.38(8) | 0.47(6) | n.a. | 0.639
+          B140906p4D | Ni | 0.03 | 0.203 | 0.0008 | 71 | n.a. | 0.29(3) | 0.18(5) | 0.53(5) | n.a. | 0.693
+          B140906p5 | Ni | 0.03 | 0.199 | 0.0008 | 71 | n.a. | 0.21(3) | 0.33(7) | 0.46(5) | 0.001(4) | 1.494
+    - observation_id: evans_2009_table_4_peak_correlations
+      type: measured_table_context
+      locator: {page: 11, published_page: 6857, pdf_page_index: 10, table: '4'}
+      attribution: present work
+      units: correlation coefficient
+      candidate_tokens: []
+      reason: Correlations are derived statistics between fitted peak proportions and Mn-glass composition, not redox observations.
+      values:
+        rows_as_printed: |
+          P(2473.1) | Mn wt.% 0.85 | Ca wt.% n.s. | S wt.% 0.8 | Mn:Ca molar 0.84
+          P(2474.9) | Mn wt.% -0.85 | Ca wt.% n.s. | S wt.% -0.81 | Mn:Ca molar -0.84
+          P(2476.2) | Mn wt.% n.s. | Ca wt.% n.s. | S wt.% n.s. | Mn:Ca molar n.s.
+    - observation_id: evans_2009_table_5_exafs_fit_parameters
+      type: measured_table_context
+      locator: {page: 15, published_page: 6861, pdf_page_index: 14, table: '5'}
+      attribution: present work
+      units: coordination number; energy eV; distance Å; disorder Å²; R-factor
+      candidate_tokens: []
+      reason: EXAFS fit parameters describe local coordination and bond distances; no matching store quantity is available.
+      values:
+        rows_as_printed: |
+          Mn | n 5(1) | E0 6540(4) | r 2.06(2) | sigma2 0.009(3) | R-factor 0.007
+          W | n 3(1) | E0 10,204(3) | r 1.77(1) | sigma2 0.001(1) | R-factor 0.023
+          Ni | n 3.8(9) | E0 8345a | r 1.96(1) | sigma2 0.007(4) | R-factor 0.036
+        note: a means energy set to maximum first derivative on edge.
+    - observation_id: evans_2009_table_6_ni_preedge_offsets
+      type: measured_table_context
+      locator: {page: 15, published_page: 6861, pdf_page_index: 14, table: '6'}
+      attribution: present work
+      units: eV
+      candidate_tokens: []
+      reason: Ni pre-edge centroid offsets are spectral coordination descriptors, not oxidation-state fractions or ratios.
+      values:
+        rows_as_printed: |
+          B231205p1 | 0.48 | 0.07
+          B220306p6 | 0.49 | 0.05
+          B120406p6 | 0.56 | 0.05
+          B070406p6 | 0.41 | 0.16
+          B190906p5 | 0.49 | 0.04
+          B030806p5 | 0.5 | 0.04
+          B030806p2 | 0.45 | 0.05
+          NiO | 0 | n.a.
+        columns: [sample, Epreedge_sample_minus_NiO, one_sigma]
+    - observation_id: evans_2009_fig1_sulfur_edge_concept
+      type: figure_record
+      locator: {page: 3, published_page: 6849, pdf_page_index: 2, figure: '1'}
+      attribution: present work
+      units: figure-only; plotted coordinates not digitized
+      values:
+        quantity: XANES edge energy versus sulfur oxidation state; schematic electronic transitions
+        species: sulfur standards, including MgS and FeS
+        phase: standard compounds; schematic valence and conduction bands
+        temperature_as_printed: not stated
+        axes_as_printed: [sulfur oxidation state, edge position (eV); schematic transition energy]
+        caption_summary: '(a) Schematic comparison of transitions producing the sulfur K-edge for ionic MgS-like and covalent FeS-like bonding; (b) edge positions, defined by maximum first derivative, versus oxidation state for standards measured in this study.'
+        panels: [a, b]
+        series: [{name: schematic transitions and standards, marker_count: 0, attribution: present work}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: evans_2009_fig2_sulfide_standards
+      type: figure_record
+      locator: {page: 8, published_page: 6854, pdf_page_index: 7, figure: '2'}
+      attribution: present work; CaS and MgS spectra digitised from Farrell and Fleet (1999)
+      units: figure-only; plotted coordinates not digitized
+      values:
+        quantity: S K-edge XANES absorption spectra
+        species: sulfide standards NiS, FeS, WS2, FeS2, MnS, CaS, MgS
+        phase: crystalline sulfide standards
+        temperature_as_printed: not stated
+        axes_as_printed: [energy (eV), absorption (arbitrary units)]
+        caption_summary: Sulfide standards spectra; dotted line marks the spurious sulfate peak near 2481 eV caused by oxidation before sample preparation and analysis.
+        panels: [whole figure]
+        series: [{name: seven sulfide standards, marker_count: 0, attribution: present work except CaS and MgS quoted_attributed}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: evans_2009_fig3_sulfate_standards
+      type: figure_record
+      locator: {page: 8, published_page: 6854, pdf_page_index: 7, figure: '3'}
+      attribution: present work
+      units: figure-only; plotted coordinates not digitized
+      values:
+        quantity: S K-edge XANES absorption spectra
+        species: NiSO4, FeSO4, MnSO4
+        phase: sulfate standards
+        temperature_as_printed: not stated
+        axes_as_printed: [energy (eV), absorption (arbitrary units)]
+        caption_summary: S K-edge XANES spectra for sulfate standards measured at NSRRC.
+        panels: [whole figure]
+        series: [{name: NiSO4, marker_count: 0}, {name: FeSO4, marker_count: 0}, {name: MnSO4, marker_count: 0}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: evans_2009_fig4_synthetic_glasses
+      type: figure_record
+      locator: {page: 9, published_page: 6855, pdf_page_index: 8, figure: '4'}
+      attribution: present work
+      units: figure-only; plotted coordinates not digitized
+      values:
+        quantity: S K-edge XANES absorption spectra
+        species: sulfur in synthetic silicate glasses with CMAS, Ni, Mn, or W additions
+        phase: silicate glass
+        temperature_as_printed: melt run at 1400 °C; spectra measured after quench
+        axes_as_printed: [energy (eV), absorption (arbitrary units)]
+        caption_summary: Selected synthetic glass spectra; panels compare base glass/additives and Mn-bearing compositions, with sulfate and W peak positions indicated.
+        panels: [a, b]
+        series: [{name: glass spectra, marker_count: 0, attribution: present work}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: evans_2009_fig5_peak_deconvolution
+      type: figure_record
+      locator: {page: 11, published_page: 6857, pdf_page_index: 10, figure: '5'}
+      attribution: present work
+      units: figure-only; plotted coordinates not digitized
+      values:
+        quantity: S-XANES spectra and fitted peak components
+        species: sulfur in B310706p1, B310706p4, B141106p2b glasses
+        phase: silicate glass
+        temperature_as_printed: melt run at 1400 °C; spectra measured after quench
+        axes_as_printed: [energy (eV), absorption (arbitrary units)]
+        caption_summary: Thick line is measured XANES; thin lines are deconvoluted peak components and fit for CMAS, CMAS + Mn, and CMAS + W samples.
+        panels: [a, b, c]
+        series: [{name: measured spectra and fitted components, marker_count: 0, attribution: present work}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: evans_2009_fig6_peak_correlations
+      type: figure_record
+      locator: {page: 12, published_page: 6858, pdf_page_index: 11, figure: '6'}
+      attribution: present work
+      units: figure-only; plotted coordinates not digitized
+      values:
+        quantity: fitted sulfur peak proportions and Ca:additive metal molar ratio
+        species: sulfur in Mn- and W-bearing silicate glasses
+        phase: silicate glass
+        temperature_as_printed: melt run at 1400 °C; spectra measured after quench
+        axes_as_printed: [Ca:additive metal molar ratio, peak proportion]
+        caption_summary: S-XANES peak-deconvolution results against Ca:Mn or Ca:W ratios, with panels differentiating measured glass series.
+        panels: [a, b, c, d]
+        series: [{name: Mn-bearing glasses, marker_count: unknown, marker_count_reason: plotted samples; exact symbol count deferred}, {name: W-bearing glasses, marker_count: unknown, marker_count_reason: plotted samples; exact symbol count deferred}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: evans_2009_fig7_metal_standards
+      type: figure_record
+      locator: {page: 13, published_page: 6859, pdf_page_index: 12, figure: '7'}
+      attribution: present work
+      units: figure-only; plotted coordinates not digitized
+      values:
+        quantity: Mn K-edge, W L3-edge, and Ni K-edge XANES spectra
+        species: Mn, W, Ni metal and oxide/sulfide/tungstate standards
+        phase: elemental, oxide, sulfide, and tungstate standards
+        temperature_as_printed: not stated
+        axes_as_printed: [energy relative to edge (eV), normalized absorption]
+        caption_summary: Metal XANES spectra for Mn, W, and Ni standards; all metal standards measured at NSRRC.
+        panels: [a, b, c]
+        series: [{name: standards grouped by Mn/W/Ni, marker_count: 0, attribution: present work}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: evans_2009_fig8_metal_glasses
+      type: figure_record
+      locator: {page: 14, published_page: 6860, pdf_page_index: 13, figure: '8'}
+      attribution: present work
+      units: figure-only; plotted coordinates not digitized
+      values:
+        quantity: Mn K-edge, W L3-edge, and Ni K-edge XANES spectra
+        species: Mn, W, Ni in synthetic silicate glasses
+        phase: quenched silicate glass
+        temperature_as_printed: melt run at 1400 °C
+        axes_as_printed: [energy relative to edge (eV), normalized absorption]
+        caption_summary: Metal XANES spectra for synthetic glasses, ordered by Mn:S ratio, W content, and Ni:S ratio across panels.
+        panels: [a, b, c]
+        series: [{name: metal-bearing glass spectra, marker_count: 0, attribution: present work}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: evans_2009_fig9_metal_exafs
+      type: figure_record
+      locator: {page: 15, published_page: 6861, pdf_page_index: 14, figure: '9'}
+      attribution: present work
+      units: figure-only; plotted coordinates not digitized
+      values:
+        quantity: EXAFS Fourier-transform magnitude and fit
+        species: Mn, W, Ni
+        phase: metal-bearing silicate glasses
+        temperature_as_printed: melt run at 1400 °C; spectra measured after quench
+        axes_as_printed: [R (Å), magnitude of Fourier-transformed signal, arbitrary units]
+        caption_summary: Metal EXAFS fits for average Mn-, W-, and Ni-bearing glasses; solid line data, dashed line fit.
+        panels: [a, b, c]
+        series: [{name: average glass spectrum and fit, marker_count: 0, attribution: present work}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: evans_2009_fig10_sulfate_peak_storage
+      type: figure_record
+      locator: {page: 16, published_page: 6862, pdf_page_index: 15, figure: '10'}
+      attribution: present work
+      units: figure-only; plotted coordinates not digitized
+      values:
+        quantity: fitted sulfate-peak proportion versus storage duration and oxidation preparation
+        species: sulfur in synthetic silicate glasses
+        phase: silicate glass
+        temperature_as_printed: melt run at 1400 °C; spectra measured after quench
+        axes_as_printed: [storage duration, sulfate peak proportion; XANES energy (eV), absorption]
+        caption_summary: Further information on the sulfate peak at 2481.4 eV, including storage duration and preparation/experimental oxidation comparisons.
+        panels: [a, b, c, d]
+        series: [{name: stored and differently prepared glasses, marker_count: unknown, marker_count_reason: plotted samples; exact symbol count deferred}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: evans_2009_fig11_sulfide_spectrum_sums
+      type: figure_record
+      locator: {page: 18, published_page: 6864, pdf_page_index: 17, figure: '11'}
+      attribution: present work; reference sulfide standards include literature-derived CaS and MgS spectra
+      units: figure-only; plotted coordinates not digitized
+      values:
+        quantity: S K-edge XANES spectra compared with sums of sulfide spectra
+        species: sulfur in B310706p1, B310706p6, and B141106p1 glasses
+        phase: silicate glass and sulfide reference standards
+        temperature_as_printed: melt run at 1400 °C; spectra measured after quench
+        axes_as_printed: [energy (eV), absorption (arbitrary units)]
+        caption_summary: Comparison of S K-edge XANES spectra with sums of sulfide spectra for (a) B310706p1 (CMAS), (b) B310706p6 (CMAS + Mn), and (c) B141106p1 (CMAS + W).
+        panels: [a, b, c]
+        series: [{name: measured spectra and component sums, marker_count: 0, attribution: present work}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: evans_2009_qualitative_sulfur_redox_interpretation
+      type: context
+      locator: {page: 15, published_page: 6861, pdf_page_index: 14, section: '4.2'}
+      attribution: present work
+      units: qualitative oxidation-state assignment
+      reason: The paper reports qualitative assignments from spectra but no numeric sulfur oxidation-state fractions or ratios.
+      values:
+        interpretation_as_printed: Sulfur XANES is consistent with S2− and S6+; the authors report no evidence for S4+.
+        quantitative_result: none reported

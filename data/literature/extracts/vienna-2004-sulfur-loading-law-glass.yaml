@@ -1,0 +1,354 @@
+schema_version: literature_extract.v1
+source_id: vienna-2004-sulfur-loading-law-glass
+source:
+  citation: 'Vienna JD, Hrma P, Buchmiller WC, Ricklefs JS (2004). Preliminary Investigation of Sulfur Loading in Hanford LAW Glass. PNNL-14649, Pacific Northwest National Laboratory, April 2004.'
+  doi: null
+  year: 2004
+  corpus_asset: raw/vienna-2004-sulfur-loading-law-glass/vienna-2004-sulfur-loading-law-glass.pdf
+extraction:
+  method: >-
+    Born-digital technical report; pdftotext-layout is primary and MinerU conversion found no table blocks. Table pages 16, 23, 24, 29, and 32 were rendered at 600 dpi to confirm row and column assignment; all table values matched the machine text. No figure values were digitised. Measured SO3 content, retention results, and author loading relations are preserved in context because simulator/battery/enums.py has no sulfur-solubility or generic concentration quantity.
+  table_dispositions:
+    table_2_1: context-only; sulfur retention and melter throughput are not a sulfur-solubility quantity
+    table_2_5: context-only; measured SO3 glass concentrations have no sulfur-solubility or generic concentration token
+    table_2_6: context-only; measured SO3 feed and glass concentrations have no sulfur-solubility or generic concentration token
+    table_3_3: nominal glass formulations are retained with Table 3.6 context to bind its rows; formulation compositions are not observations
+    table_3_6: context-only; measured SO3 glass concentrations have no sulfur-solubility or generic concentration token
+    figures: figures are recorded without numeric points; sulfur solubility and formulation limits have no matching store quantity token
+  date: '2026-10-20'
+  worker: fam31-1020
+review_status: draft
+species:
+  S:
+    observations: []
+    context:
+    - observation_id: vienna_2004_table_2_1_melter_segments
+      type: measured_table_context
+      locator: {page: 16, published_page: '2.4', pdf_page_index: 15, table: '2.1'}
+      attribution: quoted_attributed, Pegg et al. (2000)
+      units: target SO3 mass%; retention %; glass rate MT/d/m2
+      candidate_tokens: [sulfur_solubility_and_sulfate_capacity_series, yield_fraction]
+      reason: The measured column is percent of feed sulfur retained in glass, not a sulfur solubility concentration; neither existing token represents this table's retention/throughput outcome.
+      values:
+        quantity_as_printed: target sulfur loading, salt formation, sulfur retention, and glass rate by melter segment
+        quantity_token: unavailable
+        schema_gap: No store token represents sulfur retention fraction alongside melter process outcomes.
+        common_composition_as_printed: Each glass contained 7.9 mass% Na2O; test glasses LAWB37, LAWB39, or LAWB41 as listed by row.
+        temperature_as_printed: not stated for the melter segments in this table or its cited discussion
+        columns: [segment, target_SO3_in_feed_mass_percent, salt, SO3_retention_percent, glass_rate_MT_per_day_per_m2, glass, comments]
+        rows:
+        - {segment: '1a', target_SO3_in_feed: 1.02, salt: 'No', SO3_retention_percent: 74, glass: LAWB37, glass_rate: 2.6, comments: none}
+        - {segment: '1b', target_SO3_in_feed: 2.04, salt: 'Yes', SO3_retention_percent: 74, glass: LAWB37, glass_rate: 2.6, comments: none}
+        - {segment: '2a', target_SO3_in_feed: 2.04, salt: 'Yes', SO3_retention_percent: 64, glass: LAWB37, glass_rate: 1.8, comments: none}
+        - {segment: '2b', target_SO3_in_feed: 2.04, salt: 'Yes', SO3_retention_percent: 74, glass: LAWB37, glass_rate: 1.6, comments: 'high water'}
+        - {segment: '2c', target_SO3_in_feed: 2.04, salt: 'Yes', SO3_retention_percent: 26, glass: LAWB37, glass_rate: 1.9, comments: 'high sugar'}
+        - {segment: '2d', target_SO3_in_feed: 2.04, salt: 'Yes', SO3_retention_percent: 36, glass: LAWB37, glass_rate: 1.2, comments: 'high water, high sugar'}
+        - {segment: '2e', target_SO3_in_feed: 2.04, salt: 'No', SO3_retention_percent: 41, glass: LAWB37, glass_rate: 1.5, comments: 'high water, high sugar'}
+        - {segment: '3a', target_SO3_in_feed: 2.04, salt: 'Yes', SO3_retention_percent: 42, glass: LAWB39, glass_rate: 1.5, comments: none}
+        - {segment: '3b', target_SO3_in_feed: 1.59, salt: 'Yes', SO3_retention_percent: 69, glass: LAWB39, glass_rate: 1.5, comments: none}
+        - {segment: '3c', target_SO3_in_feed: 1.59, salt: 'No', SO3_retention_percent: 37, glass: LAWB39, glass_rate: 1.3, comments: 'high sugar'}
+        - {segment: '4', target_SO3_in_feed: 1.02, salt: 'No', SO3_retention_percent: 84, glass: LAWB39, glass_rate: 1.6, comments: none}
+        - {segment: '5', target_SO3_in_feed: 1.02, salt: 'No', SO3_retention_percent: 89, glass: LAWB41, glass_rate: 1.6, comments: none}
+        - {segment: '6', target_SO3_in_feed: 1.02, salt: 'No', SO3_retention_percent: 'Not Reported', glass: LAWB41, glass_rate: 2.7, comments: none}
+        interpretation_as_printed: Three segments (1a, 4, and 5) had 1.02 mass% SO3 and greater than 70% retention; the report states these support up to 0.7 mass% SO3 without a salt layer.
+    - observation_id: vienna_2004_table_2_5_rsm_glass_sulfur
+      type: measured_table_context
+      locator: {page: 23, published_page: '2.11', pdf_page_index: 22, table: '2.5'}
+      attribution: quoted_attributed, Goles et al. (2001)
+      units: mass% SO3 in glass and % of feed S in glass
+      candidate_tokens: [equilibrium_phase_composition, liquidus_composition, condensate_composition, activity]
+      reason: The measured SO3 concentrations fit sulfur solubility semantically, but this base has no sulfur-solubility or generic concentration quantity; the alternative composition and activity tokens do not represent a single oxide concentration.
+      values:
+        quantity_as_printed: target and measured SO3 content in RSM-01-1 glass
+        quantity_token: unavailable
+        schema_gap: No store quantity represents measured SO3 concentration in glass.
+        temperature_as_printed: 1147 to 1162 °C; nominal 1150 °C
+        temperature_locator: {page: 21, published_page: '2.9', pdf_page_index: 20, section: RSM-01-1 Test}
+        phase_as_printed: glass after continuous-feed melter testing
+        composition_as_printed: 2000 WM-180 simulant with SBW-9 additives; waste loading 30 to 35 mass%; target Na2O and SO3 vary by row.
+        atmosphere_as_printed: not stated
+        columns: [waste_loading_mass_percent, target_Na2O_in_glass_mass_percent, target_SO3_in_glass_mass_percent, measured_SO3_in_glass_mass_percent, percent_of_feed_S_in_glass]
+        rows:
+        - {waste_loading: 30, target_Na2O: 15.8, target_SO3: 1.07, measured_SO3: 0.68, percent_of_feed_S_in_glass: 63}
+        - {waste_loading: 32, target_Na2O: 16.8, target_SO3: 1.14, measured_SO3: 0.66, percent_of_feed_S_in_glass: 56}
+        - {waste_loading: 35, target_Na2O: 18.4, target_SO3: 1.25, measured_SO3: 0.70, percent_of_feed_S_in_glass: 56}
+        - {waste_loading: '35 (1.40×S)', target_Na2O: 18.4, target_SO3: 1.75, measured_SO3: 0.89, percent_of_feed_S_in_glass: 51}
+        method_as_printed: ICP analysis of SO3 in glass compared with target values.
+        note: RSM-01-1 melt-pool temperature and composition conditions are shared from the experiment description on PDF page 21.
+    - observation_id: vienna_2004_table_2_6_ev16_glass_sulfur
+      type: measured_table_context
+      locator: {page: 24, published_page: '2.12', pdf_page_index: 23, table: '2.6'}
+      attribution: quoted_attributed, Perry et al. (2001)
+      units: mass% SO3 on glass-oxide composition basis
+      candidate_tokens: [equilibrium_phase_composition, liquidus_composition, condensate_composition, activity]
+      reason: The measured SO3 concentrations fit sulfur solubility semantically, but this base has no sulfur-solubility or generic concentration quantity; the alternative composition and activity tokens do not represent a single oxide concentration.
+      values:
+        quantity_as_printed: target SO3, ICP SO3 in feed on a glass basis, and XRF/ICP SO3 in glass for EV-16-2001-1
+        quantity_token: unavailable
+        schema_gap: No store quantity represents measured SO3 concentration in glass.
+        temperature_as_printed: 1100 to 1175 °C; nominal 1150 °C
+        temperature_locator: {page: 24, published_page: '2.12', pdf_page_index: 23, section: EV-16-2001-1 Test}
+        phase_as_printed: glass from the EV-16 pilot-scale melter
+        composition_as_printed: 2000 WM-180 simulant at 30 mass% loading with SBW-9 additives (SBW-9-30); target SO3 1.07 mass%; ICP feed SO3 1.35 mass% on a glass basis.
+        atmosphere_as_printed: air is stated only for an estimated equilibrium SO3 concentration; the test atmosphere is not stated.
+        columns: [sample, target_SO3_mass_percent, ICP_SO3_in_feed_glass_basis_mass_percent, XRF_SO3_in_glass_mass_percent, ICP_SO3_in_glass_mass_percent]
+        rows:
+        - {sample: Melter Bottom, target_SO3: 1.07, ICP_feed_SO3: 1.35, XRF_glass_SO3: 0.74, ICP_glass_SO3: 0.79}
+        - {sample: General Melter Glass, target_SO3: 1.07, ICP_feed_SO3: 1.35, XRF_glass_SO3: 0.75, ICP_glass_SO3: 0.77}
+        - {sample: Melter Top, target_SO3: 1.07, ICP_feed_SO3: 1.35, XRF_glass_SO3: 0.76, ICP_glass_SO3: 0.76}
+        note: The table's glass concentrations are on the glass-oxide composition basis; the samples name different positions in the melter.
+    - observation_id: vienna_2004_ev16_1999_text_measurements
+      type: measured_text_context
+      locator: {page: 20, published_page: '2.8', pdf_page_index: 19, section: EV16-1999-1 Test}
+      attribution: quoted_attributed, Vienna et al. (1999)
+      units: mass% SO3
+      candidate_tokens: [equilibrium_phase_composition, liquidus_composition, condensate_composition, activity]
+      reason: Printed XRF and ICP glass concentrations have no sulfur-solubility or generic concentration token.
+      values:
+        quantity_as_printed: SO3 concentration measured in EV16-1999-1 glass
+        quantity_token: unavailable
+        schema_gap: No store quantity represents measured SO3 concentration in glass.
+        temperature_as_printed: target melt-pool temperature 1150 °C; excursions to 1350 °C
+        phase_as_printed: glass from pilot-scale EV-16 melter
+        composition_as_printed: 1998 SBW simulant with SBW-1 glass-forming additives and 35 mass% target waste loading
+        target_SO3_in_glass: 1.3
+        ICP_SO3_in_melter_feed: 1.07
+        measured_values:
+        - {method: XRF, SO3_in_glass: 0.49}
+        - {method: ICP-AES, SO3_in_glass: 0.58}
+        sulfur_retained_in_glass_percent_from_ICP: 54
+        atmosphere_as_printed: not stated
+    - observation_id: vienna_2004_table_3_6_lsm_sulfur
+      type: measured_table_context
+      locator: {page: 32, published_page: '3.6', pdf_page_index: 31, table: '3.6'}
+      attribution: present work
+      units: target and measured mass% SO3; average SiO2 size mm
+      candidate_tokens: [equilibrium_phase_composition, liquidus_composition, condensate_composition, activity]
+      reason: The measured SO3 concentrations fit sulfur solubility semantically, but this base has no sulfur-solubility or generic concentration quantity; composition and activity tokens do not represent a single oxide concentration.
+      values:
+        quantity_as_printed: target and measured SO3 in laboratory-scale melter glass with salt observations
+        quantity_token: unavailable
+        schema_gap: No store quantity represents measured SO3 concentration in glass.
+        temperature_as_printed: furnace brought to equilibrium at 1150 °C
+        temperature_locator: {page: 29, published_page: '3.3', pdf_page_index: 28, section: Laboratory-Scale Melter testing description}
+        phase_as_printed: cooled glass sampled from the laboratory-scale melter
+        composition_as_printed: AN-107 waste simulant with either C22 or New-1 additive; Table 3.3 gives the nominal base-glass formulations. Note (a) states C22-based Na2O was roughly 14.6 mass% and New-1-based Na2O 20.0 mass%; extra SO3 was added as Na2SO3, so Na2O was not fixed per run.
+        nominal_base_glass_formulations_from_table_3_3:
+          units: mass% glass oxides and halogens
+          LAWC22:
+            Al2O3: 6.09
+            B2O3: 10.05
+            CaO: 5.10
+            Cl: 0.08
+            Cr2O3: 0.02
+            F: 0.15
+            Fe2O3: 5.57
+            K2O: 0.00
+            Li2O: 2.50
+            MgO: 1.51
+            Na2O: 14.58
+            NiO: 0.03
+            P2O5: 0.12
+            PbO: 0.02
+            SO3: 0.38
+            SiO2: 46.60
+            TiO2: 1.14
+            V2O5: 0.00
+            ZnO: 3.06
+            ZrO2: 3.01
+            sum: 100.00
+          LAWN-1:
+            Al2O3: 3.00
+            B2O3: 6.00
+            CaO: 4.00
+            Cl: 0.11
+            Cr2O3: 0.03
+            F: 0.20
+            Fe2O3: 1.50
+            K2O: 0.75
+            Li2O: 2.50
+            MgO: 2.00
+            Na2O: 20.00
+            NiO: 0.04
+            P2O5: 1.30
+            PbO: 0.02
+            SO3: 0.52
+            SiO2: 52.53
+            TiO2: 0.00
+            V2O5: 3.50
+            ZnO: 0.00
+            ZrO2: 2.00
+            sum: 100.00
+        columns: [test_id, additive, target_SO3_mass_percent, measured_SO3_mass_percent, average_SiO2_size_mm, salts_observation]
+        rows:
+        - {test_id: S6-1-1, additive: C22, target_SO3: 0.6, measured_SO3: 0.46, average_SiO2_size: 0.068, salts_observation: 'No salt visible'}
+        - {test_id: M6-1-1, additive: C22, target_SO3: 0.6, measured_SO3: 0.49, average_SiO2_size: 0.138, salts_observation: 'No salt visible'}
+        - {test_id: L6-1-2, additive: C22, target_SO3: 0.6, measured_SO3: 0.66, average_SiO2_size: 0.200, salts_observation: 'No salt visible'}
+        - {test_id: S9-1-1, additive: C22, target_SO3: 0.9, measured_SO3: 0.63, average_SiO2_size: 0.068, salts_observation: 'No salt visible'}
+        - {test_id: M9-1-1, additive: C22, target_SO3: 0.9, measured_SO3: 0.55, average_SiO2_size: 0.138, salts_observation: 'No salt visible'}
+        - {test_id: L9-1-2, additive: C22, target_SO3: 0.9, measured_SO3: 0.73, average_SiO2_size: 0.200, salts_observation: 'No salt visible'}
+        - {test_id: S12-1-1, additive: C22, target_SO3: 1.2, measured_SO3: 0.70, average_SiO2_size: 0.068, salts_observation: 'Trace salts'}
+        - {test_id: M12-1-1, additive: C22, target_SO3: 1.2, measured_SO3: 0.82, average_SiO2_size: 0.138, salts_observation: 'Specks of salt seen in broken glass sample'}
+        - {test_id: L12-1-2, additive: C22, target_SO3: 1.2, measured_SO3: 0.74, average_SiO2_size: 0.355, salts_observation: 'Salts observed at meniscus'}
+        - {test_id: 'C12(b)', additive: C22, target_SO3: 1.2, measured_SO3: 0.84, average_SiO2_size: 0.038, salts_observation: 'No salt visible'}
+        - {test_id: 'C15(b)', additive: C22, target_SO3: 1.5, measured_SO3: 1.10, average_SiO2_size: 0.038, salts_observation: 'Salt observed'}
+        - {test_id: NS12-2-1, additive: New-1, target_SO3: 1.2, measured_SO3: 0.85, average_SiO2_size: 0.068, salts_observation: 'No salt visible'}
+        - {test_id: NS15-1-1, additive: New-1, target_SO3: 1.5, measured_SO3: 1.15, average_SiO2_size: 0.068, salts_observation: 'No salt visible'}
+        - {test_id: NS18-1-1, additive: New-1, target_SO3: 1.8, measured_SO3: 1.26, average_SiO2_size: 0.068, salts_observation: 'No salt visible'}
+        - {test_id: NS21-1-1, additive: New-1, target_SO3: 2.1, measured_SO3: 1.26, average_SiO2_size: 0.068, salts_observation: 'No salt visible'}
+        - {test_id: NM12Sg(c), additive: New-1, target_SO3: 1.2, measured_SO3: 0.82, average_SiO2_size: 0.138, salts_observation: 'No salt visible'}
+        footnotes:
+        - '(a) C22-based Na2O was roughly 14.6 mass%; New-1-based Na2O was 20.0 mass%; added SO3 was Na2SO3, so Na2O concentrations were not fixed.'
+        - '(b) WTP GFCs used.'
+        - '(c) Higher sugar added.'
+        method_as_printed: Glass samples from the LSM were cooled, broken from the crucible, and analyzed by XRF.
+        atmosphere_as_printed: Sweep gas is mentioned for the apparatus, but its composition is not stated.
+    - observation_id: vienna_2004_sulfur_loading_relation_context
+      type: model_derived_context
+      locator: {page: 14, published_page: '2.2', pdf_page_index: 13, equation: '2.2'}
+      attribution: Pegg et al. (2000) result summarized by Vienna et al.
+      units: mass-percent SO3 and Na2O on target-glass-composition basis
+      candidate_tokens: [sulfur_solubility_and_sulfate_capacity_series, activity, interaction_parameter]
+      reason: The rule-of-five is a fitted/author-reported loading relation, not an independently measured row or a stored solution-model parameter.
+      values:
+        quantity_as_printed: allowable product of Na2O and SO3 contents before salt-layer formation
+        quantity_token: unavailable
+        schema_gap: No store quantity represents a composition-product loading limit for sulfate.
+        relation_as_printed: g_Na2O × g_SO3 ≤ 5
+        basis_as_printed: g_Na2O and g_SO3 are mass percents in the target glass composition.
+        reported_limit_as_printed: Three possible compositions without salt formation included 1.02 mass% SO3 with greater than 70% SO3 retention; the report states these support up to 0.7 mass% SO3.
+    - observation_id: vienna_2004_equilibrium_so3_estimate_context
+      type: author_estimate_context
+      locator: {page: 24, published_page: '2.12', pdf_page_index: 23, section: EV-16-2001-1 Test}
+      attribution: present report
+      units: mass% SO3
+      reason: Author's estimate of equilibrium concentration, not a direct measured value.
+      values:
+        quantity_as_printed: estimated equilibrium SO3 concentration for the SBW-9-30 melt composition in air
+        quantity_token: unavailable
+        estimate_as_printed: roughly 1 mass%
+        temperature_as_printed: 1100 to 1175 °C, nominal 1150 °C
+        atmosphere_as_printed: air
+
+    - observation_id: vienna_2004_figure_s1_formulation_constraints
+      type: figure_record
+      locator: {page: 5, published_page: 'iv', pdf_page_index: 4, figure: 'S.1'}
+      panel: whole_figure
+      attribution: present work
+      units: mass% Na2O and SO3
+      values:
+        quantity_as_printed: formulation constraints in two-dimensional composition plot
+        quantity_token: unavailable
+        schema_gap: No store quantity represents the rule-of-five composition constraint.
+        species: [SO3, Na2O]
+        phase: glass formulation
+        temperature_as_printed: not shown
+        axes_as_printed: {x: 'gSO3 (mass%)', y: 'gNa2O (mass%)'}
+        caption: Comparison of Formulation Constraints in Two-Dimensional Composition Plot.
+        series:
+        - {name: Rule-of-Five, marker: solid red line, marker_count: 0}
+        - {name: This Study, marker: black dashed line, marker_count: 0}
+        points: []
+      reported_relation_as_printed: The legend identifies a Rule-of-Five curve and a This Study limit; the plot labels acceptable and unacceptable regions.
+      digitisation: deferred to a figure pass
+    - observation_id: vienna_2004_figure_2_1_sulfate_solubility
+      type: figure_record
+      locator: {page: 14, published_page: '2.2', pdf_page_index: 13, figure: '2.1'}
+      panel: whole_figure
+      attribution: quoted_attributed, Li et al. (2001)
+      units: SO3 retained in glass, wt%
+      values:
+        quantity_as_printed: SO3 solubility as a function of non-bridging to bridging oxygen concentration ratio
+        quantity_token: unavailable
+        schema_gap: No sulfur-solubility or generic concentration quantity exists in the battery enum.
+        species: [SO3]
+        phase: silicate glass
+        temperature_as_printed: not stated in caption
+        axes_as_printed: {x: 'cNBO2/cBO', y: 'SO3 retained in glass (wt%)'}
+        caption: 'SO3 Solubility as a Function of cNBO2/cBO (cNBO is the non-bridging oxygen concentration, and cBO is the bridging oxygen concentration as defined by Papadopoulos 1973) (from Li et al. 2001).'
+        series:
+        - {name: HLW glass series, marker: open diamond, marker_count: 6}
+        - {name: HLW alumina, marker: open red triangle, marker_count: 6}
+        - {name: HLW phosphate, marker: open blue circle, marker_count: 4}
+        - {name: HLW waste loading, marker: crossed circle, marker_count: 4}
+        - {name: LAW LRM, marker: filled black triangle, marker_count: 6}
+        - {name: LAW and LAW-SP, marker: yellow square, marker_count: 6}
+        - {name: commercial soda-lime glasses, marker: yellow triangle, marker_count: 3}
+        points: []
+      reported_curve_as_printed: SO3 (wt%) = 0.66 × [cNBO2/cBO]^0.22
+      digitisation: deferred to a figure pass
+    - observation_id: vienna_2004_figure_2_2_hanford_law_solubility
+      type: figure_record
+      locator: {page: 15, published_page: '2.3', pdf_page_index: 14, figure: '2.2'}
+      panel: whole_figure
+      attribution: quoted_attributed, Pegg et al. (2000)
+      units: SO3 and Na2O in glass, mass%
+      values:
+        quantity_as_printed: measured sulfur solubility in simulated Hanford LAW glass melts
+        quantity_token: unavailable
+        schema_gap: No sulfur-solubility or generic concentration quantity exists in the battery enum.
+        species: [SO3]
+        phase: simulated Hanford LAW glass melts
+        temperature_as_printed: 1200 °C
+        axes_as_printed: {x: 'Na2O wt% in the Glass', y: 'SO3 wt% in the Glass'}
+        caption: 'Measured Sulfur Solubility in Simulated Hanford LAW Glass Melts at 1200°C (from Pegg et al. 2000).'
+        series:
+        - {name: measured data, marker: open circle, marker_count: 25}
+        - {name: solubility model, marker: dotted curve, marker_count: 0}
+        - {name: Na2O wt% × SO3 wt% = 5, marker: solid curve, marker_count: 0}
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: vienna_2004_figure_2_3_ev16_melter_schematic
+      type: figure_record
+      locator: {page: 20, published_page: '2.8', pdf_page_index: 19, figure: '2.3'}
+      panel: whole_figure
+      attribution: quoted_attributed, Musick et al. (2000)
+      units: no measurement units; schematic
+      values:
+        quantity_as_printed: EV-16 melter schematic
+        quantity_token: unavailable
+        schema_gap: Schematic has no physical measurement quantity.
+        species: [SO3]
+        phase: melter process schematic
+        temperature_as_printed: not shown in schematic
+        axes_as_printed: none, schematic
+        caption: Schematic of the EV-16 Melter (after Musick et al. 2000).
+        series: []
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: vienna_2004_figure_2_4_rsm_schematic
+      type: figure_record
+      locator: {page: 22, published_page: '2.10', pdf_page_index: 21, figure: '2.4'}
+      panel: whole_figure
+      attribution: quoted_attributed, Goles et al. (2001)
+      units: no measurement units; schematic
+      values:
+        quantity_as_printed: research-scale melter system schematic
+        quantity_token: unavailable
+        schema_gap: Schematic has no physical measurement quantity.
+        species: [SO3]
+        phase: melter process schematic
+        temperature_as_printed: not shown in schematic
+        axes_as_printed: none, schematic
+        caption: Schematic of the Research-Scale Melter System (after Goles et al. 2001).
+        series: []
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: vienna_2004_figure_3_1_lsm_schematic
+      type: figure_record
+      locator: {page: 30, published_page: '3.4', pdf_page_index: 29, figure: '3.1'}
+      panel: whole_figure
+      attribution: quoted_attributed, Darab et al. (2001)
+      units: no measurement units; schematic
+      values:
+        quantity_as_printed: laboratory-scale melter schematic
+        quantity_token: unavailable
+        schema_gap: Schematic has no physical measurement quantity.
+        species: [SO3]
+        phase: melter process schematic
+        temperature_as_printed: furnace brought to 1150 °C during the described LSM experiment
+        axes_as_printed: none, schematic
+        caption: Laboratory-Scale Melter Schematic (from Darab et al. 2001).
+        series: []
+        points: []
+      digitisation: deferred to a figure pass

@@ -1,0 +1,343 @@
+schema_version: literature_extract.v1
+source_id: jin-2022-cl-cr-sulfur-glass-solubility
+source:
+  citation: "Jin T, Rivers EL, Kim D, Droubay TC, Jahrman EP, Mar D, Weese BL, Seidler GT, Kruger AA (2022; online 2021). Effect of chlorine and chromium on sulfur solubility in low-activity waste glass. International Journal of Applied Glass Science 13(1):82-93."
+  doi: 10.1111/ijag.16540
+  year: 2022
+  corpus_asset: raw/jin-2022-cl-cr-sulfur-glass-solubility/jin-2022-cl-cr-sulfur-glass-solubility.pdf
+extraction:
+  method: >-
+    PDF is born-digital; pdftotext-layout is the primary read. MinerU produced no table blocks, so Tables 1-4 were transcribed from the text layer; Tables 1, 2, and 4 were checked against 600 dpi renders (PDF pages 14-16). The controller ruled that this base has no composition-vector quantity: the full Table 2 glass analyses are context, not split into species concentration observations. The salt-saturated glasses were melted at 1150 °C for one hour and water-quenched; Table 4's measured Cr(VI)/Cr(total) values are typed as fractions from the printed percentages. No figures were digitised.
+  table_dispositions:
+    table_1: context-quoted; target glass compositions, not measurements in this work
+    table_2: context-no-token; candidate equilibrium_phase_composition and liquidus_composition; schema gap for glass composition vectors
+    table_3: context-no-token; aqueous wash-solution analyses, not an equilibrium glass composition
+    table_4: typed; measured Cr(VI)/Cr(total) fractions
+  date: '2026-10-20'
+  worker: fam31-1020
+review_status: draft
+fidelity_samples:
+- path: species.Cr.observations[jin_2022_table4_cr_vi_fraction].values.points[0].value
+  value: 0.577
+  locator: {page: 16, pdf_page_index: 15, table: '4', row: 'S75-Cr25(R5)'}
+species:
+  Cr:
+    observations:
+    - observation_id: jin_2022_table4_cr_vi_fraction
+      type: concentration_series
+      locator:
+        page: 16
+        pdf_page_index: 15
+        table: '4'
+        note: Cr Kα XES measurements; four samples, one-standard-deviation uncertainties.
+      phase: glass
+      quench_note: Samples were quenched in water after melting at 1150 °C.
+      units: fraction; percent as published
+      derivation:
+        relation: Cr(VI)/Cr(total) was measured by linear-combination fitting of Cr Kα1,2 X-ray fluorescence spectra to Na2CrO4 and Cr2O3 reference compounds.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 6, pdf_page_index: 5, section: '2.6 X-Ray Emission Spectroscopy (XES)', record: 'Cr K-alpha XES spectra (Figure 2) linear-combination fitted to reference compounds; fit inputs not reported numerically'}
+        output_unit: dimensionless
+      uncertainty:
+        note: Table 4 prints one-standard-deviation widths in percentage points; point sigma is stored as a fraction to match values on [0, 1].
+        confidence_level: one_sigma
+      values:
+        quantity: Cr6plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        value_form: fraction
+        value_as_published: percent
+        points:
+        - sample: S75-Cr25(R5)
+          value: 0.577
+          value_as_published: '57.7 ± 2.1'
+          T_C: 1150
+          sigma: 0.021
+          locator: {page: 16, pdf_page_index: 15, table: '4', row: 'S75-Cr25(R5)'}
+          point_conditions:
+            atmosphere: {state: {tag: value, value: air}, locator: {page: 11, pdf_page_index: 10, section: '4.3 Solubility of Anions in Glass Matrix', record: 'For glass samples prepared in air'}}
+            T_C: {state: {tag: value, value: 1150}, locator: {page: 4, pdf_page_index: 3, section: '2.3 Preparation of Salt-Saturated Glass'}}
+            quench: {state: {tag: value, value: water quench}, locator: {page: 4, pdf_page_index: 3, section: '2.3 Preparation of Salt-Saturated Glass'}}
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - [Al2O3, '10.30']
+                  - [B2O3, '13.35']
+                  - [CaO, '8.06']
+                  - [Fe2O3, '1.07']
+                  - [MgO, '0.98']
+                  - [Na2O, '21.91']
+                  - [SiO2, '36.30']
+                  - [ZnO, '3.12']
+                  - [ZrO2, '2.89']
+                  - [SO3, '1.36']
+                  - [Cr2O3, '0.65']
+                  components_as_printed: {Al2O3: '10.30', B2O3: '13.35', CaO: '8.06', Fe2O3: '1.07', MgO: '0.98', Na2O: '21.91', SiO2: '36.30', ZnO: '3.12', ZrO2: '2.89', SO3: '1.36', Cr2O3: '0.65'}
+              locator: {page: 15, pdf_page_index: 14, table: '2', row: 'S75-Cr25 (R5)'}
+        - sample: S50-Cr50(R5)
+          value: 0.731
+          value_as_published: '73.1 ± 1.6'
+          T_C: 1150
+          sigma: 0.016
+          locator: {page: 16, pdf_page_index: 15, table: '4', row: 'S50-Cr50(R5)'}
+          point_conditions:
+            atmosphere: {state: {tag: value, value: air}, locator: {page: 11, pdf_page_index: 10, section: '4.3 Solubility of Anions in Glass Matrix', record: 'For glass samples prepared in air'}}
+            T_C: {state: {tag: value, value: 1150}, locator: {page: 4, pdf_page_index: 3, section: '2.3 Preparation of Salt-Saturated Glass'}}
+            quench: {state: {tag: value, value: water quench}, locator: {page: 4, pdf_page_index: 3, section: '2.3 Preparation of Salt-Saturated Glass'}}
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - [Al2O3, '10.27']
+                  - [B2O3, '13.18']
+                  - [CaO, '8.02']
+                  - [Fe2O3, '1.06']
+                  - [MgO, '0.98']
+                  - [Na2O, '21.87']
+                  - [SiO2, '36.25']
+                  - [ZnO, '3.09']
+                  - [ZrO2, '2.88']
+                  - [SO3, '1.05']
+                  - [Cr2O3, '1.36']
+                  components_as_printed: {Al2O3: '10.27', B2O3: '13.18', CaO: '8.02', Fe2O3: '1.06', MgO: '0.98', Na2O: '21.87', SiO2: '36.25', ZnO: '3.09', ZrO2: '2.88', SO3: '1.05', Cr2O3: '1.36'}
+              locator: {page: 15, pdf_page_index: 14, table: '2', row: 'S50-Cr50 (R5)'}
+        - sample: S25-Cr75(R5)
+          value: 0.833
+          value_as_published: '83.3 ± 1.4'
+          T_C: 1150
+          sigma: 0.014
+          locator: {page: 16, pdf_page_index: 15, table: '4', row: 'S25-Cr75(R5)'}
+          point_conditions:
+            atmosphere: {state: {tag: value, value: air}, locator: {page: 11, pdf_page_index: 10, section: '4.3 Solubility of Anions in Glass Matrix', record: 'For glass samples prepared in air'}}
+            T_C: {state: {tag: value, value: 1150}, locator: {page: 4, pdf_page_index: 3, section: '2.3 Preparation of Salt-Saturated Glass'}}
+            quench: {state: {tag: value, value: water quench}, locator: {page: 4, pdf_page_index: 3, section: '2.3 Preparation of Salt-Saturated Glass'}}
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - [Al2O3, '10.22']
+                  - [B2O3, '12.97']
+                  - [CaO, '8.01']
+                  - [Fe2O3, '1.06']
+                  - [MgO, '0.98']
+                  - [Na2O, '22.22']
+                  - [SiO2, '35.92']
+                  - [ZnO, '3.01']
+                  - [ZrO2, '2.87']
+                  - [SO3, '0.62']
+                  - [Cr2O3, '2.12']
+                  components_as_printed: {Al2O3: '10.22', B2O3: '12.97', CaO: '8.01', Fe2O3: '1.06', MgO: '0.98', Na2O: '22.22', SiO2: '35.92', ZnO: '3.01', ZrO2: '2.87', SO3: '0.62', Cr2O3: '2.12'}
+              locator: {page: 15, pdf_page_index: 14, table: '2', row: 'S25-Cr75 (R5)'}
+        - sample: Cr-R5
+          value: 0.776
+          value_as_published: '77.6 ± 1.3'
+          T_C: 1150
+          sigma: 0.013
+          locator: {page: 16, pdf_page_index: 15, table: '4', row: Cr-R5}
+          point_conditions:
+            atmosphere: {state: {tag: value, value: air}, locator: {page: 11, pdf_page_index: 10, section: '4.3 Solubility of Anions in Glass Matrix', record: 'For glass samples prepared in air'}}
+            T_C: {state: {tag: value, value: 1150}, locator: {page: 4, pdf_page_index: 3, section: '2.3 Preparation of Salt-Saturated Glass'}}
+            quench: {state: {tag: value, value: water quench}, locator: {page: 4, pdf_page_index: 3, section: '2.3 Preparation of Salt-Saturated Glass'}}
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - [Al2O3, '10.12']
+                  - [B2O3, '13.12']
+                  - [CaO, '7.92']
+                  - [Fe2O3, '1.05']
+                  - [MgO, '0.98']
+                  - [Na2O, '22.19']
+                  - [SiO2, '35.66']
+                  - [ZnO, '3.02']
+                  - [ZrO2, '2.83']
+                  - [SO3, '0.04']
+                  - [Cr2O3, '3.09']
+                  components_as_printed: {Al2O3: '10.12', B2O3: '13.12', CaO: '7.92', Fe2O3: '1.05', MgO: '0.98', Na2O: '22.19', SiO2: '35.66', ZnO: '3.02', ZrO2: '2.83', SO3: '0.04', Cr2O3: '3.09'}
+              locator: {page: 15, pdf_page_index: 14, table: '2', row: 'Cr-R5'}
+    context:
+    - observation_id: jin_2022_fig2_cr_kalpha_xes_spectra
+      type: figure_record
+      locator: {page: 26, pdf_page_index: 25, figure: '2'}
+      units: normalized XES intensity; energy in eV
+      species_as_printed: Cr
+      phase_as_printed: quenched glass
+      temperature_as_printed: 1150 °C melt then water quench
+      axes_as_printed: 'x: energy (eV); y: normalized Cr Kα XES intensity'
+      panel: a-d
+      series:
+      - {name: 75S-25Cr, marker_count: 0, attribution: present work}
+      - {name: 50S-50Cr, marker_count: 0, attribution: present work}
+      - {name: 25S-75Cr, marker_count: 0, attribution: present work}
+      - {name: Cr R3, marker_count: 0, attribution: present work}
+      - {name: sodium chromate reference, marker_count: 0, attribution: present work}
+      - {name: Cr(III) oxide reference, marker_count: 0, attribution: present work}
+      values:
+        quantity: Cr6plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: figure_only
+        caption: >-
+          Figure 2. Cr Kα XES spectra of (a) 75S-25Cr, (b) 50S-50Cr, (c) 25S-75Cr, and (d) Cr R3 are shown along with spectra collected from the primary hexavalent reference, sodium chromate, and the primary trivalent reference, Cr(III) oxide. The fit of each sample to the primary references is also shown. All spectra were deadtime corrected, background subtracted, and integral normalized.
+      digitisation: deferred to a figure pass
+    - observation_id: jin_2022_discussion_mckeown_cr_vi_context
+      type: context
+      locator: {page: 9, pdf_page_index: 8, section: 'Results and discussion'}
+      attribution: McKeown et al. [45], as quoted in Jin et al.
+      units: percent of total Cr; Na2O mass%
+      candidate_tokens: [valence_ratio]
+      reason: This cited comparison gives no temperature or oxygen fugacity and is not a scored valence point in the present experiments.
+      values:
+        value_as_published: 84%
+        glass_composition_as_printed: 23.1 mass% Na2O in a similar simulated LAW glass
+        method_as_printed: X-ray absorption spectroscopy
+    - observation_id: jin_2022_discussion_chromate_molar_solubility_context
+      type: model_derived_context
+      locator: {page: 9, pdf_page_index: 8, section: '4.1 Solubility of Sulfur, Chromium, and Chlorine'}
+      attribution: present work
+      units: mol%
+      candidate_tokens: []
+      reason: The paper presents this as a derived chromate-solubility estimate, not a separate measured point; its 77.6% and 2.69 mol% inputs are already recorded in Table 4 and Table 2.
+      values:
+        quantity_as_printed: molar solubility of CrO4 2−
+        value_as_published: 2.09
+        relation_as_printed: 'The molar solubility of CrO4 2− should be 2.09 mol%, based on 77.6% Cr(VI)/Cr(total) in Table 4 rather than 2.69 mol%, which includes Cr(III).'
+        source_observation_ids: [jin_2022_table4_cr_vi_fraction, jin_2022_table2_glass_compositions]
+  S:
+    observations: []
+    context:
+    - observation_id: jin_2022_table1_target_compositions
+      type: target_composition_table
+      locator: {page: 14, pdf_page_index: 13, table: '1'}
+      units: mass% as printed
+      reason: target composition table; the LAWA161 row is attributed to prior sources and the 161SAS row is a prepared batch target, not analyzed saturation data
+      values:
+        method_class: quoted_attributed
+        attribution: LAWA161 target as cited references [21, 31]; 161SAS target as printed in this work
+        table_transcription: |
+          Glass | Al2O3 | B2O3 | CaO | Cs2O | Cl | Cr2O3 | Fe2O3 | K2O | MgO | Na2O | SiO2 | V2O5 | ZnO | ZrO2 | SO3 | SUM
+          LAWA161 | 10.16 | 13.67 | 7.99 | 0.15 | 0.02 | 1.17 | 1.00 | 0.44 | 1.00 | 20.66 | 36.58 | 1.00 | 2.99 | 2.99 | 0.19 | 100.00
+          161SAS | 10.47 | 14.09 | 8.23 | - | - | - | 1.03 | - | 1.03 | 21.29 | 37.70 | - | 3.08 | 3.08 | - | 100.00
+    - observation_id: jin_2022_table2_glass_compositions
+      type: glass_composition_vector
+      locator: {page: 15, pdf_page_index: 14, table: '2'}
+      phase_as_printed: glass after salt saturation, melted at 1150 °C and water-quenched
+      units: mass% oxide or halogen as printed; anion mol% as printed
+      reason: no store token for an equilibrated glass composition vector; schema gap
+      candidate_tokens: [equilibrium_phase_composition, liquidus_composition]
+      conditions:
+        T_C: 1150
+        atmosphere: air
+        quench: water quench
+      values:
+        method_class: measured_direct
+        table_transcription: |
+          Sample | Al2O3 | B2O3 | CaO | Fe2O3 | MgO | Na2O | SiO2 | ZnO | ZrO2 | SO3 mass% | Cr2O3 mass% | Cl mass% | SO3 mol% | CrO3 mol% | Cl mol%
+          BL | 9.83 | 13.70 | 8.33 | 1.06 | 1.02 | 21.27 | 38.74 | 3.01 | 3.02 | 0.02 | - | - | 0.02 | - | -
+          S-R1 | 9.74 | 14.00 | 7.70 | 1.05 | 0.91 | 21.26 | 38.76 | 2.94 | 3.16 | 0.48 | - | - | 0.40 | - | -
+          S-R2 | 9.91 | 13.61 | 7.79 | 1.07 | 0.92 | 21.23 | 38.00 | 2.99 | 3.04 | 1.45 | - | - | 1.20 | - | -
+          S-R3 | 9.90 | 13.35 | 7.82 | 1.08 | 0.93 | 21.16 | 38.13 | 3.00 | 3.11 | 1.51 | - | - | 1.25 | - | -
+          Cr-R1 | 10.43 | 13.39 | 8.14 | 1.08 | 0.98 | 21.98 | 36.21 | 3.13 | 2.89 | 0.03 | 1.72 | - | 0.03 | 1.50 | -
+          Cr-R2 | 10.14 | 13.16 | 7.98 | 1.07 | 0.98 | 22.29 | 35.60 | 3.02 | 2.84 | 0.04 | 2.89 | - | 0.03 | 2.51 | -
+          Cr-R3 | 10.15 | 13.09 | 7.98 | 1.07 | 0.97 | 22.28 | 35.58 | 3.04 | 2.82 | 0.04 | 2.98 | - | 0.03 | 2.59 | -
+          Cr-R4 | 10.19 | 13.14 | 7.96 | 1.05 | 0.97 | 22.17 | 35.52 | 3.05 | 2.83 | 0.04 | 3.07 | - | 0.03 | 2.68 | -
+          Cr-R5 | 10.12 | 13.12 | 7.92 | 1.05 | 0.98 | 22.19 | 35.66 | 3.02 | 2.83 | 0.04 | 3.09 | - | 0.03 | 2.69 | -
+          Cl-R1 | 9.80 | 13.14 | 7.93 | 1.04 | 0.93 | 21.53 | 37.96 | 2.95 | 3.01 | 0.01 | - | 1.72 | 0.01 | - | 3.13
+          Cl-R2 | 9.63 | 13.17 | 8.06 | 1.07 | 0.95 | 21.78 | 37.33 | 2.99 | 2.95 | 0.01 | - | 2.06 | 0.01 | - | 3.76
+          Cl-R3 | 9.78 | 12.98 | 8.04 | 1.04 | 0.94 | 22.05 | 37.12 | 2.97 | 3.02 | 0.01 | - | 2.06 | 0.00 | - | 3.76
+          S25-Cr75 (R5) | 10.22 | 12.97 | 8.01 | 1.06 | 0.98 | 22.22 | 35.92 | 3.01 | 2.87 | 0.62 | 2.12 | - | 0.51 | 1.85 | -
+          S50-Cr50 (R5) | 10.27 | 13.18 | 8.02 | 1.06 | 0.98 | 21.87 | 36.25 | 3.09 | 2.88 | 1.05 | 1.36 | - | 0.87 | 1.18 | -
+          S75-Cr25 (R5) | 10.30 | 13.35 | 8.06 | 1.07 | 0.98 | 21.91 | 36.30 | 3.12 | 2.89 | 1.36 | 0.65 | - | 1.13 | 0.57 | -
+          S25-Cl75 (R3) | 9.97 | 13.30 | 8.05 | 1.05 | 0.94 | 21.86 | 36.85 | 2.95 | 3.03 | 0.24 | - | 1.76 | 0.20 | - | 3.23
+          S50-Cl50 (R3) | 9.87 | 13.39 | 7.98 | 1.07 | 0.94 | 21.73 | 37.03 | 2.98 | 3.01 | 0.42 | - | 1.57 | 0.34 | - | 2.88
+          S75-Cl25 (R3) | 9.82 | 13.37 | 8.09 | 1.09 | 0.96 | 21.81 | 36.76 | 3.05 | 3.03 | 0.89 | - | 1.14 | 0.73 | - | 2.09
+          Dash is printed as below detection / not reported, not as zero. Table 2 footnote: up to 0.04 mass% SO3 or CrO3 in BL and samples without sulfate or chromate should be from raw-chemical impurities and are disregarded in the discussion.
+    - observation_id: jin_2022_table3_wash_solution_compositions
+      type: aqueous_wash_solution_composition
+      locator: {page: 16, pdf_page_index: 15, table: '3'}
+      units: mol% as printed
+      reason: post-run aqueous wash-solution analysis, not an equilibrium glass composition; no aqueous-solution quantity token
+      candidate_tokens: [equilibrium_phase_composition, composition_series]
+      values:
+        method_class: measured_direct
+        table_transcription: |
+          Sample | BO3(3-) | Ca(2+) | Na(+) | SO4(2-) | CrO4(2-) | Cl(-)
+          S-R1 | 3.72 | 0.62 | 64.13 | 31.53 | - | -
+          S-R2 | 3.72 | 0.63 | 64.47 | 31.19 | - | -
+          S-R3 | 3.71 | 0.64 | 64.53 | 31.11 | - | -
+          Cr-R1 | 5.12 | 1.68 | 63.10 | - | 30.11 | -
+          Cr-R2 | 5.50 | 1.45 | 63.83 | - | 29.22 | -
+          Cr-R3 | 5.35 | 1.16 | 65.07 | - | 28.42 | -
+          Cr-R4 | 5.54 | 1.13 | 64.72 | - | 28.61 | -
+          Cr-R5 | 5.71 | 1.09 | 65.52 | - | 27.68 | -
+          Cl-R1 | 6.01 | 0.17 | 50.89 | - | - | 42.93
+          Cl-R2 | 6.39 | 0.15 | 50.69 | - | - | 42.77
+          Cl-R3 | 5.61 | 0.16 | 51.17 | - | - | 43.07
+          S25-Cr75 (R5) | 4.88 | 1.16 | 63.81 | 9.53 | 20.62 | -
+          S50-Cr50 (R5) | 4.61 | 1.04 | 64.15 | 17.52 | 12.68 | -
+          S75-Cr25 (R5) | 4.20 | 0.87 | 64.34 | 24.76 | 5.84 | -
+          S25-Cl75 (R3) | 7.92 | 0.25 | 52.40 | 5.07 | - | 34.36
+          S50-Cl50 (R3) | 5.33 | 0.32 | 55.50 | 9.25 | - | 29.61
+          S75-Cl25 (R3) | 4.30 | 0.32 | 59.50 | 18.28 | - | 17.60
+    - observation_id: jin_2022_fig1_photographs
+      type: figure_record
+      locator: {page: 24, pdf_page_index: 23, figure: '1'}
+      units: none
+      species_as_printed: glass and surface salt samples
+      phase_as_printed: quenched glass and salt in crucible
+      axes_as_printed: none; photographs
+      panel: single
+      series:
+      - {name: selected quenched samples, marker_count: 0, attribution: present work}
+      values: {quantity: equilibrium_phase_composition, method_class: measured_direct, admission_status: figure_only, caption: 'Figure 1. Pictures of quenched glasses and salt in crucible. The platinum crucibles have a 20 ml capacity, with a top diameter of 37 mm, bottom diameter of 22.5 mm, and height of 31 mm.'}
+      digitisation: deferred to a figure pass
+    - observation_id: jin_2022_fig3_single_salt_composition
+      type: figure_record
+      locator: {page: 27, pdf_page_index: 26, figure: '3'}
+      units: mass fraction
+      species_as_printed: S, Cr, Cl
+      phase_as_printed: quenched glass
+      axes_as_printed: 'x: salt-saturation sample category; y: mass fractions of SO3, Cr2O3, and Cl'
+      panel: single
+      series:
+      - {name: SO3, marker_count: 3, attribution: present work}
+      - {name: Cr2O3, marker_count: 5, attribution: present work}
+      - {name: Cl, marker_count: 3, attribution: present work}
+      values: {quantity: equilibrium_phase_composition, method_class: measured_direct, admission_status: figure_only, caption: 'Figure 3. Mass fractions of SO3, Cr2O3, and Cl in single-salt-saturated glass samples. Error bars are not shown as they are smaller than the symbols (<1% relative percent).'}
+      digitisation: deferred to a figure pass
+    - observation_id: jin_2022_fig4_sulfur_solubility_model
+      type: figure_record
+      locator: {page: 28, pdf_page_index: 27, figure: '4'}
+      units: SO3 mass fraction; Cr2O3 and Cl mass fraction
+      species_as_printed: S
+      phase_as_printed: quenched glass
+      axes_as_printed: 'x: Cr2O3/Cl concentrations (mass fraction); y: sulfur solubility'
+      panel: two panels
+      series:
+      - {name: measured Cr2O3 relation, marker_count: 5, attribution: present work}
+      - {name: measured Cl relation, marker_count: 3, attribution: present work}
+      - {name: fitted model lines, marker_count: 0, attribution: 'Vienna et al. [19]'}
+      values: {quantity: equilibrium_phase_composition, method_class: measured_direct, admission_status: figure_only, caption: 'Figure 4. Sulfur solubility as a function of Cr2O3/Cl concentrations (in mass fraction). Model-predicted sulfur solubilities are also plotted as straight lines within limited ranges of Cr2O3 (0–1.17 mass%) and Cl (0.01–1.00 mass%) constrained by the model [19]. The slopes of the measured Cr2O3/Cl plots in the model limited ranges are also shown. Error bars are smaller than the symbols (<1% relative percent).'}
+      digitisation: deferred to a figure pass
+    - observation_id: jin_2022_fig5_sulfate_solubility
+      type: figure_record
+      locator: {page: 29, pdf_page_index: 28, figure: '5'}
+      units: SO4(2-) mass fraction
+      species_as_printed: S
+      phase_as_printed: quenched glass
+      axes_as_printed: 'x: CrO4(2-) or Cl(-) saturated concentration; y: SO4(2-) saturated concentration'
+      panel: a-b
+      series:
+      - {name: sulfate-chromate mixtures, marker_count: 3, attribution: present work}
+      - {name: sulfate-chloride mixtures, marker_count: 3, attribution: present work}
+      values: {quantity: equilibrium_phase_composition, method_class: measured_direct, admission_status: figure_only, caption: 'Figure 5. SO4(2-) solubility (saturated concentration) as a function of (a) CrO4(2-) and (b) Cl(-) saturated concentrations. The error bars are not visible since they are <1% relative percent.'}
+      digitisation: deferred to a figure pass
