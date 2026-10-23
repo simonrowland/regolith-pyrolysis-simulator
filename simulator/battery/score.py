@@ -7420,6 +7420,25 @@ def candidate_observation(
 _HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
 
 
+def _openimcc_liquid_row_extrapolated_notice(
+    *,
+    reason: str,
+    origin: str,
+    band: str,
+    authority: Authority | None = None,
+) -> Notice:
+    """One scored notice for an OpenIMCC liquid row used below its fitted floor."""
+
+    return Notice(
+        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+        affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+        reason=reason,
+        origin=origin,
+        band=band,
+        authority=authority,
+    )
+
+
 def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
     """A single slow cell is transient infrastructure, not a cohort refusal."""
     return str(reason).startswith(("engine_timeout:", "engine_transport_error:"))
@@ -7589,9 +7608,7 @@ def _hashimoto_residue_prediction(
             )
         if primary.provenance.get("openimcc_liquid_row_extrapolated"):
             notices.append(
-                Notice(
-                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                _openimcc_liquid_row_extrapolated_notice(
                     reason="OpenIMCC liquid-row extrapolation below fitted temperature floor",
                     origin="hashimoto-residue-addendum-a",
                     band="liquid-row floors are recorded in provenance",
