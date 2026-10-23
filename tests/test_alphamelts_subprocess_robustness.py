@@ -14,9 +14,11 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 )
 from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
+    ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID,
     ALPHAMELTS_REASON_SUBPROCESS_DIED,
     ALPHAMELTS_REASON_TIMEOUT,
     AlphaMELTSBackend,
+    AlphaMELTSSubprocessContractError,
     AlphaMELTSSubprocessRunMode,
 )
 
@@ -548,6 +550,106 @@ def test_fe_free_silicate_without_imposed_fo2_still_launches(tmp_path):
     )
 
     _assert_launched_then_signaled(result, marker)
+
+
+_GUARDED_CONTRACT_COMPOSITIONS = (
+    ('cas', {'SiO2': 0.5, 'Al2O3': 0.25, 'CaO': 0.25}),
+    ('cao_sio2', {'CaO': 0.5, 'SiO2': 0.5}),
+)
+
+
+def _equilibrate_kg(backend, composition_kg, *, fO2_log):
+    return backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg=composition_kg,
+        fO2_log=fO2_log,
+        pressure_bar=1.0,
+        subprocess_run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+    )
+
+
+@pytest.mark.parametrize(
+    ('label', 'composition_kg'),
+    _GUARDED_CONTRACT_COMPOSITIONS,
+)
+def test_nonfinite_absolute_fo2_on_guarded_composition_stays_contract_error(
+    tmp_path,
+    label: str,
+    composition_kg: dict[str, float],
+):
+    """nan absolute fO2 is the existing constraint error, not a native crash."""
+    del label
+    backend, marker = _marker_backend(tmp_path)
+
+    with pytest.raises(AlphaMELTSSubprocessContractError) as caught:
+        _equilibrate_kg(backend, composition_kg, fO2_log=float('nan'))
+
+    assert not marker.exists()
+    assert caught.value.backend_status_reason == (
+        ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID
+    )
+    assert 'absolute fO2_log' in str(caught.value)
+
+
+@pytest.mark.parametrize(
+    ('label', 'composition_kg'),
+    _GUARDED_CONTRACT_COMPOSITIONS,
+)
+def test_fo2_offset_without_buffer_on_guarded_composition_stays_contract_error(
+    tmp_path,
+    label: str,
+    composition_kg: dict[str, float],
+):
+    """An offset without a buffer stays the existing constraint error."""
+    del label
+    backend, marker = _marker_backend(tmp_path)
+    backend._fo2_offset = 1.0
+
+    with pytest.raises(AlphaMELTSSubprocessContractError) as caught:
+        _equilibrate_kg(backend, composition_kg, fO2_log=-9.0)
+
+    assert not marker.exists()
+    assert caught.value.backend_status_reason == (
+        ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID
+    )
+    assert 'fO2_offset requires fO2_buffer' in str(caught.value)
+
+
+@pytest.mark.parametrize(
+    ('buffer', 'resolved_path'),
+    (
+        ('QFM', 'FMQ'),
+        ('NNO', 'NNO'),
+    ),
+)
+def test_resolved_buffer_on_measured_fe_free_silicate_refuses_before_launch(
+    tmp_path,
+    buffer: str,
+    resolved_path: str,
+):
+    """A resolved buffer is imposed fO2. The same sets SIGSEGV on that path."""
+    backend, marker = _marker_backend(tmp_path)
+    backend._redox_buffer = buffer
+    backend._fo2_offset = 0.0
+
+    result = _equilibrate_kg(
+        backend,
+        {'SiO2': 0.5, 'CaO': 0.25, 'Al2O3': 0.25},
+        fO2_log=-9.0,
+    )
+
+    assert not marker.exists()
+    reason = _crash_reason(
+        'ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH',
+        'subprocess_fe_free_silicate_imposed_fo2_crash',
+    )
+    assert result.diagnostics['backend_status_reason'] == reason
+    assert result.diagnostics['backend_failure_category'] == 'engine_crash'
+    guard = result.diagnostics['subprocess_input_guard']
+    assert guard['predicate'] == 'fe_free_silicate_and_imposed_fo2'
+    assert guard['resolved_fo2_path'] == resolved_path
+    assert guard['resolved_fo2_offset'] == 0.0
+    assert guard['measured_signal'] == 'SIGSEGV'
 
 
 def _qualification_handle(tmp_path: Path):
