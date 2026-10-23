@@ -38,10 +38,13 @@ def _run(
         "-c",
         str(project_root / "pytest.ini"),
     ]
+    if _PLUGIN_AVAILABLE:
+        command.extend(("-p", "_pytest_known_red"))
     if roster is not None and _PLUGIN_AVAILABLE:
         command.extend(("--known-red-roster", str(roster)))
     if known_red_only and _PLUGIN_AVAILABLE:
         command.append("--known-red-only")
+    command.append("test_quarantine.py")
     pythonpath = os.pathsep.join(
         filter(None, (str(_REPO_ROOT), os.environ.get("PYTHONPATH", "")))
     )
@@ -60,18 +63,6 @@ def _make_quarantine_project(project_root: Path) -> None:
     (project_root / "pytest.ini").write_text("[pytest]\n", encoding="utf-8")
     (project_root / "test_quarantine.py").write_text(
         _SYNTHETIC_TESTS,
-        encoding="utf-8",
-    )
-    (project_root / "conftest.py").write_text(
-        """\
-import importlib.util
-
-pytest_plugins = (
-    ("_pytest_known_red",)
-    if importlib.util.find_spec("_pytest_known_red") is not None
-    else ()
-)
-""",
         encoding="utf-8",
     )
 
