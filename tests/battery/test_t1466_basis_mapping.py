@@ -270,8 +270,12 @@ def test_b2131_cao_logkf_maps_mol_species_at_one_bar(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B2131, "high-temperature-p182.json")
     log_kf = _observation(result, B2131, "high-temperature-p182", Quantity.LOG10_KF)
     assert log_kf.identity.per.value is PerBasis.MOL_SPECIES
-    assert "pdftotext-layout.txt:167" in log_kf.identity.per.reason
+    assert "pdftotext-layout.txt:167-169" in log_kf.identity.per.reason
+    assert ":170-171" in log_kf.identity.per.reason
+    assert ":187-188" in log_kf.identity.per.reason
     assert ":313-315" in log_kf.identity.per.reason
+    assert ":332-333" in log_kf.identity.per.reason
+    assert "101325" in log_kf.identity.per.reason
     assert "1 bar" in log_kf.identity.per.reason
     assert log_kf.identity.standard_pressure_Pa.value == bar_to_pa(1)
     assert log_kf.identity.reaction.is_unknown

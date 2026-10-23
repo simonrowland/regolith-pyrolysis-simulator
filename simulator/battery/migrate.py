@@ -12394,15 +12394,16 @@ _B592_ENTROPY_BASIS_REASON = (
 # Robie, R. A., and Hemingway, B. S., 1995, Thermodynamic properties of
 # minerals and related substances, USGS Bulletin 2131. pdftotext-layout.txt.
 _B2131_FORMATION_BASIS_REASON = (
-    "robie-hemingway-1995-usgs-b2131 pdftotext-layout.txt:167-170 prints mol "
-    "as identical with the gram formula weight, and \"One bar = 1OS Pascals\" "
-    "beside \"The standard atmosphere is equal to 101325 Pascals.\" "
-    ":187-188 the Gibbs energy of formation from the elements in their "
-    "reference states is in J per mol, and Kr is the equilibrium constant of "
-    "formation. :313-315 and :332 the reference states for ΔfG and log Kr, and "
-    "the reference pressure adopted for these tables, are the elements in "
-    "their standard states at 1 bar. The extracted phase is prose and the "
-    "table prints no element reaction, so reaction stays unmapped."
+    "robie-hemingway-1995-usgs-b2131 pdftotext-layout.txt:167-169 prints mol "
+    "as identical with the gram formula weight. :170-171 prints "
+    "\"One bar = 1OS Pascals\" and the standard atmosphere equal to "
+    "101325 Pascals. :187-188 the Gibbs energy of formation from the elements "
+    "in their reference states is in J per mol, and Kr is the equilibrium "
+    "constant of formation. :313-315 the reference states for ΔfG and log Kr "
+    "are the elements in their standard states at 1 bar. :332-333 the "
+    "reference pressure adopted for these tables is 1 bar, that is 1OS Pascals. "
+    "The extracted phase is prose and the table prints no element reaction, "
+    "so reaction stays unmapped."
 )
 
 
