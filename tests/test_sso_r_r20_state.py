@@ -2508,9 +2508,14 @@ def test_exchange_target_cannot_exceed_controlled_total_pressure() -> None:
 @pytest.mark.parametrize(
     ("buffer_o2_mol", "expected_unbacked_o2_mol", "expected_fO2_log"),
     [
-        (0.0, 0.0015952259282159419, -1.0),
-        (1.0e-6, 0.001594225928215942, -1.0000000153832351),
+        # d-231: derived duct changes headspace volume and exchange capacity.
+        # Fresh production values; volume-only replay restores the old pins.
+        (0.0, 0.0014778403263919684, -1.0),
+        (1.0e-6, 0.0014768403263919685, -1.0000000153832351),
     ],
+    # Preserve the original reconciliation node IDs when expected values move.
+    ids=["0.0-0.0015952259282159419--1.0",
+         "1e-06-0.001594225928215942--1.0000000153832351"],
 )
 def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
     buffer_o2_mol: float,
