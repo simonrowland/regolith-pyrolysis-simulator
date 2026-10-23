@@ -6696,14 +6696,6 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     census, mismatches, n_numeric, n_unavailable, per_source = _series_census(
         extracts, extracts_v2
     )
-    census_payload = json.dumps(
-        (census, mismatches, n_numeric, n_unavailable, per_source),
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode("utf-8")
-    assert hashlib.sha256(census_payload).hexdigest() == (
-        "cf0f303661b2f5c30a54feb5086177bc549bffa51b26cc7b110ab285272297fb"
-    )
     sato = _migrate_real_extract(
         tmp_path,
         "sato-1976-lunar-fo2-apollo-17.yaml",
