@@ -16440,7 +16440,86 @@ def test_stolyarova_1995_printed_compositions_reach_migrated_observations(
         obs.evidence.class_.is_value
         and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
         for obs in candidates
-    ) == 26
+    ) == 0
+
+
+def test_stolyarova_1995_oxygen_routes_keep_typed_reactions_without_invented_parents(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.identity import Identity
+
+    source_id = "stolyarova-1995-cao-alumina-kems"
+    extract_path = (
+        REPO_ROOT / "data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml"
+    )
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    result = _migrate_real_extract(
+        tmp_path, "stolyarova-1995-cao-alumina-kems.yaml", write=False
+    )
+    oxygen_rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == source_id
+        and isinstance(obs.identity, Identity)
+        and obs.identity.species.formula in {"O", "O2"}
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+    ]
+    eqn1_rows = [
+        obs for obs in oxygen_rows
+        if "stolyarova_1995_o_partial_pressure_eqn1_table2" in obs.observation_id
+    ]
+    eqn2_rows = [
+        obs for obs in oxygen_rows
+        if "stolyarova_1995_o_partial_pressure_eqn2_table2" in obs.observation_id
+    ]
+    o2_rows = [
+        obs for obs in oxygen_rows
+        if "stolyarova_1995_o2_partial_pressure_table2" in obs.observation_id
+    ]
+    assert (len(eqn1_rows), len(eqn2_rows), len(o2_rows)) == (9, 8, 9)
+
+    for observation_id in (
+        "stolyarova_1995_o_partial_pressure_eqn1_table2",
+        "stolyarova_1995_o_partial_pressure_eqn2_table2",
+        "stolyarova_1995_o2_partial_pressure_table2",
+    ):
+        source_observation = next(
+            observation
+            for species in extract["species"].values()
+            for observation in species["observations"]
+            if observation["observation_id"] == observation_id
+        )
+        assert "derived_from" not in source_observation
+        assert "inputs" not in source_observation["derivation"]
+        raw_inputs = source_observation["derivation"]["raw_inputs"]
+        assert raw_inputs["state"]["value"] == "not_printed"
+        assert raw_inputs["locator"]
+
+    expected_reactions = (
+        (eqn1_rows, {"MoO3", "MoO2", "O"}),
+        (eqn2_rows, {"AlO", "Al", "O"}),
+        (o2_rows, {"O2", "O"}),
+    )
+    for rows, species in expected_reactions:
+        for obs in rows:
+            reaction = obs.identity.reaction
+            assert reaction is not None and reaction.is_value
+            assert {term.species.formula for term in reaction.value.terms} == species
+            assert not obs.derived_from
+            assert obs.derivation is not None
+            # Migrated pressures carry an atm_to_Pa conversion derivation.
+            # It must not invent a pressure-observation parent.
+            assert all(
+                not parent.startswith(f"{source_id}::")
+                for parent in obs.derivation.inputs
+            )
+
+    for rows in (eqn1_rows, eqn2_rows, o2_rows):
+        assert all(
+            obs.evidence.class_.is_value
+            and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+            for obs in rows
+        )
 
 
 def test_stolyarova_1995_composition_mutation_removes_identity_map(
