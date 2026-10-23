@@ -11,6 +11,7 @@ from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from pathlib import Path
+from statistics import median
 from typing import Any
 
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
@@ -55,6 +56,272 @@ class ResidueInventoryRefusal(ValueError):
         super().__init__(detail or reason)
         self.reason = reason
         self.detail = detail or reason
+
+
+@dataclass(frozen=True)
+class EvaporationAlphaObservation:
+    """One measured, source-attributed evaporation coefficient input."""
+
+    source_id: str
+    species: str
+    alpha: float | Mapping[str, Any]
+    evidence_class: str
+    observation_id: str
+    temperature_K: float | None = None
+    temperature_range_K: tuple[float, float] | None = None
+    melt_family: str | None = None
+
+
+@dataclass(frozen=True)
+class EvaporationAlphaEstimate:
+    """LOO consensus and min/max band over one value per independent source."""
+
+    value: float
+    band: tuple[float, float]
+    contributing_source_ids: tuple[str, ...]
+    source_values: tuple[tuple[str, float], ...]
+    melt_family_fallback: bool
+
+
+def collect_measured_evaporation_alphas(
+    observations: Sequence[object],
+    source_documents: Sequence[Mapping[str, Any]] = (),
+) -> tuple[EvaporationAlphaObservation, ...]:
+    """Normalize measured alpha rows and eligible sourced context forms."""
+    from simulator.battery.enums import MEASURED_EVIDENCE, Quantity
+    from simulator.battery.extract_context import iter_extract_context_containers
+
+    collected: list[EvaporationAlphaObservation] = []
+
+    def append(
+        *, source_id: object, species: object, alpha: object,
+        evidence_class: object, observation_id: object,
+        temperature_K: object = None, temperature_range_K: object = None,
+        melt_family: object = None,
+    ) -> None:
+        source = str(source_id or "")
+        formula = str(species or "").removesuffix("(g)")
+        evidence = str(getattr(evidence_class, "value", evidence_class) or "")
+        observation = str(observation_id or "")
+        if not source or not formula or evidence not in MEASURED_EVIDENCE or not observation:
+            return
+        raw_range = None
+        if temperature_range_K is not None:
+            try:
+                parsed_range = tuple(float(value) for value in temperature_range_K)
+            except (TypeError, ValueError, OverflowError):
+                return
+            if (
+                len(parsed_range) != 2
+                or not all(math.isfinite(value) for value in parsed_range)
+                or parsed_range[0] > parsed_range[1]
+            ):
+                return
+            raw_range = parsed_range
+        try:
+            temperature = float(temperature_K) if temperature_K is not None else None
+        except (TypeError, ValueError, OverflowError):
+            return
+        if temperature is not None and not math.isfinite(temperature):
+            return
+        if isinstance(alpha, Mapping):
+            normalized_alpha: float | Mapping[str, Any] = dict(alpha)
+        else:
+            try:
+                normalized_alpha = float(alpha)
+            except (TypeError, ValueError, OverflowError):
+                return
+            if not math.isfinite(normalized_alpha):
+                return
+        family = str(melt_family).strip() if melt_family else None
+        collected.append(EvaporationAlphaObservation(
+            source_id=source,
+            species=formula,
+            alpha=normalized_alpha,
+            evidence_class=evidence,
+            observation_id=observation,
+            temperature_K=temperature,
+            temperature_range_K=raw_range,
+            melt_family=family,
+        ))
+
+    for observation in observations:
+        identity = getattr(observation, "identity", None)
+        quantity = getattr(identity, "quantity", None)
+        quantity = getattr(quantity, "value", quantity)
+        if quantity is not Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+            continue
+        evidence = getattr(getattr(observation, "evidence", None), "class_", None)
+        evidence = getattr(evidence, "value", evidence)
+        value = getattr(observation, "value", None)
+        point = getattr(value, "point", None)
+        if point is None:
+            continue
+        temperature_state = getattr(identity, "temperature_K", None)
+        temperature = (
+            getattr(temperature_state, "value", None)
+            if getattr(temperature_state, "is_value", False) else None
+        )
+        if temperature is None:
+            condition = (getattr(observation, "point_conditions", None) or {}).get(
+                "temperature_K"
+            )
+            state = getattr(condition, "state", None)
+            temperature = (
+                getattr(state, "value", None)
+                if getattr(state, "is_value", False) else None
+            )
+        provenance = getattr(observation, "provenance", None)
+        family = provenance.get("melt_family") if isinstance(provenance, Mapping) else None
+        append(
+            source_id=getattr(observation, "source_id", None),
+            species=getattr(getattr(identity, "species", None), "formula", None),
+            alpha=point,
+            evidence_class=evidence,
+            observation_id=getattr(observation, "observation_id", None),
+            temperature_K=temperature,
+            melt_family=family,
+        )
+
+    for document in source_documents:
+        source_id = document.get("source_id")
+        for formula, rows in iter_extract_context_containers(document):
+            for row in rows or ():
+                if not isinstance(row, Mapping):
+                    continue
+                values = row.get("values")
+                if not isinstance(values, Mapping):
+                    continue
+                # A fit is eligible only when the context explicitly marks it
+                # as measured. A row type or a printed model fit alone is not
+                # evidence that the alpha itself was measured.
+                method_class = values.get("method_class")
+                if method_class is not None and method_class not in MEASURED_EVIDENCE:
+                    continue
+                classifications = tuple(
+                    str(getattr(value, "value", value)).lower()
+                    for value in (
+                        values.get("evidence_class"), method_class,
+                        row.get("evidence_class"), row.get("class_tag"),
+                    )
+                    if value
+                )
+                if any(
+                    label in {"compilation_assessed", "model_derived"}
+                    or label.startswith("assumed")
+                    for label in classifications
+                ):
+                    continue
+                if "model" in str(row.get("type") or "").lower():
+                    continue
+                context_semantics = " ".join(str(value).lower() for value in (
+                    values.get("quantity"), values.get("alpha_kind"),
+                    row.get("type"), row.get("regime"),
+                ) if value)
+                if "condensation" in context_semantics:
+                    continue
+                evidence = (
+                    values.get("evidence_class")
+                    or method_class
+                    or row.get("evidence_class")
+                    or row.get("class_tag")
+                )
+                alpha = values.get("alpha_form")
+                if not isinstance(alpha, Mapping):
+                    alpha = values.get("alpha")
+                if alpha is None:
+                    continue
+                append(
+                    source_id=source_id,
+                    species=values.get("gas_species", formula),
+                    alpha=alpha,
+                    evidence_class=evidence,
+                    observation_id=row.get("observation_id"),
+                    temperature_K=row.get("temperature_K"),
+                    temperature_range_K=row.get("T_range_K"),
+                    melt_family=values.get("melt_family", row.get("melt_family")),
+                )
+    return tuple(collected)
+
+
+def estimate_loo_evaporation_alpha(
+    observations: Sequence[EvaporationAlphaObservation],
+    *,
+    species: str,
+    melt_family: str | None,
+    temperature_K: float,
+    exclude_source_id: str,
+) -> EvaporationAlphaEstimate | ResidueInventoryRefusal:
+    """Estimate alpha only from measured rows in other independent papers.
+
+    A scalar with a printed temperature is usable only there (or within its
+    printed range); a scalar with no printed T dependence is treated as
+    constant. An Arrhenius form is evaluated at T when its printed range
+    allows it. Multiple rows from one paper collapse to their median at T,
+    then the consensus is the median of those one-per-paper values. The band
+    is the cross-paper minimum and maximum. The current battery store has no
+    typed melt-family axis, so records without an explicit family use the
+    ruling's species-only fallback and the result records that limitation.
+    """
+    from simulator.battery.enums import MEASURED_EVIDENCE
+
+    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+        return ResidueInventoryRefusal("alpha_temperature_invalid")
+    candidates = tuple(
+        row for row in observations
+        if row.species == species
+        and row.source_id != exclude_source_id
+        and row.evidence_class in MEASURED_EVIDENCE
+    )
+    family_supported = bool(melt_family) and bool(candidates) and all(
+        row.melt_family for row in candidates
+    )
+    family_fallback = not family_supported
+    if family_supported:
+        candidates = tuple(row for row in candidates if row.melt_family == melt_family)
+
+    by_source: dict[str, list[float]] = defaultdict(list)
+    for row in candidates:
+        temperature_range = row.temperature_range_K
+        if temperature_range is not None and not (
+            temperature_range[0] <= temperature_K <= temperature_range[1]
+        ):
+            continue
+        if isinstance(row.alpha, Mapping):
+            try:
+                if row.alpha.get("type") != "arrhenius":
+                    continue
+                alpha_value, _sigma = _evaluate_extracted_arrhenius_alpha(
+                    row.alpha, temperature_K
+                )
+            except (KeyError, TypeError, ValueError, OverflowError):
+                continue
+        else:
+            if row.temperature_K is not None and not math.isclose(
+                row.temperature_K, temperature_K, rel_tol=0.0, abs_tol=1e-6
+            ):
+                continue
+            alpha_value = row.alpha
+        if math.isfinite(alpha_value) and 0.0 < alpha_value <= 1.0:
+            by_source[row.source_id].append(alpha_value)
+
+    source_values = tuple(sorted(
+        (source_id, median(values)) for source_id, values in by_source.items()
+    ))
+    if len(source_values) < 2:
+        return ResidueInventoryRefusal(
+            "alpha_loo_insufficient_sources",
+            f"species={species}; other_measured_sources_at_T={len(source_values)}; "
+            f"excluded_source_id={exclude_source_id}",
+        )
+    values = tuple(value for _source_id, value in source_values)
+    return EvaporationAlphaEstimate(
+        value=median(values),
+        band=(min(values), max(values)),
+        contributing_source_ids=tuple(source_id for source_id, _ in source_values),
+        source_values=source_values,
+        melt_family_fallback=family_fallback,
+    )
 
 
 class ResidueEngineNonconvergence(RuntimeError):

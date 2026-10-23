@@ -198,7 +198,11 @@ SINGLE_LIQUID_ENGINES: frozenset[Engine] = frozenset(
 # quantities come from the engine-specific compilation tier.
 _ENGINE_CELL_PREDICTED_QUANTITIES = frozenset(
     _VAPOUR_EQUILIBRIUM
-    | {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+    | {
+        Quantity.ACTIVITY,
+        Quantity.ACTIVITY_COEFFICIENT,
+        Quantity.EVAPORATION_RATE,
+    }
 )
 _SPECIES_FORMULA_INDEPENDENT_QUANTITIES = frozenset(
     {Quantity.MASS_LOSS_FRACTION}
@@ -512,6 +516,7 @@ class ScoreContext:
     hostname: str = ""
     benches: Mapping[str, Bench] = field(default_factory=dict)
     root: Path = REPO_ROOT
+    _evaporation_alpha_observations: tuple[object, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -7306,6 +7311,347 @@ def _predict_mass_loss_with_residue(
     )
 
 
+def _evaporation_ambient_pressure(
+    observation: Observation,
+    experiment: Experiment | None,
+    partial_pressure_observations: Mapping[str, Observation] | Sequence[Observation] | None,
+) -> tuple[float | None, Notice | None, Mapping[str, object] | None]:
+    """Resolve a printed gas partial, or the explicitly stated vacuum case."""
+    identity = observation.identity
+    temperature = (
+        float(identity.temperature_K.value)
+        if isinstance(identity, Identity)
+        and identity.temperature_K is not None
+        and identity.temperature_K.is_value
+        else None
+    )
+    candidates = (
+        partial_pressure_observations.values()
+        if isinstance(partial_pressure_observations, Mapping)
+        else (partial_pressure_observations or ())
+    )
+    from simulator.battery.enums import MEASURED_EVIDENCE
+
+    partials: set[float] = set()
+    for candidate in candidates:
+        if not isinstance(candidate, Observation) or not isinstance(candidate.identity, Identity):
+            continue
+        candidate_identity = candidate.identity
+        if (
+            quantity_token(candidate_identity) is not Quantity.P_PARTIAL
+            or candidate.experiment_id != observation.experiment_id
+            or candidate_identity.species.formula != identity.species.formula
+            or candidate.evidence.class_.is_unknown
+            or candidate.evidence.class_.is_not_applicable
+            or candidate.evidence.class_.value not in MEASURED_EVIDENCE
+            or candidate_identity.composition != identity.composition
+            or candidate_identity.fO2_Pa != identity.fO2_Pa
+            or candidate_identity.total_pressure_Pa != identity.total_pressure_Pa
+            or candidate.value.kind is not ValueKind.POINT
+            or candidate.value.point is None
+            or temperature is None
+            or candidate_identity.temperature_K is None
+            or not candidate_identity.temperature_K.is_value
+            or not math.isclose(
+                float(candidate_identity.temperature_K.value),
+                temperature,
+                rel_tol=0.0,
+                abs_tol=1e-6,
+            )
+        ):
+            continue
+        partials.add(float(candidate.value.point))
+    if len(partials) == 1:
+        return next(iter(partials)), None, None
+    if len(partials) > 1:
+        return None, None, {
+            "reason": "ambient_partial_pressure_ambiguous",
+            "printed_values_Pa": sorted(partials),
+        }
+    if (
+        experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+    ):
+        return (
+            0.0,
+            _omission_notice(
+                Quantity.EVAPORATION_RATE,
+                "ambient species pressure omitted because the row states vacuum/free "
+                "evaporation; P_ambient=0 Pa",
+            ),
+            None,
+        )
+    return None, None, {"reason": "ambient_partial_pressure_not_stated"}
+
+
+def _predict_evaporation_rate(
+    engine: Engine,
+    observation: Observation,
+    *,
+    experiment: Experiment | None,
+    handles: Mapping[str, object] | None,
+    isolated: bool | None,
+    bench: Bench | None,
+    alpha_observations: Sequence[object],
+    partial_pressure_observations: Mapping[str, Observation] | Sequence[Observation] | None,
+    pressure_predictor: Callable[..., EnginePrediction],
+) -> EnginePrediction:
+    identity = observation.identity
+    channel = ENGINE_CHANNELS[engine]
+    sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    formula = identity.species.formula
+    if formula in {"Na", "K"}:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=identity.composition,
+            reason=RefusalReason.UNSUPPORTED,
+            detail={
+                "reason": "alkali_alpha_not_measured",
+                "formula": formula,
+                "detail": (
+                    "Na/K kinetic rows stay refused because available literature "
+                    "alpha values are predominantly assumed unity"
+                ),
+            },
+        )
+    if formula not in {"Mg", "SiO", "Fe", "Ca", "Al"}:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=identity.composition,
+            reason=RefusalReason.UNSUPPORTED,
+            detail={"reason": "evaporation_species_not_supported", "formula": formula},
+        )
+
+    from simulator.battery.residue import (
+        EvaporationAlphaEstimate,
+        estimate_loo_evaporation_alpha,
+    )
+
+    temperature = (
+        float(identity.temperature_K.value)
+        if identity.temperature_K is not None and identity.temperature_K.is_value
+        else None
+    )
+    if temperature is None:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=identity.composition,
+            reason=RefusalReason.IDENTITY_INCOMPLETE,
+            detail={"reason": "evaporation_temperature_not_stated"},
+        )
+    alpha = estimate_loo_evaporation_alpha(
+        alpha_observations,
+        species=formula,
+        # This store has no normalized melt-family axis; the estimator marks
+        # the ruling-approved species-only grouping fallback in its result.
+        melt_family=None,
+        temperature_K=temperature,
+        exclude_source_id=str(observation.source_id or ""),
+    )
+    if not isinstance(alpha, EvaporationAlphaEstimate):
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=identity.composition,
+            reason=RefusalReason.IDENTITY_INCOMPLETE,
+            detail={
+                "reason": alpha.reason,
+                "detail": alpha.detail,
+                "species": formula,
+                "temperature_K": temperature,
+                "excluded_source_id": observation.source_id,
+            },
+        )
+
+    ambient_pressure, ambient_notice, ambient_refusal = _evaporation_ambient_pressure(
+        observation, experiment, partial_pressure_observations
+    )
+    if ambient_refusal is not None or ambient_pressure is None:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=identity.composition,
+            reason=RefusalReason.IDENTITY_INCOMPLETE,
+            detail=dict(ambient_refusal or {"reason": "ambient_partial_pressure_not_stated"}),
+        )
+
+    per_area = (
+        identity.per is not None
+        and identity.per.is_value
+        and identity.per.value is PerBasis.AREA_TIME
+    )
+    if (
+        identity.per is not None
+        and identity.per.is_value
+        and identity.per.value is not PerBasis.AREA_TIME
+    ):
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=identity.composition,
+            reason=RefusalReason.UNSUPPORTED,
+            detail={
+                "reason": "evaporation_rate_per_basis_not_supported",
+                "per": identity.per.value.value,
+            },
+        )
+    area_m2 = None
+    if not per_area:
+        exposure = identity.exposure
+        area_state = (
+            exposure.value.area_m2
+            if exposure is not None and exposure.is_value and exposure.value is not None
+            else None
+        )
+        if area_state is None or not area_state.is_value or area_state.value is None:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=identity.composition,
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail={"reason": "evaporation_surface_area_not_stated"},
+            )
+        area_m2 = float(area_state.value)
+        if not math.isfinite(area_m2) or area_m2 <= 0.0:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=identity.composition,
+                reason=RefusalReason.INVALID_IDENTITY,
+                detail={"reason": "evaporation_surface_area_invalid"},
+            )
+
+    # The engine's existing P_PARTIAL route is the equilibrium-vapour-pressure
+    # provider for the row's exact T, melt composition, total pressure and fO2.
+    pressure_identity = replace(
+        identity,
+        quantity=Quantity.P_PARTIAL,
+        per=State.not_applicable("partial pressure has no per basis"),
+        standard_pressure_Pa=State.not_applicable("partial pressure has no standard pressure axis"),
+        reaction=State.not_applicable("partial pressure has no reaction axis"),
+        formation_elements=State.not_applicable("partial pressure has no formation-elements axis"),
+        reference_state=State.not_applicable("partial pressure has no reference-state axis"),
+        reservoir=State.not_applicable("partial pressure is a mixture gas species"),
+        sweep_gas=State.not_applicable("partial pressure does not use a sweep-gas identity"),
+        exposure=State.not_applicable("partial pressure has no exposure axis"),
+        sample_mass_kg=State.not_applicable("partial pressure has no sample-mass axis"),
+        wall=State.not_applicable("partial pressure has no wall axis"),
+        subtype=State.not_applicable("partial pressure has no subtype axis"),
+    )
+    pressure_observation = replace(observation, identity=pressure_identity)
+    pressure_prediction = pressure_predictor(
+        engine,
+        pressure_observation,
+        handles=handles,
+        isolated=isolated,
+        experiment=experiment,
+        bench=bench,
+    )
+    if pressure_prediction.value is None:
+        return replace(
+            pressure_prediction,
+            identity=identity,
+            refusal_detail={
+                "reason": "equilibrium_vapour_pressure_refused",
+                "pressure_refusal": dict(pressure_prediction.refusal_detail),
+                "pressure_refusal_reason": (
+                    None if pressure_prediction.refusal_reason is None
+                    else pressure_prediction.refusal_reason.value
+                ),
+            },
+        )
+
+    from engines.builtin.evaporation_flux import _series_resistance_evaporation_flux_kg_m2_s
+    from simulator.accounting.formulas import parse_formula
+
+    try:
+        molar_mass = parse_formula(formula, species=formula).molar_mass_kg_per_mol()
+    except (TypeError, ValueError):
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=identity.composition,
+            reason=RefusalReason.IDENTITY_UNKNOWN,
+            detail={"reason": "evaporation_species_molar_mass_unavailable", "formula": formula},
+        )
+
+    # Premise: the ruling requests the interface-controlled Hertz-Knudsen-
+    # Langmuir term. Starting with dJ = alpha*k_HK*dP gives
+    # J = alpha*(P_eq-P_ambient)*sqrt(M/(2*pi*R*T)). With M in kg/mol and
+    # R*T in J/mol, the square root has units s/m; multiplying by Pa gives
+    # kg m^-2 s^-1. The shared evaporation-flux owner evaluates this exact
+    # free-molecular, zero-extra-resistance branch. Sanity: Mg, alpha=0.1,
+    # T=2000 K and dP=1 Pa gives about 4.8e-5 kg m^-2 s^-1.
+    flux = _series_resistance_evaporation_flux_kg_m2_s(
+        formula,
+        float(pressure_prediction.value),
+        ambient_pressure,
+        temperature,
+        molar_mass,
+        alpha.value,
+        knudsen_number=math.inf,
+        gas_resistance_enabled=False,
+        melt_resistance_enabled=False,
+    ).flux_kg_s_m2
+    unit = "kg_per_m2_s" if per_area else "kg_per_s"
+    if area_m2 is not None:
+        flux *= area_m2
+
+    notices = list(pressure_prediction.notices)
+    if ambient_notice is not None:
+        notices.append(ambient_notice)
+    if alpha.melt_family_fallback:
+        notices.append(Notice(
+            kind=NoticeKind.FALLBACK,
+            affected_quantities=(Quantity.EVAPORATION_RATE,),
+            reason="store has no typed melt-family axis; LOO alpha grouped by species only",
+            origin="residue:estimate_loo_evaporation_alpha",
+        ))
+    notices.append(Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(Quantity.EVAPORATION_RATE,),
+        reason=(
+            f"leave-one-paper-out alpha median={alpha.value:g}; "
+            f"cross-paper min/max={alpha.band[0]:g}/{alpha.band[1]:g}"
+        ),
+        origin="residue:estimate_loo_evaporation_alpha",
+        source=", ".join(alpha.contributing_source_ids),
+        band=f"alpha=[{alpha.band[0]:g}, {alpha.band[1]:g}]",
+    ))
+    alpha_sources = (*pressure_prediction.coefficient_sources, *alpha.contributing_source_ids)
+    return replace(
+        pressure_prediction,
+        value=Decimal(str(flux)),
+        unit=unit,
+        coefficient_basis="leave_one_paper_out_hkl",
+        notices=tuple(notices),
+        coefficient_sources=tuple(dict.fromkeys(alpha_sources)),
+        identity=identity,
+    )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -7365,6 +7711,18 @@ def predict_with_engine(
             sources,
             experiment,
             observation,
+        )
+    if quantity is Quantity.EVAPORATION_RATE:
+        return _predict_evaporation_rate(
+            engine,
+            observation,
+            experiment=experiment,
+            handles=handles,
+            isolated=isolated,
+            bench=bench,
+            alpha_observations=(),
+            partial_pressure_observations=None,
+            pressure_predictor=predict_with_engine,
         )
     if quantity is Quantity.FE3_FE2_RATIO:
         return _predict_fe_redox(engine, observation, identity, channel)
@@ -9641,7 +9999,7 @@ def compile_residual(
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch", "finite_numeric_point_endpoints"),
         )
-    if rail is None:
+    if rail is None and quantity is not Quantity.EVAPORATION_RATE:
         return _refused(
             RefusalReason.UNSUPPORTED,
             {
@@ -9964,15 +10322,30 @@ def compile_residual(
         # (predict=predict_with_engine): the reactive-cell label follows the
         # bench, not the call style (b-693/b-691 r2 finding 6). Caller-supplied
         # predictors keep the handles/experiment keyword contract.
-        if predictor is predict_with_engine and experiment is not None:
-            recorded = _bench_for_score(experiment, context.benches)
-            if recorded is not None:
-                predictor_kwargs["bench"] = recorded
-        prediction = predictor(
-            engine,
-            _melt_prediction_reference(implied_alpha_reference or reference),
-            **predictor_kwargs,
+        recorded_bench = None
+        if predictor is predict_with_engine:
+            if experiment is not None:
+                recorded = _bench_for_score(experiment, context.benches)
+                if recorded is not None:
+                    recorded_bench = recorded
+                    predictor_kwargs["bench"] = recorded
+        prediction_reference = _melt_prediction_reference(
+            implied_alpha_reference or reference
         )
+        if predictor is predict_with_engine and quantity is Quantity.EVAPORATION_RATE:
+            prediction = _predict_evaporation_rate(
+                engine,
+                prediction_reference,
+                experiment=experiment,
+                handles=handles,
+                isolated=None,
+                bench=recorded_bench,
+                alpha_observations=context._evaporation_alpha_observations,
+                partial_pressure_observations=context.observations,
+                pressure_predictor=predict_with_engine,
+            )
+        else:
+            prediction = predictor(engine, prediction_reference, **predictor_kwargs)
 
     notices = union_notices(notices, prediction.notices)
     expanded_sources = expand_coefficient_sources(prediction.coefficient_sources)
@@ -10590,6 +10963,7 @@ def load_score_context(
     benches = load_migrated_benches(root)
     origins: dict[str, str] = {}
     extract_review: dict[str, str | None] = {}
+    alpha_context_documents: list[Mapping[str, Any]] = []
     literature = root / "data" / "literature"
     for directory in (literature / "extracts-v2", literature / "observations-v2"):
         if not directory.is_dir():
@@ -10627,6 +11001,17 @@ def load_score_context(
             extract_review[source_id] = (
                 None if doc.get("review_status") is None else str(doc.get("review_status"))
             )
+            species = doc.get("species")
+            if isinstance(species, Mapping) and any(
+                isinstance(body, Mapping) and body.get("context")
+                for body in species.values()
+            ):
+                alpha_context_documents.append(doc)
+    from simulator.battery.residue import collect_measured_evaporation_alphas
+
+    evaporation_alpha_observations = collect_measured_evaporation_alphas(
+        tuple(observations.values()), alpha_context_documents
+    )
     return ScoreContext(
         works=works,
         experiments=experiments,
@@ -10636,6 +11021,7 @@ def load_score_context(
         hostname=socket.gethostname(),
         benches=benches,
         root=root,
+        _evaporation_alpha_observations=evaporation_alpha_observations,
     )
 
 
