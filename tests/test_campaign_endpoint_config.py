@@ -390,6 +390,21 @@ def test_c0_exit_forecast_engine_is_optional_and_closed():
     )
     assert recorded_notice["forecast_engine"] == "internal-analytical"
 
+    refusal_detail = {
+        "exception_class": "TypeError",
+        "exception_message": "cannot pickle '_thread.lock' object",
+    }
+    refused_notice = c0_exit_record(
+        prediction={
+            **prediction,
+            "forecast_context_refusal_detail": refusal_detail,
+        },
+        **kwargs,
+    )
+    assert "forecast_context_refusal_detail" not in refused_notice
+    assert "TypeError" in refused_notice["message"]
+    assert refusal_detail["exception_message"] in refused_notice["message"]
+
     with pytest.raises(ValueError, match="unknown C0 forecast engine"):
         c0_exit_record(
             prediction={**prediction, "forecast_engine": "free-text-engine"},
