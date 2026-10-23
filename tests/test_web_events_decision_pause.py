@@ -227,10 +227,11 @@ def _wait_loop_settled(sid, *, timeout=40.0):
 
 
 def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=240.0):
-    """Answer every gate with its recommendation.
+    """Answer each gate with its recommendation and await terminal completion.
 
     Returns ``(decisions, counts, completion, status_counts)`` where
     ``status_counts`` tallies ``simulation_status`` payloads by their ``status``.
+    ``timeout`` is the maximum gap without a simulation tick or decision event.
 
     With ``perturb_each_gate`` (requires ``sid``) the test injects pacing
     pause+resume churn while parked at each gate BEFORE answering it, then waits
@@ -245,10 +246,12 @@ def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=2
     decisions = []
     completion = None
     terminal_status = None
-    deadline = time.time() + timeout
-    while time.time() < deadline:
+    last_progress_at = time.monotonic()
+    while True:
         for msg in client.get_received():
             counts[msg['name']] += 1
+            if msg['name'] in {'simulation_tick', 'decision_required'}:
+                last_progress_at = time.monotonic()
             if msg['name'] == 'simulation_status':
                 status_payload = msg['args'][0]
                 status_counts[status_payload.get('status')] += 1
@@ -267,18 +270,21 @@ def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=2
                     client.emit('resume_simulation', {'payload_version': 4})
                     _wait_loop_settled(sid)
                 client.emit('make_decision', {'choice': d['recommendation']})
+                last_progress_at = time.monotonic()
             elif msg['name'] == 'simulation_complete':
                 completion = msg['args'][0]
         if completion is not None:
             break
         if terminal_status is not None:
             break
+        if time.monotonic() - last_progress_at >= timeout:
+            break
         time.sleep(0.02)
     assert completion is not None, (
-        'run terminated before simulation_complete: '
+        'run did not emit simulation_complete: '
         f'answered gates={decisions!r}; events={dict(counts)!r}; '
         f'statuses={dict(status_counts)!r}; '
-        f'{terminal_status or "no terminal event received"}'
+        f'{terminal_status or f"no progress for {timeout:.1f}s"}'
     )
     return decisions, counts, completion, status_counts
 
