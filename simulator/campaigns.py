@@ -16,6 +16,8 @@ Each campaign has:
 
 from __future__ import annotations
 
+from simulator.condensation_routing import STAGE3_ROUTES
+
 import ast
 import math
 from collections.abc import Mapping
@@ -376,6 +378,7 @@ class CampaignManager:
         'ramp_rate_C_per_h',
         'ramp_rate_C_per_hr',
         'setpoints',
+        'stage3_route',
         'stir_factor',
         'stir_state',
         'temperature_ramp_C_per_h',
@@ -1452,6 +1455,32 @@ class CampaignManager:
         if not math.isfinite(delta) or delta < 0.0:
             raise ValueError('target_delta_below_ceiling_C must be finite and non-negative')
         return min(self.furnace_max_T_C, process_high_C) - delta
+
+    def apply_collection_route(self, melt: MeltState, train: CondensationTrain) -> None:
+        """Apply config < active substage < runtime override before a parcel."""
+        campaign = melt.campaign
+        if campaign == CampaignPhase.IDLE:
+            campaign = CampaignPhase.C0
+        cfg = self._campaign_config(campaign)
+        command = cfg.get('stage3_route', 'divert')
+        substage = ''
+        if campaign in (CampaignPhase.C3_NA, CampaignPhase.C3_K):
+            substage = 'Na_phase' if campaign == CampaignPhase.C3_NA else 'K_phase'
+            command = cfg.get(substage, {}).get('stage3_route', command)
+        elif campaign == CampaignPhase.C2A_STAGED:
+            stage = self._c2a_staged_active_stage(melt.campaign_hour)
+            if stage:
+                substage = self._c2a_staged_stage_label(stage)
+                command = stage.get('stage3_route', command)
+        ovr = self._campaign_overrides(campaign)
+        command = ovr.get('stage3_route', command)
+        if command not in STAGE3_ROUTES:
+            raise ValueError('stage3_route must be divert or through')
+        train.collection_route = {
+            'stage3_route': command,
+            'campaign': campaign.name,
+            'substage': substage,
+        }
 
     def configure_campaign(self, melt: MeltState, campaign: CampaignPhase):
         """

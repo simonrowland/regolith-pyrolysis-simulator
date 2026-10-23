@@ -4469,7 +4469,7 @@ class EvaporationMixin:
                     segment.wall_deposit_account: (
                         float(segment.wall_temperature_C) + 273.15
                     )
-                    for segment in self.condensation_model.pipe_segments
+                    for segment in self.condensation_model.active_pipe_segments
                     if segment.name not in self.condensation_model.wall_temperature_input_refusals
                 },
                 'wall_alkali_binding_diagnostic_state_by_account': dict(

@@ -79,6 +79,10 @@ The Fe → SiO separation (Stage 1 → Stage 3):
 
 from __future__ import annotations
 
+from simulator.condensation_routing import (
+    STAGE3_BYPASS_SEGMENT_NAME, active_collector_stage_number,
+)
+
 import copy
 import math
 import warnings
@@ -126,6 +130,7 @@ from simulator.accounting.queries import (
     wall_deposit_candidates_by_segment_kg as query_wall_deposit_candidates_by_segment_kg,
 )
 from simulator.config import load_config_bundle
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.coating_rate import continuous_wall_deposition_flux
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -2061,6 +2066,9 @@ class CondensationModel:
             materials if materials is not None else MATERIALS_DATA
         )
         self.species_formula_registry = species_formula_registry or {}
+        self.retained_vapor_mol: dict[str, float] = {}
+        self.stage3_bypass: Mapping[str, Any] = {}
+        self.last_stage3_route_diagnostic: dict[str, Any] = {}
 
         for label, value in (
             ('wall_surface_area_m2', wall_surface_area_m2),
@@ -2147,6 +2155,8 @@ class CondensationModel:
         self._knudsen_policy_configured = False
         self._viscous_flow_required = True
         self.lab_geometry: LabGeometry | None = None
+        self.stage3_bypass = dict(_CONFIG_BUNDLE.setpoints[
+            'condensation_train']['stage3_bypass'])
         self.pipe_segments = self._build_default_pipe_segments(
             float(wall_temperature_C))
         self.cold_spot_margin_C = COLD_SPOT_MARGIN_C
@@ -2194,13 +2204,14 @@ class CondensationModel:
 
     @property
     def wall_deposit_accounts(self) -> tuple[str, ...]:
-        return tuple(segment.wall_deposit_account for segment in self.pipe_segments)
+        return tuple(segment.wall_deposit_account for segment in self.active_pipe_segments)
 
     def reset_run_sticking_authority(self) -> None:
         """Reset route-accumulated sticking authority at a run boundary."""
 
         self.last_sticking_alpha_provenance_notice = {}
         self.last_condensation_refusals_by_species = {}
+        self.last_stage3_route_diagnostic = {}
         self.last_condensation_authority_by_species = {}
 
     def configure_operating_conditions(
@@ -2498,7 +2509,7 @@ class CondensationModel:
                 "wall_temperature_C": float(self.wall_temperature_C),
                 "pipe_segment_temperatures_C": {
                     segment.name: float(segment.wall_temperature_C)
-                    for segment in self.pipe_segments
+                    for segment in self.active_pipe_segments
                 },
                 "stage_area_m2_by_stage": dict(self.stage_area_m2_by_stage),
                 "stage_area_geometry_provenance_notice": dict(
@@ -2584,6 +2595,10 @@ class CondensationModel:
         non-finite / non-coercible entries skipped; idempotent;
         partial overrides keep other species at the fallback.
         """
+        train_config = (setpoints or {}).get('condensation_train', {})
+        if 'stage3_bypass' in train_config:
+            self.stage3_bypass = dict(train_config['stage3_bypass'])
+
         if not setpoints:
             return
         self.upstream_hot_wall_min_C = _stage0_hot_wall_min_C_from_setpoints(
@@ -2646,6 +2661,88 @@ class CondensationModel:
                     f"finite ({value!r}); refusing rather than skipping."
                 )
             self.condensation_temperatures_C[name] = T_C
+
+    @property
+    def active_pipe_segments(self) -> list[PipeSegment]:
+        if self.train.collection_route['stage3_route'] == 'through':
+            return list(self.pipe_segments)
+        if self.lab_geometry is not None:
+            # Explicit laboratory geometry has its own declared surfaces.
+            return list(self.pipe_segments)
+        cfg = self.stage3_bypass
+        try:
+            liner = cfg['liner_material']
+            material = self.materials['liner_materials'][liner]
+            if liner == 'fused_silica_baffles' or not material:
+                raise ValueError('bypass must have a non-silica liner')
+            length = _deposition_finite_scalar('bypass.length_m', cfg['length_m'])
+            diameter = _deposition_finite_scalar('bypass.inner_diameter_m', cfg['inner_diameter_m'])
+            temperature = _deposition_finite_scalar('bypass.wall_temperature_C', cfg['wall_temperature_C'])
+            if not all(math.isfinite(v) and v > 0 for v in (length, diameter)):
+                raise ValueError('bypass dimensions must be finite and positive')
+            if not math.isfinite(temperature) or temperature <= -273.15:
+                raise ValueError('bypass temperature must exceed absolute zero')
+        except (KeyError, TypeError, ValueError) as exc:
+            raise DepositionInputRefusal('stage3_bypass', cfg, str(exc)) from exc
+        # Both cartridge ends are isolated. No silica segment remains in
+        # parallel; this declared refractory duct participates in wall physics.
+        bypass = PipeSegment(
+            name=STAGE3_BYPASS_SEGMENT_NAME,
+            upstream_stage='stage_2', downstream_stage='stage_4',
+            wall_temperature_C=temperature, length_m=length,
+            inner_diameter_m=diameter, liner_material=liner)
+        return [bypass if segment.downstream_stage == 'stage_3' else segment
+                for segment in self.pipe_segments
+                if segment.upstream_stage != 'stage_3']
+
+    def _admit_stage3_route(self, evap_flux: EvaporationFlux) -> None:
+        route = dict(self.train.collection_route)
+        diagnostic: dict[str, Any] = {**route, 'findings': []}
+        self.last_stage3_route_diagnostic = diagnostic
+        if route['stage3_route'] == 'divert':
+            return
+        if route['stage3_route'] != 'through':
+            raise DepositionInputRefusal('stage3_route', route, 'unknown route')
+        # Conservative zero-contact interlock, NOT an established SiO window.
+        # For 4Na(g)+O2 -> 2Na2O(silicate), Q=a_Na2O^2/(p_Na^4*pO2).
+        # Q<K implies pO2 > a_Na2O^2/(K*p_Na^4), ON at realistic pO2;
+        # pressures here are normalized to the same standard pressure as K.
+        # No dew-point or numerical-zero exception establishes safe contact.
+        # F_A=sum(a_i*n_dot_i): atom count a_i is dimensionless, mol/s of
+        # carrier gives mol alkali atoms/s. Zero incoming gives zero contact.
+        # Incoming supply is a conservative upper bound: proposed upstream
+        # capture can fail its committed floor, so cannot prove local zero.
+        carriers = {}
+        unknown = []
+        for source, supplies in (('fresh_kg_hr', evap_flux.species_kg_hr),
+                                 ('retained_mol', self.retained_vapor_mol)):
+            for species, raw in supplies.items():
+                try:
+                    amount = _finite_nonnegative_value(raw, label=species)
+                    if amount == 0.0:
+                        continue
+                    formula = resolve_species_formula(species, self.species_formula_registry)
+                    atoms = formula.elements.get('Na', 0) + formula.elements.get('K', 0)
+                    if atoms:
+                        record = carriers.setdefault(species, {})
+                        record[source] = amount
+                        if source == 'fresh_kg_hr':
+                            record['alkali_atom_mol_s'] = (
+                                atoms * amount / formula.molar_mass_kg_per_mol() / 3600.0)
+                        else:
+                            record['retained_alkali_atom_mol'] = atoms * amount
+                except (ValueError, TypeError) as exc:
+                    unknown.append({'species': species, 'source': source, 'detail': str(exc)})
+        if carriers or unknown:
+            finding = {
+                'type': 'silica_exposed_to_alkali', 'code': 'silica_exposed_to_alkali',
+                'carriers': carriers, 'unavailable': unknown,
+                'allowed_alkali_atom_mol_s': 0.0, **route,
+            }
+            diagnostic['findings'] = [finding]
+            diagnostic['silica_exposed_to_alkali_findings'] = [finding]
+            self.cold_spot_history.append(copy.deepcopy(diagnostic))
+            raise Stage3SilicaExposureRefusal(diagnostic)
 
     def _build_default_pipe_segments(
         self,
@@ -2795,7 +2892,7 @@ class CondensationModel:
                 self.operating_history[-1].pop("wall_temperature_input_refusals", None)
             self.operating_history[-1]["pipe_segment_temperatures_C"] = {
                 segment.name: float(segment.wall_temperature_C)
-                for segment in self.pipe_segments
+                for segment in self.active_pipe_segments
                 if segment.name not in self.wall_temperature_input_refusals
             }
 
@@ -2828,6 +2925,7 @@ class CondensationModel:
 
     def route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """Route one flux batch with mutation-checked catalog reuse."""
+        self._admit_stage3_route(evap_flux)
         data = self.vapor_pressure_data
         if not isinstance(data, VaporPressureCompatibilityView):
             return self._route(evap_flux, melt)
@@ -2846,7 +2944,7 @@ class CondensationModel:
         """
         Route all evaporated species through the train.
 
-        For each species, walk every stage in ``self.train.stages``
+        For each species, walk every stage in ``self.train.active_stages``
         (the default metals train is stages 0 through 7).  At each stage,
         calculate condensation fraction η.  Whatever condenses is
         added to that stage's collected_kg; the remainder passes
@@ -2985,9 +3083,10 @@ class CondensationModel:
         )
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
-            [segment for segment in self.pipe_segments
+            [segment for segment in self.active_pipe_segments
              if segment.name not in self.wall_temperature_input_refusals],
             evap_flux.species_kg_hr,
+            active_stage_numbers=tuple(stage.stage_number for stage in self.train.active_stages),
             margin_C=self.cold_spot_margin_C,
             upstream_hot_wall_min_C=self.upstream_hot_wall_min_C,
             temps=self.condensation_temperatures_C,
@@ -3024,7 +3123,7 @@ class CondensationModel:
             hkl_condensed_by_stage: Dict[int, float] = {}
             remaining_after_stage: Dict[int, float] = {}
             stage_alpha_records_by_stage: Dict[int, dict[str, Any]] = {}
-            for stage in self.train.stages:
+            for stage in self.train.active_stages:
                 if remaining_kg <= 1e-15:
                     break
                 if _cr_stage_isolation_blocks(stage, species):
@@ -3080,7 +3179,7 @@ class CondensationModel:
             capture_budget_kg = _pressure_isolated_capture_budget_kg(
                 species,
                 rate_kg_hr,
-                self.train.stages,
+                self.train.active_stages,
                 self.residence_time_s,
                 temps=self.condensation_temperatures_C,
                 vapor_pressure_data=self.vapor_pressure_data,
@@ -3322,7 +3421,7 @@ class CondensationModel:
                     wall_deposit_by_segment_species,
                     species,
                     wall_deposit_kg,
-                    self.pipe_segments,
+                    self.active_pipe_segments,
                 )
                 wall_deposit_fraction_by_species[species] = wall_fraction
                 wall_deposit_account_fractions_by_species[species] = dict(
@@ -3790,7 +3889,7 @@ class CondensationModel:
             overhead_pressure_mbar=requested_p_total_mbar,
             gas_temperature_C=gas_temperature_C,
             pipe_diameter_m=pipe_diameter_m,
-            pipe_segments=self.pipe_segments,
+            pipe_segments=self.active_pipe_segments,
             carrier_gas=carrier_gas,
         )
         if current.get('regime') != KnudsenRegime.FREE_MOLECULAR.value:
@@ -3811,7 +3910,7 @@ class CondensationModel:
         basis = minimum_pressure_mbar_for_knudsen(
             gas_temperature_C=gas_temperature_C,
             pipe_diameter_m=pipe_diameter_m,
-            pipe_segments=self.pipe_segments,
+            pipe_segments=self.active_pipe_segments,
             carrier_gas=carrier_gas,
         )
         pO2 = max(0.0, float(pO2_mbar))
@@ -3862,7 +3961,7 @@ class CondensationModel:
             overhead_pressure_mbar=self.overhead_pressure_mbar,
             gas_temperature_C=self.gas_temperature_C,
             pipe_diameter_m=self.pipe_diameter_m,
-            pipe_segments=self.pipe_segments,
+            pipe_segments=self.active_pipe_segments,
             regime_factor=self.regime_factor,
             carrier_gas=self.carrier_gas,
         )
@@ -3999,7 +4098,7 @@ class CondensationModel:
         antoine_extrapolation_warnings: list[str] | None = None,
     ) -> Dict[str, Dict[str, float]]:
         self.last_wall_capture_fixed_point_iterations = 0
-        if not self.pipe_segments or not stage_route_by_species:
+        if not self.active_pipe_segments or not stage_route_by_species:
             self.wall_species_partial_pressures_pa_by_segment = {}
             return {}
 
@@ -4007,7 +4106,7 @@ class CondensationModel:
             str(species): max(0.0, float(rate_kg_hr))
             for species, rate_kg_hr in evap_flux.species_kg_hr.items()
         }
-        segment_names = [segment.name for segment in self.pipe_segments]
+        segment_names = [segment.name for segment in self.active_pipe_segments]
         total_pressure_pa = self.overhead_pressure_mbar * 100.0
 
         def segment_rates_from_capture(
@@ -4016,7 +4115,7 @@ class CondensationModel:
         ) -> dict[str, dict[str, float]]:
             by_segment: dict[str, dict[str, float]] = {}
             prior_segments: list[str] = []
-            for segment in self.pipe_segments:
+            for segment in self.active_pipe_segments:
                 upstream_number = _segment_stage_number(segment.upstream_stage)
                 rates: dict[str, float] = {}
                 for species, inlet_rate in inlet_rates.items():
@@ -4280,12 +4379,13 @@ class CondensationModel:
         species: str,
     ) -> list[PipeSegment]:
         if self.lab_geometry is not None:
-            return list(self.pipe_segments)
-        target_stage_number = designated_stage_number(species)
+            return list(self.active_pipe_segments)
+        target_stage_number = active_collector_stage_number(
+            species, [stage.stage_number for stage in self.train.active_stages])
         if target_stage_number is None:
             return []
         segments: list[PipeSegment] = []
-        for segment in self.pipe_segments:
+        for segment in self.active_pipe_segments:
             downstream_number = _segment_stage_number(segment.downstream_stage)
             if downstream_number is None:
                 continue
@@ -4341,7 +4441,7 @@ class CondensationModel:
         remaining_after_stage: Mapping[int, float],
     ) -> Dict[str, float]:
         supply: Dict[str, float] = {}
-        for segment in self.pipe_segments:
+        for segment in self.active_pipe_segments:
             upstream_number = _segment_stage_number(segment.upstream_stage)
             if upstream_number is None:
                 supply[segment.name] = max(0.0, float(rate_kg_hr))
@@ -7743,6 +7843,7 @@ def cold_spot_diagnostic(
     pipe_segments: list[PipeSegment],
     vapor_species_kg_hr: Mapping[str, float],
     *,
+    active_stage_numbers: tuple[int, ...] | None = None,
     margin_C: float = COLD_SPOT_MARGIN_C,
     upstream_hot_wall_min_C: float | None = DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
     temps: Mapping[str, float] | None = None,
@@ -7772,7 +7873,9 @@ def cold_spot_diagnostic(
         )
         if kg_hr <= 1e-15:
             continue
-        target_stage_number = designated_stage_number(species)
+        target_stage_number = (designated_stage_number(species)
+                               if active_stage_numbers is None else
+                               active_collector_stage_number(species, active_stage_numbers))
         if target_stage_number is None:
             continue
         condensation_T_C = _species_condensation_temperature_C(
@@ -7977,3 +8080,16 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
             stage_report['activity'] = activity
         report[stage_key] = stage_report
     return report
+
+
+class Stage3SilicaExposureRefusal(DepositionInputRefusal):
+    """An open fused-silica cartridge has positive or unknown alkali supply."""
+
+    # Preserve already committed source vapor. The existing partial-commit
+    # stop prevents replay; a silica admission refusal must not rewind an
+    # unrelated evaporation/native-Fe transition made earlier in the hour.
+    terminal_refusal = False
+
+    def __init__(self, diagnostic: Mapping[str, Any]):
+        self.stage3_route_diagnostic = copy.deepcopy(dict(diagnostic))
+        super().__init__('stage3_route', diagnostic, 'silica_exposed_to_alkali')
