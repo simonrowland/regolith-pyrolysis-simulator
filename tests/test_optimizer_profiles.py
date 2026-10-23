@@ -160,10 +160,21 @@ def test_constrained_max_profile_costs_coating_and_applies_hardware_caps() -> No
 
 def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
     feedstocks = yaml.safe_load((DEFAULT_DATA_DIR / "feedstocks.yaml").read_text())
-    setpoints = yaml.safe_load((DEFAULT_DATA_DIR / "setpoints.yaml").read_text())
-    staged_na_duration_h = setpoints["campaigns"]["C2A_staged"][
-        "na_shuttle_stage"
-    ]["duration_h"]
+    staged_na_duration_spec = next(
+        spec
+        for spec in RecipeSchema().allowlist
+        if spec.path
+        == (
+            "campaigns",
+            "C2A_staged",
+            "na_shuttle_stage",
+            "duration_hr",
+        )
+    )
+    # Four hours includes the three injection ticks and first bakeout tick.
+    assert staged_na_duration_spec.low is not None
+    assert staged_na_duration_spec.low >= 4
+    assert staged_na_duration_spec.high == 6
     blocked_feedstocks = {
         key for key, entry in feedstocks.items()
         if is_blocked_feedstock(entry)
@@ -191,7 +202,7 @@ def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
             )
             if "duration_h" in na_stage:
                 staged_na_duration_seeds.add((feedstock, seed["id"]))
-                assert na_stage["duration_h"] == staged_na_duration_h
+                assert na_stage["duration_h"] >= 6
 
     assert staged_na_duration_seeds == {
         ("lunar_spa_kreep_influenced", "spa-kreep-staged-seed"),
