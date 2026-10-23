@@ -112,6 +112,7 @@ OBSERVATION_TYPES = frozenset(
         "sulfur_solubility_and_sulfate_capacity_series",
         "composition_series",
         "equilibrium_phase_composition",
+        "distribution_ratio",
     }
 )
 
