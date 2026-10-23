@@ -2489,6 +2489,221 @@ def test_species_formula_unparsed_never_string_matched() -> None:
     assert parse_species_formula("O2") == (("O", 2.0),)
 
 
+def test_species_formula_parser_preserves_200_existing_parses() -> None:
+    """Pin established formula results before extending the parser grammar."""
+
+    fixture = (
+        Path(__file__).resolve().parents[1]
+        / "fixtures"
+        / "species_formula_parse_golden_200.json"
+    )
+    rows = json.loads(fixture.read_text(encoding="utf-8"))
+    assert len(rows) == 200
+    for row in rows:
+        expected = tuple(
+            (str(symbol), float(count)) for symbol, count in row["elements"]
+        )
+        assert parse_species_formula(row["formula"]) == expected
+
+
+def test_species_formula_parser_accepts_published_typography() -> None:
+    assert parse_species_formula("$Ta_{2}C$") == (("C", 1.0), ("Ta", 2.0))
+    assert parse_species_formula("V₂S₃") == (("S", 3.0), ("V", 2.0))
+    assert parse_species_formula(
+        r"$\text{HCl}(g)$", species=Species("HCl", Phase.G)
+    ) == (("Cl", 1.0), ("H", 1.0))
+
+
+def test_species_formula_parser_refuses_normalized_ascii_dot_adducts() -> None:
+    for formula in ("Al₂O₃.3H₂O", "$Al_2O_3.3H_2O$", "CoSO₄.7H₂O"):
+        assert parse_species_formula(formula) is None
+
+    for formula in ("Fe0.947O", "Al2O3.3H2O"):
+        assert parse_species_formula(formula) == score_mod.formula_composition(formula)
+    assert parse_species_formula(
+        "Fe0.947O(c)", species=Species("Fe0.947O", Phase.CR)
+    ) == score_mod.formula_composition("Fe0.947O")
+
+
+def test_species_formula_parser_accepts_nested_groups() -> None:
+    assert parse_species_formula("[Al(OH)4]") == (
+        ("Al", 1.0),
+        ("H", 4.0),
+        ("O", 4.0),
+    )
+    assert parse_species_formula("(NH4)2SO4") == (
+        ("H", 8.0),
+        ("N", 2.0),
+        ("O", 4.0),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("Fe(OH)") == (
+        ("Fe", 1.0),
+        ("H", 1.0),
+        ("O", 1.0),
+    )
+
+
+def test_species_formula_parser_accepts_hydrate_segments() -> None:
+    assert parse_species_formula("CoSO4·6H2O") == (
+        ("Co", 1.0),
+        ("H", 12.0),
+        ("O", 10.0),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("CaSO4·1/2H2O") == (
+        ("Ca", 1.0),
+        ("H", 1.0),
+        ("O", 4.5),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("H2SO4·6.5H2O") == (
+        ("H", 15.0),
+        ("O", 10.5),
+        ("S", 1.0),
+    )
+
+
+def test_species_formula_parser_requires_phase_axis_for_suffix() -> None:
+    assert parse_species_formula("$As(g)$") is None
+    assert parse_species_formula("$As(g)$", species=Species("As", Phase.G)) == (
+        ("As", 1.0),
+    )
+    assert parse_species_formula("$As(g)$", species=Species("As", Phase.CR)) is None
+
+
+@pytest.mark.parametrize(
+    ("label", "phase"),
+    [
+        ("s", Phase.CR),
+        ("solid", Phase.CR),
+        ("gas", Phase.G),
+        ("liq", Phase.L),
+        ("liquid", Phase.L),
+        ("vapor", Phase.G),
+    ],
+)
+def test_species_formula_parser_gates_common_phase_suffixes(
+    label: str, phase: Phase
+) -> None:
+    formula = f"Fe2O3({label})"
+    wrong_phase = Phase.L if phase is not Phase.L else Phase.G
+
+    assert parse_species_formula(formula) is None
+    assert parse_species_formula(
+        formula, species=Species("Fe2O3", wrong_phase)
+    ) is None
+    assert parse_species_formula(formula, species=Species("Fe2O3", phase)) == (
+        score_mod.formula_composition("Fe2O3")
+    )
+
+
+def test_match_reported_species_does_not_bind_solid_to_liquid_identity() -> None:
+    assert score_mod.match_reported_species(
+        "FeO",
+        {"FeO(s)": 0.15, "FeO(l)": 0.85},
+        species=Species("FeO", Phase.L),
+    ) == ("FeO(l)", 0.85)
+
+
+@pytest.mark.parametrize(
+    ("label", "phase"),
+    [
+        ("s", Phase.CR),
+        ("S", Phase.CR),
+        ("solid", Phase.CR),
+        ("cr", Phase.CR),
+        ("l", Phase.L),
+        ("liq", Phase.L),
+        ("liquid", Phase.L),
+        ("g", Phase.G),
+        ("gas", Phase.G),
+        ("vapor", Phase.G),
+        ("aq", Phase.AQ),
+    ],
+)
+def test_species_formula_parser_gates_terminal_bracket_phase_labels(
+    label: str, phase: Phase
+) -> None:
+    formula = f"Fe2O3[{label}]"
+    wrong_phase = Phase.CR if phase is not Phase.CR else Phase.L
+
+    assert parse_species_formula(formula) is None
+    assert parse_species_formula(
+        formula, species=Species("Fe2O3", wrong_phase)
+    ) is None
+    assert parse_species_formula(formula, species=Species("Fe2O3", phase)) == (
+        score_mod.formula_composition("Fe2O3")
+    )
+
+
+def test_match_reported_species_does_not_bind_bracket_solid_to_liquid_identity() -> None:
+    liquid = Species("FeO", Phase.L)
+    assert score_mod.match_reported_species(
+        "FeO",
+        {"FeO[s]": 0.15, "FeO(l)": 0.85},
+        species=liquid,
+    ) == ("FeO(l)", 0.85)
+    assert score_mod.match_reported_species(
+        "FeO",
+        {"FeO[s]": 0.15},
+        species=liquid,
+    ) is None
+
+
+def test_species_formula_parser_keeps_non_phase_brackets() -> None:
+    assert parse_species_formula("[Al(OH)4]") == (
+        ("Al", 1.0),
+        ("H", 4.0),
+        ("O", 4.0),
+    )
+    assert parse_species_formula("Fe2O3[c]") is None
+    assert parse_species_formula(
+        "Fe2O3[c]", species=Species("Fe2O3", Phase.CR)
+    ) is None
+
+
+def test_species_formula_parser_requires_polymorph_axis_for_suffix() -> None:
+    assert parse_species_formula("Fe(α)") is None
+    assert parse_species_formula(
+        "Fe(α)", species=Species("Fe", Phase.CR, State.of(Polymorph.ALPHA))
+    ) == (("Fe", 1.0),)
+    assert parse_species_formula(
+        "Fe(alpha)", species=Species("Fe", Phase.CR, State.of(Polymorph.ALPHA))
+    ) == (("Fe", 1.0),)
+    assert parse_species_formula(
+        "Fe(α)", species=Species("Fe", Phase.CR, State.of(Polymorph.BETA))
+    ) is None
+    assert parse_species_formula(
+        "SiO2(quartz)",
+        species=Species("SiO2", Phase.CR, State.of(Polymorph.QUARTZ)),
+    ) == (("O", 2.0), ("Si", 1.0))
+
+
+def test_species_formula_parser_requires_charge_axis_for_charge_notation() -> None:
+    assert parse_species_formula("$Ba^{++}(aq)$") is None
+    assert parse_species_formula(
+        "$Ba^{++}(aq)$", species=Species("Ba", Phase.AQ, charge=2)
+    ) == (("Ba", 1.0),)
+    assert parse_species_formula(
+        "$Ba^{++}(aq)$", species=Species("Ba", Phase.AQ, charge=0)
+    ) is None
+
+
+def test_species_formula_parser_keeps_deuterium_distinct() -> None:
+    assert parse_species_formula("AsD_3") == (("As", 1.0), ("D", 3.0))
+    assert parse_species_formula(
+        "$AsD_3(g)$", species=Species("AsD3", Phase.G)
+    ) == (("As", 1.0), ("D", 3.0))
+
+
+def test_species_formula_parser_refuses_names_and_variable_compositions() -> None:
+    assert parse_species_formula("quartz") is None
+    assert parse_species_formula("gibbsite") is None
+    assert parse_species_formula("Fe1-xO") is None
+    assert parse_species_formula("NH.C1") is None
+
+
 def test_compile_mutates_each_conjunct_off() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
@@ -13691,9 +13906,9 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
     parsed_formulas: list[str] = []
     parse_formula = score_module.parse_species_formula
 
-    def track_formula_parse(formula: str):
+    def track_formula_parse(formula: str, *, species: Species | None = None):
         parsed_formulas.append(formula)
-        return parse_formula(formula)
+        return parse_formula(formula, species=species)
 
     monkeypatch.setattr(score_module, "parse_species_formula", track_formula_parse)
 

@@ -505,7 +505,7 @@ def _ellingham_attempt(
         )
     formula = identity.species.formula
     _is_comp, _is_internal, _is_sf04, parse_species_formula = _score_predicates()
-    target = parse_species_formula(formula)
+    target = parse_species_formula(formula, species=identity.species)
     if target is None:
         return _refuse(
             RefusalReason.IDENTITY_UNKNOWN,
@@ -780,7 +780,9 @@ def _resolve_symbol(engine: Engine, identity: Identity) -> tuple[str | None, str
         detail = getattr(_pure_phase_rows, "failure", "unread")
         return None, f"pure-phase-map-unavailable:{detail}"
     _is_comp, _is_internal, _is_sf04, parse_species_formula = _score_predicates()
-    target = parse_species_formula(identity.species.formula)
+    target = parse_species_formula(
+        identity.species.formula, species=identity.species
+    )
     if target is None:
         return None, "species-formula-unparsed"
     identity_poly = _poly_name(identity)
@@ -987,7 +989,9 @@ def _pure_phase_attempt(
         )
     returned = getattr(props, "formula", None)
     _is_comp, _is_internal, _is_sf04, parse_species_formula = _score_predicates()
-    if returned and parse_species_formula(str(returned)) != parse_species_formula(identity.species.formula):
+    if returned and parse_species_formula(
+        str(returned), species=identity.species
+    ) != parse_species_formula(identity.species.formula, species=identity.species):
         return _refuse(
             RefusalReason.IDENTITY_MISMATCH,
             "pure-phase-formula-disagrees",

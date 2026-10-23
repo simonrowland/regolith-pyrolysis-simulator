@@ -138,6 +138,7 @@ from simulator.battery.records import (
     Work,
     _is_source_internally_inconsistent,
     as_decimal,
+    charge_value,
     phase_token,
     polymorph_token,
     Species,
@@ -157,7 +158,7 @@ from simulator.battery.oxygen_balance import (
     _cell_oxygen_class,
     has_own_engine_solved_oxygen_balance,
 )
-from simulator.battery.composition import composition_wt_pct, parse_species_formula
+from simulator.battery.composition import composition_wt_pct
 from simulator.battery.source_lineage import (
     coefficient_lineage_sources,
     openimcc_engine_identity_sources,
@@ -618,10 +619,161 @@ def engines_from_names(names: Sequence[str] | None) -> tuple[Engine, ...]:
     return tuple(out)
 
 
-def _is_raw_element_label(formula: str) -> bool:
+def _species_axis_matches_phase(species: Species | None, phase: Phase) -> bool:
+    return species is not None and phase_token(species) is phase
+
+
+def parse_species_formula(
+    formula: str, *, species: Species | None = None
+) -> tuple[tuple[str, float], ...] | None:
+    """Parse explicit stoichiometry; None → unmatched, never string equality.
+
+    The baseline ``formula_composition`` result is returned unchanged. Its
+    source-derived extension accepts element symbols with numeric counts,
+    nested ``()[]{}`` groups, hydrate segments (including fractional or
+    decimal water multipliers) separated by a middle dot, TeX math wrappers /
+    ``\\text{}``, and TeX or Unicode subscripts. Newly normalized terminal
+    phase or polymorph labels require a matching existing species axis, as in
+    ``$AsCl_3(g)$`` and ``$Fe(α)$``. A terminal bracket phase label that the
+    accounting parser would strip, as in ``Fe2O3[s]``, uses that same axis
+    before the fallback. Mineral names, variable compositions, and unverified
+    charge or phase labels remain unmatched.
+    """
+
+    if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
+        return None
+    established = formula_composition(formula)
+    if established is not None:
+        return established
+
+    text = formula.strip()
+    if text.startswith("$") and text.endswith("$"):
+        text = text[1:-1].strip()
+    if "$" in text:
+        return None
+    text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
+    text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
+    text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
+    text = text.translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
+    # formula_composition reads the ASCII-dot water-adduct separator as a
+    # decimal count. Refuse that normalized form first; raw fast-path results
+    # and explicit middle-dot hydrates stay unchanged.
+    if "·" not in text and re.search(r"\.\d+H2O", text):
+        return None
+    phase_labels = {
+        "c": Phase.CR,
+        "cr": Phase.CR,
+        "s": Phase.CR,
+        "solid": Phase.CR,
+        "l": Phase.L,
+        "liq": Phase.L,
+        "liquid": Phase.L,
+        "g": Phase.G,
+        "gas": Phase.G,
+        "vapor": Phase.G,
+        "aq": Phase.AQ,
+    }
+    annotation = re.search(r"\(([^()]*)\)$", text)
+    if annotation is not None:
+        label = annotation.group(1).strip().lower()
+        annotated_phase = phase_labels.get(label)
+        if annotated_phase is not None:
+            if not _species_axis_matches_phase(species, annotated_phase):
+                return None
+        else:
+            from simulator.battery.polymorph_dictionary import coerce_polymorph_token
+
+            try:
+                annotated_polymorph = coerce_polymorph_token(label)
+            except ValueError:
+                annotated_polymorph = None
+            if annotated_polymorph is not None:
+                if species is None or polymorph_token(species) is not annotated_polymorph:
+                    return None
+                text = text[: annotation.start()]
+        if annotated_phase is not None:
+            text = text[: annotation.start()]
+
+    # Accounting strips these terminal brackets with no species axis. Bare
+    # [c] is not in that suffix list and stays unmatched.
+    bracket = re.search(r"\[([^\[\]]*)\]$", text)
+    if bracket is not None:
+        label = bracket.group(1).strip().lower()
+        if label != "c":
+            annotated_phase = phase_labels.get(label)
+            if annotated_phase is not None:
+                if not _species_axis_matches_phase(species, annotated_phase):
+                    return None
+                text = text[: bracket.start()]
+
+    charge_annotation = re.search(r"\^\{([+-]+)\}$|\^([+-]+)$|([+-]+)$", text)
+    if charge_annotation is not None:
+        signs = next(group for group in charge_annotation.groups() if group is not None)
+        annotated_charge = len(signs) * (1 if signs[0] == "+" else -1)
+        if any(sign != signs[0] for sign in signs):
+            return None
+        if species is None or charge_value(species) != annotated_charge:
+            return None
+        text = text[: charge_annotation.start()]
+
+    if "·" in text:
+        hydrated: defaultdict[str, float] = defaultdict(float)
+        try:
+            from simulator.accounting.formulas import parse_formula
+
+            # Parse each middle-dot segment separately so hydrate multipliers
+            # such as 1/2 and 6.5 do not collide with period splitting.
+            for segment in text.split("·"):
+                multiplier_match = re.match(
+                    r"^(\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", segment
+                )
+                multiplier = 1.0
+                body = segment
+                if multiplier_match is not None:
+                    number = multiplier_match.group(1)
+                    if "/" in number:
+                        numerator, denominator = number.split("/", 1)
+                        if int(denominator) == 0:
+                            return None
+                        multiplier = int(numerator) / int(denominator)
+                    else:
+                        multiplier = float(number)
+                    body = segment[multiplier_match.end() :]
+                if not body:
+                    return None
+                composition = formula_composition(body)
+                if composition is None:
+                    parsed_body = parse_formula(body, species=body).elements
+                    composition = tuple(
+                        sorted(
+                            (str(symbol), float(count))
+                            for symbol, count in parsed_body.items()
+                        )
+                    )
+                for symbol, count in composition:
+                    hydrated[symbol] += multiplier * count
+        except ValueError:
+            return None
+        return tuple(sorted(hydrated.items()))
+
+    parsed = formula_composition(text)
+    if parsed is not None:
+        return parsed
+    if "." in text:
+        return None
+    try:
+        from simulator.accounting.formulas import parse_formula
+
+        elements = parse_formula(text, species=text).elements
+    except ValueError:
+        return None
+    return tuple(sorted((str(symbol), float(count)) for symbol, count in elements.items()))
+
+
+def _is_raw_element_label(formula: str, *, species: Species | None = None) -> bool:
     """Na, K, Fe. Not an oxide, and not a label the formula parser rejects."""
 
-    parsed = parse_species_formula(formula)
+    parsed = parse_species_formula(formula, species=species)
     if parsed is None or len(parsed) != 1:
         return False
     element, count = parsed[0]
@@ -633,6 +785,7 @@ def match_reported_species(
     reported: Mapping[str, float],
     *,
     oxide_activity: bool = False,
+    species: Species | None = None,
 ) -> tuple[str, float] | None:
     """Closed-formula match. Oxide activity never accepts a raw element label.
 
@@ -641,15 +794,15 @@ def match_reported_species(
     ``Na`` when this flag is false.
     """
 
-    target = parse_species_formula(formula)
+    target = parse_species_formula(formula, species=species)
     if target is None:
         return None
-    if oxide_activity and _is_raw_element_label(formula):
+    if oxide_activity and _is_raw_element_label(formula, species=species):
         return None
     for name, value in reported.items():
-        if oxide_activity and _is_raw_element_label(str(name)):
+        if oxide_activity and _is_raw_element_label(str(name), species=species):
             continue
-        parsed = parse_species_formula(str(name))
+        parsed = parse_species_formula(str(name), species=species)
         if parsed == target:
             return str(name), float(value)
     if not oxide_activity:
@@ -657,7 +810,7 @@ def match_reported_species(
     from engines.alphamelts.domain import canonical_oxide_activity_map
 
     for name, value in canonical_oxide_activity_map(reported).items():
-        parsed = parse_species_formula(name)
+        parsed = parse_species_formula(name, species=species)
         if parsed == target:
             return str(name), float(value)
     return None
@@ -4816,7 +4969,7 @@ def stated_pure_substance_reservoir(identity: Identity) -> tuple[str, str] | Non
     token = phase_token(src)
     if token not in CONDENSED_PHASES:
         return None
-    if parse_species_formula(src.formula) is None:
+    if parse_species_formula(src.formula, species=src) is None:
         return None
     if quantity_token(identity) is Quantity.P_SAT and src.formula != identity.species.formula:
         return None
@@ -7563,7 +7716,7 @@ def predict_with_engine(
     formula = identity.species.formula
     if (
         quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
-        and parse_species_formula(formula) is None
+        and parse_species_formula(formula, species=identity.species) is None
     ):
         return EnginePrediction(
             engine=engine,
@@ -8878,6 +9031,7 @@ def predict_with_engine(
             compared,
             reported,
             oxide_activity=quantity in MELT_ACTIVITY_QUANTITIES,
+            species=identity.species,
         )
         if matched is not None:
             _name, magnitude = matched
@@ -9935,7 +10089,7 @@ def compile_residual(
         )
     if (
         quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
-        and parse_species_formula(formula) is None
+        and parse_species_formula(formula, species=identity.species) is None
     ):
         return _refused(
             RefusalReason.IDENTITY_UNKNOWN,
