@@ -36,8 +36,14 @@ from simulator.battery.generators.janaf import (
     load_table_document,
 )
 from simulator.battery.identity import quantity_token
-from simulator.battery.migrate import REPO_ROOT, Migrator, load_yaml
+from simulator.battery.migrate import (
+    REPO_ROOT,
+    Migrator,
+    _BARE_LOG_BAR_NOTICE,
+    load_yaml,
+)
 from simulator.battery.records import (
+    Located,
     Notice,
     StandardState,
     State,
@@ -428,6 +434,8 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
     refusal_fields: dict[tuple[str, ...], int] = {}
     scored = 0
     extrapolated = 0
+    ad10 = 0
+    ad10_scored = 0
     for observation in rows:
         residual, candidate = compile_residual(
             observation,
@@ -461,6 +469,23 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
         assert "reference_state_mismatch" not in json.dumps(
             residual.refusal.detail, default=str
         )
+        located_log = (observation.point_conditions or {}).get("fO2_log")
+        printed_log = (
+            located_log.state.value
+            if isinstance(located_log, Located)
+            and located_log.state.is_value
+            and isinstance(located_log.state.value, Decimal)
+            else None
+        )
+        # Table 2 AD 10 scores. Table 3(b) AD 10 prints the same log and T
+        # and stays identity-unknown on composition. Both took the 1 bar notice.
+        if temperature == Decimal("1677") and printed_log == Decimal("-10.31"):
+            ad10 += 1
+            assert any(
+                item.reason == _BARE_LOG_BAR_NOTICE for item in residual.notices
+            )
+            if residual.numeric is not None:
+                ad10_scored += 1
         if residual.numeric is not None:
             assert residual.numeric.operation is MetricOperation.DEX
             assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
@@ -480,6 +505,8 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
         assert phase_token(state.endmember) is Phase.L
         assert state.reference_pressure_bar == Decimal("1.01325")
     assert scored == 57
+    assert ad10 == 2
+    assert ad10_scored == 1
     assert refusal_fields == {
         ("composition",): 15,
         ("species.phase",): 24,

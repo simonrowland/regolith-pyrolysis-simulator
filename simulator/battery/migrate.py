@@ -911,6 +911,43 @@ def _temperature_number(value: object) -> Decimal | None:
     return _as_dec_or_none(value)
 
 
+def _run_temperature_K(state: object) -> Decimal | None:
+    """Kelvin point already resolved onto an identity axis. None if unknown."""
+
+    if not isinstance(state, State) or not state.is_value:
+        return None
+    return _temperature_number(state.value)
+
+
+def _bare_log_notice(
+    decision: PrintedOxygenDecision | None,
+    landed: object,
+    quantity: object,
+    origin: str,
+    existing: Sequence[Notice],
+) -> Notice | None:
+    """Notice when the unitless 1 bar convention was the value that landed."""
+
+    if (
+        decision is None
+        or not decision.notice_reason
+        or not decision.state.is_value
+        or not isinstance(quantity, Quantity)
+        or not isinstance(landed, State)
+        or not landed.is_value
+        or landed.value != decision.state.value
+    ):
+        return None
+    if any(notice.reason == decision.notice_reason for notice in existing):
+        return None
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason=decision.notice_reason,
+        origin=origin,
+    )
+
+
 # ---------------------------------------------------------------------------
 # YAML plain codec (deterministic; no timestamps)
 # ---------------------------------------------------------------------------
@@ -11974,7 +12011,8 @@ _CONGRUENT_VAPORIZATION_M_O2_G_MOL = Decimal("32.00")
 _CONGRUENT_VAPORIZATION_M_K_G_MOL = Decimal("39.10")
 _OXYGEN_TABLE_KEYS = frozenset({"series", "rows", "points"})
 _BAR_PA = Decimal("100000")
-# Bare and generic log labels retain their existing bar reference.
+# Explicit frames keep their reference. An empty unit is not a printed
+# standard state: `_bare_log_convention` accepts 1 bar only inside the IW band.
 _OXYGEN_LOG_REFERENCE_PA = {
     "": _BAR_PA,
     "log10": _BAR_PA,
@@ -12001,6 +12039,9 @@ class PrintedOxygenFacts:
     oxygen_partial_pressure_Pa: Located[Value] | None = None
     rejected_log_fO2: bool = False
     log_fO2_reference_Pa: Decimal = _BAR_PA
+    # True only for a printed log whose unit string was empty. An explicit
+    # ``log10(bar)`` or ``log10(atm)`` is not this case.
+    bare_log: bool = False
 
 
 # A named buffer (IW, FMQ, QFM, NNO), with or without an offset, is not an
@@ -12029,6 +12070,56 @@ def _log_fO2_to_pa(
     return log10_fo2_to_pa(log10_fO2, reference_pressure_pa)
 
 
+# d-262. A unitless printed log does not name its standard state.
+_BARE_LOG_BAR_NOTICE = (
+    "fO2 reference state not printed; 1 bar convention assumed "
+    "(1 atm alternative: +0.0057 dex)"
+)
+_BARE_LOG_SCALE_UNKNOWN = (
+    "fO2 reference scale not printed (absolute vs buffer-relative)"
+)
+
+
+def _bare_log_convention(
+    log10_fO2: Decimal, temperature_K: Decimal | None
+) -> tuple[State, str | None]:
+    """Unitless printed log fO2, accepted only as a plausible absolute.
+
+    Premise: fugacity carries a standard state. 1 atm versus 1 bar is
+    log10(1.01325) = 0.0057 dex, so a unitless number is not yet a pressure.
+    The 1 bar convention is applied only when the value is plausible as an
+    absolute log fO2 at the row's run temperature: inside [IW-6, IW+6].
+    The centre is ``feo_iw_log10_fO2_bar``, the production FeO-IW buffer.
+    This function adds no buffer coefficients. Unknown temperature, or a
+    value outside that band, stays identity-unknown. The returned sentence
+    is the notice when the convention is applied, and None when it is not.
+    """
+
+    if (
+        temperature_K is None
+        or not temperature_K.is_finite()
+        or temperature_K <= 0
+    ):
+        return State.unknown(_BARE_LOG_SCALE_UNKNOWN), None
+    from simulator.fe_redox import Kress91InvalidControls, feo_iw_log10_fO2_bar
+
+    try:
+        centre = feo_iw_log10_fO2_bar(float(temperature_K), a_feo=1.0)
+        iw = Decimal(str(centre))
+    except (Kress91InvalidControls, OverflowError, ValueError):
+        return State.unknown(_BARE_LOG_SCALE_UNKNOWN), None
+    if not iw.is_finite():
+        return State.unknown(_BARE_LOG_SCALE_UNKNOWN), None
+    # Closed plausibility window around the buffer owner. Not a buffer fit.
+    half_width = Decimal(6)
+    if log10_fO2 < iw - half_width or log10_fO2 > iw + half_width:
+        return State.unknown(_BARE_LOG_SCALE_UNKNOWN), None
+    return (
+        State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)),
+        _BARE_LOG_BAR_NOTICE,
+    )
+
+
 @dataclass(frozen=True)
 class PrintedOxygenDecision:
     """Identity outcome for one printed oxygen fact.
@@ -12036,10 +12127,12 @@ class PrintedOxygenDecision:
     ``log`` and ``pressure`` carry the converted pascal state. ``refusal``
     is unknown, with the buffer or bounded reason. Whether that state
     overwrites an inherited value is decided by ``_printed_oxygen_state_for``.
+    ``notice_reason`` is set only when the unitless 1 bar convention was applied.
     """
 
     kind: str
     state: State
+    notice_reason: str | None = None
 
 
 def _oxygen_pressure_point(located: object) -> Decimal | None:
@@ -12120,6 +12213,7 @@ def printed_oxygen_decision(
     raw_item: object,
     point_conditions: Mapping[str, Any] | None,
     scope: str,
+    run_temperature_K: Decimal | None = None,
 ) -> PrintedOxygenDecision | None:
     """Turn one oxygen scope into one identity state, for every quantity.
 
@@ -12185,6 +12279,13 @@ def printed_oxygen_decision(
             reason = _BOUNDED_FO2_REASON
         return PrintedOxygenDecision("refusal", State.unknown(reason))
     if has_log:
+        if facts.bare_log:
+            state, notice = _bare_log_convention(log_point, run_temperature_K)
+            return PrintedOxygenDecision(
+                "refusal" if state.is_unknown else "log",
+                state,
+                notice_reason=notice,
+            )
         return PrintedOxygenDecision(
             "log",
             State.of(_log_fO2_to_pa(log_point, log_reference_pa)),
@@ -12246,6 +12347,7 @@ def _scoped_oxygen_decision(
     from_fallback: bool,
     raw_item: object,
     row_point_conditions: Mapping[str, Any] | None,
+    run_temperature_K: Decimal | None = None,
 ) -> tuple[PrintedOxygenDecision | None, bool]:
     """Row oxygen first. Inherited facts fill only when the row has none."""
 
@@ -12254,6 +12356,7 @@ def _scoped_oxygen_decision(
         raw_item=raw_item,
         point_conditions=row_point_conditions,
         scope="row",
+        run_temperature_K=run_temperature_K,
     )
     if row_decision is not None or not from_fallback:
         return row_decision, False
@@ -12263,6 +12366,7 @@ def _scoped_oxygen_decision(
             raw_item=None,
             point_conditions=None,
             scope="inherited",
+            run_temperature_K=run_temperature_K,
         ),
         True,
     )
@@ -12358,6 +12462,7 @@ def _printed_oxygen_state_for(
         and decision.state.is_unknown
         and current.reason != decision.state.reason
         and decision.state.reason != _BOUNDED_FO2_REASON
+        and decision.state.reason != _BARE_LOG_SCALE_UNKNOWN
         and not (decision.state.reason or "").startswith("buffer-relative fO2 (")
     ):
         return None
@@ -12528,7 +12633,7 @@ def _frames_agree(log_value: Decimal, pressure_pa: Decimal) -> bool:
 def _walk_printed_oxygen(
     obj: object,
     fallback: Locator | None,
-    logs: list[tuple[Decimal, Located[Decimal], Decimal]],
+    logs: list[tuple[Decimal, Located[Decimal], Decimal, bool]],
     pressures: list[tuple[Decimal, Located[Value], str]],
     rejected_logs: list[bool],
     *,
@@ -12593,6 +12698,7 @@ def _walk_printed_oxygen(
                             inference=located_condition.inference,
                         ),
                         _BAR_PA,
+                        False,
                     ))
         if name in _PRINTED_LOG_FO2_KEYS or name in _PRINTED_PO2_KEYS:
             if name in _PRINTED_LOG_FO2_KEYS and buffer_relative:
@@ -12640,6 +12746,7 @@ def _walk_printed_oxygen(
                         inference=None,
                     ),
                     reference_pressure_pa,
+                    units == "",
                 ))
             else:
                 units = str(node.get("units") or node.get("unit") or "").strip()
@@ -12802,7 +12909,7 @@ def collect_printed_oxygen(
     is landed. Bounds, ranges, and ``inferred: true`` stay refusals.
     """
 
-    logs: list[tuple[Decimal, Located[Decimal], Decimal]] = []
+    logs: list[tuple[Decimal, Located[Decimal], Decimal, bool]] = []
     pressures: list[tuple[Decimal, Located[Value], str]] = []
     rejected_logs: list[bool] = []
     if fallback_locator is None:
@@ -12812,11 +12919,12 @@ def collect_printed_oxygen(
             payload, fallback_locator, logs, pressures, rejected_logs,
             skip_tables=skip_tables
         )
-    log_frames = {(value, reference_pa) for value, _, reference_pa in logs}
+    log_frames = {(value, reference_pa) for value, _, reference_pa, _bare in logs}
     if len(log_frames) == 1:
         log_located, log_reference_pa = logs[0][1], logs[0][2]
+        bare_log = all(item[3] for item in logs)
     else:
-        log_located, log_reference_pa = None, _BAR_PA
+        log_located, log_reference_pa, bare_log = None, _BAR_PA, False
     if logs and log_located is None:
         rejected_logs.append(True)
     pressure_located = _unique_oxygen(
@@ -12842,6 +12950,7 @@ def collect_printed_oxygen(
             pressure_located[0] if isinstance(pressure_located, tuple) else None
         ),
         rejected_log_fO2=bool(rejected_logs),
+        bare_log=bare_log and isinstance(log_located, Located),
     )
 
 
@@ -13726,6 +13835,7 @@ class Migrator:
             facts = PrintedOxygenFacts(
                 log_fO2=facts.log_fO2,
                 log_fO2_reference_Pa=facts.log_fO2_reference_Pa,
+                bare_log=facts.bare_log,
             )
         elif facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None:
             refusal = _rejected_log_fO2_reason(facts)
@@ -16490,6 +16600,7 @@ class Migrator:
             from_fallback=oxygen_from_fallback,
             raw_item=values if isinstance(values, Mapping) else None,
             row_point_conditions=row_point_conditions,
+            run_temperature_K=_run_temperature_K(ident_kwargs.get("temperature_K")),
         )
         oxygen_state = _printed_oxygen_state_for(
             fill_identity(quantity, species, **ident_kwargs),
@@ -17122,6 +17233,15 @@ class Migrator:
                     origin=obs_id,
                 )
             )
+        bare_log_notice = _bare_log_notice(
+            oxygen_decision,
+            ident_kwargs.get("fO2_Pa"),
+            q_token,
+            obs_id,
+            observation_notices,
+        )
+        if bare_log_notice is not None:
+            observation_notices.append(bare_log_notice)
         derivation_identity_provenance = _identity_provenance_for_value_derivation(
             identity_provenance, value_derivation
         )
@@ -18473,6 +18593,9 @@ class Migrator:
             from_fallback=oxygen_from_fallback,
             raw_item=raw_item if isinstance(raw_item, Mapping) else None,
             row_point_conditions=row_point_conditions,
+            run_temperature_K=_run_temperature_K(
+                getattr(identity, "temperature_K", None)
+            ),
         )
         oxygen_state = _printed_oxygen_state_for(
             identity,
@@ -18693,6 +18816,15 @@ class Migrator:
                     origin=point_id,
                 )
             )
+        bare_log_notice = _bare_log_notice(
+            oxygen_decision,
+            identity.fO2_Pa,
+            q_token_point,
+            point_id,
+            child_notices,
+        )
+        if bare_log_notice is not None:
+            child_notices.append(bare_log_notice)
         observation = Observation(
             observation_id=point_id,
             experiment_id=experiment_id,

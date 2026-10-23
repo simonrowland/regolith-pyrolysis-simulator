@@ -15,7 +15,14 @@ from decimal import Decimal
 from pathlib import Path
 
 from simulator.battery.enums import Quantity, ValueKind
-from simulator.battery.migrate import Migrator, _BOUNDED_FO2_REASON, _log_fO2_to_pa
+from simulator.battery.identity import IdentityEqualKind, identity_equal
+from simulator.battery.migrate import (
+    Migrator,
+    _BARE_LOG_BAR_NOTICE,
+    _BARE_LOG_SCALE_UNKNOWN,
+    _BOUNDED_FO2_REASON,
+    _log_fO2_to_pa,
+)
 from simulator.battery.records import Located, Value
 from tests.battery.test_migrate import _scalar_extract, _write_min_tree
 
@@ -175,6 +182,9 @@ def test_activity_row_fO2_log_reaches_identity(tmp_path: Path) -> None:
     assert observation.identity.fO2_Pa.is_value
     assert observation.identity.fO2_Pa.value == _log_fO2_to_pa(Decimal("-9.56"))
     assert observation.identity.fO2_Pa.value == _LOG_MINUS_9_56_PA
+    assert all(
+        notice.reason != _BARE_LOG_BAR_NOTICE for notice in observation.notices
+    )
 
 
 def test_gamma_row_fO2_log_reaches_identity(tmp_path: Path) -> None:
@@ -193,6 +203,99 @@ def test_gamma_row_fO2_log_reaches_identity(tmp_path: Path) -> None:
     assert observation.identity.fO2_Pa is not None
     assert observation.identity.fO2_Pa.is_value
     assert observation.identity.fO2_Pa.value == _log_fO2_to_pa(Decimal("-9.56"))
+    assert all(
+        notice.reason != _BARE_LOG_BAR_NOTICE for notice in observation.notices
+    )
+
+
+def _series_logged(result, quantity: Quantity, log: str):
+    expected = Decimal(log)
+    matches = []
+    for observation in result.observations.values():
+        if (
+            "::T=" not in observation.observation_id
+            and "::point:" not in observation.observation_id
+        ):
+            continue
+        identity_quantity = observation.identity.quantity
+        if not identity_quantity.is_value or identity_quantity.value is not quantity:
+            continue
+        located = (observation.point_conditions or {}).get("fO2_log")
+        if not isinstance(located, Located):
+            continue
+        if _decimal_point(located.state) == expected:
+            matches.append(observation)
+    assert len(matches) == 1, [item.observation_id for item in matches]
+    return matches[0]
+
+
+def _same_row_identity(observation):
+    return identity_equal(observation.identity, observation.identity)
+
+
+def test_unitless_holzheid_ad10_log_is_one_bar_with_notice(tmp_path: Path) -> None:
+    # Holzheid Table 2 AD 10 prints log fO2 = -10.31 at 1677 K with no unit.
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity_coefficient",
+        point={
+            "T_K": 1677,
+            "gamma": "1.62",
+            "log_fO2": "-10.31",
+            "locator": {"published_page": 23, "table": "2", "row": "AD 10"},
+        },
+    )
+    observation = _series_logged(result, Quantity.ACTIVITY_COEFFICIENT, "-10.31")
+    assert observation.identity.temperature_K is not None
+    assert observation.identity.temperature_K.value == Decimal("1677")
+    assert observation.identity.fO2_Pa is not None
+    assert observation.identity.fO2_Pa.is_value
+    assert observation.identity.fO2_Pa.value == _log_fO2_to_pa(Decimal("-10.31"))
+    assert any(notice.reason == _BARE_LOG_BAR_NOTICE for notice in observation.notices)
+    assert "fO2_Pa" not in _same_row_identity(observation).fields
+
+
+def test_unitless_log_outside_iw_band_stays_unknown(tmp_path: Path) -> None:
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity_coefficient",
+        point={
+            "T_K": 1573,
+            "gamma": "1.5",
+            "log_fO2": "-1.0",
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    observation = _series_logged(result, Quantity.ACTIVITY_COEFFICIENT, "-1.0")
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_unknown
+    assert oxygen.reason == _BARE_LOG_SCALE_UNKNOWN
+    outcome = _same_row_identity(observation)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "fO2_Pa" in outcome.fields
+
+
+def test_unitless_log_without_temperature_stays_unknown(tmp_path: Path) -> None:
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity_coefficient",
+        point={
+            "gamma": "1.5",
+            "log_fO2": "-10.31",
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    observation = _series_logged(result, Quantity.ACTIVITY_COEFFICIENT, "-10.31")
+    assert (
+        observation.identity.temperature_K is None
+        or not observation.identity.temperature_K.is_value
+    )
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_unknown
+    assert oxygen.reason == _BARE_LOG_SCALE_UNKNOWN
+    outcome = _same_row_identity(observation)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "fO2_Pa" in outcome.fields
 
 
 def test_activity_buffer_offset_stays_unknown(tmp_path: Path) -> None:
