@@ -294,3 +294,18 @@ def test_run_executor_preserves_typed_silica_refusal_and_coating_finding(monkeyp
     assert len(execution.simulator.atom_ledger.transitions) == before_count + int(prior_commit)
     if prior_commit:
         assert execution.simulator.atom_ledger.mol_by_account("process.overhead_gas")["Na"] == pytest.approx(1e-6)
+
+
+def test_existing_numeric_override_boundaries_and_silica_mass_pin():
+    """Pin numeric parsing and the existing 2SiO -> Si + SiO2 mass basis."""
+    from simulator.session import _finite_float
+    from simulator.session_cli import _parse_override_json
+    from simulator.runner import _parse_runtime_campaign_overrides_json
+    from simulator.condensation import CondensationRouteResult
+    assert _finite_float("1.25", "pin") == 1.25
+    for parse in (_parse_override_json, _parse_runtime_campaign_overrides_json):
+        assert parse('{"C0":{"max_hours":"1.25"}}', flag_name="pin") == {
+            "C0": {"max_hours": 1.25}}
+    result = CondensationRouteResult(condensed_by_stage_species={3: {"SiO": 1.0}})
+    assert result.silica_fume_fraction_of_feedstock(1.0) == pytest.approx(
+        0.6814603937936665, rel=1e-12)
