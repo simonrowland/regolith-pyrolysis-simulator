@@ -703,9 +703,18 @@ def test_lee_1976_table3_cells_match_render_and_unprinted_conditions_stay_unknow
         assert row["values"]["material_as_printed"] == "Cr2O3"
         assert observation.point_conditions is not None
         assert observation.point_conditions["pO2_atm"].state.is_value
-        assert observation.point_conditions["pO2_atm"].state.value == Decimal("1e-9")
+        oxygen_value = observation.point_conditions["pO2_atm"].state.value
+        assert oxygen_value.point == Decimal("1e-9")
+        assert oxygen_value.approximate is True
         oxygen = row["point_conditions"]["pO2_atm"]
-        assert oxygen["state"]["approximate"] is True
+        assert oxygen["state"] == {
+            "tag": "value",
+            "value": {
+                "kind": "point",
+                "point": "1e-9",
+                "approximate": True,
+            },
+        }
         assert oxygen["locator"]["page"] == 4
         assert oxygen["locator"]["published_page"] == 581
         assert observation.provenance["printed_unit"] == "μg·cm^-2·sec^-1"
