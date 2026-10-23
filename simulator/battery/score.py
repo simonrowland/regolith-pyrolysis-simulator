@@ -7660,14 +7660,12 @@ def _hashimoto_residue_prediction(
                     band=f"N={integration.get('steps')}; N_cap=256",
                 )
             )
-        if primary.provenance.get("openimcc_liquid_row_extrapolated"):
-            notices.append(
-                _openimcc_liquid_row_extrapolated_notice(
-                    reason="OpenIMCC liquid-row extrapolation below fitted temperature floor",
-                    origin="hashimoto-residue-addendum-a",
-                    band="liquid-row floors are recorded in provenance",
-                )
+        notices.extend(
+            _liquid_rows_below_floor_notices(
+                primary.provenance.get("liquid_rows_used"),
+                origin="hashimoto-residue-addendum-a",
             )
+        )
         return EnginePrediction(
             engine=engine,
             channel=channel,
