@@ -14,7 +14,7 @@ fidelity_samples:
 - path: species.Al.observations[stolyarova_1996_table2_pAl_1933k].values.points[0].P_Al_times_10^8_atm_as_printed
   value: "0.27"
   locator:
-    page: 20
+    page: 6
     published_page: 20
     pdf_page_index: 5
     table: '2'
@@ -22,7 +22,7 @@ fidelity_samples:
 - path: species.AlO.observations[stolyarova_1996_table2_pAlO_1933k].values.points[0].P_AlO_times_10^8_atm_as_printed
   value: "0.14"
   locator:
-    page: 20
+    page: 6
     published_page: 20
     pdf_page_index: 5
     table: '2'
@@ -30,7 +30,7 @@ fidelity_samples:
 - path: species.Ca.observations[stolyarova_1996_table2_pCa_1933k].values.points[0].P_Ca_times_10^7_atm_as_printed
   value: "0.75"
   locator:
-    page: 20
+    page: 6
     published_page: 20
     pdf_page_index: 5
     table: '2'
@@ -38,7 +38,7 @@ fidelity_samples:
 - path: species.SiO.observations[stolyarova_1996_table2_pSiO_1933k].values.points[29].P_SiO_times_10^5_atm_as_printed
   value: "10.9"
   locator:
-    page: 20
+    page: 6
     published_page: 20
     pdf_page_index: 5
     table: '2'
@@ -46,7 +46,7 @@ fidelity_samples:
 - path: species.SiO2.observations[stolyarova_1996_table2_pSiO2_1933k].values.points[9].P_SiO2_times_10^8_atm_as_printed
   value: "1.30"
   locator:
-    page: 20
+    page: 6
     published_page: 20
     pdf_page_index: 5
     table: '2'
@@ -54,7 +54,7 @@ fidelity_samples:
 - path: species.O.observations[stolyarova_1996_table2_pO_1933k].values.points[2].P_O_times_10^8_atm_as_printed
   value: "0.35"
   locator:
-    page: 20
+    page: 6
     published_page: 20
     pdf_page_index: 5
     table: '2'
@@ -62,7 +62,7 @@ fidelity_samples:
 - path: species.CaO.observations[stolyarova_1996_table3_cao_activity_column_1_1933k].values.points[1].activity_as_published
   value: "0.853"
   locator:
-    page: 23
+    page: 9
     published_page: 23
     pdf_page_index: 8
     table: '3'
@@ -70,7 +70,7 @@ fidelity_samples:
 - path: species.Al2O3.observations[stolyarova_1996_table3_al2o3_activity_column_2_1933k].values.points[12].activity_as_published
   value: "0.251"
   locator:
-    page: 23
+    page: 9
     published_page: 23
     pdf_page_index: 8
     table: '3'
@@ -80,52 +80,52 @@ benches:
   identity: {basis: described_in_this_work}
   apparatus_family:
     state: {tag: value, value: 'magnetic mass spectrometer model MI 1201, produced by the Electron Microscope Plant in Sumy, and modified for high-temperature mass spectrometric studies'}
-    locator: {page: 17, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'The paper says “magnetic mass spectrometer model MI 1201 (produced at the Electron Microscope Plant, Sumy, Ukraine), which was modified for high-temperature mass spectrometric studies by standard methods (64)”.'}
+    locator: {page: 3, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'The paper says “magnetic mass spectrometer model MI 1201 (produced at the Electron Microscope Plant, Sumy, Ukraine), which was modified for high-temperature mass spectrometric studies by standard methods (64)”.'}
   cell_material_and_liner:
     state: {tag: unknown, reason: not_published}
-    locator: {page: 17, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'The paper identifies the MI-1201 instrument but does not name the Knudsen-cell material.'}
+    locator: {page: 3, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'The paper identifies the MI-1201 instrument but does not name the Knudsen-cell material.'}
   cell_materials:
   - state: {tag: value, value: Mo}
     inferred: true
     inference: 'Inferred from the identified Mo+, MoO+, MoO2+, and MoO3+ ions (p. 18) and the oxygen derivation from the MoO3/MoO2 equilibrium (p. 19); the paper does not name the cell material.'
-    locator: {page: 18, published_page: 18, pdf_page_index: 3, section: Results, note: 'The inference uses the Mo-bearing ions identified on p. 18 together with the MoO3/MoO2 equilibrium used for oxygen on p. 19; neither passage explicitly names the cell.'}
+    locator: {page: 4, published_page: 18, pdf_page_index: 3, section: Results, note: 'The inference uses the Mo-bearing ions identified on p. 18 together with the MoO3/MoO2 equilibrium used for oxygen on p. 19; neither passage explicitly names the cell.'}
 experiments:
 - experiment_id: stolyarova-1996-mi1201-1933k
   bench_id: stolyarova-1996-mi1201
   method: knudsen_effusion
-  locator: {page: 17, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'MI-1201 modified for high-temperature mass spectrometric measurements.'}
+  locator: {page: 3, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'MI-1201 modified for high-temperature mass spectrometric measurements.'}
   apparatus:
     calibration:
       method:
         state: {tag: value, value: ion-current comparison using silver vapor pressure as standard}
-        locator: {page: 18, published_page: 18, pdf_page_index: 3, section: Results, note: 'The paper says “were obtained by the ion current comparison method” and “The vapor pressure of silver was used as a standard.”'}
+        locator: {page: 4, published_page: 18, pdf_page_index: 3, section: Results, note: 'The paper says “were obtained by the ion current comparison method” and “The vapor pressure of silver was used as a standard.”'}
       reference_substance:
         state: {tag: value, value: silver vapor}
-        locator: {page: 18, published_page: 18, pdf_page_index: 3, section: Results, note: 'The paper says “The vapor pressure of silver was used as a standard.”'}
+        locator: {page: 4, published_page: 18, pdf_page_index: 3, section: Results, note: 'The paper says “The vapor pressure of silver was used as a standard.”'}
     geometry:
       orifice_diameter_m:
         state: {tag: unknown, reason: not_published}
-        locator: {page: 17, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'No diameter or area ratio is printed in the Experimental description. It says “Samples studied were prepared using the precursor method described previously (63)” and identifies the MI 1201, but gives no effusion-orifice dimensions.'}
+        locator: {page: 3, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'No diameter or area ratio is printed in the Experimental description. It says “Samples studied were prepared using the precursor method described previously (63)” and identifies the MI 1201, but gives no effusion-orifice dimensions.'}
       orifice_to_sample_area_ratio:
         state: {tag: unknown, reason: not_published}
-        locator: {page: 17, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'No diameter or area ratio is printed in the Experimental description; the quoted description is “The present study was carried out on a magnetic mass spectrometer model MI 1201”.'}
+        locator: {page: 3, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'No diameter or area ratio is printed in the Experimental description; the quoted description is “The present study was carried out on a magnetic mass spectrometer model MI 1201”.'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 17, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'No chamber/background pressure is reported in the Experimental section (p. 17) or Results and Table 2 (pp. 18–20); the Experimental description says “The present study was carried out on a magnetic mass spectrometer model MI 1201”.'}
+      locator: {page: 3, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'No chamber/background pressure is reported in the Experimental section (p. 17) or Results and Table 2 (pp. 18–20); the Experimental description says “The present study was carried out on a magnetic mass spectrometer model MI 1201”.'}
     sweep_gas:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 17, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'No sweep/carrier gas is stated in the Experimental description; it says “Partial pressures of vapor species were identified” by the Knudsen-effusion mass-spectrometric study.'}
+      locator: {page: 3, published_page: 17, pdf_page_index: 2, section: Experimental, note: 'No sweep/carrier gas is stated in the Experimental description; it says “Partial pressures of vapor species were identified” by the Knudsen-effusion mass-spectrometric study.'}
     regime:
       regime_class: {tag: unknown, reason: not_published}
-      locator: {page: 15, published_page: 15, pdf_page_index: 0, section: Abstract, note: 'The paper says “the Knudsen effusion mass spectrometric method”, but does not print a flow-regime class or orifice condition.'}
+      locator: {page: 1, published_page: 15, pdf_page_index: 0, section: Abstract, note: 'The paper says “the Knudsen effusion mass spectrometric method”, but does not print a flow-regime class or orifice condition.'}
 species:
   Ca:
     observations:
     - observation_id: stolyarova_1996_table2_pCa_1933k
       type: partial_pressure
       locator:
-        page: 20
+        page: 6
         published_page: 20
         pdf_page_index: 5
         table: '2'
@@ -153,7 +153,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. The Table 2 caption reports atm; partial pressures were obtained by the ion-current comparison method using silver vapor pressure as standard. Molecular ionization cross-sections were calculated by the additivity rule using Mann atomic cross-sections."
         points:
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -175,7 +175,7 @@ species:
                   - [Al2O3, "0.055495495495"]
                   - [SiO2, "0.44"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -183,7 +183,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "0.75"
           pressure_atm: "0.000000075"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -205,7 +205,7 @@ species:
                   - [Al2O3, "0.097826086957"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -213,7 +213,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "6.58"
           pressure_atm: "0.000000658"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -235,7 +235,7 @@ species:
                   - [Al2O3, "0.078260869565"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -243,7 +243,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "1.24"
           pressure_atm: "0.000000124"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -265,7 +265,7 @@ species:
                   - [Al2O3, "0.092413793103"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -273,7 +273,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "3.95"
           pressure_atm: "0.000000395"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -295,7 +295,7 @@ species:
                   - [Al2O3, "0.08"]
                   - [SiO2, "0.42"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -303,7 +303,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "0.83"
           pressure_atm: "0.000000083"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -325,7 +325,7 @@ species:
                   - [Al2O3, "0.068965517241"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -333,7 +333,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "0.50"
           pressure_atm: "0.000000050"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -355,7 +355,7 @@ species:
                   - [Al2O3, "0.130769230769"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -363,7 +363,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "7.76"
           pressure_atm: "0.000000776"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -385,7 +385,7 @@ species:
                   - [Al2O3, "0.125891472868"]
                   - [SiO2, "0.44"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -393,7 +393,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "6.58"
           pressure_atm: "0.000000658"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -415,7 +415,7 @@ species:
                   - [Al2O3, "0.115384615385"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -423,7 +423,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "3.95"
           pressure_atm: "0.000000395"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -445,7 +445,7 @@ species:
                   - [Al2O3, "0.223308270677"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -453,7 +453,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "7.50"
           pressure_atm: "0.000000750"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -475,7 +475,7 @@ species:
                   - [Al2O3, "0.148872180451"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -483,7 +483,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "1.09"
           pressure_atm: "0.000000109"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -505,7 +505,7 @@ species:
                   - [Al2O3, "0.190298507463"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -513,7 +513,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "5.66"
           pressure_atm: "0.000000566"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -535,7 +535,7 @@ species:
                   - [Al2O3, "0.17"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -543,7 +543,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "3.03"
           pressure_atm: "0.000000303"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -565,7 +565,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -573,7 +573,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "3.16"
           pressure_atm: "0.000000316"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -595,7 +595,7 @@ species:
                   - [Al2O3, "0.182374100719"]
                   - [SiO2, "0.35"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -603,7 +603,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "2.37"
           pressure_atm: "0.000000237"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -625,7 +625,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -633,7 +633,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "2.89"
           pressure_atm: "0.000000289"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -655,7 +655,7 @@ species:
                   - [Al2O3, "0.249620253165"]
                   - [SiO2, "0.32"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -663,7 +663,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "1.58"
           pressure_atm: "0.000000158"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -685,7 +685,7 @@ species:
                   - [Al2O3, "0.25125"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -693,7 +693,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "1.32"
           pressure_atm: "0.000000132"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -715,7 +715,7 @@ species:
                   - [Al2O3, "0.34099378882"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -723,7 +723,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "3.16"
           pressure_atm: "0.000000316"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -745,7 +745,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -753,7 +753,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "2.24"
           pressure_atm: "0.000000224"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -775,7 +775,7 @@ species:
                   - [Al2O3, "0.22962962963"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -783,7 +783,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "8.29"
           pressure_atm: "0.000000829"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -805,7 +805,7 @@ species:
                   - [Al2O3, "0.289877300613"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -813,7 +813,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "2.37"
           pressure_atm: "0.000000237"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -835,7 +835,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -843,7 +843,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "0.34"
           pressure_atm: "0.000000034"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -865,7 +865,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -873,7 +873,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "0.83"
           pressure_atm: "0.000000083"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -895,7 +895,7 @@ species:
                   - [Al2O3, "0.249775280899"]
                   - [SiO2, "0.43"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -903,7 +903,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "0.45"
           pressure_atm: "0.000000045"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -925,7 +925,7 @@ species:
                   - [Al2O3, "0.45"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -933,7 +933,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "0.76"
           pressure_atm: "0.000000076"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -955,7 +955,7 @@ species:
                   - [Al2O3, "0.375"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -963,7 +963,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "0.41"
           pressure_atm: "0.000000041"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -985,7 +985,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -993,7 +993,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "0.33"
           pressure_atm: "0.000000033"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1015,7 +1015,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1023,7 +1023,7 @@ species:
           P_Ca_times_10^7_atm_as_printed: "0.25"
           pressure_atm: "0.000000025"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1045,7 +1045,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1059,7 +1059,7 @@ species:
     - observation_id: stolyarova_1996_table2_pAl_1933k
       type: partial_pressure
       locator:
-        page: 20
+        page: 6
         published_page: 20
         pdf_page_index: 5
         table: '2'
@@ -1087,7 +1087,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. The Table 2 caption reports atm; partial pressures were obtained by the ion-current comparison method using silver vapor pressure as standard. Molecular ionization cross-sections were calculated by the additivity rule using Mann atomic cross-sections."
         points:
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1109,7 +1109,7 @@ species:
                   - [Al2O3, "0.068965517241"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1117,7 +1117,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.27"
           pressure_atm: "0.0000000027"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1139,7 +1139,7 @@ species:
                   - [Al2O3, "0.125891472868"]
                   - [SiO2, "0.44"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1147,7 +1147,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.32"
           pressure_atm: "0.0000000032"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1169,7 +1169,7 @@ species:
                   - [Al2O3, "0.115384615385"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1177,7 +1177,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.53"
           pressure_atm: "0.0000000053"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1199,7 +1199,7 @@ species:
                   - [Al2O3, "0.148872180451"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1207,7 +1207,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.33"
           pressure_atm: "0.0000000033"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1229,7 +1229,7 @@ species:
                   - [Al2O3, "0.190298507463"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1237,7 +1237,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.28"
           pressure_atm: "0.0000000028"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1259,7 +1259,7 @@ species:
                   - [Al2O3, "0.17"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1267,7 +1267,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.29"
           pressure_atm: "0.0000000029"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1289,7 +1289,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1297,7 +1297,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.64"
           pressure_atm: "0.0000000064"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1319,7 +1319,7 @@ species:
                   - [Al2O3, "0.182374100719"]
                   - [SiO2, "0.35"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1327,7 +1327,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.32"
           pressure_atm: "0.0000000032"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1349,7 +1349,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1357,7 +1357,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.42"
           pressure_atm: "0.0000000042"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1379,7 +1379,7 @@ species:
                   - [Al2O3, "0.249620253165"]
                   - [SiO2, "0.32"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1387,7 +1387,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.47"
           pressure_atm: "0.0000000047"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1409,7 +1409,7 @@ species:
                   - [Al2O3, "0.25125"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1417,7 +1417,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.58"
           pressure_atm: "0.0000000058"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1439,7 +1439,7 @@ species:
                   - [Al2O3, "0.34099378882"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1447,7 +1447,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.57"
           pressure_atm: "0.0000000057"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1469,7 +1469,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1477,7 +1477,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "1.21"
           pressure_atm: "0.0000000121"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1499,7 +1499,7 @@ species:
                   - [Al2O3, "0.22962962963"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1507,7 +1507,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.53"
           pressure_atm: "0.0000000053"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1529,7 +1529,7 @@ species:
                   - [Al2O3, "0.289877300613"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1537,7 +1537,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.63"
           pressure_atm: "0.0000000063"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1559,7 +1559,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1567,7 +1567,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "1.30"
           pressure_atm: "0.0000000130"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1589,7 +1589,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1597,7 +1597,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "0.84"
           pressure_atm: "0.0000000084"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1619,7 +1619,7 @@ species:
                   - [Al2O3, "0.249775280899"]
                   - [SiO2, "0.43"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1627,7 +1627,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "1.20"
           pressure_atm: "0.0000000120"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1649,7 +1649,7 @@ species:
                   - [Al2O3, "0.45"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1657,7 +1657,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "1.45"
           pressure_atm: "0.0000000145"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1679,7 +1679,7 @@ species:
                   - [Al2O3, "0.375"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1687,7 +1687,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "1.58"
           pressure_atm: "0.0000000158"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1709,7 +1709,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1717,7 +1717,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "1.58"
           pressure_atm: "0.0000000158"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1739,7 +1739,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1747,7 +1747,7 @@ species:
           P_Al_times_10^8_atm_as_printed: "1.71"
           pressure_atm: "0.0000000171"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1769,7 +1769,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1783,7 +1783,7 @@ species:
     - observation_id: stolyarova_1996_table2_pAlO_1933k
       type: partial_pressure
       locator:
-        page: 20
+        page: 6
         published_page: 20
         pdf_page_index: 5
         table: '2'
@@ -1811,7 +1811,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. The Table 2 caption reports atm; partial pressures were obtained by the ion-current comparison method using silver vapor pressure as standard. Molecular ionization cross-sections were calculated by the additivity rule using Mann atomic cross-sections."
         points:
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1833,7 +1833,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1841,7 +1841,7 @@ species:
           P_AlO_times_10^8_atm_as_printed: "0.14"
           pressure_atm: "0.0000000014"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1863,7 +1863,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1871,7 +1871,7 @@ species:
           P_AlO_times_10^8_atm_as_printed: "0.25"
           pressure_atm: "0.0000000025"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1893,7 +1893,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1901,7 +1901,7 @@ species:
           P_AlO_times_10^8_atm_as_printed: "0.26"
           pressure_atm: "0.0000000026"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1923,7 +1923,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1931,7 +1931,7 @@ species:
           P_AlO_times_10^8_atm_as_printed: "0.16"
           pressure_atm: "0.0000000016"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1953,7 +1953,7 @@ species:
                   - [Al2O3, "0.249775280899"]
                   - [SiO2, "0.43"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1961,7 +1961,7 @@ species:
           P_AlO_times_10^8_atm_as_printed: "0.22"
           pressure_atm: "0.0000000022"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -1983,7 +1983,7 @@ species:
                   - [Al2O3, "0.45"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -1991,7 +1991,7 @@ species:
           P_AlO_times_10^8_atm_as_printed: "0.24"
           pressure_atm: "0.0000000024"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2013,7 +2013,7 @@ species:
                   - [Al2O3, "0.375"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2021,7 +2021,7 @@ species:
           P_AlO_times_10^8_atm_as_printed: "0.26"
           pressure_atm: "0.0000000026"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2043,7 +2043,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2051,7 +2051,7 @@ species:
           P_AlO_times_10^8_atm_as_printed: "0.28"
           pressure_atm: "0.0000000028"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2073,7 +2073,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2081,7 +2081,7 @@ species:
           P_AlO_times_10^8_atm_as_printed: "0.30"
           pressure_atm: "0.0000000030"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2103,7 +2103,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2117,7 +2117,7 @@ species:
     - observation_id: stolyarova_1996_table2_pSiO_1933k
       type: partial_pressure
       locator:
-        page: 20
+        page: 6
         published_page: 20
         pdf_page_index: 5
         table: '2'
@@ -2145,7 +2145,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. The Table 2 caption reports atm; partial pressures were obtained by the ion-current comparison method using silver vapor pressure as standard. Molecular ionization cross-sections were calculated by the additivity rule using Mann atomic cross-sections."
         points:
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2167,7 +2167,7 @@ species:
                   - [Al2O3, "0.055495495495"]
                   - [SiO2, "0.44"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2175,7 +2175,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "2.08"
           pressure_atm: "0.0000208"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2197,7 +2197,7 @@ species:
                   - [Al2O3, "0.097826086957"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2205,7 +2205,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.05"
           pressure_atm: "0.0000005"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2227,7 +2227,7 @@ species:
                   - [Al2O3, "0.078260869565"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2235,7 +2235,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "1.21"
           pressure_atm: "0.0000121"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2257,7 +2257,7 @@ species:
                   - [Al2O3, "0.092413793103"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2265,7 +2265,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.20"
           pressure_atm: "0.0000020"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2287,7 +2287,7 @@ species:
                   - [Al2O3, "0.08"]
                   - [SiO2, "0.42"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2295,7 +2295,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "1.88"
           pressure_atm: "0.0000188"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2317,7 +2317,7 @@ species:
                   - [Al2O3, "0.068965517241"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2325,7 +2325,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "3.38"
           pressure_atm: "0.0000338"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2347,7 +2347,7 @@ species:
                   - [Al2O3, "0.130769230769"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2355,7 +2355,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.03"
           pressure_atm: "0.0000003"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2377,7 +2377,7 @@ species:
                   - [Al2O3, "0.125891472868"]
                   - [SiO2, "0.44"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2385,7 +2385,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "3.01"
           pressure_atm: "0.0000301"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2407,7 +2407,7 @@ species:
                   - [Al2O3, "0.115384615385"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2415,7 +2415,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "4.57"
           pressure_atm: "0.0000457"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2437,7 +2437,7 @@ species:
                   - [Al2O3, "0.223308270677"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2445,7 +2445,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.04"
           pressure_atm: "0.0000004"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2467,7 +2467,7 @@ species:
                   - [Al2O3, "0.148872180451"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2475,7 +2475,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "1.93"
           pressure_atm: "0.0000193"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2497,7 +2497,7 @@ species:
                   - [Al2O3, "0.190298507463"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2505,7 +2505,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.07"
           pressure_atm: "0.0000007"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2527,7 +2527,7 @@ species:
                   - [Al2O3, "0.17"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2535,7 +2535,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.55"
           pressure_atm: "0.0000055"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2557,7 +2557,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2565,7 +2565,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "5.08"
           pressure_atm: "0.0000508"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2587,7 +2587,7 @@ species:
                   - [Al2O3, "0.182374100719"]
                   - [SiO2, "0.35"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2595,7 +2595,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.88"
           pressure_atm: "0.0000088"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2617,7 +2617,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2625,7 +2625,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.10"
           pressure_atm: "0.0000010"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2647,7 +2647,7 @@ species:
                   - [Al2O3, "0.249620253165"]
                   - [SiO2, "0.32"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2655,7 +2655,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.86"
           pressure_atm: "0.0000086"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2677,7 +2677,7 @@ species:
                   - [Al2O3, "0.25125"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2685,7 +2685,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "1.47"
           pressure_atm: "0.0000147"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2707,7 +2707,7 @@ species:
                   - [Al2O3, "0.34099378882"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2715,7 +2715,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.10"
           pressure_atm: "0.0000010"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2737,7 +2737,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2745,7 +2745,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "6.99"
           pressure_atm: "0.0000699"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2767,7 +2767,7 @@ species:
                   - [Al2O3, "0.22962962963"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2775,7 +2775,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "3.20"
           pressure_atm: "0.0000320"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2797,7 +2797,7 @@ species:
                   - [Al2O3, "0.289877300613"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2805,7 +2805,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.14"
           pressure_atm: "0.0000014"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2827,7 +2827,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2835,7 +2835,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "6.57"
           pressure_atm: "0.0000657"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2857,7 +2857,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2865,7 +2865,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "2.49"
           pressure_atm: "0.0000249"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2887,7 +2887,7 @@ species:
                   - [Al2O3, "0.249775280899"]
                   - [SiO2, "0.43"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2895,7 +2895,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "5.59"
           pressure_atm: "0.0000559"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2917,7 +2917,7 @@ species:
                   - [Al2O3, "0.45"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2925,7 +2925,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "0.24"
           pressure_atm: "0.0000024"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2947,7 +2947,7 @@ species:
                   - [Al2O3, "0.375"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2955,7 +2955,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "1.16"
           pressure_atm: "0.0000116"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -2977,7 +2977,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -2985,7 +2985,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "3.21"
           pressure_atm: "0.0000321"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3007,7 +3007,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3015,7 +3015,7 @@ species:
           P_SiO_times_10^5_atm_as_printed: "6.25"
           pressure_atm: "0.0000625"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3037,7 +3037,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3051,7 +3051,7 @@ species:
     - observation_id: stolyarova_1996_table2_pSiO2_1933k
       type: partial_pressure
       locator:
-        page: 20
+        page: 6
         published_page: 20
         pdf_page_index: 5
         table: '2'
@@ -3079,7 +3079,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. The Table 2 caption reports atm; partial pressures were obtained by the ion-current comparison method using silver vapor pressure as standard. Molecular ionization cross-sections were calculated by the additivity rule using Mann atomic cross-sections."
         points:
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3101,7 +3101,7 @@ species:
                   - [Al2O3, "0.055495495495"]
                   - [SiO2, "0.44"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3109,7 +3109,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "0.50"
           pressure_atm: "0.0000000050"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3131,7 +3131,7 @@ species:
                   - [Al2O3, "0.08"]
                   - [SiO2, "0.42"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3139,7 +3139,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "0.40"
           pressure_atm: "0.0000000040"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3161,7 +3161,7 @@ species:
                   - [Al2O3, "0.068965517241"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3169,7 +3169,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "0.80"
           pressure_atm: "0.0000000080"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3191,7 +3191,7 @@ species:
                   - [Al2O3, "0.125891472868"]
                   - [SiO2, "0.44"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3199,7 +3199,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "0.70"
           pressure_atm: "0.0000000070"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3221,7 +3221,7 @@ species:
                   - [Al2O3, "0.115384615385"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3229,7 +3229,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "1.00"
           pressure_atm: "0.0000000100"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3251,7 +3251,7 @@ species:
                   - [Al2O3, "0.148872180451"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3259,7 +3259,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "0.40"
           pressure_atm: "0.0000000040"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3281,7 +3281,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3289,7 +3289,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "1.10"
           pressure_atm: "0.0000000110"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3311,7 +3311,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3319,7 +3319,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "1.50"
           pressure_atm: "0.0000000150"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3341,7 +3341,7 @@ species:
                   - [Al2O3, "0.22962962963"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3349,7 +3349,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "0.70"
           pressure_atm: "0.0000000070"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3371,7 +3371,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3379,7 +3379,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "1.30"
           pressure_atm: "0.0000000130"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3401,7 +3401,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3409,7 +3409,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "0.50"
           pressure_atm: "0.0000000050"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3431,7 +3431,7 @@ species:
                   - [Al2O3, "0.249775280899"]
                   - [SiO2, "0.43"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3439,7 +3439,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "1.00"
           pressure_atm: "0.0000000100"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3461,7 +3461,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3469,7 +3469,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "0.60"
           pressure_atm: "0.0000000060"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3491,7 +3491,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3499,7 +3499,7 @@ species:
           P_SiO2_times_10^8_atm_as_printed: "1.10"
           pressure_atm: "0.0000000110"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -3521,7 +3521,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -3533,7 +3533,7 @@ species:
     - observation_id: stolyarova_1996_table3_sio2_activity_column_5_1933k
       type: activity_coefficient
       locator:
-        page: 23
+        page: 9
         published_page: 23
         pdf_page_index: 8
         table: '3'
@@ -3560,7 +3560,7 @@ species:
         inference: >-
           Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
         locator:
-          page: 19
+          page: 5
           published_page: 19
           pdf_page_index: 4
           section: Results
@@ -3588,7 +3588,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. Table 3 activities are dimensionless and reduced by ion-current comparison / Belton-Fruehan and Gibbs-Duhem equations (10–15). column 5 is assigned to SiO2 by the caption. The table caption omits temperature; 1933 K is stated for the matching current-study activity maps in Figure 1, published p.21."
         points:
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3610,7 +3610,7 @@ species:
                   - [Al2O3, "0.055495495495"]
                   - [SiO2, "0.44"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3620,7 +3620,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3642,7 +3642,7 @@ species:
                   - [Al2O3, "0.097826086957"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3652,7 +3652,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3674,7 +3674,7 @@ species:
                   - [Al2O3, "0.078260869565"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3684,7 +3684,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3706,7 +3706,7 @@ species:
                   - [Al2O3, "0.092413793103"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3716,7 +3716,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3738,7 +3738,7 @@ species:
                   - [Al2O3, "0.08"]
                   - [SiO2, "0.42"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3748,7 +3748,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3770,7 +3770,7 @@ species:
                   - [Al2O3, "0.068965517241"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3780,7 +3780,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3802,7 +3802,7 @@ species:
                   - [Al2O3, "0.130769230769"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3812,7 +3812,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3834,7 +3834,7 @@ species:
                   - [Al2O3, "0.125891472868"]
                   - [SiO2, "0.44"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3844,7 +3844,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3866,7 +3866,7 @@ species:
                   - [Al2O3, "0.115384615385"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3876,7 +3876,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3898,7 +3898,7 @@ species:
                   - [Al2O3, "0.223308270677"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3908,7 +3908,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3930,7 +3930,7 @@ species:
                   - [Al2O3, "0.148872180451"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3940,7 +3940,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3962,7 +3962,7 @@ species:
                   - [Al2O3, "0.190298507463"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -3972,7 +3972,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -3994,7 +3994,7 @@ species:
                   - [Al2O3, "0.17"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4004,7 +4004,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4026,7 +4026,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4036,7 +4036,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4058,7 +4058,7 @@ species:
                   - [Al2O3, "0.182374100719"]
                   - [SiO2, "0.35"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4068,7 +4068,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4090,7 +4090,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4100,7 +4100,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4122,7 +4122,7 @@ species:
                   - [Al2O3, "0.249620253165"]
                   - [SiO2, "0.32"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4132,7 +4132,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4154,7 +4154,7 @@ species:
                   - [Al2O3, "0.25125"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4164,7 +4164,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4186,7 +4186,7 @@ species:
                   - [Al2O3, "0.34099378882"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4196,7 +4196,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4218,7 +4218,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4228,7 +4228,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4250,7 +4250,7 @@ species:
                   - [Al2O3, "0.22962962963"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4260,7 +4260,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4282,7 +4282,7 @@ species:
                   - [Al2O3, "0.289877300613"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4292,7 +4292,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4314,7 +4314,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4324,7 +4324,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4346,7 +4346,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4356,7 +4356,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4378,7 +4378,7 @@ species:
                   - [Al2O3, "0.249775280899"]
                   - [SiO2, "0.43"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4388,7 +4388,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4410,7 +4410,7 @@ species:
                   - [Al2O3, "0.45"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4420,7 +4420,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4442,7 +4442,7 @@ species:
                   - [Al2O3, "0.375"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4452,7 +4452,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4474,7 +4474,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4484,7 +4484,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4506,7 +4506,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4516,7 +4516,7 @@ species:
           quantity_as_published: "a_SiO2"
           activity_column_as_printed: "5"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -4538,7 +4538,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -4552,7 +4552,7 @@ species:
     - observation_id: stolyarova_1996_fig1_sio2_activity_figure_only
       type: activity_coefficient
       locator:
-        page: 21
+        page: 7
         published_page: 21
         pdf_page_index: 6
         figure: '1'
@@ -4578,7 +4578,7 @@ species:
     - observation_id: stolyarova_1996_fig2_sio2_activity_figure_only
       type: activity_coefficient
       locator:
-        page: 26
+        page: 12
         published_page: 26
         pdf_page_index: 11
         figure: '2'
@@ -4606,7 +4606,7 @@ species:
     - observation_id: stolyarova_1996_table1_moo2_ion_current_col1_1933k
       type: rate_series
       locator:
-        page: 19
+        page: 5
         published_page: 19
         pdf_page_index: 4
         table: '1'
@@ -4627,7 +4627,7 @@ species:
     - observation_id: stolyarova_1996_table1_moo2_ion_current_col2_1933k
       type: rate_series
       locator:
-        page: 19
+        page: 5
         published_page: 19
         pdf_page_index: 4
         table: '1'
@@ -4648,7 +4648,7 @@ species:
     - observation_id: stolyarova_1996_table1_moo2_ion_current_col3_1933k
       type: rate_series
       locator:
-        page: 19
+        page: 5
         published_page: 19
         pdf_page_index: 4
         table: '1'
@@ -4671,7 +4671,7 @@ species:
     - observation_id: stolyarova_1996_table1_moo3_ion_current_col1_1933k
       type: rate_series
       locator:
-        page: 19
+        page: 5
         published_page: 19
         pdf_page_index: 4
         table: '1'
@@ -4692,7 +4692,7 @@ species:
     - observation_id: stolyarova_1996_table1_moo3_ion_current_col2_1933k
       type: rate_series
       locator:
-        page: 19
+        page: 5
         published_page: 19
         pdf_page_index: 4
         table: '1'
@@ -4713,7 +4713,7 @@ species:
     - observation_id: stolyarova_1996_table1_moo3_ion_current_col3_1933k
       type: rate_series
       locator:
-        page: 19
+        page: 5
         published_page: 19
         pdf_page_index: 4
         table: '1'
@@ -4736,7 +4736,7 @@ species:
     - observation_id: stolyarova_1996_table2_pO_1933k
       type: partial_pressure
       locator:
-        page: 20
+        page: 6
         published_page: 20
         pdf_page_index: 5
         table: '2'
@@ -4768,7 +4768,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. Author-calculated atomic oxygen partial-pressure estimate from thermodynamic equilibrium Eq. (7) (MoO3 = MoO2 + O); Table 2 prints this result, it is not a measured direct pressure."
         points:
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -4790,7 +4790,7 @@ species:
                   - [Al2O3, "0.055495495495"]
                   - [SiO2, "0.44"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -4798,7 +4798,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.36"
           pressure_atm: "0.0000000036"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -4820,7 +4820,7 @@ species:
                   - [Al2O3, "0.097826086957"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -4828,7 +4828,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.35"
           pressure_atm: "0.0000000035"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -4850,7 +4850,7 @@ species:
                   - [Al2O3, "0.078260869565"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -4858,7 +4858,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.35"
           pressure_atm: "0.0000000035"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -4880,7 +4880,7 @@ species:
                   - [Al2O3, "0.092413793103"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -4888,7 +4888,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.35"
           pressure_atm: "0.0000000035"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -4910,7 +4910,7 @@ species:
                   - [Al2O3, "0.08"]
                   - [SiO2, "0.42"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -4918,7 +4918,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.35"
           pressure_atm: "0.0000000035"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -4940,7 +4940,7 @@ species:
                   - [Al2O3, "0.068965517241"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -4948,7 +4948,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.36"
           pressure_atm: "0.0000000036"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -4970,7 +4970,7 @@ species:
                   - [Al2O3, "0.130769230769"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -4978,7 +4978,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.35"
           pressure_atm: "0.0000000035"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5000,7 +5000,7 @@ species:
                   - [Al2O3, "0.125891472868"]
                   - [SiO2, "0.44"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5008,7 +5008,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.34"
           pressure_atm: "0.0000000034"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5030,7 +5030,7 @@ species:
                   - [Al2O3, "0.115384615385"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5038,7 +5038,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.34"
           pressure_atm: "0.0000000034"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5060,7 +5060,7 @@ species:
                   - [Al2O3, "0.223308270677"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5068,7 +5068,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.32"
           pressure_atm: "0.0000000032"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5090,7 +5090,7 @@ species:
                   - [Al2O3, "0.148872180451"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5098,7 +5098,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.33"
           pressure_atm: "0.0000000033"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5120,7 +5120,7 @@ species:
                   - [Al2O3, "0.190298507463"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5128,7 +5128,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.32"
           pressure_atm: "0.0000000032"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5150,7 +5150,7 @@ species:
                   - [Al2O3, "0.17"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5158,7 +5158,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.32"
           pressure_atm: "0.0000000032"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5180,7 +5180,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5188,7 +5188,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.34"
           pressure_atm: "0.0000000034"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5210,7 +5210,7 @@ species:
                   - [Al2O3, "0.182374100719"]
                   - [SiO2, "0.35"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5218,7 +5218,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.31"
           pressure_atm: "0.0000000031"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5240,7 +5240,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5248,7 +5248,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.30"
           pressure_atm: "0.0000000030"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5270,7 +5270,7 @@ species:
                   - [Al2O3, "0.249620253165"]
                   - [SiO2, "0.32"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5278,7 +5278,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.32"
           pressure_atm: "0.0000000032"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5300,7 +5300,7 @@ species:
                   - [Al2O3, "0.25125"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5308,7 +5308,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.30"
           pressure_atm: "0.0000000030"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5330,7 +5330,7 @@ species:
                   - [Al2O3, "0.34099378882"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5338,7 +5338,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.29"
           pressure_atm: "0.0000000029"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5360,7 +5360,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5368,7 +5368,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.32"
           pressure_atm: "0.0000000032"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5390,7 +5390,7 @@ species:
                   - [Al2O3, "0.22962962963"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5398,7 +5398,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.32"
           pressure_atm: "0.0000000032"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5420,7 +5420,7 @@ species:
                   - [Al2O3, "0.289877300613"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5428,7 +5428,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.29"
           pressure_atm: "0.0000000029"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5450,7 +5450,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5458,7 +5458,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.32"
           pressure_atm: "0.0000000032"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5480,7 +5480,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5488,7 +5488,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.30"
           pressure_atm: "0.0000000030"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5510,7 +5510,7 @@ species:
                   - [Al2O3, "0.249775280899"]
                   - [SiO2, "0.43"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5518,7 +5518,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.29"
           pressure_atm: "0.0000000029"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5540,7 +5540,7 @@ species:
                   - [Al2O3, "0.45"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5548,7 +5548,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.27"
           pressure_atm: "0.0000000027"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5570,7 +5570,7 @@ species:
                   - [Al2O3, "0.375"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5578,7 +5578,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.27"
           pressure_atm: "0.0000000027"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5600,7 +5600,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5608,7 +5608,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.27"
           pressure_atm: "0.0000000027"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5630,7 +5630,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5638,7 +5638,7 @@ species:
           P_O_times_10^8_atm_as_printed: "0.28"
           pressure_atm: "0.0000000028"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5660,7 +5660,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5672,7 +5672,7 @@ species:
     - observation_id: stolyarova_1996_table2_pO_prime_1933k
       type: partial_pressure
       locator:
-        page: 20
+        page: 6
         published_page: 20
         pdf_page_index: 5
         table: '2'
@@ -5704,7 +5704,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. Author-calculated atomic oxygen partial-pressure estimate from thermodynamic equilibrium Eq. (8) (AlO = Al + O); Table 2 prints this result, it is not a measured direct pressure."
         points:
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5726,7 +5726,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5734,7 +5734,7 @@ species:
           P_O_prime_times_10^8_atm_as_printed: "0.40"
           pressure_atm: "0.0000000040"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5756,7 +5756,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5764,7 +5764,7 @@ species:
           P_O_prime_times_10^8_atm_as_printed: "0.38"
           pressure_atm: "0.0000000038"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5786,7 +5786,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5794,7 +5794,7 @@ species:
           P_O_prime_times_10^8_atm_as_printed: "0.36"
           pressure_atm: "0.0000000036"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5816,7 +5816,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5824,7 +5824,7 @@ species:
           P_O_prime_times_10^8_atm_as_printed: "0.35"
           pressure_atm: "0.0000000035"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5846,7 +5846,7 @@ species:
                   - [Al2O3, "0.249775280899"]
                   - [SiO2, "0.43"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5854,7 +5854,7 @@ species:
           P_O_prime_times_10^8_atm_as_printed: "0.33"
           pressure_atm: "0.0000000033"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5876,7 +5876,7 @@ species:
                   - [Al2O3, "0.45"]
                   - [SiO2, "0.10"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5884,7 +5884,7 @@ species:
           P_O_prime_times_10^8_atm_as_printed: "0.30"
           pressure_atm: "0.0000000030"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5906,7 +5906,7 @@ species:
                   - [Al2O3, "0.375"]
                   - [SiO2, "0.25"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5914,7 +5914,7 @@ species:
           P_O_prime_times_10^8_atm_as_printed: "0.30"
           pressure_atm: "0.0000000030"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5936,7 +5936,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5944,7 +5944,7 @@ species:
           P_O_prime_times_10^8_atm_as_printed: "0.32"
           pressure_atm: "0.0000000032"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5966,7 +5966,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -5974,7 +5974,7 @@ species:
           P_O_prime_times_10^8_atm_as_printed: "0.32"
           pressure_atm: "0.0000000032"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -5996,7 +5996,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6008,7 +6008,7 @@ species:
     - observation_id: stolyarova_1996_table2_pO_double_prime_1933k
       type: partial_pressure
       locator:
-        page: 20
+        page: 6
         published_page: 20
         pdf_page_index: 5
         table: '2'
@@ -6040,7 +6040,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. Author-calculated atomic oxygen partial-pressure estimate from thermodynamic equilibrium Eq. (9) (SiO2 = SiO + O); Table 2 prints this result, it is not a measured direct pressure."
         points:
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6062,7 +6062,7 @@ species:
                   - [Al2O3, "0.055495495495"]
                   - [SiO2, "0.44"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6070,7 +6070,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.16"
           pressure_atm: "0.0000000016"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6092,7 +6092,7 @@ species:
                   - [Al2O3, "0.08"]
                   - [SiO2, "0.42"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6100,7 +6100,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.15"
           pressure_atm: "0.0000000015"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6122,7 +6122,7 @@ species:
                   - [Al2O3, "0.068965517241"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6130,7 +6130,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.16"
           pressure_atm: "0.0000000016"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6152,7 +6152,7 @@ species:
                   - [Al2O3, "0.125891472868"]
                   - [SiO2, "0.44"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6160,7 +6160,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.16"
           pressure_atm: "0.0000000016"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6182,7 +6182,7 @@ species:
                   - [Al2O3, "0.115384615385"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6190,7 +6190,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.15"
           pressure_atm: "0.0000000015"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6212,7 +6212,7 @@ species:
                   - [Al2O3, "0.148872180451"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6220,7 +6220,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.15"
           pressure_atm: "0.0000000015"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6242,7 +6242,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6250,7 +6250,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.15"
           pressure_atm: "0.0000000015"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6272,7 +6272,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6280,7 +6280,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.15"
           pressure_atm: "0.0000000015"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6302,7 +6302,7 @@ species:
                   - [Al2O3, "0.22962962963"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6310,7 +6310,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.15"
           pressure_atm: "0.0000000015"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6332,7 +6332,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6340,7 +6340,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.14"
           pressure_atm: "0.0000000014"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6362,7 +6362,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6370,7 +6370,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.13"
           pressure_atm: "0.0000000013"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6392,7 +6392,7 @@ species:
                   - [Al2O3, "0.249775280899"]
                   - [SiO2, "0.43"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6400,7 +6400,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.12"
           pressure_atm: "0.0000000012"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6422,7 +6422,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6430,7 +6430,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.13"
           pressure_atm: "0.0000000013"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6452,7 +6452,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6460,7 +6460,7 @@ species:
           P_O_double_prime_times_10^8_atm_as_printed: "0.12"
           pressure_atm: "0.0000000012"
         - locator:
-            page: 20
+            page: 6
             published_page: 20
             pdf_page_index: 5
             table: '2'
@@ -6482,7 +6482,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 20
+                page: 6
                 published_page: 20
                 pdf_page_index: 5
                 table: '2'
@@ -6496,7 +6496,7 @@ species:
     - observation_id: stolyarova_1996_table3_cao_activity_column_1_1933k
       type: activity_coefficient
       locator:
-        page: 23
+        page: 9
         published_page: 23
         pdf_page_index: 8
         table: '3'
@@ -6523,7 +6523,7 @@ species:
         inference: >-
           Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
         locator:
-          page: 19
+          page: 5
           published_page: 19
           pdf_page_index: 4
           section: Results
@@ -6551,7 +6551,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. Table 3 activities are dimensionless and reduced by ion-current comparison / Belton-Fruehan and Gibbs-Duhem equations (10–15). column 1 is assigned to CaO by the caption. The table caption omits temperature; 1933 K is stated for the matching current-study activity maps in Figure 1, published p.21."
         points:
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6573,7 +6573,7 @@ species:
                   - [Al2O3, "0.055495495495"]
                   - [SiO2, "0.44"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6583,7 +6583,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6605,7 +6605,7 @@ species:
                   - [Al2O3, "0.097826086957"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6615,7 +6615,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6637,7 +6637,7 @@ species:
                   - [Al2O3, "0.078260869565"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6647,7 +6647,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6669,7 +6669,7 @@ species:
                   - [Al2O3, "0.092413793103"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6679,7 +6679,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6701,7 +6701,7 @@ species:
                   - [Al2O3, "0.08"]
                   - [SiO2, "0.42"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6711,7 +6711,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6733,7 +6733,7 @@ species:
                   - [Al2O3, "0.068965517241"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6743,7 +6743,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6765,7 +6765,7 @@ species:
                   - [Al2O3, "0.130769230769"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6775,7 +6775,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6797,7 +6797,7 @@ species:
                   - [Al2O3, "0.125891472868"]
                   - [SiO2, "0.44"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6807,7 +6807,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6829,7 +6829,7 @@ species:
                   - [Al2O3, "0.115384615385"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6839,7 +6839,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6861,7 +6861,7 @@ species:
                   - [Al2O3, "0.223308270677"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6871,7 +6871,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6893,7 +6893,7 @@ species:
                   - [Al2O3, "0.148872180451"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6903,7 +6903,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6925,7 +6925,7 @@ species:
                   - [Al2O3, "0.190298507463"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6935,7 +6935,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6957,7 +6957,7 @@ species:
                   - [Al2O3, "0.17"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6967,7 +6967,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -6989,7 +6989,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -6999,7 +6999,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7021,7 +7021,7 @@ species:
                   - [Al2O3, "0.182374100719"]
                   - [SiO2, "0.35"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7031,7 +7031,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7053,7 +7053,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7063,7 +7063,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7085,7 +7085,7 @@ species:
                   - [Al2O3, "0.249620253165"]
                   - [SiO2, "0.32"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7095,7 +7095,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7117,7 +7117,7 @@ species:
                   - [Al2O3, "0.25125"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7127,7 +7127,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7149,7 +7149,7 @@ species:
                   - [Al2O3, "0.34099378882"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7159,7 +7159,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7181,7 +7181,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7191,7 +7191,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7213,7 +7213,7 @@ species:
                   - [Al2O3, "0.22962962963"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7223,7 +7223,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7245,7 +7245,7 @@ species:
                   - [Al2O3, "0.289877300613"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7255,7 +7255,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7277,7 +7277,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7287,7 +7287,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7309,7 +7309,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7319,7 +7319,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7341,7 +7341,7 @@ species:
                   - [Al2O3, "0.249775280899"]
                   - [SiO2, "0.43"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7351,7 +7351,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7373,7 +7373,7 @@ species:
                   - [Al2O3, "0.45"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7383,7 +7383,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7405,7 +7405,7 @@ species:
                   - [Al2O3, "0.375"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7415,7 +7415,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7437,7 +7437,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7447,7 +7447,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7469,7 +7469,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7479,7 +7479,7 @@ species:
           quantity_as_published: "a_CaO"
           activity_column_as_printed: "1"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7501,7 +7501,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7515,7 +7515,7 @@ species:
     - observation_id: stolyarova_1996_fig1_cao_activity_figure_only
       type: activity_coefficient
       locator:
-        page: 21
+        page: 7
         published_page: 21
         pdf_page_index: 6
         figure: '1'
@@ -7541,7 +7541,7 @@ species:
     - observation_id: stolyarova_1996_fig2_cao_activity_figure_only
       type: activity_coefficient
       locator:
-        page: 26
+        page: 12
         published_page: 26
         pdf_page_index: 11
         figure: '2'
@@ -7569,7 +7569,7 @@ species:
     - observation_id: stolyarova_1996_table3_al2o3_activity_column_2_1933k
       type: activity_coefficient
       locator:
-        page: 23
+        page: 9
         published_page: 23
         pdf_page_index: 8
         table: '3'
@@ -7596,7 +7596,7 @@ species:
         inference: >-
           Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
         locator:
-          page: 19
+          page: 5
           published_page: 19
           pdf_page_index: 4
           section: Results
@@ -7624,7 +7624,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. Table 3 activities are dimensionless and reduced by ion-current comparison / Belton-Fruehan and Gibbs-Duhem equations (10–15). columns 2–4 are assigned to Al2O3 by the caption; this is printed column 2 and the caption does not assign a separate equation to each column. The table caption omits temperature; 1933 K is stated for the matching current-study activity maps in Figure 1, published p.21."
         points:
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7646,7 +7646,7 @@ species:
                   - [Al2O3, "0.068965517241"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7656,7 +7656,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7678,7 +7678,7 @@ species:
                   - [Al2O3, "0.125891472868"]
                   - [SiO2, "0.44"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7688,7 +7688,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7710,7 +7710,7 @@ species:
                   - [Al2O3, "0.115384615385"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7720,7 +7720,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7742,7 +7742,7 @@ species:
                   - [Al2O3, "0.148872180451"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7752,7 +7752,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7774,7 +7774,7 @@ species:
                   - [Al2O3, "0.190298507463"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7784,7 +7784,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7806,7 +7806,7 @@ species:
                   - [Al2O3, "0.17"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7816,7 +7816,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7838,7 +7838,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7848,7 +7848,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7870,7 +7870,7 @@ species:
                   - [Al2O3, "0.182374100719"]
                   - [SiO2, "0.35"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7880,7 +7880,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7902,7 +7902,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7912,7 +7912,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7934,7 +7934,7 @@ species:
                   - [Al2O3, "0.249620253165"]
                   - [SiO2, "0.32"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7944,7 +7944,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7966,7 +7966,7 @@ species:
                   - [Al2O3, "0.25125"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -7976,7 +7976,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -7998,7 +7998,7 @@ species:
                   - [Al2O3, "0.34099378882"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8008,7 +8008,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8030,7 +8030,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8040,7 +8040,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8062,7 +8062,7 @@ species:
                   - [Al2O3, "0.22962962963"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8072,7 +8072,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8094,7 +8094,7 @@ species:
                   - [Al2O3, "0.289877300613"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8104,7 +8104,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8126,7 +8126,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8136,7 +8136,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8158,7 +8158,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8168,7 +8168,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8190,7 +8190,7 @@ species:
                   - [Al2O3, "0.249775280899"]
                   - [SiO2, "0.43"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8200,7 +8200,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8222,7 +8222,7 @@ species:
                   - [Al2O3, "0.45"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8232,7 +8232,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8254,7 +8254,7 @@ species:
                   - [Al2O3, "0.375"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8264,7 +8264,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8286,7 +8286,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8296,7 +8296,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8318,7 +8318,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8328,7 +8328,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "2"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8350,7 +8350,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8364,7 +8364,7 @@ species:
     - observation_id: stolyarova_1996_table3_al2o3_activity_column_3_1933k
       type: activity_coefficient
       locator:
-        page: 23
+        page: 9
         published_page: 23
         pdf_page_index: 8
         table: '3'
@@ -8391,7 +8391,7 @@ species:
         inference: >-
           Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
         locator:
-          page: 19
+          page: 5
           published_page: 19
           pdf_page_index: 4
           section: Results
@@ -8419,7 +8419,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. Table 3 activities are dimensionless and reduced by ion-current comparison / Belton-Fruehan and Gibbs-Duhem equations (10–15). columns 2–4 are assigned to Al2O3 by the caption; this is printed column 3 and the caption does not assign a separate equation to each column. The table caption omits temperature; 1933 K is stated for the matching current-study activity maps in Figure 1, published p.21."
         points:
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8441,7 +8441,7 @@ species:
                   - [Al2O3, "0.055495495495"]
                   - [SiO2, "0.44"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8451,7 +8451,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8473,7 +8473,7 @@ species:
                   - [Al2O3, "0.097826086957"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8483,7 +8483,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8505,7 +8505,7 @@ species:
                   - [Al2O3, "0.078260869565"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8515,7 +8515,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8537,7 +8537,7 @@ species:
                   - [Al2O3, "0.092413793103"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8547,7 +8547,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8569,7 +8569,7 @@ species:
                   - [Al2O3, "0.08"]
                   - [SiO2, "0.42"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8579,7 +8579,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8601,7 +8601,7 @@ species:
                   - [Al2O3, "0.068965517241"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8611,7 +8611,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8633,7 +8633,7 @@ species:
                   - [Al2O3, "0.130769230769"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8643,7 +8643,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8665,7 +8665,7 @@ species:
                   - [Al2O3, "0.125891472868"]
                   - [SiO2, "0.44"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8675,7 +8675,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8697,7 +8697,7 @@ species:
                   - [Al2O3, "0.115384615385"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8707,7 +8707,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8729,7 +8729,7 @@ species:
                   - [Al2O3, "0.223308270677"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8739,7 +8739,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8761,7 +8761,7 @@ species:
                   - [Al2O3, "0.148872180451"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8771,7 +8771,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8793,7 +8793,7 @@ species:
                   - [Al2O3, "0.190298507463"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8803,7 +8803,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8825,7 +8825,7 @@ species:
                   - [Al2O3, "0.17"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8835,7 +8835,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8857,7 +8857,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8867,7 +8867,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8889,7 +8889,7 @@ species:
                   - [Al2O3, "0.182374100719"]
                   - [SiO2, "0.35"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8899,7 +8899,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8921,7 +8921,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8931,7 +8931,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8953,7 +8953,7 @@ species:
                   - [Al2O3, "0.25125"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8963,7 +8963,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -8985,7 +8985,7 @@ species:
                   - [Al2O3, "0.34099378882"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -8995,7 +8995,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9017,7 +9017,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9027,7 +9027,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9049,7 +9049,7 @@ species:
                   - [Al2O3, "0.22962962963"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9059,7 +9059,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9081,7 +9081,7 @@ species:
                   - [Al2O3, "0.289877300613"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9091,7 +9091,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9113,7 +9113,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9123,7 +9123,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9145,7 +9145,7 @@ species:
                   - [Al2O3, "0.24874251497"]
                   - [SiO2, "0.38"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9155,7 +9155,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9177,7 +9177,7 @@ species:
                   - [Al2O3, "0.45"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9187,7 +9187,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9209,7 +9209,7 @@ species:
                   - [Al2O3, "0.375"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9219,7 +9219,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9241,7 +9241,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9251,7 +9251,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9273,7 +9273,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9283,7 +9283,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "3"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9305,7 +9305,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9319,7 +9319,7 @@ species:
     - observation_id: stolyarova_1996_table3_al2o3_activity_column_4_1933k
       type: activity_coefficient
       locator:
-        page: 23
+        page: 9
         published_page: 23
         pdf_page_index: 8
         table: '3'
@@ -9346,7 +9346,7 @@ species:
         inference: >-
           Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
         locator:
-          page: 19
+          page: 5
           published_page: 19
           pdf_page_index: 4
           section: Results
@@ -9374,7 +9374,7 @@ species:
         note: "Dash cells remain unreported and are not substituted with zero. Table 3 activities are dimensionless and reduced by ion-current comparison / Belton-Fruehan and Gibbs-Duhem equations (10–15). columns 2–4 are assigned to Al2O3 by the caption; this is printed column 4 and the caption does not assign a separate equation to each column. The table caption omits temperature; 1933 K is stated for the matching current-study activity maps in Figure 1, published p.21."
         points:
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9396,7 +9396,7 @@ species:
                   - [Al2O3, "0.097826086957"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9406,7 +9406,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9428,7 +9428,7 @@ species:
                   - [Al2O3, "0.078260869565"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9438,7 +9438,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9460,7 +9460,7 @@ species:
                   - [Al2O3, "0.092413793103"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9470,7 +9470,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9492,7 +9492,7 @@ species:
                   - [Al2O3, "0.08"]
                   - [SiO2, "0.42"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9502,7 +9502,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9524,7 +9524,7 @@ species:
                   - [Al2O3, "0.068965517241"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9534,7 +9534,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9556,7 +9556,7 @@ species:
                   - [Al2O3, "0.130769230769"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9566,7 +9566,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9588,7 +9588,7 @@ species:
                   - [Al2O3, "0.125891472868"]
                   - [SiO2, "0.44"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9598,7 +9598,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9620,7 +9620,7 @@ species:
                   - [Al2O3, "0.115384615385"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9630,7 +9630,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9652,7 +9652,7 @@ species:
                   - [Al2O3, "0.223308270677"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9662,7 +9662,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9684,7 +9684,7 @@ species:
                   - [Al2O3, "0.148872180451"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9694,7 +9694,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9716,7 +9716,7 @@ species:
                   - [Al2O3, "0.190298507463"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9726,7 +9726,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9748,7 +9748,7 @@ species:
                   - [Al2O3, "0.17"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9758,7 +9758,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9780,7 +9780,7 @@ species:
                   - [Al2O3, "0.12962962963"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9790,7 +9790,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9812,7 +9812,7 @@ species:
                   - [Al2O3, "0.182374100719"]
                   - [SiO2, "0.35"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9822,7 +9822,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9844,7 +9844,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9854,7 +9854,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9876,7 +9876,7 @@ species:
                   - [Al2O3, "0.25125"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9886,7 +9886,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9908,7 +9908,7 @@ species:
                   - [Al2O3, "0.34099378882"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9918,7 +9918,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9940,7 +9940,7 @@ species:
                   - [Al2O3, "0.189440993789"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9950,7 +9950,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -9972,7 +9972,7 @@ species:
                   - [Al2O3, "0.22962962963"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -9982,7 +9982,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -10004,7 +10004,7 @@ species:
                   - [Al2O3, "0.289877300613"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -10014,7 +10014,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -10036,7 +10036,7 @@ species:
                   - [Al2O3, "0.202926829268"]
                   - [SiO2, "0.48"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -10046,7 +10046,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -10068,7 +10068,7 @@ species:
                   - [Al2O3, "0.45"]
                   - [SiO2, "0.10"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -10078,7 +10078,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -10100,7 +10100,7 @@ species:
                   - [Al2O3, "0.375"]
                   - [SiO2, "0.25"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -10110,7 +10110,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -10132,7 +10132,7 @@ species:
                   - [Al2O3, "0.335"]
                   - [SiO2, "0.33"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -10142,7 +10142,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -10164,7 +10164,7 @@ species:
                   - [Al2O3, "0.3"]
                   - [SiO2, "0.40"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -10174,7 +10174,7 @@ species:
           quantity_as_published: "a_Al2O3"
           activity_column_as_printed: "4"
         - locator:
-            page: 23
+            page: 9
             published_page: 23
             pdf_page_index: 8
             table: '3'
@@ -10196,7 +10196,7 @@ species:
                   - [Al2O3, "0.25"]
                   - [SiO2, "0.50"]
               locator:
-                page: 23
+                page: 9
                 published_page: 23
                 pdf_page_index: 8
                 table: '3'
@@ -10210,7 +10210,7 @@ species:
     - observation_id: stolyarova_1996_fig1_al2o3_activity_figure_only
       type: activity_coefficient
       locator:
-        page: 21
+        page: 7
         published_page: 21
         pdf_page_index: 6
         figure: '1'
@@ -10236,7 +10236,7 @@ species:
     - observation_id: stolyarova_1996_fig2_al2o3_activity_figure_only
       type: activity_coefficient
       locator:
-        page: 26
+        page: 12
         published_page: 26
         pdf_page_index: 11
         figure: '2'

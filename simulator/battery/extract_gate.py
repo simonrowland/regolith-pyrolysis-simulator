@@ -138,9 +138,16 @@ def _as_decimal(value: object) -> Decimal | None:
     return result if result.is_finite() else None
 
 
-def _pdf_page_count(corpus: Path, source_id: str) -> tuple[int | None, str | None]:
-    pdf_path = corpus / "raw" / source_id / f"{source_id}.pdf"
-    if not pdf_path.is_file():
+def _pdf_page_count(
+    corpus: Path, source_ids: Iterable[str]
+) -> tuple[int | None, str | None]:
+    pdf_paths = [
+        corpus / "raw" / source_id / f"{source_id}.pdf"
+        for source_id in dict.fromkeys(source_ids)
+        if source_id
+    ]
+    pdf_path = next((path for path in pdf_paths if path.is_file()), None)
+    if pdf_path is None:
         return None, None
     try:
         result = subprocess.run(
@@ -184,21 +191,38 @@ def _locator_issues(
     pdf_page_count: int | None,
     pdf_error: str | None,
     legacy_missing_index: bool,
-) -> tuple[list[str], list[str], list[str], list[str]]:
+) -> tuple[list[str], list[str], list[str], list[str], list[str]]:
     hard_issues: list[str] = []
-    soft_page_issues: list[str] = []
+    page_offset_issues: list[str] = []
     soft_pdf_issues: list[str] = []
     soft_legacy_issues: list[str] = []
+    verification_issues: list[str] = []
     saw_locator = False
     for mapping, path in _mappings(doc):
         for key, locator in mapping.items():
-            if key != "locator":
+            if key != "locator" and not (
+                isinstance(key, str) and key.endswith("_locator")
+            ):
                 continue
-            location = f"{path}.locator" if path else "locator"
+            location = f"{path}.{key}" if path else str(key)
             saw_locator = True
             if not isinstance(locator, Mapping):
                 hard_issues.append(f"{location} must be a mapping")
                 continue
+            verification = locator.get("page_verification")
+            if verification is not None:
+                if verification != "unverified_pdf_absent":
+                    hard_issues.append(
+                        f"{location}.page_verification has unsupported value {verification!r}"
+                    )
+                elif pdf_page_count is None and pdf_error is None:
+                    verification_issues.append(
+                        f"{location}: physical page could not be verified because the PDF is absent"
+                    )
+                else:
+                    page_offset_issues.append(
+                        f"{location}.page_verification is invalid because a corpus PDF is present"
+                    )
             index = locator.get("pdf_page_index")
             if index is None:
                 message = f"{location}.pdf_page_index is missing"
@@ -221,14 +245,18 @@ def _locator_issues(
                     f"0..{pdf_page_count - 1} page range"
                 )
             page = _as_decimal(locator.get("page"))
-            if (
+            if page is None and verification != "unverified_pdf_absent":
+                verification_issues.append(
+                    f"{location}.page is missing or invalid; physical page is unverified"
+                )
+            elif (
                 page is not None
                 and page != Decimal(index + 1)
-                and locator.get("published_page") in (None, "")
+                and verification != "unverified_pdf_absent"
             ):
-                soft_page_issues.append(
+                page_offset_issues.append(
                     f"{location}: page {page} differs from pdf_page_index + 1; "
-                    "no published_page is recorded (possible folio/index confusion)"
+                    "page must be the one-based physical PDF page"
                 )
     if saw_locator:
         if pdf_error:
@@ -237,7 +265,13 @@ def _locator_issues(
             soft_pdf_issues.append(
                 "corpus PDF is absent; pdf_page_index upper bounds could not be checked"
             )
-    return hard_issues, soft_page_issues, soft_pdf_issues, soft_legacy_issues
+    return (
+        hard_issues,
+        page_offset_issues,
+        soft_pdf_issues,
+        soft_legacy_issues,
+        verification_issues,
+    )
 
 
 def _component_pairs(value: object) -> list[tuple[str, object]]:
@@ -1162,12 +1196,20 @@ def evaluate_extract(
     migration_issues = _migrate_one(path, doc, report)
     _add(report, "isolated-migration", "HARD", migration_issues)
     source_id = path.stem
-    page_count, pdf_error = _pdf_page_count(corpus, source_id)
+    source = doc.get("source") if isinstance(doc, Mapping) else None
+    corpus_source_id = (
+        source.get("corpus_source_id") if isinstance(source, Mapping) else None
+    )
+    source_ids = [source_id]
+    if isinstance(corpus_source_id, str):
+        source_ids.append(corpus_source_id)
+    page_count, pdf_error = _pdf_page_count(corpus, source_ids)
     (
         locator_hard,
-        locator_page_soft,
+        locator_page_issues,
         locator_pdf_soft,
         locator_legacy_soft,
+        locator_verification,
     ) = _locator_issues(
         doc,
         pdf_page_count=page_count,
@@ -1175,9 +1217,10 @@ def evaluate_extract(
         legacy_missing_index=_legacy_missing_locator_index(doc),
     )
     _add(report, "locator", "HARD", locator_hard)
-    _add(report, "locator-page-offset", "SOFT", locator_page_soft)
+    _add(report, "locator-page-offset", "HARD", locator_page_issues)
     _add(report, "locator-pdf", "SOFT", locator_pdf_soft)
     _add(report, "locator-legacy", "SOFT", locator_legacy_soft)
+    _add(report, "locator-verification", "SOFT", locator_verification)
     _add(
         report,
         "composition",

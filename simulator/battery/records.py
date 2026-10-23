@@ -69,6 +69,9 @@ _LOCATOR_KEYS = (
     "page",
     "published_page",
     "pdf_page_index",
+    "page_verification",
+    "table_caption_page",
+    "table_continued",
     "table",
     "figure",
     "paragraph",
@@ -126,6 +129,9 @@ class Locator:
     page: str | int | None = None
     published_page: str | int | None = None
     pdf_page_index: int | None = None
+    page_verification: str | None = None
+    table_caption_page: int | None = None
+    table_continued: bool | None = None
     table: str | None = None
     figure: str | None = None
     paragraph: str | None = None
@@ -139,9 +145,21 @@ class Locator:
     def __post_init__(self) -> None:
         if not self.has_location():
             raise ValueError("Locator requires at least one nonempty location key")
+        if self.table_caption_page is not None:
+            if type(self.table_caption_page) is not int:
+                raise TypeError("table_caption_page must be an integer physical page")
+            if not isinstance(self.page, int) or self.table_caption_page >= self.page:
+                raise ValueError("table_caption_page must be earlier than the data page")
+        if self.table_continued is not None:
+            if type(self.table_continued) is not bool:
+                raise TypeError("table_continued must be a boolean")
+            if self.table_continued and not isinstance(self.page, int):
+                raise ValueError("table_continued requires a physical data page")
 
     def has_location(self) -> bool:
         for name in _LOCATOR_KEYS:
+            if name in {"page_verification", "table_caption_page", "table_continued"}:
+                continue
             raw = getattr(self, name)
             if raw is None:
                 continue

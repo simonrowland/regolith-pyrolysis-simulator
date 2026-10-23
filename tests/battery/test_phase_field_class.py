@@ -234,7 +234,8 @@ def test_stolyarova_1991_class_s_is_exactly_the_20_points_at_1933k(migrated) -> 
     for x, notice in classified.values():
         payload = _payload(notice, OUTSIDE_SINGLE_LIQUID_FIELD)
         assert payload["criterion"] == "stated_liquidus_side_and_printed_plateau_within_2_sigma"
-        assert payload["locator"]["page"] == 3711
+        assert payload["locator"]["page"] == 2
+        assert payload["locator"]["published_page"] == 3711
         values = payload["test_values"]
         assert Decimal(values["x"]) == x
         assert (values["liquidus"], values["liquidus_sigma"]) == ("0.37", "0.02")
@@ -269,7 +270,8 @@ def test_stolyarova_1991_contested_rows_carry_stated_liquidus_and_sigma(migrated
         assert payload["stated_liquidus"] == "0.37"
         assert payload["stated_liquidus_sigma"] == "0.02"
         assert payload["superseded_liquidus"] == ["0.41"]
-        assert payload["locator"]["page"] == 3711
+        assert payload["locator"]["page"] == 2
+        assert payload["locator"]["published_page"] == 3711
         assert not any(notice.band for notice in observation.notices)
 
 
