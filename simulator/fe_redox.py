@@ -515,14 +515,21 @@ def _published_intrinsic_melt_fO2(
     temperature_K: float,
 ) -> dict[str, object]:
     """Bound the vapour-facing potential without respeciating the ledger."""
-    from simulator.chemistry.ellingham_graph import dissociation_pO2_threshold
+    from simulator.chemistry.ellingham_graph import (
+        GAS_CONSTANT_J_PER_MOL_K,
+        dissociation_pO2_threshold,
+    )
     from simulator.chemistry.ellingham_thermo import (
         ELLINGHAM_METAL_PHASE_GAS,
         ELLINGHAM_THERMO,
         ellingham_authority_limit,
         ellingham_metal_phase_kind,
+        ellingham_segment_for_temperature,
     )
-    from simulator.chemistry.melt_activity import melt_oxide_activity
+    from simulator.chemistry.melt_activity import (
+        _oxide_liquid_reference_delta_g_kj_per_mol,
+        melt_oxide_activity,
+    )
     from simulator.state import OXIDE_TO_METAL
 
     raw = float(raw_fO2_log)
@@ -530,6 +537,8 @@ def _published_intrinsic_melt_fO2(
     if not math.isfinite(raw) or not math.isfinite(temperature) or temperature <= 0.0:
         raise Kress91InvalidControls('intrinsic publication requires finite fO2 and positive T_K')
     candidates = {}
+    unavailable = {}
+    notices = []
     for oxide, (metal, _, _) in OXIDE_TO_METAL.items():
         # The Fe thermochemistry is Fe/FeO, never Fe/Fe2O3. In particular,
         # a Kress-implied ferrous fraction must not invent a missing ledger
@@ -560,13 +569,50 @@ def _published_intrinsic_melt_fO2(
         # Green does not precipitate metal at this publication site: that
         # missing transition remains a model limitation, not a ledger mutation.
         if oxide == 'FeO':
-            bound = feo_iw_log10_fO2_bar(temperature, a_feo=activity.activity)
+            # The activity owner uses stoichiometric FeO(l); Eq. 9 uses
+            # liquid wustite "FeO". Holzheid's printed gamma_stoich/gamma_w
+            # ratio has the same mole-fraction denominator, hence
+            # a_w = a_stoich/ratio. Reuse its existing interpolation/clamping
+            # owner and expose the latter as a prediction limitation.
+            band = holzheid_stoich_feo_gamma_band(temperature)
+            ratio = float(band['conversion_multiplier'])
+            reference_activity = activity.thermodynamic_parent_activity() / ratio
+            bound = feo_iw_log10_fO2_bar(temperature, a_feo=reference_activity)
+            conversion = {'stoich_to_wustite_activity_divisor': ratio,
+                          'status': band['conversion_status'],
+                          'source': band['conversion_source']}
             authority = FE_FEO_BUFFER_STANDARD
-            authority_limit = None
+            authority_limit = {
+                'reason': 'temperature_support_not_established',
+                'source': 'simulator.fe_redox:feo_iw_log10_fO2_bar; Holzheid1997 Eq.9',
+            }
         else:
+            segment = ellingham_segment_for_temperature(metal, temperature)
+            try:
+                conversion = _oxide_liquid_reference_delta_g_kj_per_mol(
+                    oxide, temperature, segment.phase_basis,
+                )
+            except (ValueError, OSError) as exc:
+                reason = f'{oxide}: reduction buffer reference conversion unavailable: {exc}'
+                unavailable[oxide] = reason
+                notices.append(reason)
+                continue
+            # Equate the SAME component potential on the two standards:
+            # G_l^0 + RT ln(a_l) = G_s^0 + RT ln(a_s), so
+            # ln(a_s) = ln(a_l) + (G_l^0-G_s^0)/(RT). Activities here are
+            # parent-formula activities from their owning conversion method.
+            # With n_ox oxide/mol O2, the log10 buffer shift is
+            # n_ox*(G_l^0-G_s^0)*1000/(R*T*ln(10)). JANAF G is kJ/mol
+            # parent; R*T is J/mol, so 1000 converts to a dimensionless log.
+            # Below melting G_l^0>G_s^0: the floor becomes LESS reducing.
+            # At the cr/l Gibbs crossing the correction vanishes. A declared
+            # liquid segment already has the activity's reference and gets
+            # zero correction, regardless of any guessed melting cutoff.
+            shift = (segment.n_ox * conversion['delta_g_kJ_per_mol'] * 1000.0
+                     / (GAS_CONSTANT_J_PER_MOL_K * temperature * math.log(10.0)))
             bound = math.log10(dissociation_pO2_threshold(
                 metal, temperature, a_oxide=activity.thermodynamic_parent_activity(),
-            ))
+            )) + shift
             authority = 'ellingham_metal_oxide_equilibrium'
             authority_limit = ellingham_authority_limit(
                 temperature, species=metal, consumer='intrinsic_melt_reduction_buffer',
@@ -578,10 +624,21 @@ def _published_intrinsic_melt_fO2(
             'activity_notice': activity.warning,
             'authority': authority,
             'authority_limit': authority_limit,
+            'reference_conversion': conversion,
         }
     oxide = max(candidates, key=lambda key: candidates[key]['fO2_log_lower_bound']) if candidates else None
     floor = candidates[oxide]['fO2_log_lower_bound'] if oxide is not None else None
     published = max(raw, floor) if floor is not None else raw
+    if published > raw:
+        notices.insert(0, f'intrinsic fO2 below reduction buffer of {oxide}; buffer published')
+    iw_notice = ''
+    if published > raw and oxide == 'FeO':
+        iw_notice = ('IW buffer temperature support not established '
+                     f"(source: {candidates[oxide]['authority_limit']['source']})")
+        notices.append(iw_notice)
+        conversion = candidates[oxide]['reference_conversion']
+        if str(conversion['status']).startswith('clamped'):
+            notices.append(f"FeO stoichiometric/wustite reference conversion {conversion['status']}")
     return {
         'raw_reservoir_fO2_log': raw,
         'published_intrinsic_fO2_log': published,
@@ -591,10 +648,9 @@ def _published_intrinsic_melt_fO2(
         'authority_level': 'non_certifying_reduction_buffer',
         'inventory_basis': 'ledger_oxide_inventory_not_kress_implied_split',
         'candidates': candidates,
-        'notice': (
-            f'intrinsic fO2 below reduction buffer of {oxide}; buffer published'
-            if published > raw else ''
-        ),
+        'unavailable_buffers': unavailable,
+        'iw_temperature_support_notice': iw_notice,
+        'notice': '; '.join(notices),
     }
 
 

@@ -8,7 +8,11 @@ import pytest
 from simulator.chemistry.kernel import ChemistryIntent, IntentResult
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.core import PyrolysisSimulator
-from simulator.fe_redox import _published_intrinsic_melt_fO2, feo_iw_log10_fO2_bar
+from simulator.fe_redox import (
+    _published_intrinsic_melt_fO2,
+    feo_iw_log10_fO2_bar,
+    holzheid_stoich_feo_gamma_band,
+)
 from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
 from tests.test_fe_redox_split_diagnostic import _load_yaml, _make_sim
 
@@ -67,7 +71,8 @@ def test_h167_intrinsic_publication_uses_feo_buffer(incident):
     before = sim.atom_ledger.mol_by_account()
     sim._refresh_vapor_pressures_from_kernel(result)
     activity = melt_oxide_activity("FeO", before["process.cleaned_melt"], temperature_K=T_K)
-    floor = feo_iw_log10_fO2_bar(T_K, a_feo=activity.activity)
+    divisor = holzheid_stoich_feo_gamma_band(T_K)['conversion_multiplier']
+    floor = feo_iw_log10_fO2_bar(T_K, a_feo=activity.activity / divisor)
     assert calls[0]["control_inputs"]["intrinsic_fO2_log"] == floor
     assert calls[0]["fO2_log"] == floor
     publication = sim._last_vapor_pressure_diagnostic["intrinsic_fO2_publication"]
@@ -132,7 +137,8 @@ def test_real_kernel_retains_published_source_oxygen_and_raw_reservoir(incident,
     sim._refresh_vapor_pressures_from_kernel(result)
     diagnostic = sim._last_vapor_pressure_diagnostic
     activity = melt_oxide_activity("FeO", before["process.cleaned_melt"], temperature_K=T_K)
-    expected = feo_iw_log10_fO2_bar(T_K, a_feo=activity.activity)
+    divisor = holzheid_stoich_feo_gamma_band(T_K)['conversion_multiplier']
+    expected = feo_iw_log10_fO2_bar(T_K, a_feo=activity.activity / divisor)
     assert diagnostic["source_reaction_fO2_log10"] == expected
     published = diagnostic["intrinsic_fO2_publication"]["published_intrinsic_fO2_log"]
     assert published > RAW_LOG_FO2

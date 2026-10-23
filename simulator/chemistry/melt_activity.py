@@ -796,6 +796,55 @@ def _na2o_janaf_liquid_source_data() -> tuple[
     return liquid_points, liquid_tm, delta_h_fus_kJ_per_mol_na2o
 
 
+def _oxide_liquid_reference_delta_g_kj_per_mol(
+    parent_oxide: str, temperature_K: float, phase_basis: str,
+) -> dict[str, Any]:
+    """G_liquid - G_declared_oxide, on the parent-formula JANAF basis."""
+    from decimal import Decimal
+    from simulator.reference_data.janaf import (
+        _FUSION_TABLES,
+        _formation_gibbs_kJ_per_mol,
+    )
+
+    match = re.search(re.escape(parent_oxide) + r"\(([^)]+)\)", phase_basis)
+    if match is None:
+        raise ValueError(f'{parent_oxide}: oxide reference phase not declared in {phase_basis}')
+    phase = match.group(1)
+    if phase.lower().startswith('l'):
+        return {'delta_g_kJ_per_mol': 0.0, 'phase': phase, 'tables': ()}
+    if parent_oxide == 'Na2O':
+        from simulator.chemistry.ellingham_thermo import ellingham_segment_for_temperature
+
+        segment = ellingham_segment_for_temperature('Na', temperature_K)
+        # Reuse the existing alpha/beta-to-liquid JANAF/fusion continuation.
+        # Divide its per-mol-O2 energy difference by oxide mol/mol O2.
+        difference = (_na_activity_reference_standard_delta_g_kj_per_mol_o2(temperature_K)
+                      - segment.delta_g_kJ_per_mol_O2(temperature_K)) / segment.n_ox
+        return {'delta_g_kJ_per_mol': difference, 'phase': phase,
+                'source': '_na_activity_reference_standard_delta_g_kj_per_mol_o2',
+                'tables': ('Na-014', 'Na-013')}
+    pairs = {
+        **_FUSION_TABLES,
+        'Cr2O3': ('Cr-014', 'Cr-015'),
+        'TiO2': ('O-043', 'O-044'),
+    }
+    if parent_oxide == 'SiO2' and phase == 'II':
+        # This Ellingham segment declares quartz II (O-039's I/II branch),
+        # not the high-cristobalite solid used by the default fusion pair.
+        solid, liquid = 'O-037', 'O-038'
+    elif parent_oxide in pairs and phase in {'s', 'cr', 'alpha,s', 'rutile,s'}:
+        solid, liquid = pairs[parent_oxide]
+    else:
+        raise ValueError(f'{parent_oxide}({phase}): JANAF liquid/crystal reference pair unavailable')
+    temperature = Decimal(str(temperature_K))
+    difference = (
+        _formation_gibbs_kJ_per_mol(liquid, temperature)
+        - _formation_gibbs_kJ_per_mol(solid, temperature)
+    )
+    return {'delta_g_kJ_per_mol': float(difference), 'phase': phase,
+            'tables': (solid, liquid)}
+
+
 def _na_activity_reference_standard_delta_g_kj_per_mol_o2(
     temperature_K: float,
 ) -> float:

@@ -1,8 +1,9 @@
 """NIST-JANAF 4th edition compilation loader.
 
 Reads ``data/literature/compilations/janaf/`` (one YAML/JSON file per
-table). Numbers stay as published tokens; there is no unit conversion,
-smoothing, phase merging, or integer rewrite of printed formulas.
+table). Raw loaders retain printed tokens without unit conversion, phase
+merging or formula rewriting. Opt-in Gibbs queries share the fusion reader's
+interpolation arithmetic and missing-node rules.
 
 Source ``.txt`` bytes are not in git. Source round-trip tests re-parse
 available original downloads and compare complete printed-token rows;
@@ -17,6 +18,7 @@ import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
 
@@ -1335,6 +1337,30 @@ def _formation_gibbs_points(rows: Iterable[Mapping[str, Any]]) -> tuple[
             points.append((t, Decimal(str(g_value))))
     points.sort()
     return tuple(points), tuple(sorted(temperatures))
+
+
+@lru_cache
+def _formation_gibbs_kJ_per_mol(table_id: str, temperature_K: Decimal) -> Decimal:
+    """Interpolate one printed phase, refusing unavailable Gibbs nodes/ranges."""
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    table = document['table']
+    if table['index_entry']['state'] == 'l':
+        # A table titled liquid may include a glass branch. Its printed
+        # transition, rather than an invented T cutoff, delimits liquid data.
+        for marker in table.get('parse_ambiguities', ()):
+            fields = str(marker.get('raw_line', '')).split('\t')
+            if fields[-1].strip() == 'GLASS <--> LIQUID' and temperature_K < Decimal(fields[0]):
+                raise ValueError(f'{table_id}: liquid Gibbs unavailable below printed '
+                                 f'GLASS <--> LIQUID at {fields[0]} K')
+    points, temperatures = _formation_gibbs_points(table['values'])
+    if len(points) < 2:
+        raise ValueError(f'{table_id}: JANAF table has fewer than two Gibbs points')
+    present = {temperature for temperature, _ in points}
+    missing = tuple(temperature for temperature in temperatures if temperature not in present)
+    absent = _missing_node_for_interpolation(points, missing, temperature_K)
+    if absent is not None:
+        raise ValueError(f'{table_id}: missing formation Gibbs node {absent} K')
+    return _interpolate_formation_gibbs(points, temperature_K)
 
 
 def _interpolate_formation_gibbs(
