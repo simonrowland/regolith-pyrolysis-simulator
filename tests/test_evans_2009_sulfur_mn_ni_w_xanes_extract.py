@@ -49,8 +49,22 @@ def test_xanes_tables_and_deferred_figures_preserve_printed_evidence() -> None:
     assert typed_vectors["B030106p2b"]["Si"] == "19.93(8)"
     assert typed_vectors["B030106p2b"]["S"] == "0.224(1)"
     assert typed_vectors["B030106p2b"]["Mn"] == "0.381(3)"
+    assert typed_vectors["B301205p3b"]["Si"] == "19.8(1)"
+    assert typed_vectors["B111006p2"]["Ca"] == "24.(1)"
+    assert typed_vectors["B120406p6b"]["O"] == "41.(1)"
     assert typed_vectors["B220806p4"]["W"] == "2.23(3)"
     assert typed_vectors["B010806p2"]["Ni"] == "0.132(8)"
+    expected_sigma = {
+        ("B030106p2b", "S"): "0.001",
+        ("B301205p3b", "Si"): "0.1",
+        ("B111006p2", "Ca"): "1",
+        ("B120406p6b", "O"): "1",
+    }
+    assert all("sigma" in point for point in all_source_points)
+    for point in all_source_points:
+        key = (point["sample"], point["species_as_printed"])
+        if key in expected_sigma:
+            assert point["sigma"] == expected_sigma[key]
     assert all(point["run_as_printed"] == point["sample"][:7] for point in all_source_points)
     assert all(
         point["locator"]["page"] in {7, 8}
@@ -114,3 +128,8 @@ def test_xanes_tables_and_deferred_figures_preserve_printed_evidence() -> None:
     assert all(row.point_conditions["T_C"].state.value == Decimal("1400") for row in migrated)
     assert all(row.locator.page in {7, 8} and row.locator.published_page in {6853, 6854} for row in migrated)
     assert all("fO2_log" not in row.point_conditions and "atmosphere" not in row.point_conditions for row in migrated)
+    sulfur = next(
+        row for row in migrated
+        if row.identity.species.formula == "S" and row.value.point == Decimal("0.224")
+    )
+    assert sulfur.uncertainty.verbatim["sigma"] == "0.001"

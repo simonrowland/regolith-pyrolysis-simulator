@@ -7,12 +7,12 @@ source:
   corpus_asset: raw/evans-2009-sulfur-mn-ni-w-xanes/evans-2009-sulfur-mn-ni-w-xanes.pdf
 extraction:
   method: >-
-    Born-digital journal article; pdftotext-layout is primary and MinerU table draft found no table blocks. Tables 1, 2a, 2b, 2c, 3, 4, 5, and 6 were transcribed from text and checked against 600 dpi renders. Figures 1-11 are recorded with deferred digitisation and no numeric points. The paper reports proportions of S-XANES peak components, not oxidation-state fractions: it explicitly rejects a one-to-one mapping between components and sulphur species. The battery has no matching quantity for these peak proportions, for whole-glass composition vectors, or for the sulfur concentration data.
+    Born-digital journal article; pdftotext-layout is primary and MinerU table draft found no table blocks. Tables 1, 2a, 2b, 2c, 3, 4, 5, and 6 were transcribed from text and checked against 600 dpi renders. Figures 1-11 are recorded with deferred digitisation and no numeric points. The paper reports proportions of S-XANES peak components, not oxidation-state fractions: it explicitly rejects a one-to-one mapping between components and sulphur species. Numeric component cells in Tables 2a-2c are typed as equilibrium_phase_composition; Tables 3-6, peak proportions, and sulfur concentration data remain context because no matching quantity describes them.
   table_dispositions:
     table_1: context-only; run conditions include printed fugacity logs, but there are no scored observations to attach them to
-    table_2a: context-only; measured Mn-bearing whole-glass composition vectors have no matching store quantity
-    table_2b: context-only; measured W-bearing whole-glass composition vectors have no matching store quantity
-    table_2c: context-only; measured Ni-bearing whole-glass composition vectors have no matching store quantity
+    table_2a: typed; numeric measured Mn-bearing whole-glass composition cells are equilibrium_phase_composition observations
+    table_2b: typed; numeric measured W-bearing whole-glass composition cells are equilibrium_phase_composition observations
+    table_2c: typed; numeric measured Ni-bearing whole-glass composition cells are equilibrium_phase_composition observations
     table_3: context-only; fitted S-XANES peak proportions are not sulfur oxidation-state fractions, and no peak-proportion quantity exists
     table_4: context-only; correlation coefficients are derived statistics rather than measured quantities
     table_5: context-only; EXAFS coordination and bond-distance fit parameters have no matching quantity token
@@ -22,6 +22,10 @@ extraction:
   date: '2026-10-20'
   worker: fam31-1020
 review_status: draft
+fidelity_samples:
+- path: species.S.observations[evans_2009_2a_s_composition].values.points[0].value
+  value: '0.224'
+  locator: {page: 7, published_page: 6853, pdf_page_index: 6, table: 2a, row: B030106p2b, column: 'S (wt%)'}
 species:
   S:
     observations:
@@ -37,7 +41,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: S
@@ -52,6 +56,7 @@ species:
           row_as_printed: B030106p2b
           value_as_published: 0.224(1)
           value: '0.224'
+          sigma: '0.001'
           point_conditions:
             T_C:
               state:
@@ -81,6 +86,7 @@ species:
           row_as_printed: B310706p1a
           value_as_published: 0.196(3)
           value: '0.196'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -110,6 +116,7 @@ species:
           row_as_printed: B310706p2a
           value_as_published: 0.332(3)
           value: '0.332'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -139,6 +146,7 @@ species:
           row_as_printed: B310706p3a
           value_as_published: 0.480(2)
           value: '0.480'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -168,6 +176,7 @@ species:
           row_as_printed: B310706p4a
           value_as_published: 0.726(6)
           value: '0.726'
+          sigma: '0.006'
           point_conditions:
             T_C:
               state:
@@ -197,6 +206,7 @@ species:
           row_as_printed: B310706p5
           value_as_published: 0.879(4)
           value: '0.879'
+          sigma: '0.004'
           point_conditions:
             T_C:
               state:
@@ -226,6 +236,7 @@ species:
           row_as_printed: B310706p6a
           value_as_published: 1.117(8)
           value: '1.117'
+          sigma: '0.008'
           point_conditions:
             T_C:
               state:
@@ -255,6 +266,7 @@ species:
           row_as_printed: B020806p1
           value_as_published: 0.088(3)
           value: '0.088'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -284,6 +296,7 @@ species:
           row_as_printed: B020806p2a
           value_as_published: 0.053(2)
           value: '0.053'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -313,6 +326,7 @@ species:
           row_as_printed: B020806p3a
           value_as_published: 0.12(1)
           value: '0.12'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -342,6 +356,7 @@ species:
           row_as_printed: B020806p4
           value_as_published: 0.024(2)
           value: '0.024'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -371,6 +386,7 @@ species:
           row_as_printed: B020806p5
           value_as_published: 0.039(2)
           value: '0.039'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -400,6 +416,7 @@ species:
           row_as_printed: B020806p6b
           value_as_published: 0.122(4)
           value: '0.122'
+          sigma: '0.004'
           point_conditions:
             T_C:
               state:
@@ -429,6 +446,7 @@ species:
           row_as_printed: B111006p2
           value_as_published: 0.019(7)
           value: '0.019'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -458,6 +476,7 @@ species:
           row_as_printed: B151106p1
           value_as_published: 0.229(2)
           value: '0.229'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -487,6 +506,7 @@ species:
           row_as_printed: B151106p4
           value_as_published: 0.274(5)
           value: '0.274'
+          sigma: '0.005'
           point_conditions:
             T_C:
               state:
@@ -516,6 +536,7 @@ species:
           row_as_printed: B151106p5
           value_as_published: 0.219(7)
           value: '0.219'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -545,6 +566,7 @@ species:
           row_as_printed: B151106p6
           value_as_published: 0.251(4)
           value: '0.251'
+          sigma: '0.004'
           point_conditions:
             T_C:
               state:
@@ -580,7 +602,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: S
@@ -595,6 +617,7 @@ species:
           row_as_printed: B301205p3b
           value_as_published: 0.208(2)
           value: '0.208'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -624,6 +647,7 @@ species:
           row_as_printed: B240306p1
           value_as_published: 0.075(4)
           value: '0.075'
+          sigma: '0.004'
           point_conditions:
             T_C:
               state:
@@ -653,6 +677,7 @@ species:
           row_as_printed: B220806p2
           value_as_published: 0.064(4)
           value: '0.064'
+          sigma: '0.004'
           point_conditions:
             T_C:
               state:
@@ -682,6 +707,7 @@ species:
           row_as_printed: B220806p3
           value_as_published: 0.068(7)
           value: '0.068'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -711,6 +737,7 @@ species:
           row_as_printed: B220806p5
           value_as_published: 0.073(5)
           value: '0.073'
+          sigma: '0.005'
           point_conditions:
             T_C:
               state:
@@ -740,6 +767,7 @@ species:
           row_as_printed: B220806p6
           value_as_published: 0.071(3)
           value: '0.071'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -769,6 +797,7 @@ species:
           row_as_printed: B150906p1
           value_as_published: 0.3(1)
           value: '0.3'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -798,6 +827,7 @@ species:
           row_as_printed: B150906p2
           value_as_published: 0.200(3)
           value: '0.200'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -827,6 +857,7 @@ species:
           row_as_printed: B150906p3
           value_as_published: 0.206(4)
           value: '0.206'
+          sigma: '0.004'
           point_conditions:
             T_C:
               state:
@@ -856,6 +887,7 @@ species:
           row_as_printed: B150906p4
           value_as_published: 0.202(5)
           value: '0.202'
+          sigma: '0.005'
           point_conditions:
             T_C:
               state:
@@ -885,6 +917,7 @@ species:
           row_as_printed: B150906p5
           value_as_published: 0.134(2)
           value: '0.134'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -914,6 +947,7 @@ species:
           row_as_printed: B141106p1a
           value_as_published: 0.14(2)
           value: '0.14'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -943,6 +977,7 @@ species:
           row_as_printed: B141106p2a
           value_as_published: 0.10(2)
           value: '0.10'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -972,6 +1007,7 @@ species:
           row_as_printed: B141106p3
           value_as_published: 0.05(4)
           value: '0.05'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -1001,6 +1037,7 @@ species:
           row_as_printed: B141106p4
           value_as_published: 0.18(5)
           value: '0.18'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -1036,7 +1073,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: S
@@ -1051,6 +1088,7 @@ species:
           row_as_printed: B231205p1
           value_as_published: 0.214(2)
           value: '0.214'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -1080,6 +1118,7 @@ species:
           row_as_printed: B231205p5
           value_as_published: 0.214(2)
           value: '0.214'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -1109,6 +1148,7 @@ species:
           row_as_printed: B220306p3
           value_as_published: 0.188(5)
           value: '0.188'
+          sigma: '0.005'
           point_conditions:
             T_C:
               state:
@@ -1138,6 +1178,7 @@ species:
           row_as_printed: B070406p6
           value_as_published: 0.058(5)
           value: '0.058'
+          sigma: '0.005'
           point_conditions:
             T_C:
               state:
@@ -1167,6 +1208,7 @@ species:
           row_as_printed: B120406p6b
           value_as_published: 0.022(3)
           value: '0.022'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -1196,6 +1238,7 @@ species:
           row_as_printed: B010806p1a
           value_as_published: 0.180(4)
           value: '0.180'
+          sigma: '0.004'
           point_conditions:
             T_C:
               state:
@@ -1225,6 +1268,7 @@ species:
           row_as_printed: B010806p5
           value_as_published: 0.021(9)
           value: '0.021'
+          sigma: '0.009'
           point_conditions:
             T_C:
               state:
@@ -1254,6 +1298,7 @@ species:
           row_as_printed: B030806p2
           value_as_published: 0.021(8)
           value: '0.021'
+          sigma: '0.008'
           point_conditions:
             T_C:
               state:
@@ -1283,6 +1328,7 @@ species:
           row_as_printed: B030806p5
           value_as_published: 0.016(2)
           value: '0.016'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -1312,6 +1358,7 @@ species:
           row_as_printed: B140906p4
           value_as_published: 0.203(3)
           value: '0.203'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -1341,6 +1388,7 @@ species:
           row_as_printed: B140906p5
           value_as_published: 0.199(3)
           value: '0.199'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -1757,7 +1805,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Si
@@ -1772,6 +1820,7 @@ species:
           row_as_printed: B030106p2b
           value_as_published: 19.93(8)
           value: '19.93'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -1801,6 +1850,7 @@ species:
           row_as_printed: B310706p1a
           value_as_published: 20.3(1)
           value: '20.3'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -1830,6 +1880,7 @@ species:
           row_as_printed: B310706p2a
           value_as_published: 19.5(1)
           value: '19.5'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -1859,6 +1910,7 @@ species:
           row_as_printed: B310706p3a
           value_as_published: 18.9(2)
           value: '18.9'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -1888,6 +1940,7 @@ species:
           row_as_printed: B310706p4a
           value_as_published: 18.4(1)
           value: '18.4'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -1917,6 +1970,7 @@ species:
           row_as_printed: B310706p5
           value_as_published: 18.2(1)
           value: '18.2'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -1946,6 +2000,7 @@ species:
           row_as_printed: B310706p6a
           value_as_published: 17.6(2)
           value: '17.6'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -1975,6 +2030,7 @@ species:
           row_as_printed: B020806p1
           value_as_published: 17.6(2)
           value: '17.6'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -2004,6 +2060,7 @@ species:
           row_as_printed: B020806p2a
           value_as_published: 18.40(5)
           value: '18.40'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -2033,6 +2090,7 @@ species:
           row_as_printed: B020806p3a
           value_as_published: 17.93(5)
           value: '17.93'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -2062,6 +2120,7 @@ species:
           row_as_printed: B020806p4
           value_as_published: 19.4(1)
           value: '19.4'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -2091,6 +2150,7 @@ species:
           row_as_printed: B020806p5
           value_as_published: 19.12(5)
           value: '19.12'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -2120,6 +2180,7 @@ species:
           row_as_printed: B020806p6b
           value_as_published: 18.1(1)
           value: '18.1'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -2149,6 +2210,7 @@ species:
           row_as_printed: B111006p2
           value_as_published: 20.2(5)
           value: '20.2'
+          sigma: '0.5'
           point_conditions:
             T_C:
               state:
@@ -2178,6 +2240,7 @@ species:
           row_as_printed: B151106p1
           value_as_published: 21.08(9)
           value: '21.08'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -2207,6 +2270,7 @@ species:
           row_as_printed: B151106p4
           value_as_published: 20.84(5)
           value: '20.84'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -2236,6 +2300,7 @@ species:
           row_as_printed: B151106p5
           value_as_published: 21.19(4)
           value: '21.19'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -2265,6 +2330,7 @@ species:
           row_as_printed: B151106p6
           value_as_published: 20.89(7)
           value: '20.89'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -2300,7 +2366,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Si
@@ -2315,6 +2381,7 @@ species:
           row_as_printed: B301205p3b
           value_as_published: 19.8(1)
           value: '19.8'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -2344,6 +2411,7 @@ species:
           row_as_printed: B240306p1
           value_as_published: 20.60(6)
           value: '20.60'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -2373,6 +2441,7 @@ species:
           row_as_printed: B220806p2
           value_as_published: 21.59(1)
           value: '21.59'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -2402,6 +2471,7 @@ species:
           row_as_printed: B220806p3
           value_as_published: 21.1(1)
           value: '21.1'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -2431,6 +2501,7 @@ species:
           row_as_printed: B220806p4
           value_as_published: 23.08(5)
           value: '23.08'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -2460,6 +2531,7 @@ species:
           row_as_printed: B220806p5
           value_as_published: 22.8(2)
           value: '22.8'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -2489,6 +2561,7 @@ species:
           row_as_printed: B220806p6
           value_as_published: 20.51(9)
           value: '20.51'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -2518,6 +2591,7 @@ species:
           row_as_printed: B230806p5b
           value_as_published: 22.8(2)
           value: '22.8'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -2547,6 +2621,7 @@ species:
           row_as_printed: B200906p5b
           value_as_published: 19.2(1)
           value: '19.2'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -2576,6 +2651,7 @@ species:
           row_as_printed: B150906p1
           value_as_published: 19.7(2)
           value: '19.7'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -2605,6 +2681,7 @@ species:
           row_as_printed: B150906p2
           value_as_published: 20.1(1)
           value: '20.1'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -2634,6 +2711,7 @@ species:
           row_as_printed: B150906p3
           value_as_published: 19.7(1)
           value: '19.7'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -2663,6 +2741,7 @@ species:
           row_as_printed: B150906p4
           value_as_published: 19.9(1)
           value: '19.9'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -2692,6 +2771,7 @@ species:
           row_as_printed: B150906p5
           value_as_published: 21.16(3)
           value: '21.16'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -2721,6 +2801,7 @@ species:
           row_as_printed: B141106p1a
           value_as_published: 18.4(3)
           value: '18.4'
+          sigma: '0.3'
           point_conditions:
             T_C:
               state:
@@ -2750,6 +2831,7 @@ species:
           row_as_printed: B141106p2a
           value_as_published: 19.5(2)
           value: '19.5'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -2779,6 +2861,7 @@ species:
           row_as_printed: B141106p3
           value_as_published: 20.2(7)
           value: '20.2'
+          sigma: '0.7'
           point_conditions:
             T_C:
               state:
@@ -2808,6 +2891,7 @@ species:
           row_as_printed: B141106p4
           value_as_published: 17.57(8)
           value: '17.57'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -2843,7 +2927,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Si
@@ -2858,6 +2942,7 @@ species:
           row_as_printed: B231205p1
           value_as_published: 19.81(8)
           value: '19.81'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -2887,6 +2972,7 @@ species:
           row_as_printed: B231205p5
           value_as_published: 19.8(2)
           value: '19.8'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -2916,6 +3002,7 @@ species:
           row_as_printed: B220306p3
           value_as_published: 19.5(1)
           value: '19.5'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -2945,6 +3032,7 @@ species:
           row_as_printed: B070406p6
           value_as_published: 22.717(8)
           value: '22.717'
+          sigma: '0.008'
           point_conditions:
             T_C:
               state:
@@ -2974,6 +3062,7 @@ species:
           row_as_printed: B120406p6b
           value_as_published: 18.7(9)
           value: '18.7'
+          sigma: '0.9'
           point_conditions:
             T_C:
               state:
@@ -3003,6 +3092,7 @@ species:
           row_as_printed: B010806p1a
           value_as_published: 20.04(8)
           value: '20.04'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -3032,6 +3122,7 @@ species:
           row_as_printed: B010806p2
           value_as_published: 23.73(4)
           value: '23.73'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -3061,6 +3152,7 @@ species:
           row_as_printed: B010806p4
           value_as_published: 23.6(1)
           value: '23.6'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -3090,6 +3182,7 @@ species:
           row_as_printed: B010806p5
           value_as_published: 20.1(1)
           value: '20.1'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -3119,6 +3212,7 @@ species:
           row_as_printed: B030806p2
           value_as_published: 20.2(1)
           value: '20.2'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -3148,6 +3242,7 @@ species:
           row_as_printed: B030806p5
           value_as_published: 20.0(1)
           value: '20.0'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -3177,6 +3272,7 @@ species:
           row_as_printed: B140906p4
           value_as_published: 20.2(1)
           value: '20.2'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -3206,6 +3302,7 @@ species:
           row_as_printed: B140906p5
           value_as_published: 20.18(9)
           value: '20.18'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -3235,6 +3332,7 @@ species:
           row_as_printed: B190906p5
           value_as_published: 19.8(1)
           value: '19.8'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -3272,7 +3370,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Al
@@ -3287,6 +3385,7 @@ species:
           row_as_printed: B030106p2b
           value_as_published: 6.64(4)
           value: '6.64'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -3316,6 +3415,7 @@ species:
           row_as_printed: B310706p1a
           value_as_published: 6.98(6)
           value: '6.98'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -3345,6 +3445,7 @@ species:
           row_as_printed: B310706p2a
           value_as_published: 6.91(2)
           value: '6.91'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -3374,6 +3475,7 @@ species:
           row_as_printed: B310706p3a
           value_as_published: 6.58(9)
           value: '6.58'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -3403,6 +3505,7 @@ species:
           row_as_printed: B310706p4a
           value_as_published: 6.44(2)
           value: '6.44'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -3432,6 +3535,7 @@ species:
           row_as_printed: B310706p5
           value_as_published: 6.3(1)
           value: '6.3'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -3461,6 +3565,7 @@ species:
           row_as_printed: B310706p6a
           value_as_published: 6.10(9)
           value: '6.10'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -3490,6 +3595,7 @@ species:
           row_as_printed: B020806p1
           value_as_published: 6.19(3)
           value: '6.19'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -3519,6 +3625,7 @@ species:
           row_as_printed: B020806p2a
           value_as_published: 6.39(2)
           value: '6.39'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -3548,6 +3655,7 @@ species:
           row_as_printed: B020806p3a
           value_as_published: 6.3(1)
           value: '6.3'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -3577,6 +3685,7 @@ species:
           row_as_printed: B020806p4
           value_as_published: 6.76(5)
           value: '6.76'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -3606,6 +3715,7 @@ species:
           row_as_printed: B020806p5
           value_as_published: 6.69(4)
           value: '6.69'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -3635,6 +3745,7 @@ species:
           row_as_printed: B020806p6b
           value_as_published: 6.3(1)
           value: '6.3'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -3664,6 +3775,7 @@ species:
           row_as_printed: B111006p2
           value_as_published: 7.6(7)
           value: '7.6'
+          sigma: '0.7'
           point_conditions:
             T_C:
               state:
@@ -3693,6 +3805,7 @@ species:
           row_as_printed: B151106p1
           value_as_published: 7.08(4)
           value: '7.08'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -3722,6 +3835,7 @@ species:
           row_as_printed: B151106p4
           value_as_published: 6.95(6)
           value: '6.95'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -3751,6 +3865,7 @@ species:
           row_as_printed: B151106p5
           value_as_published: 7.02(7)
           value: '7.02'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -3780,6 +3895,7 @@ species:
           row_as_printed: B151106p6
           value_as_published: 6.95(3)
           value: '6.95'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -3815,7 +3931,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Al
@@ -3830,6 +3946,7 @@ species:
           row_as_printed: B301205p3b
           value_as_published: 6.65(6)
           value: '6.65'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -3859,6 +3976,7 @@ species:
           row_as_printed: B240306p1
           value_as_published: 7.32(6)
           value: '7.32'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -3888,6 +4006,7 @@ species:
           row_as_printed: B220806p2
           value_as_published: 7.63(9)
           value: '7.63'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -3917,6 +4036,7 @@ species:
           row_as_printed: B220806p3
           value_as_published: 7.39(7)
           value: '7.39'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -3946,6 +4066,7 @@ species:
           row_as_printed: B220806p4
           value_as_published: 8.14(5)
           value: '8.14'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -3975,6 +4096,7 @@ species:
           row_as_printed: B220806p5
           value_as_published: 7.89(3)
           value: '7.89'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -4004,6 +4126,7 @@ species:
           row_as_printed: B220806p6
           value_as_published: 7.32(7)
           value: '7.32'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -4033,6 +4156,7 @@ species:
           row_as_printed: B230806p5b
           value_as_published: 8.00(8)
           value: '8.00'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -4062,6 +4186,7 @@ species:
           row_as_printed: B200906p5b
           value_as_published: 6.61(8)
           value: '6.61'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -4091,6 +4216,7 @@ species:
           row_as_printed: B150906p1
           value_as_published: 7.0(3)
           value: '7.0'
+          sigma: '0.3'
           point_conditions:
             T_C:
               state:
@@ -4120,6 +4246,7 @@ species:
           row_as_printed: B150906p2
           value_as_published: 6.93(6)
           value: '6.93'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -4149,6 +4276,7 @@ species:
           row_as_printed: B150906p3
           value_as_published: 6.83(5)
           value: '6.83'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -4178,6 +4306,7 @@ species:
           row_as_printed: B150906p4
           value_as_published: 6.89(6)
           value: '6.89'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -4207,6 +4336,7 @@ species:
           row_as_printed: B150906p5
           value_as_published: 7.32(1)
           value: '7.32'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -4236,6 +4366,7 @@ species:
           row_as_printed: B141106p1a
           value_as_published: 6.6(2)
           value: '6.6'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -4265,6 +4396,7 @@ species:
           row_as_printed: B141106p2a
           value_as_published: 6.8(4)
           value: '6.8'
+          sigma: '0.4'
           point_conditions:
             T_C:
               state:
@@ -4294,6 +4426,7 @@ species:
           row_as_printed: B141106p3
           value_as_published: 6.7(4)
           value: '6.7'
+          sigma: '0.4'
           point_conditions:
             T_C:
               state:
@@ -4323,6 +4456,7 @@ species:
           row_as_printed: B141106p4
           value_as_published: 6.22(4)
           value: '6.22'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -4358,7 +4492,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Al
@@ -4373,6 +4507,7 @@ species:
           row_as_printed: B231205p1
           value_as_published: 6.64(2)
           value: '6.64'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -4402,6 +4537,7 @@ species:
           row_as_printed: B231205p5
           value_as_published: 6.74(5)
           value: '6.74'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -4431,6 +4567,7 @@ species:
           row_as_printed: B220306p3
           value_as_published: 7.22(9)
           value: '7.22'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -4460,6 +4597,7 @@ species:
           row_as_printed: B070406p6
           value_as_published: 8.46(6)
           value: '8.46'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -4489,6 +4627,7 @@ species:
           row_as_printed: B120406p6b
           value_as_published: 6.9(3)
           value: '6.9'
+          sigma: '0.3'
           point_conditions:
             T_C:
               state:
@@ -4518,6 +4657,7 @@ species:
           row_as_printed: B010806p1a
           value_as_published: 7.00(9)
           value: '7.00'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -4547,6 +4687,7 @@ species:
           row_as_printed: B010806p2
           value_as_published: 8.28(4)
           value: '8.28'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -4576,6 +4717,7 @@ species:
           row_as_printed: B010806p4
           value_as_published: 7.9(2)
           value: '7.9'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -4605,6 +4747,7 @@ species:
           row_as_printed: B010806p5
           value_as_published: 7.02(1)
           value: '7.02'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -4634,6 +4777,7 @@ species:
           row_as_printed: B030806p2
           value_as_published: 7.04(1)
           value: '7.04'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -4663,6 +4807,7 @@ species:
           row_as_printed: B030806p5
           value_as_published: 6.98(9)
           value: '6.98'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -4692,6 +4837,7 @@ species:
           row_as_printed: B140906p4
           value_as_published: 6.96(7)
           value: '6.96'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -4721,6 +4867,7 @@ species:
           row_as_printed: B140906p5
           value_as_published: 7.00(2)
           value: '7.00'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -4750,6 +4897,7 @@ species:
           row_as_printed: B190906p5
           value_as_published: 6.84(8)
           value: '6.84'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -4787,7 +4935,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Mg
@@ -4802,6 +4950,7 @@ species:
           row_as_printed: B030106p2b
           value_as_published: 5.07(3)
           value: '5.07'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -4831,6 +4980,7 @@ species:
           row_as_printed: B310706p1a
           value_as_published: 5.43(5)
           value: '5.43'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -4860,6 +5010,7 @@ species:
           row_as_printed: B310706p2a
           value_as_published: 5.35(7)
           value: '5.35'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -4889,6 +5040,7 @@ species:
           row_as_printed: B310706p3a
           value_as_published: 5.17(7)
           value: '5.17'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -4918,6 +5070,7 @@ species:
           row_as_printed: B310706p4a
           value_as_published: 5.06(2)
           value: '5.06'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -4947,6 +5100,7 @@ species:
           row_as_printed: B310706p5
           value_as_published: 4.87(7)
           value: '4.87'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -4976,6 +5130,7 @@ species:
           row_as_printed: B310706p6a
           value_as_published: 4.76(7)
           value: '4.76'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -5005,6 +5160,7 @@ species:
           row_as_printed: B020806p1
           value_as_published: 4.75(1)
           value: '4.75'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -5034,6 +5190,7 @@ species:
           row_as_printed: B020806p2a
           value_as_published: 4.993(3)
           value: '4.993'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -5063,6 +5220,7 @@ species:
           row_as_printed: B020806p3a
           value_as_published: 4.92(8)
           value: '4.92'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -5092,6 +5250,7 @@ species:
           row_as_printed: B020806p4
           value_as_published: 5.29(9)
           value: '5.29'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -5121,6 +5280,7 @@ species:
           row_as_printed: B020806p5
           value_as_published: 5.09(8)
           value: '5.09'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -5150,6 +5310,7 @@ species:
           row_as_printed: B020806p6b
           value_as_published: 4.87(7)
           value: '4.87'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -5179,6 +5340,7 @@ species:
           row_as_printed: B111006p2
           value_as_published: 4.9(8)
           value: '4.9'
+          sigma: '0.8'
           point_conditions:
             T_C:
               state:
@@ -5208,6 +5370,7 @@ species:
           row_as_printed: B151106p1
           value_as_published: 5.25(2)
           value: '5.25'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -5237,6 +5400,7 @@ species:
           row_as_printed: B151106p4
           value_as_published: 5.20(2)
           value: '5.20'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -5266,6 +5430,7 @@ species:
           row_as_printed: B151106p5
           value_as_published: 5.22(6)
           value: '5.22'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -5295,6 +5460,7 @@ species:
           row_as_printed: B151106p6
           value_as_published: 5.18(6)
           value: '5.18'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -5330,7 +5496,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Mg
@@ -5345,6 +5511,7 @@ species:
           row_as_printed: B301205p3b
           value_as_published: 5.15(5)
           value: '5.15'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -5374,6 +5541,7 @@ species:
           row_as_printed: B240306p1
           value_as_published: 5.55(1)
           value: '5.55'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -5403,6 +5571,7 @@ species:
           row_as_printed: B220806p2
           value_as_published: 5.80(5)
           value: '5.80'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -5432,6 +5601,7 @@ species:
           row_as_printed: B220806p3
           value_as_published: 5.69(5)
           value: '5.69'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -5461,6 +5631,7 @@ species:
           row_as_printed: B220806p4
           value_as_published: 6.14(7)
           value: '6.14'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -5490,6 +5661,7 @@ species:
           row_as_printed: B220806p5
           value_as_published: 6.09(6)
           value: '6.09'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -5519,6 +5691,7 @@ species:
           row_as_printed: B220806p6
           value_as_published: 5.6(1)
           value: '5.6'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -5548,6 +5721,7 @@ species:
           row_as_printed: B230806p5b
           value_as_published: 6.2(1)
           value: '6.2'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -5577,6 +5751,7 @@ species:
           row_as_printed: B200906p5b
           value_as_published: 5.31(7)
           value: '5.31'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -5606,6 +5781,7 @@ species:
           row_as_printed: B150906p1
           value_as_published: 5.5(5)
           value: '5.5'
+          sigma: '0.5'
           point_conditions:
             T_C:
               state:
@@ -5635,6 +5811,7 @@ species:
           row_as_printed: B150906p2
           value_as_published: 5.36(6)
           value: '5.36'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -5664,6 +5841,7 @@ species:
           row_as_printed: B150906p3
           value_as_published: 5.39(9)
           value: '5.39'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -5693,6 +5871,7 @@ species:
           row_as_printed: B150906p4
           value_as_published: 5.4(1)
           value: '5.4'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -5722,6 +5901,7 @@ species:
           row_as_printed: B150906p5
           value_as_published: 5.80(8)
           value: '5.80'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -5751,6 +5931,7 @@ species:
           row_as_printed: B141106p1a
           value_as_published: 5.16(5)
           value: '5.16'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -5780,6 +5961,7 @@ species:
           row_as_printed: B141106p2a
           value_as_published: 5.2(3)
           value: '5.2'
+          sigma: '0.3'
           point_conditions:
             T_C:
               state:
@@ -5809,6 +5991,7 @@ species:
           row_as_printed: B141106p3
           value_as_published: 5.1(8)
           value: '5.1'
+          sigma: '0.8'
           point_conditions:
             T_C:
               state:
@@ -5838,6 +6021,7 @@ species:
           row_as_printed: B141106p4
           value_as_published: 5.27(5)
           value: '5.27'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -5873,7 +6057,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Mg
@@ -5888,6 +6072,7 @@ species:
           row_as_printed: B231205p1
           value_as_published: 5.14(3)
           value: '5.14'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -5917,6 +6102,7 @@ species:
           row_as_printed: B231205p5
           value_as_published: 5.15(7)
           value: '5.15'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -5946,6 +6132,7 @@ species:
           row_as_printed: B220306p3
           value_as_published: 5.5(1)
           value: '5.5'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -5975,6 +6162,7 @@ species:
           row_as_printed: B070406p6
           value_as_published: 6.5(1)
           value: '6.5'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -6004,6 +6192,7 @@ species:
           row_as_printed: B120406p6b
           value_as_published: 5.3(2)
           value: '5.3'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -6033,6 +6222,7 @@ species:
           row_as_printed: B010806p1a
           value_as_published: 5.50(5)
           value: '5.50'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -6062,6 +6252,7 @@ species:
           row_as_printed: B010806p2
           value_as_published: 6.47(7)
           value: '6.47'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -6091,6 +6282,7 @@ species:
           row_as_printed: B010806p4
           value_as_published: 6.4(2)
           value: '6.4'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -6120,6 +6312,7 @@ species:
           row_as_printed: B010806p5
           value_as_published: 5.47(7)
           value: '5.47'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -6149,6 +6342,7 @@ species:
           row_as_printed: B030806p2
           value_as_published: 5.4(1)
           value: '5.4'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -6178,6 +6372,7 @@ species:
           row_as_printed: B030806p5
           value_as_published: 5.4(2)
           value: '5.4'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -6207,6 +6402,7 @@ species:
           row_as_printed: B140906p4
           value_as_published: 5.3(1)
           value: '5.3'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -6236,6 +6432,7 @@ species:
           row_as_printed: B140906p5
           value_as_published: 5.28(6)
           value: '5.28'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -6265,6 +6462,7 @@ species:
           row_as_printed: B190906p5
           value_as_published: 5.40(4)
           value: '5.40'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -6302,7 +6500,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Ca
@@ -6317,6 +6515,7 @@ species:
           row_as_printed: B030106p2b
           value_as_published: 24.54(5)
           value: '24.54'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -6346,6 +6545,7 @@ species:
           row_as_printed: B310706p1a
           value_as_published: 25.32(9)
           value: '25.32'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -6375,6 +6575,7 @@ species:
           row_as_printed: B310706p2a
           value_as_published: 24.91(1)
           value: '24.91'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -6404,6 +6605,7 @@ species:
           row_as_printed: B310706p3a
           value_as_published: 24.2(2)
           value: '24.2'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -6433,6 +6635,7 @@ species:
           row_as_printed: B310706p4a
           value_as_published: 23.71(7)
           value: '23.71'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -6462,6 +6665,7 @@ species:
           row_as_printed: B310706p5
           value_as_published: 23.24(7)
           value: '23.24'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -6491,6 +6695,7 @@ species:
           row_as_printed: B310706p6a
           value_as_published: 22.36(6)
           value: '22.36'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -6520,6 +6725,7 @@ species:
           row_as_printed: B020806p1
           value_as_published: 22.62(5)
           value: '22.62'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -6549,6 +6755,7 @@ species:
           row_as_printed: B020806p2a
           value_as_published: 23.76(8)
           value: '23.76'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -6578,6 +6785,7 @@ species:
           row_as_printed: B020806p3a
           value_as_published: 23.29(3)
           value: '23.29'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -6607,6 +6815,7 @@ species:
           row_as_printed: B020806p4
           value_as_published: 25.07(8)
           value: '25.07'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -6636,6 +6845,7 @@ species:
           row_as_printed: B020806p5
           value_as_published: 24.62(6)
           value: '24.62'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -6665,6 +6875,7 @@ species:
           row_as_printed: B020806p6b
           value_as_published: 23.3(1)
           value: '23.3'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -6694,6 +6905,7 @@ species:
           row_as_printed: B111006p2
           value_as_published: 24.(1)
           value: '24.'
+          sigma: '1'
           point_conditions:
             T_C:
               state:
@@ -6723,6 +6935,7 @@ species:
           row_as_printed: B151106p1
           value_as_published: 22.03(7)
           value: '22.03'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -6752,6 +6965,7 @@ species:
           row_as_printed: B151106p4
           value_as_published: 21.93(6)
           value: '21.93'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -6781,6 +6995,7 @@ species:
           row_as_printed: B151106p5
           value_as_published: 22.02(6)
           value: '22.02'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -6810,6 +7025,7 @@ species:
           row_as_printed: B151106p6
           value_as_published: 21.82(6)
           value: '21.82'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -6845,7 +7061,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Ca
@@ -6860,6 +7076,7 @@ species:
           row_as_printed: B301205p3b
           value_as_published: 24.38(2)
           value: '24.38'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -6889,6 +7106,7 @@ species:
           row_as_printed: B240306p1
           value_as_published: 15.53(3)
           value: '15.53'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -6918,6 +7136,7 @@ species:
           row_as_printed: B220806p2
           value_as_published: 16.03(5)
           value: '16.03'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -6947,6 +7166,7 @@ species:
           row_as_printed: B220806p3
           value_as_published: 15.50(7)
           value: '15.50'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -6976,6 +7196,7 @@ species:
           row_as_printed: B220806p4
           value_as_published: 16.77(2)
           value: '16.77'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -7005,6 +7226,7 @@ species:
           row_as_printed: B220806p5
           value_as_published: 19.73(2)
           value: '19.73'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -7034,6 +7256,7 @@ species:
           row_as_printed: B220806p6
           value_as_published: 15.1(2)
           value: '15.1'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -7063,6 +7286,7 @@ species:
           row_as_printed: B230806p5b
           value_as_published: 16.6(1)
           value: '16.6'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -7092,6 +7316,7 @@ species:
           row_as_printed: B200906p5b
           value_as_published: 24.46(4)
           value: '24.46'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -7121,6 +7346,7 @@ species:
           row_as_printed: B150906p1
           value_as_published: 25.1(3)
           value: '25.1'
+          sigma: '0.3'
           point_conditions:
             T_C:
               state:
@@ -7150,6 +7376,7 @@ species:
           row_as_printed: B150906p2
           value_as_published: 25.1(1)
           value: '25.1'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -7179,6 +7406,7 @@ species:
           row_as_printed: B150906p3
           value_as_published: 24.95(7)
           value: '24.95'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -7208,6 +7436,7 @@ species:
           row_as_printed: B150906p4
           value_as_published: 25.14(9)
           value: '25.14'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -7237,6 +7466,7 @@ species:
           row_as_printed: B150906p5
           value_as_published: 22.80(9)
           value: '22.80'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -7266,6 +7496,7 @@ species:
           row_as_printed: B141106p1a
           value_as_published: 22.0(3)
           value: '22.0'
+          sigma: '0.3'
           point_conditions:
             T_C:
               state:
@@ -7295,6 +7526,7 @@ species:
           row_as_printed: B141106p2a
           value_as_published: 24.8(8)
           value: '24.8'
+          sigma: '0.8'
           point_conditions:
             T_C:
               state:
@@ -7324,6 +7556,7 @@ species:
           row_as_printed: B141106p3
           value_as_published: 23.5(8)
           value: '23.5'
+          sigma: '0.8'
           point_conditions:
             T_C:
               state:
@@ -7353,6 +7586,7 @@ species:
           row_as_printed: B141106p4
           value_as_published: 20.55(9)
           value: '20.55'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -7388,7 +7622,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Ca
@@ -7403,6 +7637,7 @@ species:
           row_as_printed: B231205p1
           value_as_published: 24.96(2)
           value: '24.96'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -7432,6 +7667,7 @@ species:
           row_as_printed: B231205p5
           value_as_published: 24.82(3)
           value: '24.82'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -7461,6 +7697,7 @@ species:
           row_as_printed: B220306p3
           value_as_published: 24.63(3)
           value: '24.63'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -7490,6 +7727,7 @@ species:
           row_as_printed: B070406p6
           value_as_published: 16.89(8)
           value: '16.89'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -7519,6 +7757,7 @@ species:
           row_as_printed: B120406p6b
           value_as_published: 24.6(2)
           value: '24.6'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -7548,6 +7787,7 @@ species:
           row_as_printed: B010806p1a
           value_as_published: 25.80(9)
           value: '25.80'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -7577,6 +7817,7 @@ species:
           row_as_printed: B010806p2
           value_as_published: 17.26(3)
           value: '17.26'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -7606,6 +7847,7 @@ species:
           row_as_printed: B010806p4
           value_as_published: 17.37(9)
           value: '17.37'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -7635,6 +7877,7 @@ species:
           row_as_printed: B010806p5
           value_as_published: 25.53(9)
           value: '25.53'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -7664,6 +7907,7 @@ species:
           row_as_printed: B030806p2
           value_as_published: 25.71(5)
           value: '25.71'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -7693,6 +7937,7 @@ species:
           row_as_printed: B030806p5
           value_as_published: 25.3(2)
           value: '25.3'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -7722,6 +7967,7 @@ species:
           row_as_printed: B140906p4
           value_as_published: 25.68(6)
           value: '25.68'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -7751,6 +7997,7 @@ species:
           row_as_printed: B140906p5
           value_as_published: 25.641(8)
           value: '25.641'
+          sigma: '0.008'
           point_conditions:
             T_C:
               state:
@@ -7780,6 +8027,7 @@ species:
           row_as_printed: B190906p5
           value_as_published: 24.1(1)
           value: '24.1'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -7817,7 +8065,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Fe
@@ -7832,6 +8080,7 @@ species:
           row_as_printed: B030106p2b
           value_as_published: 0.73(1)
           value: '0.73'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -7861,6 +8110,7 @@ species:
           row_as_printed: B310706p1a
           value_as_published: 0.018(1)
           value: '0.018'
+          sigma: '0.001'
           point_conditions:
             T_C:
               state:
@@ -7890,6 +8140,7 @@ species:
           row_as_printed: B310706p2a
           value_as_published: 0.04(2)
           value: '0.04'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -7919,6 +8170,7 @@ species:
           row_as_printed: B310706p3a
           value_as_published: 0.043(9)
           value: '0.043'
+          sigma: '0.009'
           point_conditions:
             T_C:
               state:
@@ -7948,6 +8200,7 @@ species:
           row_as_printed: B310706p4a
           value_as_published: 0.05(1)
           value: '0.05'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -7977,6 +8230,7 @@ species:
           row_as_printed: B310706p5
           value_as_published: 0.07(3)
           value: '0.07'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -8006,6 +8260,7 @@ species:
           row_as_printed: B310706p6a
           value_as_published: 0.06(2)
           value: '0.06'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8035,6 +8290,7 @@ species:
           row_as_printed: B020806p2a
           value_as_published: 0.02(2)
           value: '0.02'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8064,6 +8320,7 @@ species:
           row_as_printed: B020806p3a
           value_as_published: 0.040(7)
           value: '0.040'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -8093,6 +8350,7 @@ species:
           row_as_printed: B151106p1
           value_as_published: 0.048(7)
           value: '0.048'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -8122,6 +8380,7 @@ species:
           row_as_printed: B151106p4
           value_as_published: 0.05(2)
           value: '0.05'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8151,6 +8410,7 @@ species:
           row_as_printed: B151106p5
           value_as_published: 0.096(8)
           value: '0.096'
+          sigma: '0.008'
           point_conditions:
             T_C:
               state:
@@ -8180,6 +8440,7 @@ species:
           row_as_printed: B151106p6
           value_as_published: 0.065(4)
           value: '0.065'
+          sigma: '0.004'
           point_conditions:
             T_C:
               state:
@@ -8215,7 +8476,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Fe
@@ -8230,6 +8491,7 @@ species:
           row_as_printed: B301205p3b
           value_as_published: 0.486(7)
           value: '0.486'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -8259,6 +8521,7 @@ species:
           row_as_printed: B240306p1
           value_as_published: 0.06(1)
           value: '0.06'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -8288,6 +8551,7 @@ species:
           row_as_printed: B220806p2
           value_as_published: 0.048(1)
           value: '0.048'
+          sigma: '0.001'
           point_conditions:
             T_C:
               state:
@@ -8317,6 +8581,7 @@ species:
           row_as_printed: B220806p3
           value_as_published: 0.05(1)
           value: '0.05'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -8346,6 +8611,7 @@ species:
           row_as_printed: B220806p4
           value_as_published: 0.020(7)
           value: '0.020'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -8375,6 +8641,7 @@ species:
           row_as_printed: B220806p5
           value_as_published: 0.06(2)
           value: '0.06'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8404,6 +8671,7 @@ species:
           row_as_printed: B220806p6
           value_as_published: 0.05(1)
           value: '0.05'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -8433,6 +8701,7 @@ species:
           row_as_printed: B150906p2
           value_as_published: 0.040(5)
           value: '0.040'
+          sigma: '0.005'
           point_conditions:
             T_C:
               state:
@@ -8462,6 +8731,7 @@ species:
           row_as_printed: B150906p3
           value_as_published: 0.18(2)
           value: '0.18'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8491,6 +8761,7 @@ species:
           row_as_printed: B150906p4
           value_as_published: 0.17(2)
           value: '0.17'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8520,6 +8791,7 @@ species:
           row_as_printed: B150906p5
           value_as_published: 0.163(7)
           value: '0.163'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -8549,6 +8821,7 @@ species:
           row_as_printed: B141106p1a
           value_as_published: 0.07(2)
           value: '0.07'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8578,6 +8851,7 @@ species:
           row_as_printed: B141106p3
           value_as_published: 0.01(2)
           value: '0.01'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8607,6 +8881,7 @@ species:
           row_as_printed: B141106p4
           value_as_published: 0.05(3)
           value: '0.05'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -8642,7 +8917,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Fe
@@ -8657,6 +8932,7 @@ species:
           row_as_printed: B231205p1
           value_as_published: 0.374(7)
           value: '0.374'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -8686,6 +8962,7 @@ species:
           row_as_printed: B231205p5
           value_as_published: 0.521(4)
           value: '0.521'
+          sigma: '0.004'
           point_conditions:
             T_C:
               state:
@@ -8715,6 +8992,7 @@ species:
           row_as_printed: B220306p3
           value_as_published: 0.10(1)
           value: '0.10'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -8744,6 +9022,7 @@ species:
           row_as_printed: B070406p6
           value_as_published: 0.04(2)
           value: '0.04'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8773,6 +9052,7 @@ species:
           row_as_printed: B120406p6b
           value_as_published: 0.02(2)
           value: '0.02'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8802,6 +9082,7 @@ species:
           row_as_printed: B010806p1a
           value_as_published: 0.04(1)
           value: '0.04'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -8831,6 +9112,7 @@ species:
           row_as_printed: B010806p2
           value_as_published: 0.03(1)
           value: '0.03'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -8860,6 +9142,7 @@ species:
           row_as_printed: B010806p4
           value_as_published: 0.018(7)
           value: '0.018'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -8889,6 +9172,7 @@ species:
           row_as_printed: B010806p5
           value_as_published: 0.032(9)
           value: '0.032'
+          sigma: '0.009'
           point_conditions:
             T_C:
               state:
@@ -8918,6 +9202,7 @@ species:
           row_as_printed: B030806p2
           value_as_published: 0.05(2)
           value: '0.05'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8947,6 +9232,7 @@ species:
           row_as_printed: B030806p5
           value_as_published: 0.02(2)
           value: '0.02'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -8976,6 +9262,7 @@ species:
           row_as_printed: B140906p4
           value_as_published: 0.08(1)
           value: '0.08'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -9005,6 +9292,7 @@ species:
           row_as_printed: B140906p5
           value_as_published: 0.104(7)
           value: '0.104'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -9034,6 +9322,7 @@ species:
           row_as_printed: B190906p5
           value_as_published: 0.020(5)
           value: '0.020'
+          sigma: '0.005'
           point_conditions:
             T_C:
               state:
@@ -9071,7 +9360,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Mn
@@ -9086,6 +9375,7 @@ species:
           row_as_printed: B030106p2b
           value_as_published: 0.381(3)
           value: '0.381'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -9115,6 +9405,7 @@ species:
           row_as_printed: B310706p2a
           value_as_published: 2.07(2)
           value: '2.07'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -9144,6 +9435,7 @@ species:
           row_as_printed: B310706p3a
           value_as_published: 3.74(5)
           value: '3.74'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -9173,6 +9465,7 @@ species:
           row_as_printed: B310706p4a
           value_as_published: 6.03(2)
           value: '6.03'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -9202,6 +9495,7 @@ species:
           row_as_printed: B310706p5
           value_as_published: 7.15(2)
           value: '7.15'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -9231,6 +9525,7 @@ species:
           row_as_printed: B310706p6a
           value_as_published: 8.74(3)
           value: '8.74'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -9260,6 +9555,7 @@ species:
           row_as_printed: B020806p1
           value_as_published: 9.008(1)
           value: '9.008'
+          sigma: '0.001'
           point_conditions:
             T_C:
               state:
@@ -9289,6 +9585,7 @@ species:
           row_as_printed: B020806p2a
           value_as_published: 6.10(3)
           value: '6.10'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -9318,6 +9615,7 @@ species:
           row_as_printed: B020806p3a
           value_as_published: 7.27(2)
           value: '7.27'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -9347,6 +9645,7 @@ species:
           row_as_printed: B020806p4
           value_as_published: 2.122(7)
           value: '2.122'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -9376,6 +9675,7 @@ species:
           row_as_printed: B020806p5
           value_as_published: 3.902(7)
           value: '3.902'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -9405,6 +9705,7 @@ species:
           row_as_printed: B020806p6b
           value_as_published: 7.24(2)
           value: '7.24'
+          sigma: '0.02'
           point_conditions:
             T_C:
               state:
@@ -9434,6 +9735,7 @@ species:
           row_as_printed: B111006p2
           value_as_published: 1.02(9)
           value: '1.02'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -9463,6 +9765,7 @@ species:
           row_as_printed: B151106p1
           value_as_published: 0.379(5)
           value: '0.379'
+          sigma: '0.005'
           point_conditions:
             T_C:
               state:
@@ -9492,6 +9795,7 @@ species:
           row_as_printed: B151106p4
           value_as_published: 1.070(6)
           value: '1.070'
+          sigma: '0.006'
           point_conditions:
             T_C:
               state:
@@ -9521,6 +9825,7 @@ species:
           row_as_printed: B151106p5
           value_as_published: 0.235(3)
           value: '0.235'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -9550,6 +9855,7 @@ species:
           row_as_printed: B151106p6
           value_as_published: 0.840(7)
           value: '0.840'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -9587,7 +9893,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: O
@@ -9602,6 +9908,7 @@ species:
           row_as_printed: B030106p2b
           value_as_published: 42.31(1)
           value: '42.31'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -9631,6 +9938,7 @@ species:
           row_as_printed: B310706p1a
           value_as_published: 43.2(2)
           value: '43.2'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -9660,6 +9968,7 @@ species:
           row_as_printed: B310706p2a
           value_as_published: 42.8(1)
           value: '42.8'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -9689,6 +9998,7 @@ species:
           row_as_printed: B310706p3a
           value_as_published: 42.0(4)
           value: '42.0'
+          sigma: '0.4'
           point_conditions:
             T_C:
               state:
@@ -9718,6 +10028,7 @@ species:
           row_as_printed: B310706p4a
           value_as_published: 42.0(1)
           value: '42.0'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -9747,6 +10058,7 @@ species:
           row_as_printed: B310706p5
           value_as_published: 41.8(1)
           value: '41.8'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -9776,6 +10088,7 @@ species:
           row_as_printed: B310706p6a
           value_as_published: 41.2(2)
           value: '41.2'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -9805,6 +10118,7 @@ species:
           row_as_printed: B020806p1
           value_as_published: 40.5(2)
           value: '40.5'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -9834,6 +10148,7 @@ species:
           row_as_printed: B020806p2a
           value_as_published: 41.25(9)
           value: '41.25'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -9863,6 +10178,7 @@ species:
           row_as_printed: B020806p3a
           value_as_published: 40.8(2)
           value: '40.8'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -9892,6 +10208,7 @@ species:
           row_as_printed: B020806p4
           value_as_published: 42.3(2)
           value: '42.3'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -9921,6 +10238,7 @@ species:
           row_as_printed: B020806p5
           value_as_published: 42.10(5)
           value: '42.10'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -9950,6 +10268,7 @@ species:
           row_as_printed: B020806p6b
           value_as_published: 41.0(2)
           value: '41.0'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -9979,6 +10298,7 @@ species:
           row_as_printed: B111006p2
           value_as_published: 43.0(3)
           value: '43.0'
+          sigma: '0.3'
           point_conditions:
             T_C:
               state:
@@ -10008,6 +10328,7 @@ species:
           row_as_printed: B151106p1
           value_as_published: 42.93(9)
           value: '42.93'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -10037,6 +10358,7 @@ species:
           row_as_printed: B151106p4
           value_as_published: 42.7(1)
           value: '42.7'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -10066,6 +10388,7 @@ species:
           row_as_printed: B151106p5
           value_as_published: 42.94(4)
           value: '42.94'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -10095,6 +10418,7 @@ species:
           row_as_printed: B151106p6
           value_as_published: 42.62(9)
           value: '42.62'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -10130,7 +10454,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: O
@@ -10145,6 +10469,7 @@ species:
           row_as_printed: B301205p3b
           value_as_published: 42.1(2)
           value: '42.1'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -10174,6 +10499,7 @@ species:
           row_as_printed: B240306p1
           value_as_published: 41.97(9)
           value: '41.97'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -10203,6 +10529,7 @@ species:
           row_as_printed: B220806p2
           value_as_published: 43.23(1)
           value: '43.23'
+          sigma: '0.01'
           point_conditions:
             T_C:
               state:
@@ -10232,6 +10559,7 @@ species:
           row_as_printed: B220806p3
           value_as_published: 42.6(1)
           value: '42.6'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -10261,6 +10589,7 @@ species:
           row_as_printed: B220806p4
           value_as_published: 44.92(9)
           value: '44.92'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -10290,6 +10619,7 @@ species:
           row_as_printed: B220806p5
           value_as_published: 45.0(2)
           value: '45.0'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -10319,6 +10649,7 @@ species:
           row_as_printed: B220806p6
           value_as_published: 42.1(2)
           value: '42.1'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -10348,6 +10679,7 @@ species:
           row_as_printed: B230806p5b
           value_as_published: 44.4(4)
           value: '44.4'
+          sigma: '0.4'
           point_conditions:
             T_C:
               state:
@@ -10377,6 +10709,7 @@ species:
           row_as_printed: B200906p5b
           value_as_published: 41.7(1)
           value: '41.7'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -10406,6 +10739,7 @@ species:
           row_as_printed: B150906p1
           value_as_published: 42.9(2)
           value: '42.9'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -10435,6 +10769,7 @@ species:
           row_as_printed: B150906p2
           value_as_published: 42.9(2)
           value: '42.9'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -10464,6 +10799,7 @@ species:
           row_as_printed: B150906p3
           value_as_published: 42.5(2)
           value: '42.5'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -10493,6 +10829,7 @@ species:
           row_as_printed: B150906p4
           value_as_published: 42.7(2)
           value: '42.7'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -10522,6 +10859,7 @@ species:
           row_as_printed: B150906p5
           value_as_published: 43.7(1)
           value: '43.7'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -10551,6 +10889,7 @@ species:
           row_as_printed: B141106p1a
           value_as_published: 40.9(7)
           value: '40.9'
+          sigma: '0.7'
           point_conditions:
             T_C:
               state:
@@ -10580,6 +10919,7 @@ species:
           row_as_printed: B141106p2a
           value_as_published: 42.1(6)
           value: '42.1'
+          sigma: '0.6'
           point_conditions:
             T_C:
               state:
@@ -10609,6 +10949,7 @@ species:
           row_as_printed: B141106p3
           value_as_published: 42.7(6)
           value: '42.7'
+          sigma: '0.6'
           point_conditions:
             T_C:
               state:
@@ -10638,6 +10979,7 @@ species:
           row_as_printed: B141106p4
           value_as_published: 40.1(2)
           value: '40.1'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -10673,7 +11015,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: O
@@ -10688,6 +11030,7 @@ species:
           row_as_printed: B231205p1
           value_as_published: 42.2(1)
           value: '42.2'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -10717,6 +11060,7 @@ species:
           row_as_printed: B231205p5
           value_as_published: 42.3(2)
           value: '42.3'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -10746,6 +11090,7 @@ species:
           row_as_printed: B220306p3
           value_as_published: 42.3(3)
           value: '42.3'
+          sigma: '0.3'
           point_conditions:
             T_C:
               state:
@@ -10775,6 +11120,7 @@ species:
           row_as_printed: B070406p6
           value_as_published: 44.50(6)
           value: '44.50'
+          sigma: '0.06'
           point_conditions:
             T_C:
               state:
@@ -10804,6 +11150,7 @@ species:
           row_as_printed: B120406p6b
           value_as_published: 41.(1)
           value: '41.'
+          sigma: '1'
           point_conditions:
             T_C:
               state:
@@ -10833,6 +11180,7 @@ species:
           row_as_printed: B010806p1a
           value_as_published: 43.2(1)
           value: '43.2'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -10862,6 +11210,7 @@ species:
           row_as_printed: B010806p2
           value_as_published: 45.64(7)
           value: '45.64'
+          sigma: '0.07'
           point_conditions:
             T_C:
               state:
@@ -10891,6 +11240,7 @@ species:
           row_as_printed: B010806p4
           value_as_published: 45.2(2)
           value: '45.2'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -10920,6 +11270,7 @@ species:
           row_as_printed: B010806p5
           value_as_published: 43.1(2)
           value: '43.1'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -10949,6 +11300,7 @@ species:
           row_as_printed: B030806p2
           value_as_published: 43.2(3)
           value: '43.2'
+          sigma: '0.3'
           point_conditions:
             T_C:
               state:
@@ -10978,6 +11330,7 @@ species:
           row_as_printed: B030806p5
           value_as_published: 42.7(4)
           value: '42.7'
+          sigma: '0.4'
           point_conditions:
             T_C:
               state:
@@ -11007,6 +11360,7 @@ species:
           row_as_printed: B140906p4
           value_as_published: 43.2(2)
           value: '43.2'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -11036,6 +11390,7 @@ species:
           row_as_printed: B140906p5
           value_as_published: 43.16(8)
           value: '43.16'
+          sigma: '0.08'
           point_conditions:
             T_C:
               state:
@@ -11065,6 +11420,7 @@ species:
           row_as_printed: B190906p5
           value_as_published: 42.4(2)
           value: '42.4'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -11102,7 +11458,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: W
@@ -11117,6 +11473,7 @@ species:
           row_as_printed: B301205p3b
           value_as_published: 0.740(6)
           value: '0.740'
+          sigma: '0.006'
           point_conditions:
             T_C:
               state:
@@ -11146,6 +11503,7 @@ species:
           row_as_printed: B240306p1
           value_as_published: 7.74(4)
           value: '7.74'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -11175,6 +11533,7 @@ species:
           row_as_printed: B220806p2
           value_as_published: 5.86(4)
           value: '5.86'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -11204,6 +11563,7 @@ species:
           row_as_printed: B220806p3
           value_as_published: 7.6(1)
           value: '7.6'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -11233,6 +11593,7 @@ species:
           row_as_printed: B220806p4
           value_as_published: 2.23(3)
           value: '2.23'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -11262,6 +11623,7 @@ species:
           row_as_printed: B220806p5
           value_as_published: 0.223(7)
           value: '0.223'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
@@ -11291,6 +11653,7 @@ species:
           row_as_printed: B220806p6
           value_as_published: 9.27(5)
           value: '9.27'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -11320,6 +11683,7 @@ species:
           row_as_printed: B230806p5b
           value_as_published: 2.34(4)
           value: '2.34'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -11349,6 +11713,7 @@ species:
           row_as_printed: B200906p5b
           value_as_published: 2.67(4)
           value: '2.67'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -11378,6 +11743,7 @@ species:
           row_as_printed: B150906p1
           value_as_published: 0.70(9)
           value: '0.70'
+          sigma: '0.09'
           point_conditions:
             T_C:
               state:
@@ -11407,6 +11773,7 @@ species:
           row_as_printed: B150906p2
           value_as_published: 0.28(3)
           value: '0.28'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -11436,6 +11803,7 @@ species:
           row_as_printed: B150906p3
           value_as_published: 0.89(3)
           value: '0.89'
+          sigma: '0.03'
           point_conditions:
             T_C:
               state:
@@ -11465,6 +11833,7 @@ species:
           row_as_printed: B150906p4
           value_as_published: 0.49(5)
           value: '0.49'
+          sigma: '0.05'
           point_conditions:
             T_C:
               state:
@@ -11494,6 +11863,7 @@ species:
           row_as_printed: B141106p1a
           value_as_published: 6.4(2)
           value: '6.4'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -11523,6 +11893,7 @@ species:
           row_as_printed: B141106p2a
           value_as_published: 2.4(2)
           value: '2.4'
+          sigma: '0.2'
           point_conditions:
             T_C:
               state:
@@ -11552,6 +11923,7 @@ species:
           row_as_printed: B141106p3
           value_as_published: 3.8(1)
           value: '3.8'
+          sigma: '0.1'
           point_conditions:
             T_C:
               state:
@@ -11581,6 +11953,7 @@ species:
           row_as_printed: B141106p4
           value_as_published: 10.1(4)
           value: '10.1'
+          sigma: '0.4'
           point_conditions:
             T_C:
               state:
@@ -11618,7 +11991,7 @@ species:
       phase: glass
       units: wt.% as printed
       uncertainty:
-        note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
+        note: Parenthetical digits are stored as the printed last-digit sigma; no confidence level beyond the printed notation is assigned.
       values:
         quantity: equilibrium_phase_composition
         formula: Ni
@@ -11633,6 +12006,7 @@ species:
           row_as_printed: B231205p1
           value_as_published: 0.016(2)
           value: '0.016'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -11662,6 +12036,7 @@ species:
           row_as_printed: B220306p3
           value_as_published: 0.021(3)
           value: '0.021'
+          sigma: '0.003'
           point_conditions:
             T_C:
               state:
@@ -11691,6 +12066,7 @@ species:
           row_as_printed: B070406p6
           value_as_published: 0.033(2)
           value: '0.033'
+          sigma: '0.002'
           point_conditions:
             T_C:
               state:
@@ -11720,6 +12096,7 @@ species:
           row_as_printed: B120406p6b
           value_as_published: 0.312(9)
           value: '0.312'
+          sigma: '0.009'
           point_conditions:
             T_C:
               state:
@@ -11749,6 +12126,7 @@ species:
           row_as_printed: B010806p1a
           value_as_published: 0.016(4)
           value: '0.016'
+          sigma: '0.004'
           point_conditions:
             T_C:
               state:
@@ -11778,6 +12156,7 @@ species:
           row_as_printed: B010806p2
           value_as_published: 0.132(8)
           value: '0.132'
+          sigma: '0.008'
           point_conditions:
             T_C:
               state:
@@ -11807,6 +12186,7 @@ species:
           row_as_printed: B010806p4
           value_as_published: 0.091(4)
           value: '0.091'
+          sigma: '0.004'
           point_conditions:
             T_C:
               state:
@@ -11836,6 +12216,7 @@ species:
           row_as_printed: B010806p5
           value_as_published: 0.10(4)
           value: '0.10'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -11865,6 +12246,7 @@ species:
           row_as_printed: B030806p2
           value_as_published: 0.38(4)
           value: '0.38'
+          sigma: '0.04'
           point_conditions:
             T_C:
               state:
@@ -11894,6 +12276,7 @@ species:
           row_as_printed: B030806p5
           value_as_published: 0.354(5)
           value: '0.354'
+          sigma: '0.005'
           point_conditions:
             T_C:
               state:
@@ -11923,6 +12306,7 @@ species:
           row_as_printed: B140906p4
           value_as_published: 0.025(6)
           value: '0.025'
+          sigma: '0.006'
           point_conditions:
             T_C:
               state:
@@ -11952,6 +12336,7 @@ species:
           row_as_printed: B190906p5
           value_as_published: 2.473(7)
           value: '2.473'
+          sigma: '0.007'
           point_conditions:
             T_C:
               state:
