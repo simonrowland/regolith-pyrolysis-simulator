@@ -1895,10 +1895,13 @@ def _identity_equal(
         return species_outcome
 
     profile = _comparison_profile(left, right)
+    uncompared_axes = _uncompared_axes_for(left) | _uncompared_axes_for(right)
     mismatch: list[str] = []
     unknown: list[str] = []
     invalid: list[str] = []
     for name in _AXIS_NAMES:
+        if name in uncompared_axes:
+            continue
         required = name in profile.required
         permitted_na = name in profile.permitted_not_applicable
         if not required and not permitted_na:

@@ -11,6 +11,7 @@ from simulator.battery.identity import (
     IdentityEqualKind,
     SweepIdentity,
     WallIdentity,
+    identity_equal,
     profile_for,
     validate_quantity_profile,
 )
@@ -368,6 +369,41 @@ def test_d275_dew_temperature_is_the_wall_temperature_value_axis():
     )
 
     assert validate_quantity_profile(identity).kind is IdentityEqualKind.EQUAL
+
+
+def test_d275_dew_identity_ignores_optional_wall_axes():
+    without_wall = replace(
+        F.wall_deposit_identity(),
+        quantity=Quantity.WALL_DEW_TEMPERATURE,
+        per=State.not_applicable("wall dew temperature is not per a basis"),
+        sample_mass_kg=None,
+        wall=None,
+    )
+    with_wall = replace(
+        without_wall,
+        wall=State.of(
+            WallIdentity(
+                State.of(Decimal("1200")),
+                State.of("SiO2"),
+                State.of(Decimal("0.02")),
+                State.of("duct-1"),
+            )
+        ),
+    )
+
+    assert identity_equal(without_wall, with_wall).kind is IdentityEqualKind.EQUAL
+
+
+def test_d275_flux_identity_ignores_optional_exposure():
+    with_exposure = replace(
+        F.wall_deposit_identity(),
+        quantity=Quantity.WALL_DEPOSITION_FLUX,
+        per=State.not_applicable("wall deposition has no per basis"),
+        sample_mass_kg=None,
+    )
+    without_exposure = replace(with_exposure, exposure=None)
+
+    assert identity_equal(without_exposure, with_exposure).kind is IdentityEqualKind.EQUAL
 
 
 @pytest.mark.parametrize("pressure", [None, Decimal("0")])
