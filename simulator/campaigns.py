@@ -1679,6 +1679,16 @@ class CampaignManager:
     # Temperature ramp
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _c3_is_injection_phase(
+        campaign_hour: int,
+        *,
+        staged: bool = False,
+    ) -> bool:
+        if staged:
+            return int(campaign_hour) <= 3
+        return int(campaign_hour) % 6 < 3
+
     def get_temp_target(self, campaign: CampaignPhase,
                         campaign_hour: int,
                         melt: MeltState) -> Tuple[Optional[float], float]:
@@ -1808,8 +1818,14 @@ class CampaignManager:
             inject_target = self._float(ovr.get('inject_target_C'), default_inject)
             bakeout_target = self._float(ovr.get('bakeout_target_C'), default_bakeout)
             ramp_rate = self._float(ovr.get('ramp_rate'), 50.0)
-            cycle_period = 6  # hours per inject-bakeout cycle
-            if campaign_hour % cycle_period < 3:
+            staged = (
+                campaign == CampaignPhase.C3_NA
+                and self._active_c3_na_scoped_overrides is not None
+            )
+            if self._c3_is_injection_phase(
+                campaign_hour,
+                staged=staged,
+            ):
                 return (inject_target, ramp_rate)  # injection phase
             else:
                 return (bakeout_target, ramp_rate)  # bakeout phase

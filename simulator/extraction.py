@@ -2651,16 +2651,10 @@ class ExtractionMixin:
             self._transfer_condensed_species('Na')
             self._top_up_c3_alkali_credit('Na')
 
-        cycle_period = 6  # hours per inject-bakeout cycle
-        # Staged C2A enters the cool Na cleanup at the end of the cooldown
-        # tick, so the first real shuttle tick starts with campaign_hour == 1.
-        if (
-            campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA)
-            and self.record.path == 'A_staged'
-        ):
-            is_injection = self.melt.campaign_hour <= 3
-        else:
-            is_injection = (self.melt.campaign_hour % cycle_period) < 3
+        is_injection = self.campaign_mgr._c3_is_injection_phase(
+            self.melt.campaign_hour,
+            staged=self.record.path == 'A_staged',
+        )
 
         if is_injection:
             self._shuttle_phase = 'inject'
@@ -2698,6 +2692,30 @@ class ExtractionMixin:
                     self._pending_shuttle_bakeout_cycle_increment = campaign.name
                 elif campaign == CampaignPhase.C3_NA:
                     self._pending_shuttle_bakeout_cycle_increment = campaign.name
+
+    def _record_shuttle_refusal(
+        self,
+        reaction_family: str,
+        reagent: str,
+        diagnostic: dict[str, Any],
+        *,
+        target_stage: str | None = None,
+    ) -> None:
+        refusal_record = {
+            'reaction_family': reaction_family,
+            'reagent': reagent,
+        }
+        if target_stage is not None:
+            refusal_record['target_stage'] = target_stage
+        refusal_record.update({
+            'hour': int(self.melt.hour),
+            'campaign_hour': int(self.melt.campaign_hour),
+            'campaign': self.melt.campaign.name,
+            'temperature_C': float(self.melt.temperature_C),
+            'diagnostic': diagnostic,
+        })
+        self._last_shuttle_refusal_diagnostic = refusal_record
+        self._shuttle_refusal_history.append(refusal_record)
 
     def _shuttle_inject_K(self, *, liquid_fraction=None):
         """
@@ -2755,17 +2773,11 @@ class ExtractionMixin:
                 # SC-109 shape C: no_liquid_phase is a first-class refusal
                 # record, not a silent no-op. Dropping it made shuttle history
                 # look clean while metallothermy was refused every hour.
-                refusal_record = {
-                    'reaction_family': REACTION_FAMILY_C3_K,
-                    'reagent': 'K',
-                    'hour': int(self.melt.hour),
-                    'campaign_hour': int(self.melt.campaign_hour),
-                    'campaign': self.melt.campaign.name,
-                    'temperature_C': float(self.melt.temperature_C),
-                    'diagnostic': diagnostic,
-                }
-                self._last_shuttle_refusal_diagnostic = refusal_record
-                self._shuttle_refusal_history.append(refusal_record)
+                self._record_shuttle_refusal(
+                    REACTION_FAMILY_C3_K,
+                    'K',
+                    diagnostic,
+                )
             self._chem_no_op_dispatch_count += 1
             return
 
@@ -2876,18 +2888,12 @@ class ExtractionMixin:
             if getattr(kernel_result, 'status', '') == 'refused':
                 # SC-109 shape C: preserve no_liquid_phase on the operator
                 # shuttle history (same rule as the K twin).
-                refusal_record = {
-                    'reaction_family': REACTION_FAMILY_C3_NA,
-                    'reagent': 'Na',
-                    'target_stage': target_stage,
-                    'hour': int(self.melt.hour),
-                    'campaign_hour': int(self.melt.campaign_hour),
-                    'campaign': self.melt.campaign.name,
-                    'temperature_C': float(self.melt.temperature_C),
-                    'diagnostic': diagnostic,
-                }
-                self._last_shuttle_refusal_diagnostic = refusal_record
-                self._shuttle_refusal_history.append(refusal_record)
+                self._record_shuttle_refusal(
+                    REACTION_FAMILY_C3_NA,
+                    'Na',
+                    diagnostic,
+                    target_stage=target_stage,
+                )
             self._chem_no_op_dispatch_count += 1
             return
 
