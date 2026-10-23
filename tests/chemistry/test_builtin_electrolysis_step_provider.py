@@ -143,6 +143,24 @@ def _force_fast_redox_liquidus_floor(sim) -> None:
     sim._melt_redox_liquidus_gate_curve = floor_authority
 
 
+def test_fast_redox_liquidus_floor_overrides_gate_record(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    original_gate_record = sim._melt_redox_liquidus_gate_record
+
+    _force_fast_redox_liquidus_floor(sim)
+
+    assert sim._melt_redox_liquidus_gate_record != original_gate_record
+    fallback = sim._melt_redox_liquidus_gate_record()
+    assert fallback.source == "test:electrolysis_full_run_liquidus_floor"
+
+
 def _simulator_ledger_fingerprint(sim) -> tuple:
     sim.atom_ledger.assert_balanced()
     return (
