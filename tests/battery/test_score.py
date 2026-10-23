@@ -3643,7 +3643,7 @@ def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures(
         identity,
         Decimal("0.2"),
         evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="kems-053-stolyarova-1991",
+        source_id="ferguson-2004-iron-vapor-pressure",
     )
     reference = replace(
         reference,

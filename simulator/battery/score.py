@@ -1270,9 +1270,9 @@ def _unverified_apparatus_notices(
         return ()
     if reference.admission.status is not AdmissionStatus.ADMITTED:
         return ()
-    source_is_kems = bool(reference.source_id and reference.source_id.startswith("kems-"))
     author_reported_pressure = (
-        source_is_kems
+        experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
         and reference.evidence.original_method_class
         in {"measured", "measured_direct", "measured_tabulated"}
     )
