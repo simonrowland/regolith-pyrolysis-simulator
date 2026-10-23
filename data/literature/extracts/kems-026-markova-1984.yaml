@@ -96,7 +96,7 @@ fidelity_samples:
     pdf_page_index: 2
     note: Table 2 right panel T=0 SiO2 = 52.32 (composition V)
 - species: Na
-  observable: rate_series
+  observable: model_output_context
   observation_id: markova_1984_dissipation_1500C_reduced_lunar_mass_model
   field: Na_pct
   value: 14.0
@@ -104,7 +104,7 @@ fidelity_samples:
     published_page: 510
     pdf_page_index: 2
     paragraph: dissipation for SiO-2%, K-3%, Na-14%
-- path: species.SiO2.observations[markova_1984_kems_method_stepwise_heating].values.temperature_step_C
+- path: species.SiO2.context[markova_1984_kems_method_stepwise_heating].values.temperature_step_C
   value: 70.0
   locator:
     published_page: 509
@@ -140,53 +140,6 @@ benches:
 species:
   SiO2:
     observations:
-    - observation_id: markova_1984_kems_method_stepwise_heating
-      type: rate_series
-      locator:
-        published_page: 509
-        pdf_page_index: 1
-        paragraph: The experiments were carried out in the step-wise heating regime till the complete
-          vaporization of the sample under study
-      T_range_K:
-      - 1748.15
-      - 2564.15
-      phase: silicate_melt_knudsen_stepwise_vaporization
-      condensed_form:
-        state: liquid
-        metastable: false
-        basis: explicit_author
-        note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite,
-          lunar basalt 68415,40, gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
-      standard_state: Knudsen effusion cell; technique described in Yakovlev et al. 14th LPS (1983) 869
-      regime: kems_effusion
-      units: as published
-      values:
-        quantity: kems_method_geometry_reference
-        method_class: method_only
-        semantics: method_geometry_reference_not_measured_species_observation
-        cell: Knudsen effusion cell
-        technique_reference: Yakovlev O.I. et al. 14th LPS (1983) 869
-        heating_regime: step-wise to complete vaporization
-        temperature_step_C: 70.0
-        step_duration_min: 15.0
-        determined_as_printed:
-        - forms of the components in vapor
-        - partial pressures of the main components over the residuals (see /2/ for compositions I-IV)
-        - compositions of residual melts (see table 2 for compositions V and VI)
-        - compositions of complementary vapor
-        - partial pressure of oxygen
-        - total pressure of the components in vapor over the residual melts
-        - activities of components in these melts
-        missing_for_motzfeldt:
-        - orifice_area
-        - orifice_diameter
-        - clausing_factor
-        - sample_surface_area
-        - cell_material
-        missing_note: Orifice geometry and cell material are not printed in this two-page abstract; authors
-          point to Yakovlev et al. 14th LPS (1983) 869 for the technique.
-      uncertainty:
-        note: No numeric uncertainty printed for the temperature step or duration.
     - observation_id: markova_1984_table1_initial_sample_compositions
       type: rate_series
       locator:
@@ -332,10 +285,7 @@ species:
         pdf_page_index: 2
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE
           2; 400 dpi pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
-      T_range_K:
-      - 1748.15
-      - 2564.15
-      phase: residual_silicate_melt_composition_VI_lherzolite
+      phase: l
       condensed_form:
         state: liquid
         metastable: false
@@ -352,6 +302,8 @@ species:
         evidence_class: authors_table_from_this_work_kems
         composition_id: VI
         composition_name: lherzolite
+        system_note: Composition VI lherzolite residual silicate melt.
+        mass_loss_reference: cumulative from the initial charge at T=0.
         panel: left
         oxide_basis: SiO2 Al2O3 FeO MgO CaO as printed (header MgO is a damaged typewriter glyph)
         composition_wt_pct:
@@ -516,10 +468,7 @@ species:
         pdf_page_index: 2
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE
           2; 400 dpi pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
-      T_range_K:
-      - 1749.15
-      - 2528.15
-      phase: residual_silicate_melt_composition_V_alumina_basalt
+      phase: l
       condensed_form:
         state: liquid
         metastable: false
@@ -536,6 +485,8 @@ species:
         evidence_class: authors_table_from_this_work_kems
         composition_id: V
         composition_name: alumina_basalt
+        system_note: Composition V alumina-basalt residual silicate melt.
+        mass_loss_reference: cumulative from the initial charge at T=0.
         panel: right
         oxide_basis: SiO2 Al2O3 FeO MgO CaO as printed
         composition_wt_pct:
@@ -702,7 +653,7 @@ species:
       T_range_K:
       - 1873.15
       - 1973.15
-      phase: residual_silicate_melt_composition_V_alumina_basalt
+      phase: l
       condensed_form:
         state: liquid
         metastable: false
@@ -714,6 +665,7 @@ species:
       units: C and mass-loss percent as published
       values:
         quantity: residual_melt_composition_window
+        system_note: Composition V alumina-basalt residual silicate melt during vaporization.
         method_class: measured_direct
         T_C_range:
         - 1600.0
@@ -739,7 +691,7 @@ species:
       T_range_K:
       - 1748.15
       - 2564.15
-      phase: silicate_melt_knudsen_stepwise_vaporization
+      phase: l
       condensed_form:
         state: liquid
         metastable: false
@@ -751,6 +703,7 @@ species:
       units: ternary coordinates as plotted; not digitised
       values:
         quantity: residual_melt_ternary_track
+        system_note: Residual silicate melt trajectories from vaporization of the labeled samples.
         method_class: measured_direct
         admission_status: figure_only
         semantics: bound_not_point_ordering
@@ -773,168 +726,177 @@ species:
           and increases in crystallization melts.
       uncertainty:
         note: Figure-only; tracks not digitised.
+    context:
+      - observation_id: markova_1984_kems_method_stepwise_heating
+        type: method_context
+        locator:
+          published_page: 509
+          pdf_page_index: 1
+          paragraph: The experiments were carried out in the step-wise heating regime till the complete
+            vaporization of the sample under study
+        T_range_K:
+        - 1748.15
+        - 2564.15
+        phase: l
+        condensed_form:
+          state: liquid
+          metastable: false
+          basis: explicit_author
+          note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite,
+            lunar basalt 68415,40, gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
+        standard_state: Knudsen effusion cell; technique described in Yakovlev et al. 14th LPS (1983) 869
+        regime: kems_effusion
+        units: as published
+        values:
+          quantity_as_printed: kems_method_geometry_reference
+          schema_gap: Method and apparatus description only; no scored measurement.
+          method_class: method_only
+          semantics: method_geometry_reference_not_measured_species_observation
+          cell: Knudsen effusion cell
+          technique_reference: Yakovlev O.I. et al. 14th LPS (1983) 869
+          heating_regime: step-wise to complete vaporization
+          temperature_step_C: 70.0
+          step_duration_min: 15.0
+          determined_as_printed:
+          - forms of the components in vapor
+          - partial pressures of the main components over the residuals (see /2/ for compositions I-IV)
+          - compositions of residual melts (see table 2 for compositions V and VI)
+          - compositions of complementary vapor
+          - partial pressure of oxygen
+          - total pressure of the components in vapor over the residual melts
+          - activities of components in these melts
+          missing_for_motzfeldt:
+          - orifice_area
+          - orifice_diameter
+          - clausing_factor
+          - sample_surface_area
+          - cell_material
+          missing_note: Orifice geometry and cell material are not printed in this two-page abstract; authors
+            point to Yakovlev et al. 14th LPS (1983) 869 for the technique.
+        uncertainty:
+          note: No numeric uncertainty printed for the temperature step or duration.
+
   Na:
-    observations:
-    - observation_id: markova_1984_dissipation_1500C_recent_moon_model
-      type: rate_series
-      class_tag: model
-      locator:
-        published_page: 509
-        pdf_page_index: 1
-        paragraph: Only for Na the level of dissipation reaches ~2%, for the others it is significantly
-          less than ~1%
-      quote: The calculation shows that losses of petrogenic elements at temperature ~1500 C from the
-        recent Moon is improbable. Only for Na the level of dissipation reaches ~2%, for the others it
-        is significantly less than ~1%.
-      T_range_K:
-      - 1773.15
-      - 1773.15
-      phase: model_dissipation_from_basalt_vaporization_experiment
-      standard_state: calculated dissipation from experimental vapor forms and masses, recent Moon
-      regime: kems_effusion
-      units: percent of petrogenic element as printed
-      values:
-        quantity: thermal_dissipation_fraction
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        T_C: 1500.0
-        body: recent_Moon
-        Na_pct_about: 2.0
-        other_elements_pct_less_than_about: 1.0
-        as_printed: Only for Na the level of dissipation reaches ~2%, for the others it is significantly
-          less than ~1%.
-        derivation_note: Calculated from experimental forms of components in vapor (and their masses) during
-          vaporization of silicate melts /2/, under ideal conditions. Not a directly tabulated ion-current
-          series.
-      uncertainty:
-        note: Authors print ~2% and ~1%; no numeric uncertainty.
-    - observation_id: markova_1984_dissipation_1500C_reduced_lunar_mass_model
-      type: rate_series
-      class_tag: model
-      locator:
-        published_page: 510
-        pdf_page_index: 2
-        paragraph: dissipation for SiO-2%, K-3%, Na-14%
-      quote: It may be seen, that at temperatures 1500 C the level of dissipation for SiO-2%, K-3%, Na-14%.
-      T_range_K:
-      - 1773.15
-      - 1773.15
-      phase: model_dissipation_from_basalt_vaporization_experiment
-      standard_state: calculated dissipation for lunar mass 3.53e25 g (escape 1.88 km/s)
-      regime: kems_effusion
-      units: percent as printed
-      values:
-        quantity: thermal_dissipation_fraction
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        T_C: 1500.0
-        lunar_mass_g: 3.53e+25
-        escape_velocity_km_s: 1.88
-        radius_less_than_recent_km: 400.0
-        radius_offset_note: 400 km is the assumed value of the magmatic ocean depth /3,4/
-        Na_pct: 14.0
-        K_pct: 3.0
-        SiO_pct: 2.0
-        curve_onset_p_torr_ge: 0.0001
-        curve_onset_note: Curves of Na, K, SiO and Fe begin from the temperatures at which pressures of
-          their vapors >= 10^-4 tor (the pressures have been taken from the basalt vaporization experiment).
-      uncertainty:
-        note: Model percentages as printed; no numeric uncertainty. Fig. 2 is the curve form of the same
-          calculation and was not digitised.
-    - observation_id: markova_1984_fig2_dissipation_curves_figure_only
-      type: rate_series
-      locator:
-        figure: '2'
-        published_page: 510
-        pdf_page_index: 2
-        note: CURVES OF THE DISSIPATION LEVELS OF THE VOLATILE PETROGENIC COMPONENTS IN DEPENDENCE ON
-          TEMPERATURE FOR THE LUNAR MASS 3.53e25 g AND ESCAPE VELOCITY 1.88 km/sek
-      T_range_K:
-      - 773.15
-      - 3173.15
-      phase: model_dissipation_from_basalt_vaporization_experiment
-      standard_state: calculated dissipation percent vs T; not a measured P(T) series
-      regime: kems_effusion
-      units: percent vs C as plotted; not digitised
-      values:
-        quantity: thermal_dissipation_fraction
-        method_class: model_derived
-        admission_status: figure_only
-        semantics: bound_not_point_ordering
-        axis: dissipation_percent vs T_C
-        labeled_species_as_printed:
-        - Na
-        - K
-        - SiO
-        - Fe
-        - O2
-        labeled_mass_numbers_as_printed:
-        - 23Na
-        - 39K
-        - 44SiO
-        - 56Fe
-        - 32O2
-        T_axis_ticks_C_as_printed:
-        - 500
-        - 900
-        - 1300
-        - 1700
-        - 2100
-        - 2500
-        - 2900
-      uncertainty:
-        note: Figure-only model curves; not digitised. 1500 C intercepts are printed in the text (Na 14%,
-          K 3%, SiO 2%).
+    observations: []
+    context:
+      - observation_id: markova_1984_dissipation_1500C_recent_moon_model
+        type: model_output_context
+        class_tag: model
+        locator:
+          published_page: 509
+          pdf_page_index: 1
+          paragraph: Only for Na the level of dissipation reaches ~2%, for the others it is significantly
+            less than ~1%
+        quote: The calculation shows that losses of petrogenic elements at temperature ~1500 C from the
+          recent Moon is improbable. Only for Na the level of dissipation reaches ~2%, for the others it
+          is significantly less than ~1%.
+        T_range_K:
+        - 1773.15
+        - 1773.15
+        phase: model_dissipation_from_basalt_vaporization_experiment
+        standard_state: calculated dissipation from experimental vapor forms and masses, recent Moon
+        regime: kems_effusion
+        units: percent of petrogenic element as printed
+        values:
+          quantity_as_printed: thermal_dissipation_fraction
+          schema_gap: Model-calculated lunar escape dissipation has no scored quantity token.
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          T_C: 1500.0
+          body: recent_Moon
+          Na_pct_about: 2.0
+          other_elements_pct_less_than_about: 1.0
+          as_printed: Only for Na the level of dissipation reaches ~2%, for the others it is significantly
+            less than ~1%.
+          derivation_note: Calculated from experimental forms of components in vapor (and their masses) during
+            vaporization of silicate melts /2/, under ideal conditions. Not a directly tabulated ion-current
+            series.
+        uncertainty:
+          note: Authors print ~2% and ~1%; no numeric uncertainty.
+      - observation_id: markova_1984_dissipation_1500C_reduced_lunar_mass_model
+        type: model_output_context
+        class_tag: model
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          paragraph: dissipation for SiO-2%, K-3%, Na-14%
+        quote: It may be seen, that at temperatures 1500 C the level of dissipation for SiO-2%, K-3%, Na-14%.
+        T_range_K:
+        - 1773.15
+        - 1773.15
+        phase: model_dissipation_from_basalt_vaporization_experiment
+        standard_state: calculated dissipation for lunar mass 3.53e25 g (escape 1.88 km/s)
+        regime: kems_effusion
+        units: percent as printed
+        values:
+          quantity_as_printed: thermal_dissipation_fraction
+          schema_gap: Model-calculated lunar escape dissipation has no scored quantity token.
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          T_C: 1500.0
+          lunar_mass_g: 3.53e+25
+          escape_velocity_km_s: 1.88
+          radius_less_than_recent_km: 400.0
+          radius_offset_note: 400 km is the assumed value of the magmatic ocean depth /3,4/
+          Na_pct: 14.0
+          K_pct: 3.0
+          SiO_pct: 2.0
+          curve_onset_p_torr_ge: 0.0001
+          curve_onset_note: Curves of Na, K, SiO and Fe begin from the temperatures at which pressures of
+            their vapors >= 10^-4 tor (the pressures have been taken from the basalt vaporization experiment).
+        uncertainty:
+          note: Model percentages as printed; no numeric uncertainty. Fig. 2 is the curve form of the same
+            calculation and was not digitised.
+      - observation_id: markova_1984_fig2_dissipation_curves_figure_only
+        type: figure_model_context
+        locator:
+          figure: '2'
+          published_page: 510
+          pdf_page_index: 2
+          note: CURVES OF THE DISSIPATION LEVELS OF THE VOLATILE PETROGENIC COMPONENTS IN DEPENDENCE ON
+            TEMPERATURE FOR THE LUNAR MASS 3.53e25 g AND ESCAPE VELOCITY 1.88 km/sek
+        T_range_K:
+        - 773.15
+        - 3173.15
+        phase: model_dissipation_from_basalt_vaporization_experiment
+        standard_state: calculated dissipation percent vs T; not a measured P(T) series
+        regime: kems_effusion
+        units: percent vs C as plotted; not digitised
+        values:
+          quantity_as_printed: thermal_dissipation_fraction
+          schema_gap: Model-calculated lunar escape dissipation has no scored quantity token.
+          method_class: model_derived
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          axis: dissipation_percent vs T_C
+          labeled_species_as_printed:
+          - Na
+          - K
+          - SiO
+          - Fe
+          - O2
+          labeled_mass_numbers_as_printed:
+          - 23Na
+          - 39K
+          - 44SiO
+          - 56Fe
+          - 32O2
+          T_axis_ticks_C_as_printed:
+          - 500
+          - 900
+          - 1300
+          - 1700
+          - 2100
+          - 2500
+          - 2900
+        uncertainty:
+          note: Figure-only model curves; not digitised. 1500 C intercepts are printed in the text (Na 14%,
+            K 3%, SiO 2%).
+
   K:
-    observations:
-    - observation_id: markova_1984_K_dissipation_1500C_reduced_lunar_mass_model
-      type: rate_series
-      class_tag: model
-      locator:
-        published_page: 510
-        pdf_page_index: 2
-        paragraph: dissipation for SiO-2%, K-3%, Na-14%
-      T_range_K:
-      - 1773.15
-      - 1773.15
-      phase: model_dissipation_from_basalt_vaporization_experiment
-      standard_state: calculated dissipation for lunar mass 3.53e25 g
-      regime: kems_effusion
-      units: percent as printed
-      values:
-        quantity: thermal_dissipation_fraction
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        gas_species: K(g)
-        T_C: 1500.0
-        K_pct: 3.0
-      uncertainty:
-        note: Model percentage as printed; curve in Fig. 2 not digitised.
+    observations: []
   SiO:
     observations:
-    - observation_id: markova_1984_SiO_dissipation_1500C_reduced_lunar_mass_model
-      type: rate_series
-      class_tag: model
-      locator:
-        published_page: 510
-        pdf_page_index: 2
-        paragraph: dissipation for SiO-2%, K-3%, Na-14%
-      T_range_K:
-      - 1773.15
-      - 1773.15
-      phase: model_dissipation_from_basalt_vaporization_experiment
-      standard_state: calculated dissipation for lunar mass 3.53e25 g
-      regime: kems_effusion
-      units: percent as printed
-      values:
-        quantity: thermal_dissipation_fraction
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        gas_species: SiO(g)
-        T_C: 1500.0
-        SiO_pct: 2.0
-      uncertainty:
-        note: Model percentage as printed; curve in Fig. 2 not digitised.
     - observation_id: markova_1984_silica_partially_in_vapor_at_1500C
       type: psat_series
       locator:
@@ -945,7 +907,7 @@ species:
       T_range_K:
       - 1773.15
       - 1773.15
-      phase: silicate_melt_knudsen_stepwise_vaporization
+      phase: l
       condensed_form:
         state: liquid
         metastable: false
@@ -957,6 +919,7 @@ species:
       units: qualitative as printed; no numeric p(SiO)
       values:
         quantity: partial_pressure
+        system_note: Silicate melt during Knudsen-cell stepwise vaporization.
         gas_species: SiO(g)
         method_class: measured_direct
         admission_status: qualitative_not_numeric
@@ -980,7 +943,7 @@ species:
       T_range_K:
       - 1773.15
       - 1773.15
-      phase: silicate_melt_knudsen_stepwise_vaporization
+      phase: l
       condensed_form:
         state: liquid
         metastable: false
@@ -992,6 +955,7 @@ species:
       units: qualitative as printed; no numeric p(Mg)
       values:
         quantity: partial_pressure
+        system_note: Silicate melt during Knudsen-cell stepwise vaporization.
         gas_species: Mg(g)
         method_class: measured_direct
         admission_status: qualitative_not_numeric
@@ -1014,7 +978,7 @@ species:
       T_range_K:
       - 1748.15
       - 2564.15
-      phase: silicate_melt_knudsen_stepwise_vaporization
+      phase: l
       condensed_form:
         state: liquid
         metastable: false
@@ -1026,6 +990,7 @@ species:
       units: qualitative as printed
       values:
         quantity: relative_volatility
+        system_note: Silicate melt during Knudsen-cell stepwise vaporization.
         method_class: measured_direct
         gas_species: Fe(g)
         as_printed: As the experiments show, iron is more volatile than silica, but we haven't any signs
@@ -1047,7 +1012,7 @@ species:
       T_range_K:
       - 1748.15
       - 2564.15
-      phase: silicate_melt_knudsen_stepwise_vaporization
+      phase: l
       condensed_form:
         state: liquid
         metastable: false
@@ -1059,6 +1024,7 @@ species:
       units: qualitative as printed; numeric residual Al2O3 in Table 2
       values:
         quantity: residual_melt_enrichment
+        system_note: Silicate melt during Knudsen-cell stepwise vaporization.
         method_class: measured_direct
         depleted:
         - Na
