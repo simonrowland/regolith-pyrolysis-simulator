@@ -1,0 +1,4911 @@
+schema_version: literature_extract.v1
+source_id: drowart-1960-al2o3-kems
+source:
+  citation: Drowart, J., DeMaria, G., Burns, R. P. & Inghram, M. G. (1960), “Thermodynamics of Al2O3 Using a Mass
+    Spectrometer,” Journal of Chemical Physics 32, 1366–1373.
+  doi: 10.1063/1.1730923
+  year: 1960
+extraction:
+  method: Tables I and II transcribed from MinerU HTML and pdftotext; every numeric table cell and every row/column
+    assignment checked against the PDF page render. See data/literature/audits/drowart-1960-al2o3-kems/audit.md.
+  date: '2026-10-23'
+  worker: band-BAND02
+review_status: draft
+fidelity_samples:
+- path: species.O.observations[drowart_1960_table_i_o_partial_pressure].values.points[0].pressure_as_printed
+  value: 1.5 × 10^-7 atm
+  note: Table I rendered cell, 1a row, P_O column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 1a
+    column: P_O
+- path: species.O.observations[drowart_1960_table_i_o_partial_pressure].values.points[8].pressure_as_printed
+  value: 1.1 × 10^-6 atm
+  note: Table I rendered cell, 9a row, P_O column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 9a
+    column: P_O
+- path: species.O.observations[drowart_1960_table_i_o_partial_pressure].values.points[16].pressure_as_printed
+  value: 2.5 × 10^-5 atm
+  note: Table I rendered cell, 8b row, P_O column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 8b
+    column: P_O
+- path: species.Al.observations[drowart_1960_table_i_al_partial_pressure].values.points[0].pressure_as_printed
+  value: 2.0 × 10^-7 atm
+  note: Table I rendered cell, 1a row, P_Al column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 1a
+    column: P_Al
+- path: species.Al.observations[drowart_1960_table_i_al_partial_pressure].values.points[8].pressure_as_printed
+  value: 1.4 × 10^-6 atm
+  note: Table I rendered cell, 9a row, P_Al column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 9a
+    column: P_Al
+- path: species.Al.observations[drowart_1960_table_i_al_partial_pressure].values.points[16].pressure_as_printed
+  value: 3.5 × 10^-5 atm
+  note: Table I rendered cell, 8b row, P_Al column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 8b
+    column: P_Al
+- path: species.AlO.observations[drowart_1960_table_i_alo_partial_pressure].values.points[0].pressure_as_printed
+  value: 9.6 × 10^-9 atm
+  note: Table I rendered cell, 1a row, P_AlO column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 1a
+    column: P_AlO
+- path: species.AlO.observations[drowart_1960_table_i_alo_partial_pressure].values.points[8].pressure_as_printed
+  value: 9.7 × 10^-8 atm
+  note: Table I rendered cell, 9a row, P_AlO column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 9a
+    column: P_AlO
+- path: species.AlO.observations[drowart_1960_table_i_alo_partial_pressure].values.points[16].pressure_as_printed
+  value: 1.8 × 10^-6 atm
+  note: Table I rendered cell, 8b row, P_AlO column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 8b
+    column: P_AlO
+- path: species.Al2O.observations[drowart_1960_table_i_al2o_partial_pressure].values.points[0].pressure_as_printed
+  value: 7.5 × 10^-9 atm
+  note: Table I rendered cell, 1a row, P_Al2O column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 1a
+    column: P_Al2O
+- path: species.Al2O.observations[drowart_1960_table_i_al2o_partial_pressure].values.points[8].pressure_as_printed
+  value: 7.2 × 10^-8 atm
+  note: Table I rendered cell, 9a row, P_Al2O column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 9a
+    column: P_Al2O
+- path: species.Al2O.observations[drowart_1960_table_i_al2o_partial_pressure].values.points[16].pressure_as_printed
+  value: 8.9 × 10^-7 atm
+  note: Table I rendered cell, 8b row, P_Al2O column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 8b
+    column: P_Al2O
+- path: species.Al2O2.observations[drowart_1960_table_i_al2o2_partial_pressure].values.points[0].pressure_as_printed
+  value: 1.4 × 10^-9 atm
+  note: Table I rendered cell, 10a row, P_Al2O2 column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 10a
+    column: P_Al2O2
+- path: species.Al2O2.observations[drowart_1960_table_i_al2o2_partial_pressure].values.points[2].pressure_as_printed
+  value: 2.3 × 10^-9 atm
+  note: Table I rendered cell, 7a row, P_Al2O2 column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 7a
+    column: P_Al2O2
+- path: species.Al2O2.observations[drowart_1960_table_i_al2o2_partial_pressure].values.points[4].pressure_as_printed
+  value: 6.0 × 10^-9 atm
+  note: Table I rendered cell, 8b row, P_Al2O2 column.
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    row: 8b
+    column: P_Al2O2
+- path: species.O.observations[drowart_1960_table_ii_o_partial_pressure].values.points[0].pressure_as_printed
+  value: 2.0 × 10^-8 atm
+  note: Table II rendered cell, 4a row, P_O column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 4a
+    column: P_O
+- path: species.O.observations[drowart_1960_table_ii_o_partial_pressure].values.points[8].pressure_as_printed
+  value: 3.2 × 10^-7 atm
+  note: Table II rendered cell, 1a row, P_O column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 1a
+    column: P_O
+- path: species.O.observations[drowart_1960_table_ii_o_partial_pressure].values.points[15].pressure_as_printed
+  value: 1.9 × 10^-6 atm
+  note: Table II rendered cell, 2a row, P_O column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 2a
+    column: P_O
+- path: species.Al.observations[drowart_1960_table_ii_al_partial_pressure].values.points[0].pressure_as_printed
+  value: 1.9 × 10^-8 atm
+  note: Table II rendered cell, 4a row, P_Al column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 4a
+    column: P_Al
+- path: species.Al.observations[drowart_1960_table_ii_al_partial_pressure].values.points[8].pressure_as_printed
+  value: 5.7 × 10^-6 atm
+  note: Table II rendered cell, 1a row, P_Al column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 1a
+    column: P_Al
+- path: species.Al.observations[drowart_1960_table_ii_al_partial_pressure].values.points[15].pressure_as_printed
+  value: 6.0 × 10^-5 atm
+  note: Table II rendered cell, 2a row, P_Al column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 2a
+    column: P_Al
+- path: species.AlO.observations[drowart_1960_table_ii_alo_partial_pressure].values.points[0].pressure_as_printed
+  value: 1.2 × 10^-9 atm
+  note: Table II rendered cell, 4a row, P_AlO column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 4a
+    column: P_AlO
+- path: species.AlO.observations[drowart_1960_table_ii_alo_partial_pressure].values.points[7].pressure_as_printed
+  value: 9.4 × 10^-8 atm
+  note: Table II rendered cell, 10a row, P_AlO column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 10a
+    column: P_AlO
+- path: species.AlO.observations[drowart_1960_table_ii_alo_partial_pressure].values.points[14].pressure_as_printed
+  value: 2.2 × 10^-6 atm
+  note: Table II rendered cell, 2a row, P_AlO column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 2a
+    column: P_AlO
+- path: species.Al2O.observations[drowart_1960_table_ii_al2o_partial_pressure].values.points[0].pressure_as_printed
+  value: 1.4 × 10^-9 atm
+  note: Table II rendered cell, 4a row, P_Al2O column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 4a
+    column: P_Al2O
+- path: species.Al2O.observations[drowart_1960_table_ii_al2o_partial_pressure].values.points[6].pressure_as_printed
+  value: 6.6 × 10^-7 atm
+  note: Table II rendered cell, 1a row, P_Al2O column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 1a
+    column: P_Al2O
+- path: species.Al2O.observations[drowart_1960_table_ii_al2o_partial_pressure].values.points[12].pressure_as_printed
+  value: 1.4 × 10^-5 atm
+  note: Table II rendered cell, 2a row, P_Al2O column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 2a
+    column: P_Al2O
+- path: species.Al2O2.observations[drowart_1960_table_ii_al2o2_partial_pressure].values.points[0].pressure_as_printed
+  value: 1.1 × 10^-9 atm
+  note: Table II rendered cell, 5a row, P_Al2O2 column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 5a
+    column: P_Al2O2
+- path: species.Al2O2.observations[drowart_1960_table_ii_al2o2_partial_pressure].values.points[4].pressure_as_printed
+  value: 1.9 × 10^-9 atm
+  note: Table II rendered cell, 2b row, P_Al2O2 column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 2b
+    column: P_Al2O2
+- path: species.Al2O2.observations[drowart_1960_table_ii_al2o2_partial_pressure].values.points[7].pressure_as_printed
+  value: 6.7 × 10^-9 atm
+  note: Table II rendered cell, 2a row, P_Al2O2 column.
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    row: 2a
+    column: P_Al2O2
+benches:
+- id: drowart-1960-w-alumina-cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: mass spectrometer with Knudsen effusion cell
+    locator:
+      page: 3
+      published_page: 1367
+      pdf_page_index: 2
+      section: Experimental Arrangement
+      note: Knudsen cells identified as tungsten or molybdenum; an alumina liner was inserted.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: W cell with recrystallized alumina liner
+    locator:
+      page: 3
+      published_page: 1367
+      pdf_page_index: 2
+      section: Experimental Arrangement
+      note: Knudsen cells identified as tungsten or molybdenum; an alumina liner was inserted.
+  geometry_notes:
+    state:
+      tag: value
+      value: Effusion hole usually 1 mm diameter; cell walls usually 3 mm thick.
+    locator:
+      page: 3
+      published_page: 1367
+      pdf_page_index: 2
+      section: Experimental Arrangement
+      note: The source qualifies both dimensions as “usually”; no run-specific dimension is printed.
+  temperature_measurement:
+    optical_pyrometers:
+      state:
+        tag: value
+        value: Two Leeds and Northrup optical pyrometers calibrated against an NBS ribbon filament lamp
+      locator:
+        page: 3
+        published_page: 1367
+        pdf_page_index: 2
+        section: Experimental Arrangement
+        note: Knudsen cells identified as tungsten or molybdenum; an alumina liner was inserted.
+- id: drowart-1960-mo-alumina-cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: mass spectrometer with Knudsen effusion cell
+    locator:
+      page: 3
+      published_page: 1367
+      pdf_page_index: 2
+      section: Experimental Arrangement
+      note: Knudsen cells identified as tungsten or molybdenum; an alumina liner was inserted.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Mo cell with recrystallized alumina liner
+    locator:
+      page: 3
+      published_page: 1367
+      pdf_page_index: 2
+      section: Experimental Arrangement
+      note: Knudsen cells identified as tungsten or molybdenum; an alumina liner was inserted.
+  geometry_notes:
+    state:
+      tag: value
+      value: Effusion hole usually 1 mm diameter; cell walls usually 3 mm thick.
+    locator:
+      page: 3
+      published_page: 1367
+      pdf_page_index: 2
+      section: Experimental Arrangement
+      note: The source qualifies both dimensions as “usually”; no run-specific dimension is printed.
+  temperature_measurement:
+    optical_pyrometers:
+      state:
+        tag: value
+        value: Two Leeds and Northrup optical pyrometers calibrated against an NBS ribbon filament lamp
+      locator:
+        page: 3
+        published_page: 1367
+        pdf_page_index: 2
+        section: Experimental Arrangement
+        note: Knudsen cells identified as tungsten or molybdenum; an alumina liner was inserted.
+experiments:
+- experiment_id: drowart-1960-w-al2o3
+  bench_id: drowart-1960-w-alumina-cell
+  method: knudsen_effusion
+  locator:
+    page: 4
+    published_page: 1368
+    pdf_page_index: 3
+    table: I
+    note: Table I reports partial pressures over W + Al2O3; the table title assigns the experiment system.
+  apparatus:
+    calibration:
+      pressure_method:
+        state:
+          tag: value
+          value: Absolute pressures derived from ion intensities using silver, O/O2, quantitative vaporization self-calibration,
+            and Mo calibration methods as applicable.
+        locator:
+          page: 4
+          published_page: 1368
+          pdf_page_index: 3
+          section: Experimental Arrangement / Pressure Data
+          note: Calibration methods are described on printed p. 1368.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1367
+        pdf_page_index: 2
+        section: Experimental Arrangement
+        note: No chamber background or total pressure is printed; tabulated values are species partial pressures.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1367
+        pdf_page_index: 2
+        section: Experimental Arrangement
+        note: No sweep gas is stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: drowart-1960-mo-al2o3
+  bench_id: drowart-1960-mo-alumina-cell
+  method: knudsen_effusion
+  locator:
+    page: 6
+    published_page: 1370
+    pdf_page_index: 5
+    table: II
+    note: Table II reports partial pressures over Mo + Al2O3; the table title assigns the experiment system.
+  apparatus:
+    calibration:
+      pressure_method:
+        state:
+          tag: value
+          value: Absolute pressures derived from ion intensities using silver, O/O2, quantitative vaporization self-calibration,
+            and Mo calibration methods as applicable.
+        locator:
+          page: 4
+          published_page: 1368
+          pdf_page_index: 3
+          section: Experimental Arrangement / Pressure Data
+          note: Calibration methods are described on printed p. 1368.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1367
+        pdf_page_index: 2
+        section: Experimental Arrangement
+        note: No chamber background or total pressure is printed; tabulated values are species partial pressures.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1367
+        pdf_page_index: 2
+        section: Experimental Arrangement
+        note: No sweep gas is stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+species:
+  O:
+    observations:
+    - observation_id: drowart_1960_table_i_o_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        published_page: 1368
+        pdf_page_index: 3
+        table: I
+        note: Table I W + Al2O3, O partial-pressure column; absolute pressures reduced from measured ion intensities
+          using the stated calibration procedures (printed pp. 1367–1368).
+      phase: gas
+      experiment: drowart-1960-w-al2o3
+      regime: kems_effusion
+      units: atm
+      standard_state: O(g) partial pressure over W + Al2O3
+      derivation:
+        relation: Absolute partial pressures reduced from measured ion intensities using the pressure ratio equation
+          and applicable calibration described by the authors.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            published_page: 1367
+            pdf_page_index: 2
+            section: Pressure Data
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: ion_intensity_calibration
+        method_note: Species partial pressure is derived from ion intensity through the printed relative-pressure
+          equation and absolute-pressure calibration.
+        species_as_printed: O
+        composition_mol:
+          Al2O3: '1'
+        composition_mol_basis: pure_oxide_system
+        composition_basis_note: The table caption identifies the Al2O3 system and the experimental section describes
+          complete vaporization of alumina samples.
+        series: Table I W + Al2O3 O column
+        points:
+        - T_K: '2188'
+          experiment_id_as_printed: 1a
+          pressure_atm: '1.5e-7'
+          pressure_as_printed: 1.5 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1a
+            column: P_O
+            note: Table I row 1a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2188'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1a
+                column: T
+                note: Table I row 1a temperature cell.
+            composition: &id001
+              state:
+                tag: value
+                value:
+                  basis: measured_as_printed
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '1'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                note: The table title identifies the system as W + Al2O3; experiment section describes complete
+                  vaporization of alumina samples.
+        - T_K: '2191'
+          experiment_id_as_printed: 11a
+          pressure_atm: '1.6e-7'
+          pressure_as_printed: 1.6 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 11a
+            column: P_O
+            note: Table I row 11a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2191'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 11a
+                column: T
+                note: Table I row 11a temperature cell.
+            composition: *id001
+        - T_K: '2213'
+          experiment_id_as_printed: 1c
+          pressure_atm: '2.3e-7'
+          pressure_as_printed: 2.3 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1c
+            column: P_O
+            note: Table I row 1c, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2213'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1c
+                column: T
+                note: Table I row 1c temperature cell.
+            composition: *id001
+        - T_K: '2226'
+          experiment_id_as_printed: 12a
+          pressure_atm: '2.7e-7'
+          pressure_as_printed: 2.7 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 12a
+            column: P_O
+            note: Table I row 12a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2226'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 12a
+                column: T
+                note: Table I row 12a temperature cell.
+            composition: *id001
+        - T_K: '2233'
+          experiment_id_as_printed: 1b
+          pressure_atm: '3.0e-7'
+          pressure_as_printed: 3.0 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1b
+            column: P_O
+            note: Table I row 1b, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2233'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1b
+                column: T
+                note: Table I row 1b temperature cell.
+            composition: *id001
+        - T_K: '2240'
+          experiment_id_as_printed: 3a
+          pressure_atm: '3.4e-7'
+          pressure_as_printed: 3.4 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 3a
+            column: P_O
+            note: Table I row 3a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2240'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 3a
+                column: T
+                note: Table I row 3a temperature cell.
+            composition: *id001
+        - T_K: '2264'
+          experiment_id_as_printed: 2a
+          pressure_atm: '4.8e-7'
+          pressure_as_printed: 4.8 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 2a
+            column: P_O
+            note: Table I row 2a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2264'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 2a
+                column: T
+                note: Table I row 2a temperature cell.
+            composition: *id001
+          temperature_mark_as_printed: footnote 1
+        - T_K: '2275'
+          experiment_id_as_printed: 4a
+          pressure_atm: '5.6e-7'
+          pressure_as_printed: 5.6 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 4a
+            column: P_O
+            note: Table I row 4a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2275'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 4a
+                column: T
+                note: Table I row 4a temperature cell.
+            composition: *id001
+        - T_K: '2325'
+          experiment_id_as_printed: 9a
+          pressure_atm: '1.1e-6'
+          pressure_as_printed: 1.1 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9a
+            column: P_O
+            note: Table I row 9a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2325'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9a
+                column: T
+                note: Table I row 9a temperature cell.
+            composition: *id001
+        - T_K: '2335'
+          experiment_id_as_printed: 9b
+          pressure_atm: '1.2e-6'
+          pressure_as_printed: 1.2 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9b
+            column: P_O
+            note: Table I row 9b, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2335'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9b
+                column: T
+                note: Table I row 9b temperature cell.
+            composition: *id001
+        - T_K: '2350'
+          experiment_id_as_printed: 6a
+          pressure_atm: '1.5e-6'
+          pressure_as_printed: 1.5 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 6a
+            column: P_O
+            note: Table I row 6a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2350'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 6a
+                column: T
+                note: Table I row 6a temperature cell.
+            composition: *id001
+        - T_K: '2390'
+          experiment_id_as_printed: 9c
+          pressure_atm: '2.5e-6'
+          pressure_as_printed: 2.5 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9c
+            column: P_O
+            note: Table I row 9c, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2390'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9c
+                column: T
+                note: Table I row 9c temperature cell.
+            composition: *id001
+        - T_K: '2464'
+          experiment_id_as_printed: 10a
+          pressure_atm: '6.0e-6'
+          pressure_as_printed: 6.0 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 10a
+            column: P_O
+            note: Table I row 10a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2464'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 10a
+                column: T
+                note: Table I row 10a temperature cell.
+            composition: *id001
+        - T_K: '2475'
+          experiment_id_as_printed: 5a
+          pressure_atm: '6.8e-6'
+          pressure_as_printed: 6.8 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 5a
+            column: P_O
+            note: Table I row 5a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2475'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 5a
+                column: T
+                note: Table I row 5a temperature cell.
+            composition: *id001
+        - T_K: '2470'
+          experiment_id_as_printed: 7a
+          pressure_atm: '6.6e-6'
+          pressure_as_printed: 6.6 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 7a
+            column: P_O
+            note: Table I row 7a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2470'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 7a
+                column: T
+                note: Table I row 7a temperature cell.
+            composition: *id001
+        - T_K: '2514'
+          experiment_id_as_printed: 8a
+          pressure_atm: '1.1e-5'
+          pressure_as_printed: 1.1 × 10^-5 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 8a
+            column: P_O
+            note: Table I row 8a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2514'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 8a
+                column: T
+                note: Table I row 8a temperature cell.
+            composition: *id001
+        - T_K: '2594'
+          experiment_id_as_printed: 8b
+          pressure_atm: '2.5e-5'
+          pressure_as_printed: 2.5 × 10^-5 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 8b
+            column: P_O
+            note: Table I row 8b, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2594'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 8b
+                column: T
+                note: Table I row 8b temperature cell.
+            composition: *id001
+    - observation_id: drowart_1960_table_ii_o_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 6
+        published_page: 1370
+        pdf_page_index: 5
+        table: II
+        note: Table II Mo + Al2O3, O partial-pressure column; absolute pressures reduced from measured ion intensities
+          using the stated calibration procedures (printed pp. 1367–1368).
+      phase: gas
+      experiment: drowart-1960-mo-al2o3
+      regime: kems_effusion
+      units: atm
+      standard_state: O(g) partial pressure over Mo + Al2O3
+      derivation:
+        relation: Absolute partial pressures reduced from measured ion intensities using the pressure ratio equation
+          and applicable calibration described by the authors.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            published_page: 1367
+            pdf_page_index: 2
+            section: Pressure Data
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: ion_intensity_calibration
+        method_note: Species partial pressure is derived from ion intensity through the printed relative-pressure
+          equation and absolute-pressure calibration.
+        species_as_printed: O
+        composition_mol:
+          Al2O3: '1'
+        composition_mol_basis: pure_oxide_system
+        composition_basis_note: The table caption identifies the Al2O3 system and the experimental section describes
+          complete vaporization of alumina samples.
+        series: Table II Mo + Al2O3 O column
+        points:
+        - T_K: '2036'
+          experiment_id_as_printed: 4a
+          pressure_atm: '2.0e-8'
+          pressure_as_printed: 2.0 × 10^-8 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 4a
+            column: P_O
+            note: Table II row 4a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2036'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 4a
+                column: T
+                note: Table II row 4a temperature cell.
+            composition: &id002
+              state:
+                tag: value
+                value:
+                  basis: measured_as_printed
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '1'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                note: The table title identifies the system as Mo + Al2O3; experiment section describes complete
+                  vaporization of alumina samples.
+        - T_K: '2111'
+          experiment_id_as_printed: 7a
+          pressure_atm: '6.0e-8'
+          pressure_as_printed: 6.0 × 10^-8 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 7a
+            column: P_O
+            note: Table II row 7a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2111'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 7a
+                column: T
+                note: Table II row 7a temperature cell.
+            composition: *id002
+        - T_K: '2198'
+          experiment_id_as_printed: 8a
+          pressure_atm: '2.1e-7'
+          pressure_as_printed: 2.1 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 8a
+            column: P_O
+            note: Table II row 8a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2198'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 8a
+                column: T
+                note: Table II row 8a temperature cell.
+            composition: *id002
+        - T_K: '2262'
+          experiment_id_as_printed: 9a
+          pressure_atm: '6.0e-7'
+          pressure_as_printed: 6.0 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 9a
+            column: P_O
+            note: Table II row 9a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2262'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 9a
+                column: T
+                note: Table II row 9a temperature cell.
+            composition: *id002
+        - T_K: '2194'
+          experiment_id_as_printed: 3a
+          pressure_atm: '7.0e-8'
+          pressure_as_printed: 7.0 × 10^-8 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 3a
+            column: P_O
+            note: Table II row 3a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2194'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 3a
+                column: T
+                note: Table II row 3a temperature cell.
+            composition: *id002
+        - T_K: '2243'
+          experiment_id_as_printed: 3b
+          pressure_atm: '1.4e-7'
+          pressure_as_printed: 1.4 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 3b
+            column: P_O
+            note: Table II row 3b, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2243'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 3b
+                column: T
+                note: Table II row 3b temperature cell.
+            composition: *id002
+        - T_K: '2281'
+          experiment_id_as_printed: 5a
+          pressure_atm: '2.3e-7'
+          pressure_as_printed: 2.3 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 5a
+            column: P_O
+            note: Table II row 5a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2281'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 5a
+                column: T
+                note: Table II row 5a temperature cell.
+            composition: *id002
+        - T_K: '2287'
+          experiment_id_as_printed: 10a
+          pressure_atm: '2.6e-7'
+          pressure_as_printed: 2.6 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 10a
+            column: P_O
+            note: Table II row 10a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2287'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 10a
+                column: T
+                note: Table II row 10a temperature cell.
+            composition: *id002
+        - T_K: '2304'
+          experiment_id_as_printed: 1a
+          pressure_atm: '3.2e-7'
+          pressure_as_printed: 3.2 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 1a
+            column: P_O
+            note: Table II row 1a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2304'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 1a
+                column: T
+                note: Table II row 1a temperature cell.
+            composition: *id002
+        - T_K: '2321'
+          experiment_id_as_printed: 11a
+          pressure_atm: '3.9e-7'
+          pressure_as_printed: 3.9 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 11a
+            column: P_O
+            note: Table II row 11a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2321'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 11a
+                column: T
+                note: Table II row 11a temperature cell.
+            composition: *id002
+        - T_K: '2328'
+          experiment_id_as_printed: 6a
+          pressure_atm: '4.3e-7'
+          pressure_as_printed: 4.3 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 6a
+            column: P_O
+            note: Table II row 6a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2328'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 6a
+                column: T
+                note: Table II row 6a temperature cell.
+            composition: *id002
+        - T_K: '2371'
+          experiment_id_as_printed: 13a
+          pressure_atm: '1.0e-7'
+          pressure_as_printed: 1.0 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 13a
+            column: P_O
+            note: Table II row 13a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2371'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 13a
+                column: T
+                note: Table II row 13a temperature cell.
+            composition: *id002
+        - T_K: '2384'
+          experiment_id_as_printed: 2b
+          pressure_atm: '7.8e-7'
+          pressure_as_printed: 7.8 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 2b
+            column: P_O
+            note: Table II row 2b, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2384'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 2b
+                column: T
+                note: Table II row 2b temperature cell.
+            composition: *id002
+        - T_K: '2395'
+          experiment_id_as_printed: 6b
+          pressure_atm: '9.0e-7'
+          pressure_as_printed: 9.0 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 6b
+            column: P_O
+            note: Table II row 6b, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2395'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 6b
+                column: T
+                note: Table II row 6b temperature cell.
+            composition: *id002
+        - T_K: '2416'
+          experiment_id_as_printed: 12a
+          pressure_atm: '1.2e-6'
+          pressure_as_printed: 1.2 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 12a
+            column: P_O
+            note: Table II row 12a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2416'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 12a
+                column: T
+                note: Table II row 12a temperature cell.
+            composition: *id002
+        - T_K: '2466'
+          experiment_id_as_printed: 2a
+          pressure_atm: '1.9e-6'
+          pressure_as_printed: 1.9 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 2a
+            column: P_O
+            note: Table II row 2a, P_O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2466'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 2a
+                column: T
+                note: Table II row 2a temperature cell.
+            composition: *id002
+  Al:
+    observations:
+    - observation_id: drowart_1960_table_i_al_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        published_page: 1368
+        pdf_page_index: 3
+        table: I
+        note: Table I W + Al2O3, Al partial-pressure column; absolute pressures reduced from measured ion intensities
+          using the stated calibration procedures (printed pp. 1367–1368).
+      phase: gas
+      experiment: drowart-1960-w-al2o3
+      regime: kems_effusion
+      units: atm
+      standard_state: Al(g) partial pressure over W + Al2O3
+      derivation:
+        relation: Absolute partial pressures reduced from measured ion intensities using the pressure ratio equation
+          and applicable calibration described by the authors.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            published_page: 1367
+            pdf_page_index: 2
+            section: Pressure Data
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: ion_intensity_calibration
+        method_note: Species partial pressure is derived from ion intensity through the printed relative-pressure
+          equation and absolute-pressure calibration.
+        species_as_printed: Al
+        composition_mol:
+          Al2O3: '1'
+        composition_mol_basis: pure_oxide_system
+        composition_basis_note: The table caption identifies the Al2O3 system and the experimental section describes
+          complete vaporization of alumina samples.
+        series: Table I W + Al2O3 Al column
+        points:
+        - T_K: '2188'
+          experiment_id_as_printed: 1a
+          pressure_atm: '2.0e-7'
+          pressure_as_printed: 2.0 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1a
+            column: P_Al
+            note: Table I row 1a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2188'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1a
+                column: T
+                note: Table I row 1a temperature cell.
+            composition: *id001
+        - T_K: '2191'
+          experiment_id_as_printed: 11a
+          pressure_atm: '2.1e-7'
+          pressure_as_printed: 2.1 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 11a
+            column: P_Al
+            note: Table I row 11a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2191'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 11a
+                column: T
+                note: Table I row 11a temperature cell.
+            composition: *id001
+        - T_K: '2213'
+          experiment_id_as_printed: 1c
+          pressure_atm: '2.9e-7'
+          pressure_as_printed: 2.9 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1c
+            column: P_Al
+            note: Table I row 1c, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2213'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1c
+                column: T
+                note: Table I row 1c temperature cell.
+            composition: *id001
+        - T_K: '2226'
+          experiment_id_as_printed: 12a
+          pressure_atm: '3.4e-7'
+          pressure_as_printed: 3.4 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 12a
+            column: P_Al
+            note: Table I row 12a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2226'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 12a
+                column: T
+                note: Table I row 12a temperature cell.
+            composition: *id001
+        - T_K: '2233'
+          experiment_id_as_printed: 1b
+          pressure_atm: '4.0e-7'
+          pressure_as_printed: 4.0 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1b
+            column: P_Al
+            note: Table I row 1b, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2233'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1b
+                column: T
+                note: Table I row 1b temperature cell.
+            composition: *id001
+        - T_K: '2240'
+          experiment_id_as_printed: 3a
+          pressure_atm: '4.3e-7'
+          pressure_as_printed: 4.3 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 3a
+            column: P_Al
+            note: Table I row 3a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2240'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 3a
+                column: T
+                note: Table I row 3a temperature cell.
+            composition: *id001
+        - T_K: '2264'
+          experiment_id_as_printed: 2a
+          pressure_atm: '4.8e-7'
+          pressure_as_printed: 4.8 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 2a
+            column: P_Al
+            note: Table I row 2a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2264'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 2a
+                column: T
+                note: Table I row 2a temperature cell.
+            composition: *id001
+          temperature_mark_as_printed: footnote 1
+        - T_K: '2275'
+          experiment_id_as_printed: 4a
+          pressure_atm: '7.2e-7'
+          pressure_as_printed: 7.2 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 4a
+            column: P_Al
+            note: Table I row 4a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2275'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 4a
+                column: T
+                note: Table I row 4a temperature cell.
+            composition: *id001
+        - T_K: '2325'
+          experiment_id_as_printed: 9a
+          pressure_atm: '1.4e-6'
+          pressure_as_printed: 1.4 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9a
+            column: P_Al
+            note: Table I row 9a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2325'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9a
+                column: T
+                note: Table I row 9a temperature cell.
+            composition: *id001
+        - T_K: '2335'
+          experiment_id_as_printed: 9b
+          pressure_atm: '1.8e-6'
+          pressure_as_printed: 1.8 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9b
+            column: P_Al
+            note: Table I row 9b, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2335'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9b
+                column: T
+                note: Table I row 9b temperature cell.
+            composition: *id001
+        - T_K: '2350'
+          experiment_id_as_printed: 6a
+          pressure_atm: '2.0e-6'
+          pressure_as_printed: 2.0 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 6a
+            column: P_Al
+            note: Table I row 6a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2350'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 6a
+                column: T
+                note: Table I row 6a temperature cell.
+            composition: *id001
+        - T_K: '2390'
+          experiment_id_as_printed: 9c
+          pressure_atm: '3.3e-6'
+          pressure_as_printed: 3.3 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9c
+            column: P_Al
+            note: Table I row 9c, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2390'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9c
+                column: T
+                note: Table I row 9c temperature cell.
+            composition: *id001
+        - T_K: '2464'
+          experiment_id_as_printed: 10a
+          pressure_atm: '9.0e-6'
+          pressure_as_printed: 9.0 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 10a
+            column: P_Al
+            note: Table I row 10a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2464'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 10a
+                column: T
+                note: Table I row 10a temperature cell.
+            composition: *id001
+        - T_K: '2475'
+          experiment_id_as_printed: 5a
+          pressure_atm: '1.0e-5'
+          pressure_as_printed: 1.0 × 10^-5 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 5a
+            column: P_Al
+            note: Table I row 5a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2475'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 5a
+                column: T
+                note: Table I row 5a temperature cell.
+            composition: *id001
+        - T_K: '2470'
+          experiment_id_as_printed: 7a
+          pressure_atm: '1.0e-5'
+          pressure_as_printed: 1.0 × 10^-5 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 7a
+            column: P_Al
+            note: Table I row 7a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2470'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 7a
+                column: T
+                note: Table I row 7a temperature cell.
+            composition: *id001
+        - T_K: '2514'
+          experiment_id_as_printed: 8a
+          pressure_atm: '1.4e-5'
+          pressure_as_printed: 1.4 × 10^-5 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 8a
+            column: P_Al
+            note: Table I row 8a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2514'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 8a
+                column: T
+                note: Table I row 8a temperature cell.
+            composition: *id001
+        - T_K: '2594'
+          experiment_id_as_printed: 8b
+          pressure_atm: '3.5e-5'
+          pressure_as_printed: 3.5 × 10^-5 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 8b
+            column: P_Al
+            note: Table I row 8b, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2594'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 8b
+                column: T
+                note: Table I row 8b temperature cell.
+            composition: *id001
+    - observation_id: drowart_1960_table_ii_al_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 6
+        published_page: 1370
+        pdf_page_index: 5
+        table: II
+        note: Table II Mo + Al2O3, Al partial-pressure column; absolute pressures reduced from measured ion intensities
+          using the stated calibration procedures (printed pp. 1367–1368).
+      phase: gas
+      experiment: drowart-1960-mo-al2o3
+      regime: kems_effusion
+      units: atm
+      standard_state: Al(g) partial pressure over Mo + Al2O3
+      derivation:
+        relation: Absolute partial pressures reduced from measured ion intensities using the pressure ratio equation
+          and applicable calibration described by the authors.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            published_page: 1367
+            pdf_page_index: 2
+            section: Pressure Data
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: ion_intensity_calibration
+        method_note: Species partial pressure is derived from ion intensity through the printed relative-pressure
+          equation and absolute-pressure calibration.
+        species_as_printed: Al
+        composition_mol:
+          Al2O3: '1'
+        composition_mol_basis: pure_oxide_system
+        composition_basis_note: The table caption identifies the Al2O3 system and the experimental section describes
+          complete vaporization of alumina samples.
+        series: Table II Mo + Al2O3 Al column
+        points:
+        - T_K: '2036'
+          experiment_id_as_printed: 4a
+          pressure_atm: '1.9e-8'
+          pressure_as_printed: 1.9 × 10^-8 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 4a
+            column: P_Al
+            note: Table II row 4a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2036'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 4a
+                column: T
+                note: Table II row 4a temperature cell.
+            composition: *id002
+        - T_K: '2111'
+          experiment_id_as_printed: 7a
+          pressure_atm: '6.0e-8'
+          pressure_as_printed: 6.0 × 10^-8 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 7a
+            column: P_Al
+            note: Table II row 7a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2111'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 7a
+                column: T
+                note: Table II row 7a temperature cell.
+            composition: *id002
+        - T_K: '2198'
+          experiment_id_as_printed: 8a
+          pressure_atm: '1.5e-7'
+          pressure_as_printed: 1.5 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 8a
+            column: P_Al
+            note: Table II row 8a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2198'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 8a
+                column: T
+                note: Table II row 8a temperature cell.
+            composition: *id002
+        - T_K: '2262'
+          experiment_id_as_printed: 9a
+          pressure_atm: '3.5e-7'
+          pressure_as_printed: 3.5 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 9a
+            column: P_Al
+            note: Table II row 9a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2262'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 9a
+                column: T
+                note: Table II row 9a temperature cell.
+            composition: *id002
+        - T_K: '2194'
+          experiment_id_as_printed: 3a
+          pressure_atm: '1.0e-6'
+          pressure_as_printed: 1.0 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 3a
+            column: P_Al
+            note: Table II row 3a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2194'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 3a
+                column: T
+                note: Table II row 3a temperature cell.
+            composition: *id002
+        - T_K: '2243'
+          experiment_id_as_printed: 3b
+          pressure_atm: '1.5e-6'
+          pressure_as_printed: 1.5 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 3b
+            column: P_Al
+            note: Table II row 3b, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2243'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 3b
+                column: T
+                note: Table II row 3b temperature cell.
+            composition: *id002
+        - T_K: '2281'
+          experiment_id_as_printed: 5a
+          pressure_atm: '3.5e-6'
+          pressure_as_printed: 3.5 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 5a
+            column: P_Al
+            note: Table II row 5a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2281'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 5a
+                column: T
+                note: Table II row 5a temperature cell.
+            composition: *id002
+        - T_K: '2287'
+          experiment_id_as_printed: 10a
+          pressure_atm: '3.0e-6'
+          pressure_as_printed: 3.0 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 10a
+            column: P_Al
+            note: Table II row 10a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2287'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 10a
+                column: T
+                note: Table II row 10a temperature cell.
+            composition: *id002
+        - T_K: '2304'
+          experiment_id_as_printed: 1a
+          pressure_atm: '5.7e-6'
+          pressure_as_printed: 5.7 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 1a
+            column: P_Al
+            note: Table II row 1a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2304'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 1a
+                column: T
+                note: Table II row 1a temperature cell.
+            composition: *id002
+        - T_K: '2321'
+          experiment_id_as_printed: 11a
+          pressure_atm: '6.0e-6'
+          pressure_as_printed: 6.0 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 11a
+            column: P_Al
+            note: Table II row 11a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2321'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 11a
+                column: T
+                note: Table II row 11a temperature cell.
+            composition: *id002
+        - T_K: '2328'
+          experiment_id_as_printed: 6a
+          pressure_atm: '5.5e-6'
+          pressure_as_printed: 5.5 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 6a
+            column: P_Al
+            note: Table II row 6a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2328'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 6a
+                column: T
+                note: Table II row 6a temperature cell.
+            composition: *id002
+        - T_K: '2371'
+          experiment_id_as_printed: 13a
+          pressure_atm: '1.2e-5'
+          pressure_as_printed: 1.2 × 10^-5 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 13a
+            column: P_Al
+            note: Table II row 13a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2371'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 13a
+                column: T
+                note: Table II row 13a temperature cell.
+            composition: *id002
+        - T_K: '2384'
+          experiment_id_as_printed: 2b
+          pressure_atm: '1.6e-5'
+          pressure_as_printed: 1.6 × 10^-5 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 2b
+            column: P_Al
+            note: Table II row 2b, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2384'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 2b
+                column: T
+                note: Table II row 2b temperature cell.
+            composition: *id002
+        - T_K: '2395'
+          experiment_id_as_printed: 6b
+          pressure_atm: '1.35e-5'
+          pressure_as_printed: 1.35 × 10^-5 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 6b
+            column: P_Al
+            note: Table II row 6b, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2395'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 6b
+                column: T
+                note: Table II row 6b temperature cell.
+            composition: *id002
+        - T_K: '2416'
+          experiment_id_as_printed: 12a
+          pressure_atm: '2.4e-5'
+          pressure_as_printed: 2.4 × 10^-5 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 12a
+            column: P_Al
+            note: Table II row 12a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2416'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 12a
+                column: T
+                note: Table II row 12a temperature cell.
+            composition: *id002
+        - T_K: '2466'
+          experiment_id_as_printed: 2a
+          pressure_atm: '6.0e-5'
+          pressure_as_printed: 6.0 × 10^-5 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 2a
+            column: P_Al
+            note: Table II row 2a, P_Al cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2466'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 2a
+                column: T
+                note: Table II row 2a temperature cell.
+            composition: *id002
+  AlO:
+    observations:
+    - observation_id: drowart_1960_table_i_alo_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        published_page: 1368
+        pdf_page_index: 3
+        table: I
+        note: Table I W + Al2O3, AlO partial-pressure column; absolute pressures reduced from measured ion intensities
+          using the stated calibration procedures (printed pp. 1367–1368).
+      phase: gas
+      experiment: drowart-1960-w-al2o3
+      regime: kems_effusion
+      units: atm
+      standard_state: AlO(g) partial pressure over W + Al2O3
+      derivation:
+        relation: Absolute partial pressures reduced from measured ion intensities using the pressure ratio equation
+          and applicable calibration described by the authors.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            published_page: 1367
+            pdf_page_index: 2
+            section: Pressure Data
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: ion_intensity_calibration
+        method_note: Species partial pressure is derived from ion intensity through the printed relative-pressure
+          equation and absolute-pressure calibration.
+        species_as_printed: AlO
+        composition_mol:
+          Al2O3: '1'
+        composition_mol_basis: pure_oxide_system
+        composition_basis_note: The table caption identifies the Al2O3 system and the experimental section describes
+          complete vaporization of alumina samples.
+        series: Table I W + Al2O3 AlO column
+        points:
+        - T_K: '2188'
+          experiment_id_as_printed: 1a
+          pressure_atm: '9.6e-9'
+          pressure_as_printed: 9.6 × 10^-9 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1a
+            column: P_AlO
+            note: Table I row 1a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2188'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1a
+                column: T
+                note: Table I row 1a temperature cell.
+            composition: *id001
+        - T_K: '2191'
+          experiment_id_as_printed: 11a
+          pressure_atm: '1.0e-8'
+          pressure_as_printed: 1.0 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 11a
+            column: P_AlO
+            note: Table I row 11a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2191'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 11a
+                column: T
+                note: Table I row 11a temperature cell.
+            composition: *id001
+        - T_K: '2213'
+          experiment_id_as_printed: 1c
+          pressure_atm: '1.6e-8'
+          pressure_as_printed: 1.6 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1c
+            column: P_AlO
+            note: Table I row 1c, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2213'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1c
+                column: T
+                note: Table I row 1c temperature cell.
+            composition: *id001
+        - T_K: '2226'
+          experiment_id_as_printed: 12a
+          pressure_atm: '1.5e-8'
+          pressure_as_printed: 1.5 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 12a
+            column: P_AlO
+            note: Table I row 12a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2226'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 12a
+                column: T
+                note: Table I row 12a temperature cell.
+            composition: *id001
+        - T_K: '2233'
+          experiment_id_as_printed: 1b
+          pressure_atm: '2.3e-8'
+          pressure_as_printed: 2.3 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1b
+            column: P_AlO
+            note: Table I row 1b, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2233'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1b
+                column: T
+                note: Table I row 1b temperature cell.
+            composition: *id001
+        - T_K: '2240'
+          experiment_id_as_printed: 3a
+          pressure_atm: '1.8e-8'
+          pressure_as_printed: 1.8 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 3a
+            column: P_AlO
+            note: Table I row 3a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2240'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 3a
+                column: T
+                note: Table I row 3a temperature cell.
+            composition: *id001
+        - T_K: '2264'
+          experiment_id_as_printed: 2a
+          pressure_atm: '3.5e-8'
+          pressure_as_printed: 3.5 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 2a
+            column: P_AlO
+            note: Table I row 2a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2264'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 2a
+                column: T
+                note: Table I row 2a temperature cell.
+            composition: *id001
+          temperature_mark_as_printed: footnote 1
+        - T_K: '2275'
+          experiment_id_as_printed: 4a
+          pressure_atm: '3.9e-8'
+          pressure_as_printed: 3.9 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 4a
+            column: P_AlO
+            note: Table I row 4a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2275'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 4a
+                column: T
+                note: Table I row 4a temperature cell.
+            composition: *id001
+        - T_K: '2325'
+          experiment_id_as_printed: 9a
+          pressure_atm: '9.7e-8'
+          pressure_as_printed: 9.7 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9a
+            column: P_AlO
+            note: Table I row 9a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2325'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9a
+                column: T
+                note: Table I row 9a temperature cell.
+            composition: *id001
+        - T_K: '2335'
+          experiment_id_as_printed: 9b
+          pressure_atm: '7.6e-8'
+          pressure_as_printed: 7.6 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9b
+            column: P_AlO
+            note: Table I row 9b, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2335'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9b
+                column: T
+                note: Table I row 9b temperature cell.
+            composition: *id001
+        - T_K: '2350'
+          experiment_id_as_printed: 6a
+          pressure_atm: '1.5e-7'
+          pressure_as_printed: 1.5 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 6a
+            column: P_AlO
+            note: Table I row 6a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2350'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 6a
+                column: T
+                note: Table I row 6a temperature cell.
+            composition: *id001
+        - T_K: '2390'
+          experiment_id_as_printed: 9c
+          pressure_atm: '1.3e-7'
+          pressure_as_printed: 1.3 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9c
+            column: P_AlO
+            note: Table I row 9c, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2390'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9c
+                column: T
+                note: Table I row 9c temperature cell.
+            composition: *id001
+        - T_K: '2464'
+          experiment_id_as_printed: 10a
+          pressure_atm: '5.6e-7'
+          pressure_as_printed: 5.6 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 10a
+            column: P_AlO
+            note: Table I row 10a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2464'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 10a
+                column: T
+                note: Table I row 10a temperature cell.
+            composition: *id001
+        - T_K: '2475'
+          experiment_id_as_printed: 5a
+          pressure_atm: '7.1e-7'
+          pressure_as_printed: 7.1 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 5a
+            column: P_AlO
+            note: Table I row 5a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2475'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 5a
+                column: T
+                note: Table I row 5a temperature cell.
+            composition: *id001
+        - T_K: '2470'
+          experiment_id_as_printed: 7a
+          pressure_atm: '1.1e-6'
+          pressure_as_printed: 1.1 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 7a
+            column: P_AlO
+            note: Table I row 7a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2470'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 7a
+                column: T
+                note: Table I row 7a temperature cell.
+            composition: *id001
+        - T_K: '2514'
+          experiment_id_as_printed: 8a
+          pressure_atm: '1.2e-6'
+          pressure_as_printed: 1.2 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 8a
+            column: P_AlO
+            note: Table I row 8a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2514'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 8a
+                column: T
+                note: Table I row 8a temperature cell.
+            composition: *id001
+        - T_K: '2594'
+          experiment_id_as_printed: 8b
+          pressure_atm: '1.8e-6'
+          pressure_as_printed: 1.8 × 10^-6 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 8b
+            column: P_AlO
+            note: Table I row 8b, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2594'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 8b
+                column: T
+                note: Table I row 8b temperature cell.
+            composition: *id001
+    - observation_id: drowart_1960_table_ii_alo_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 6
+        published_page: 1370
+        pdf_page_index: 5
+        table: II
+        note: Table II Mo + Al2O3, AlO partial-pressure column; absolute pressures reduced from measured ion intensities
+          using the stated calibration procedures (printed pp. 1367–1368).
+      phase: gas
+      experiment: drowart-1960-mo-al2o3
+      regime: kems_effusion
+      units: atm
+      standard_state: AlO(g) partial pressure over Mo + Al2O3
+      derivation:
+        relation: Absolute partial pressures reduced from measured ion intensities using the pressure ratio equation
+          and applicable calibration described by the authors.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            published_page: 1367
+            pdf_page_index: 2
+            section: Pressure Data
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: ion_intensity_calibration
+        method_note: Species partial pressure is derived from ion intensity through the printed relative-pressure
+          equation and absolute-pressure calibration.
+        species_as_printed: AlO
+        composition_mol:
+          Al2O3: '1'
+        composition_mol_basis: pure_oxide_system
+        composition_basis_note: The table caption identifies the Al2O3 system and the experimental section describes
+          complete vaporization of alumina samples.
+        series: Table II Mo + Al2O3 AlO column
+        points:
+        - T_K: '2036'
+          experiment_id_as_printed: 4a
+          pressure_atm: '1.2e-9'
+          pressure_as_printed: 1.2 × 10^-9 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 4a
+            column: P_AlO
+            note: Table II row 4a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2036'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 4a
+                column: T
+                note: Table II row 4a temperature cell.
+            composition: *id002
+        - T_K: '2111'
+          experiment_id_as_printed: 7a
+          pressure_atm: '2.1e-9'
+          pressure_as_printed: 2.1 × 10^-9 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 7a
+            column: P_AlO
+            note: Table II row 7a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2111'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 7a
+                column: T
+                note: Table II row 7a temperature cell.
+            composition: *id002
+        - T_K: '2198'
+          experiment_id_as_printed: 8a
+          pressure_atm: '1.4e-8'
+          pressure_as_printed: 1.4 × 10^-8 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 8a
+            column: P_AlO
+            note: Table II row 8a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2198'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 8a
+                column: T
+                note: Table II row 8a temperature cell.
+            composition: *id002
+        - T_K: '2262'
+          experiment_id_as_printed: 9a
+          pressure_atm: '5.3e-8'
+          pressure_as_printed: 5.3 × 10^-8 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 9a
+            column: P_AlO
+            note: Table II row 9a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2262'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 9a
+                column: T
+                note: Table II row 9a temperature cell.
+            composition: *id002
+        - T_K: '2194'
+          experiment_id_as_printed: 3a
+          pressure_atm: '2.1e-8'
+          pressure_as_printed: 2.1 × 10^-8 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 3a
+            column: P_AlO
+            note: Table II row 3a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2194'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 3a
+                column: T
+                note: Table II row 3a temperature cell.
+            composition: *id002
+        - T_K: '2243'
+          experiment_id_as_printed: 3b
+          pressure_atm: '4.8e-8'
+          pressure_as_printed: 4.8 × 10^-8 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 3b
+            column: P_AlO
+            note: Table II row 3b, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2243'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 3b
+                column: T
+                note: Table II row 3b temperature cell.
+            composition: *id002
+        - T_K: '2281'
+          experiment_id_as_printed: 5a
+          pressure_atm: '1.1e-7'
+          pressure_as_printed: 1.1 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 5a
+            column: P_AlO
+            note: Table II row 5a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2281'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 5a
+                column: T
+                note: Table II row 5a temperature cell.
+            composition: *id002
+        - T_K: '2287'
+          experiment_id_as_printed: 10a
+          pressure_atm: '9.4e-8'
+          pressure_as_printed: 9.4 × 10^-8 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 10a
+            column: P_AlO
+            note: Table II row 10a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2287'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 10a
+                column: T
+                note: Table II row 10a temperature cell.
+            composition: *id002
+        - T_K: '2304'
+          experiment_id_as_printed: 1a
+          pressure_atm: '1.1e-7'
+          pressure_as_printed: 1.1 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 1a
+            column: P_AlO
+            note: Table II row 1a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2304'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 1a
+                column: T
+                note: Table II row 1a temperature cell.
+            composition: *id002
+        - T_K: '2321'
+          experiment_id_as_printed: 11a
+          pressure_atm: '2.1e-7'
+          pressure_as_printed: 2.1 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 11a
+            column: P_AlO
+            note: Table II row 11a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2321'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 11a
+                column: T
+                note: Table II row 11a temperature cell.
+            composition: *id002
+        - T_K: '2328'
+          experiment_id_as_printed: 6a
+          pressure_atm: '2.4e-7'
+          pressure_as_printed: 2.4 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 6a
+            column: P_AlO
+            note: Table II row 6a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2328'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 6a
+                column: T
+                note: Table II row 6a temperature cell.
+            composition: *id002
+        - T_K: '2384'
+          experiment_id_as_printed: 2b
+          pressure_atm: '3.5e-7'
+          pressure_as_printed: 3.5 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 2b
+            column: P_AlO
+            note: Table II row 2b, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2384'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 2b
+                column: T
+                note: Table II row 2b temperature cell.
+            composition: *id002
+        - T_K: '2395'
+          experiment_id_as_printed: 6b
+          pressure_atm: '4.3e-7'
+          pressure_as_printed: 4.3 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 6b
+            column: P_AlO
+            note: Table II row 6b, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2395'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 6b
+                column: T
+                note: Table II row 6b temperature cell.
+            composition: *id002
+        - T_K: '2416'
+          experiment_id_as_printed: 12a
+          pressure_atm: '8.9e-7'
+          pressure_as_printed: 8.9 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 12a
+            column: P_AlO
+            note: Table II row 12a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2416'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 12a
+                column: T
+                note: Table II row 12a temperature cell.
+            composition: *id002
+        - T_K: '2466'
+          experiment_id_as_printed: 2a
+          pressure_atm: '2.2e-6'
+          pressure_as_printed: 2.2 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 2a
+            column: P_AlO
+            note: Table II row 2a, P_AlO cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2466'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 2a
+                column: T
+                note: Table II row 2a temperature cell.
+            composition: *id002
+  Al2O:
+    observations:
+    - observation_id: drowart_1960_table_i_al2o_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        published_page: 1368
+        pdf_page_index: 3
+        table: I
+        note: Table I W + Al2O3, Al2O partial-pressure column; absolute pressures reduced from measured ion intensities
+          using the stated calibration procedures (printed pp. 1367–1368).
+      phase: gas
+      experiment: drowart-1960-w-al2o3
+      regime: kems_effusion
+      units: atm
+      standard_state: Al2O(g) partial pressure over W + Al2O3
+      derivation:
+        relation: Absolute partial pressures reduced from measured ion intensities using the pressure ratio equation
+          and applicable calibration described by the authors.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            published_page: 1367
+            pdf_page_index: 2
+            section: Pressure Data
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: ion_intensity_calibration
+        method_note: Species partial pressure is derived from ion intensity through the printed relative-pressure
+          equation and absolute-pressure calibration.
+        species_as_printed: Al2O
+        composition_mol:
+          Al2O3: '1'
+        composition_mol_basis: pure_oxide_system
+        composition_basis_note: The table caption identifies the Al2O3 system and the experimental section describes
+          complete vaporization of alumina samples.
+        series: Table I W + Al2O3 Al2O column
+        points:
+        - T_K: '2188'
+          experiment_id_as_printed: 1a
+          pressure_atm: '7.5e-9'
+          pressure_as_printed: 7.5 × 10^-9 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1a
+            column: P_Al2O
+            note: Table I row 1a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2188'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1a
+                column: T
+                note: Table I row 1a temperature cell.
+            composition: *id001
+        - T_K: '2191'
+          experiment_id_as_printed: 11a
+          pressure_atm: '9.4e-9'
+          pressure_as_printed: 9.4 × 10^-9 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 11a
+            column: P_Al2O
+            note: Table I row 11a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2191'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 11a
+                column: T
+                note: Table I row 11a temperature cell.
+            composition: *id001
+        - T_K: '2213'
+          experiment_id_as_printed: 1c
+          pressure_atm: '1.2e-8'
+          pressure_as_printed: 1.2 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1c
+            column: P_Al2O
+            note: Table I row 1c, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2213'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1c
+                column: T
+                note: Table I row 1c temperature cell.
+            composition: *id001
+        - T_K: '2226'
+          experiment_id_as_printed: 12a
+          pressure_atm: '1.5e-8'
+          pressure_as_printed: 1.5 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 12a
+            column: P_Al2O
+            note: Table I row 12a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2226'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 12a
+                column: T
+                note: Table I row 12a temperature cell.
+            composition: *id001
+        - T_K: '2233'
+          experiment_id_as_printed: 1b
+          pressure_atm: '1.6e-8'
+          pressure_as_printed: 1.6 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 1b
+            column: P_Al2O
+            note: Table I row 1b, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2233'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 1b
+                column: T
+                note: Table I row 1b temperature cell.
+            composition: *id001
+        - T_K: '2240'
+          experiment_id_as_printed: 3a
+          pressure_atm: '1.0e-8'
+          pressure_as_printed: 1.0 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 3a
+            column: P_Al2O
+            note: Table I row 3a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2240'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 3a
+                column: T
+                note: Table I row 3a temperature cell.
+            composition: *id001
+        - T_K: '2264'
+          experiment_id_as_printed: 2a
+          pressure_atm: '2.2e-8'
+          pressure_as_printed: 2.2 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 2a
+            column: P_Al2O
+            note: Table I row 2a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2264'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 2a
+                column: T
+                note: Table I row 2a temperature cell.
+            composition: *id001
+          temperature_mark_as_printed: footnote 1
+        - T_K: '2275'
+          experiment_id_as_printed: 4a
+          pressure_atm: '2.4e-8'
+          pressure_as_printed: 2.4 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 4a
+            column: P_Al2O
+            note: Table I row 4a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2275'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 4a
+                column: T
+                note: Table I row 4a temperature cell.
+            composition: *id001
+        - T_K: '2325'
+          experiment_id_as_printed: 9a
+          pressure_atm: '7.2e-8'
+          pressure_as_printed: 7.2 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9a
+            column: P_Al2O
+            note: Table I row 9a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2325'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9a
+                column: T
+                note: Table I row 9a temperature cell.
+            composition: *id001
+        - T_K: '2335'
+          experiment_id_as_printed: 9b
+          pressure_atm: '5.6e-8'
+          pressure_as_printed: 5.6 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9b
+            column: P_Al2O
+            note: Table I row 9b, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2335'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9b
+                column: T
+                note: Table I row 9b temperature cell.
+            composition: *id001
+        - T_K: '2350'
+          experiment_id_as_printed: 6a
+          pressure_atm: '8.3e-8'
+          pressure_as_printed: 8.3 × 10^-8 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 6a
+            column: P_Al2O
+            note: Table I row 6a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2350'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 6a
+                column: T
+                note: Table I row 6a temperature cell.
+            composition: *id001
+        - T_K: '2390'
+          experiment_id_as_printed: 9c
+          pressure_atm: '1.1e-7'
+          pressure_as_printed: 1.1 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 9c
+            column: P_Al2O
+            note: Table I row 9c, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2390'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 9c
+                column: T
+                note: Table I row 9c temperature cell.
+            composition: *id001
+        - T_K: '2464'
+          experiment_id_as_printed: 10a
+          pressure_atm: '5.0e-7'
+          pressure_as_printed: 5.0 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 10a
+            column: P_Al2O
+            note: Table I row 10a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2464'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 10a
+                column: T
+                note: Table I row 10a temperature cell.
+            composition: *id001
+        - T_K: '2475'
+          experiment_id_as_printed: 5a
+          pressure_atm: '3.4e-7'
+          pressure_as_printed: 3.4 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 5a
+            column: P_Al2O
+            note: Table I row 5a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2475'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 5a
+                column: T
+                note: Table I row 5a temperature cell.
+            composition: *id001
+        - T_K: '2470'
+          experiment_id_as_printed: 7a
+          pressure_atm: '4.9e-7'
+          pressure_as_printed: 4.9 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 7a
+            column: P_Al2O
+            note: Table I row 7a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2470'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 7a
+                column: T
+                note: Table I row 7a temperature cell.
+            composition: *id001
+        - T_K: '2514'
+          experiment_id_as_printed: 8a
+          pressure_atm: '5.4e-7'
+          pressure_as_printed: 5.4 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 8a
+            column: P_Al2O
+            note: Table I row 8a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2514'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 8a
+                column: T
+                note: Table I row 8a temperature cell.
+            composition: *id001
+        - T_K: '2594'
+          experiment_id_as_printed: 8b
+          pressure_atm: '8.9e-7'
+          pressure_as_printed: 8.9 × 10^-7 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 8b
+            column: P_Al2O
+            note: Table I row 8b, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2594'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 8b
+                column: T
+                note: Table I row 8b temperature cell.
+            composition: *id001
+    - observation_id: drowart_1960_table_ii_al2o_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 6
+        published_page: 1370
+        pdf_page_index: 5
+        table: II
+        note: Table II Mo + Al2O3, Al2O partial-pressure column; absolute pressures reduced from measured ion intensities
+          using the stated calibration procedures (printed pp. 1367–1368).
+      phase: gas
+      experiment: drowart-1960-mo-al2o3
+      regime: kems_effusion
+      units: atm
+      standard_state: Al2O(g) partial pressure over Mo + Al2O3
+      derivation:
+        relation: Absolute partial pressures reduced from measured ion intensities using the pressure ratio equation
+          and applicable calibration described by the authors.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            published_page: 1367
+            pdf_page_index: 2
+            section: Pressure Data
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: ion_intensity_calibration
+        method_note: Species partial pressure is derived from ion intensity through the printed relative-pressure
+          equation and absolute-pressure calibration.
+        species_as_printed: Al2O
+        composition_mol:
+          Al2O3: '1'
+        composition_mol_basis: pure_oxide_system
+        composition_basis_note: The table caption identifies the Al2O3 system and the experimental section describes
+          complete vaporization of alumina samples.
+        series: Table II Mo + Al2O3 Al2O column
+        points:
+        - T_K: '2036'
+          experiment_id_as_printed: 4a
+          pressure_atm: '1.4e-9'
+          pressure_as_printed: 1.4 × 10^-9 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 4a
+            column: P_Al2O
+            note: Table II row 4a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2036'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 4a
+                column: T
+                note: Table II row 4a temperature cell.
+            composition: *id002
+        - T_K: '2111'
+          experiment_id_as_printed: 7a
+          pressure_atm: '8.1e-9'
+          pressure_as_printed: 8.1 × 10^-9 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 7a
+            column: P_Al2O
+            note: Table II row 7a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2111'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 7a
+                column: T
+                note: Table II row 7a temperature cell.
+            composition: *id002
+        - T_K: '2194'
+          experiment_id_as_printed: 3a
+          pressure_atm: '5.0e-8'
+          pressure_as_printed: 5.0 × 10^-8 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 3a
+            column: P_Al2O
+            note: Table II row 3a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2194'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 3a
+                column: T
+                note: Table II row 3a temperature cell.
+            composition: *id002
+        - T_K: '2243'
+          experiment_id_as_printed: 3b
+          pressure_atm: '1.6e-7'
+          pressure_as_printed: 1.6 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 3b
+            column: P_Al2O
+            note: Table II row 3b, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2243'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 3b
+                column: T
+                note: Table II row 3b temperature cell.
+            composition: *id002
+        - T_K: '2281'
+          experiment_id_as_printed: 5a
+          pressure_atm: '2.7e-7'
+          pressure_as_printed: 2.7 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 5a
+            column: P_Al2O
+            note: Table II row 5a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2281'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 5a
+                column: T
+                note: Table II row 5a temperature cell.
+            composition: *id002
+        - T_K: '2287'
+          experiment_id_as_printed: 10a
+          pressure_atm: '2.8e-7'
+          pressure_as_printed: 2.8 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 10a
+            column: P_Al2O
+            note: Table II row 10a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2287'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 10a
+                column: T
+                note: Table II row 10a temperature cell.
+            composition: *id002
+        - T_K: '2304'
+          experiment_id_as_printed: 1a
+          pressure_atm: '6.6e-7'
+          pressure_as_printed: 6.6 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 1a
+            column: P_Al2O
+            note: Table II row 1a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2304'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 1a
+                column: T
+                note: Table II row 1a temperature cell.
+            composition: *id002
+        - T_K: '2321'
+          experiment_id_as_printed: 11a
+          pressure_atm: '4.7e-7'
+          pressure_as_printed: 4.7 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 11a
+            column: P_Al2O
+            note: Table II row 11a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2321'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 11a
+                column: T
+                note: Table II row 11a temperature cell.
+            composition: *id002
+        - T_K: '2328'
+          experiment_id_as_printed: 6a
+          pressure_atm: '4.0e-7'
+          pressure_as_printed: 4.0 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 6a
+            column: P_Al2O
+            note: Table II row 6a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2328'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 6a
+                column: T
+                note: Table II row 6a temperature cell.
+            composition: *id002
+        - T_K: '2371'
+          experiment_id_as_printed: 13a
+          pressure_atm: '8.4e-7'
+          pressure_as_printed: 8.4 × 10^-7 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 13a
+            column: P_Al2O
+            note: Table II row 13a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2371'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 13a
+                column: T
+                note: Table II row 13a temperature cell.
+            composition: *id002
+        - T_K: '2384'
+          experiment_id_as_printed: 2b
+          pressure_atm: '1.3e-6'
+          pressure_as_printed: 1.3 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 2b
+            column: P_Al2O
+            note: Table II row 2b, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2384'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 2b
+                column: T
+                note: Table II row 2b temperature cell.
+            composition: *id002
+        - T_K: '2416'
+          experiment_id_as_printed: 12a
+          pressure_atm: '1.7e-6'
+          pressure_as_printed: 1.7 × 10^-6 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 12a
+            column: P_Al2O
+            note: Table II row 12a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2416'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 12a
+                column: T
+                note: Table II row 12a temperature cell.
+            composition: *id002
+        - T_K: '2466'
+          experiment_id_as_printed: 2a
+          pressure_atm: '1.4e-5'
+          pressure_as_printed: 1.4 × 10^-5 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 2a
+            column: P_Al2O
+            note: Table II row 2a, P_Al2O cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2466'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 2a
+                column: T
+                note: Table II row 2a temperature cell.
+            composition: *id002
+  Al2O2:
+    observations:
+    - observation_id: drowart_1960_table_i_al2o2_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        published_page: 1368
+        pdf_page_index: 3
+        table: I
+        note: Table I W + Al2O3, Al2O2 partial-pressure column; absolute pressures reduced from measured ion intensities
+          using the stated calibration procedures (printed pp. 1367–1368).
+      phase: gas
+      experiment: drowart-1960-w-al2o3
+      regime: kems_effusion
+      units: atm
+      standard_state: Al2O2(g) partial pressure over W + Al2O3
+      derivation:
+        relation: Absolute partial pressures reduced from measured ion intensities using the pressure ratio equation
+          and applicable calibration described by the authors.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            published_page: 1367
+            pdf_page_index: 2
+            section: Pressure Data
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: ion_intensity_calibration
+        method_note: Species partial pressure is derived from ion intensity through the printed relative-pressure
+          equation and absolute-pressure calibration.
+        species_as_printed: Al2O2
+        composition_mol:
+          Al2O3: '1'
+        composition_mol_basis: pure_oxide_system
+        composition_basis_note: The table caption identifies the Al2O3 system and the experimental section describes
+          complete vaporization of alumina samples.
+        series: Table I W + Al2O3 Al2O2 column
+        points:
+        - T_K: '2464'
+          experiment_id_as_printed: 10a
+          pressure_atm: '1.4e-9'
+          pressure_as_printed: 1.4 × 10^-9 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 10a
+            column: P_Al2O2
+            note: Table I row 10a, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2464'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 10a
+                column: T
+                note: Table I row 10a temperature cell.
+            composition: *id001
+        - T_K: '2475'
+          experiment_id_as_printed: 5a
+          pressure_atm: '3.2e-9'
+          pressure_as_printed: 3.2 × 10^-9 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 5a
+            column: P_Al2O2
+            note: Table I row 5a, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2475'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 5a
+                column: T
+                note: Table I row 5a temperature cell.
+            composition: *id001
+        - T_K: '2470'
+          experiment_id_as_printed: 7a
+          pressure_atm: '2.3e-9'
+          pressure_as_printed: 2.3 × 10^-9 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 7a
+            column: P_Al2O2
+            note: Table I row 7a, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2470'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 7a
+                column: T
+                note: Table I row 7a temperature cell.
+            composition: *id001
+        - T_K: '2514'
+          experiment_id_as_printed: 8a
+          pressure_atm: '3.5e-9'
+          pressure_as_printed: 3.5 × 10^-9 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 8a
+            column: P_Al2O2
+            note: Table I row 8a, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2514'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 8a
+                column: T
+                note: Table I row 8a temperature cell.
+            composition: *id001
+        - T_K: '2594'
+          experiment_id_as_printed: 8b
+          pressure_atm: '6.0e-9'
+          pressure_as_printed: 6.0 × 10^-9 atm
+          locator:
+            page: 4
+            published_page: 1368
+            pdf_page_index: 3
+            table: I
+            row: 8b
+            column: P_Al2O2
+            note: Table I row 8b, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2594'
+              locator:
+                page: 4
+                published_page: 1368
+                pdf_page_index: 3
+                table: I
+                row: 8b
+                column: T
+                note: Table I row 8b temperature cell.
+            composition: *id001
+    - observation_id: drowart_1960_table_ii_al2o2_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 6
+        published_page: 1370
+        pdf_page_index: 5
+        table: II
+        note: Table II Mo + Al2O3, Al2O2 partial-pressure column; absolute pressures reduced from measured ion intensities
+          using the stated calibration procedures (printed pp. 1367–1368).
+      phase: gas
+      experiment: drowart-1960-mo-al2o3
+      regime: kems_effusion
+      units: atm
+      standard_state: Al2O2(g) partial pressure over Mo + Al2O3
+      derivation:
+        relation: Absolute partial pressures reduced from measured ion intensities using the pressure ratio equation
+          and applicable calibration described by the authors.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            published_page: 1367
+            pdf_page_index: 2
+            section: Pressure Data
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: ion_intensity_calibration
+        method_note: Species partial pressure is derived from ion intensity through the printed relative-pressure
+          equation and absolute-pressure calibration.
+        species_as_printed: Al2O2
+        composition_mol:
+          Al2O3: '1'
+        composition_mol_basis: pure_oxide_system
+        composition_basis_note: The table caption identifies the Al2O3 system and the experimental section describes
+          complete vaporization of alumina samples.
+        series: Table II Mo + Al2O3 Al2O2 column
+        points:
+        - T_K: '2281'
+          experiment_id_as_printed: 5a
+          pressure_atm: '1.1e-9'
+          pressure_as_printed: 1.1 × 10^-9 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 5a
+            column: P_Al2O2
+            note: Table II row 5a, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2281'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 5a
+                column: T
+                note: Table II row 5a temperature cell.
+            composition: *id002
+        - T_K: '2287'
+          experiment_id_as_printed: 10a
+          pressure_atm: '2.6e-10'
+          pressure_as_printed: 2.6 × 10^-10 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 10a
+            column: P_Al2O2
+            note: Table II row 10a, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2287'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 10a
+                column: T
+                note: Table II row 10a temperature cell.
+            composition: *id002
+        - T_K: '2321'
+          experiment_id_as_printed: 11a
+          pressure_atm: '6.2e-10'
+          pressure_as_printed: 6.2 × 10^-10 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 11a
+            column: P_Al2O2
+            note: Table II row 11a, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2321'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 11a
+                column: T
+                note: Table II row 11a temperature cell.
+            composition: *id002
+        - T_K: '2328'
+          experiment_id_as_printed: 6a
+          pressure_atm: '8.0e-10'
+          pressure_as_printed: 8.0 × 10^-10 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 6a
+            column: P_Al2O2
+            note: Table II row 6a, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2328'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 6a
+                column: T
+                note: Table II row 6a temperature cell.
+            composition: *id002
+        - T_K: '2384'
+          experiment_id_as_printed: 2b
+          pressure_atm: '1.9e-9'
+          pressure_as_printed: 1.9 × 10^-9 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 2b
+            column: P_Al2O2
+            note: Table II row 2b, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2384'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 2b
+                column: T
+                note: Table II row 2b temperature cell.
+            composition: *id002
+        - T_K: '2395'
+          experiment_id_as_printed: 6b
+          pressure_atm: '1.5e-9'
+          pressure_as_printed: 1.5 × 10^-9 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 6b
+            column: P_Al2O2
+            note: Table II row 6b, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2395'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 6b
+                column: T
+                note: Table II row 6b temperature cell.
+            composition: *id002
+        - T_K: '2416'
+          experiment_id_as_printed: 12a
+          pressure_atm: '2.3e-9'
+          pressure_as_printed: 2.3 × 10^-9 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 12a
+            column: P_Al2O2
+            note: Table II row 12a, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2416'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 12a
+                column: T
+                note: Table II row 12a temperature cell.
+            composition: *id002
+        - T_K: '2466'
+          experiment_id_as_printed: 2a
+          pressure_atm: '6.7e-9'
+          pressure_as_printed: 6.7 × 10^-9 atm
+          locator:
+            page: 6
+            published_page: 1370
+            pdf_page_index: 5
+            table: II
+            row: 2a
+            column: P_Al2O2
+            note: Table II row 2a, P_Al2O2 cell; rendered page confirms the displayed mantissa and exponent.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2466'
+              locator:
+                page: 6
+                published_page: 1370
+                pdf_page_index: 5
+                table: II
+                row: 2a
+                column: T
+                note: Table II row 2a temperature cell.
+            composition: *id002
