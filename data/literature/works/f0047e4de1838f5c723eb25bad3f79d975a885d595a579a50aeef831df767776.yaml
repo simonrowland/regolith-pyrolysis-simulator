@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
+    - asset_id: pdf:shimaoka-nakamura-1989-nipr2-252
+      role: pdf
+      path: raw/shimaoka-nakamura-1989-nipr2-252/shimaoka-nakamura-1989-nipr2-252.pdf
+      sha256:
+        tag: value
+        value: a440416bc584759c38b412a9128a7741a4cc188f2cdcee5e85f6df2473ec0906
+    - asset_id: tables:shimaoka-nakamura-1989-nipr2-252
+      role: table_csv
+      path: tables/shimaoka-nakamura-1989-nipr2-252
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:shimaoka-nakamura-1989-nipr2-252
       role: pdftotext
       path: unknown

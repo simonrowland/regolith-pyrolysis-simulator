@@ -20,20 +20,35 @@ extraction:
 review_status: draft
 corrections: []
 fidelity_samples:
-- species: SiO2
-  observable: psat_series
-  observation_id: steurer_1985_table1_single_oxide_psat
-  field: SiO2_2000K_SiO2_P_torr
-  value: 0.000192
+- path: species.SiO2.observations[steurer_1985_table1_single_oxide_psat].values.points[2].P
+  value: 15.3
   locator:
     table: '1'
     published_page: 126
     pdf_page_index: 4
-    note: Table 1 SiO2/SiO2 at 2000 K = 1.92 x 10^{-4} torr
-- species: O2
-  observable: psat_series
-  observation_id: steurer_1985_table2_mixture_psat
-  field: O2_3000K_P_atm
+    note: Table 1 SiO2(g) row at 3000 K = 1.53 x 10^1 torr
+- path: species.SiO.observations[steurer_1985_table1_sio_psat].values.points[0].P
+  value: 0.00713
+  locator:
+    table: '1'
+    published_page: 126
+    pdf_page_index: 4
+    note: Table 1 SiO(g) row at 2000 K = 7.13 x 10^-3 torr
+- path: species.SiO.observations[steurer_1985_table1_sio_psat].values.points[1].P
+  value: 3.26
+  locator:
+    table: '1'
+    published_page: 126
+    pdf_page_index: 4
+    note: Table 1 SiO(g) row at 2500 K = 3.26 torr
+- path: species.SiO.observations[steurer_1985_table1_sio_psat].values.points[2].P
+  value: 180.0
+  locator:
+    table: '1'
+    published_page: 126
+    pdf_page_index: 4
+    note: Table 1 SiO(g) row at 3000 K = 1.80 x 10^2 torr
+- path: species.O2.observations[steurer_1985_table2_mixture_psat].values.points[2].P
   value: 0.081
   locator:
     table: '2'
@@ -112,28 +127,53 @@ species:
         published_page: 126
         pdf_page_index: 4
         note: Table 1 vapor pressure of oxide dissociation species vs temperature
+      derived_from: [pdf:steurer-1985-vapor-phase-pyrolysis]
       T_range_K:
       - 2000.0
       - 3000.0
       phase: single_oxide_JANAF_equilibrium
       standard_state: partial pressure of dissociation species; torr as printed
       regime: janaf_equilibrium_calculation
-      units: torr as published; T in K as printed (header 2000 / 2500 / 3000)
+      units: torr
       uncertainty:
         note: none printed; values are calculated from JANAF free energies
       values:
         quantity: partial_pressure
         method_class: model_derived
         evidence_class: authors_janaf_equilibrium_not_measured
-        T_K:
-        - 2000.0
-        - 2500.0
-        - 3000.0
-        SiO2_2000K_SiO2_P_torr: 0.000192
+        composition_mol:
+          basis: pure_oxide_system
+          SiO2: 1.0
+        model: Authors' equilibrium vapor pressures calculated from JANAF Thermochemical Tables, 2nd ed. (Ref. 5).
+        derivation:
+          relation: Authors solved the stated oxide vaporization equilibria using JANAF thermodynamic data.
+          inputs: [pdf:steurer-1985-vapor-phase-pyrolysis]
+        points:
+        - T_K: 2000.0
+          P: 1.92e-04
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 2000.0}
+              locator: {table: '1', row: SiO2(g), column: 2000 K, published_page: 126, pdf_page_index: 4}
+          locator: {table: '1', row: SiO2(g), column: 2000 K, published_page: 126, pdf_page_index: 4}
+        - T_K: 2500.0
+          P: 1.77e-01
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 2500.0}
+              locator: {table: '1', row: SiO2(g), column: 2500 K, published_page: 126, pdf_page_index: 4}
+          locator: {table: '1', row: SiO2(g), column: 2500 K, published_page: 126, pdf_page_index: 4}
+        - T_K: 3000.0
+          P: 1.53e+01
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 3000.0}
+              locator: {table: '1', row: SiO2(g), column: 3000 K, published_page: 126, pdf_page_index: 4}
+          locator: {table: '1', row: SiO2(g), column: 3000 K, published_page: 126, pdf_page_index: 4}
         caption_as_published: Table 1 Vapor pressure of oxide dissociation species vs. temperature
         header_as_published: Vapor Pressure of Species (torr) at K
         source_of_thermo: JANAF Thermochemical Tables 2nd ed. (Ref. 5)
-        rows:
+        table_rows_as_printed:
         - oxide: SiO2
           vapor_species: SiO2
           P_torr:
@@ -433,6 +473,58 @@ species:
         - T_K: 3000.0
           yield_wt_pct: 21.5
         authors_note: close to half of all metal contained in the oxide (SiO2 = 46.8%)
+  SiO:
+    observations:
+    - observation_id: steurer_1985_table1_sio_psat
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 126
+        pdf_page_index: 4
+        note: Table 1 SiO(g) pressures for the SiO2 oxide system
+      derived_from: [pdf:steurer-1985-vapor-phase-pyrolysis]
+      T_range_K:
+      - 2000.0
+      - 3000.0
+      phase: single_oxide_JANAF_equilibrium
+      standard_state: partial pressure of dissociation species; torr as printed
+      regime: janaf_equilibrium_calculation
+      units: torr
+      uncertainty:
+        note: none printed; values are calculated from JANAF free energies
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        evidence_class: authors_janaf_equilibrium_not_measured
+        composition_mol:
+          basis: pure_oxide_system
+          SiO2: 1.0
+        model: Authors' equilibrium vapor pressures calculated from JANAF Thermochemical Tables, 2nd ed. (Ref. 5).
+        derivation:
+          relation: Authors solved the stated oxide vaporization equilibria using JANAF thermodynamic data.
+          inputs: [pdf:steurer-1985-vapor-phase-pyrolysis]
+        points:
+        - T_K: 2000.0
+          P: 7.13e-03
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 2000.0}
+              locator: {table: '1', row: SiO(g), column: 2000 K, published_page: 126, pdf_page_index: 4}
+          locator: {table: '1', row: SiO(g), column: 2000 K, published_page: 126, pdf_page_index: 4}
+        - T_K: 2500.0
+          P: 3.26
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 2500.0}
+              locator: {table: '1', row: SiO(g), column: 2500 K, published_page: 126, pdf_page_index: 4}
+          locator: {table: '1', row: SiO(g), column: 2500 K, published_page: 126, pdf_page_index: 4}
+        - T_K: 3000.0
+          P: 1.80e+02
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 3000.0}
+              locator: {table: '1', row: SiO(g), column: 3000 K, published_page: 126, pdf_page_index: 4}
+          locator: {table: '1', row: SiO(g), column: 3000 K, published_page: 126, pdf_page_index: 4}
   O2:
     observations:
     - observation_id: steurer_1985_table2_mixture_psat
@@ -443,24 +535,46 @@ species:
         published_page: 127
         pdf_page_index: 5
         note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+      derived_from: [pdf:steurer-1985-vapor-phase-pyrolysis]
       T_range_K:
       - 2000.0
       - 3000.0
       phase: ideal_oxide_mixture_representative_of_lunar_basalt
       standard_state: partial pressure; atm as printed
       regime: janaf_equilibrium_calculation
-      units: atm as published
+      units: atm
       uncertainty:
         note: none printed
       values:
         quantity: partial_pressure
         method_class: model_derived
         evidence_class: authors_janaf_equilibrium_not_measured
-        O2_3000K_P_atm: 0.081
-        T_K:
-        - 2000.0
-        - 2500.0
-        - 3000.0
+        model: Authors' equilibrium vapor pressures calculated with an ideal oxide mixture and JANAF thermodynamic data.
+        derivation:
+          relation: Authors solved nine equilibrium equations for the stated oxide mixture using JANAF thermodynamic data.
+          inputs: [pdf:steurer-1985-vapor-phase-pyrolysis]
+        points:
+        - T_K: 2000.0
+          P: 3.2e-06
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 2000.0}
+              locator: {table: '2', row: O2(g), column: 2000 K, published_page: 127, pdf_page_index: 5}
+          locator: {table: '2', row: O2(g), column: 2000 K, published_page: 127, pdf_page_index: 5}
+        - T_K: 2500.0
+          P: 1.5e-03
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 2500.0}
+              locator: {table: '2', row: O2(g), column: 2500 K, published_page: 127, pdf_page_index: 5}
+          locator: {table: '2', row: O2(g), column: 2500 K, published_page: 127, pdf_page_index: 5}
+        - T_K: 3000.0
+          P: 8.1e-02
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 3000.0}
+              locator: {table: '2', row: O2(g), column: 3000 K, published_page: 127, pdf_page_index: 5}
+          locator: {table: '2', row: O2(g), column: 3000 K, published_page: 127, pdf_page_index: 5}
         composition_wt_pct:
           Al2O3: 15.0
           SiO2: 50.0
@@ -472,7 +586,7 @@ species:
           note: Oxides % (Weight) table above Table 2
         activity_assumption_as_printed: ideal mixture; activity of all solids equivalent to the mole fraction;
           activity of the gases equal to their respective partial pressures
-        rows:
+        table_rows_as_printed:
         - species: O2(g)
           P_atm:
           - P_as_printed: 3.2 x 10^{-6}

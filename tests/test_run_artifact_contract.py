@@ -554,6 +554,40 @@ def test_cost_totals_mark_refused_pumping_unavailable_instead_of_omitting() -> N
     assert totals["process_electrical_energy_kWh"] == pytest.approx(2.0)
 
 
+def test_cost_totals_propagate_unavailable_cost_rollup_diagnostic() -> None:
+    payload = _runner_payload(
+        per_hour_summary=[
+            {
+                "hour": 1,
+                "campaign": "C0",
+                "mass_balance_pct": 0.0,
+                "energy_electrical_kWh": 2.0,
+                "energy_evaporation_thermal_kWh": 3.0,
+            }
+        ]
+    )
+    payload["run_metadata"]["cost_rollup_diagnostic"] = {
+        "status": "unavailable",
+        "section": "cost_rollup_diagnostic",
+        "exception_type": "RuntimeError",
+        "reason": "injected cost report failure",
+    }
+
+    artifact = build_run_artifact(payload, run_id="run-cost-report-unavailable")
+
+    totals = artifact["terminal"]["cost_totals"]
+    for field in _CANONICAL_UNAVAILABLE_LEAVES:
+        assert is_unavailable_quantity(totals[field]), field
+        assert "cost_rollup_diagnostic" in unavailable_reason_of(totals[field])
+        assert "injected cost report failure" in unavailable_reason_of(
+            totals[field]
+        )
+    assert totals["process_electrical_energy_kWh"] == pytest.approx(2.0)
+    assert totals["process_electrical_cost_usd"] == pytest.approx(2.0 * 0.15)
+    assert totals["solar_heat_cost_usd"] == pytest.approx(3.0 * 0.05)
+    assert totals["completeness"] == "incomplete"
+
+
 _REFUSED_PUMPING_HOUR_FIXTURE = (
     Path(__file__).resolve().parent
     / "fixtures/cost/refused_pumping_hour_canonical_totals.json"

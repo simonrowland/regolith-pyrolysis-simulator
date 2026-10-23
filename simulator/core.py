@@ -9985,6 +9985,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     getattr(self.melt, 'fO2_log', -9.0),
                 )
         intrinsic_fO2_log = float(intrinsic_fO2_log)
+        from simulator.fe_redox import _published_intrinsic_melt_fO2
+
+        intrinsic_publication = _published_intrinsic_melt_fO2(
+            intrinsic_fO2_log,
+            self.atom_ledger.project_account_mol('process.cleaned_melt'),
+            T_C + 273.15,
+        )
+        intrinsic_fO2_log = intrinsic_publication['published_intrinsic_fO2_log']
         vacuum_floor = (
             float(self._oxygen_numerical_floor_bar())
             if callable(getattr(self, '_oxygen_numerical_floor_bar', None))
@@ -10044,6 +10052,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_high_t_melt_activity_temperature_K = T_C + 273.15
         diagnostic = dict(kernel_result.diagnostic or {})
+        diagnostic['intrinsic_fO2_publication'] = intrinsic_publication
 
         def append_kernel_warnings(
             messages: tuple[str, ...] | str,
@@ -10062,6 +10071,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             diagnostic['kernel_vapor_pressure_warnings'] = existing
 
         append_kernel_warnings(getattr(kernel_result, 'warnings', ()) or ())
+        if intrinsic_publication['notice']:
+            append_kernel_warnings(intrinsic_publication['notice'])
+            result.warnings.append(intrinsic_publication['notice'])
         self._last_high_t_melt_activity = dict(
             diagnostic.get("high_t_melt_activity") or {}
         )
@@ -13427,7 +13439,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if account.startswith('reservoir.')
             or account.startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX)
         )
-        return sum(float(totals.get(account, 0.0)) for account in accounts)
+        return sum(float(totals.get(account, 0.0)) for account in sorted(accounts))
 
     def _finalize_record(self) -> None:
         """Populate final batch ledger fields when a batch completes."""

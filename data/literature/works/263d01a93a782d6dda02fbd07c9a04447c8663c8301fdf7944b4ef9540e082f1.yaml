@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
     - asset_id: pdf:shornikov-2014-ca-al-evaporation-coefficients
       role: pdf
@@ -17,6 +17,12 @@ work:
       sha256:
         tag: value
         value: 03e1d4e21a7752c999b56963e317aa07241b96f007994a36e854c8f4fa816b53
+    - asset_id: pdftotext:shornikov-2014-ca-al-evaporation-coefficients
+      role: pdftotext
+      path: text/shornikov-2014-ca-al-evaporation-coefficients
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:shornikov-2014-ca-al-evaporation-coefficients
       role: pdftotext
       path: unknown

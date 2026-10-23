@@ -22,6 +22,7 @@ Usage: scripts/check_store_freshness.py [--head REF]
 from __future__ import annotations
 
 import argparse
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -168,6 +169,14 @@ CODE_INPUTS = (
 #     produced no store change (observations=126296 queue=80926
 #     hard_issues=3334; j01 7/7). This acknowledges STORE outputs only; the
 #     scoring and diagnostic changes are covered by the commits' tests.
+#   b1d82d91d, a571c4a70: Stolyarova 1996 extraction.method text only.
+#     The sentences say the authors calculated p_O, p'_O and p''_O via
+#     Eqs. (7)–(9) (published p. 19; Table 2 footnote a, p. 20) from ion
+#     currents, Gurvich K and Mann cross-sections, and that the row inputs
+#     are not printed. Migration does not copy extraction.method into the
+#     store. A full regen at a571c4a70 was byte-identical to store commit
+#     d6fad0b93 (rows_in=51641 observations=128946 works=371 experiments=3863
+#     queue=88788 hard_issues=3268; git diff empty under store outputs).
 #   c21acfc5d, 6ba1b9771: t-1424 public battery tools. c21acfc5d names the
 #     residual-key spellings in simulator/battery/score.py, shares its key
 #     splitter with pins.py, and gives compilation_tier.py the shared
@@ -197,6 +206,14 @@ CODE_INPUTS = (
 #     The landing train's full regen of b148 (tip 20a005ad5 on green 850a09e93,
 #     studio-3) was a fixed point: no store change. This acknowledges STORE
 #     outputs only; the new rows' scoring is covered by the commits' tests.
+#   2458a9f46: decision band for phase rows uses metric_operation_for_identity;
+#     no store output change (decision bands are not store data; ror-bandfix:
+#     same output on green).
+#   3b4e68626: a refused composition_role is not projected onto point
+#     conditions. No extract declares a role outside datum_state and
+#     initial_charge_only. Regen on this tree (battery_migrate exit 1,
+#     observations 128946, queue 88695, hard issues 3278) left every store
+#     file byte-identical.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "037f97ff6", "5d46c88e1",
     "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
@@ -212,11 +229,47 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "23bee5e7b", "8c154cdb0", "ed246fcb7", "62224868f",
     "2e69a5faa", "4f9402dea", "31bb956c5", "cdd49ec85",
     "9364d3828",
+    "b1d82d91d", "a571c4a70",
     "c21acfc5d", "6ba1b9771",
     "f74ef7a6f",
     "d6ccae4b4",
     "7e0508bb5", "b37e28bac", "297df02b9",
+    "2458a9f46",
+    "3b4e68626",
 })
+
+
+def _store_neutral_ack_commits() -> set[str]:
+    """Resolve validated receipt files; separate files avoid shared-set conflicts."""
+    directory = ROOT / "scripts" / "store_neutral_acks"
+    if not directory.exists():
+        return set()
+
+    acknowledgements: set[str] = set()
+    for path in sorted(directory.iterdir()):
+        stem = path.stem
+        if (
+            path.suffix != ".txt"
+            or (not 7 <= len(stem) <= 12 and len(stem) != 40)
+            or any(char not in "0123456789abcdefABCDEF" for char in stem)
+            or not stat.S_ISREG(path.lstat().st_mode)
+        ):
+            raise ValueError(f"malformed store-neutral ack file: {path}")
+        reason_lines = [
+            line for line in path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        if len(reason_lines) != 1:
+            raise ValueError(f"store-neutral ack must contain one reason line: {path}")
+        commit = _git(
+            "rev-parse", "--verify", "--end-of-options", f"{stem}^{{commit}}"
+        ).strip().lower()
+        if commit[:9] in STORE_NEUTRAL_INPUT_COMMITS:
+            raise ValueError(f"duplicate store-neutral acknowledgement: {commit[:9]}")
+        if commit in acknowledgements:
+            raise ValueError(f"duplicate store-neutral acknowledgement: {commit}")
+        acknowledgements.add(commit)
+    return acknowledgements
 
 
 def _git(*args: str) -> str:
@@ -283,8 +336,9 @@ def _untraced_extracts(head: str) -> list[str]:
 
 def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
     """Migrate-input commits after the last store-output commit, keyed
-    "<sha9> <subject>", minus the acknowledged STORE_NEUTRAL_INPUT_COMMITS."""
+    "<sha9> <subject>", minus the acknowledged store-neutral commits."""
     stale: dict[str, list[str]] = {}
+    ack_shas = _store_neutral_ack_commits()
     log = _git(
         "log", "--format=%H%x00%s", "--name-only", f"{last_store}..{head}", "--",
         "data/literature", "simulator/battery", *CODE_INPUTS,
@@ -298,6 +352,7 @@ def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
             line.strip()
             and commit is not None
             and commit[:9] not in STORE_NEUTRAL_INPUT_COMMITS
+            and commit.lower() not in ack_shas
             and _is_input(line.strip())
         ):
             stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())

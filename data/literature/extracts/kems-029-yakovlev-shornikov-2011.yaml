@@ -41,7 +41,7 @@ fidelity_samples:
 - species: SiO
   observable: psat_series
   observation_id: yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar
-  field: p_bar_about
+  field: p_bar
   value: 1.0e-06
   locator:
     published_page: 2
@@ -451,10 +451,8 @@ species:
         T_C_range:
         - 2000.0
         - 2400.0
-        p_bar_about: 1.0e-06
-        p_Pa: 0.09999999999999999
-        p_Pa_conversion: p_Pa = p_bar × 1e5
         p_bar: 1.0e-06
+        approximate: true
         approximately_equal_to:
         - Ca
         - Al
@@ -528,10 +526,23 @@ species:
       quote: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization
         process proceeded at comparatively high oxygen pressure which was in 10 and 100 times higher then
         oxygen pressure condition at the Murchison and Krymka high temperature vaporization (table).
+      derived_from: [pdf:kems-029-yakovlev-shornikov-2011]
+      derivation:
+        relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
+        inputs: [pdf:kems-029-yakovlev-shornikov-2011]
       T_range_K:
       - 2293.15
       - 2621.15
       phase: high_T_residual_Murchison_and_Efremovka_CAI
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        locator: {table: O2, published_page: 2, pdf_page_index: 2}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+          locator: {table: O2, published_page: 2, pdf_page_index: 2}
       standard_state: calculated p(O2) in bar; not a direct ion-current calibration
       regime: kems_effusion
       units: bar as published (p_Pa = p_bar × 1e5)
@@ -539,6 +550,7 @@ species:
         quantity: partial_pressure
         gas_species: O2(g)
         method_class: model_derived
+        model: Thermodynamic analysis reported for meteorite and Efremovka CAI melts.
         admission_status: model_output_not_measurement
         related_source: kems-028-yakovlev-1984 torr table at the same T grid (1 torr = 1.33322e-3 bar)
         CAI_vs_chondrite_factor_as_printed: 10 and 100 times higher
@@ -546,56 +558,100 @@ species:
         - T_C: 2020
           T_K: 2293.15
           sample: Murchison
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+              locator: {table: O2, published_page: 2, pdf_page_index: 2}
           p_bar: 1.9e-09
           p_Pa: 0.00019
         - T_C: 2072
           T_K: 2345.15
           sample: Murchison
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+              locator: {table: O2, published_page: 2, pdf_page_index: 2}
           p_bar: 2.1e-09
           p_Pa: 0.00021
         - T_C: 2130
           T_K: 2403.15
           sample: Murchison
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+              locator: {table: O2, published_page: 2, pdf_page_index: 2}
           p_bar: 2.0e-09
           p_Pa: 0.0002
         - T_C: 2130
           T_K: 2403.15
           sample: Efremovka_type_A
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+              locator: {table: O2, published_page: 2, pdf_page_index: 2}
           p_bar: 2.7e-08
           p_Pa: 0.0027
         - T_C: 2130
           T_K: 2403.15
           sample: Efremovka_type_B
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+              locator: {table: O2, published_page: 2, pdf_page_index: 2}
           p_bar: 4.5e-07
           p_Pa: 0.045
         - T_C: 2180
           T_K: 2453.15
           sample: Efremovka_type_A
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+              locator: {table: O2, published_page: 2, pdf_page_index: 2}
           p_bar: 6.3e-09
           p_Pa: 0.00063
         - T_C: 2205
           T_K: 2478.15
           sample: Efremovka_type_A
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+              locator: {table: O2, published_page: 2, pdf_page_index: 2}
           p_bar: 4.8e-09
           p_Pa: 0.00048
         - T_C: 2205
           T_K: 2478.15
           sample: Efremovka_type_B
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+              locator: {table: O2, published_page: 2, pdf_page_index: 2}
           p_bar: 3.7e-07
           p_Pa: 0.037
         - T_C: 2267
           T_K: 2540.15
           sample: Efremovka_type_A
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+              locator: {table: O2, published_page: 2, pdf_page_index: 2}
           p_bar: 7.3e-08
           p_Pa: 0.007300000000000001
         - T_C: 2267
           T_K: 2540.15
           sample: Efremovka_type_B
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+              locator: {table: O2, published_page: 2, pdf_page_index: 2}
           p_bar: 5.5e-08
           p_Pa: 0.0055000000000000005
         - T_C: 2348
           T_K: 2621.15
           sample: Efremovka_type_A
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_compositions_not_published}
+              locator: {table: O2, published_page: 2, pdf_page_index: 2}
           p_bar: 2.5e-07
           p_Pa: 0.024999999999999998
         blank_cells_as_printed:

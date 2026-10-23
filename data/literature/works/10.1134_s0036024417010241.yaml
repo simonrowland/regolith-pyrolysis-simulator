@@ -1,0 +1,344 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0036024417010241
+  citation: Shornikov, S. I. (2017). Mass Spectrometric Study of the Evaporation of MgAl2O4 Spinel. Russian Journal of Physical
+    Chemistry A, 91(1), 10–16.
+  source_ids:
+  - shornikov-2017-spinel-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:shornikov-2017-spinel-evaporation
+      role: pdf
+      path: raw/shornikov-2017-spinel-evaporation/shornikov-2017-spinel-evaporation.pdf
+      sha256:
+        tag: value
+        value: 2e6859e045e37837b99dcb2b2940a641b16a089a121bf4f58204a3ee94b22caf
+    - asset_id: pdftotext:shornikov-2017-spinel-evaporation
+      role: pdftotext
+      path: text/shornikov-2017-spinel-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2017-spinel-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0036024417010241
+experiments:
+- experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 11
+        pdf_page_index: 1
+        section: EXPERIMENTAL
+        note: The source describes a stoichiometric MgAl2O4 charge; 50 mol% MgO.
+    form:
+      state:
+        tag: value
+        value: solid stoichiometric MgAl2O4 spinel
+      locator:
+        page: 2
+        published_page: 11
+        pdf_page_index: 1
+        section: EXPERIMENTAL
+    characterization:
+      state:
+        tag: value
+        value: X-ray diffraction and chemical analysis
+      locator:
+        page: 2
+        published_page: 11
+        pdf_page_index: 1
+        section: EXPERIMENTAL
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 11
+        pdf_page_index: 1
+        section: EXPERIMENTAL
+        note: The paper does not print a numeric chamber or background pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 11
+        pdf_page_index: 1
+        section: EXPERIMENTAL
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1134/s0036024417010241
+  locator:
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    section: EXPERIMENTAL
+  bench_id: 10.1134/s0036024417010241::bench::shornikov_2017_spinel_mo_kems
+benches:
+- id: 10.1134/s0036024417010241::bench::shornikov_2017_spinel_mo_kems
+  work_id: 10.1134/s0036024417010241
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI-1201 serial mass spectrometer with modified high-temperature ion source
+    locator:
+      page: 2
+      published_page: 11
+      pdf_page_index: 1
+      section: EXPERIMENTAL
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: molybdenum Knudsen effusion container
+    locator:
+      page: 2
+      published_page: 11
+      pdf_page_index: 1
+      section: EXPERIMENTAL
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      page: 2
+      published_page: 11
+      pdf_page_index: 1
+      section: EXPERIMENTAL
+  other_facts: []
+context:
+- observation_id: shornikov_2017_table1_row_1
+  type: literature_summary
+  locator:
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 1.
+  units: as printed
+  values:
+    quantity: prior_spinel_evaporation_study_metadata
+    method_class: quoted_attributed
+    research_method_as_printed: High-temperature furnace (Knudsen)
+    container_or_suspension_material_as_printed: Al2O3
+    T_range_K_as_printed: 2023–2273
+    T_K_min_as_printed: '2023'
+    T_K_max_as_printed: '2273'
+    MgO_mol_percent_as_printed: '50'
+    gas_phase_component_as_printed: Mg
+    basic_results_as_printed: pMg
+    reference_as_printed: '[13]'
+  context_id: shornikov-2017-spinel-evaporation::context::shornikov_2017_table1_row_1
+  work_id: 10.1134/s0036024417010241
+  source_id: shornikov-2017-spinel-evaporation
+  species: MgAl2O4
+- observation_id: shornikov_2017_table1_row_2
+  type: literature_summary
+  locator:
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 2.
+  units: as printed
+  values:
+    quantity: prior_spinel_evaporation_study_metadata
+    method_class: quoted_attributed
+    research_method_as_printed: High-temperature furnace (Langmuir)
+    container_or_suspension_material_as_printed: W
+    T_range_K_as_printed: 1973–2273
+    T_K_min_as_printed: '1973'
+    T_K_max_as_printed: '2273'
+    MgO_mol_percent_as_printed: '50'
+    gas_phase_component_as_printed: '-'
+    basic_results_as_printed: p_tot
+    reference_as_printed: '[14, 15]'
+  context_id: shornikov-2017-spinel-evaporation::context::shornikov_2017_table1_row_2
+  work_id: 10.1134/s0036024417010241
+  source_id: shornikov-2017-spinel-evaporation
+  species: MgAl2O4
+- observation_id: shornikov_2017_table1_row_3
+  type: literature_summary
+  locator:
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 3.
+  units: as printed
+  values:
+    quantity: prior_spinel_evaporation_study_metadata
+    method_class: quoted_attributed
+    research_method_as_printed: High-temperature furnace (Langmuir) in a helium environment
+    container_or_suspension_material_as_printed: W
+    T_range_K_as_printed: 2273–2573
+    T_K_min_as_printed: '2273'
+    T_K_max_as_printed: '2573'
+    MgO_mol_percent_as_printed: '50'
+    gas_phase_component_as_printed: '-'
+    basic_results_as_printed: p_tot
+    reference_as_printed: '[14, 15]'
+  context_id: shornikov-2017-spinel-evaporation::context::shornikov_2017_table1_row_3
+  work_id: 10.1134/s0036024417010241
+  source_id: shornikov-2017-spinel-evaporation
+  species: MgAl2O4
+- observation_id: shornikov_2017_table1_row_4
+  type: literature_summary
+  locator:
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 4.
+  units: as printed
+  values:
+    quantity: prior_spinel_evaporation_study_metadata
+    method_class: quoted_attributed
+    research_method_as_printed: High-temperature furnace (Langmuir)
+    container_or_suspension_material_as_printed: W
+    T_range_K_as_printed: 1833–2093
+    T_K_min_as_printed: '1833'
+    T_K_max_as_printed: '2093'
+    MgO_mol_percent_as_printed: '50'
+    gas_phase_component_as_printed: Mg
+    basic_results_as_printed: p_tot
+    reference_as_printed: '[16–18]'
+  context_id: shornikov-2017-spinel-evaporation::context::shornikov_2017_table1_row_4
+  work_id: 10.1134/s0036024417010241
+  source_id: shornikov-2017-spinel-evaporation
+  species: MgAl2O4
+- observation_id: shornikov_2017_table1_row_5
+  type: literature_summary
+  locator:
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 5.
+  units: as printed
+  values:
+    quantity: prior_spinel_evaporation_study_metadata
+    method_class: quoted_attributed
+    research_method_as_printed: Knudsen effusion mass spectrometry
+    container_or_suspension_material_as_printed: Al2O3
+    T_range_K_as_printed: 2038–2048
+    T_K_min_as_printed: '2038'
+    T_K_max_as_printed: '2048'
+    MgO_mol_percent_as_printed: '50'
+    gas_phase_component_as_printed: Mg, O2
+    basic_results_as_printed: pMg
+    reference_as_printed: '[16, 17]'
+  context_id: shornikov-2017-spinel-evaporation::context::shornikov_2017_table1_row_5
+  work_id: 10.1134/s0036024417010241
+  source_id: shornikov-2017-spinel-evaporation
+  species: MgAl2O4
+- observation_id: shornikov_2017_table1_row_6
+  type: literature_summary
+  locator:
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 6.
+  units: as printed
+  values:
+    quantity: prior_spinel_evaporation_study_metadata
+    method_class: quoted_attributed
+    research_method_as_printed: High-temperature furnace (Langmuir)
+    container_or_suspension_material_as_printed: W
+    T_range_K_as_printed: 1973–2173
+    T_K_min_as_printed: '1973'
+    T_K_max_as_printed: '2173'
+    MgO_mol_percent_as_printed: 26, 50, 53
+    gas_phase_component_as_printed: Mg, O2
+    basic_results_as_printed: p_tot
+    reference_as_printed: '[19, 20]'
+  context_id: shornikov-2017-spinel-evaporation::context::shornikov_2017_table1_row_6
+  work_id: 10.1134/s0036024417010241
+  source_id: shornikov-2017-spinel-evaporation
+  species: MgAl2O4
+- observation_id: shornikov_2017_table1_row_7
+  type: literature_summary
+  locator:
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 7.
+  units: as printed
+  values:
+    quantity: prior_spinel_evaporation_study_metadata
+    method_class: quoted_attributed
+    research_method_as_printed: Knudsen effusion mass spectrometry
+    container_or_suspension_material_as_printed: W
+    T_range_K_as_printed: 1850–2300
+    T_K_min_as_printed: '1850'
+    T_K_max_as_printed: '2300'
+    MgO_mol_percent_as_printed: 26, 33, 50
+    gas_phase_component_as_printed: Mg, O2
+    basic_results_as_printed: pMg, αMgAl2O4
+    reference_as_printed: '[21]'
+  context_id: shornikov-2017-spinel-evaporation::context::shornikov_2017_table1_row_7
+  work_id: 10.1134/s0036024417010241
+  source_id: shornikov-2017-spinel-evaporation
+  species: MgAl2O4
+- observation_id: shornikov_2017_table1_row_8
+  type: literature_summary
+  locator:
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 8.
+  units: as printed
+  values:
+    quantity: prior_spinel_evaporation_study_metadata
+    method_class: quoted_attributed
+    research_method_as_printed: Knudsen effusion mass spectrometry
+    container_or_suspension_material_as_printed: Ir, Al2O3
+    T_range_K_as_printed: '1773'
+    T_K_min_as_printed: '1773'
+    T_K_max_as_printed: '1773'
+    MgO_mol_percent_as_printed: 0–10
+    gas_phase_component_as_printed: Mg, O2
+    basic_results_as_printed: pMg, pO2
+    reference_as_printed: '[22]'
+  context_id: shornikov-2017-spinel-evaporation::context::shornikov_2017_table1_row_8
+  work_id: 10.1134/s0036024417010241
+  source_id: shornikov-2017-spinel-evaporation
+  species: MgAl2O4
