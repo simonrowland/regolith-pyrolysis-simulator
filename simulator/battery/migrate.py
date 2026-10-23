@@ -3041,6 +3041,13 @@ def convert_temperature_to_k(
         return amount, "identity:K"
     if unit in {"c", "celsius", "degc", "°c"}:
         return celsius_to_kelvin(amount), "celsius_to_kelvin"
+    if unit in {"f", "fahrenheit", "degf", "°f"}:
+        # Exact scale and offset: T_K = (T_F - 32) x 5/9 + 273.15.
+        kelvin = (
+            (amount - Decimal("32")) * Decimal("5") / Decimal("9")
+            + Decimal("273.15")
+        )
+        return kelvin, "fahrenheit_to_kelvin"
     return None, f"unmapped temperature unit {units!r}"
 
 
@@ -4336,6 +4343,24 @@ def conversion_derivation(
 
     if not trail or str(trail).startswith("identity"):
         return None
+    if trail == "fahrenheit_to_kelvin":
+        parameters: list[tuple[str, Located[Decimal]]] = []
+        original = _as_dec_or_none(original_value)
+        if original is not None:
+            parameters.append(("original", Located(State.of(original), locator=locator)))
+        for name, value in (
+            ("freezing_point_F", Decimal("32")),
+            ("scale_numerator", Decimal("5")),
+            ("scale_denominator", Decimal("9")),
+            ("absolute_zero_offset_K", Decimal("273.15")),
+        ):
+            parameters.append((name, Located(State.of(value), locator=locator)))
+        return Derivation(
+            relation=trail,
+            inputs=("T_K = (T_F - 32) × 5/9 + 273.15", "original_unit=°F"),
+            parameters=tuple(parameters),
+            output_unit="K",
+        )
     if str(trail).startswith("specific_gas_yield:"):
         _, species, raw_molar_mass, raw_factor = str(trail).split(":", 3)
         molar_mass = _as_dec_or_none(raw_molar_mass)
@@ -10451,6 +10476,7 @@ def select_declared_source(
             ("melting_temperature_K", "K"),
             ("Tmax_K", "K"),
             ("T_C", "C"),
+            ("T_F", "F"),
             ("Tmax_C", "C"),
         ):
             if key not in payload:
@@ -15550,6 +15576,8 @@ class Migrator:
             t_payload.setdefault("T_K", obs.get("T_K"))
         if obs.get("T_C") is not None and q_token in _T1473_QUANTITIES:
             t_payload.setdefault("T_C", obs.get("T_C"))
+        if obs.get("T_F") is not None and q_token in _T1473_QUANTITIES:
+            t_payload.setdefault("T_F", obs.get("T_F"))
         if obs.get("T_range_K") is not None:
             t_payload.setdefault("T_range_K", obs.get("T_range_K"))
         t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, t_payload)
