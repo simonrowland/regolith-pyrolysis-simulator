@@ -283,72 +283,19 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
     sim = session.simulator
     hot_hours = set()
     c6_releases = []
-    c6_hours = 0
-    c6_redox_outcomes = {}
-    campaign_steps = {}
-    campaign_route = []
-    snapshot_campaign_steps = {}
-    snapshot_campaign_route = []
-    last_campaign_name = None
-    last_snapshot_campaign_name = None
     c6_moves_toward_gas_split = False
     transition_count = len(sim.atom_ledger.transitions)
     for result in drive_session(session, 400, DecisionPolicy.AUTO_APPLY):
         snapshot = result.snapshot
-        campaign_name = sim.melt.campaign.name
-        campaign_steps[campaign_name] = campaign_steps.get(campaign_name, 0) + 1
-        snapshot_campaign_name = snapshot.campaign.name
-        snapshot_campaign_steps[snapshot_campaign_name] = (
-            snapshot_campaign_steps.get(snapshot_campaign_name, 0) + 1
-        )
-        if snapshot_campaign_name != last_snapshot_campaign_name:
-            snapshot_campaign_route.append(
-                (
-                    snapshot_campaign_name,
-                    sim.record.path,
-                    sim.record.branch,
-                    tuple(
-                        (decision.name, choice)
-                        for decision, choice in sim.record.decisions
-                    ),
-                )
-            )
-            last_snapshot_campaign_name = snapshot_campaign_name
-        if campaign_name != last_campaign_name:
-            campaign_route.append(
-                (
-                    campaign_name,
-                    sim.record.path,
-                    sim.record.branch,
-                    tuple(
-                        (decision.name, choice)
-                        for decision, choice in sim.record.decisions
-                    ),
-                )
-            )
-            last_campaign_name = campaign_name
         assert abs(snapshot.mass_balance_error_pct) <= 5e-12
         if sim.melt.hour in (167, 168):
             hot_hours.add(sim.melt.hour)
             assert sim._current_melt_redox_fO2_log() <= math.log10(
                 sim.melt.p_total_mbar / 1000.0,
             )
-        # A step's snapshot records the campaign that produced the hour.
-        # sim.melt.campaign may already be the successor if this hour
-        # completed the campaign, so use the snapshot for per-hour checks.
+        # The live campaign may already be the successor after a finishing
+        # hour; the snapshot identifies the campaign that produced the hour.
         if snapshot.campaign == CampaignPhase.C6:
-            c6_hours += 1
-            for diagnostic in sim._fe_redox_respeciation_diagnostics_this_hr:
-                outcome = tuple(
-                    str(diagnostic.get(key, ""))
-                    for key in (
-                        "status",
-                        "respeciation_status",
-                        "direction",
-                        "reason",
-                    )
-                )
-                c6_redox_outcomes[outcome] = c6_redox_outcomes.get(outcome, 0) + 1
             for transition in sim.atom_ledger.transitions[transition_count:]:
                 if transition.name == "fe_redox_respeciation":
                     # Following passive exchange, reduction returns O2 to its
@@ -386,17 +333,7 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
         transition_count = len(sim.atom_ledger.transitions)
     assert sim.is_complete()
     assert hot_hours == {167, 168}
-    assert c6_releases, (
-        "expected C6 Fe-redox O2 credits; "
-        f"c6_hours={c6_hours}, c6_redox_outcomes={c6_redox_outcomes}, "
-        f"campaign_steps={campaign_steps}, "
-        f"campaign_route={campaign_route}, "
-        f"snapshot_campaign_steps={snapshot_campaign_steps}, "
-        f"snapshot_campaign_route={snapshot_campaign_route}, "
-        f"final_campaign={sim.melt.campaign.name}, "
-        f"c4_refusal={sim._last_c4_refusal_diagnostic}, "
-        f"c6_refusal={sim._last_c6_refusal_diagnostic}"
-    )
+    assert c6_releases
     assert c6_moves_toward_gas_split
 
 
