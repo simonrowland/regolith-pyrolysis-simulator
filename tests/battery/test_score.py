@@ -3024,7 +3024,9 @@ def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_g
             right_basis="liquid_janaf(l)",
         )
 
+    from engines.antoine import _antoine_log10_pressure
     from engines.builtin.vapor_pressure import (
+        _pow10_pressure_or_raise,
         vapor_pressure_antoine_coefficients,
         wall_condensation_antoine_coefficients,
     )
@@ -3041,15 +3043,27 @@ def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_g
     )
     # Si(cr) is certified through the 1685 K melting join. Si(l) is certified
     # from 1700 K. 1690 K is above that join, so the extension is the liquid
-    # segment. The Antoine value below is the segment's own formula, read
-    # from the yaml, not a stored pressure.
-    expected_1690 = 10.0 ** (
-        float(liquid_segment["A"])
-        - float(liquid_segment["B"]) / (1690.0 + float(liquid_segment["C"]))
+    # segment. The comparison pressure is the production Antoine owner
+    # applied to that segment's coefficients.
+    expected_1690 = _pow10_pressure_or_raise(
+        _antoine_log10_pressure(
+            float(liquid_segment["A"]),
+            float(liquid_segment["B"]),
+            float(liquid_segment["C"]),
+            1690.0,
+        ),
+        species="Si",
+        field="liquid_janaf",
     )
-    expected_1700 = 10.0 ** (
-        float(liquid_segment["A"])
-        - float(liquid_segment["B"]) / (1700.0 + float(liquid_segment["C"]))
+    expected_1700 = _pow10_pressure_or_raise(
+        _antoine_log10_pressure(
+            float(liquid_segment["A"]),
+            float(liquid_segment["B"]),
+            float(liquid_segment["C"]),
+            1700.0,
+        ),
+        species="Si",
+        field="liquid_janaf",
     )
     for selector in (
         wall_condensation_antoine_coefficients,
@@ -3145,6 +3159,92 @@ def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_g
     notice = diagnostic["wall_saturation_pressure_notice"]
     assert notice["authority_level"] == "extrapolated"
     assert notice["reason"] == "antoine-gap-crosses-phase-boundary"
+
+
+def test_phase_gap_underflowing_preferred_flank_uses_the_other_flank() -> None:
+    """A preferred flank that underflows to 0 is not an available extension.
+
+    Si's join still names the liquid segment, but that segment's Antoine
+    triple is replaced in memory with A=1, B=1e6, C=0. At 1690 K the
+    exponentiated liquid pressure is 0. The crystal flank stays the
+    shipped fit and is positive. The selector must use it and say so.
+    """
+
+    import copy
+
+    from engines.antoine import _antoine_log10_pressure
+    from engines.builtin.vapor_pressure import (
+        _pow10_pressure_or_raise,
+        wall_condensation_antoine_coefficients,
+    )
+    from simulator.battery.score import REPO_ROOT, load_yaml
+    from simulator.condensation import (
+        _try_antoine_psat_pa,
+        _wall_deposition_driving_pressure_pa,
+    )
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    silicon = vapor_pressure_legacy_view(
+        load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
+    )["metals"]["Si"]
+    row = copy.deepcopy(silicon)
+    liquid = next(
+        segment
+        for segment in row["pure_component_antoine"]["segments"]
+        if segment["name"] == "liquid_janaf"
+    )
+    liquid["A"] = 1.0
+    liquid["B"] = 1_000_000.0
+    liquid["C"] = 0.0
+    crystal = next(
+        segment
+        for segment in row["pure_component_antoine"]["segments"]
+        if segment["name"] == "crystal_janaf"
+    )
+    selected, block = wall_condensation_antoine_coefficients(row, 1690.0)
+    assert block == "pure_component_antoine"
+    assert selected["selection_refusal"] == "antoine-gap-crosses-phase-boundary"
+    assert selected["name"] == "crystal_janaf"
+    assert selected["segment_used"] == "crystal_janaf"
+    assert selected["segment_choice"] == "only_finite_flank"
+    assert selected["authority_level"] == "extrapolated"
+    assert [float(value) for value in selected["certified_band_K"]] == [100.0, 1685.0]
+    expected = _pow10_pressure_or_raise(
+        _antoine_log10_pressure(
+            float(crystal["A"]),
+            float(crystal["B"]),
+            float(crystal["C"]),
+            1690.0,
+        ),
+        species="Si",
+        field="crystal_janaf",
+    )
+    assert expected > 0.0
+    vapor = {"metals": {"Si": row}}
+    extrapolations: dict = {}
+    pressure, refused = _try_antoine_psat_pa(
+        "Si",
+        1690.0,
+        vapor_pressure_data=vapor,
+        antoine_extrapolations=extrapolations,
+    )
+    assert refused is False
+    assert pressure is not None and pressure > 0.0
+    assert abs(pressure - expected) / expected < 1e-12
+    diagnostic: dict = {}
+    driving = _wall_deposition_driving_pressure_pa(
+        "Si",
+        1.0,
+        1690.0,
+        vapor_pressure_data=vapor,
+        reactive_product_backstop=False,
+        diagnostic_out=diagnostic,
+    )
+    assert driving > 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["segment_used"] == "crystal_janaf"
+    assert notice["segment_choice"] == "only_finite_flank"
 
 
 _GAS_MAP_PARTIAL_PA = Decimal("1234.5")
