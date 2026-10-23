@@ -28,6 +28,7 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
     for row in (
         row for row in source_observations.values()
         if row["values"].get("quantity") == "residue_component_composition"
+        and row["locator"].get("table") == "5.6"
     ):
         oxygen = row["values"]["log10_fO2"]
         assert oxygen["units"] == "log10(atm)"
@@ -49,8 +50,8 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         for item in source["species"].values()
         for row in item.get("observations", [])
     ]
-    assert len(all_source_rows) == 224
-    assert len(source["experiments"]) == 10
+    assert len(all_source_rows) == 240
+    assert len(source["experiments"]) == 11
     table57_rows = [
         row for row in all_source_rows
         if row["values"].get("quantity") == "element_fraction_remaining"
@@ -63,7 +64,24 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
     assert all(row["admission_status"] == "admitted" for row in table57_rows)
     assert all("basis" not in row["values"] for row in table57_rows)
     assert all("normalising_element" not in row["values"] for row in table57_rows)
-    assert all(row["values"]["method_class"] == "model_derived" for row in table57_rows)
+    assert all(row["values"]["method_class"] == "author_derived" for row in table57_rows)
+    assert all(len(row["derived_from"]) == 2 for row in table57_rows)
+    assert all(
+        row["values"]["derivation"]["relation"] == "X_final/X_initial (Equation 5.1)"
+        for row in table57_rows
+    )
+    starting_trace_rows = [
+        row for row in all_source_rows
+        if row["observation_id"].endswith("table52_starting_trace")
+    ]
+    assert len(starting_trace_rows) == 16
+    assert all(row["values"]["quantity"] == "residue_component_composition" for row in starting_trace_rows)
+    assert all(row["T_C"] == "1500" for row in starting_trace_rows)
+    assert all(
+        row["point_conditions"]["total_pressure_Pa"]["state"]["value"]["point"] == "1500000000"
+        for row in starting_trace_rows
+    )
+    assert all(row["values"]["duration"] == {"value": "5", "unit": "min"} for row in starting_trace_rows)
     expected_table57 = {
         "norris_2016_ag_f008_table57_fraction_remaining": ("0.646", "0.117"),
         "norris_2016_cr_f014_table57_fraction_remaining": ("1.192", "0.179"),
@@ -87,6 +105,7 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         if row.source_id == source["source_id"]
         and row.identity.quantity.is_value
         and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and row.locator.table == "5.6"
     ]
     assert len(residue_rows) == 160
     for row in residue_rows:
@@ -141,6 +160,18 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         )
         assert row.value.point == Decimal(ratio)
         assert row.uncertainty.verbatim["sigma"] == sigma
+        assert len(row.derived_from) == 2
+        assert row.derivation.relation == "X_final/X_initial (Equation 5.1)"
+
+    migrated_starting_trace = [
+        row for row in result.observations.values()
+        if row.source_id == source["source_id"]
+        and row.observation_id.endswith("table52_starting_trace")
+    ]
+    assert len(migrated_starting_trace) == 16
+    assert all(row.admission.status.value == "admitted" for row in migrated_starting_trace)
+    assert all(row.identity.temperature_K.value == Decimal("1773.15") for row in migrated_starting_trace)
+    assert all(row.identity.total_pressure_Pa.value == Decimal("1500000000") for row in migrated_starting_trace)
 
     migrated_by_id = {row.observation_id: row for row in residue_rows}
     for observation_id, (value, _) in expected.items():
@@ -155,4 +186,4 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         for rows in result.context_by_work.values()
         for row in rows
     ]
-    assert len(contexts) == 4
+    assert len(contexts) == 3
