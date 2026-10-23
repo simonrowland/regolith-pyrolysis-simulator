@@ -256,3 +256,41 @@ def test_diverted_sio_bypass_remains_in_wall_and_cold_spot_model():
     findings = model.last_cold_spot_diagnostic["findings"]
     assert any(f["segment"] == "stage_2_to_stage_4_bypass" for f in findings)
     assert all("stage_3" not in f["segment"] for f in findings)
+
+
+@pytest.mark.parametrize("prior_commit", [False, True])
+def test_run_executor_preserves_typed_silica_refusal_and_coating_finding(monkeypatch, prior_commit):
+    from simulator.run_executor import RunExecutor
+    from simulator.session import SimSession
+    from simulator.optimize.physics import _coating_runtime_diagnostics
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.campaign_mgr.overrides["C0"] = {"stage3_route": "through"}
+    session = SimSession()
+    session._sim = sim
+    ledger = sim.atom_ledger
+    ledger.load_external_mol("process.metal_phase", {"Na": 1e-6}, material_origin="reagent")
+    before_count = len(ledger.transitions)
+
+    def refuse():
+        if prior_commit:
+            ledger.transfer("source_before_admission", (
+                ledger.debit_mol("process.metal_phase", {"Na": 1e-6}),), (
+                ledger.credit_mol("process.overhead_gas", {"Na": 1e-6}),))
+        sim.condensation_model.route(EvaporationFlux({"Na": 1e-30}), sim.melt)
+
+    def drive(*args, **kwargs):
+        sim.step()
+        yield  # Admission always raises before producing a snapshot.
+
+    monkeypatch.setattr(sim, "_step_one_hour", refuse)
+    monkeypatch.setattr("simulator.run_executor.drive_session", drive)
+    execution = RunExecutor().execute_session(session, hours=1)
+    assert execution.status == ("failed" if prior_commit else "refused")
+    assert execution.reason == ("poisoned_hour" if prior_commit else "silica_exposed_to_alkali")
+    assert isinstance(execution.failure_exception, Stage3SilicaExposureRefusal)
+    assert execution.refusal_diagnostic["findings"][0]["type"] == "silica_exposed_to_alkali"
+    assert _coating_runtime_diagnostics(execution)["silica_exposed_to_alkali_findings"]
+    assert len(execution.simulator.atom_ledger.transitions) == before_count + int(prior_commit)
+    if prior_commit:
+        assert execution.simulator.atom_ledger.mol_by_account("process.overhead_gas")["Na"] == pytest.approx(1e-6)

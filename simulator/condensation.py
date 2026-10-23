@@ -2735,7 +2735,7 @@ class CondensationModel:
                     unknown.append({'species': species, 'source': source, 'detail': str(exc)})
         if carriers or unknown:
             finding = {
-                'type': 'silica_exposed_to_alkali', 'code': 'silica_exposed_to_alkali',
+                'key': 'silica_exposed_to_alkali', 'type': 'silica_exposed_to_alkali',
                 'carriers': carriers, 'unavailable': unknown,
                 'allowed_alkali_atom_mol_s': 0.0, **route,
             }

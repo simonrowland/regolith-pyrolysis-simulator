@@ -16,7 +16,7 @@ from simulator.campaigns import (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
 )
-from simulator.condensation import KnudsenRegimeRefusal
+from simulator.condensation import KnudsenRegimeRefusal, Stage3SilicaExposureRefusal
 from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.core import (
     BACKEND_FALLBACK_EXCEPTIONS,
@@ -411,6 +411,15 @@ class RunExecutor:
             reason = exc.reason
             error_message = exc.reason
             refusal_diagnostic = dict(exc.diagnostic)
+        except Stage3SilicaExposureRefusal as exc:
+            # Admission can follow committed source vapor. Keep this out of
+            # the rollback tuple above; the existing poisoned-hour guard still
+            # prevents replay when any earlier transition committed.
+            failure_exc = exc
+            status = "refused"
+            reason = exc.reason
+            error_message = str(exc)
+            refusal_diagnostic = dict(exc.stage3_route_diagnostic)
         except _TYPED_PHYSICS_REFUSALS as exc:
             failure_exc = exc
             status = "refused"

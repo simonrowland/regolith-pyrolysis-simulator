@@ -528,6 +528,9 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
         CondensationTrain.create_default(),
         wall_temperature_C=900.0,
     )
+    # Keep the material-reload pin on its original silica path. This parcel
+    # contains only SiO, so the explicit through command satisfies admission.
+    default_model.train.collection_route['stage3_route'] = 'through'
     _configure_knudsen_policy(default_model)
     default_route = default_model.route(
         EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
@@ -574,6 +577,7 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
             materials=bundle.materials,
         )
     )
+    sim.campaign_mgr.overrides['C0'] = {'stage3_route': 'through'}
     sim.condensation_model.configure_operating_conditions(
         wall_temperature_C=900.0,
         overhead_pressure_mbar=1.0,
