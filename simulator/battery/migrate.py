@@ -18513,8 +18513,18 @@ class Migrator:
                 parent_atmosphere = (parent_point_conditions or {}).get(
                     "atmosphere"
                 )
+                point_atmosphere = (point_conditions or {}).get("atmosphere")
                 if parent_atmosphere is not None and parent_atmosphere.state.is_value:
                     condition_updates["atmosphere"] = parent_atmosphere
+                elif point_atmosphere is None or not point_atmosphere.state.is_value:
+                    condition_updates["atmosphere"] = Located(
+                        pressure_environment.sweep_gas.state,
+                        locator=(
+                            pressure_environment.sweep_gas.locator
+                            or run_experiment.locator
+                            or point_locator
+                        ),
+                    )
                 point_conditions = {
                     **(point_conditions or {}),
                     **condition_updates,
