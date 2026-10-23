@@ -1,0 +1,988 @@
+schema_version: literature_extract.v1
+source_id: takigawa-2015-corundum-kinetics
+source:
+  citation: 'Takigawa, A., Tachibana, S., Nagahara, H. & Ozawa, K. (2015), “Evaporation and Condensation
+    Kinetics of Corundum: The Origin of the 13 μm Feature of Oxygen-rich AGB Stars”, Astrophysical Journal
+    Supplement Series 218(1):2.'
+  doi: 10.1088/0067-0049/218/1/2
+  url: https://doi.org/10.1088/0067-0049/218/1/2
+  year: 2015
+extraction:
+  method: Transcribed from MinerU Table 2 and born-digital pdftotext; page layout and row/column assignments
+    checked against the PDF render.
+  date: '2026-10-22'
+  worker: wave52-F67
+review_status: draft
+fidelity_samples:
+- species: Al
+  observable: alpha
+  observation_id: takigawa_2015_table2_beta_0_axis_c_alpha_c
+  field: alpha
+  value: '0.032'
+  locator:
+    page: 10
+    published_page: 9
+    pdf_page_index: 9
+    table: '2'
+    note: Table 2, β=0, //c
+- species: Al
+  observable: alpha
+  observation_id: takigawa_2015_table2_beta_0_axis_a_alpha_c
+  field: alpha
+  value: '0.046'
+  locator:
+    page: 10
+    published_page: 9
+    pdf_page_index: 9
+    table: '2'
+    note: Table 2, β=0, //a
+- species: Al
+  observable: alpha
+  observation_id: takigawa_2015_table2_beta_0_axis_m_alpha_c
+  field: alpha
+  value: '0.099'
+  locator:
+    page: 10
+    published_page: 9
+    pdf_page_index: 9
+    table: '2'
+    note: Table 2, β=0, //m
+species:
+  Al:
+    observations:
+    - observation_id: takigawa_2015_table2_beta_0_axis_c_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0; corundum c-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; c-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.032'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //c
+        beta_as_printed: '0'
+        printed_conditions_as_table:
+          beta: '0'
+          Al_pressure_values_as_printed:
+            u1: '3.32'
+            u2: '1.80'
+            u3: '1.13'
+            d1: '2.99'
+            d2: '1.47'
+            d3: '0.80'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_axis_a_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0; corundum a-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; a-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.046'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //a
+        beta_as_printed: '0'
+        printed_conditions_as_table:
+          beta: '0'
+          Al_pressure_values_as_printed:
+            u1: '3.32'
+            u2: '1.80'
+            u3: '1.13'
+            d1: '2.99'
+            d2: '1.47'
+            d3: '0.80'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_axis_m_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0; corundum m-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; m-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.099'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //m
+        beta_as_printed: '0'
+        printed_conditions_as_table:
+          beta: '0'
+          Al_pressure_values_as_printed:
+            u1: '3.32'
+            u2: '1.80'
+            u3: '1.13'
+            d1: '2.99'
+            d2: '1.47'
+            d3: '0.80'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_1_axis_c_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.1; corundum c-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; c-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.036'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //c
+        beta_as_printed: '0.1'
+        printed_conditions_as_table:
+          beta: '0.1'
+          Al_pressure_values_as_printed:
+            u1: '3.11'
+            u2: '1.58'
+            u3: '0.92'
+            d1: '2.77'
+            d2: '1.25'
+            d3: '0.58'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_1_axis_a_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.1; corundum a-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; a-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.053'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //a
+        beta_as_printed: '0.1'
+        printed_conditions_as_table:
+          beta: '0.1'
+          Al_pressure_values_as_printed:
+            u1: '3.11'
+            u2: '1.58'
+            u3: '0.92'
+            d1: '2.77'
+            d2: '1.25'
+            d3: '0.58'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_1_axis_m_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.1; corundum m-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; m-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.11'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //m
+        beta_as_printed: '0.1'
+        printed_conditions_as_table:
+          beta: '0.1'
+          Al_pressure_values_as_printed:
+            u1: '3.11'
+            u2: '1.58'
+            u3: '0.92'
+            d1: '2.77'
+            d2: '1.25'
+            d3: '0.58'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_3_axis_c_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.3; corundum c-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; c-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.043'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //c
+        beta_as_printed: '0.3'
+        printed_conditions_as_table:
+          beta: '0.3'
+          Al_pressure_values_as_printed:
+            u1: '2.85'
+            u2: '1.33'
+            u3: '0.66'
+            d1: '2.51'
+            d2: '0.99'
+            d3: '0.33'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_3_axis_a_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.3; corundum a-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; a-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.063'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //a
+        beta_as_printed: '0.3'
+        printed_conditions_as_table:
+          beta: '0.3'
+          Al_pressure_values_as_printed:
+            u1: '2.85'
+            u2: '1.33'
+            u3: '0.66'
+            d1: '2.51'
+            d2: '0.99'
+            d3: '0.33'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_3_axis_m_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.3; corundum m-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; m-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.13'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //m
+        beta_as_printed: '0.3'
+        printed_conditions_as_table:
+          beta: '0.3'
+          Al_pressure_values_as_printed:
+            u1: '2.85'
+            u2: '1.33'
+            u3: '0.66'
+            d1: '2.51'
+            d2: '0.99'
+            d3: '0.33'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_5_axis_c_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.5; corundum c-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; c-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.048'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //c
+        beta_as_printed: '0.5'
+        printed_conditions_as_table:
+          beta: '0.5'
+          Al_pressure_values_as_printed:
+            u1: '2.71'
+            u2: '1.19'
+            u3: '0.52'
+            d1: '2.37'
+            d2: '0.85'
+            d3: '0.18'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_5_axis_a_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.5; corundum a-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; a-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.070'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //a
+        beta_as_printed: '0.5'
+        printed_conditions_as_table:
+          beta: '0.5'
+          Al_pressure_values_as_printed:
+            u1: '2.71'
+            u2: '1.19'
+            u3: '0.52'
+            d1: '2.37'
+            d2: '0.85'
+            d3: '0.18'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_5_axis_m_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.5; corundum m-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; m-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.15'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //m
+        beta_as_printed: '0.5'
+        printed_conditions_as_table:
+          beta: '0.5'
+          Al_pressure_values_as_printed:
+            u1: '2.71'
+            u2: '1.19'
+            u3: '0.52'
+            d1: '2.37'
+            d2: '0.85'
+            d3: '0.18'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_7_axis_c_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.7; corundum c-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; c-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.052'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //c
+        beta_as_printed: '0.7'
+        printed_conditions_as_table:
+          beta: '0.7'
+          Al_pressure_values_as_printed:
+            u1: '2.61'
+            u2: '1.09'
+            u3: '0.43'
+            d1: '2.28'
+            d2: '0.76'
+            d3: '0.09'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_7_axis_a_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.7; corundum a-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; a-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.076'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //a
+        beta_as_printed: '0.7'
+        printed_conditions_as_table:
+          beta: '0.7'
+          Al_pressure_values_as_printed:
+            u1: '2.61'
+            u2: '1.09'
+            u3: '0.43'
+            d1: '2.28'
+            d2: '0.76'
+            d3: '0.09'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_0_7_axis_m_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=0.7; corundum m-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; m-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.16'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //m
+        beta_as_printed: '0.7'
+        printed_conditions_as_table:
+          beta: '0.7'
+          Al_pressure_values_as_printed:
+            u1: '2.61'
+            u2: '1.09'
+            u3: '0.43'
+            d1: '2.28'
+            d2: '0.76'
+            d3: '0.09'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_1_axis_c_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=1; corundum c-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; c-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.057'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //c
+        beta_as_printed: '1'
+        printed_conditions_as_table:
+          beta: '1'
+          Al_pressure_values_as_printed:
+            u1: '2.52'
+            u2: '1.00'
+            u3: '0.34'
+            d1: '2.19'
+            d2: '0.67'
+            d3: '0.00'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_1_axis_a_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=1; corundum a-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; a-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.083'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //a
+        beta_as_printed: '1'
+        printed_conditions_as_table:
+          beta: '1'
+          Al_pressure_values_as_printed:
+            u1: '2.52'
+            u2: '1.00'
+            u3: '0.34'
+            d1: '2.19'
+            d2: '0.67'
+            d3: '0.00'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
+    - observation_id: takigawa_2015_table2_beta_1_axis_m_alpha_c
+      type: alpha
+      locator:
+        page: 10
+        published_page: 9
+        pdf_page_index: 9
+        table: '2'
+        note: Table 2; β=1; corundum m-axis surface.
+      T_C: '1575'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1575'
+          locator:
+            page: 10
+            published_page: 9
+            pdf_page_index: 9
+            table: '2'
+      phase: solid_corundum
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Corundum substrate; m-axis surface orientation as printed in Table 2.
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        alpha: '0.18'
+        gas_species: Al(g)
+        substrate: corundum (Al2O3)
+        surface_orientation_as_printed: //m
+        beta_as_printed: '1'
+        printed_conditions_as_table:
+          beta: '1'
+          Al_pressure_values_as_printed:
+            u1: '2.52'
+            u2: '1.00'
+            u3: '0.34'
+            d1: '2.19'
+            d2: '0.67'
+            d3: '0.00'
+          Al_pressure_units_as_printed: 10^-9 atm
+          note: Al pressures at locations u1-u3 and d1-d3; these are location-specific Al pressures, not
+            total pressure.
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Authors’ condensation coefficients derived from their condensation experiments; reported
+          in Table 2.
+        note: Author-derived αc for corundum at the printed β assumption and surface axis; total pressure
+          is not printed.
