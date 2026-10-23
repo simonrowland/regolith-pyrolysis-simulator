@@ -2789,12 +2789,15 @@ def _internal_analytical_vapor_pressure_adapter(
                     f"cell oxygen condition could not be derived: {reason_code}: {exc}",
                 ) from exc
             raise
+        oxygen_notices = [
+            dict(row)
+            for row in (oxygen_result.diagnostics or {}).get("imcc_notices", ())
+            if isinstance(row, Mapping)
+        ]
         solved = next(
             (
-                dict(row)
-                for row in (oxygen_result.diagnostics or {}).get("imcc_notices", ())
-                if isinstance(row, Mapping)
-                and row.get("kind") == "fo2_oxygen_balance_effusion_solved"
+                row for row in oxygen_notices
+                if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
             ),
             None,
         )
@@ -2806,9 +2809,8 @@ def _internal_analytical_vapor_pressure_adapter(
                 "the existing battery oxygen-balance convention did not produce a positive pO2",
             )
         oxygen_source = "openimcc_oxygen_balance_condition_only"
-        oxygen_notices.append(
+        solved.update(
             {
-                **solved,
                 "oxygen_condition_source": oxygen_source,
                 "pressure_prediction_source": "internal-analytical core",
             }
