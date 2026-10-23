@@ -63,7 +63,8 @@ def test_millibar_fe_sio_at_1400_c_is_hot_wall_violation():
 
     fe_psat, refused = _try_antoine_psat_pa("Fe", WALL_1400_K)
     assert refused is False
-    assert fe_psat == pytest.approx(1.1375418658, rel=1e-9, abs=0.0)
+    # d-267: fresh production value from the certified JANAF Fe wall surface.
+    assert fe_psat == pytest.approx(0.4099464932959728, rel=1e-9, abs=0.0)
     assert MILLIBAR_BAKEOFF_PA > fe_psat
 
     diagnostic = cold_spot_diagnostic(
@@ -90,14 +91,21 @@ def test_dilute_or_hot_fe_at_valid_wall_stays_clear():
         {"Fe": 1.0},
         species_partial_pressures_pa={"Fe": DILUTE_QUIESCENT_PA},
     )
-    hot = cold_spot_diagnostic(
+    below_dew = cold_spot_diagnostic(
         _fe_sio_segments(1800.0),
+        {"Fe": 1.0},
+        species_partial_pressures_pa={"Fe": MILLIBAR_BAKEOFF_PA},
+    )
+    # d-267: the production inverse gives 1819.1676242737253 C at 100 Pa.
+    hot = cold_spot_diagnostic(
+        _fe_sio_segments(1850.0),
         {"Fe": 1.0},
         species_partial_pressures_pa={"Fe": MILLIBAR_BAKEOFF_PA},
     )
 
     assert dilute["has_upstream_hot_wall_violation"] is False
     assert dilute["has_cold_spot"] is False
+    assert below_dew["has_upstream_hot_wall_violation"] is True
     assert hot["has_upstream_hot_wall_violation"] is False
     assert hot["has_cold_spot"] is False
 
@@ -206,8 +214,18 @@ def test_sio_reactive_wall_saturation_backstop_unchanged():
     assert sio_only["has_upstream_hot_wall_violation"] is False
 
 
-def test_route_millibar_fe_at_1400_c_uses_wall_partial_pressure():
+def test_route_millibar_fe_at_1400_c_uses_wall_partial_pressure(monkeypatch):
     """Production route() must feed local P into the diagnostic."""
+
+    diagnostic_pressures = []
+
+    def record_diagnostic(*args, **kwargs):
+        diagnostic_pressures.append(dict(kwargs["species_partial_pressures_pa"]))
+        return cold_spot_diagnostic(*args, **kwargs)
+
+    monkeypatch.setattr(
+        "simulator.condensation.cold_spot_diagnostic", record_diagnostic,
+    )
 
     def _route(wall_C: float, fe_mbar: float):
         model = CondensationModel(
@@ -231,12 +249,21 @@ def test_route_millibar_fe_at_1400_c_uses_wall_partial_pressure():
             EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0),
             MeltState(temperature_C=1700.0),
         )
-        return model.last_cold_spot_diagnostic
+        duct = next(
+            segment for segment in model.pipe_segments
+            if segment.name == "stage_0_to_stage_1"
+        )
+        return model.last_cold_spot_diagnostic, duct.wall_temperature_C
 
-    millibar = _route(1400.0, 1.0)
-    dilute = _route(1400.0, DILUTE_QUIESCENT_PA / MBAR_TO_PA)
-    hot = _route(1800.0, 1.0)
+    millibar, millibar_wall_C = _route(1400.0, 1.0)
+    dilute, dilute_wall_C = _route(1400.0, DILUTE_QUIESCENT_PA / MBAR_TO_PA)
+    hot, hot_wall_C = _route(1800.0, 1.0)
 
-    assert millibar["has_upstream_hot_wall_violation"] is True
+    # d-260 raises only the upstream duct; d-267 supplies its certified dew floor.
+    assert millibar_wall_C == pytest.approx(1819.1676242737253, rel=0, abs=1e-9)
+    assert dilute_wall_C == 1400.0
+    assert hot_wall_C == millibar_wall_C
+    assert diagnostic_pressures == [{"Fe": 100.0}, {"Fe": 0.01}, {"Fe": 100.0}]
+    assert millibar["has_upstream_hot_wall_violation"] is False
     assert dilute["has_upstream_hot_wall_violation"] is False
     assert hot["has_upstream_hot_wall_violation"] is False
