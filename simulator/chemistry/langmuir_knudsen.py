@@ -538,6 +538,101 @@ def _net_evaporation_pressure_Pa(pressure_Pa: float, background_pressure_Pa: flo
     return max(0.0, pressure_Pa - background_pressure_Pa)
 
 
+class OxygenClosureNonconvergence(ValueError):
+    """The supplied physical source and transport do not bracket a root."""
+
+
+@dataclass(frozen=True)
+class _SurfaceOxygenEvaluation:
+    reaction_pO2_bar: float
+    gas_face_pO2_bar: float
+    oxygen_flux_mol_m2_s: float
+    atomic_oxygen_flux_mol_m2_s: float
+    source_terms_mol_m2_s: Mapping[str, float]
+    ferric_rate_mol_m2_s: float
+    other_oxygen_mol_m2_s: float
+    storage_mol_m2_s: float
+    payload: Any = None
+
+    @property
+    def balance_terms(self) -> tuple[float, ...]:
+        # All terms are mol O2/(m² s). Ferric rate is signed mol Fe2O3:
+        # 2 FeO + 1/2 O2 -> Fe2O3, so reduction supplies +1/2 per mol.
+        return (self.oxygen_flux_mol_m2_s,
+                0.5 * self.atomic_oxygen_flux_mol_m2_s,
+                *(-value for value in self.source_terms_mol_m2_s.values()),
+                -0.5 * self.ferric_rate_mol_m2_s,
+                -self.other_oxygen_mol_m2_s, self.storage_mol_m2_s)
+
+    @property
+    def residual(self) -> float:
+        return math.fsum(self.balance_terms)
+
+
+def _log_oxygen_root(residual, low, high):
+    """Shared log-coordinate root; endpoint policy belongs to the caller."""
+    return brentq(residual, low, high, xtol=1.0e-12, rtol=1.0e-12, maxiter=200)
+
+
+def _solve_surface_oxygen_balance(
+    evaluate: Callable[[float], _SurfaceOxygenEvaluation],
+    *,
+    source_free_zero: _SurfaceOxygenEvaluation | None = None,
+    bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
+) -> _SurfaceOxygenEvaluation:
+    """Close the current signed source/storage against series O/O2 escape.
+
+    The caller owns thermodynamics and finite settlement. Only a proved zero
+    source/storage state may bypass the log coordinate. Positive-source roots
+    must be interior; representability limits never become physical oxygen.
+    """
+    if source_free_zero is not None:
+        zero = source_free_zero
+        if zero.reaction_pO2_bar != 0.0 or any(zero.balance_terms):
+            raise ValueError('source-free zero requires individually zero balance terms')
+        return zero
+    low, high = map(float, bracket_log10_pO2_bar)
+    if not math.isfinite(low) or not math.isfinite(high) or low >= high:
+        raise ValueError('oxygen bracket must be finite and increasing')
+
+    def residual(logp):
+        result = evaluate(10.0 ** logp)
+        if not all(math.isfinite(value) for value in result.balance_terms):
+            raise OxygenClosureNonconvergence('nonfinite signed oxygen balance')
+        return result.residual
+
+    f_low, f_high = residual(low), residual(high)
+    # Expand toward representable pressures, never manufacture an endpoint
+    # solution. 1 bar is a coordinate anchor, not a pressure limit or floor.
+    while not f_low < 0.0 < f_high and (low > -300.0 or high < 3.0):
+        if f_low >= 0.0 and low > -300.0:
+            low = max(-300.0, low - 30.0)
+            f_low = residual(low)
+        elif high < 3.0:
+            high = min(3.0, high + 1.0)
+            f_high = residual(high)
+        else:
+            break
+    if not f_low < 0.0 < f_high:
+        raise OxygenClosureNonconvergence(
+            f'no interior oxygen root: log bracket {(low, high)}, residuals {(f_low, f_high)}')
+    try:
+        root = _log_oxygen_root(residual, low, high)
+    except (RuntimeError, ValueError) as exc:
+        raise OxygenClosureNonconvergence('oxygen root did not converge') from exc
+    if not low < root < high:
+        raise OxygenClosureNonconvergence('oxygen root reached a bracket endpoint')
+    achieved = evaluate(10.0 ** root)
+    # A coordinate root across a gate/cutoff jump is not a closed balance.
+    # sqrt(binary64 epsilon) is a numerical relative residual criterion,
+    # scaled by gross flux rather than a cancellation-small net; it carries
+    # no pressure units and cannot set the physical oxygen coordinate.
+    scale = math.fsum(abs(term) for term in achieved.balance_terms)
+    if abs(achieved.residual) > math.sqrt(math.ulp(1.0)) * scale:
+        raise OxygenClosureNonconvergence('oxygen coordinate converged without closing signed flux')
+    return achieved
+
+
 def _solve_vacuum_oxygen_balance(
     pressure_model: Callable[[float], Mapping[str, float]],
     channels: Sequence[_VacuumOxygenChannel],
@@ -689,13 +784,10 @@ def _solve_vacuum_oxygen_balance(
     elif f_low < 0.0 and f_high < 0.0:
         raise ValueError("vacuum oxygen balance has no root in the declared pO2 bracket")
     else:
-        root = brentq(
+        root = _log_oxygen_root(
             lambda value: evaluate(value)[0],
             low,
             high,
-            xtol=1.0e-12,
-            rtol=1.0e-12,
-            maxiter=200,
         )
 
     residual, pressures, oxygen_flux, parent_flux = evaluate(root)

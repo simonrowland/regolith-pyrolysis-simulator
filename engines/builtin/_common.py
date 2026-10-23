@@ -355,8 +355,9 @@ def resolve_transport_pO2_bar(
 
     controls = request.control_inputs or {}
     observation = controls.get('pO2_admission') == 'observation'
+    surface_closure = controls.get('pO2_admission') == 'surface_closure'
     floor_bar = (
-        0.0 if observation
+        0.0 if observation or surface_closure
         else resolve_request_vacuum_floor_bar(request, floor_bar=floor_bar)
     )
     if "pO2_bar" in controls and controls.get("pO2_bar") is not None:
@@ -367,7 +368,7 @@ def resolve_transport_pO2_bar(
             raise ValueError(
                 f"pO2_bar must be numeric, got {raw_pO2!r}"
             ) from exc
-        if not math.isfinite(pO2_bar) or pO2_bar <= 0.0:
+        if not math.isfinite(pO2_bar) or (pO2_bar < 0.0 if surface_closure else pO2_bar <= 0.0):
             raise ValueError(
                 f"pO2_bar must be finite and > 0, got {raw_pO2!r}"
             )

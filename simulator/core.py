@@ -4347,6 +4347,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return float(self._commanded_pO2_bar())
 
     def _vapor_pressure_dispatch_pO2_bar(self) -> float:
+        reaction = getattr(self, '_reaction_pO2_bar', None)
+        if reaction is not None:
+            # The closure owns this physical coordinate. Cache quantization
+            # must never change the accepted root on its way to a consumer.
+            return float(reaction)
         pO2_bar = max(self._vapor_pressure_transport_pO2_bar(), self._oxygen_numerical_floor_bar())
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'quantize_live_controls', False):
@@ -10340,6 +10345,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         dispatch_kwargs = {
             'control_inputs': {
                 'pO2_bar': pO2_bar,
+                **({'pO2_admission': 'surface_closure'}
+                   if getattr(self, '_reaction_pO2_bar', None) is not None else {}),
                 **({'pO2_admission': 'observation'}
                    if observation_pO2_bar is not None else {}),
                 'intrinsic_fO2_log': intrinsic_fO2_log,
@@ -14054,6 +14061,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         *,
         defer_committed_history: bool = False,
+        state_receiver: Any = None,
     ) -> tuple[Dict[str, Any], Any, Optional[Dict[str, Any]]]:
         preserved_names = {
             'backend',
@@ -14075,7 +14083,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # hourly mutation that refusal rollback needs to restore.
             'vapour_rail_catalog',
         }
-        memo = {id(self): self}
+        memo = {id(self): self if state_receiver is None else state_receiver}
         record = getattr(self, 'record', None)
         record_snapshots = getattr(record, 'snapshots', None)
         if (
@@ -14568,21 +14576,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 5. Condensation routing ---
         # Send evaporated species through the 8-stage train.
         # Each stage collects species based on its temperature.
-        self._ledger_committed_evap_flux_this_tick = evap_flux
-        if (
-            evap_flux.total_kg_hr > 0
-            or bool(evap_flux.carrier_authority_by_species)
-        ):
-            self._configure_condensation_operating_conditions(evap_flux)
-            self._apply_lab_surface_temperatures(sample_time_h=float(self.melt.hour) + 1.0)
-            overhead_flux = self._route_to_condensation(evap_flux)
-            evap_flux = self._ledger_committed_evap_flux_this_tick
-            effective_transport_capacity = (
-                self._controlled_o2_transport_capacity(evap_flux)
-            )
-            self._effective_transport_capacity_this_tick = (
-                effective_transport_capacity
-            )
+        routed_batch = evap_flux.total_kg_hr > 0 or bool(evap_flux.carrier_authority_by_species)
+        evap_flux, overhead_flux = self._apply_evaporation_carrier_batch(evap_flux)
+        if routed_batch:
+            effective_transport_capacity = self._effective_transport_capacity_this_tick
         if evap_flux.alpha_authority_status_by_species:
             engaged_alpha_authority = dict(
                 getattr(
@@ -14599,11 +14596,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 sorted(engaged_alpha_authority.items())
             )
         self._pending_knudsen_zero_overhead_flow_marker = None
-
-        # --- 6. Update melt composition ---
-        # Subtract evaporated mass from the melt.
-        self._update_melt_composition(evap_flux)
-        self._settle_evaporative_redox_after_batch()
 
         # --- 7. Overhead gas (with cold-train capacity feedback) ---   [LOOP-2]
         # Equipment sizing also supplies the runtime pipe/throat geometry used

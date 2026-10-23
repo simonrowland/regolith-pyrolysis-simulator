@@ -3869,6 +3869,176 @@ class EvaporationMixin:
                 effective_rates[species] = min(current_rate, allowed_rate)
         return effective_rates
 
+    def _apply_evaporation_carrier_batch(self, evap_flux):
+        """One carrier/finite-settlement path for projection and acceptance."""
+        overhead_flux = evap_flux
+        self._ledger_committed_evap_flux_this_tick = evap_flux
+        if evap_flux.total_kg_hr > 0 or bool(evap_flux.carrier_authority_by_species):
+            self._configure_condensation_operating_conditions(evap_flux)
+            self._apply_lab_surface_temperatures(sample_time_h=float(self.melt.hour) + 1.0)
+            overhead_flux = self._route_to_condensation(evap_flux)
+            evap_flux = self._ledger_committed_evap_flux_this_tick
+            self._effective_transport_capacity_this_tick = self._controlled_o2_transport_capacity(evap_flux)
+        self._update_melt_composition(evap_flux)
+        self._settle_evaporative_redox_after_batch()
+        return evap_flux, overhead_flux
+
+    def _detached_evaporation_projection(self):
+        """Read-only live-state projection using the existing snapshot owner."""
+        from simulator.chemistry.kernel import ChemistryKernel
+
+        trial = copy.copy(self)
+        state, ledger, cost_state = self._snapshot_terminal_refusal_hour_state(state_receiver=trial)
+        trial.__dict__ = dict(self.__dict__)
+        trial.__dict__.update({key: value for key, value in state.items()
+                               if key != '_terminal_refusal_chem_registry_tables'})
+        trial.atom_ledger = ledger
+        trial.cost_ledger = copy.copy(self.cost_ledger)
+        trial.cost_ledger.__dict__ = dict(cost_state)
+        trial._chem_registry = copy.copy(self._chem_registry)
+        for name, table in state['_terminal_refusal_chem_registry_tables'].items():
+            setattr(trial._chem_registry, name, table)
+        kernel = self._require_chem_kernel()
+        trial._chem_kernel = ChemistryKernel(
+            ledger, trial._chem_registry, self.species_formula_registry,
+            allow_fallback_intents=kernel.allow_fallback_intents,
+            oxygen_sink_channel_mode=kernel.oxygen_sink_channel_mode,
+        )
+        return trial
+
+    def _evaporation_signed_amounts(self, transition_start, buffer_before):
+        """Current interval's signed reaction progress and finite O2 storage.
+
+        Redox-state labels have different sign conventions for metal and SiO
+        loss. Physical O2 credits minus debits own this receipt instead.
+        Native Fe formation precedes this interval and is counted only there.
+        """
+        operands = defaultdict(list)
+        oxygen_accounts = ('process.overhead_gas', 'reservoir.fo2_buffer')
+        for transition in self.atom_ledger.transitions[transition_start:]:
+            carrier = transition.name.removeprefix('evaporate_') if transition.name.startswith('evaporate_') else None
+            if carrier is not None:
+                label = f'source:{carrier}'
+                operands[f'carrier:{carrier}'].append(self._transition_species_mol(
+                    transition, side='credits', account='process.overhead_gas', species=carrier))
+            elif transition.name.startswith('fe_redox_respeciation'):
+                label = 'ferric_oxygen'
+            else:
+                label = 'other_oxygen'
+            for account in oxygen_accounts:
+                for side, sign in (('credits', 1.0), ('debits', -1.0)):
+                    operands[label].append(sign * self._transition_species_mol(
+                        transition, side=side, account=account, species='O2'))
+        operands['storage'] = [self.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0), -buffer_before]
+        for label in ('ferric_oxygen', 'other_oxygen'):
+            operands.setdefault(label, [])
+        amounts = {label: math.fsum(values) for label, values in operands.items()}
+        # Each converted operand is rounded once, then fsum and the final
+        # subtraction round once. Sum their ULPs, including the result; this
+        # bound scales with gross traffic even when the signed sum cancels.
+        # Units: every ULP here is mol; exact zero has only subnormal error.
+        roundoff = {label: math.fsum(math.ulp(value) for value in (*values, amounts[label]))
+                    for label, values in operands.items()}
+        return amounts, roundoff
+
+    def _verify_evaporation_projection(self, predicted, actual):
+        expected, expected_roundoff = predicted
+        achieved, achieved_roundoff = actual
+        mismatches = {label: (expected.get(label, 0.0), achieved.get(label, 0.0))
+                      for label in expected.keys() | achieved.keys()
+                      if abs(expected.get(label, 0.0) - achieved.get(label, 0.0)) >
+                      math.fsum((expected_roundoff.get(label, 0.0), achieved_roundoff.get(label, 0.0)))}
+        if mismatches:
+            raise EvaporationFluxRefusal('oxygen_projection_commit_mismatch', {'signed_amounts_mol': mismatches})
+
+    def _solve_evaporative_oxygen_boundary(self, equilibrium, *, overhead_partials_override_Pa=None):
+        from simulator.chemistry.langmuir_knudsen import (
+            OxygenClosureNonconvergence, _SurfaceOxygenEvaluation,
+            _solve_surface_oxygen_balance,
+        )
+        from simulator.transport_regime import series_evaporation_flux
+
+        # C7 freezes the pre-batch bulk partials, removal boundary, T, and
+        # interval (one hour). C8 will couple evolving bulk inventory/removal
+        # and source/settlement within that interval. Every C7 trial still
+        # settles its OWN carrier batch and finite Fe/buffer inventory.
+        bulk = self._vapor_pressure_transport_pO2_bar()
+        partials = (dict(overhead_partials_override_Pa) if overhead_partials_override_Pa is not None
+                    else {species: self._evaporation_bulk_partial_pressure_pa(species)
+                          for species in equilibrium.vapor_pressures_Pa})
+        controls, _ = self._evaporation_flux_control_inputs(
+            equilibrium, overhead_partials_Pa=partials,
+            overhead_pressure_pa=self._evaporation_overhead_total_pressure_Pa(partials))
+        area_dt = controls['melt_surface_area_m2'] * 3600.0
+        if not math.isfinite(area_dt) or area_dt <= 0.0:
+            raise EvaporationFluxRefusal('oxygen_closure_invalid_area', {'area_dt_m2_s': area_dt})
+        mass = resolve_species_formula('O2', self.species_formula_registry).molar_mass_kg_per_mol()
+        config = controls['evaporation_series_resistance']
+        empty_request = not self.vapour_rail_catalog.build_request(self.atom_ledger.mol_by_account())
+
+        def evaluate(oxygen):
+            trial = self._detached_evaporation_projection()
+            trial._reaction_pO2_bar = oxygen
+            result = copy.deepcopy(equilibrium)
+            if not empty_request:
+                trial._refresh_vapor_pressures_from_kernel(result, include_diagnostic_shadows=False,
+                                                           simulation_hour=int(self.melt.hour))
+            flux = trial._apply_analytic_evaporation_depletion(trial._calculate_evaporation(
+                result, overhead_partials_override_Pa=partials))
+            start = len(trial.atom_ledger.transitions)
+            buffer_before = trial.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
+            # Preserve the proposed pre-routing batch: acceptance executes the
+            # identical owner once, then checks every signed term and carrier.
+            proposed_flux = copy.deepcopy(flux)
+            trial._apply_evaporation_carrier_batch(flux)
+            receipt = trial._evaporation_signed_amounts(start, buffer_before)
+            amounts, _ = receipt
+            series = series_evaporation_flux(
+                'O2', oxygen * 100000.0, bulk * 100000.0,
+                self.melt.temperature_C + 273.15, mass, 1.0,
+                overhead_pressure_pa=controls['overhead_pressure_pa'],
+                carrier_gas=controls['carrier_gas'], T_gas_K=controls['gas_temperature_K'],
+                gas_resistance_enabled=bool(config.get('gas_resistance_enabled', True)),
+                melt_surface_area_m2=controls['melt_surface_area_m2'],
+                surface_flow=controls['surface_flow'], signed=True,
+                stir_diagnostic=dict(axial_stir_applied=0.0, radial_stir_applied=0.0,
+                    axial_stir_clamped=False, radial_stir_clamped=False,
+                    frozen_skull_stir_clamped=False, frozen_skull_stir_ceiling='not applicable to oxygen'),
+            )
+            oxygen_flux = series.flux_kg_s_m2 / mass
+            # p_face = p_bulk + j*M*R_film, with the same owner's effective
+            # film resistance (including its Stefan correction). Units:
+            # (mol/m²/s)(kg/mol)(Pa*m²*s/kg)=Pa. R_film=0 gives EXACT bulk,
+            # avoiding cancellation of x and its equal HK jump at vacuum.
+            gas_face = (bulk * 100000.0 + series.flux_kg_s_m2 * series.r_gas) / 100000.0
+            return _SurfaceOxygenEvaluation(
+                # Atomic O is dormant_pending_r2_epoch in the runtime catalog;
+                # its unacquired diagnostic pressure cannot mint an escape flux.
+                oxygen, gas_face, oxygen_flux, 0.0,
+                {key.removeprefix('source:'): value / area_dt for key, value in amounts.items()
+                 if key.startswith('source:')},
+                2.0 * amounts['ferric_oxygen'] / area_dt,
+                amounts['other_oxygen'] / area_dt, amounts['storage'] / area_dt,
+                (proposed_flux, receipt, trial, result, series.as_diagnostic()),
+            )
+
+        try:
+            # Existing cold/no-liquid gates prove no carrier source independently
+            # of a trial pressure or rate cutoff. Settlement may still supply
+            # oxygen, so check its individually signed terms before accepting 0.
+            zero = None
+            if bulk == 0.0 and (self.melt.temperature_C + 273.15 < 400.0
+                                or getattr(equilibrium, 'liquid_fraction', None) == 0.0
+                                or empty_request):
+                candidate = evaluate(0.0)
+                if not any(candidate.balance_terms):
+                    zero = candidate
+            return _solve_surface_oxygen_balance(
+                evaluate, source_free_zero=zero,
+                bracket_log10_pO2_bar=(-12.0, 0.0))
+        except OxygenClosureNonconvergence as exc:
+            raise EvaporationFluxRefusal('oxygen_closure_nonconvergence', {'detail': str(exc)}) from exc
+
     def _route_to_condensation(
         self, evap_flux: EvaporationFlux
     ) -> EvaporationFlux:
