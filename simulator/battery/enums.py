@@ -125,6 +125,12 @@ class ValencePrintedForm(StrEnum):
     MASS_FRACTION_PAIR = "mass_fraction_pair"
 
 
+class ScalarPrintedForm(StrEnum):
+    LOG10 = "log10"
+    NEG_LOG10 = "neg_log10"
+    LN = "ln"
+
+
 class EvidenceClass(StrEnum):
     MEASURED_DIRECT = "measured_direct"
     MEASURED_TABULATED = "measured_tabulated"

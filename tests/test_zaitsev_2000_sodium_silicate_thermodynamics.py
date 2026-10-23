@@ -26,7 +26,7 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
     assert migrator.result.validation is not None
     assert migrator.result.validation.ok
     assert migrator.result.validation.hard_issues == ()
-    assert len(migrator.result.observations) == 66
+    assert len(migrator.result.observations) == 110
     assert all(
         all(
             key in (observation.point_conditions or {})
@@ -35,6 +35,20 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
             for key in ("temperature_K", "composition")
         )
         for observation in migrator.result.observations.values()
+    )
+    table5 = [
+        observation
+        for observation in migrator.result.observations.values()
+        if "::zaitsev_2000_table5_" in observation.observation_id
+    ]
+    assert len(table5) == 44
+    assert {observation.identity.species.formula for observation in table5} == {
+        "Na2O"
+    }
+    assert all(
+        observation.provenance["printed_form"] == "neg_log10"
+        and observation.locator.page == 9
+        for observation in table5
     )
     reduced_silica_rows = [
         observation
@@ -50,6 +64,28 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
     )
 
     species = document["species"]
+    table5 = {
+        observation["observation_id"]: observation["values"]["points"]
+        for observation in species["Na2O"]["observations"]
+        if observation["observation_id"].startswith("zaitsev_2000_table5_")
+    }
+    # These Table 5 cells were confirmed against the 600 dpi p. 537 render.
+    table5_pins = {
+        ("zaitsev_2000_table5_this_work_na2o_activity", "0.103", "1430"): "9.394",
+        ("zaitsev_2000_table5_ref39_na2o_activity", "0.103", "1430"): "9.823",
+        ("zaitsev_2000_table5_this_work_na2o_activity", "0.254", "1557"): "8.348",
+        ("zaitsev_2000_table5_ref39_na2o_activity", "0.254", "1557"): "8.790",
+        ("zaitsev_2000_table5_this_work_model_na2o_activity", "0.500", "1255"): "7.080",
+    }
+    for (observation_id, x_na2o, temperature), expected in table5_pins.items():
+        point = next(
+            point
+            for point in table5[observation_id]
+            if point["x_Na2O_as_printed"] == x_na2o
+            and point["T_K"] == temperature
+        )
+        assert point["activity"] == expected
+
     sio2 = species["SiO2"]["observations"][0]["values"]["points"]
     na2o = next(
         row["values"]["points"]

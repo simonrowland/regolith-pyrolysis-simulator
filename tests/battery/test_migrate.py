@@ -7699,6 +7699,120 @@ def test_k01_source_activity_is_quantity_activity(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(
+    ("printed_form", "printed_value", "inverse"),
+    [
+        ("neg_log10", "2.000", "neg_log10"),
+        ("log10", "-2.000", "log10"),
+        ("ln", "-4.605170185988091368035982909", "ln"),
+    ],
+)
+def test_scalar_activity_printed_forms_round_trip(
+    tmp_path: Path, printed_form: str, printed_value: str, inverse: str
+) -> None:
+    extract = _scalar_extract(
+        quantity="activity",
+        units="dimensionless activity",
+        values={
+            "quantity": "activity",
+            "method_class": "measured_direct",
+            "points": [
+                {
+                    "T_K": "1473",
+                    "activity": printed_value,
+                    "printed_form": printed_form,
+                    "locator": {"table": "4", "row": "1", "page": 6},
+                }
+            ],
+        },
+        obs_type="activity_coefficient",
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.POINT
+    assert abs(observation.value.point - Decimal("0.01")) < Decimal("1e-26")
+    if inverse == "neg_log10":
+        round_trip = -observation.value.point.log10()
+    elif inverse == "log10":
+        round_trip = observation.value.point.log10()
+    else:
+        round_trip = observation.value.point.ln()
+    assert abs(round_trip - Decimal(printed_value)) < Decimal("1e-26")
+    assert observation.provenance == {
+        "printed_value": printed_value,
+        "printed_form": printed_form,
+    }
+
+
+@pytest.mark.parametrize(
+    ("printed_form", "sigma", "expected_dex"),
+    [
+        ("neg_log10", "0.20", Decimal("0.20")),
+        ("log10", "0.20", Decimal("0.20")),
+        (
+            "ln",
+            "0.4605170185988091368035982909",
+            Decimal("0.20"),
+        ),
+    ],
+)
+def test_scalar_activity_log_uncertainty_stays_in_dex(
+    tmp_path: Path, printed_form: str, sigma: str, expected_dex: Decimal
+) -> None:
+    extract = _scalar_extract(
+        quantity="activity",
+        units="dimensionless activity",
+        values={
+            "quantity": "activity",
+            "method_class": "measured_direct",
+            "points": [
+                {
+                    "T_K": "1473",
+                    "activity": "2.000",
+                    "printed_form": printed_form,
+                    "sigma": sigma,
+                }
+            ],
+        },
+        obs_type="activity_coefficient",
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.uncertainty.basis == "log10_dex"
+    assert observation.uncertainty.value is not None
+    assert abs(observation.uncertainty.value - expected_dex) < Decimal("1e-26")
+    assert observation.uncertainty.verbatim["sigma"] == sigma
+
+
+def test_unknown_scalar_activity_printed_form_is_typed_unavailable(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="activity",
+        units="dimensionless activity",
+        values={
+            "quantity": "activity",
+            "method_class": "measured_direct",
+            "points": [
+                {
+                    "T_K": "1473",
+                    "activity": "2.000",
+                    "printed_form": "log_base_2",
+                }
+            ],
+        },
+        obs_type="activity_coefficient",
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.UNAVAILABLE
+    assert "unknown printed_form 'log_base_2'" in observation.value.unavailable_reason
+    assert any("unknown printed_form 'log_base_2'" in entry.why for entry in result.queue)
+
+
+@pytest.mark.parametrize(
     ("per", "expected", "reason", "invalid"),
     [
         ("mol_species", PerBasis.MOL_SPECIES, None, False),
