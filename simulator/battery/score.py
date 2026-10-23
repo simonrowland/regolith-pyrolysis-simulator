@@ -7306,6 +7306,31 @@ def _predict_mass_loss_with_residue(
     )
 
 
+def _resolve_battery_engine_handle(
+    engine: Engine,
+    handles: Mapping[str, object] | None,
+    opener,
+):
+    handle_map = handles if handles is not None else {}
+    handle = handle_map.get(engine.value)
+    if handle is not None and (
+        not getattr(handle, "available", False)
+        or getattr(handle, "backend", None) is None
+    ):
+        if isinstance(handle_map, dict):
+            handle_map.pop(engine.value, None)
+        handle = None
+    if handle is None:
+        handle = opener(engine.value)
+        if (
+            isinstance(handle_map, dict)
+            and getattr(handle, "available", False)
+            and getattr(handle, "backend", None) is not None
+        ):
+            handle_map[engine.value] = handle
+    return handle
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -8095,23 +8120,9 @@ def predict_with_engine(
                 requested_composition=requested,
             )
 
-    handle_map = handles if handles is not None else {}
-    handle = handle_map.get(engine.value)
-    if handle is not None and (
-        not getattr(handle, "available", False)
-        or getattr(handle, "backend", None) is None
-    ):
-        if isinstance(handle_map, dict):
-            handle_map.pop(engine.value, None)
-        handle = None
-    if handle is None:
-        handle = open_battery_engine(engine.value)
-        if (
-            isinstance(handle_map, dict)
-            and getattr(handle, "available", False)
-            and getattr(handle, "backend", None) is not None
-        ):
-            handle_map[engine.value] = handle
+    handle = _resolve_battery_engine_handle(
+        engine, handles, open_battery_engine
+    )
     name = str(getattr(handle, "name", engine.value))
     engine_version: str | None = None
     if engine is Engine.OPENIMCC:
