@@ -1181,6 +1181,34 @@ def _printed_entropy_shift(identity: Identity) -> tuple[Decimal | None, str | No
     )
 
 
+def _neutral_species_charge_refusal(
+    identity: Identity,
+    quantity: Quantity,
+    origin: str,
+    *,
+    engine: Engine,
+) -> ThermoAttempt | None:
+    """Refuse thermo lookups unless species charge is known and neutral."""
+
+    charge = identity.species.charge
+    if not isinstance(charge, State) or not charge.is_value:
+        return _refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "vaporock-gas-charge-unknown",
+            quantity=quantity,
+            origin=origin,
+        )
+    if as_decimal(charge.value) != 0:
+        return _refuse(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            "vaporock-charged-species-not-in-janaf-table",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": engine.value, "charge": str(charge.value)},
+        )
+    return None
+
+
 @lru_cache(maxsize=2)
 def _openimcc_datapack(vaporock_root: str | None):
     """Reuse the pinned OpenIMCC tables while respecting its explicit override."""
@@ -1373,6 +1401,12 @@ def _openimcc_pure_phase_attempt(
             extra={"engine": Engine.OPENIMCC.value},
         )
 
+    charge_refusal = _neutral_species_charge_refusal(
+        identity, quantity, origin, engine=Engine.OPENIMCC
+    )
+    if charge_refusal is not None:
+        return charge_refusal
+
     pressure_state = identity.standard_pressure_Pa
     if not isinstance(pressure_state, State) or not pressure_state.is_value or pressure_state.value is None:
         return _refuse(
@@ -1533,6 +1567,12 @@ def _openimcc_fusion_attempt(
             quantity=quantity,
             origin=origin,
         )
+    charge_refusal = _neutral_species_charge_refusal(
+        identity, quantity, origin, engine=Engine.OPENIMCC
+    )
+    if charge_refusal is not None:
+        return charge_refusal
+
     pressure_state = identity.standard_pressure_Pa
     catalog_pressure = _janaf_catalog_standard_pressure_Pa()
     if (
@@ -1634,22 +1674,11 @@ def _vaporock_gas_attempt(
             origin=origin,
         )
 
-    charge = identity.species.charge
-    if not isinstance(charge, State) or not charge.is_value:
-        return _refuse(
-            RefusalReason.IDENTITY_UNKNOWN,
-            "vaporock-gas-charge-unknown",
-            quantity=quantity,
-            origin=origin,
-        )
-    if as_decimal(charge.value) != 0:
-        return _refuse(
-            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
-            "vaporock-charged-species-not-in-janaf-table",
-            quantity=quantity,
-            origin=origin,
-            extra={"engine": Engine.VAPOROCK.value, "charge": str(charge.value)},
-        )
+    charge_refusal = _neutral_species_charge_refusal(
+        identity, quantity, origin, engine=Engine.VAPOROCK
+    )
+    if charge_refusal is not None:
+        return charge_refusal
 
     try:
         vapor = getattr(_vaporock_gas_attempt, "_janaf_vapor", None)

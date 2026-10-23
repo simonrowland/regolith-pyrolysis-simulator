@@ -33,6 +33,7 @@ def _observation(
     polymorph: Polymorph | None = None,
     fusion: bool = False,
     pressure_Pa: str | None = "100000",
+    charge: State[int] | int | None = None,
 ):
     identity = F.o2_identity(Decimal(temperature_K))
     identity = replace(
@@ -49,7 +50,7 @@ def _observation(
             else State.of(Decimal(pressure_Pa))
         ),
         species=replace(
-            Species(formula, phase),
+            Species(formula, phase, charge=charge),
             polymorph=None if polymorph is None else State.of(polymorph),
         ),
         reaction=State.not_applicable("pure standard-state thermo"),
@@ -126,6 +127,67 @@ def test_openimcc_refuses_an_unsupported_species_without_zero() -> None:
 
     assert attempt.value is None
     assert attempt.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+
+
+def test_openimcc_refuses_charged_al_before_card_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unexpected_call(*_args, **_kwargs):
+        pytest.fail("charged species must be refused before OpenIMCC card lookup")
+
+    monkeypatch.setattr(openimcc.gas, "species_thermo", unexpected_call)
+    observation = _observation("Al", Phase.G, Quantity.S, charge=1)
+
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, observation)
+
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert attempt.refusal_detail["reason"] == "vaporock-charged-species-not-in-janaf-table"
+
+
+def test_openimcc_refuses_unknown_charge_before_card_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unexpected_call(*_args, **_kwargs):
+        pytest.fail("unknown charge must be refused before OpenIMCC card lookup")
+
+    monkeypatch.setattr(openimcc.gas, "species_thermo", unexpected_call)
+    observation = _observation(
+        "K", Phase.G, Quantity.CP, charge=State.unknown("charge not reported")
+    )
+
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, observation)
+
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert attempt.refusal_detail["reason"] == "vaporock-gas-charge-unknown"
+
+
+def test_openimcc_neutral_al_still_uses_gas_card() -> None:
+    observation = _observation("Al", Phase.G, Quantity.S)
+
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, observation)
+
+    assert attempt.value is not None
+    assert "Al(g)" in attempt.call_evidence
+
+
+def test_openimcc_fusion_refuses_charged_species_before_card_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unexpected_call(*_args, **_kwargs):
+        pytest.fail("charged fusion species must be refused before card lookup")
+
+    monkeypatch.setattr(openimcc.gas, "species_thermo", unexpected_call)
+    observation = _observation(
+        "Al", Phase.CR, Quantity.ENTHALPY_OF_FUSION, fusion=True, charge=1
+    )
+
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, observation)
+
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert attempt.refusal_detail["reason"] == "vaporock-charged-species-not-in-janaf-table"
 
 
 @pytest.mark.parametrize("formula", ["K", "Na", "Mg"])
