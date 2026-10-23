@@ -1,0 +1,286 @@
+schema_version: literature_extract.v1
+source_id: baud-2003-sic-alumina-vaporization-condensation
+source:
+  citation: 'Baud, S., Thévenot, F. & Chatillon, C. (2003), High temperature sintering of SiC with oxide additives: III. Quantitative vaporization of SiC–Al2O3 powder beds as revealed by mass spectrometry, Journal of the European Ceramic Society 23:19–27.'
+  doi: 10.1016/S0955-2219(02)00069-9
+  url: https://doi.org/10.1016/S0955-2219(02)00069-9
+  year: 2003
+extraction:
+  method: 'Table 5 explicit β (at 1500 K) point rows transcribed from pdftotext and independently checked against the page render; only the 16 printed species-by-bed cells are included.'
+  date: '2026-10-22'
+  worker: wave52-F65
+review_status: draft
+fidelity_samples:
+  - species: Al
+    observable: alpha
+    observation_id: baud_2003_norton_al_beta_1500k
+    field: alpha
+    value: 0.0129
+    locator: {page: 6, table: '5'}
+  - species: Al2O
+    observable: alpha
+    observation_id: baud_2003_carborundum_al2o_beta_1500k
+    field: alpha
+    value: 0.0033
+    locator: {page: 6, table: '5'}
+  - species: SiO
+    observable: alpha
+    observation_id: baud_2003_norton_carbon_sio_beta_1500k
+    field: alpha
+    value: 0.022
+    locator: {page: 6, table: '5'}
+  - species: CO
+    observable: alpha
+    observation_id: baud_2003_norton_silicon_co_beta_1500k
+    field: alpha
+    value: 0.113
+    locator: {page: 6, table: '5'}
+species:
+  Al:
+    observations:
+      - observation_id: baud_2003_norton_al_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0129
+          gas_species: Al(g)
+          substrate: SiC (Nor.) + Al2O3 powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_carborundum_al_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0101
+          gas_species: Al(g)
+          substrate: SiC (Car.) + Al2O3 powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_norton_carbon_al_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0127
+          gas_species: Al(g)
+          substrate: SiC (Nor.) + Al2O3 + C powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_norton_silicon_al_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0281
+          gas_species: Al(g)
+          substrate: SiC (Nor.) + Al2O3 + Si powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+  Al2O:
+    observations:
+      - observation_id: baud_2003_norton_al2o_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0034
+          gas_species: Al2O(g)
+          substrate: SiC (Nor.) + Al2O3 powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_carborundum_al2o_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0033
+          gas_species: Al2O(g)
+          substrate: SiC (Car.) + Al2O3 powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_norton_carbon_al2o_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.004
+          gas_species: Al2O(g)
+          substrate: SiC (Nor.) + Al2O3 + C powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_norton_silicon_al2o_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0219
+          gas_species: Al2O(g)
+          substrate: SiC (Nor.) + Al2O3 + Si powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+  SiO:
+    observations:
+      - observation_id: baud_2003_norton_sio_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0106
+          gas_species: SiO(g)
+          substrate: SiC (Nor.) + Al2O3 powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_carborundum_sio_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0451
+          gas_species: SiO(g)
+          substrate: SiC (Car.) + Al2O3 powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_norton_carbon_sio_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.022
+          gas_species: SiO(g)
+          substrate: SiC (Nor.) + Al2O3 + C powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_norton_silicon_sio_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        units: dimensionless
+        regime: knudsen_effusion
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0138
+          gas_species: SiO(g)
+          substrate: SiC (Nor.) + Al2O3 + Si powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+  CO:
+    observations:
+      - observation_id: baud_2003_norton_co_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0311
+          gas_species: CO(g)
+          substrate: SiC (Nor.) + Al2O3 powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_carborundum_co_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0249
+          gas_species: CO(g)
+          substrate: SiC (Car.) + Al2O3 powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_norton_carbon_co_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.0211
+          gas_species: CO(g)
+          substrate: SiC (Nor.) + Al2O3 + C powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
+      - observation_id: baud_2003_norton_silicon_co_beta_1500k
+        type: alpha
+        locator: {table: '5', page: 6, published_page: 24}
+        T_K: 1500
+        phase: condensed_solid
+        regime: knudsen_effusion
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          method_class: measured_direct
+          alpha: 0.113
+          gas_species: CO(g)
+          substrate: SiC (Nor.) + Al2O3 + Si powder bed
+          technique: multiple cell mass spectrometry
+          method: multiple cell method; β at 1500 K
