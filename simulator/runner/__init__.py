@@ -1404,14 +1404,19 @@ class PyrolysisRun:
         c3_credit_drawn_kg = dict(
             getattr(sim, "_c3_alkali_credit_drawn_kg_by_species", {}) or {}
         )
-        c3_credit_outstanding_kg = (
-            sim._c3_alkali_credit_outstanding_kg_by_species()
+        c3_credit_outstanding_kg = _safe_failure_value(
+            lambda: sim._c3_alkali_credit_outstanding_kg_by_species(),
+            section=(
+                "run_metadata.c3_alkali_credit_outstanding_kg_by_species"
+            ),
         )
-        c3_credit_species = (
-            set(c3_credit_dose_kg)
-            | set(c3_credit_drawn_kg)
-            | set(c3_credit_outstanding_kg)
+        c3_credit_outstanding_unavailable = (
+            isinstance(c3_credit_outstanding_kg, Mapping)
+            and c3_credit_outstanding_kg.get("status") == "unavailable"
         )
+        c3_credit_species = set(c3_credit_dose_kg) | set(c3_credit_drawn_kg)
+        if not c3_credit_outstanding_unavailable:
+            c3_credit_species |= set(c3_credit_outstanding_kg)
         if c3_credit_species:
             ordered_species = sorted(c3_credit_species)
             run_metadata["c3_alkali_credit_dose_kg_by_species"] = {
@@ -1422,13 +1427,24 @@ class PyrolysisRun:
                 species: float(c3_credit_drawn_kg.get(species, 0.0))
                 for species in ordered_species
             }
-            run_metadata["c3_alkali_credit_outstanding_kg_by_species"] = {
-                species: float(c3_credit_outstanding_kg.get(species, 0.0))
-                for species in ordered_species
-            }
+            run_metadata["c3_alkali_credit_outstanding_kg_by_species"] = (
+                c3_credit_outstanding_kg
+                if c3_credit_outstanding_unavailable
+                else {
+                    species: float(
+                        c3_credit_outstanding_kg.get(species, 0.0)
+                    )
+                    for species in ordered_species
+                }
+            )
+        elif c3_credit_outstanding_unavailable:
+            run_metadata["c3_alkali_credit_outstanding_kg_by_species"] = (
+                c3_credit_outstanding_kg
+            )
         if execution.reduced_real_cache:
-            run_metadata["reduced_real_cache"] = _json_safe(
-                execution.reduced_real_cache
+            run_metadata["reduced_real_cache"] = _safe_failure_value(
+                lambda: _json_safe(execution.reduced_real_cache),
+                section="run_metadata.reduced_real_cache",
             )
         lab_area_bridge = _safe_failure_value(
             lambda: _json_safe(self._lab_area_bridge()),
@@ -1507,20 +1523,31 @@ class PyrolysisRun:
             ),
             section="run_metadata.pressure_coating_pareto_diagnostic",
         )
-        alpha_authority_status_by_species = dict(
-            getattr(sim, "_alpha_authority_status_by_species_engaged", {}) or {}
+        alpha_authority_status_by_species = _safe_failure_value(
+            lambda: _json_safe(
+                dict(
+                    getattr(
+                        sim,
+                        "_alpha_authority_status_by_species_engaged",
+                        {},
+                    )
+                    or {}
+                )
+            ),
+            section="run_metadata.alpha_authority_status_by_species",
         )
         if alpha_authority_status_by_species:
-            run_metadata["alpha_authority_status_by_species"] = _json_safe(
+            run_metadata["alpha_authority_status_by_species"] = (
                 alpha_authority_status_by_species
             )
-        c3_na_hold_adjustment = dict(
-            getattr(sim, "_last_c3_na_hold_adjustment", {}) or {}
+        c3_na_hold_adjustment = _safe_failure_value(
+            lambda: _json_safe(
+                dict(getattr(sim, "_last_c3_na_hold_adjustment", {}) or {})
+            ),
+            section="run_metadata.c3_na_hold_adjustment",
         )
         if c3_na_hold_adjustment:
-            run_metadata["c3_na_hold_adjustment"] = _json_safe(
-                c3_na_hold_adjustment
-            )
+            run_metadata["c3_na_hold_adjustment"] = c3_na_hold_adjustment
         cost_rollup_diagnostic = _safe_failure_value(
             lambda: _json_safe(
                 {
@@ -4496,15 +4523,20 @@ def build_sio_yield_report(
     sio_evolved_kg = sio_evaporated_mol * sio_molar_mass_kg_mol
     sio_yield_pct = sio_evolved_kg / mass_kg * 100.0
 
-    sio_to_silica_fume_kg = _stage_silica_fume_kg(sim)
     reported_stage_numbers = set(SIO_YIELD_STAGE_KEYS)
-    downstream_sio2_kg = sum(
-        stage.collected_kg.get("SiO2", 0.0)
-        for stage in sim.train.stages
-        if stage.stage_number not in reported_stage_numbers
-    )
-    sio_to_silica_fume_kg["terminal_offgas_escape"] = _clean_report_float(
-        downstream_sio2_kg + sio_escape_mol * sio_molar_mass_kg_mol
+    sio_to_silica_fume_kg = _safe_failure_value(
+        lambda: {
+            **_stage_silica_fume_kg(sim),
+            "terminal_offgas_escape": _clean_report_float(
+                sum(
+                    stage.collected_kg.get("SiO2", 0.0)
+                    for stage in sim.train.stages
+                    if stage.stage_number not in reported_stage_numbers
+                )
+                + sio_escape_mol * sio_molar_mass_kg_mol
+            ),
+        },
+        section="sio_yield_report.sio_to_silica_fume_kg",
     )
     condensation_model = sim.condensation_model
     sticking_notice = dict(
