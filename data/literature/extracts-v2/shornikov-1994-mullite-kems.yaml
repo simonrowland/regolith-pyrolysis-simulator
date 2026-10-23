@@ -11,11 +11,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -109,6 +109,22 @@ observations:
     note: Table 6 row a_Al2O3, column 1833 K; value printed as 1.05 ± 0.07
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
     temperature_K:
       state:
         tag: value
@@ -146,22 +162,6 @@ observations:
               table: '6'
               note: Table 6 row a_Al2O3, column 1833 K; value printed as 1.05 ± 0.07
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 479
-        published_page: 479
-        table: '6'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.00:h=4de074fdc8b4
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
@@ -180,8 +180,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -201,11 +201,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -299,6 +299,22 @@ observations:
     note: Table 6 row a_Al2O3, column 1933 K; value printed as 1.01 ± 0.05
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
     temperature_K:
       state:
         tag: value
@@ -336,22 +352,6 @@ observations:
               table: '6'
               note: Table 6 row a_Al2O3, column 1933 K; value printed as 1.01 ± 0.05
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 479
-        published_page: 479
-        table: '6'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.00:h=90cfcf09c8cf
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
@@ -370,8 +370,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -391,11 +391,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -489,6 +489,22 @@ observations:
     note: Table 6 row a_Al2O3, column 1983 K; value printed as 1.01 ± 0.05
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
     temperature_K:
       state:
         tag: value
@@ -526,22 +542,6 @@ observations:
               table: '6'
               note: Table 6 row a_Al2O3, column 1983 K; value printed as 1.01 ± 0.05
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 479
-        published_page: 479
-        table: '6'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.00:h=e6af00593244
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
@@ -560,8 +560,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -581,11 +581,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -679,6 +679,22 @@ observations:
     note: Table 6 row a_Al2O3, column 2033 K; value printed as 1.01 ± 0.03
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
     temperature_K:
       state:
         tag: value
@@ -716,22 +732,6 @@ observations:
               table: '6'
               note: Table 6 row a_Al2O3, column 2033 K; value printed as 1.01 ± 0.03
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 479
-        published_page: 479
-        table: '6'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.00:h=d4599ed98706
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
@@ -750,8 +750,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -880,6 +880,34 @@ observations:
     note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -917,34 +945,6 @@ observations:
               table: '2'
               note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -980,8 +980,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -1110,6 +1110,34 @@ observations:
     note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1147,34 +1175,6 @@ observations:
               table: '2'
               note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1210,8 +1210,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -1340,6 +1340,34 @@ observations:
     note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1377,34 +1405,6 @@ observations:
               table: '2'
               note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1440,8 +1440,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -1570,6 +1570,34 @@ observations:
     note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1607,34 +1635,6 @@ observations:
               table: '2'
               note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1670,8 +1670,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -1800,6 +1800,34 @@ observations:
     note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1837,34 +1865,6 @@ observations:
               table: '2'
               note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1900,8 +1900,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -2030,6 +2030,34 @@ observations:
     note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2067,34 +2095,6 @@ observations:
               table: '2'
               note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2130,8 +2130,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -2260,6 +2260,34 @@ observations:
     note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2297,34 +2325,6 @@ observations:
               table: '2'
               note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2360,8 +2360,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -2490,6 +2490,34 @@ observations:
     note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2527,34 +2555,6 @@ observations:
               table: '2'
               note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2590,8 +2590,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -2720,6 +2720,34 @@ observations:
     note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2757,34 +2785,6 @@ observations:
               table: '2'
               note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2820,8 +2820,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -2950,6 +2950,34 @@ observations:
     note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2987,34 +3015,6 @@ observations:
               table: '2'
               note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3050,8 +3050,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -3180,6 +3180,34 @@ observations:
     note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3217,34 +3245,6 @@ observations:
               table: '2'
               note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3280,8 +3280,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -3410,6 +3410,34 @@ observations:
     note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3447,34 +3475,6 @@ observations:
               table: '2'
               note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3510,8 +3510,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -3640,6 +3640,34 @@ observations:
     note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3677,34 +3705,6 @@ observations:
               table: '2'
               note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3740,8 +3740,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -3870,6 +3870,34 @@ observations:
     note: Table 2 row p_MoO2, column 1833 K; value printed as 0.526 ± 0.050 under p_MoO2 · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3907,34 +3935,6 @@ observations:
               table: '2'
               note: Table 2 row p_MoO2, column 1833 K; value printed as 0.526 ± 0.050 under p_MoO2 · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3970,8 +3970,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -4100,6 +4100,34 @@ observations:
     note: Table 2 row p_MoO2, column 1933 K; value printed as 1.91 ± 0.15 under p_MoO2 · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -4137,34 +4165,6 @@ observations:
               table: '2'
               note: Table 2 row p_MoO2, column 1933 K; value printed as 1.91 ± 0.15 under p_MoO2 · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4200,8 +4200,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -4330,6 +4330,34 @@ observations:
     note: Table 2 row p_MoO2, column 1983 K; value printed as 3.40 ± 0.25 under p_MoO2 · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -4367,34 +4395,6 @@ observations:
               table: '2'
               note: Table 2 row p_MoO2, column 1983 K; value printed as 3.40 ± 0.25 under p_MoO2 · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4430,8 +4430,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -4560,6 +4560,34 @@ observations:
     note: Table 2 row p_MoO2, column 2033 K; value printed as 5.78 ± 0.30 under p_MoO2 · 10^-8
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -4597,34 +4625,6 @@ observations:
               table: '2'
               note: Table 2 row p_MoO2, column 2033 K; value printed as 5.78 ± 0.30 under p_MoO2 · 10^-8
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4660,8 +4660,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -4790,6 +4790,34 @@ observations:
     note: Table 2 row p_MoO3, column 1833 K; value printed as 1.24 ± 0.08 under p_MoO3 · 10^-9
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -4827,34 +4855,6 @@ observations:
               table: '2'
               note: Table 2 row p_MoO3, column 1833 K; value printed as 1.24 ± 0.08 under p_MoO3 · 10^-9
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4890,8 +4890,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -5020,6 +5020,34 @@ observations:
     note: Table 2 row p_MoO3, column 1933 K; value printed as 4.22 ± 0.25 under p_MoO3 · 10^-9
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -5057,34 +5085,6 @@ observations:
               table: '2'
               note: Table 2 row p_MoO3, column 1933 K; value printed as 4.22 ± 0.25 under p_MoO3 · 10^-9
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5120,8 +5120,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -5250,6 +5250,34 @@ observations:
     note: Table 2 row p_MoO3, column 1983 K; value printed as 7.64 ± 0.40 under p_MoO3 · 10^-9
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -5287,34 +5315,6 @@ observations:
               table: '2'
               note: Table 2 row p_MoO3, column 1983 K; value printed as 7.64 ± 0.40 under p_MoO3 · 10^-9
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5350,8 +5350,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -5480,6 +5480,34 @@ observations:
     note: Table 2 row p_MoO3, column 2033 K; value printed as 12.4 ± 0.6 under p_MoO3 · 10^-9
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -5517,34 +5545,6 @@ observations:
               table: '2'
               note: Table 2 row p_MoO3, column 2033 K; value printed as 12.4 ± 0.6 under p_MoO3 · 10^-9
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5580,8 +5580,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -5711,6 +5711,34 @@ observations:
     note: Table 2 row p_O2, column 1833 K; value printed as 0.521 ± 0.050 under p_O2 · 10^-11
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -5748,34 +5776,6 @@ observations:
               table: '2'
               note: Table 2 row p_O2, column 1833 K; value printed as 0.521 ± 0.050 under p_O2 · 10^-11
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
   derivation:
@@ -5841,8 +5841,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -5972,6 +5972,34 @@ observations:
     note: Table 2 row p_O2, column 1933 K; value printed as 4.59 ± 0.26 under p_O2 · 10^-11
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -6009,34 +6037,6 @@ observations:
               table: '2'
               note: Table 2 row p_O2, column 1933 K; value printed as 4.59 ± 0.26 under p_O2 · 10^-11
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
   derivation:
@@ -6102,8 +6102,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -6233,6 +6233,34 @@ observations:
     note: Table 2 row p_O2, column 1983 K; value printed as 13.7 ± 0.6 under p_O2 · 10^-11
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -6270,34 +6298,6 @@ observations:
               table: '2'
               note: Table 2 row p_O2, column 1983 K; value printed as 13.7 ± 0.6 under p_O2 · 10^-11
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
   derivation:
@@ -6363,8 +6363,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -6494,6 +6494,34 @@ observations:
     note: Table 2 row p_O2, column 2033 K; value printed as 34.3 ± 1.7 under p_O2 · 10^-11
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -6531,34 +6559,6 @@ observations:
               table: '2'
               note: Table 2 row p_O2, column 2033 K; value printed as 34.3 ± 1.7 under p_O2 · 10^-11
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
   derivation:
@@ -6624,8 +6624,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -6755,6 +6755,34 @@ observations:
     note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -6792,34 +6820,6 @@ observations:
               table: '2'
               note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.00:h=96ee96960eb1
   - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.00:h=4238cad08175
@@ -6888,8 +6888,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -7019,6 +7019,34 @@ observations:
     note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -7056,34 +7084,6 @@ observations:
               table: '2'
               note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.00:h=5f4934d9373a
   - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.00:h=fafa8bfc1e7e
@@ -7152,8 +7152,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -7283,6 +7283,34 @@ observations:
     note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -7320,34 +7348,6 @@ observations:
               table: '2'
               note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.00:h=ca69236b2015
   - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.00:h=459b34325a55
@@ -7416,8 +7416,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -7547,6 +7547,34 @@ observations:
     note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -7584,34 +7612,6 @@ observations:
               table: '2'
               note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.00:h=e4fc7486ece4
   - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.00:h=542f6f0a10b0
@@ -7680,8 +7680,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -7701,11 +7701,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -7799,6 +7799,22 @@ observations:
     note: Table 6 row a_SiO2, column 1833 K; value printed as 0.37 ± 0.09
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
     temperature_K:
       state:
         tag: value
@@ -7836,22 +7852,6 @@ observations:
               table: '6'
               note: Table 6 row a_SiO2, column 1833 K; value printed as 0.37 ± 0.09
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 479
-        published_page: 479
-        table: '6'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.00:h=0c083bf8ccd6
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
@@ -7870,8 +7870,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -7891,11 +7891,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -7989,6 +7989,22 @@ observations:
     note: Table 6 row a_SiO2, column 1933 K; value printed as 0.19 ± 0.02
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
     temperature_K:
       state:
         tag: value
@@ -8026,22 +8042,6 @@ observations:
               table: '6'
               note: Table 6 row a_SiO2, column 1933 K; value printed as 0.19 ± 0.02
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 479
-        published_page: 479
-        table: '6'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.00:h=eb7c088af742
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
@@ -8060,8 +8060,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -8081,11 +8081,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -8179,6 +8179,22 @@ observations:
     note: Table 6 row a_SiO2, column 1983 K; value printed as 0.18 ± 0.02
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
     temperature_K:
       state:
         tag: value
@@ -8216,22 +8232,6 @@ observations:
               table: '6'
               note: Table 6 row a_SiO2, column 1983 K; value printed as 0.18 ± 0.02
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 479
-        published_page: 479
-        table: '6'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.00:h=2e233f99fb9e
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
@@ -8250,8 +8250,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -8271,11 +8271,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -8369,6 +8369,22 @@ observations:
     note: Table 6 row a_SiO2, column 2033 K; value printed as 0.17 ± 0.01
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
     temperature_K:
       state:
         tag: value
@@ -8406,22 +8422,6 @@ observations:
               table: '6'
               note: Table 6 row a_SiO2, column 2033 K; value printed as 0.17 ± 0.01
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 479
-        published_page: 479
-        table: '6'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
   - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.00:h=4f4aec7a1a57
   - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
@@ -8440,8 +8440,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -8570,6 +8570,34 @@ observations:
     note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -8607,34 +8635,6 @@ observations:
               table: '2'
               note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -8670,8 +8670,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -8800,6 +8800,34 @@ observations:
     note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -8837,34 +8865,6 @@ observations:
               table: '2'
               note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -8900,8 +8900,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -9030,6 +9030,34 @@ observations:
     note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -9067,34 +9095,6 @@ observations:
               table: '2'
               note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -9130,8 +9130,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
@@ -9260,6 +9260,34 @@ observations:
     note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
   read_from: pdf:shornikov-1994-mullite-kems
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -9297,34 +9325,6 @@ observations:
               table: '2'
               note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
         output_unit: K
-    composition:
-      state:
-        tag: value
-        value:
-          basis: derived_from_formula
-          components:
-          - - Al2O3
-            - '0.6'
-          - - SiO2
-            - '0.4'
-          amount_basis: mole_fraction
-      locator:
-        page: 478
-        published_page: 478
-        pdf_page_index: 0
-        table: '2'
-        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
-      inference:
-        relation: formula_stoichiometry_to_mole_fraction
-        inputs:
-        - printed formula=3Al2O3·2SiO2
-        - x(Al2O3)=3/(3+2)=0.6
-        - x(SiO2)=2/(3+2)=0.4
-        - mole fractions sum to 1
-        - 71.8 wt% Al2O3 sanity check
-        - derived, not printed compositional analysis
-        parameters: []
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -9360,8 +9360,8 @@ observations:
       this paper's label and values, do not merge or silently rescale.
     sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
       mole fraction or weight percent.
-    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
-      K; all Table 2 and Table 6 temperatures are below that value.
+    sample_phase: 'The condensed reservoir is solid mullite throughout the measured 1833–2033 K range: the maximum measured
+      temperature, 2033 K, is below the printed incongruent melting point of 2163 ± 4 K (p. 478).'
     cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
       400:1; no separate orifice material is stated.
     table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures

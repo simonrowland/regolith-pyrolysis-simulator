@@ -1509,6 +1509,22 @@ def test_overhead_product_partials_use_mole_fractions_not_mass_fractions():
     assert gas.composition["Na"] > gas.composition["Fe"]
 
 
+def test_overhead_oxide_proxy_includes_formula_resolved_mno():
+    from engines.builtin.overhead_gas_equilibrium import (
+        BuiltinOverheadGasEquilibriumProvider,
+    )
+    from benchmarks.melt_activity_benchmark import _oxide_mole_fractions
+
+    composition = {"SiO2": 50.0, "MnO": 50.0}
+    expected = _oxide_mole_fractions(composition)
+
+    assert BuiltinOverheadGasEquilibriumProvider._oxide_activity_proxy_gamma_1(
+        composition
+    ) == pytest.approx(expected)
+    assert expected["SiO2"] == pytest.approx(0.5414213110781737)
+    assert expected["MnO"] == pytest.approx(0.4585786889218264)
+
+
 def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
     sim = _gas_train_sim()
     sim.vapor_pressures["oxide_vapors"]["FeO"] = {

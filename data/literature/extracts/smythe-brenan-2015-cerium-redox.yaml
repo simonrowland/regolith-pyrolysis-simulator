@@ -1,0 +1,1770 @@
+schema_version: literature_extract.v1
+source_id: smythe-brenan-2015-cerium-redox
+source:
+  citation: "Smythe, D. J. & Brenan, J. M. (2015), Cerium oxidation state in silicate melts, Geochimica et Cosmochimica Acta 170:173-187."
+  doi: 10.1016/j.gca.2015.07.016
+  url: https://doi.org/10.1016/j.gca.2015.07.016
+  year: 2015
+extraction:
+  method: "Table 3 EPMA glass oxide wt% values, totals, Ce valence ratios and parenthetical widths transcribed from the paper. Table 3 oxide wt% is converted to row mole fractions; Table 1 compositions remain labelled starting-material records. The authors infer that the hydrous Ce ratios were not shifted during quench and state in Section 5.2 that the measured glass ratios represent those at temperature. Table 2 log fO2 is absolute log10(fO2/1 bar); Ru and Ir are retained as the imposing noble-metal oxide assemblages. Its eight hydrous H2O values are determined by difference from EPMA totals. Printed pressure in GPa is converted to Pa using the exact SI factor. Confidence level for parenthetical widths is not stated. Figure-only candidates are not extracted."
+  date: '2026-10-16'
+  worker: rdxw2-ce15
+review_status: draft
+corrections: []
+fidelity_samples:
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[0].value
+    value: -0.15
+    locator: {table: '3', pdf_page_index: 38, row: DS11-C38}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[4].value
+    value: -0.41
+    locator: {table: '3', pdf_page_index: 38, row: DS09-C2-13}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[10].value
+    value: -2.57
+    locator: {table: '3', pdf_page_index: 39, row: DS11-C66}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[21].value
+    value: -1.93
+    locator: {table: '3', pdf_page_index: 39, row: DS09-C3-15}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[27].value
+    value: -1.68
+    locator: {table: '3', pdf_page_index: 40, row: DS11-C22}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[36].value
+    value: -2.98
+    locator: {table: '3', pdf_page_index: 40, row: DS09-C3-14}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[44].value
+    value: -1.12
+    locator: {table: '3', pdf_page_index: 40, row: DS09-C3-04}
+species:
+  Ce:
+    observations:
+      - observation_id: smythe_brenan_2015_table3_ce_log_ratio
+        type: concentration_series
+        locator:
+          table: '3'
+          note: Table 3; point locators carry exact PDF pages.
+        derivation:
+          relation: "Table 3 ratios are reported as measured reduced: anhydrous rows by potentiometry (Fig. 3); hydrous rows by Ce M4,5-edge XANES corrected by Eq. 10 (section 4.4)."
+          locator: {table: '3', note: Empirically calibrated ratios reported in Table 3.}
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {table: '3', note: Raw calibration inputs are not printed for these reported ratios.}
+        phase: glass
+        standard_state: "Ce4+/Ce3+ as printed in log10 form"
+        units: log10 ratio
+        uncertainty:
+          note: Table 3 parenthetical widths as printed; confidence level not stated.
+        values:
+          quantity: log10_Ce4plus_over_Ce3plus
+          method_class: measured_reduced
+          compositions_as_published_wt_pct:
+            RH08:
+              SiO2: 72.1
+              TiO2: 0.3
+              Al2O3: 14.8
+              MgO: 0.7
+              CaO: 1.7
+              Na2O: 6.4
+              K2O: 3.9
+              P2O5: 0.1
+            AA08:
+              SiO2: 61.5
+              TiO2: 0.6
+              Al2O3: 18.7
+              MgO: 4.2
+              CaO: 11.5
+              Na2O: 2.8
+              K2O: 0.7
+            BH09:
+              SiO2: 51.7
+              TiO2: 1.1
+              Al2O3: 16.8
+              MgO: 11.9
+              CaO: 15.9
+              Na2O: 2.6
+          compositions_mole_fraction_from_table1:
+            RH08: &rh08
+              SiO2: '0.7782292817542516198257140579'
+              TiO2: '0.002436063871078598050680098485'
+              Al2O3: '0.09413594197732396289121338376'
+              MgO: '0.01126351137559419770761349129'
+              CaO: '0.01966020589595715219843866275'
+              Na2O: '0.06696726381623317691814180992'
+              K2O: '0.02685084158737774411042934968'
+              P2O5: '0.0004568897221835482977691464399'
+            AA08: &aa08
+              SiO2: '0.6493202205495891163875579532'
+              TiO2: '0.004765738135699231829311187569'
+              Al2O3: '0.1163447719686480507773717569'
+              MgO: '0.06610534273157339346803210520'
+              CaO: '0.1300913706863663603996045582'
+              Na2O: '0.02865841193156538430416210164'
+              K2O: '0.004714143996558462833960337083'
+            BH09: &bh09
+              SiO2: '0.5184327210510110696775922091'
+              TiO2: '0.008298310094803038132017666168'
+              Al2O3: '0.09927333171358709135598353555'
+              MgO: '0.1778903058366683934128291306'
+              CaO: '0.1708306617033230094822128676'
+              Na2O: '0.02527466960060739793936459085'
+          series:
+            - sample: DS11-C38
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1476
+              value: -0.15
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 71.05
+                TiO2: 0.32
+                Al2O3: 14.62
+                MgO: 0.66
+                CaO: 1.79
+                Na2O: 6.57
+                K2O: 3.79
+                P2O5: 0.14
+                Ce2O3: 0.92
+                total: 99.90
+              composition_mol:
+                SiO2: '0.7737799555621544722339796179'
+                TiO2: '0.002621793513431659889764706858'
+                Al2O3: '0.09382578791881604980865367717'
+                MgO: '0.01071521248721783827934250375'
+                CaO: '0.02088686508734044830004726988'
+                Na2O: '0.06936318718470431424973726432'
+                K2O: '0.02632774091296899648822705782'
+                P2O5: '0.0006453874477623251825546994838'
+                Ce2O3: '0.001834069885603895567693202693'
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1476}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C40
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1474
+              value: -0.05
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 71.23
+                TiO2: 0.25
+                Al2O3: 14.37
+                MgO: 0.64
+                CaO: 1.83
+                Na2O: 6.49
+                K2O: 3.76
+                P2O5: 0.09
+                Ce2O3: 0.94
+                total: 99.63
+              composition_mol:
+                SiO2: '0.7767649764264545656667356508'
+                TiO2: '0.002050981830599783529701214884'
+                Al2O3: '0.09234319861312929748713598007'
+                MgO: '0.01040423430890681772764351103'
+                CaO: '0.02138181749655356780854705517'
+                Na2O: '0.06860909104446799267492970096'
+                K2O: '0.02615384397008787822847135537'
+                P2O5: '0.0004154399777051194051380401496'
+                Ce2O3: '0.001876416332094977471697491132'
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1474}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C41
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1478
+              value: -0.19
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 71.15
+                TiO2: 0.18
+                Al2O3: 14.56
+                MgO: 0.64
+                CaO: 1.81
+                Na2O: 6.36
+                K2O: 3.71
+                P2O5: 0.11
+                Ce2O3: 0.97
+                total: 99.55
+              composition_mol:
+                SiO2: '0.7774702778107405439935843082'
+                TiO2: '0.001479709660492434169389230602'
+                Al2O3: '0.09375441326646372862527492195'
+                MgO: '0.01042539032554613867392447638'
+                CaO: '0.02119113914634868349335587188'
+                Na2O: '0.06737151045495811604262621359'
+                K2O: '0.02585852763650536317932431419'
+                P2O5: '0.0005087924541533068620476028484'
+                Ce2O3: '0.001940239244791684960473060855'
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1478}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C44
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1473
+              value: -0.15
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 71.60
+                TiO2: 0.25
+                Al2O3: 14.30
+                MgO: 0.63
+                CaO: 1.74
+                Na2O: 6.45
+                K2O: 3.73
+                P2O5: 0.14
+                Ce2O3: 0.94
+                total: 99.82
+              composition_mol:
+                SiO2: '0.7792645552287680945506724593'
+                TiO2: '0.002046949000872022927695726297'
+                Al2O3: '0.09171268169801051794113471630'
+                MgO: '0.01022153003487750992515522865'
+                CaO: '0.02029027748282402610601013043'
+                Na2O: '0.06805215664042624038759180934'
+                K2O: '0.02589415389639526833436651156'
+                P2O5: '0.0006449692686680742643558109356'
+                Ce2O3: '0.001872726749158245563017607077'
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1473}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C2-13
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1572
+              value: -0.41
+              sigma: 0.01
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 72.34
+                TiO2: 0.37
+                Al2O3: 14.35
+                MgO: 0.66
+                CaO: 1.83
+                Na2O: 6.06
+                K2O: 3.55
+                P2O5: 0.09
+                Ce2O3: 1.17
+                total: 100.48
+              composition_mol:
+                SiO2: '0.7828119102976701241280545345'
+                TiO2: '0.003012144190856892371157428384'
+                Al2O3: '0.09150656981931973256400290279'
+                MgO: '0.01064697697699098795685506983'
+                CaO: '0.02121762881631857588790990393'
+                Na2O: '0.06357140680558171446145159543'
+                K2O: '0.02450350811416477672566539986'
+                P2O5: '0.0004122498587329014189278969669'
+                Ce2O3: '0.002317605120364294485975267923'
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1572}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-10
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1571
+              value: -0.99
+              sigma: 0.03
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 71.44
+                TiO2: 0.25
+                Al2O3: 14.36
+                MgO: 0.7
+                CaO: 1.84
+                Na2O: 6.39
+                K2O: 3.65
+                P2O5: 0.09
+                Ce2O3: 1.10
+                total: 99.87
+              composition_mol:
+                SiO2: '0.7776435062888952425202957711'
+                TiO2: '0.002047265773220915280202813676'
+                Al2O3: '0.09211174255383198298427299843'
+                MgO: '0.01135901316840034529549210004'
+                CaO: '0.02145970583305459472265773867'
+                Na2O: '0.06742954666088614537629812312'
+                K2O: '0.02534270456669961891276881965'
+                P2O5: '0.0004146872656276182086894104403'
+                Ce2O3: '0.002191827889383536699322224323'
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1571}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -2.73}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-05
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1571
+              value: -1.63
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 71.42
+                TiO2: 0.22
+                Al2O3: 14.16
+                MgO: 0.68
+                CaO: 1.90
+                Na2O: 6.36
+                K2O: 3.76
+                P2O5: 0.12
+                Ce2O3: 1.17
+                total: 99.84
+              composition_mol:
+                SiO2: '0.7779284591534260298910791485'
+                TiO2: '0.001802758732385782896391100171'
+                Al2O3: '0.09088757618042038348932739836'
+                MgO: '0.01104160446404525319997419005'
+                CaO: '0.02217380644696189026998070973'
+                Na2O: '0.06715636908468623108901473891'
+                K2O: '0.02612333689245301902908005011'
+                P2O5: '0.0005532738518843196480932094838'
+                Ce2O3: '0.002332815193737090487059454567'
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1571}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -6.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-19
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1672
+              value: -0.60
+              sigma: 0.03
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 72.01
+                TiO2: 0.30
+                Al2O3: 14.29
+                MgO: 0.69
+                CaO: 1.89
+                Na2O: 6.04
+                K2O: 3.51
+                P2O5: 0.08
+                Ce2O3: 1.18
+                total: 100.04
+              composition_mol:
+                SiO2: '0.7822570981610229222484350906'
+                TiO2: '0.002451732418690295962347135988'
+                Al2O3: '0.09147667805479164685538255278'
+                MgO: '0.01117401503878054585588438458'
+                CaO: '0.02199810868266513826196902269'
+                Na2O: '0.06360685432813314281059921466'
+                K2O: '0.02432118944556641391194909299'
+                P2O5: '0.0003678627172112160511598290895'
+                Ce2O3: '0.002346461153138678042273675806'
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-24
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1672
+              value: -1.58
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 72.09
+                TiO2: 0.30
+                Al2O3: 14.38
+                MgO: 0.71
+                CaO: 1.91
+                Na2O: 6.02
+                K2O: 3.64
+                P2O5: 0.11
+                Ce2O3: 1.18
+                total: 100.38
+              composition_mol:
+                SiO2: '0.7809161846777590948288415213'
+                TiO2: '0.002444813675719985116092378273'
+                Al2O3: '0.09179303698641432209611486240'
+                MgO: '0.01146545267550593770847141983'
+                CaO: '0.02216815773809400730688721895'
+                Na2O: '0.06321733261557816700615030666'
+                K2O: '0.02515079830089058884279282536'
+                P2O5: '0.0005043838463296286473961463293'
+                Ce2O3: '0.002339839483708268447253322006'
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -4.30}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-32
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1672
+              value: -2.09
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 71.83
+                TiO2: 0.28
+                Al2O3: 14.27
+                MgO: 0.72
+                CaO: 1.92
+                Na2O: 6.43
+                K2O: 3.53
+                P2O5: 0.06
+                Ce2O3: 1.17
+                total: 100.26
+              composition_mol:
+                SiO2: '0.7781835498420871379935999336'
+                TiO2: '0.002282071903870391968505088824'
+                Al2O3: '0.09110067757343985986361262515'
+                MgO: '0.01162819042011767489282829262'
+                CaO: '0.02228662192782175589959688243'
+                Na2O: '0.06753010581582601725406478781'
+                K2O: '0.02439337416303374712578499207'
+                P2O5: '0.0002751480983866574741214215366'
+                Ce2O3: '0.002320260255416757527885975889'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -6.31}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C66
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1672
+              value: -2.57
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 71.88
+                TiO2: 0.3
+                Al2O3: 14.76
+                MgO: 0.73
+                CaO: 1.99
+                Na2O: 5.62
+                K2O: 3.56
+                P2O5: 0.07
+                Ce2O3: 1.03
+                total: 99.97
+              composition_mol:
+                SiO2: '0.7816364032012699343475419349'
+                TiO2: '0.002454217661624834012226776366'
+                Al2O3: '0.09458113495193647729998655778'
+                MgO: '0.01183376739185003795505316189'
+                CaO: '0.02318550838762642011941054220'
+                Na2O: '0.05924385393826075071404294569'
+                K2O: '0.02469264994056961724524676030'
+                P2O5: '0.0003222061569226748702726467523'
+                Ce2O3: '0.002050258369939253436218674564'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -9.31}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C36
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1773
+              value: -0.82
+              sigma: 0.03
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 72.11
+                TiO2: 0.34
+                Al2O3: 14.52
+                MgO: 0.65
+                CaO: 1.82
+                Na2O: 6.16
+                K2O: 3.59
+                P2O5: 0.02
+                Ce2O3: 0.98
+                total: 100.20
+              composition_mol:
+                SiO2: '0.7813373527955786966268966184'
+                TiO2: '0.002771514285981935217733645891'
+                Al2O3: '0.09271097792444072928389763353'
+                MgO: '0.01049928940730344357199938255'
+                CaO: '0.02112911547981315451231056086'
+                Na2O: '0.06470443975356672853882430269'
+                K2O: '0.02481181488105322546693914792'
+                P2O5: '0.00009173016456758184549936862621'
+                Ce2O3: '0.001943765307694504935899339753'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1773}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C24
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1772
+              value: -1.58
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 71.23
+                TiO2: 0.33
+                Al2O3: 14.59
+                MgO: 0.65
+                CaO: 1.79
+                Na2O: 5.93
+                K2O: 3.64
+                P2O5: 0.13
+                Ce2O3: 1.02
+                total: 99.37
+              composition_mol:
+                SiO2: '0.7803900008269865482510301725'
+                TiO2: '0.002719930486812912769683755196'
+                Al2O3: '0.09419448980713454865987820563'
+                MgO: '0.01061611385395641841158825657'
+                CaO: '0.02101205941989238463660203269'
+                Na2O: '0.06298160487053071438777280119'
+                K2O: '0.02543730679045744313852937208'
+                P2O5: '0.0006028804345932542334565195947'
+                Ce2O3: '0.002045613509635775511458884847'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1772}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -2.40}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C28
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1772
+              value: -1.83
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 72.16
+                TiO2: 0.29
+                Al2O3: 14.55
+                MgO: 0.66
+                CaO: 1.75
+                Na2O: 5.37
+                K2O: 3.53
+                P2O5: 0.07
+                Ce2O3: 0.98
+                total: 99.41
+              composition_mol:
+                SiO2: '0.7888278085243379385117295535'
+                TiO2: '0.002384947366432146678278337690'
+                Al2O3: '0.09372816955643451097186681877'
+                MgO: '0.01075556136614045669669662548'
+                CaO: '0.02049701288100665221930408139'
+                Na2O: '0.05690759752686410319907906029'
+                K2O: '0.02461395406026597414998478667'
+                P2O5: '0.0003239088495736770254823275030'
+                Ce2O3: '0.001961039868944540547578409261'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1772}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -6.77}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS08-C1-02
+              instrument: Ce M4,5-edge XANES corrected by Eq. 10 (section 4.4)
+              H2O_wt_pct: 9.1
+              T_K: 1373
+              value: -1.47
+              sigma: 0.11
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 65.44
+                TiO2: 0.31
+                Al2O3: 13.19
+                MgO: 0.64
+                CaO: 1.62
+                Na2O: 5.11
+                K2O: 3.40
+                P2O5: 0.11
+                Ce2O3: 1.03
+                total: 90.89
+              composition_mol:
+                SiO2: '0.7837769258628394930526851914'
+                TiO2: '0.002793225449316302217919119578'
+                Al2O3: '0.09309265857263686258880798617'
+                MgO: '0.01142701023240899366794864758'
+                CaO: '0.02078887726528254410119836519'
+                Na2O: '0.05933082142623268794381753116'
+                K2O: '0.02597461342050214319153787093'
+                P2O5: '0.0005576747151169856627797122415'
+                Ce2O3: '0.002258193055663987573305575793'
+              noble_metal_oxide_buffer_as_published: Ru
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                H2O_wt_pct:
+                  state: {tag: value, value: 9.1}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                temperature_K:
+                  state: {tag: value, value: 1373}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -2.72}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS08-C1-20
+              instrument: Ce M4,5-edge XANES corrected by Eq. 10 (section 4.4)
+              H2O_wt_pct: 6.1
+              T_K: 1373
+              value: -0.56
+              sigma: 0.11
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 67.42
+                TiO2: 0.26
+                Al2O3: 13.38
+                MgO: 0.63
+                CaO: 1.72
+                Na2O: 5.82
+                K2O: 3.43
+                P2O5: 0.10
+                Ce2O3: 1.05
+                total: 93.85
+              composition_mol:
+                SiO2: '0.7808068579175054619630884344'
+                TiO2: '0.002265287519081758271609695379'
+                Al2O3: '0.09131296373743333171944157273'
+                MgO: '0.01087674331410345922413963898'
+                CaO: '0.02134273909526318387473168685'
+                Na2O: '0.06534135456367560042510784213'
+                K2O: '0.02533786299059223007811697322'
+                P2O5: '0.0004902233085353589662240711292'
+                Ce2O3: '0.002225967553809615477540084911'
+              noble_metal_oxide_buffer_as_published: Ir
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                H2O_wt_pct:
+                  state: {tag: value, value: 6.1}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                temperature_K:
+                  state: {tag: value, value: 1373}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.06}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C3-37
+              instrument: Ce M4,5-edge XANES corrected by Eq. 10 (section 4.4)
+              H2O_wt_pct: 7.3
+              T_K: 1573
+              value: -1.62
+              sigma: 0.11
+              sample_composition_as_published: RH08
+              composition_wt_pct:
+                SiO2: 66.63
+                TiO2: 0.34
+                Al2O3: 13.18
+                MgO: 0.58
+                CaO: 1.61
+                Na2O: 5.57
+                K2O: 3.56
+                Ce2O3: 1.01
+                total: 92.62
+              composition_mol:
+                SiO2: '0.7829848990705265874073588935'
+                TiO2: '0.003005782857192725511973441731'
+                Al2O3: '0.09126840011594776866962704073'
+                MgO: '0.01016049872265081508097139504'
+                CaO: '0.02027105194131242716639429436'
+                Na2O: '0.06345254501714618015535252851'
+                K2O: '0.02668422311992971202629490153'
+                Ce2O3: '0.002172599155293783982027504839'
+              noble_metal_oxide_buffer_as_published: Ru
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                H2O_wt_pct:
+                  state: {tag: value, value: 7.3}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                temperature_K:
+                  state: {tag: value, value: 1573}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -1.30}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C2-09
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1572
+              value: -0.44
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 59.70
+                TiO2: 0.55
+                Al2O3: 17.76
+                MgO: 3.88
+                CaO: 11.27
+                Na2O: 2.72
+                K2O: 0.67
+                Ce2O3: 1.08
+                total: 97.64
+              composition_mol:
+                SiO2: '0.6510328749821818071594357351'
+                TiO2: '0.004512179739901312995780506804'
+                Al2O3: '0.1141282096183480291616538701'
+                MgO: '0.06307594606073871513511311678'
+                CaO: '0.1316798557058638716640810928'
+                Na2O: '0.02875462911035453526305294363'
+                K2O: '0.004660412769738256502491851922'
+                Ce2O3: '0.002155892012873472118390883453'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1572}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C50
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1574
+              value: -0.57
+              sigma: 0.02
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 61.53
+                TiO2: 0.58
+                Al2O3: 18.42
+                MgO: 3.96
+                CaO: 11.59
+                Na2O: 2.66
+                K2O: 0.7
+                Ce2O3: 0.95
+                total: 100.43
+              composition_mol:
+                SiO2: '0.6522069181031670685738035645'
+                TiO2: '0.004625104960311184242751734189'
+                Al2O3: '0.1150560781544707339524547566'
+                MgO: '0.06257446297427485630790365267'
+                CaO: '0.1316281445747435562349419540'
+                Na2O: '0.02733319505016148645905218000'
+                K2O: '0.004732793093320357717183749334'
+                Ce2O3: '0.001843303089550756511908407990'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1574}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.01}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-08
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1571
+              value: -1.26
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 61.01
+                TiO2: 0.69
+                Al2O3: 17.96
+                MgO: 4.02
+                CaO: 11.74
+                Na2O: 2.80
+                K2O: 0.66
+                Ce2O3: 1.15
+                total: 100.05
+              composition_mol:
+                SiO2: '0.6488362673419785750618766836'
+                TiO2: '0.005520498500001860031229245899'
+                Al2O3: '0.1125542449743368029594458873'
+                MgO: '0.06373288885141932820004118588'
+                CaO: '0.1337731724760724586470406368'
+                Na2O: '0.02886704979436282346848100930'
+                K2O: '0.004477122941151995159503767979'
+                Ce2O3: '0.002238755120676156472381583323'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1571}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -2.73}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-06
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1574
+              value: -2.01
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 60.84
+                TiO2: 0.58
+                Al2O3: 17.90
+                MgO: 4.09
+                CaO: 11.75
+                Na2O: 2.83
+                K2O: 0.67
+                Ce2O3: 1.16
+                total: 99.87
+              composition_mol:
+                SiO2: '0.6479638072918897405046217960'
+                TiO2: '0.004647128162782090105304824463'
+                Al2O3: '0.1123404162344868352341516275'
+                MgO: '0.06493641527183148380087603633'
+                CaO: '0.1340806934174546703861926399'
+                Na2O: '0.02921852286576724593367070406'
+                K2O: '0.004551529253339389994098739107'
+                Ce2O3: '0.002261487502448544041083632201'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1574}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -6.01}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-15
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1574
+              value: -1.93
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 60.64
+                TiO2: 0.60
+                Al2O3: 18.32
+                MgO: 4.13
+                CaO: 11.55
+                Na2O: 2.86
+                K2O: 0.65
+                Ce2O3: 1.20
+                total: 99.96
+              composition_mol:
+                SiO2: '0.6463050273912532291044300927'
+                TiO2: '0.004810882004636369523837158737'
+                Al2O3: '0.1150602372962964792750759003'
+                MgO: '0.06561933915038091681751115849'
+                CaO: '0.1318946449976007925162888109'
+                Na2O: '0.02954980725720667842148322981'
+                K2O: '0.004418884911559640680559310337'
+                Ce2O3: '0.002341176991065893660814339143'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1574}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -7.28}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-18
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1672
+              value: -0.87
+              sigma: 0.03
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 60.99
+                TiO2: 0.60
+                Al2O3: 18.08
+                MgO: 4.11
+                CaO: 11.74
+                Na2O: 2.88
+                K2O: 0.65
+                Ce2O3: 1.21
+                total: 100.29
+              composition_mol:
+                SiO2: '0.6472514816586850751587837547'
+                TiO2: '0.004790278722311285361776133519'
+                Al2O3: '0.1130665916040456004814834918'
+                MgO: '0.06502190674816710542663305597'
+                CaO: '0.1334901909650352091808196085'
+                Na2O: '0.02962901306518763690402757499'
+                K2O: '0.004399960412204392128752353034'
+                Ce2O3: '0.002350576824363695357724027069'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-23
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1674
+              value: -1.72
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 61.21
+                TiO2: 0.65
+                Al2O3: 18.17
+                MgO: 4.08
+                CaO: 11.72
+                Na2O: 2.79
+                K2O: 0.67
+                Ce2O3: 1.21
+                total: 100.54
+              composition_mol:
+                SiO2: '0.6484163366358982787683311729'
+                TiO2: '0.005180122601752722787524660822'
+                Al2O3: '0.1134247812907246416666546902'
+                MgO: '0.06443104733574996633801114261'
+                CaO: '0.1330227794316567273642880412'
+                Na2O: '0.02865141332296333435455337750'
+                K2O: '0.004527175846603604343354764154'
+                Ce2O3: '0.002346343534650724377282151338'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1674}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -4.29}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-29
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1674
+              value: -2.33
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 60.91
+                TiO2: 0.60
+                Al2O3: 17.89
+                MgO: 4.10
+                CaO: 11.69
+                Na2O: 2.74
+                K2O: 0.64
+                Ce2O3: 1.13
+                total: 99.74
+              composition_mol:
+                SiO2: '0.6492770490669340116322046165'
+                TiO2: '0.004811581159413446188748111432'
+                Al2O3: '0.1123759165906241060863711405'
+                MgO: '0.06515215239661385997435773413'
+                CaO: '0.1335127682614002813118912743'
+                Na2O: '0.02831406942725434448822541673'
+                K2O: '0.004351534373682619342325888337'
+                Ce2O3: '0.002204928724077330975875818261'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1674}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -6.30}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C63
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1672
+              value: -3.04
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 61.36
+                TiO2: 0.56
+                Al2O3: 18.09
+                MgO: 3.94
+                CaO: 11.7
+                Na2O: 2.42
+                K2O: 0.72
+                Ce2O3: 0.96
+                total: 99.79
+              composition_mol:
+                SiO2: '0.6539368655561554520078413934'
+                TiO2: '0.004489868387788248865542577365'
+                Al2O3: '0.1136084126115487319303247829'
+                MgO: '0.06259651447372254228787280458'
+                CaO: '0.1335989883760368086033349699'
+                Na2O: '0.02500207848541465764078508730'
+                K2O: '0.004894450710036769173960539060'
+                Ce2O3: '0.001872821399296789490337844916'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -9.31}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C34
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1773
+              value: -1.03
+              sigma: 0.09
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 60.96
+                TiO2: 0.68
+                Al2O3: 18.01
+                MgO: 3.93
+                CaO: 11.77
+                Na2O: 2.83
+                K2O: 0.72
+                Ce2O3: 0.96
+                total: 99.89
+              composition_mol:
+                SiO2: '0.6489775128788791203430104890'
+                TiO2: '0.005446138935627828663532725636'
+                Al2O3: '0.1129847574693296062339713439'
+                MgO: '0.06237071172139869299636190148'
+                CaO: '0.1342542339190492582877928041'
+                Na2O: '0.02920662696183210300236169815'
+                K2O: '0.004889204235148799039592170530'
+                Ce2O3: '0.001870813878734591433376867558'
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1773}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C22
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1772
+              value: -1.68
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 51.58
+                TiO2: 1.20
+                Al2O3: 16.27
+                MgO: 11.35
+                CaO: 16.22
+                Na2O: 2.14
+                Ce2O3: 1.09
+                total: 99.88
+              composition_mol:
+                SiO2: '0.5228951558396730898077258865'
+                TiO2: '0.009151865733967484900520771035'
+                Al2O3: '0.09719463386831875271066542654'
+                MgO: '0.1715270432250646050626496368'
+                CaO: '0.1761777130255205453834727846'
+                Na2O: '0.02103087450357872861877193013'
+                Ce2O3: '0.002022713803876793516193564597'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1772}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -2.40}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS08-C1-09
+              instrument: Ce M4,5-edge XANES corrected by Eq. 10 (section 4.4)
+              H2O_wt_pct: 6.1
+              T_K: 1573
+              value: -0.94
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 57.36
+                TiO2: 0.54
+                Al2O3: 17.01
+                MgO: 3.72
+                CaO: 10.87
+                Na2O: 2.65
+                K2O: 0.66
+                Ce2O3: 1.17
+                total: 93.95
+              composition_mol:
+                SiO2: '0.6504426561853274959189875377'
+                TiO2: '0.004606687422633529953078570533'
+                Al2O3: '0.1136647078716088689853826917'
+                MgO: '0.06288488499221159719896134436'
+                CaO: '0.1320675902401319124393438565'
+                Na2O: '0.02913104229377768347483865681'
+                K2O: '0.004773806373941146067602143709'
+                Ce2O3: '0.002428624620367765961805198797'
+              noble_metal_oxide_buffer_as_published: Ir
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                H2O_wt_pct:
+                  state: {tag: value, value: 6.1}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                temperature_K:
+                  state: {tag: value, value: 1573}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 1.08}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C2-06
+              instrument: Ce M4,5-edge XANES corrected by Eq. 10 (section 4.4)
+              H2O_wt_pct: 7.2
+              T_K: 1573
+              value: -1.09
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 56.11
+                TiO2: 0.64
+                Al2O3: 16.57
+                MgO: 3.56
+                CaO: 10.68
+                Na2O: 3.34
+                K2O: 0.65
+                Ce2O3: 1.08
+                total: 92.67
+              composition_mol:
+                SiO2: '0.6452688900918871935443725182'
+                TiO2: '0.005537013033806201252758965205'
+                Al2O3: '0.1122908634914086213672651059'
+                MgO: '0.06103148196999517946666573618'
+                CaO: '0.1315947455811840234267125486'
+                Na2O: '0.03723550113505798512423823104'
+                K2O: '0.004767984200963971031149819357'
+                Ce2O3: '0.002273520495696824786837075100'
+              noble_metal_oxide_buffer_as_published: Ir
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                H2O_wt_pct:
+                  state: {tag: value, value: 7.2}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                temperature_K:
+                  state: {tag: value, value: 1573}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 1.08}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C3-22
+              instrument: Ce M4,5-edge XANES corrected by Eq. 10 (section 4.4)
+              H2O_wt_pct: 6.0
+              T_K: 1673
+              value: -1.02
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_wt_pct:
+                SiO2: 57.3
+                TiO2: 0.60
+                Al2O3: 16.87
+                MgO: 3.73
+                CaO: 10.95
+                Na2O: 2.91
+                K2O: 0.60
+                Ce2O3: 1.07
+                total: 94.07
+              composition_mol:
+                SiO2: '0.6483012847491401116201077447'
+                TiO2: '0.005107032527282798272670331922'
+                Al2O3: '0.1124757239965534801081961213'
+                MgO: '0.06291215346334829262168452675'
+                CaO: '0.1327404290251581186609884257'
+                Na2O: '0.03191725453680150779531449053'
+                K2O: '0.004330065871351110710551406424'
+                Ce2O3: '0.002216055830364580210486952983'
+              noble_metal_oxide_buffer_as_published: Ir
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                H2O_wt_pct:
+                  state: {tag: value, value: 6.0}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                temperature_K:
+                  state: {tag: value, value: 1673}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 1.54}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C2-12
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1572
+              value: -1.09
+              sigma: 0.07
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 51.88
+                TiO2: 1.01
+                Al2O3: 16.39
+                MgO: 11.46
+                CaO: 16.29
+                Na2O: 2.11
+                Ce2O3: 1.13
+                total: 100.31
+              composition_mol:
+                SiO2: '0.5235744805817346916233794186'
+                TiO2: '0.007668227521172194233217566950'
+                Al2O3: '0.09747178316633277442643861296'
+                MgO: '0.1724116387880981317068412363'
+                CaO: '0.1761434202483328140259914996'
+                Na2O: '0.02064292507395941667169504802'
+                Ce2O3: '0.002087524620369977312436617315'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1572}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C49
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1574
+              value: -0.93
+              sigma: 0.02
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 51.86
+                TiO2: 1.17
+                Al2O3: 16.38
+                MgO: 11.28
+                CaO: 16.30
+                Na2O: 2.14
+                Ce2O3: 1.12
+                total: 100.29
+              composition_mol:
+                SiO2: '0.5240913899007262673315159631'
+                TiO2: '0.008895195294465948961088618795'
+                Al2O3: '0.09754608963952942280420988269'
+                MgO: '0.1699366572665617290516948086'
+                CaO: '0.1764935970479254653069846524'
+                Na2O: '0.02096517846302753258573109709'
+                Ce2O3: '0.002071892387763633958774977376'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1574}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -0.01}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-07
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1572
+              value: -1.46
+              sigma: 0.09
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 51.65
+                TiO2: 1.05
+                Al2O3: 16.28
+                MgO: 11.53
+                CaO: 16.28
+                Na2O: 2.24
+                Ce2O3: 1.11
+                total: 100.19
+              composition_mol:
+                SiO2: '0.5215097717718647411156267120'
+                TiO2: '0.007975841904617089911944874962'
+                Al2O3: '0.09686524463076371746027364649'
+                MgO: '0.1735501090782002496142534564'
+                CaO: '0.1761219002652870931120823886'
+                Na2O: '0.02192554617817027256972536501'
+                Ce2O3: '0.002051586171096836216093557129'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1572}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -2.73}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-03
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1571
+              value: -2.09
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 51.52
+                TiO2: 0.95
+                Al2O3: 16.26
+                MgO: 11.40
+                CaO: 16.24
+                Na2O: 2.28
+                Ce2O3: 1.12
+                total: 99.8
+              composition_mol:
+                SiO2: '0.5223758354351002862738568515'
+                TiO2: '0.007246460728378005794128945019'
+                Al2O3: '0.09715143506123941945056581968'
+                MgO: '0.1723120045867138049071382078'
+                CaO: '0.1764249840268091590193296800'
+                Na2O: '0.02241054143649983070774255312'
+                Ce2O3: '0.002078738725259493847237942884'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1571}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -5.32}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-13
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1574
+              value: -2.83
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 51.57
+                TiO2: 1.09
+                Al2O3: 16.60
+                MgO: 11.61
+                CaO: 16.14
+                Na2O: 2.17
+                Ce2O3: 1.10
+                total: 100.30
+              composition_mol:
+                SiO2: '0.5205010919537795442770744633'
+                TiO2: '0.008276488667793044021212647427'
+                Al2O3: '0.09873111827647720552210615758'
+                MgO: '0.1746868414757183446939876045'
+                CaO: '0.1745399637539033112780730503'
+                Na2O: '0.02123217696128794919556951908'
+                Ce2O3: '0.002032318911040601011976557690'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1574}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -7.28}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-14
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1575
+              value: -2.98
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 51.32
+                TiO2: 1.00
+                Al2O3: 16.48
+                MgO: 11.46
+                CaO: 16.15
+                Na2O: 2.23
+                Ce2O3: 1.12
+                total: 99.81
+              composition_mol:
+                SiO2: '0.5208137272275615284263167511'
+                TiO2: '0.007634680867351608711982840239'
+                Al2O3: '0.09855404108338087138572636765'
+                MgO: '0.1733739530671416036449870801'
+                CaO: '0.1756042970853867759146538433'
+                Na2O: '0.02193870132552558697602486615'
+                Ce2O3: '0.002080599343652024940308251049'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1575}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -7.28}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-17
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1672
+              value: -1.04
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 51.35
+                TiO2: 1.06
+                Al2O3: 16.52
+                MgO: 11.54
+                CaO: 16.09
+                Na2O: 2.30
+                Ce2O3: 1.12
+                total: 100.04
+              composition_mol:
+                SiO2: '0.5199491820819082110937572418'
+                TiO2: '0.008074607670026648184481953348'
+                Al2O3: '0.09857163243137232656185022539'
+                MgO: '0.1741926071685255054207629304'
+                CaO: '0.1745594372059148494614754895'
+                Na2O: '0.02257660139321571175118231093'
+                Ce2O3: '0.002075932049036747526489847917'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-20
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1672
+              value: -2.47
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 52.23
+                TiO2: 1.07
+                Al2O3: 16.53
+                MgO: 11.52
+                CaO: 16.35
+                Na2O: 1.94
+                Ce2O3: 1.14
+                total: 100.82
+              composition_mol:
+                SiO2: '0.5246267333396418009602964227'
+                TiO2: '0.008085544696660512472828319548'
+                Al2O3: '0.09784185981313176620053688332'
+                MgO: '0.1724988997945075803788598403'
+                CaO: '0.1759604183216742775898685642'
+                Na2O: '0.01889045414920610069546769849'
+                Ce2O3: '0.002096089885177961702142271079'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -4.30}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-28
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1674
+              value: -2.80
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 51.62
+                TiO2: 1.08
+                Al2O3: 16.25
+                MgO: 11.60
+                CaO: 16.32
+                Na2O: 2.11
+                Ce2O3: 1.14
+                total: 100.17
+              composition_mol:
+                SiO2: '0.5211986105425477812103839231'
+                TiO2: '0.008203593226152949987436561945'
+                Al2O3: '0.09668521534422044523869532639'
+                MgO: '0.1746009882044099581298061544'
+                CaO: '0.1765518371146655883016166036'
+                Na2O: '0.02065275447914163884037669308'
+                Ce2O3: '0.002107001088861638291684737619'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1674}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -6.30}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C64
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1673
+              value: -3.57
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 51.99
+                TiO2: 0.92
+                Al2O3: 16.4
+                MgO: 11.61
+                CaO: 16.32
+                Na2O: 1.6
+                Ce2O3: 1.14
+                total: 100.01
+              composition_mol:
+                SiO2: '0.5256853384779303945634363660'
+                TiO2: '0.006998242506057191491607309347'
+                Al2O3: '0.09771727549536506775211263290'
+                MgO: '0.1750014817882476525773819571'
+                CaO: '0.1768043879110889296209949183'
+                Na2O: '0.01568325874623548322675958925'
+                Ce2O3: '0.002110015075075280767707227354'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1673}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -9.31}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C33
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1773
+              value: -1.28
+              sigma: 0.08
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 51.91
+                TiO2: 1.04
+                Al2O3: 16.50
+                MgO: 11.32
+                CaO: 16.18
+                Na2O: 2.15
+                Ce2O3: 1.09
+                total: 100.23
+              composition_mol:
+                SiO2: '0.5248185216247502150174066657'
+                TiO2: '0.007910183843676548486794370160'
+                Al2O3: '0.09830226471821430591382571386'
+                MgO: '0.1706113858207330015021285934'
+                CaO: '0.1752683424420059225750641476'
+                Na2O: '0.02107205360313869262606402352'
+                Ce2O3: '0.002017247947481313878716485556'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1773}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C21
+              instrument: potentiometric method (Fig. 3)
+              T_K: 1772
+              value: -1.96
+              sigma: 0.32
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 51.57
+                TiO2: 1.02
+                Al2O3: 16.28
+                MgO: 11.40
+                CaO: 16.23
+                Na2O: 2.12
+                Ce2O3: 1.15
+                total: 99.80
+              composition_mol:
+                SiO2: '0.5231261650841938723241422722'
+                TiO2: '0.007784031705405308155075309167'
+                Al2O3: '0.09731620536526208054699509212'
+                MgO: '0.1723922038228829101811045140'
+                CaO: '0.1763984109319944688882742096'
+                Na2O: '0.02084757043995001256898175052'
+                Ce2O3: '0.002135412650311347335426852775'
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1772}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -2.40}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-09
+              instrument: Ce M4,5-edge XANES corrected by Eq. 10 (section 4.4)
+              H2O_wt_pct: 2.8
+              T_K: 1573
+              value: -1.60
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 50.16
+                TiO2: 0.99
+                Al2O3: 15.86
+                MgO: 11.10
+                CaO: 15.81
+                Na2O: 2.18
+                Ce2O3: 1.05
+                total: 97.21
+              composition_mol:
+                SiO2: '0.5222661153257981426836582856'
+                TiO2: '0.007754693365890449131312603364'
+                Al2O3: '0.09731033313429904170736819337'
+                MgO: '0.1722902732390882823516607083'
+                CaO: '0.1763733765674065207261471046'
+                Na2O: '0.02200397248810157338531516892'
+                Ce2O3: '0.002001235879415990014537935455'
+              noble_metal_oxide_buffer_as_published: Ru
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                H2O_wt_pct:
+                  state: {tag: value, value: 2.8}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                temperature_K:
+                  state: {tag: value, value: 1573}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -1.30}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C3-04
+              instrument: Ce M4,5-edge XANES corrected by Eq. 10 (section 4.4)
+              H2O_wt_pct: 3.6
+              T_K: 1573
+              value: -1.12
+              sigma: 0.10
+              sample_composition_as_published: BH09
+              composition_wt_pct:
+                SiO2: 48.94
+                TiO2: 1.06
+                Al2O3: 16.18
+                MgO: 10.95
+                CaO: 15.32
+                Na2O: 2.84
+                Ce2O3: 1.13
+                total: 96.44
+              composition_mol:
+                SiO2: '0.5153202746703135382584595060'
+                TiO2: '0.008396808392973276041022024994'
+                Al2O3: '0.1003952663736999670537761185'
+                MgO: '0.1718821758933444750703065450'
+                CaO: '0.1728378548113207357122487843'
+                Na2O: '0.02898957726876494126584013677'
+                Ce2O3: '0.002178042589583066598346883999'
+              noble_metal_oxide_buffer_as_published: Ir
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                H2O_wt_pct:
+                  state: {tag: value, value: 3.6}
+                  locator: {table: '2', page: 38, pdf_page_index: 37}
+                temperature_K:
+                  state: {tag: value, value: 1573}
+                  locator: {table: '2', page: 38, pdf_page_index: 37}
+                fO2_log:
+                  state: {tag: value, value: 1.08}
+                  locator: {table: '2', page: 38, pdf_page_index: 37}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 38, pdf_page_index: 37, note: "Table 2 1 GPa converted to Pa."}

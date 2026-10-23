@@ -9,8 +9,14 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
+    - asset_id: pdf:gca-366-210-berry-2024
+      role: pdf
+      path: raw/gca-366-210-berry-2024/gca-366-210-berry-2024.pdf
+      sha256:
+        tag: value
+        value: 680c4494cc523213f9c266cb947b49dce2aa47e057763a37acbf9b2354869359
     - asset_id: unknown:gca-366-210-berry-2024
       role: pdftotext
       path: unknown
@@ -18,7 +24,42 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2023.11.014
-experiments: []
+experiments:
+- experiment_id: 10.1016/j.gca.2023.11.014::experiment::berry_2024_re_quenched_cmas_melts
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 214
+        table: '2'
+        note: Table 2 caption states 1400 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2023.11.014
+  locator:
+    page: 211
+    section: Experimental
 context:
 - observation_id: berry_2024_experimental_conditions
   type: experiment_series
@@ -108,6 +149,29 @@ context:
       AD+Wo: 117
       AD+En: 134
       AD+Qz: 106
+    additional_columns_as_printed:
+      AD:
+        optical_basicity_Lambda: 0.6094(10)
+        NBO_over_T: 0.917(13)
+        log_K_prime: '4.001'
+      AD+Fo:
+        optical_basicity_Lambda: 0.6127(12)
+        NBO_over_T: 1.204(18)
+        log_K_prime: '4.012'
+      AD+Wo:
+        optical_basicity_Lambda: 0.6345(14)
+        NBO_over_T: 1.435(20)
+        log_K_prime: '4.096'
+      AD+En:
+        optical_basicity_Lambda: 0.5986(14)
+        NBO_over_T: 1.271(26)
+        log_K_prime: '3.938'
+      AD+Qz:
+        optical_basicity_Lambda: 0.5633(10)
+        NBO_over_T: 0.532(12)
+        log_K_prime: '3.852'
+    additional_columns_note: log K′ is a fitted parameter; it is preserved here as reported, not treated as an independent
+      measurement.
   context_id: gca-366-210-berry-2024::context::berry_2024_glass_compositions_table1
   work_id: 10.1016/j.gca.2023.11.014
   source_id: gca-366-210-berry-2024
@@ -141,135 +205,11 @@ context:
     fixed_method_phrase: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly
       optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives
       pure-valence end-member spectra.
-    rows:
-    - logfO2_nom: −3.1
-      logfO2_cal: −3.10
-      delta_FMQ_cal: '3.29'
-      Ti3+_over_SumTi:
-        AD: '0.000'
-        AD+Fo: '0.000'
-        AD+Wo: '0.000'
-        AD+En: '0.000'
-        AD+Qz: '0.000'
-      method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises
-        the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence
-        end-member spectra.
-    - logfO2_nom: −9.4
-      logfO2_cal: −9.40
-      delta_FMQ_cal: −3.01
-      Ti3+_over_SumTi:
-        AD: '0.019'
-        AD+Fo: '0.023'
-        AD+Wo: '0.020'
-        AD+En: '0.032'
-        AD+Qz: '0.014'
-      method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises
-        the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence
-        end-member spectra.
-    - logfO2_nom: −11.0
-      logfO2_cal: −10.99
-      delta_FMQ_cal: −4.60
-      Ti3+_over_SumTi:
-        AD: '0.042'
-        AD+Fo: '0.042'
-        AD+Wo: '0.040'
-        AD+En: '0.058'
-        AD+Qz: '0.069'
-      method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises
-        the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence
-        end-member spectra.
-    - logfO2_nom: −12.0
-      logfO2_cal: −12.01
-      delta_FMQ_cal: −5.62
-      Ti3+_over_SumTi:
-        AD: '0.094'
-        AD+Fo: '0.087'
-        AD+Wo: '0.073'
-        AD+En: '0.109'
-        AD+Qz: '0.129'
-      method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises
-        the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence
-        end-member spectra.
-    - logfO2_nom: −13.0
-      logfO2_cal: −13.01
-      delta_FMQ_cal: −6.62
-      Ti3+_over_SumTi:
-        AD: '0.156'
-        AD+Fo: '0.150'
-        AD+Wo: '0.125'
-        AD+En:
-          as_printed: –
-          state:
-            tag: unknown
-            reason: not_published
-        AD+Qz:
-          as_printed: –
-          state:
-            tag: unknown
-            reason: not_published
-      method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises
-        the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence
-        end-member spectra.
-    - logfO2_nom: −13.5
-      logfO2_cal: −13.52
-      delta_FMQ_cal: −7.13
-      Ti3+_over_SumTi:
-        AD: '0.185'
-        AD+Fo: '0.190'
-        AD+Wo: '0.165'
-        AD+En: '0.226'
-        AD+Qz: '0.262'
-      method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises
-        the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence
-        end-member spectra.
-    - logfO2_nom: −14.0
-      logfO2_cal: −13.98
-      delta_FMQ_cal: −7.59
-      Ti3+_over_SumTi:
-        AD: '0.243'
-        AD+Fo: '0.239'
-        AD+Wo: '0.198'
-        AD+En: '0.248'
-        AD+Qz: '0.293'
-      method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises
-        the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence
-        end-member spectra.
-    - logfO2_nom: −16.1
-      logfO2_cal: −16.10
-      delta_FMQ_cal: −9.71
-      Ti3+_over_SumTi:
-        AD: '0.511'
-        AD+Fo: '0.500'
-        AD+Wo: '0.451'
-        AD+En: '0.558'
-        AD+Qz: '0.622'
-      method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises
-        the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence
-        end-member spectra.
-    - logfO2_nom: −18.0
-      logfO2_cal: −16.35
-      delta_FMQ_cal: −9.96
-      Ti3+_over_SumTi:
-        AD: '0.551'
-        AD+Fo: '0.551'
-        AD+Wo: '0.498'
-        AD+En: '0.592'
-        AD+Qz: '0.605'
-      method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises
-        the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence
-        end-member spectra.
-    - logfO2_nom: −20.0
-      logfO2_cal: −16.62
-      delta_FMQ_cal: −10.23
-      Ti3+_over_SumTi:
-        AD: '0.591'
-        AD+Fo: '0.579'
-        AD+Wo: '0.539'
-        AD+En: '0.613'
-        AD+Qz: '0.674'
-      method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises
-        the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence
-        end-member spectra.
+    table2_cell_count: 50
+    table2_numeric_fraction_count: 48
+    table2_printed_dash_count: 2
+    table2_inputs: Supplementary Spreadsheet 1 (recorded spectra and LCF proportions) is absent from the local corpus package;
+      fitted values are represented as quoted_attributed under d-110.
     calibration_and_model:
       method_and_locator: Ti K-edge XANES spectra, printed pp. 212–215 (PDF pp. 4–7).
       energy_reference: Ti foil first derivative-spectrum peak set to 4966.4 eV; printed p. 212.
@@ -282,8 +222,9 @@ context:
         pp. 212–213). Only afterward, Eq. (4) derives pure Ti3+ and Ti4+ end-member spectra (printed p. 214).
       physical_compounds: Ti2O3, TiO2, and Ni2.62Ti0.69O4 (spinel) standards mixed with BN (~1 wt% Ti) are described as prepared
         previously; printed p. 212. The paper does not state that these compounds set the Table 2 Ti3+/ΣTi scale.
-      model_note: The expected relation is log(Ti3+/Ti4+) = −1/4 log fO2 − log K′ (Eq. 1, printed p. 211). No slope or fO2
-        value has been calculated in this extract.
+      model_note: The expected relation is log(Ti3+/Ti4+) = −1/4 log fO2 − log K′ (Eq. 1, printed p. 211). Table 2 values
+        are transcribed as quoted_attributed because the measured fit inputs are unavailable locally; no slope or fO2 value
+        has been recalculated in this extract.
   context_id: gca-366-210-berry-2024::context::berry_2024_ti3_sumti_table2
   work_id: 10.1016/j.gca.2023.11.014
   source_id: gca-366-210-berry-2024

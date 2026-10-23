@@ -648,7 +648,7 @@ def _knudsen_pressure_basis(diagnostic: object) -> dict[str, object] | None:
                 carrier_gas=carrier_gas.strip(),
                 **kwargs,
             )
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError, KnudsenRegimeRefusal):
             continue
     return None
 

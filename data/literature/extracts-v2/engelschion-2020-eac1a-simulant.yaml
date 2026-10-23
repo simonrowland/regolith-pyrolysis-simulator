@@ -110,10 +110,9 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class,
-      water_released_wt_pct_as_printed, drying_atmosphere, procedure'
-    approximate: false
+    kind: point
+    point: '0.008'
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -124,9 +123,14 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: engelschion-2020-eac1a-simulant::engelschion_2020_eac1a_water_release
   source_id: engelschion-2020-eac1a-simulant
   locator:
     page: 2

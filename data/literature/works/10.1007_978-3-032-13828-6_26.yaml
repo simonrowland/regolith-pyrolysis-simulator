@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
     - asset_id: pdf:shornikov-2026-hatrurite-evaporation
       role: pdf
@@ -17,6 +17,18 @@ work:
       sha256:
         tag: value
         value: 75d1e382d3b3e1507a8b45d2d33d3f7b9a490293e8494e3b78d3c0d57771664e
+    - asset_id: pdftotext:shornikov-2026-hatrurite-evaporation
+      role: pdftotext
+      path: text/shornikov-2026-hatrurite-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shornikov-2026-hatrurite-evaporation
+      role: table_csv
+      path: tables/shornikov-2026-hatrurite-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:shornikov-2026-hatrurite-evaporation
       role: pdftotext
       path: unknown
@@ -84,3 +96,26 @@ experiments:
     published_page: 303
     pdf_page_index: 7
     section: Experimental Methodology
+  bench_id: 10.1007/978-3-032-13828-6_26::bench::shornikov-2026-mo-kems
+benches:
+- id: 10.1007/978-3-032-13828-6_26::bench::shornikov-2026-mo-kems
+  work_id: 10.1007/978-3-032-13828-6_26
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen-cell mass spectrometry
+    locator:
+      published_page: 303
+      pdf_page_index: 7
+      section: Experimental Methodology
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 304
+      pdf_page_index: 8
+      paragraph: Molybdenum effusion cell used for the vaporization study
+  other_facts: []

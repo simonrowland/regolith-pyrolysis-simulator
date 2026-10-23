@@ -286,19 +286,30 @@ def _pin_live_residual(row: Residual | Mapping[str, object]) -> _PinLiveResidual
         evidence = execution.get("call_evidence") if isinstance(execution, Mapping) else None
         call_evidence = None if evidence is None else str(evidence)
 
-    parts = key.rsplit("::", 3)
+    from simulator.battery.score import _residual_key_parts
+
+    parsed = _residual_key_parts(key)
     quantity: Quantity | None = None
     engine: Engine | None = None
-    if parts:
+    if parsed is not None:
+        _head, quantity_token, _rail, engine_token = parsed
         try:
-            engine = Engine(parts[-1])
+            quantity = Quantity(quantity_token)
         except ValueError:
             pass
-    if len(parts) == 4:
         try:
-            quantity = Quantity(parts[1])
+            engine = Engine(engine_token)
         except ValueError:
             pass
+    else:
+        # Not a four-field residual key. A short key still names its engine
+        # or channel in the last field, including a key with no separator.
+        engine_token = key.rsplit("::", 1)[-1] if key else ""
+        if engine_token:
+            try:
+                engine = Engine(engine_token)
+            except ValueError:
+                pass
     return _PinLiveResidual(
         key=key,
         reference=reference,
@@ -408,6 +419,8 @@ def _pin_failures_from_live(
 ) -> list[dict[str, Any]]:
     """Join pins by reference, quantity, and their typed comparison channel."""
 
+    from simulator.battery.score import _residual_key_parts
+
     pins: list[
         tuple[
             PinBandRecord,
@@ -424,9 +437,9 @@ def _pin_failures_from_live(
     for record in records:
         if record.tombstone:
             continue
-        parts = record.key.rsplit("::", 3)
-        if len(parts) == 4:
-            reference, quantity_token, _rail, channel = parts
+        parsed = _residual_key_parts(record.key)
+        if parsed is not None:
+            reference, quantity_token, _rail, channel = parsed
             try:
                 quantity = Quantity(quantity_token)
             except ValueError:
@@ -434,7 +447,9 @@ def _pin_failures_from_live(
         else:
             reference = ""
             quantity = None
-            channel = parts[-1] if len(parts) > 1 else None
+            # A short pin key is not a residual key. Its channel is the last
+            # field only when the key actually has a separator.
+            channel = record.key.rsplit("::", 1)[-1] if "::" in record.key else None
         references = frozenset(
             item
             for item in (reference, *record.aliases, record.old_key)

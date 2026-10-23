@@ -1,0 +1,678 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1021/ja01209a030
+  citation: 'Darken, L. S. & Gurry, R. W. (1946), "The System Iron-Oxygen. II. Equilibrium and Thermodynamics of Liquid Oxide
+    and Other Phases", Journal of the American Chemical Society 68, 798-816. DOI: 10.1021/ja01209a030.'
+  source_ids:
+  - darken-gurry-1946-iron-oxygen-ii
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:darken-gurry-1946-iron-oxygen-ii
+      role: pdf
+      path: raw/darken-gurry-1946-iron-oxygen-ii/darken-gurry-1946-iron-oxygen-ii.pdf
+      sha256:
+        tag: value
+        value: 14c215ac23b71a5cdfdea2a87f6c08f2446e58d45e512328510a28d19cb72ae1
+    - asset_id: pdftotext:darken-gurry-1946-iron-oxygen-ii
+      role: pdftotext
+      path: text/darken-gurry-1946-iron-oxygen-ii
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:darken-gurry-1946-iron-oxygen-ii
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1021/ja01209a030
+experiments:
+- experiment_id: 10.1021/ja01209a030::darken-gurry-1946-iron-oxygen-ii
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    published_page: 803
+    table: III A
+    note: pdf_page=6; row=1390 C, Fe2O3
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_a
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_a
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO2-CO, pCO2/pCO=0.376
+      locator:
+        published_page: 800
+        table: I
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: CO
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.376'
+            approximate: false
+        locator:
+          published_page: 800
+          table: I
+      basis: partial_pressure
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_b
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_b
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO2-CO, pCO2/pCO=1.00
+      locator:
+        published_page: 800
+        table: I
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: CO
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1'
+            approximate: false
+        locator:
+          published_page: 800
+          table: I
+      basis: partial_pressure
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_c
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_c
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO2-H2, initial pCO2/pH2=2.23
+      locator:
+        published_page: 800
+        table: I
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2.23'
+            approximate: false
+        locator:
+          published_page: 800
+          table: I
+      basis: partial_pressure
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_d
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_d
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2O-H2, pH2O/pH2=7.10
+      locator:
+        published_page: 800
+        table: I
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '7.1'
+            approximate: false
+        locator:
+          published_page: 800
+          table: I
+      basis: partial_pressure
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_e
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_e
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO2-CO-H2O, initial pCO2/pCO/pH2O = 1:1:14.1
+      locator:
+        published_page: 800
+        table: I
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_f
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_f
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO2-H2, initial pCO2/pH2=7.13
+      locator:
+        published_page: 800
+        table: I
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '7.13'
+            approximate: false
+        locator:
+          published_page: 800
+          table: I
+      basis: partial_pressure
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_g
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_g
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO2-H2, initial pCO2/pH2=28.3
+      locator:
+        published_page: 800
+        table: I
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '28.3'
+            approximate: false
+        locator:
+          published_page: 800
+          table: I
+      basis: partial_pressure
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_h
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_h
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Steam, 1 atmosphere
+      locator:
+        published_page: 800
+        table: I
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_i
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_i
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO2, 1 atmosphere
+      locator:
+        published_page: 800
+        table: I
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_j
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_j
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO2-O2, 3.91% oxygen
+      locator:
+        published_page: 800
+        table: I
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_k
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_k
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Air, 1 atmosphere
+      locator:
+        published_page: 800
+        table: I
+- experiment_id: 10.1021/ja01209a030::experiment::dg46_t1_l
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01209a030
+  locator:
+    note: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml:experiments:dg46_t1_l
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Oxygen, 1 atmosphere
+      locator:
+        published_page: 800
+        table: I
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 800
+        table: I
+        note: pdf_page=3; row=L, Oxygen, 1 atmosphere; quote=Oxygen, 1 atmosphere
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=1 atm
+        - printed=oxygen_partial_pressure
+        - quote=Oxygen, 1 atmosphere
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 800
+              table: I
+              note: pdf_page=3; row=L, Oxygen, 1 atmosphere
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 800
+              table: I
+              note: pdf_page=3; row=L, Oxygen, 1 atmosphere
+        output_unit: Pa

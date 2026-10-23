@@ -33,6 +33,12 @@ from simulator.optimize.objective import (
     canonical_objective_metric,
 )
 from simulator.optimize.product_pools import forbidden_gates_for_pool, product_pool_class
+from simulator.thermal_window import (
+    DEFAULT_COLD_START_TEMPERATURE_C,
+    DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR,
+    ThermalPreheatInterval,
+    resolve_thermal_preheat_interval,
+)
 
 DESIGN_TARGET_PROVENANCE = (
     "design-composition-target-objective-2026-06-10 rev 3.2 PC target menu seed"
@@ -72,8 +78,6 @@ MENU_TARGET_IDS = (
 # (B1 regen alignment 2026-07-21; 27x make_recipe_db class in
 # research/2026-07-20-red-partition.)
 FURNACE_SURVIVABLE_T_MAX_C = 1843.0
-DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
-DEFAULT_COLD_START_TEMPERATURE_C = 25.0
 MIN_THERMAL_WINDOW_HOLD_HR = 1.0
 THERMAL_VOLATILIZATION = "thermal_volatilization"
 C3_METALLOTHERMIC_SHUTTLE = "c3_metallothermic_shuttle"
@@ -634,16 +638,15 @@ def _validate_campaign_window_within_caps(
     temp_range = cfg.get("temp_range_C")
     if temp_range is None:
         return
-    low_C, high_C = _numeric_interval(temp_range, label=f"{campaign}.temp_range_C")
-    if high_C < low_C:
-        raise SystemExit(f"{campaign}.temp_range_C must be ascending")
+    preheat_interval = _campaign_preheat_interval(campaign, temp_range)
+    low_C, high_C = preheat_interval.low_C, preheat_interval.high_C
     if high_C > FURNACE_SURVIVABLE_T_MAX_C:
         raise SystemExit(
             f"{row.target_id} {campaign}.temp_range_C exceeds furnace-survivable "
             f"window: {high_C:g} C > {FURNACE_SURVIVABLE_T_MAX_C:g} C"
         )
     max_hold_hr = _setpoint_campaign_max_hold_hr(campaign)
-    preheat_hours = _thermal_window_preheat_hours(campaign, low_C)
+    preheat_hours = preheat_interval.hours
     total_hours = preheat_hours + float(hours)
     if max_hold_hr is not None and total_hours > max_hold_hr:
         raise SystemExit(
@@ -664,9 +667,8 @@ def _construct_campaign_hold_hours(
     if temp_range is None:
         return requested_hours, None
 
-    low_C, high_C = _numeric_interval(temp_range, label=f"{campaign}.temp_range_C")
-    if high_C < low_C:
-        raise SystemExit(f"{campaign}.temp_range_C must be ascending")
+    preheat_interval = _campaign_preheat_interval(campaign, temp_range)
+    low_C, high_C = preheat_interval.low_C, preheat_interval.high_C
 
     max_hold_hr = _setpoint_campaign_max_hold_hr(campaign)
     if max_hold_hr is None:
@@ -679,7 +681,7 @@ def _construct_campaign_hold_hours(
     if not math.isfinite(requested) or requested <= 0.0:
         raise SystemExit(f"{row.target_id} {campaign}.duration_h must be positive")
 
-    preheat_hours = _thermal_window_preheat_hours(campaign, low_C)
+    preheat_hours = preheat_interval.hours
     usable_hold_hr = max_hold_hr - float(preheat_hours)
     if usable_hold_hr < MIN_THERMAL_WINDOW_HOLD_HR:
         raise SystemExit(
@@ -716,22 +718,14 @@ def _format_hours(value: int | float) -> str:
     return f"{float(value):g}"
 
 
-def _thermal_window_preheat_hours(campaign: str, low_C: float) -> int:
+def _campaign_preheat_interval(
+    campaign: str, temperature_range: Any
+) -> ThermalPreheatInterval:
     cfg = _setpoint_campaign_config(campaign)
-    value = cfg.get("preheat_ramp_C_per_hr") or cfg.get("ramp_rate_C_per_hr")
-    if value is None:
-        ramp_C_per_hr = DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR
-    else:
-        try:
-            ramp_C_per_hr = float(value)
-        except (TypeError, ValueError) as exc:
-            raise SystemExit(f"{campaign}.preheat_ramp_C_per_hr must be numeric") from exc
-    if ramp_C_per_hr <= 0.0:
-        raise SystemExit(f"{campaign}.preheat_ramp_C_per_hr must be positive")
-    return int(
-        math.ceil(
-            max(0.0, low_C - DEFAULT_COLD_START_TEMPERATURE_C) / ramp_C_per_hr
-        )
+    return resolve_thermal_preheat_interval(
+        temperature_range,
+        cfg.get("preheat_ramp_C_per_hr"),
+        cfg.get("ramp_rate_C_per_hr"),
     )
 
 
@@ -740,9 +734,8 @@ def _campaign_window_patch(campaign: str, *, hours: int | float) -> dict[str, An
     temp_range = cfg.get("temp_range_C")
     if temp_range is None:
         return None
-    low_C, high_C = _numeric_interval(temp_range, label=f"{campaign}.temp_range_C")
-    if high_C < low_C:
-        raise SystemExit(f"{campaign}.temp_range_C must be ascending")
+    preheat_interval = _campaign_preheat_interval(campaign, temp_range)
+    low_C, high_C = preheat_interval.low_C, preheat_interval.high_C
     patch: dict[str, Any] = {
         "temp_range_C": [low_C, high_C],
     }
@@ -923,15 +916,6 @@ def _ensure_target_campaign_window(
         "patch": {"campaigns": {campaign: patch}},
     })
     profile["seed_recipes"] = seeds
-
-
-def _numeric_interval(value: Any, *, label: str) -> tuple[float, float]:
-    if not isinstance(value, (list, tuple)) or len(value) != 2:
-        raise SystemExit(f"{label} must be a two-value interval")
-    try:
-        return float(value[0]), float(value[1])
-    except (TypeError, ValueError) as exc:
-        raise SystemExit(f"{label} must be numeric") from exc
 
 
 def _target_profile(
@@ -1159,4 +1143,8 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main(sys.argv[1:]))
+    try:
+        raise SystemExit(main(sys.argv[1:]))
+    except ValueError as exc:
+        print(f"invalid recipe profile input: {exc}", file=sys.stderr)
+        raise SystemExit(2) from exc

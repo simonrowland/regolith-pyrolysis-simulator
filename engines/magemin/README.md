@@ -34,10 +34,9 @@ averages (binding spec §7).
 
 ## Binary install
 
-Compiled `MAGEMin` binary + libs under `engines/magemin/bin/` and
-`engines/magemin/lib/` are gitignored. Only the provider/domain/parity
-Python modules here are tracked.
-
-Canonical local subprocess path: `engines/magemin/bin/MAGEMin`. Build the
-MAGEMin source tree outside synced repo storage, then copy only the executable
-to that path so `simulator/melt_backend/magemin.py::initialize()` finds it.
+The source checkout and compiled artifacts live under
+`~/repos/engine-bin/MAGEMin/<commit>/`, as declared in
+`engines/engines.lock.toml`. Run `install-engines.py` to clone and build the
+locked revision; it records that exact executable path in the checkout's
+generated `engines/engines.local.toml`. Only the provider/domain/parity Python
+modules in this directory are tracked.

@@ -6087,6 +6087,19 @@ def test_knudsen_refusal_message_uses_actual_geometry_threshold():
     assert "0.26 mbar" not in message
 
 
+def test_knudsen_pressure_basis_skips_invalid_segment_diameter():
+    diagnostic = {
+        "gas_temperature_C": 1160.0,
+        "pipe_diameter_m": 0.12,
+        "carrier_gas": "N2",
+        "segments": [
+            {"name": "narrow_duct", "characteristic_length_m": 1.0e-12},
+        ],
+    }
+
+    assert web_events._knudsen_pressure_basis(diagnostic) is None
+
+
 def test_knudsen_refusal_message_without_geometry_omits_a_number():
     import re
 

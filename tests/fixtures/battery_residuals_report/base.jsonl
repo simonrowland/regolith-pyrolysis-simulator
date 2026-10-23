@@ -1,0 +1,5 @@
+{"kind":"battery_store_stamp","revision":"base"}
+{"key":"k1:T=1000::activity::melt_activity::openimcc","status":"match","rail":"melt_activity","candidate_request":{"engine":"openimcc","experiment_id":"e","quantity":"activity","channel":"activity"},"numeric":{"operation":"dex","unit":"1","value":"0.2"}}
+{"key":"k2:T=1100::activity::melt_activity::openimcc","status":"refused","rail":"melt_activity","candidate_request":{"engine":"openimcc","experiment_id":"e","quantity":"activity","channel":"activity"},"refusal":{"reason":"identity_unknown","detail":{"reason":"quantity_unknown"}}}
+{"key":"k3:T=1200::p_sat::vapour::magemin","status":"match","rail":"vapour","candidate_request":{"engine":"magemin","experiment_id":"e","quantity":"p_sat","channel":"p_sat"},"numeric":{"operation":"dex","unit":"1","value":"1.0"}}
+{"key":"k4:T=1300::activity::melt_activity::openimcc","status":"no_band","rail":"melt_activity","candidate_request":{"engine":"openimcc","experiment_id":"e","quantity":"activity","channel":"activity"},"numeric":{"operation":"dex","unit":"1","value":"0.5"}}

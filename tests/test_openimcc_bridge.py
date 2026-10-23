@@ -19,6 +19,7 @@ from simulator.melt_backend.openimcc_bridge import (
     OpenImccBridgeResult,
     OpenImccUnavailableError,
     OPENIMCC_PARENT_OXIDES,
+    _temperature_domain_K,
     _load_pack,
     _pack_digest,
     _cleaned_melt_projection,
@@ -103,6 +104,12 @@ def _openimcc_or_skip():
             "checkout's src/ directory on PYTHONPATH before running the parity check"
         ),
     )
+
+
+def test_default_pack_temperature_domain_matches_bridge_owner() -> None:
+    _openimcc_or_skip()
+    domains = _load_pack("default").kernel_datapack.domains
+    assert set(domains) == {_temperature_domain_K()}
 
 
 def _load_activity_bounds() -> dict[tuple[str, str, float], dict]:
@@ -371,6 +378,8 @@ def test_missing_openimcc_is_a_typed_refusal(monkeypatch: pytest.MonkeyPatch) ->
 
     monkeypatch.setattr(bridge, "_openimcc", None)
     monkeypatch.setattr(bridge, "_OPENIMCC_IMPORT_ERROR", ModuleNotFoundError("openimcc"))
+
+    assert bridge._temperature_domain_K() == bridge._UNAVAILABLE_TEMPERATURE_DOMAIN_K
 
     with pytest.raises(OpenImccUnavailableError) as exc_info:
         bridge_evaluate(composition_mol={"SiO2": 1.0}, temperature_K=2200.0)

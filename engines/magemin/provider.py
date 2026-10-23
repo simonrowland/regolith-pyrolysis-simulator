@@ -73,6 +73,7 @@ from simulator.melt_backend.base import (
     RealBackendFamily,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.scalar_boundary import is_finite
 
 
 # Intent set: silicate parity shadows plus the freeze-gate scalar fallback.
@@ -471,7 +472,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             result[account] = {
                 str(sp): float(mol)
                 for sp, mol in species_mol.items()
-                if _is_finite(mol) and float(mol) > 0.0
+                if is_finite(mol) and float(mol) > 0.0
             }
         return result
 
@@ -676,7 +677,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         for phase, value in dict(
             getattr(equilibrium, 'phase_masses_kg', {}) or {}
         ).items():
-            finite = _is_finite(value)
+            finite = is_finite(value)
             numeric = float(value) if finite else None
             if numeric is None or numeric <= 0.0:
                 reason = 'nonfinite' if numeric is None else 'nonpositive'
@@ -692,7 +693,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         for field, value in dict(
             getattr(equilibrium, 'liquid_composition_wt_pct', {}) or {}
         ).items():
-            finite = _is_finite(value)
+            finite = is_finite(value)
             numeric = float(value) if finite else None
             if numeric is None:
                 projection_warnings.append(
@@ -703,14 +704,14 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 continue
             liquid_comp[str(field)] = numeric
         liquid_fraction_raw = getattr(equilibrium, 'liquid_fraction', None)
-        if liquid_fraction_raw is not None and not _is_finite(liquid_fraction_raw):
+        if liquid_fraction_raw is not None and not is_finite(liquid_fraction_raw):
             projection_warnings.append(
                 'MAGEMin provider omitted nonfinite liquid_fraction field '
                 f'for phase liquid: {liquid_fraction_raw!r}'
             )
         liquid_fraction = (
             float(liquid_fraction_raw)
-            if liquid_fraction_raw is not None and _is_finite(liquid_fraction_raw)
+            if liquid_fraction_raw is not None and is_finite(liquid_fraction_raw)
             else None
         )
         # Modal abundance: project per-phase mass onto wt% summing to 100.
@@ -733,7 +734,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         # comparator hit its conservative "cannot evaluate" branch.
         for field in ('liquidus_T_K', 'liquidus_T_C', 'solidus_T_C'):
             value = getattr(equilibrium, field, None)
-            if value is not None and not _is_finite(value):
+            if value is not None and not is_finite(value):
                 projection_warnings.append(
                     f'MAGEMin provider omitted nonfinite {field} field '
                     f'for phase liquid: {value!r}'
@@ -792,18 +793,6 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         )
 
 
-def _is_finite(value: Any) -> bool:
-    try:
-        numeric = float(value)
-    except (TypeError, ValueError):
-        return False
-    if numeric != numeric:
-        return False
-    if numeric in (float('inf'), float('-inf')):
-        return False
-    return True
-
-
 def _safe_attr_float(obj: Any, name: str) -> Optional[float]:
     value = getattr(obj, name, None)
     if value is None:
@@ -812,7 +801,7 @@ def _safe_attr_float(obj: Any, name: str) -> Optional[float]:
         result = float(value)
     except (TypeError, ValueError):
         return None
-    if not _is_finite(result):
+    if not is_finite(result):
         return None
     return result
 

@@ -9,8 +9,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
+    - asset_id: pdf:morey-1964-usgs-pp440l-phase-equilibria
+      role: pdf
+      path: raw/morey-1964-usgs-pp440l-phase-equilibria/morey-1964-usgs-pp440l-phase-equilibria.pdf
+      sha256:
+        tag: value
+        value: 6e9967175b2e75bd24d6d0c1031da87b8634c38a2d530db6006a74b840dff728
+    - asset_id: pdftotext:morey-1964-usgs-pp440l-phase-equilibria
+      role: pdftotext
+      path: text/morey-1964-usgs-pp440l-phase-equilibria
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:morey-1964-usgs-pp440l-phase-equilibria
+      role: table_csv
+      path: tables/morey-1964-usgs-pp440l-phase-equilibria
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:morey-1964-usgs-pp440l-phase-equilibria
       role: pdftotext
       path: unknown

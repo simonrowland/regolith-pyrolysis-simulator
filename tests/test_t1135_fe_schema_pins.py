@@ -39,7 +39,7 @@ def _intrinsic_fO2_pin(composition: dict[str, Any]) -> float:
     sim = SimpleNamespace(
         melt=SimpleNamespace(temperature_C=1600.0),
         _melt_oxide_wt_pct=lambda: composition,
-        _vacuum_floor_bar=lambda: DEFAULT_VACUUM_FLOOR_BAR,
+        _oxygen_numerical_floor_bar=lambda: DEFAULT_VACUUM_FLOOR_BAR,
     )
     return PyrolysisSimulator._compute_intrinsic_melt_fO2(
         sim, temperature_K=1873.15

@@ -1,0 +1,6004 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml
+observations:
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_10_7
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1785c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2058.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.8343761059775868665612285749'
+        - - Fe2O3
+          - '0.007968185826918422099125047684'
+        - - SiO2
+          - '0.1576557081954947113396463777'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.886'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_10_7
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1785 C, initial SiO2 10.7%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2058.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 10.7%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1785'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 10.7%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 10.7%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.8343761059775868665612285749'
+          - - Fe2O3
+            - '0.007968185826918422099125047684'
+          - - SiO2
+            - '0.1576557081954947113396463777'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 10.7%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '84.8'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 10.7%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 10.7%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '1.8'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 10.7%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 10.7%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '13.4'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 10.7%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 10.7%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '1.8'
+          FeO: '84.8'
+          SiO2: '13.4'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 10.7%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_15_4
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1785c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2058.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.7781896952618827719638913759'
+        - - Fe2O3
+          - '0.001303144666014554415056164509'
+        - - SiO2
+          - '0.2205071600721026736210524593'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.795'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_15_4
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1785 C, initial SiO2 15.4%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2058.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 15.4%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1785'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 15.4%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 15.4%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.7781896952618827719638913759'
+          - - Fe2O3
+            - '0.001303144666014554415056164509'
+          - - SiO2
+            - '0.2205071600721026736210524593'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 15.4%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '80.6'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 15.4%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 15.4%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 15.4%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 15.4%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '19.1'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 15.4%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 15.4%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.3'
+          FeO: '80.6'
+          SiO2: '19.1'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 15.4%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_1_4
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1785c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2058.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.9623135171548089710652075002'
+        - - Fe2O3
+          - '0.009973712325930940791526780864'
+        - - SiO2
+          - '0.02771277051926008814326571901'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.977'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_1_4
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1785 C, initial SiO2 1.4%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium atmospheres of the same composition and flow rate as previously employed
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2058.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 1.4%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1785'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 1.4%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 1.4%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.9623135171548089710652075002'
+          - - Fe2O3
+            - '0.009973712325930940791526780864'
+          - - SiO2
+            - '0.02771277051926008814326571901'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 1.4%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '95.5'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 1.4%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 1.4%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '2.2'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 1.4%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 1.4%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '2.3'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 1.4%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 1.4%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '2.2'
+          FeO: '95.5'
+          SiO2: '2.3'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 1.4%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_21_9
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1785c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2058.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.705583244398177628490576194'
+        - - Fe2O3
+          - '0.002147804594808226269452749387'
+        - - SiO2
+          - '0.2922689510070141452399710567'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.705'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_21_9
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1785 C, initial SiO2 21.9%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2058.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 21.9%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1785'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 21.9%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 21.9%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.705583244398177628490576194'
+          - - Fe2O3
+            - '0.002147804594808226269452749387'
+          - - SiO2
+            - '0.2922689510070141452399710567'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 21.9%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '73.9'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 21.9%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 21.9%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 21.9%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 21.9%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '25.6'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 21.9%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 21.9%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.5'
+          FeO: '73.9'
+          SiO2: '25.6'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 21.9%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_25_3
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1785c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2058.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.6740031946977042821125036255'
+        - - Fe2O3
+          - '0'
+        - - SiO2
+          - '0.3259968053022957178874963747'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.659'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_25_3
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1785 C, initial SiO2 25.3%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2058.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 25.3%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1785'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 25.3%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 25.3%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.6740031946977042821125036255'
+          - - Fe2O3
+            - '0'
+          - - SiO2
+            - '0.3259968053022957178874963747'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 25.3%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '71.2'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 25.3%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 25.3%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 25.3%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 25.3%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '28.8'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 25.3%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 25.3%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '71.2'
+          SiO2: '28.8'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 25.3%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_31_9
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1785c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2058.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.5936981173514313994511590673'
+        - - Fe2O3
+          - '0'
+        - - SiO2
+          - '0.406301882648568600548840933'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.545'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_31_9
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1785 C, initial SiO2 31.9%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2058.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 31.9%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1785'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 31.9%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 31.9%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.5936981173514313994511590673'
+          - - Fe2O3
+            - '0'
+          - - SiO2
+            - '0.406301882648568600548840933'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 31.9%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '63.6'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 31.9%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 31.9%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 31.9%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 31.9%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '36.4'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 31.9%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 31.9%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '63.6'
+          SiO2: '36.4'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 31.9%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_38_6
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1785c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2058.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.5261779964745652461749965394'
+        - - Fe2O3
+          - '0.001664184030075560515002484656'
+        - - SiO2
+          - '0.4721578194953591933100009761'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.477'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_38_6
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1785 C, initial SiO2 38.6%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2058.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 38.6%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1785'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 38.6%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 38.6%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.5261779964745652461749965394'
+          - - Fe2O3
+            - '0.001664184030075560515002484656'
+          - - SiO2
+            - '0.4721578194953591933100009761'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 38.6%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '56.9'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 38.6%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 38.6%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.4'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 38.6%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 38.6%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '42.7'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 38.6%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 38.6%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.4'
+          FeO: '56.9'
+          SiO2: '42.7'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 38.6%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_6_1
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1785c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2058.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.897159510620333422679315251'
+        - - Fe2O3
+          - '0.009866673996158868823367657059'
+        - - SiO2
+          - '0.09297381538350770849731709178'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.932'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1785_6_1
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1785 C, initial SiO2 6.1%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium atmospheres of the same composition and flow rate as previously employed
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2058.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 6.1%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1785'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 6.1%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 6.1%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.897159510620333422679315251'
+          - - Fe2O3
+            - '0.009866673996158868823367657059'
+          - - SiO2
+            - '0.09297381538350770849731709178'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 6.1%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '90'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 6.1%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 6.1%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '2.2'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 6.1%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 6.1%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '7.8'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 6.1%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1785 C, initial SiO2 6.1%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '2.2'
+          FeO: '90'
+          SiO2: '7.8'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1785 C, initial SiO2 6.1%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_10_7
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2153.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.8248268420151065599745018986'
+        - - Fe2O3
+          - '0.002631871099510994433161650601'
+        - - SiO2
+          - '0.172541286885382445592336451'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.857'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_10_7
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1880 C, initial SiO2 10.7%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2153.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 10.7%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1880'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 10.7%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 10.7%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.8248268420151065599745018986'
+          - - Fe2O3
+            - '0.002631871099510994433161650601'
+          - - SiO2
+            - '0.172541286885382445592336451'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 10.7%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '84.6'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 10.7%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 10.7%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.6'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 10.7%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 10.7%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '14.8'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 10.7%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 10.7%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.6'
+          FeO: '84.6'
+          SiO2: '14.8'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 10.7%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_15_4
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2153.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.7754025380915328627119281263'
+        - - Fe2O3
+          - '0'
+        - - SiO2
+          - '0.2245974619084671372880718741'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.778'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_15_4
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1880 C, initial SiO2 15.4%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2153.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 15.4%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1880'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 15.4%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 15.4%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.7754025380915328627119281263'
+          - - Fe2O3
+            - '0'
+          - - SiO2
+            - '0.2245974619084671372880718741'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 15.4%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '80.5'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 15.4%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 15.4%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 15.4%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 15.4%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 15.4%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 15.4%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '80.5'
+          SiO2: '19.5'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 15.4%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_1_4
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2153.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.9355047198925947202973009242'
+        - - Fe2O3
+          - '0.004930534682591558593897022469'
+        - - SiO2
+          - '0.05956474542481372110880205315'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.952'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_1_4
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1880 C, initial SiO2 1.4%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2153.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 1.4%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1880'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 1.4%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 1.4%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.9355047198925947202973009242'
+          - - Fe2O3
+            - '0.004930534682591558593897022469'
+          - - SiO2
+            - '0.05956474542481372110880205315'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 1.4%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '93.9'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 1.4%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 1.4%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '1.1'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 1.4%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 1.4%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 1.4%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 1.4%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '1.1'
+          FeO: '93.9'
+          SiO2: '5'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 1.4%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_21_9
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2153.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.6786578356358969999954343966'
+        - - Fe2O3
+          - '0.001281111774824501762017891262'
+        - - SiO2
+          - '0.320061052589278498242547712'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.667'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_21_9
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1880 C, initial SiO2 21.9%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2153.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 21.9%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1880'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 21.9%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 21.9%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.6786578356358969999954343966'
+          - - Fe2O3
+            - '0.001281111774824501762017891262'
+          - - SiO2
+            - '0.320061052589278498242547712'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 21.9%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '71.5'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 21.9%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 21.9%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 21.9%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 21.9%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '28.2'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 21.9%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 21.9%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.3'
+          FeO: '71.5'
+          SiO2: '28.2'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 21.9%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_25_3
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2153.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.6408160216724586365490912437'
+        - - Fe2O3
+          - '0.000847960039861731686955122711'
+        - - SiO2
+          - '0.3583360182876796317639536337'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.619'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_25_3
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1880 C, initial SiO2 25.3%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2153.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 25.3%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1880'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 25.3%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 25.3%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.6408160216724586365490912437'
+          - - Fe2O3
+            - '0.000847960039861731686955122711'
+          - - SiO2
+            - '0.3583360182876796317639536337'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 25.3%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '68'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 25.3%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 25.3%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 25.3%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 25.3%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '31.8'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 25.3%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 25.3%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.2'
+          FeO: '68'
+          SiO2: '31.8'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 25.3%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_31_9
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2153.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.5791477330893817751486479078'
+        - - Fe2O3
+          - '0'
+        - - SiO2
+          - '0.4208522669106182248513520923'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.54'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_31_9
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1880 C, initial SiO2 31.9%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2153.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 31.9%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1880'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 31.9%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 31.9%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.5791477330893817751486479078'
+          - - Fe2O3
+            - '0'
+          - - SiO2
+            - '0.4208522669106182248513520923'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 31.9%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '62.2'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 31.9%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 31.9%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 31.9%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 31.9%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '37.8'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 31.9%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 31.9%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '62.2'
+          SiO2: '37.8'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 31.9%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_38_6
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2153.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.4984139470547556175028675357'
+        - - Fe2O3
+          - '0'
+        - - SiO2
+          - '0.5015860529452443824971324646'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.46'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_38_6
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1880 C, initial SiO2 38.6%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2153.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 38.6%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1880'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 38.6%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 38.6%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.4984139470547556175028675357'
+          - - Fe2O3
+            - '0'
+          - - SiO2
+            - '0.5015860529452443824971324646'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 38.6%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '54.3'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 38.6%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 38.6%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 38.6%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 38.6%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.7'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 38.6%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 38.6%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '54.3'
+          SiO2: '45.7'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 38.6%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_6_1
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2153.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.8726463536428440487731733409'
+        - - Fe2O3
+          - '0.005773648065859396989483827139'
+        - - SiO2
+          - '0.1215799982912965542373428324'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.905'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1880_6_1
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1880 C, initial SiO2 6.1%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2153.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 6.1%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1880'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 6.1%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 6.1%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.8726463536428440487731733409'
+          - - Fe2O3
+            - '0.005773648065859396989483827139'
+          - - SiO2
+            - '0.1215799982912965542373428324'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 6.1%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '88.4'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 6.1%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 6.1%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '1.3'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 6.1%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 6.1%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '10.3'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 6.1%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1880 C, initial SiO2 6.1%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '1.3'
+          FeO: '88.4'
+          SiO2: '10.3'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1880 C, initial SiO2 6.1%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_10_7
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2233.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.8112692320807654573134243437'
+        - - Fe2O3
+          - '0.002625857459086465304011118267'
+        - - SiO2
+          - '0.186104910460148077382564538'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.833'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_10_7
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1960 C, initial SiO2 10.7%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2233.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 10.7%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1960'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 10.7%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 10.7%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.8112692320807654573134243437'
+          - - Fe2O3
+            - '0.002625857459086465304011118267'
+          - - SiO2
+            - '0.186104910460148077382564538'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 10.7%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '83.4'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 10.7%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 10.7%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.6'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 10.7%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 10.7%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 10.7%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 10.7%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.6'
+          FeO: '83.4'
+          SiO2: '16'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 10.7%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_15_4
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2233.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.739017598927087901334301864'
+        - - Fe2O3
+          - '0'
+        - - SiO2
+          - '0.2609824010729120986656981363'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.738'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_15_4
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1960 C, initial SiO2 15.4%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2233.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 15.4%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1960'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 15.4%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 15.4%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.739017598927087901334301864'
+          - - Fe2O3
+            - '0'
+          - - SiO2
+            - '0.2609824010729120986656981363'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 15.4%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '77.2'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 15.4%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 15.4%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 15.4%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 15.4%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '22.8'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 15.4%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 15.4%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '77.2'
+          SiO2: '22.8'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 15.4%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_1_4
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2233.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.919648322410491325988421782'
+        - - Fe2O3
+          - '0.002226881029072169081206181124'
+        - - SiO2
+          - '0.07812479656043650493037203662'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.929'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_1_4
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1960 C, initial SiO2 1.4%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2233.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 1.4%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1960'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 1.4%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 1.4%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.919648322410491325988421782'
+          - - Fe2O3
+            - '0.002226881029072169081206181124'
+          - - SiO2
+            - '0.07812479656043650493037203662'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 1.4%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '92.9'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 1.4%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 1.4%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 1.4%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 1.4%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '6.6'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 1.4%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 1.4%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.5'
+          FeO: '92.9'
+          SiO2: '6.6'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 1.4%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_21_9
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2233.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.6740031946977042821125036255'
+        - - Fe2O3
+          - '0'
+        - - SiO2
+          - '0.3259968053022957178874963747'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.667'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_21_9
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1960 C, initial SiO2 21.9%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2233.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 21.9%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1960'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 21.9%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 21.9%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.6740031946977042821125036255'
+          - - Fe2O3
+            - '0'
+          - - SiO2
+            - '0.3259968053022957178874963747'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 21.9%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '71.2'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 21.9%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 21.9%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 21.9%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 21.9%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '28.8'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 21.9%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 21.9%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '71.2'
+          SiO2: '28.8'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 21.9%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_25_3
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2233.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.6173898272967479542024585644'
+        - - Fe2O3
+          - '0.001691122365902557152228187682'
+        - - SiO2
+          - '0.3809190503373494886453132482'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.595'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_25_3
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1960 C, initial SiO2 25.3%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2233.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 25.3%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1960'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 25.3%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 25.3%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.6173898272967479542024585644'
+          - - Fe2O3
+            - '0.001691122365902557152228187682'
+          - - SiO2
+            - '0.3809190503373494886453132482'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 25.3%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '65.7'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 25.3%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 25.3%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.4'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 25.3%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 25.3%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '33.9'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 25.3%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 25.3%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.4'
+          FeO: '65.7'
+          SiO2: '33.9'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 25.3%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_31_9
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2233.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.5568174104351678928696693904'
+        - - Fe2O3
+          - '0.0004175250128407885644555550095'
+        - - SiO2
+          - '0.4427650645519913185658750547'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.536'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_31_9
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1960 C, initial SiO2 31.9%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2233.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 31.9%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1960'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 31.9%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 31.9%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.5568174104351678928696693904'
+          - - Fe2O3
+            - '0.0004175250128407885644555550095'
+          - - SiO2
+            - '0.4427650645519913185658750547'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 31.9%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 31.9%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 31.9%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.1'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 31.9%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 31.9%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '39.9'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 31.9%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 31.9%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.1'
+          FeO: '60'
+          SiO2: '39.9'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 31.9%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_38_6
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2233.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.4729868773568911896514195999'
+        - - Fe2O3
+          - '0.0008232078184967837197406350191'
+        - - SiO2
+          - '0.5261899148246120266288397653'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.456'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_38_6
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1960 C, initial SiO2 38.6%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2233.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 38.6%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1960'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 38.6%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 38.6%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.4729868773568911896514195999'
+          - - Fe2O3
+            - '0.0008232078184967837197406350191'
+          - - SiO2
+            - '0.5261899148246120266288397653'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 38.6%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '51.7'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 38.6%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 38.6%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 38.6%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 38.6%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '48.1'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 38.6%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 38.6%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.2'
+          FeO: '51.7'
+          SiO2: '48.1'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 38.6%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless
+- observation_id: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_6_1
+  experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid FeO-SiO2 slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2233.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe(1-x)O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe(1-x)O
+        reference_pressure_bar: '1.01325'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.8530655256734383987916127585'
+        - - Fe2O3
+          - '0.00087926358209843809246776904'
+        - - SiO2
+          - '0.1460552107444631631159194725'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.881'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: distin-1971-ferrous-silicate-melts::distin1971_t1_1960_6_1
+  source_id: distin-1971-ferrous-silicate-melts
+  locator:
+    page: 74
+    table: Experimental results
+    note: row=1960 C, initial SiO2 6.1%
+  read_from: pdf:distin-1971-ferrous-silicate-melts
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: helium or argon + helium
+      locator:
+        page: 74
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '2233.15'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 6.1%
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1960'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 6.1%
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 6.1%
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.8530655256734383987916127585'
+          - - Fe2O3
+            - '0.00087926358209843809246776904'
+          - - SiO2
+            - '0.1460552107444631631159194725'
+          amount_basis: mole_fraction
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 6.1%
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '87.3'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 6.1%
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 6.1%
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 6.1%
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 6.1%
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '12.5'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 6.1%
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: Experimental results
+              note: row=1960 C, initial SiO2 6.1%
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.2'
+          FeO: '87.3'
+          SiO2: '12.5'
+      locator:
+        page: 74
+        table: Experimental results
+        note: row=1960 C, initial SiO2 6.1%
+  derived_from:
+  - pdf:distin-1971-ferrous-silicate-melts
+  derivation:
+    relation: 'a_FeO = O_metal / O_sat(T). The p. 74 Experimental method sentence states: "Activities of ''FeO'' were obtained
+      as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure ''FeO''
+      at the same temperature." O_metal is this row''s printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74,
+      table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation
+      values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses
+      0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through
+      initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial
+      SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83,
+      3) = 0.458. The printed activity remains unchanged.'
+    inputs:
+    - pdf:distin-1971-ferrous-silicate-melts
+    parameters: []
+    output_unit: dimensionless

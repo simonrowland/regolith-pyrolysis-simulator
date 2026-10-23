@@ -90,8 +90,12 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
+    # Recomputed 2026-10-22 (t-1441 stirring labels): 4 description strings
+    # changed, no values. Paths: campaigns.C2A_continuous.adaptive_control.
+    # induction_stirring; endpoint_criteria.control.surface_renewal;
+    # endpoint_criteria.general; furnace.induction_stirring.note.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
+        "6e96c06bd07493a6db66db50de75fc9599b8a0353c5d08ae37d68f09ec90ccb6"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
@@ -677,7 +681,11 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # serialize those fingerprints, and the June corpus is not interoperable.
     # Pin recomputed from this tree's executable cache_key(spec).
     # 2026-09-30 C7d removed the physics-gate version and class from this digest.
-    assert cache_key(spec) == "f6d1c88ba2fcbcca5ae07e720bfe53a721601506fbd93611c907e8869352c7a3"
+    # 2026-10-20 b-585 d-045: the default physics_constraints digest now includes
+    # coating_max_upstream_wall_deposit_fraction_per_campaign = 5e-4. Removing
+    # that one threshold from the default constraint payload restores
+    # f6d1c88b.... recipe_id is unchanged. The key carries no run result.
+    assert cache_key(spec) == "368ca7f8131d3652aea965f3106bad89afeab89a35478a660eeb0c61fd8fc6d4"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

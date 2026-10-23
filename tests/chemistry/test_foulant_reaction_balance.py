@@ -5,19 +5,14 @@ from __future__ import annotations
 from collections import defaultdict
 from fractions import Fraction
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Mapping
 
 import pytest
 import yaml
 
+import simulator.core as core
 from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
-from simulator.core import (
-    STAGE0_CARBONATE_METAL_OXIDE_STOICH,
-    STAGE0_CATION_SULFATE_OXIDE_PRODUCTS,
-    STAGE0_CATION_SULFATE_OXIDE_STOICH,
-    STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS,
-    STAGE0_CATION_SULFATE_SULFIDE_STOICH,
-)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FOULANT_THERMO = REPO_ROOT / "data" / "foulant_thermo.yaml"
@@ -106,18 +101,81 @@ def test_all_foulant_dg_reactions_are_atom_balanced() -> None:
         _assert_reaction_balanced(row_key, row["reaction"], registry)
 
 
+def _runtime_cation_sulfate_reaction(
+    sulfate: str,
+    product_mode: str,
+    stoich: Mapping[str, float],
+    registry: Mapping[str, object],
+) -> str:
+    feed_mass = resolve_species_formula(
+        sulfate, registry
+    ).molar_mass_kg_per_mol()
+    runtime = SimpleNamespace(
+        species_formula_registry=registry,
+        inventory=SimpleNamespace(
+            cation_sulfate_feed_kg={sulfate: stoich["feed"] * feed_mass},
+            gas_volatiles_kg={},
+            stage0_products_kg={},
+            melt_oxide_kg={},
+            sulfide_matte_kg={},
+        ),
+        _decrease_inventory_species=(
+            core.PyrolysisSimulator._decrease_inventory_species
+        ),
+        _merge_masses=core.PyrolysisSimulator._merge_masses,
+    )
+    specs: list[dict] = []
+    core.PyrolysisSimulator._apply_stage0_cation_sulfate_carbon_reactions(
+        runtime,
+        {"stage0_carbon_cleanup": {"cation_sulfate_product": product_mode}},
+        stoich["C"],
+        specs,
+    )
+    if len(specs) != 1:
+        raise AssertionError(
+            f"{sulfate} runtime emitted {len(specs)} sulfate reactions"
+        )
+
+    reaction_spec = specs[0]
+    reactants_kg: dict[str, float] = {}
+    for debit in reaction_spec["debits"]:
+        for species, mass_kg in debit[1].items():
+            reactants_kg[species] = reactants_kg.get(species, 0.0) + mass_kg
+
+    products_kg: dict[str, float] = {}
+    for field in ("products_kg", "oxide_products_kg", "sulfide_products_kg"):
+        for species, mass_kg in reaction_spec[field].items():
+            products_kg[species] = products_kg.get(species, 0.0) + mass_kg
+
+    def reaction_terms(masses: Mapping[str, float]) -> tuple[tuple[float, str], ...]:
+        return tuple(
+            (
+                mass_kg
+                / resolve_species_formula(species, registry).molar_mass_kg_per_mol(),
+                species,
+            )
+            for species, mass_kg in masses.items()
+        )
+
+    return _format_reaction(
+        reaction_terms(reactants_kg),
+        reaction_terms(products_kg),
+    )
+
+
 def test_stage0_cation_sulfate_code_tables_are_atom_balanced() -> None:
+    _assert_stage0_cation_sulfate_code_tables_are_atom_balanced()
+
+
+def _assert_stage0_cation_sulfate_code_tables_are_atom_balanced() -> None:
     registry = _species_registry()
 
-    for sulfate, oxide in STAGE0_CATION_SULFATE_OXIDE_PRODUCTS.items():
-        stoich = STAGE0_CATION_SULFATE_OXIDE_STOICH[sulfate]
-        reaction = _format_reaction(
-            ((stoich["feed"], sulfate), (stoich["C"], "C")),
-            (
-                (stoich["oxide"], oxide),
-                (stoich["SO2"], "SO2"),
-                (stoich["CO"], "CO"),
-            ),
+    for sulfate in core.STAGE0_CATION_SULFATE_OXIDE_PRODUCTS:
+        reaction = _runtime_cation_sulfate_reaction(
+            sulfate,
+            "oxide",
+            core.STAGE0_CATION_SULFATE_OXIDE_STOICH[sulfate],
+            registry,
         )
         _assert_reaction_balanced(
             f"STAGE0_CATION_SULFATE_OXIDE_PRODUCTS[{sulfate!r}]",
@@ -125,11 +183,12 @@ def test_stage0_cation_sulfate_code_tables_are_atom_balanced() -> None:
             registry,
         )
 
-    for sulfate, sulfide in STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS.items():
-        stoich = STAGE0_CATION_SULFATE_SULFIDE_STOICH[sulfate]
-        reaction = _format_reaction(
-            ((stoich["feed"], sulfate), (stoich["C"], "C")),
-            ((stoich["sulfide"], sulfide), (stoich["CO"], "CO")),
+    for sulfate in core.STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS:
+        reaction = _runtime_cation_sulfate_reaction(
+            sulfate,
+            "sulfide",
+            core.STAGE0_CATION_SULFATE_SULFIDE_STOICH[sulfate],
+            registry,
         )
         _assert_reaction_balanced(
             f"STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS[{sulfate!r}]",
@@ -138,20 +197,90 @@ def test_stage0_cation_sulfate_code_tables_are_atom_balanced() -> None:
         )
 
 
+def test_stage0_sulfate_guard_rejects_runtime_oxide_yield_mutation(
+    monkeypatch,
+) -> None:
+    runtime_method = (
+        core.PyrolysisSimulator._apply_stage0_cation_sulfate_carbon_reactions
+    )
+
+    def halve_runtime_oxide_yields(runtime, feedstock, carbon_mol_remaining, specs):
+        remaining = runtime_method(
+            runtime, feedstock, carbon_mol_remaining, specs
+        )
+        for spec in specs:
+            spec["oxide_products_kg"] = {
+                oxide: product_kg / 2.0
+                for oxide, product_kg in spec["oxide_products_kg"].items()
+            }
+        return remaining
+
+    monkeypatch.setattr(
+        core.PyrolysisSimulator,
+        "_apply_stage0_cation_sulfate_carbon_reactions",
+        halve_runtime_oxide_yields,
+    )
+
+    with pytest.raises(AssertionError, match="Ca"):
+        _assert_stage0_cation_sulfate_code_tables_are_atom_balanced()
+
+
 def test_stage0_carbonate_code_table_is_atom_balanced() -> None:
+    _assert_stage0_carbonate_code_table_is_atom_balanced()
+
+
+def _assert_stage0_carbonate_code_table_is_atom_balanced() -> None:
     registry = _species_registry()
 
-    for metal, oxide, atoms_per_oxide in STAGE0_CARBONATE_METAL_OXIDE_STOICH:
+    class _CompleteDecompositionRuntime:
+        def __init__(self) -> None:
+            self.species_formula_registry = registry
+
+        def _stage0_carbonate_decomposition_extent(
+            self, *_args
+        ) -> float:
+            return 1.0
+
+    runtime = _CompleteDecompositionRuntime()
+    for metal, _, atoms_per_oxide in core.STAGE0_CARBONATE_METAL_OXIDE_STOICH:
         carbonate = f"{metal}CO3" if atoms_per_oxide == 1.0 else f"{metal}2CO3"
+        feed_kg = resolve_species_formula(
+            carbonate, registry
+        ).molar_mass_kg_per_mol()
+        oxide_kg, gas_kg, _, _ = (
+            core.PyrolysisSimulator._decompose_single_carbonate_species(
+                runtime, carbonate, feed_kg, {}, 0.0
+            )
+        )
+        products_kg = {**oxide_kg, **gas_kg}
+        products = tuple(
+            (
+                product_kg
+                / resolve_species_formula(product, registry).molar_mass_kg_per_mol(),
+                product,
+            )
+            for product, product_kg in products_kg.items()
+        )
         reaction = _format_reaction(
             ((1.0, carbonate),),
-            ((1.0, oxide), (1.0, "CO2")),
+            products,
         )
         _assert_reaction_balanced(
             f"STAGE0_CARBONATE_METAL_OXIDE_STOICH[{metal!r}]",
             reaction,
             registry,
         )
+
+
+def test_stage0_carbonate_guard_rejects_runtime_divisor_mutation(monkeypatch) -> None:
+    mutated_stoich = tuple(
+        (metal, oxide, 3.0 if metal == "Na" else atoms_per_oxide)
+        for metal, oxide, atoms_per_oxide in core.STAGE0_CARBONATE_METAL_OXIDE_STOICH
+    )
+    monkeypatch.setattr(core, "STAGE0_CARBONATE_METAL_OXIDE_STOICH", mutated_stoich)
+
+    with pytest.raises(AssertionError, match="Na"):
+        _assert_stage0_carbonate_code_table_is_atom_balanced()
 
 
 def test_foulant_reaction_balance_guard_rejects_unbalanced_oxygen_row() -> None:

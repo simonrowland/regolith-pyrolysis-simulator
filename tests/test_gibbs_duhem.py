@@ -23,7 +23,10 @@ import math
 import pytest
 
 from benchmarks.gibbs_duhem import (
+    BATTERY_DISCRETISATION_SHRINK_MIN,
+    BATTERY_INDEX_THRESHOLD,
     GibbsDuhemInapplicable,
+    GibbsDuhemReport,
     gibbs_duhem_residual,
     mole_fractions_from_wt,
 )
@@ -424,17 +427,48 @@ def test_verdict_thresholds_are_overridable_and_defaults_asserted():
         _consistent_activities, START, END, T_K=1673.15, engine_name="synthetic"
     )
     assert battery_verdict(report) == "consistent_on_this_path"
-    # A hostile threshold still moves the verdict off the clean pass, so the
-    # knob is live. Since SC-130/GD-1 the token is `discretisation_limited`
-    # rather than `inconsistent`, and that IS the repair working: this model's
-    # residual shrinks ~4x on step halving, so the instrument now declines to
-    # call it a violation however hostile the index threshold is.
-    assert battery_verdict(report, index_threshold=-1.0) == "discretisation_limited"
     # Floor raised above this path's real TV: material becomes immaterial.
     assert (
         battery_verdict(report, materiality_floor_ln=report.total_variation * 2)
         == "immaterial_variation"
     )
+
+
+@pytest.mark.parametrize(
+    ("coarse_residual", "expected_ratio", "expected_verdict"),
+    [
+        (0.001, 0.1, "inconsistent"),
+        (0.4, 40.0, "discretisation_limited"),
+    ],
+)
+def test_verdict_shrink_threshold_has_margin(
+    coarse_residual: float, expected_ratio: float, expected_verdict: str
+) -> None:
+    report = GibbsDuhemReport(
+        engine="constructed-classifier-input",
+        T_K=1673.15,
+        n_nodes=20,
+        components=("SiO2", "CaO"),
+        integrated_residual=coarse_residual,
+        total_variation=1.0,
+        consistency_index=coarse_residual,
+        rectified_index=1.0,
+        residual_at_double_resolution=0.01,
+        closed_segments=20,
+    )
+    assert report.rectified_index >= 10 * BATTERY_INDEX_THRESHOLD
+    ratio = abs(report.integrated_residual) / abs(
+        report.residual_at_double_resolution
+    )
+    assert ratio == pytest.approx(expected_ratio)
+    if expected_verdict == "inconsistent":
+        assert ratio <= BATTERY_DISCRETISATION_SHRINK_MIN / 10
+    else:
+        assert ratio >= 10 * BATTERY_DISCRETISATION_SHRINK_MIN
+    assert (expected_ratio < BATTERY_DISCRETISATION_SHRINK_MIN) == (
+        expected_verdict == "inconsistent"
+    )
+    assert battery_verdict(report) == expected_verdict
 
 
 def test_verdict_boundaries_are_exclusive_flag_inclusive_immaterial():

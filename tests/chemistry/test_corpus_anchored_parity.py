@@ -367,19 +367,6 @@ _OVERHEAD_ALLOWED_STATUSES = {
     "simulator_engine_surface_gap",
 }
 
-_OXIDE_MOLAR_MASS_G_MOL = {
-    "SiO2": 60.0843,
-    "MgO": 40.3044,
-    "Al2O3": 101.9613,
-    "TiO2": 79.866,
-    "Fe2O3": 159.6882,
-    "FeO": 71.844,
-    "CaO": 56.0774,
-    "Na2O": 61.9789,
-    "K2O": 94.196,
-}
-
-
 def _expected_overhead_status(anchor: AtomicRatioAnchor) -> str:
     if anchor.numerator_element not in _OVERHEAD_GAS_ELEMENT_SPECIES:
         return "simulator_engine_surface_gap"
@@ -429,21 +416,9 @@ def _build_sim_for_atomic_ratio_anchor(
 def _oxide_activity_proxy_gamma_1(
     composition_wt_pct: Mapping[str, float],
 ) -> dict[str, float]:
-    oxide_moles: dict[str, float] = {}
-    for oxide, wt_pct in composition_wt_pct.items():
-        molar_mass = _OXIDE_MOLAR_MASS_G_MOL.get(str(oxide))
-        if molar_mass is None:
-            continue
-        wt = float(wt_pct)
-        if wt > 0.0:
-            oxide_moles[str(oxide)] = wt / molar_mass
-    total = sum(oxide_moles.values())
-    if total <= 0.0:
-        return {}
-    return {
-        oxide: amount / total
-        for oxide, amount in sorted(oxide_moles.items())
-    }
+    from simulator.accounting.formulas import project_oxide_composition
+
+    return project_oxide_composition(composition_wt_pct, source_basis="wt_pct")
 
 
 def _seed_sf2004_reference_overhead_holdup(

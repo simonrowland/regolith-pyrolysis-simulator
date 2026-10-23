@@ -94,8 +94,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 10.13
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1304328557069239377646669636'
+          - - CaO
+            - '0.7025159172174758735952957611'
+          - - SiO2
+            - '0.1670512270756001886400372753'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 10.13
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '21.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.13
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.13
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '62.8'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.13
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.13
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.13
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.13
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -142,7 +221,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -255,8 +334,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 10.14
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1576051630291686292857048595'
+          - - CaO
+            - '0.711851846662956658073497486'
+          - - SiO2
+            - '0.1305429903078747126407976547'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 10.14
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '25.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.14
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.14
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '62.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.14
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.14
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '12.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.14
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 10.14
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -303,7 +461,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -416,8 +574,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 11.6
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1332316921365819590960555858'
+          - - CaO
+            - '0.6919653370519453691444107493'
+          - - SiO2
+            - '0.1748029708114726717595336646'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 11.6
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '21.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.6
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.6
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '61.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.6
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.6
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '16.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.6
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.6
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -464,7 +701,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -577,8 +814,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 11.7
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1684453956656310032312316387'
+          - - CaO
+            - '0.7020122461074475985538845418'
+          - - SiO2
+            - '0.1295423582269213982148838195'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 11.7
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '26.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.7
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.7
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '61.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.7
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.7
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.7
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 11.7
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -625,7 +941,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -738,8 +1054,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 12.10
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1529729840632685223562637404'
+          - - CaO
+            - '0.6565877543955312975519727513'
+          - - SiO2
+            - '0.1904392615412001800917635085'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 12.10
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '24.4'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.10
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.10
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '57.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.10
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.10
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '17.9'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.10
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.10
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -786,7 +1181,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -899,8 +1294,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 12.11
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1900363113264537158456380608'
+          - - CaO
+            - '0.6443611407669869942861615264'
+          - - SiO2
+            - '0.1656025479065592898682004124'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 12.11
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '29.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.11
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.11
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '55.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.11
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.11
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '15.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.11
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 12.11
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -947,7 +1421,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -1060,8 +1534,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 13.10
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1809473482530372580192659338'
+          - - CaO
+            - '0.6161508331922903781939269865'
+          - - SiO2
+            - '0.2029018185546723637868070801'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 13.10
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '28.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.10
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.10
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '53'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.10
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.10
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '18.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.10
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.10
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1108,7 +1661,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -1221,8 +1774,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 13.8
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1573144518939729288195918414'
+          - - CaO
+            - '0.6429990205693684124507491'
+          - - SiO2
+            - '0.1996865275366586587296590588'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 13.8
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.8
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.8
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '56.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.8
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.8
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '18.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.8
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.8
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1269,7 +1901,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -1382,8 +2014,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 13.9
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1408479028493868403500965604'
+          - - CaO
+            - '0.6085014459131844942419799104'
+          - - SiO2
+            - '0.2506506512374286654079235291'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 13.9
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.9
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.9
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '53.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.9
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.9
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '23.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.9
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 13.9
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1430,7 +2141,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -1543,8 +2254,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 14.6
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1389861358858241904196473251'
+          - - CaO
+            - '0.588138160097588352183288933'
+          - - SiO2
+            - '0.2728757040165874573970637422'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 14.6
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.6
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.6
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '51.9'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.6
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.6
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '25.8'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.6
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.6
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1591,7 +2381,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -1704,8 +2494,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 14.8
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1373815246885228053150903659'
+          - - CaO
+            - '0.6126052689918522881476043657'
+          - - SiO2
+            - '0.250013206319624906537305268'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 14.8
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.1'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.8
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.8
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '54.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.8
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.8
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '23.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.8
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.8
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1752,7 +2621,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -1865,8 +2734,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 14.9
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1021657277073490702149280637'
+          - - CaO
+            - '0.6037177944140666787209829638'
+          - - SiO2
+            - '0.2941164778785842510640889722'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 14.9
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.8'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.9
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.9
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '54.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.9
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.9
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '28.5'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.9
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 14.9
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1913,7 +2861,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -2026,8 +2974,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 15.5
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09836832656304401751534726722'
+          - - CaO
+            - '0.5718938305154134700300369745'
+          - - SiO2
+            - '0.3297378429215425124546157583'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 15.5
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.5
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.5
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '51.8'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.5
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.5
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '32'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.5
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.5
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2074,7 +3101,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -2187,8 +3214,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 15.8
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.08600048356836500490764335469'
+          - - CaO
+            - '0.5904783769969356740665220917'
+          - - SiO2
+            - '0.3235211394346993210258345539'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 15.8
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.8
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.8
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '54'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.8
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.8
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '31.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.8
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 15.8
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2235,7 +3341,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -2348,8 +3454,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 16.17
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.05658677890969207338996807573'
+          - - CaO
+            - '0.5723087426646195864480328759'
+          - - SiO2
+            - '0.3711044784256883401619990483'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 16.17
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.17
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.17
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '53.4'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.17
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.17
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '37.1'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.17
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.17
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2396,7 +3581,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -2509,8 +3694,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 16.18
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.05298006854221261951111264401'
+          - - CaO
+            - '0.5843970730610459568345567065'
+          - - SiO2
+            - '0.3626228583967414236543306494'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 16.18
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.18
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.18
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '54.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.18
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.18
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '36.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.18
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.18
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2557,7 +3821,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -2670,8 +3934,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 16.19
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0552716322246376895210734284'
+          - - CaO
+            - '0.5954907427419583345189409065'
+          - - SiO2
+            - '0.349237625033403975959985665'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 16.19
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.4'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.19
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.19
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '55.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.19
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.19
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.19
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 16.19
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2718,7 +4061,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -2831,8 +4174,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 17.6
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.03248668935327824743400404259'
+          - - CaO
+            - '0.5727467601718823474843238347'
+          - - SiO2
+            - '0.3947665504748394050816721229'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 17.6
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '5.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.6
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.6
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '54.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.6
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.6
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.1'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.6
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.6
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2879,7 +4301,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -2992,8 +4414,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 17.7
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.03181762908912743782466173894'
+          - - CaO
+            - '0.5921870461852561735831845091'
+          - - SiO2
+            - '0.3759953247256163885921537518'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 17.7
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '5.5'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.7
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.7
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '56.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.7
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.7
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '38.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.7
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 17.7
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3040,7 +4541,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -3153,8 +4654,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 18.10
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0'
+          - - CaO
+            - '0.6036216524525470412125312306'
+          - - SiO2
+            - '0.3963783475474529587874687694'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 18.10
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '58.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '41.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3201,7 +4781,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -3314,8 +4894,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 18.11
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0'
+          - - CaO
+            - '0.6203799385072204982572621927'
+          - - SiO2
+            - '0.3796200614927795017427378074'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 18.11
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.11
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.11
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '60.4'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.11
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.11
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '39.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.11
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.11
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3362,7 +5021,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -3475,8 +5134,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 18.6
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0'
+          - - CaO
+            - '0.5858349520928410497863298838'
+          - - SiO2
+            - '0.4141650479071589502136701162'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 18.6
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.6
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.6
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '56.9'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.6
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.6
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.1'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.6
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.6
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3523,7 +5261,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -3636,8 +5374,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 18.9
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0'
+          - - CaO
+            - '0.6085546139791452619484668753'
+          - - SiO2
+            - '0.3914453860208547380515331247'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 18.9
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.9
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.9
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '59.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.9
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.9
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.8'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.9
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.9
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3684,7 +5501,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -3797,8 +5614,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 19.3
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.2609635894599206648498530446'
+          - - CaO
+            - '0.7390364105400793351501469551'
+          - - SiO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 19.3
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '39.1'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.3
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.3
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '60.9'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.3
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.3
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.3
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.3
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3845,7 +5741,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -3958,8 +5854,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 19.4
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.2642104333044730843860944591'
+          - - CaO
+            - '0.7357895666955269156139055406'
+          - - SiO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 19.4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '39.5'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '60.5'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.4
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.4
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -4006,7 +5981,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -4119,8 +6094,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 19.6
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.2806602497795463292017761623'
+          - - CaO
+            - '0.7193397502204536707982238375'
+          - - SiO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 19.6
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '41.5'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.6
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.6
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '58.5'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.6
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.6
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.6
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.6
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -4167,7 +6221,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -4280,8 +6334,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 19.9
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.244147739589667026348111889'
+          - - CaO
+            - '0.7558522604103329736518881111'
+          - - SiO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 19.9
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '37'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.9
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.9
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '63'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.9
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.9
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.9
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 19.9
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -4328,7 +6461,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -4441,8 +6574,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 23.1
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1293080552995526200355513957'
+          - - CaO
+            - '0.6029613392516233555016362305'
+          - - SiO2
+            - '0.267730605448824024462812374'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 23.1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '20.9'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '53.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.1
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '25.5'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.1
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -4489,7 +6701,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -4602,8 +6814,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 23.2
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1489792977784861020174724914'
+          - - CaO
+            - '0.6236987983621412411033875584'
+          - - SiO2
+            - '0.2273219038593726568791399503'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 23.2
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '23.8'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.2
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.2
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '54.8'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.2
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.2
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '21.4'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.2
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.2
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -4650,7 +6941,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -4763,8 +7054,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 23.3
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.165916002488870652527361953'
+          - - CaO
+            - '0.5987364676211069764430276602'
+          - - SiO2
+            - '0.2353475298900223710296103866'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 23.3
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '26.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.3
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.3
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '52'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.3
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.3
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '21.9'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.3
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.3
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -4811,7 +7181,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -4924,8 +7294,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 23.4
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1555899207483742358932599494'
+          - - CaO
+            - '0.592134591329550910091209458'
+          - - SiO2
+            - '0.2522754879220748540155305929'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 23.4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '24.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '51.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.4
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '23.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 23.4
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -4972,7 +7421,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -5085,8 +7534,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 3.3
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.236952199608325206746384983'
+          - - CaO
+            - '0.7228373173642224224983226177'
+          - - SiO2
+            - '0.04021048302745237075529239942'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 3.3
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '36'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.3
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.3
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '60.4'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.3
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.3
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.3
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.3
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -5133,7 +7661,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -5246,8 +7774,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 3.4
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.2317116332227499727427319125'
+          - - CaO
+            - '0.7137065787467177629303214258'
+          - - SiO2
+            - '0.05458178803053226432694666159'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 3.4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '35.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '59.8'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.4
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '4.9'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 3.4
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -5294,7 +7901,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -5407,8 +8014,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 4.3
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.209907516091272253929450693'
+          - - CaO
+            - '0.7197299454908400362876490838'
+          - - SiO2
+            - '0.07036253841788770978290022335'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 4.3
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '32.4'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 4.3
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 4.3
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '61.1'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 4.3
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 4.3
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '6.4'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 4.3
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 4.3
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -5455,7 +8141,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -5568,8 +8254,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 5.16
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1869282126633755104768718841'
+          - - CaO
+            - '0.7145511594694889909184737163'
+          - - SiO2
+            - '0.09852062786713549860465439911'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 5.16
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '29.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.16
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.16
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '61.6'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.16
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.16
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '9.1'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.16
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.16
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -5616,7 +8381,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -5729,8 +8494,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 5.18
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1752030396631608031580651985'
+          - - CaO
+            - '0.7153154992041393825811103242'
+          - - SiO2
+            - '0.109481461132699814260824477'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 5.18
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '27.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.18
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.18
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '62.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.18
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.18
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '10.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.18
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 5.18
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -5777,7 +8621,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -5890,8 +8734,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 6.11
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1563365429159285486132698575'
+          - - CaO
+            - '0.7163189293850800214532801785'
+          - - SiO2
+            - '0.1273445276989914299334499641'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 6.11
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.11
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.11
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '63'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.11
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.11
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '12'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.11
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.11
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -5938,7 +8861,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -6051,8 +8974,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 6.8
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1661683369528088555251731092'
+          - - CaO
+            - '0.7152695663841654432482177443'
+          - - SiO2
+            - '0.1185620966630257012266091469'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 6.8
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '26.4'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.8
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.8
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '62.5'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.8
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.8
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '11.1'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.8
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 6.8
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -6099,7 +9101,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:
@@ -6212,8 +9214,87 @@ observations:
     published_page: 1468
     table: '1'
     note: Experiment no. 7.5
-  read_from: unknown:gornerup-1996-cao-corner-liquidus
+  read_from: pdf:gornerup-1996-cao-corner-liquidus
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1269141208172268586224243682'
+          - - CaO
+            - '0.7045341702378197748614091946'
+          - - SiO2
+            - '0.1685517089449533665161664372'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 7.5
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '20.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 7.5
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 7.5
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '63.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 7.5
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 7.5
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '16.2'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 7.5
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 7.5
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -6260,7 +9341,7 @@ observations:
   derivation:
     relation: celsius_to_kelvin
     inputs:
-    - unknown:gornerup-1996-cao-corner-liquidus
+    - pdf:gornerup-1996-cao-corner-liquidus
     parameters:
     - - original
       - state:

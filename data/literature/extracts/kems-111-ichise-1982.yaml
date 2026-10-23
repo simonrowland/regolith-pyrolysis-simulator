@@ -20,7 +20,7 @@ extraction:
 review_status: draft
 corrections: []
 fidelity_samples:
-- path: species.Fe.observations[ichise_1982_table2_a_Fe_1823K].values.rows[0].a_Fe
+- path: species.Fe.observations[ichise_1982_table2_a_Fe_1823K].values.rows[0].activity
   value: 0.897
   locator:
     table: '2'
@@ -360,7 +360,7 @@ species:
         rows:
         - 'no': Fe-Mo 6
           x_Mo: 0.096
-          a_Fe: 0.897
+          activity: 0.897
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -374,7 +374,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 2
           x_Mo: 0.154
-          a_Fe: 0.81
+          activity: 0.81
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -388,7 +388,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 4
           x_Mo: 0.2
-          a_Fe: 0.8
+          activity: 0.8
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -402,7 +402,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 7
           x_Mo: 0.201
-          a_Fe: 0.767
+          activity: 0.767
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -416,7 +416,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 1
           x_Mo: 0.24
-          a_Fe: 0.692
+          activity: 0.692
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -430,7 +430,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 5
           x_Mo: 0.251
-          a_Fe: 0.737
+          activity: 0.737
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -444,7 +444,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 9
           x_Mo: 0.254
-          a_Fe: 0.741
+          activity: 0.741
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -458,7 +458,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 3
           x_Mo: 0.3
-          a_Fe: 0.69
+          activity: 0.69
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -472,7 +472,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 8
           x_Mo: 0.302
-          a_Fe: 0.673
+          activity: 0.673
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -486,7 +486,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 10
           x_Mo: 0.333
-          a_Fe: 0.677
+          activity: 0.677
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -500,7 +500,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 7
           x_Mo: 0.339
-          a_Fe: 0.652
+          activity: 0.652
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -514,7 +514,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 2
           x_Mo: 0.348
-          a_Fe: 0.652
+          activity: 0.652
           phases: Fe liquid solution
           point_conditions:
             composition:
@@ -528,7 +528,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 10
           x_Mo: 0.434
-          a_Fe: 0.621
+          activity: 0.621
           phases: Fe liquid solution+σ
           point_conditions:
             composition:
@@ -542,7 +542,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 11
           x_Mo: 0.434
-          a_Fe: 0.656
+          activity: 0.656
           phases: Fe liquid solution+σ
           point_conditions:
             composition:
@@ -556,7 +556,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 13
           x_Mo: 0.434
-          a_Fe: 0.528
+          activity: 0.528
           a_Fe_as_printed: 0.528*
           phases: Fe liquid solution+σ
           point_conditions:
@@ -574,7 +574,7 @@ species:
             because of its unreasonably low value
         - 'no': Ag-Fe-Mo 8
           x_Mo: 0.556
-          a_Fe: 0.585
+          activity: 0.585
           phases: σ+Mo solid solution
           point_conditions:
             composition:
@@ -588,7 +588,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 9
           x_Mo: 0.613
-          a_Fe: 0.552
+          activity: 0.552
           phases: σ+Mo solid solution
           point_conditions:
             composition:
@@ -602,7 +602,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 12
           x_Mo: 0.666
-          a_Fe: 0.526
+          activity: 0.526
           phases: σ+Mo solid solution
           point_conditions:
             composition:
@@ -616,7 +616,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 4
           x_Mo: 0.778
-          a_Fe: 0.556
+          activity: 0.556
           phases: σ+Mo solid solution
           point_conditions:
             composition:
@@ -630,7 +630,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 6
           x_Mo: 0.793
-          a_Fe: 0.538
+          activity: 0.538
           phases: σ+Mo solid solution
           point_conditions:
             composition:
@@ -644,7 +644,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 3
           x_Mo: 0.842
-          a_Fe: 0.518
+          activity: 0.518
           phases: Mo solid solution
           point_conditions:
             composition:
@@ -658,7 +658,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 1
           x_Mo: 0.912
-          a_Fe: 0.36
+          activity: 0.36
           phases: Mo solid solution
           point_conditions:
             composition:
@@ -672,7 +672,7 @@ species:
               locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 5
           x_Mo: 0.912
-          a_Fe: 0.383
+          activity: 0.383
           phases: Mo solid solution
           point_conditions:
             composition:

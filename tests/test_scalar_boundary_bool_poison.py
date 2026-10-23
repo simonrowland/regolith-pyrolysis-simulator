@@ -26,10 +26,8 @@ from engines.builtin.evaporation_flux import (
     _validated_stir_factor,
 )
 from engines.builtin.ca_aluminothermic_step import _finite_float as ca_finite_float
-from engines.builtin.electrolysis_step import (
-    MRE_INVALID_CONTROL_REFUSAL,
-    BuiltinElectrolysisStepProvider,
-)
+from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
+from simulator.electrolysis import MRE_INVALID_CONTROL_REFUSAL
 from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
 from engines.builtin.oxygen_bubbler import _finite_nonnegative_control
 from simulator.accounting.queries import (
@@ -191,7 +189,7 @@ from simulator.vapour_rail.channels import (
     CHANNEL_O2,
     REACTION_PLANE_MELT_INTERFACE,
     ReactionThermoInputs,
-    clamp_physical_pO2_bar,
+    validate_physical_pO2_bar,
     compile_channel_term_from_binding,
     compile_o2_channel_term,
     o2_potential_from_pO2_bar,
@@ -1157,7 +1155,7 @@ HARD_CASES = (
         ),
         TypeError,
     ),
-    HardCase("physical_po2_clamp", clamp_physical_pO2_bar, TypeError),
+    HardCase("physical_po2_validation", validate_physical_pO2_bar, TypeError),
     HardCase(
         "o2_potential_temperature",
         lambda v: o2_potential_from_pO2_bar(

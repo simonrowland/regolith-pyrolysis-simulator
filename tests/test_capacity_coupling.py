@@ -666,6 +666,26 @@ def test_missing_gamma_ideal_assertion_reaches_activity_seam(monkeypatch):
     assert answer.is_flux_active
 
 
+@pytest.mark.parametrize("temperature_K", [1800.0, 2000.0])
+def test_flux_activity_operands_retain_every_pressure_carrier(temperature_K):
+    sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = temperature_K - 273.15
+    equilibrium = sim._get_equilibrium()
+    diagnostic = sim._last_vapor_pressure_diagnostic
+
+    controls, _ = sim._evaporation_flux_control_inputs(
+        equilibrium,
+        overhead_partials_Pa={},
+        vapour_batch_flux_pressures_Pa={},
+    )
+
+    operands = controls["vapor_pressure_activities"]
+    assert set(diagnostic["vapor_pressures_Pa"]) <= set(operands)
+    assert operands == diagnostic["activities"]
+    assert operands != equilibrium.activity_coefficients
+
+
 def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     """RG-1 gateway: catalog P_eff class without a flux-value cutover.
 
@@ -738,11 +758,11 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         )
 
     temperature_K = equilibrium.temperature_C + 273.15
-    original_activities = dict(equilibrium.activity_coefficients)
-    original_diagnostic_activities = dict(
-        sim._last_vapor_pressure_diagnostic["activities"]
-    )
-    assert original_activities == original_diagnostic_activities
+    original_equilibrium_activities = dict(equilibrium.activity_coefficients)
+    original_activities = dict(sim._last_vapor_pressure_diagnostic["activities"])
+    original_diagnostic_activities = dict(original_activities)
+    assert original_equilibrium_activities == sim._last_high_t_melt_activity["selected_parent_activities"]
+    assert original_equilibrium_activities != original_activities
     baseline_catalog_pa: dict[str, float] = {}
     activity_exponents: dict[str, float] = {}
     for species_id, probe_pa in verifier_probe_pa.items():
@@ -836,7 +856,7 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
                 float(seam_pa),
             )
     finally:
-        equilibrium.activity_coefficients = original_activities
+        equilibrium.activity_coefficients = original_equilibrium_activities
         sim._last_vapor_pressure_diagnostic["activities"] = (
             original_diagnostic_activities
         )

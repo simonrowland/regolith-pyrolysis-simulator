@@ -27,6 +27,7 @@ from simulator.fe_redox import (
     normalize_redox_state,
 )
 from simulator.melt_backend.base import MeltCompositionError
+from simulator.melt_backend.liquidus import LIQUIDUS_LIQUID_EPSILON
 from simulator.melt_regime import (
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
@@ -389,6 +390,21 @@ def _composition_projected_notice_key(notice: Mapping[str, Any]) -> tuple:
 
 _FREEZE_GATE_ACCOUNT = 'process.cleaned_melt'
 _FREEZE_GATE_EPSILON = 1.0e-12
+# Typed refusal when a supplied fraction at the declared liquidus lies
+# below the finder's liquid band. The epsilon itself lives in liquidus.py.
+FREEZE_GATE_LIQUIDUS_FRACTION_INCONSISTENT = (
+    'freeze_gate_liquidus_fraction_inconsistent'
+)
+
+
+def _liquidus_fraction_inconsistent_since(
+    reasons: list[str],
+    start: int,
+) -> bool:
+    token = FREEZE_GATE_LIQUIDUS_FRACTION_INCONSISTENT
+    return any(token in reason for reason in reasons[start:])
+
+
 # The validation map's smallest adjacent Na-dose step changes the FeO mole
 # fraction by 0.00105. A 0.0001 quantum leaves more than ten bins across that
 # physical delta while remaining well above floating-point composition jitter.
@@ -1892,7 +1908,9 @@ class EvaporationMixin:
             return None
         projected_source = f'{source}:composition_projected'
         curve = None
+        inconsistent = False
         if path:
+            reason_mark = len(reasons)
             curve = self._freeze_gate_curve_from_path(
                 path,
                 solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
@@ -1901,8 +1919,13 @@ class EvaporationMixin:
                 ),
                 source=projected_source,
                 repair_notices=repair_notices,
+                reasons=reasons,
             )
-        if curve is None:
+            inconsistent = _liquidus_fraction_inconsistent_since(
+                reasons,
+                reason_mark,
+            )
+        if curve is None and not inconsistent:
             curve = self._freeze_gate_curve_from_bounds(
                 solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
                 liquidus_T_C=self._optional_float(
@@ -2719,12 +2742,14 @@ class EvaporationMixin:
             )
             return None
         if path:
+            reason_mark = len(reasons)
             curve = self._freeze_gate_curve_from_path(
                 path,
                 solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
                 liquidus_T_C=self._optional_float(diagnostic.get('liquidus_T_C')),
                 source=source,
                 repair_notices=repair_notices,
+                reasons=reasons,
             )
             if curve is not None:
                 record_gate_curve_provider_outcome(
@@ -2732,6 +2757,8 @@ class EvaporationMixin:
                     GateCurveProviderOutcome.PRODUCED,
                 )
                 return curve
+            if _liquidus_fraction_inconsistent_since(reasons, reason_mark):
+                return None
             reasons.append('gate liquid fraction table invalid')
         curve = self._freeze_gate_curve_from_bounds(
             solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
@@ -3025,15 +3052,19 @@ class EvaporationMixin:
                 'liquid_fraction': getattr(sample, 'frac_M', None),
             })
         if samples:
+            reason_mark = len(reasons)
             curve = self._freeze_gate_curve_from_path(
                 samples,
                 solidus_T_C=solidus_T_C,
                 liquidus_T_C=liquidus_T_C,
                 source=source,
                 repair_notices=repair_notices,
+                reasons=reasons,
             )
             if curve is not None:
                 return curve
+            if _liquidus_fraction_inconsistent_since(reasons, reason_mark):
+                return None
         return self._freeze_gate_curve_from_bounds(
             solidus_T_C=solidus_T_C,
             liquidus_T_C=liquidus_T_C,
@@ -3074,6 +3105,7 @@ class EvaporationMixin:
         liquidus_T_C: float | None,
         source: str,
         repair_notices: list[dict[str, Any]] | None = None,
+        reasons: list[str] | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import record_repair_notice
 
@@ -3129,7 +3161,35 @@ class EvaporationMixin:
         for temperature_C, liquid_fraction in sorted(points):
             dedup[temperature_C] = liquid_fraction
         dedup[solidus_T_C] = 0.0
-        dedup[liquidus_T_C] = 1.0
+        # The finder declares liquidus only for frac_M within
+        # LIQUIDUS_LIQUID_EPSILON of 1 (liquidus.py liquid_threshold).
+        # That residual is the declaration tolerance, so snapping it to 1
+        # does not invent melt. A supplied fraction below the band is a
+        # measured deficit; writing 1 would replace it. No fraction at
+        # this temperature is the endpoint convention: nothing was measured
+        # there to overwrite.
+        raw_at_liquidus = dedup.get(liquidus_T_C)
+        if (
+            raw_at_liquidus is None
+            or raw_at_liquidus >= 1.0 - LIQUIDUS_LIQUID_EPSILON
+        ):
+            dedup[liquidus_T_C] = 1.0
+        else:
+            notice = {
+                'type': 'typed_notice',
+                'kind': FREEZE_GATE_LIQUIDUS_FRACTION_INCONSISTENT,
+                'temperature_C': liquidus_T_C,
+                'raw_fraction': raw_at_liquidus,
+                'action': 'refuse_curve',
+            }
+            record_repair_notice(self, notice)
+            if repair_notices is not None and notice not in repair_notices:
+                repair_notices.append(notice)
+            if reasons is not None:
+                reasons.append(
+                    f'{source} {FREEZE_GATE_LIQUIDUS_FRACTION_INCONSISTENT}'
+                )
+            return None
         ordered = tuple(sorted(dedup.items()))
         if len(ordered) < 2:
             return None
@@ -3288,6 +3348,15 @@ class EvaporationMixin:
         )
         return max(partial_sum_Pa, control_floor_Pa)
 
+    @staticmethod
+    def _vapor_pressure_activity_operands(
+        equilibrium: Any, diagnostic: Mapping[str, Any],
+    ) -> dict[str, float]:
+        operands = diagnostic.get('activities')
+        if not isinstance(operands, Mapping):
+            operands = getattr(equilibrium, 'activity_coefficients', {}) or {}
+        return dict(operands)
+
     def _resolve_evaporation_vapour_batch(
         self,
         equilibrium: Any,
@@ -3338,13 +3407,12 @@ class EvaporationMixin:
         except (TypeError, ValueError):
             total_pressure_Pa = None
         try:
-            reported_activities = dict(
-                getattr(equilibrium, 'activity_coefficients', {}) or {}
+            reported_activities = EvaporationMixin._vapor_pressure_activity_operands(
+                equilibrium, vapor_pressure_diagnostic,
             )
             kernel_activities = vapor_pressure_diagnostic.get('activities')
             kernel_activity_source = (
                 isinstance(kernel_activities, Mapping)
-                and dict(kernel_activities) == reported_activities
                 and bool(reported_activities)
             )
             if kernel_activity_source:
@@ -3613,8 +3681,8 @@ class EvaporationMixin:
                     'vapor_pressure_numerator_provenance'
                 ) or {}
             ),
-            'vapor_pressure_activities': dict(
-                getattr(equilibrium, 'activity_coefficients', {}) or {}
+            'vapor_pressure_activities': EvaporationMixin._vapor_pressure_activity_operands(
+                equilibrium, vapor_pressure_diagnostic,
             ),
             'pO2_bar': vapor_pressure_diagnostic.get('pO2_bar'),
             'overhead_partials_Pa': dict(overhead_partials_Pa),
