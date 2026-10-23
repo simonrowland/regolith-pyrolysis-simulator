@@ -692,3 +692,184 @@ def test_hashimoto_liquid_floor_notice_text_is_unchanged(
         ),
     )
     assert prediction.notices[1].authority is None
+
+
+def test_hashimoto_below_liquid_floor_reaches_the_scored_notice(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A below-floor Hashimoto liquid row is predicted and the scored residual carries the flag.
+
+    The fixture is the provenance residue.py writes: the boolean nested under
+    assumption_flags, and the row under liquid_rows_used. It does not set the
+    top-level key. FeO(l) on the gas pack is the 1000-5000 K JANAF interval.
+    No Hashimoto extract is below that floor, so one run is marked below it.
+    """
+
+    from simulator.battery.enums import (
+        AdmissionStatus,
+        Authority,
+        Engine,
+        NoticeKind,
+        Quantity,
+        Rail,
+    )
+    from simulator.battery.score import load_score_context, score_store
+    import simulator.battery.residue as residue
+
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    # The production selector's only FeO(l) interval, and an in-band MgO(l) sibling.
+    feo_band = (1000.0, 5000.0)
+    mgo_band = (1800.0, 2200.0)
+    below_floor_run: dict[str, str] = {}
+
+    def liquid_record(
+        channel: str,
+        parent: str,
+        name: str,
+        source: str,
+        band: tuple[float, float],
+        *,
+        below_floor: bool,
+    ) -> dict:
+        return {
+            "channel": channel,
+            "parent": parent,
+            "liquid_row": {
+                "row": name,
+                "source": source,
+                "T_fit_K": [band[0], band[1]],
+                "extrapolated_below_floor": below_floor,
+            },
+        }
+
+    def fake_cohort(experiments, _catalog, *, engine, **_kwargs):
+        below_floor_run["id"] = str(experiments[0]["experiment_id"])
+        rows = []
+        for experiment in experiments:
+            experiment_id = str(experiment["experiment_id"])
+            below = experiment_id == below_floor_run["id"]
+            values = {
+                "FeO": 12.5,
+                "MgO": 20.0,
+                "SiO2": 30.0,
+                "CaO": 4.0,
+                "Al2O3": 5.0,
+            }
+            primary_provenance = {
+                "experiment_id": experiment_id,
+                "engine": engine,
+                "integration": {"refinement_status": "converged"},
+                "geometry_refusal_by_geometry": {},
+                "code_revision": "fixture-revision",
+                "liquid_rows_used": (
+                    liquid_record(
+                        "Fe",
+                        "FeO",
+                        "FeO(l)",
+                        "JANAF",
+                        feo_band,
+                        below_floor=below,
+                    ),
+                    liquid_record(
+                        "Mg",
+                        "MgO",
+                        "MgO(l)",
+                        "Mg-009-SC-CP",
+                        mgo_band,
+                        below_floor=False,
+                    ),
+                ),
+                "assumption_flags": {
+                    "openimcc_liquid_row_extrapolated": below,
+                },
+            }
+            rows.extend(
+                (
+                    SimpleNamespace(
+                        experiment_id=experiment_id,
+                        alpha_arm=residue._HASHIMOTO_PRIMARY_ALPHA_ARM,
+                        primary_geometry_policy_id=residue._HASHIMOTO_PRIMARY_GEOMETRY,
+                        primary_oxide_wt_pct=values,
+                        sensitivity_band_wt_pct={
+                            name: (value - 1.0, value + 1.0)
+                            for name, value in values.items()
+                        },
+                        provenance=primary_provenance,
+                    ),
+                    SimpleNamespace(
+                        experiment_id=experiment_id,
+                        alpha_arm="alpha_runtime_catalog",
+                        primary_geometry_policy_id=residue._HASHIMOTO_PRIMARY_GEOMETRY,
+                        primary_oxide_wt_pct=values,
+                        geometry_oxide_wt_pct={
+                            residue._HASHIMOTO_PRIMARY_GEOMETRY: values
+                        },
+                        sensitivity_band_wt_pct={
+                            name: (value - 1.0, value + 1.0)
+                            for name, value in values.items()
+                        },
+                        provenance={
+                            "engine": engine,
+                            "alpha_arm": "alpha_runtime_catalog",
+                        },
+                    ),
+                )
+            )
+        return tuple(rows)
+
+    monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", fake_cohort)
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.RESIDUE_COMPOSITION,
+    )
+
+    def iron(experiment_id: str):
+        matched = []
+        for residual in residuals:
+            reference = context.observations.get(residual.reference)
+            if reference is None:
+                continue
+            if (
+                reference.experiment_id == experiment_id
+                and reference.identity.species.formula == "FeO"
+                and reference.admission.status is AdmissionStatus.ADMITTED
+            ):
+                matched.append(residual)
+        assert len(matched) == 1
+        return matched[0]
+
+    flagged = iron(below_floor_run["id"])
+    assert flagged.numeric is not None
+    floor_notices = [
+        notice
+        for notice in flagged.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.reason == "extrapolated_below_floor"
+    ]
+    assert len(floor_notices) == 1
+    notice = floor_notices[0]
+    assert notice.origin == "hashimoto-residue-addendum-a"
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.authority.value == "extrapolated"
+    assert notice.affected_quantities == (
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    )
+    assert "FeO(l)" in (notice.band or "")
+    assert "1000" in (notice.band or "")
+    assert "5000" in (notice.band or "")
+    assert "MgO" not in (notice.band or "")
+
+    other_id = next(
+        row.experiment_id
+        for row in context.observations.values()
+        if row.source_id == "kems-015-hashimoto-1983"
+        and row.identity.species.formula == "FeO"
+        and row.admission.status is AdmissionStatus.ADMITTED
+        and row.experiment_id != below_floor_run["id"]
+    )
+    unflagged = iron(other_id)
+    assert unflagged.numeric is not None
+    assert all(
+        notice.reason != "extrapolated_below_floor" for notice in unflagged.notices
+    )
