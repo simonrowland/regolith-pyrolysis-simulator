@@ -1,4 +1,6 @@
 """Production resolver outputs at integrated base 1660bc715."""
+# d-254/d-257 C11 actual pool film and declared 30 m/s default.
+# Fresh production resolver output; pre-C11 owner restores every old leaf.
 EXPECTED = {'asteroid': {'carrier_report': {},
               'composition': {'Fe': '0x1.dda42ec87191ep-5',
                               'O2': '0x1.a0ce30efd674bp-3'},
@@ -69,11 +71,11 @@ EXPECTED = {'asteroid': {'carrier_report': {},
                                      'capacity_allocation_rule': 'pool_first_residual',
                                      'carrier_gas': 'N2',
                                      'native_fe_pool_mol': '0x1.0000000000000p+0',
-                                     'native_fe_tap_mol': '0x0.0p+0',
-                                     'native_fe_vapor_capacity_kg_hr': '0x1.676528997792bp-4',
-                                     'native_fe_vapor_capacity_mol_hr': '0x1.9239554becb68p+0',
-                                     'native_fe_vapor_escape_fraction_of_pool': '0x1.0000000000000p+0',
-                                     'native_fe_vapor_mol': '0x1.0000000000000p+0',
+                                     'native_fe_tap_mol': '0x1.02cfb05c96298p-4',
+                                     'native_fe_vapor_capacity_kg_hr': '0x1.ac935b0504dd9p-5',
+                                     'native_fe_vapor_capacity_mol_hr': '0x1.dfa609f46d3adp-1',
+                                     'native_fe_vapor_escape_fraction_of_pool': '0x1.dfa609f46d3adp-1',
+                                     'native_fe_vapor_mol': '0x1.dfa609f46d3adp-1',
                                      'native_pool_activity_argument': 'a_Fe(pool) '
                                                                       '~= 1 '
                                                                       'outcompetes '
@@ -81,38 +83,104 @@ EXPECTED = {'asteroid': {'carrier_report': {},
                                                                       'melt '
                                                                       'FeO '
                                                                       'activity',
-                                     'ordinary_melt_fe_residual_capacity_mol_hr': '0x1.2472aa97d96d0p-1',
+                                     'ordinary_melt_fe_residual_capacity_mol_hr': '0x0.0p+0',
                                      'overhead_pressure_pa': '0x1.fe0cccccccccdp+9',
                                      'overhead_pressure_source': '_melt_headspace_composition_mbar',
-                                     'series_resistance': {'Kn': '0x1.033feb1bd4b9ep-11',
-                                                           'R_gas_fraction': '0x1.7ce3cd3bab66dp-1',
-                                                           'R_interface_fraction': '0x1.06386588a9326p-2',
+                                     'series_resistance': {'Kn': '0x1.cb4011b01bceap-15',
+                                                           'R_gas_fraction': '0x1.b1d37df17aacep-1',
+                                                           'R_interface_fraction': '0x1.38b2083a154c9p-3',
                                                            'R_melt_fraction': '0x0.0p+0',
-                                                           'alpha_eff': '0x1.4fa45900d8926p-8',
-                                                           'alpha_effective': '0x1.4fa45900d8926p-8',
+                                                           'alpha_eff': '0x1.90400a87c957ep-9',
+                                                           'alpha_effective': '0x1.90400a87c957ep-9',
                                                            'alpha_intrinsic': '0x1.47ae147ae147bp-6',
                                                            'authority_class': 'upper-bound',
                                                            'authority_reason': 'missing-species-state-dependent-melt-transfer-inputs',
                                                            'axial_stir_applied': '0x1.8000000000000p+2',
                                                            'axial_stir_clamped': False,
                                                            'd_ab_m2_s': '0x1.03b582b488b64p-5',
-                                                           'flux_kg_s_m2': '0x1.f29995afb0c2dp-15',
+                                                           'flux_kg_s_m2': '0x1.2949be1fee09bp-15',
                                                            'frozen_skull_stir_ceiling': 'not_certified',
                                                            'frozen_skull_stir_clamped': False,
                                                            'gas_resistance_weight': '0x1.0000000000000p+0',
                                                            'k_hk_kg_s_m2_pa': '0x1.8c112cf8eabaap-11',
-                                                           'k_mt_kg_s_m2_pa': '0x1.5d042876bea64p-18',
-                                                           'knudsen_number': '0x1.033feb1bd4b9ep-11',
+                                                           'k_mt_kg_s_m2_pa': '0x1.6d69d979f9665p-19',
+                                                           'knudsen_number': '0x1.cb4011b01bceap-15',
                                                            'limiting_resistance_label': 'gas',
                                                            'melt_resistance_enabled': False,
                                                            'melt_surface_renewal_base_kg_s_m2_pa': '0x0.0p+0',
                                                            'melt_surface_renewal_source': 'disabled:missing-species-state-dependent-melt-transfer-inputs',
-                                                           'r_gas': '0x1.778c07aac484bp+17',
+                                                           'r_gas': '0x1.66b1edfa275dfp+18',
                                                            'r_interface': '0x1.028ac41d9159dp+16',
                                                            'r_melt': '0x0.0p+0',
                                                            'radial_stir_applied': '0x1.0000000000000p+0',
                                                            'radial_stir_clamped': False,
-                                                           'transport_length_m': '0x1.47ae147ae147bp-4'},
+                                                           'source_film_length_m': '0x1.47ae147ae147bp-4',
+                                                           'surface_film': {'D_m2_s': '0x1.03b582b488b64p-5',
+                                                                            'Kn_film': '0x1.f0b752938a254p-11',
+                                                                            'Kn_geometry': '0x1.cb4011b01bceap-15',
+                                                                            'Mach': '0x1.1690ab10be5b2p-5',
+                                                                            'Pe': '0x1.55e120ba7fe76p+9',
+                                                                            'Re': '0x1.4f2446a96bd46p+9',
+                                                                            'Sc': '0x1.052589d539a8ap+0',
+                                                                            'Sh': '0x1.14e27478fa171p+4',
+                                                                            'authority_status': 'status_bearing_non_authoritative',
+                                                                            'binary_approximation': 'independent '
+                                                                                                    'dilute '
+                                                                                                    'species; '
+                                                                                                    'not '
+                                                                                                    'coupled '
+                                                                                                    'multicomponent '
+                                                                                                    'certification',
+                                                                            'dilute_flux_kg_s_m2': '0x1.2949be1fee09bp-15',
+                                                                            'domain_flags': ['surface '
+                                                                                             'flow '
+                                                                                             'undeclared: '
+                                                                                             'default '
+                                                                                             '30 '
+                                                                                             'm/s '
+                                                                                             'planar '
+                                                                                             'recirculation '
+                                                                                             'fan '
+                                                                                             '(assumed '
+                                                                                             'hardware)',
+                                                                                             'momentum '
+                                                                                             'layer '
+                                                                                             'exceeds '
+                                                                                             '10% '
+                                                                                             'of '
+                                                                                             'flow '
+                                                                                             'length'],
+                                                                            'flow_assumed': True,
+                                                                            'formula_id': 'Blasius_plate_area_mean_0.664',
+                                                                            'gas_face_partial_pressure_pa': '0x1.a3bef36c12e6ep+3',
+                                                                            'gas_face_vapour_fraction': '0x1.a559c48bb4b71p-7',
+                                                                            'geometry': 'planar',
+                                                                            'geometry_parameters': {'coverage': '0x1.0000000000000p+0',
+                                                                                                    'declared_length_m': '0x1.71f471f598449p-1',
+                                                                                                    'impeller_material_id': 'dense_alumina_continuous',
+                                                                                                    'impeller_service_T_C': '0x1.a900000000000p+10',
+                                                                                                    'pool_area_m2': '0x1.a3e6c6fd139b4p-2'},
+                                                                            'k_g_m_s': '0x1.84bf3d4378b4dp-1',
+                                                                            'length_m': '0x1.71f471f598449p-1',
+                                                                            'mu_Pa_s': '0x1.f1c67688076b1p-15',
+                                                                            'rho_kg_m3': '0x1.e0ff0e96151fep-10',
+                                                                            'stefan_model': 'dilute_passive_scalar',
+                                                                            'still_gas_comparison': {'domain_flags': ['declared '
+                                                                                                                      'zero '
+                                                                                                                      'flow: '
+                                                                                                                      'isolated-disk '
+                                                                                                                      'halfspace'],
+                                                                                                     'flux_kg_s_m2': '0x1.954dcc5064916p-18',
+                                                                                                     'formula_id': 'isolated_disk_halfspace_8_over_pi',
+                                                                                                     'k_g_m_s': '0x1.c9a25498db347p-4',
+                                                                                                     'rate_multiplier': '0x1.778c8d1d60ec2p+2',
+                                                                                                     'stefan_model': 'binary_stagnant_carrier_logarithmic'},
+                                                                            'u_m_s': '0x1.e000000000000p+4',
+                                                                            'velocity_provenance': 'd-257 '
+                                                                                                   'assumed '
+                                                                                                   'recirculation '
+                                                                                                   'hardware'},
+                                                           'transport_length_m': '0x1.71f471f598449p-1'},
                                      'source_label': 'native_fe_partition:pure_component_derived_from_evaluation',
                                      'temperature_K': '0x1.d44999999999ap+10'},
                        'pressure_bar': '0x1.4e4430b178b37p-7'},
@@ -153,11 +221,11 @@ EXPECTED = {'asteroid': {'carrier_report': {},
                                      'capacity_allocation_rule': 'pool_first_residual',
                                      'carrier_gas': 'N2',
                                      'native_fe_pool_mol': '0x1.0000000000000p+0',
-                                     'native_fe_tap_mol': '0x0.0p+0',
-                                     'native_fe_vapor_capacity_kg_hr': '0x1.3db6780aa6821p-4',
-                                     'native_fe_vapor_capacity_mol_hr': '0x1.639306d6f33d5p+0',
-                                     'native_fe_vapor_escape_fraction_of_pool': '0x1.0000000000000p+0',
-                                     'native_fe_vapor_mol': '0x1.0000000000000p+0',
+                                     'native_fe_tap_mol': '0x1.01bc5dc316894p-3',
+                                     'native_fe_vapor_capacity_kg_hr': '0x1.8fe8c25c966f4p-5',
+                                     'native_fe_vapor_capacity_mol_hr': '0x1.bf90e88f3a5dbp-1',
+                                     'native_fe_vapor_escape_fraction_of_pool': '0x1.bf90e88f3a5dbp-1',
+                                     'native_fe_vapor_mol': '0x1.bf90e88f3a5dbp-1',
                                      'native_pool_activity_argument': 'a_Fe(pool) '
                                                                       '~= 1 '
                                                                       'outcompetes '
@@ -165,38 +233,104 @@ EXPECTED = {'asteroid': {'carrier_report': {},
                                                                       'melt '
                                                                       'FeO '
                                                                       'activity',
-                                     'ordinary_melt_fe_residual_capacity_mol_hr': '0x1.8e4c1b5bccf54p-2',
+                                     'ordinary_melt_fe_residual_capacity_mol_hr': '0x0.0p+0',
                                      'overhead_pressure_pa': '0x1.2c00000000000p+10',
                                      'overhead_pressure_source': 'melt.p_total_mbar',
-                                     'series_resistance': {'Kn': '0x1.b8c485c85cd3cp-12',
-                                                           'R_gas_fraction': '0x1.8c188d68cf286p-1',
-                                                           'R_interface_fraction': '0x1.cf9dca5cc35e8p-3',
+                                     'series_resistance': {'Kn': '0x1.8666a7f41b64ap-15',
+                                                           'R_gas_fraction': '0x1.b70e149c2adcdp-1',
+                                                           'R_interface_fraction': '0x1.23c7ad8f548ccp-3',
                                                            'R_melt_fraction': '0x0.0p+0',
-                                                           'alpha_eff': '0x1.28b6e7e972cbep-8',
-                                                           'alpha_effective': '0x1.28b6e7e972cbep-8',
+                                                           'alpha_eff': '0x1.757a77c1b3e76p-9',
+                                                           'alpha_effective': '0x1.757a77c1b3e76p-9',
                                                            'alpha_intrinsic': '0x1.47ae147ae147bp-6',
                                                            'authority_class': 'upper-bound',
                                                            'authority_reason': 'missing-species-state-dependent-melt-transfer-inputs',
                                                            'axial_stir_applied': '0x1.8000000000000p+2',
                                                            'axial_stir_clamped': False,
                                                            'd_ab_m2_s': '0x1.b98c72e9fa5a7p-6',
-                                                           'flux_kg_s_m2': '0x1.b8c5cf1495846p-15',
+                                                           'flux_kg_s_m2': '0x1.1567366954665p-15',
                                                            'frozen_skull_stir_ceiling': 'not_certified',
                                                            'frozen_skull_stir_clamped': False,
                                                            'gas_resistance_weight': '0x1.0000000000000p+0',
                                                            'k_hk_kg_s_m2_pa': '0x1.8c112cf8eabaap-11',
-                                                           'k_mt_kg_s_m2_pa': '0x1.28b16149ce91cp-18',
-                                                           'knudsen_number': '0x1.b8c485c85cd3cp-12',
+                                                           'k_mt_kg_s_m2_pa': '0x1.50e93d4b9f681p-19',
+                                                           'knudsen_number': '0x1.8666a7f41b64ap-15',
                                                            'limiting_resistance_label': 'gas',
                                                            'melt_resistance_enabled': False,
                                                            'melt_surface_renewal_base_kg_s_m2_pa': '0x0.0p+0',
                                                            'melt_surface_renewal_source': 'disabled:missing-species-state-dependent-melt-transfer-inputs',
-                                                           'r_gas': '0x1.b9c6d471a6b46p+17',
+                                                           'r_gas': '0x1.850a52a1d5e61p+18',
                                                            'r_interface': '0x1.028ac41d9159dp+16',
                                                            'r_melt': '0x0.0p+0',
                                                            'radial_stir_applied': '0x1.0000000000000p+0',
                                                            'radial_stir_clamped': False,
-                                                           'transport_length_m': '0x1.47ae147ae147bp-4'},
+                                                           'source_film_length_m': '0x1.47ae147ae147bp-4',
+                                                           'surface_film': {'D_m2_s': '0x1.b98c72e9fa5a7p-6',
+                                                                            'Kn_film': '0x1.c9f8d97457fc9p-11',
+                                                                            'Kn_geometry': '0x1.8666a7f41b64ap-15',
+                                                                            'Mach': '0x1.1690ab10be5b2p-5',
+                                                                            'Pe': '0x1.922bf064f04d7p+9',
+                                                                            'Re': '0x1.8a3ee688e973cp+9',
+                                                                            'Sc': '0x1.052589d539a89p+0',
+                                                                            'Sh': '0x1.2c4f0c6ded5bfp+4',
+                                                                            'authority_status': 'status_bearing_non_authoritative',
+                                                                            'binary_approximation': 'independent '
+                                                                                                    'dilute '
+                                                                                                    'species; '
+                                                                                                    'not '
+                                                                                                    'coupled '
+                                                                                                    'multicomponent '
+                                                                                                    'certification',
+                                                                            'dilute_flux_kg_s_m2': '0x1.1567366954665p-15',
+                                                                            'domain_flags': ['surface '
+                                                                                             'flow '
+                                                                                             'undeclared: '
+                                                                                             'default '
+                                                                                             '30 '
+                                                                                             'm/s '
+                                                                                             'planar '
+                                                                                             'recirculation '
+                                                                                             'fan '
+                                                                                             '(assumed '
+                                                                                             'hardware)',
+                                                                                             'momentum '
+                                                                                             'layer '
+                                                                                             'exceeds '
+                                                                                             '10% '
+                                                                                             'of '
+                                                                                             'flow '
+                                                                                             'length'],
+                                                                            'flow_assumed': True,
+                                                                            'formula_id': 'Blasius_plate_area_mean_0.664',
+                                                                            'gas_face_partial_pressure_pa': '0x1.a8c43873cdaf1p+3',
+                                                                            'gas_face_vapour_fraction': '0x1.6a77a7a3ac1a8p-7',
+                                                                            'geometry': 'planar',
+                                                                            'geometry_parameters': {'coverage': '0x1.0000000000000p+0',
+                                                                                                    'declared_length_m': '0x1.71f471f598449p-1',
+                                                                                                    'impeller_material_id': 'dense_alumina_continuous',
+                                                                                                    'impeller_service_T_C': '0x1.a900000000000p+10',
+                                                                                                    'pool_area_m2': '0x1.a3e6c6fd139b4p-2'},
+                                                                            'k_g_m_s': '0x1.666cb3e1db6c6p-1',
+                                                                            'length_m': '0x1.71f471f598449p-1',
+                                                                            'mu_Pa_s': '0x1.f1c67688076b1p-15',
+                                                                            'rho_kg_m3': '0x1.1ae949334f345p-9',
+                                                                            'stefan_model': 'dilute_passive_scalar',
+                                                                            'still_gas_comparison': {'domain_flags': ['declared '
+                                                                                                                      'zero '
+                                                                                                                      'flow: '
+                                                                                                                      'isolated-disk '
+                                                                                                                      'halfspace'],
+                                                                                                     'flux_kg_s_m2': '0x1.5984cedb1becep-18',
+                                                                                                     'formula_id': 'isolated_disk_halfspace_8_over_pi',
+                                                                                                     'k_g_m_s': '0x1.8506f19993f15p-4',
+                                                                                                     'rate_multiplier': '0x1.9b1073e529e59p+2',
+                                                                                                     'stefan_model': 'binary_stagnant_carrier_logarithmic'},
+                                                                            'u_m_s': '0x1.e000000000000p+4',
+                                                                            'velocity_provenance': 'd-257 '
+                                                                                                   'assumed '
+                                                                                                   'recirculation '
+                                                                                                   'hardware'},
+                                                           'transport_length_m': '0x1.71f471f598449p-1'},
                                      'source_label': 'native_fe_partition:pure_component_derived_from_evaluation',
                                      'temperature_K': '0x1.d44999999999ap+10'},
                        'pressure_bar': '0x1.89374bc6a7efap-7'}],

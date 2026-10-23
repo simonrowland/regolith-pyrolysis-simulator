@@ -424,7 +424,9 @@ def test_transition_and_free_molecular_regimes_do_not_apply_continuum_gas_film()
     transitional = _evap(knudsen_number=1.0)
     free_molecular = _evap(knudsen_number=FREE_MOLECULAR_KNUDSEN_MIN)
 
-    assert transitional.r_gas == 0.0
+    # d-254/d-257: transitional film predicts with flags; molecular is HK.
+    assert transitional.r_gas > 0.0
+    assert transitional.r_gas == 445703.894663124
     assert free_molecular.r_gas == 0.0
-    assert transitional.gas_resistance_weight == 0.0
+    assert transitional.gas_resistance_weight == 1.0
     assert free_molecular.gas_resistance_weight == 0.0

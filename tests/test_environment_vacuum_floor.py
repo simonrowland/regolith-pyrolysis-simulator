@@ -379,7 +379,8 @@ def test_controlled_lab_co2_uses_existing_residual_background_pressure_owner_b15
     sim.melt.pO2_mbar = 900.0
     sim.melt.background_gas_species = 'CO2'
     sim.melt.background_gas_mole_fraction = 1.0
-    expected = co2_dissociation_partials_bar(1800.0, 0.1, 0.9)
+    # d-254 approved stack, 9b572306c/c814b890a: fixed final total pressure.
+    expected = co2_dissociation_partials_bar(1800.0, 0.1, 0.9, total_pressure_bar=1.0)
     assert sim._headspace_transport_pO2_bar_from_ledger(0.0) == expected['p_O2_bar']
     assert sim._headspace_co2_dissociation_diagnostic['p_CO2_bar'] == expected['p_CO2_bar']
 

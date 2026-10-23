@@ -91,6 +91,8 @@ def test_frozen_mars_plane_pins(monkeypatch, flow):
     for field in ('source_plane_mbar', 'upstream_mbar'):
         actual.pop(field)
         expected.pop(field)
+    # d-254/d-257 C11: fresh exact source, gas-atom and postcapture pins.
+    # The complete-source pressure maps retain their independent check below.
     assert actual == expected
     reference = source_partials_mbar(receipt['gas_deltas_mol'], flow, sim.melt.p_total_mbar)
     assert receipt['source_plane_mbar'] == receipt['upstream_mbar']

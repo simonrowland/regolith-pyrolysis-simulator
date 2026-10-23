@@ -3263,8 +3263,10 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     # 2026-09-22 03616bb20 corrected Chapman-Enskog's pressure prefactor
     # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
     # finite-series-resistance escape fraction moved with D_AB.
+    # d-254/d-257: native Fe uses the actual pool film and declared 30 m/s fan.
+    # Fresh production value: reconcile-evidence/physics-values.log.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0019750990648993625,
+        0.0015474821988360411,
         rel=0.0,
         abs=1.0e-15,
     )
@@ -3407,7 +3409,8 @@ def test_c7_and_native_fe_predict_and_flag_at_transitional_kn_probe() -> None:
     assert c7_diag["authority_class"] == "status_bearing"
     assert c7_diag["reason"] == "viscous_p_bulk_transport_out_of_domain"
     assert c7_diag["p_bulk_transport_domain"] == "out_of_domain_transitional"
-    assert c7_diag["knudsen_number"] == pytest.approx(0.100002, rel=1e-3)
+    # d-254/d-257: Kn is based on the actual pool-film length, not the pipe.
+    assert c7_diag["knudsen_number"] == pytest.approx(0.016607794193556916, rel=1e-3)
     assert "transport_model_validity_domain" in c7_diag["framing"]
     assert "not_kn_safety_gate" in c7_diag["framing"]
     assert "not_coating_gate" in c7_diag["framing"]
