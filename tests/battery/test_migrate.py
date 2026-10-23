@@ -6832,13 +6832,33 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         amount = _num(item.get("cp"))
         if amount is None:
             return None
-        unit = str(units or "").strip().lower()
-        if unit == "cal/deg-mole":
+        # Same heat-capacity tokens as migrate._convert_compilation_amount:
+        # whitespace is not part of the unit. J/mol/K (Chen 2019, 07d0feef1)
+        # and J/mol K (Klemme 2011, cdad0b3cd) are stored as the printed joule cell.
+        unit = (
+            "".join(str(units or "").lower().split())
+            .replace("·", "")
+            .replace(".", "")
+            .replace("deg-", "deg")
+            .replace("_", "")
+        )
+        if unit in {
+            "cal/mol/k",
+            "cal/molk",
+            "cal/degmole",
+            "calmol^-1k^-1",
+            "caldeg^-1gfw^-1",
+            "caldeg-1gfw-1",
+        }:
             # Beyer RI 8410 Table 1 prints Cp in thermochemical calories per degree-mole.
             return amount * as_decimal("4.184")
-        if unit == "j/mol/k":
-            # Chen 2019 Tables 5-12 print molar Cp in J/mol/K. The stored point
-            # is that printed cell (07d0feef1); it is not a calorie conversion.
+        if unit in {
+            "j/mol/k",
+            "j/molk",
+            "j/degmole",
+            "jk^-1mol^-1",
+            "jmol^-1k^-1",
+        }:
             return amount
         return None
     if q_token == "S":
