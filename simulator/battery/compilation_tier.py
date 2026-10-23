@@ -15,6 +15,7 @@ are not collapsed. ``transition_temperature`` series are not expanded.
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import math
@@ -383,6 +384,119 @@ def _parse_product(segment: EllinghamFitSegment) -> _Product | None:
         return None
     phase, polymorph = _product_phase(token)
     return _Product(formula, coeff, phase, polymorph, token.strip())
+
+
+def _janaf_row_contains(temperature: float, row: object) -> bool:
+    """One JANAF coefficient row. Open at T_min, closed at T_max.
+
+    This is the only copy of that bound. ``_vaporock_gas_attempt`` and the
+    source-basis adapter both use it.
+    """
+
+    return temperature > float(row["T_min"]) and temperature <= float(row["T_max"])
+
+
+def _installed_janaf_vapor_csv() -> Path | None:
+    """JANAF vapor CSV beside ``vaporock.equil``, without importing that package.
+
+    Importing ``vaporock`` constructs ThermoEngine. The editable finder already
+    on ``sys.meta_path`` names the package directory whose ``equil.py`` the
+    engine loads, and the CSV sits next to that module.
+    """
+
+    import sys
+
+    for entry in sys.meta_path:
+        module = sys.modules.get(getattr(entry, "__module__", "") or "")
+        mapping = getattr(module, "MAPPING", None)
+        if not isinstance(mapping, dict):
+            continue
+        root = mapping.get("vaporock")
+        if not root:
+            continue
+        path = Path(root) / "data" / "JANAF-vapor-data-full.csv"
+        if path.is_file():
+            return path
+    try:
+        import importlib.util
+
+        spec = importlib.util.find_spec("vaporock.equil")
+    except Exception:  # noqa: BLE001 - optional engine import boundary
+        spec = None
+    origin = getattr(spec, "origin", None)
+    if not origin:
+        return None
+    path = Path(origin).resolve().parent / "data" / "JANAF-vapor-data-full.csv"
+    return path if path.is_file() else None
+
+
+def _janaf_vapor_rows() -> dict[str, tuple[dict[str, str], ...]]:
+    """Installed vapor-table rows keyed by species name. Empty if unreadable."""
+
+    cached = getattr(_janaf_vapor_rows, "_rows", None)
+    if cached is not None:
+        return cached
+    path = _installed_janaf_vapor_csv()
+    grouped: dict[str, list[dict[str, str]]] = defaultdict(list)
+    if path is not None:
+        with path.open(newline="", encoding="utf-8") as handle:
+            for row in csv.DictReader(handle):
+                grouped[row["species_name"]].append(dict(row))
+    cached = {name: tuple(rows) for name, rows in grouped.items()}
+    setattr(_janaf_vapor_rows, "_rows", cached)
+    return cached
+
+
+def vaporock_gas_has_one_coefficient_row(
+    species_name: str,
+    temperatures_K: Iterable[Decimal],
+) -> bool:
+    """True when one temperature sits in exactly one installed coefficient row.
+
+    Species absent from the loaded table is false. The caller leaves those
+    rows unmapped so they keep the missing-basis refusal.
+    """
+
+    rows = _janaf_vapor_rows().get(species_name)
+    if not rows:
+        return False
+    for temperature_K in temperatures_K:
+        temperature = float(temperature_K)
+        hits = sum(1 for row in rows if _janaf_row_contains(temperature, row))
+        if hits == 1:
+            return True
+    return False
+
+
+def formula_is_ellingham_oxide_product(formula: str) -> bool:
+    """True when the formula's composition is a parsed Ellingham oxide product.
+
+    Same composition parser the formation attempt uses. A string spelling
+    that does not parse is not a match.
+    """
+
+    _, _, _, parse_species_formula = _score_predicates()
+    target = parse_species_formula(formula)
+    if target is None:
+        return False
+    return target in _ellingham_product_compositions(parse_species_formula)
+
+
+def _ellingham_product_compositions(parse_species_formula) -> frozenset:
+    cached = getattr(_ellingham_product_compositions, "_value", None)
+    if cached is None:
+        found = []
+        for segments in ELLINGHAM_FIT_SEGMENTS.values():
+            for segment in segments:
+                product = _parse_product(segment)
+                if product is None:
+                    continue
+                parsed = parse_species_formula(product.formula)
+                if parsed is not None and parsed not in found:
+                    found.append(parsed)
+        cached = frozenset(found)
+        setattr(_ellingham_product_compositions, "_value", cached)
+    return cached
 
 
 def _phase_compatible(product: _Product, identity: Identity) -> bool:
@@ -1133,9 +1247,7 @@ def _vaporock_gas_attempt(
     )
     temperature = float(temperature_K)
     matching_rows = tuple(
-        row
-        for row in table_rows
-        if temperature > float(row["T_min"]) and temperature <= float(row["T_max"])
+        row for row in table_rows if _janaf_row_contains(temperature, row)
     )
     if not matching_rows:
         return _refuse(

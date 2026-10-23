@@ -7,6 +7,7 @@ on the missing-input refusal.
 
 from __future__ import annotations
 
+import json
 from decimal import Decimal
 from pathlib import Path
 
@@ -14,10 +15,18 @@ from simulator.battery.compilation_tier import (
     _iter_compilation_series_cells,
     predict_thermo_attempt,
 )
-from simulator.battery.enums import Engine, Quantity, RefusalReason
-from simulator.battery.identity import quantity_token
-from simulator.battery.migrate import migrate
+from simulator.battery.enums import Engine, PerBasis, Quantity, RefusalReason
+from simulator.battery.identity import atm_to_pa, quantity_token
+from simulator.battery.migrate import (
+    REPO_ROOT,
+    _identity_from_plain,
+    _state_from_plain,
+    compilation_column_series_from_record,
+    migrate,
+    to_plain,
+)
 from simulator.battery.records import State
+from simulator.state_types import StateTag
 
 from tests.battery.test_migrate import (
     _copy_compilation_record,
@@ -78,38 +87,120 @@ def _per_is_unknown(observation) -> bool:
     return per is None or per.is_unknown
 
 
-def _pressure_is_unknown(observation) -> bool:
-    pressure = observation.identity.standard_pressure_Pa
-    return pressure is None or pressure.is_unknown
-
-
 def _attempt(engine: Engine, cell):
     return predict_thermo_attempt(engine, cell)
 
 
-def test_b677_potassium_gas_refuses_missing_mol_basis(tmp_path: Path) -> None:
+def _record_doc(source_id: str, filename: str) -> dict:
+    path = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "compilations"
+        / source_id
+        / "records"
+        / filename
+    )
+    document = json.loads(path.read_text(encoding="utf-8"))
+    assert isinstance(document, dict)
+    return document
+
+
+def _printed_b677_token(document: dict, temperature: str, column: int) -> str:
+    for row in document["source_table_rows_raw"]:
+        if isinstance(row, list) and row and str(row[0]) == temperature:
+            return str(row[column])
+    raise AssertionError(temperature)
+
+
+def _assert_cell_matches_reader(
+    observation,
+    document: dict,
+    quantity: Quantity,
+    temperature: str,
+    *,
+    printed_token: str,
+    column: int,
+) -> None:
+    """Stored magnitude is the reader's lift of the printed cell, not a recomputed factor."""
+
+    assert _printed_b677_token(document, temperature, column) == printed_token
+    series = next(
+        item
+        for item in compilation_column_series_from_record(document)
+        if item.quantity is quantity
+    )
+    assert series.value.series is not None
+    magnitude = next(
+        value
+        for point_temperature, value in series.value.series
+        if point_temperature == Decimal(temperature)
+    )
+    assert _cell_at(observation, temperature).value.point == magnitude
+
+
+def test_b677_potassium_gas_uses_printed_ideal_gas_basis(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B677, "table-0096.json")
     heat_capacity = _observation(result, B677, "table-0096", Quantity.CP)
-    assert _per_is_unknown(heat_capacity)
-    assert _pressure_is_unknown(heat_capacity)
-    cell = _cell_at(heat_capacity, "1600")
-    attempt = _attempt(Engine.VAPOROCK, cell)
-    assert attempt.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
-    assert attempt.refusal_detail["reason"] == _MISSING_GAS
+    entropy = _observation(result, B677, "table-0096", Quantity.S)
     enthalpy = _observation(result, B677, "table-0096", Quantity.H_MINUS_H298)
-    anchor = enthalpy.identity.subtype
-    assert anchor is None or not anchor.is_value
+    gibbs = _observation(result, B677, "table-0096", Quantity.DELTA_FG)
+    assert heat_capacity.identity.per.value is PerBasis.MOL_SPECIES
+    assert "pankratz-1984-usbm-b677-p001-p040.md:677" in heat_capacity.identity.per.reason
+    assert "101325" in heat_capacity.identity.per.reason
+    assert heat_capacity.identity.standard_pressure_Pa.value == atm_to_pa(1)
+    # Identity.__post_init__ rewrites decimal axes with State.of, which drops a reason.
+    assert heat_capacity.identity.standard_pressure_Pa.reason is None
+    assert heat_capacity.identity.subtype.is_not_applicable
+    assert entropy.identity.per.value is PerBasis.MOL_SPECIES
+    assert entropy.identity.subtype.is_not_applicable
+    assert enthalpy.identity.subtype.value == "H(T)-H(298.15 K)"
+    assert ":149" in enthalpy.identity.subtype.reason
+    assert _per_is_unknown(gibbs)
+    document = _record_doc(B677, "table-0096.json")
+    _assert_cell_matches_reader(
+        heat_capacity, document, Quantity.CP, "1600", printed_token="4.975", column=1
+    )
+    _assert_cell_matches_reader(
+        enthalpy, document, Quantity.H_MINUS_H298, "1600", printed_token="6.469", column=3
+    )
+    restored = _identity_from_plain(to_plain(heat_capacity.identity))
+    assert restored.per.reason == heat_capacity.identity.per.reason
+    assert restored.standard_pressure_Pa.value == atm_to_pa(1)
+    admitted = _attempt(Engine.VAPOROCK, _cell_at(heat_capacity, "1600"))
+    assert admitted.refusal_reason is None
+    assert admitted.value is not None
+    outside = _attempt(Engine.VAPOROCK, _cell_at(heat_capacity, "298"))
+    assert outside.value is None
+    assert outside.refusal_detail["reason"] == "vaporock-temperature-outside-janaf-row"
+    assert _cell_at(heat_capacity, "298").identity.per.value is PerBasis.MOL_SPECIES
 
 
-def test_b677_mgo_formation_refuses_missing_per_basis(tmp_path: Path) -> None:
+def test_b677_mgo_formation_maps_mol_species_without_a_reaction(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B677, "table-1203.json")
     gibbs = _observation(result, B677, "table-1203", Quantity.DELTA_FG)
-    assert _per_is_unknown(gibbs)
-    assert _pressure_is_unknown(gibbs)
-    cell = _cell_at(gibbs, "298")
-    attempt = _attempt(Engine.INTERNAL_ANALYTICAL, cell)
-    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
-    assert attempt.refusal_detail["reason"] == _MISSING_PER
+    heat_capacity = _observation(result, B677, "table-1203", Quantity.CP)
+    assert gibbs.identity.per.value is PerBasis.MOL_SPECIES
+    assert "pankratz-1984-usbm-b677-p001-p040.md:175" in gibbs.identity.per.reason
+    assert "0.5" in gibbs.identity.per.reason
+    assert gibbs.identity.standard_pressure_Pa.value == atm_to_pa(1)
+    assert gibbs.identity.reaction.is_unknown
+    assert _per_is_unknown(heat_capacity)
+    document = _record_doc(B677, "table-1203.json")
+    _assert_cell_matches_reader(
+        gibbs,
+        document,
+        Quantity.DELTA_FG,
+        "1200",
+        printed_token="-112.322",
+        column=5,
+    )
+    inside = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(gibbs, "1200"))
+    assert inside.value is None
+    assert inside.refusal_detail["reason"] == "standard-pressure-transform-reaction-unknown"
+    below = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(gibbs, "298"))
+    assert below.value is None
+    assert below.refusal_detail["reason"] == "ellingham-formation-outside-segment"
 
 
 def test_b592_alo_refuses_missing_mol_basis(tmp_path: Path) -> None:
@@ -182,6 +273,18 @@ def test_b2131_silver_stays_unmapped(tmp_path: Path) -> None:
     assert _per_is_unknown(log_kf)
     attempt = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(log_kf, "1600"))
     assert attempt.refusal_detail["reason"] == _MISSING_PER
+
+
+def test_cited_value_reason_survives_plain_reload() -> None:
+    cited = State(StateTag.VALUE, value=PerBasis.MOL_SPECIES, reason="quoted basis")
+    restored = _state_from_plain(to_plain(cited), lambda value: PerBasis(str(value)))
+    assert restored.value is PerBasis.MOL_SPECIES
+    assert restored.reason == "quoted basis"
+    bare = _state_from_plain(
+        to_plain(State.of(PerBasis.MOL_SPECIES)),
+        lambda value: PerBasis(str(value)),
+    )
+    assert bare.reason is None
 
 
 def test_shornikov_solid_k2o_stays_missing_per_basis(tmp_path: Path) -> None:
