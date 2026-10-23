@@ -2113,7 +2113,7 @@ species:
               categorical redox boundary, not a numeric buffer; the tabulated p(O2) is the measurement.'
             algebra: pO2_bar = p_atm × (1.01325 bar / 1 atm) = 5.54e-9 × 1.01325 = 5.613405e-9 bar
             unit_check: 5.54e-9 atm × 101325 Pa/atm = 5.613405e-4 Pa; 5.613405e-4 Pa / 1e5 Pa/bar =
-              5.613405e-9 bar. Matches the already-stored Table 1 point p_Pa=0.0005613405.
+              5.613405e-9 bar. This agrees with the printed Table 1 O2 pressure range in atm; no converted p_Pa twin is stored.
             sanity_check: 5.6e-9 bar is the same order as the alkali-window O2 table (5.54e-9–4.96e-8
               atm). Distinct from DEFAULT_PO2_BAR=1e-8. Harness is observation-level, so this single
               measured pO2 is attached to the whole series; no Clausius–Clapeyron interpolation or
@@ -2358,7 +2358,7 @@ species:
               not a Re/ReO2 buffer calculation.'
             algebra: pO2_bar = p_atm × (1.01325 bar / 1 atm) = 3.78e-9 × 1.01325 = 3.830085e-9 bar
             unit_check: 3.78e-9 atm × 101325 Pa/atm = 3.830085e-4 Pa; 3.830085e-4 Pa / 1e5 Pa/bar =
-              3.830085e-9 bar. Matches the already-stored Table 1 point p_Pa=0.0003830085.
+              3.830085e-9 bar. This agrees with the printed Table 1 O2 pressure range in atm; no converted p_Pa twin is stored.
           sanity_check: 3.8e-9 bar sits inside the 12065 alkali-window O2 table (3.78e-9–2.11e-8 atm).
               Distinct from DEFAULT_PO2_BAR=1e-8. Harness is observation-level, so this single measured
               pO2 is attached as context to the whole series; no interpolation or same-run pairing is

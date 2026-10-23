@@ -75,8 +75,9 @@ The article prints T for all table pressure points, but no experiment total
 pressure, absolute fO2, or run melt composition for these rows. The extract maps
 the printed T into `T_K` and point conditions. It leaves total P, fO2, and
 composition unknown; no 1 atm, vacuum, ambient, or room-temperature condition
-was added. C2's 25 `in_cell_total_pressure_not_derivable` refusals therefore
-remain expected pending the Q1 policy.
+was added. C2's 70 numeric partial-pressure points refused with
+`in_cell_total_pressure_not_derivable` therefore remain expected pending the Q1
+policy (74 observations total include four nonnumeric or summary rows).
 
 Changed pressure series (33 measured-reduced point values):
 `demaria_1971_mn_psat_table2_sample_12022`,
@@ -104,16 +105,17 @@ Changed/split thermochemistry observations:
 `demaria_1971_alo_al_o_table8_minus_delta_fef`.
 
 Isolated real migrator on the edited extract: 1 work, 3 experiments, 152
-observations, 75 unavailable values, 303 unavailable queue entries, and 278
-validation issues. There are 46 hard conditional-field issues: all 33
-`measured_reduced` pressure observations lack a stored input parent, and 13 of
-those also lack a derivation record. The source does not publish the raw
+observations, 75 unavailable values, 303 unavailable queue entries, and 232
+validation issues. There are zero hard `conditional_field` issues: all five
+`measured_reduced` pressure series declare the source's printed calibration
+method with unprinted raw inputs. The source does not publish the raw
 ion-current/calibration values as observation rows, so no parent observations
-were invented. These are explained unavailable lineage fields. The 232
-`identity_incomplete` issues are expected for source rows whose scoring profile
-requires composition, fO2, or total pressure that the paper does not print.
+were invented. The 232 `identity_incomplete` issues are expected for source
+rows whose scoring profile requires composition, fO2, or total pressure that the
+paper does not print.
 Unsupported thermochemistry quantities remain explicit typed refusals. The
-figure-only pressure values already present in the base extract were not changed.
+figure-only F rows had their derived `p_Pa` keys removed; the printed atm values
+remain, and no converted pressure twins are stored.
 No battery store was regenerated. Expected store delta: +35 observation rows
 (33 Table 7–8 split point quantities and two Table 6 second-law summaries), with
 no new works or experiments.

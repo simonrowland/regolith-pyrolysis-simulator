@@ -114,6 +114,15 @@ def test_demaria_1971_tables7_and8_split_printed_thermochemistry_columns() -> No
     """Tables 7–8, p. 1377 (PDF p. 11), keep each printed column separate."""
     rows = _observations(yaml.safe_load(EXTRACT.read_text()))
 
+    for observation_id in (
+        "demaria_1971_sio2_sio_o2_table7_minus_R_ln_Kp",
+        "demaria_1971_sio2_sio_o2_table7_minus_delta_fef",
+        "demaria_1971_alo_al_o_table8_Kp",
+        "demaria_1971_alo_al_o_table8_minus_R_ln_Kp",
+        "demaria_1971_alo_al_o_table8_minus_delta_fef",
+    ):
+        assert rows[observation_id]["locator"]["published_page"] == 1377
+
     table7_h = rows["demaria_1971_sio2_sio_o2_equilibrium_table7"]["values"]
     table7_lnk = rows["demaria_1971_sio2_sio_o2_table7_minus_R_ln_Kp"]["values"]
     table7_fef = rows["demaria_1971_sio2_sio_o2_table7_minus_delta_fef"]["values"]
