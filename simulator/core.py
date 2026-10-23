@@ -13726,7 +13726,98 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         p_total_mbar: float | None = None,
         pO2_mbar: float | None = None,
     ) -> dict[str, Any]:
-        """Predict the C0 temperature and evacuation exit with live owners.
+        """Predict C0 exit in a detached simulator context."""
+        context, unavailable_status = self._build_c0_forecast_context()
+        if context is None:
+            cfg = self.campaign_mgr._campaign_config(CampaignPhase.C0)
+            budget_raw = (
+                cfg.get('alkali_retention_budget_fraction')
+                if alkali_retention_budget_fraction is None
+                else alkali_retention_budget_fraction
+            )
+            try:
+                budget = float(budget_raw)
+            except (TypeError, ValueError):
+                budget = None
+            return {
+                'T_exit_C': None,
+                't_evac_hr': None,
+                'Na_plus_K_to_train_kg': None,
+                'Na_plus_K_feed_loss_fraction': None,
+                'alkali_retention_budget_fraction': budget,
+                'budget_authority': 'owner:d-244',
+                'budget_provenance': 'owner d-244, purity limit',
+                'phase_state': 'unknown; analytical liquid-law extrapolated',
+                'phase_state_ticket': 't-1460',
+                'release_curves': 'uncertified (t-1417)',
+                'prediction_status': unavailable_status,
+            }
+        return context._evaluate_c0_exit_forecast(
+            alkali_retention_budget_fraction=(
+                alkali_retention_budget_fraction
+            ),
+            p_total_mbar=p_total_mbar,
+            pO2_mbar=pO2_mbar,
+        )
+
+    def _build_c0_forecast_context(
+        self,
+    ) -> tuple['PyrolysisSimulator | None', str]:
+        """Build an evaluator with private mutable owners for a C0 forecast."""
+        backend_factory = getattr(self, '_c0_forecast_backend_factory', None)
+        try:
+            if callable(backend_factory):
+                forecast_backend = backend_factory()
+                if forecast_backend is self.backend:
+                    return None, 'unavailable_forecast_backend'
+            elif self.backend is None:
+                forecast_backend = None
+            elif type(self.backend) is InternalAnalyticalBackend:
+                forecast_backend = InternalAnalyticalBackend()
+                forecast_backend.initialize({})
+            else:
+                return None, 'unavailable_forecast_backend'
+        except Exception:
+            return None, 'unavailable_forecast_backend'
+
+        live_store = getattr(self, '_pt0_determinism_store', None)
+        forecast_store = None
+        if live_store is not None:
+            clone_store = getattr(live_store, 'clone_for_replay', None)
+            if not callable(clone_store):
+                return None, 'unavailable_forecast_cache'
+            try:
+                forecast_store = clone_store()
+            except Exception:
+                return None, 'unavailable_forecast_cache'
+            if forecast_store is live_store:
+                return None, 'unavailable_forecast_cache'
+
+        context = type(self).__new__(type(self))
+        try:
+            ledger = snapshot_atom_ledger(self.atom_ledger)
+            memo = {id(self): context, id(self.atom_ledger): ledger}
+            if self.backend is not None:
+                memo[id(self.backend)] = forecast_backend
+            if live_store is not None:
+                memo[id(live_store)] = forecast_store
+            context.__dict__.update(
+                _deepcopy_refusal_state(self.__dict__, memo)
+            )
+            context._c0_forecast_backend_factory = None
+            context._chem_kernel = context._build_chemistry_kernel()
+        except Exception:
+            return None, 'unavailable_forecast_context'
+        return context, ''
+
+    def _evaluate_c0_exit_forecast(
+        self,
+        *,
+        alkali_retention_budget_fraction: float | None = None,
+        p_total_mbar: float | None = None,
+        pO2_mbar: float | None = None,
+    ) -> dict[str, Any]:
+        """Evaluate C0 temperature and evacuation bounds on private owners.
 
         Each integer ramp temperature is evaluated with the analytical
         equilibrium, evaporation, finite-parent depletion, and C0 pipe-cap
@@ -13803,54 +13894,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         max_hold_hr = self.campaign_mgr._max_hold_hr(CampaignPhase.C0)
         max_runtime_hr = float(math.ceil(max_hold_hr))
-        original_state = (
-            self.melt.temperature_C,
-            self.melt.p_total_mbar,
-            self.melt.pO2_mbar,
-            self.melt.atmosphere,
-            self.melt.background_gas_species,
-            self.melt.campaign,
-        )
-        forecast_diagnostic_names = (
-            '_last_backend_error',
-            '_backend_failed',
-            '_last_backend_status',
-            '_last_backend_diagnostics',
-            '_last_out_of_domain_diagnostics',
-            '_last_sulfur_saturation_result',
-            '_last_vapor_pressures_source',
-            '_last_vapor_pressure_diagnostic',
-            '_last_evaporation_flux_diagnostic',
-            '_last_partial_melt_offgassing_diagnostic',
-            '_last_vapour_batch',
-            '_last_vapour_batch_report',
-            '_last_vapour_batch_flux_overlay',
-            '_last_vapour_batch_resolve_error',
-            '_last_imcc_activity_shadow',
-            '_unmeasured_alpha_fallback_species_engaged',
-            '_last_high_t_melt_activity_temperature_K',
-            '_last_high_t_melt_activity',
-            '_last_reduced_real_cache_state',
-        )
-        forecast_diagnostics = {
-            name: (hasattr(self, name), getattr(self, name, None))
-            for name in forecast_diagnostic_names
-        }
-        degraded_path_engagement = copy.deepcopy(
-            self._degraded_path_engagement
-        )
-        condensation_model = getattr(self, 'condensation_model', None)
-        wall_pressure_notices = (
-            copy.deepcopy(
-                condensation_model.last_sticking_alpha_provenance_notice
-            )
-            if condensation_model is not None
-            else None
-        )
-        backend_status_history = self._backend_status_history
-        backend_status_history_length = len(backend_status_history)
-        commissioning_steps = self._engine_commissioning_steps
-        commissioning_steps_length = len(commissioning_steps)
         self.melt.atmosphere = Atmosphere.ARGON_FLOW
         self.melt.background_gas_species = 'Ar'
         self.melt.p_total_mbar = total_pressure_mbar
@@ -14076,28 +14119,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'release_curves': 'uncertified (t-1417)',
                 'prediction_status': f'unavailable:{type(exc).__name__}:{exc}',
             }
-        finally:
-            (
-                self.melt.temperature_C,
-                self.melt.p_total_mbar,
-                self.melt.pO2_mbar,
-                self.melt.atmosphere,
-                self.melt.background_gas_species,
-                self.melt.campaign,
-            ) = original_state
-            for name, (was_present, value) in forecast_diagnostics.items():
-                if was_present:
-                    setattr(self, name, value)
-                elif hasattr(self, name):
-                    delattr(self, name)
-            self._degraded_path_engagement = degraded_path_engagement
-            if condensation_model is not None:
-                condensation_model.last_sticking_alpha_provenance_notice = (
-                    wall_pressure_notices
-                )
-            del backend_status_history[backend_status_history_length:]
-            del commissioning_steps[commissioning_steps_length:]
-            self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
 
     def _cap_c0_joint_release_to_pipe_capacity(
         self,

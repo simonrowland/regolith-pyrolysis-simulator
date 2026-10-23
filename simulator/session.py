@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, field
 from enum import Enum
 import math
@@ -297,6 +298,7 @@ class SimSession:
     ) -> "SimSession":
         """Build, load, and start a simulator from explicit config."""
 
+        forecast_backend_resolvable = backend is None
         cached_real_config = None
         if config.backend_name == CACHED_REAL_BACKEND_NAME:
             cached_real_config = normalize_cached_real_config(
@@ -346,6 +348,16 @@ class SimSession:
                 stage0_subprocess_required=stage0_subprocess_required,
             )
         else:
+            configured_backend_name = canonical_backend_name(
+                str(config.backend_name)
+            )
+            selected_backend_name = canonical_backend_name(
+                str(getattr(backend, "backend_name", ""))
+            )
+            forecast_backend_resolvable = (
+                type(backend).__module__.startswith("simulator.melt_backend.")
+                and selected_backend_name == configured_backend_name
+            )
             assert_stage0_subprocess_backend_safe(
                 backend,
                 subprocess_required=stage0_subprocess_required,
@@ -394,6 +406,31 @@ class SimSession:
                 ),
             )
         )
+        if forecast_backend_resolvable:
+            forecast_backend_name = str(config.backend_name)
+            forecast_backend_policy = config.backend_policy
+            forecast_unavailable_error_cls = config.unavailable_error_cls
+            forecast_cached_real_config = copy.deepcopy(cached_real_config)
+            forecast_backend_config = copy.deepcopy(config.backend_config)
+            forecast_feedstock_id = str(config.feedstock_id)
+            forecast_feedstocks = copy.deepcopy(config.feedstocks)
+            forecast_subprocess_required = bool(stage0_subprocess_required)
+
+            def build_forecast_backend():
+                return resolve_backend(
+                    forecast_backend_name,
+                    forecast_backend_policy,
+                    unavailable_error_cls=forecast_unavailable_error_cls,
+                    cached_real_config=copy.deepcopy(
+                        forecast_cached_real_config
+                    ),
+                    backend_config=copy.deepcopy(forecast_backend_config),
+                    feedstock_id=forecast_feedstock_id,
+                    feedstocks=copy.deepcopy(forecast_feedstocks),
+                    stage0_subprocess_required=forecast_subprocess_required,
+                )
+
+            sim._c0_forecast_backend_factory = build_forecast_backend
         if config.imcc_activity_shadow:
             sim._imcc_activity_shadow_enabled = True
         sim._high_t_melt_activity = config.high_t_melt_activity
