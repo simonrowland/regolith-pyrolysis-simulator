@@ -325,11 +325,16 @@ def runner_payloads(source: str) -> dict[str, dict]:
     if set(raw) != names:
         raise ValueError(f"runner artifact inventory mismatch: missing {sorted(names - raw.keys())}")
     result = {"runner/" + Path(name).stem: load_json(content) for name, content in raw.items()}
-    for artifact, payload in result.items():
+    return _admit_runner_payloads(result)
+
+
+def _admit_runner_payloads(payloads):
+    """Use the same runner admission rule for external and reconstructed states."""
+    for artifact, payload in payloads.items():
         if type(payload) is not dict or payload.get("status") != "ok":
             raise ValueError(f"runner output refused/unavailable: {artifact} status={payload.get('status') if isinstance(payload, dict) else None!r}")
         nodes(payload)  # Reject overflow/nonfinite producer numbers before admission.
-    return result
+    return payloads
 
 
 def snapshot_id(payloads: dict[str, dict]) -> str:
@@ -416,9 +421,11 @@ def compare_manifests(old: dict, new: dict, offers: list[tuple[dict, list]]) -> 
         raise ValueError("artifact inventory mismatch")
     current, initial_id = old, snapshot_id(old)
     measured_states = {initial_id: old}
+    snapshot_edges = {initial_id: frozenset()}
+    current_edges, latest_edge = frozenset(), {}
     chains, classes = {}, []
     report = {k: [] for k in ("UNDECLARED", "MISSING", "WRONG-OLD", "OVERLAP", "CANCELLED")}
-    for manifest, rows in offers:
+    for edge, (manifest, rows) in enumerate(offers):
         classes.append({"offer": manifest["offer"], "classes": manifest["classes"]})
         incoming_id = snapshot_id(current)
         measured = manifest["base_green"]
@@ -438,28 +445,37 @@ def compare_manifests(old: dict, new: dict, offers: list[tuple[dict, list]]) -> 
             overlap = key in chains
             wrong_base = (artifact not in measured_nodes
                           or measured_nodes[artifact].get(pointer, MISSING) != row["old"]
-                          # Returning to green cannot license an independent
-                          # green-based overlap after a cancelled chain.
-                          or (overlap and measured == initial_id))
+                          # A moved leaf requires a measured base descended from
+                          # its previous edge, even after cancellation. Matching
+                          # old tokens on a disjoint earlier base proves no ancestry.
+                          or (overlap and latest_edge[key] not in snapshot_edges[measured]))
             if actual_old != row["old"] or wrong_base:
                 violation = dict(row, offer=manifest["offer"], actual_old=actual_old,
                                  measured_base=measured, incoming_base=incoming_id)
                 report["OVERLAP" if overlap else "WRONG-OLD"].append(violation)
         if len(report["WRONG-OLD"]) + len(report["OVERLAP"]) != prior_errors:
             continue
-        candidate = _apply_rows(incoming, rows)
+        candidate = _admit_runner_payloads(_apply_rows(incoming, rows))
         # Reuse the single-offer owner for complete structure/section validation.
         check_manifest(current, candidate, json_bytes(manifest),
                        b"".join(json.dumps(r).encode() + b"\n" for r in rows),
                        base_green=manifest["base_green"])
-        measured_candidate = candidate if measured == incoming_id else _apply_rows(measured_nodes, rows)
+        measured_candidate = (candidate if measured == incoming_id else
+                              _admit_runner_payloads(_apply_rows(measured_nodes, rows)))
         if measured != incoming_id:
             check_manifest(measured_states[measured], measured_candidate, json_bytes(manifest),
                            b"".join(json.dumps(r).encode() + b"\n" for r in rows),
                            base_green=manifest["base_green"])
-        measured_states[snapshot_id(measured_candidate)] = measured_candidate
-        measured_states[snapshot_id(candidate)] = candidate
+        measured_result_id, merged_result_id = snapshot_id(measured_candidate), snapshot_id(candidate)
+        measured_states[measured_result_id] = measured_candidate
+        measured_states[merged_result_id] = candidate
+        # A content hash cannot distinguish re-created bytes from an earlier
+        # snapshot. Keep its first proof: cancellation must not bless a stale base.
+        snapshot_edges.setdefault(measured_result_id, snapshot_edges[measured] | {edge})
+        current_edges = current_edges | {edge}
+        snapshot_edges.setdefault(merged_result_id, current_edges)
         for row in rows:
+            latest_edge[row["artifact"], row["path"]] = edge
             chains.setdefault((row["artifact"], row["path"]), []).append(
                 dict(row, offer=manifest["offer"]))
         current = candidate

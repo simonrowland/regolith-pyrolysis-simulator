@@ -215,7 +215,7 @@ def test_independent_overlap_after_cancellation_is_rejected(tmp_path):
 
 def test_review_cancelled_chain_with_disjoint_measurement_base():
     repro = ROOT / "tests/fixtures/golden_sections/step3-ror-repro"
-    # Pin the reviewer's measured, individually valid offers before the fix.
+    # Every measured offer is valid alone; C still predates the x chain.
     for base, tip, offers in [("g", "u-tip", ("U",)), ("g", "a-tip", ("A",)),
                               ("a-tip", "g", ("cancel",)), ("u-tip", "final", ("C",))]:
         result = _check(repro / base, repro / tip,
@@ -223,9 +223,23 @@ def test_review_cancelled_chain_with_disjoint_measurement_base():
         assert result.returncode == 0, result.stdout + result.stderr
     result = _check(repro / "g", repro / "final",
                     *(repro / offer / "expected.json" for offer in ("U", "A", "cancel", "C")))
+    assert result.returncode != 0, result.stdout + result.stderr
+    assert 'OVERLAP {"artifact":' in result.stdout
+    assert '"offer": "C-independent-of-A-and-cancel"' in result.stdout
+
+
+def test_continuation_can_measure_descendant_of_previous_edge(tmp_path):
+    old = {"status": "ok", "a": 0, "b": 0}
+    base = _snapshot(tmp_path / "base", old)
+    first = _snapshot(tmp_path / "first", {**old, "a": 1})
+    descendant = _snapshot(tmp_path / "descendant", {**old, "a": 1, "b": 1})
+    tip = _snapshot(tmp_path / "tip", {**old, "a": 2, "b": 1})
+    a = _offer(tmp_path / "A", base, first, offer="A")
+    b = _offer(tmp_path / "B", first, descendant, offer="B")
+    c = _offer(tmp_path / "C", descendant, tip, offer="C")
+    result = _check(base, tip, a, b, c)
     assert result.returncode == 0, result.stdout + result.stderr
     assert "D=2 E=2 exact=yes" in result.stdout
-    assert "OVERLAP: count=0" in result.stdout
 
 
 @pytest.mark.parametrize("status", ["refused", "unavailable"])
@@ -233,9 +247,9 @@ def test_review_cancelled_non_ok_intermediate(status):
     repro = ROOT / "tests/fixtures/golden_sections/step3-ror-repro"
     result = _check(repro / "g", repro / "g",
                     *(repro / f"intermediate-{status}-{i}" / "expected.json" for i in (0, 1)))
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "D=0 E=0 exact=yes" in result.stdout
-    assert "CANCELLED: count=1" in result.stdout
+    assert result.returncode != 0, result.stdout + result.stderr
+    assert "runner output refused/unavailable" in result.stderr
+    assert f"status={status!r}" in result.stderr
 
 
 def test_revision_extra_fixture_is_rejected(tmp_path):
