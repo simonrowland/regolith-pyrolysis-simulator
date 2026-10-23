@@ -110,7 +110,9 @@ def test_c0_forecast_reports_internal_analytical_when_live_backend_is_none():
 
     prediction = sim.campaign_mgr.c0_exit_prediction
     assert prediction["prediction_status"] == "ok"
-    assert prediction["forecast_engine"] == "internal-analytical"
+    context, status = sim._build_c0_forecast_context()
+    assert status == ""
+    assert context._c0_forecast_engine == "internal-analytical"
 
 
 def _canonical_bytes(value):
@@ -216,9 +218,9 @@ def test_c0_forecast_and_supplied_decision_have_identical_realized_trajectory():
         feedstocks
     )
     assert forecasted.campaign_mgr.c0_exit_prediction["prediction_status"] == "ok"
-    assert forecasted.campaign_mgr.c0_exit_prediction["forecast_engine"] == (
-        "internal-analytical"
-    )
+    forecast_context, forecast_status = forecasted._build_c0_forecast_context()
+    assert forecast_status == ""
+    assert forecast_context._c0_forecast_engine == "internal-analytical"
     decision = deepcopy(forecasted.campaign_mgr.c0_exit_prediction)
     supplied, supplied_phase_context, supplied_payloads = _short_c0_trajectory(
         feedstocks,
@@ -297,7 +299,6 @@ def test_c0_forecast_digest_is_unchanged_by_forecast():
     prediction = sim._predict_c0_exit()
 
     assert prediction["prediction_status"] == "ok"
-    assert prediction["forecast_engine"] == "internal-analytical"
     assert _forecast_owned_state_digest(sim, per_hour_summaries) == before
 
 

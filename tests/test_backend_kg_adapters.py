@@ -231,7 +231,6 @@ def test_c0_forecast_refuses_missing_equivalent_backend():
     prediction = sim._predict_c0_exit()
 
     assert prediction["prediction_status"] == "unavailable_forecast_backend"
-    assert prediction["forecast_engine"] is None
     assert vars(live_backend) == before_backend
 
 
