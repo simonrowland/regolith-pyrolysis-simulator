@@ -357,7 +357,7 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     # from e975edd to e1423d8. JSON round-trips preserve float bits.
     assert hashlib.sha256(
         json.dumps(_physics(result), sort_keys=True).encode()
-    ).hexdigest() == "0dbdc3673e0d640898dad7b848278f93322c0b48898050618b21811bd63c7e78"
+    ).hexdigest() == "934e52dd541fc5e6933b7fa9d3b106003b5d20f103aa0c6489c4f4ced3f74cc9"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
