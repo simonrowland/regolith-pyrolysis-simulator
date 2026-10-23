@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from simulator.condensation_routing import STAGE3_ROUTES
+from simulator.condensation_routing import STAGE3_ROUTES, STAGE3_PURITY_FIELDS
 
 import copy
 from dataclasses import dataclass, field, replace
@@ -576,6 +576,9 @@ class RecipeSchema:
     )
 
     ALLOWLIST: tuple[KnobSpec, ...] = (
+        *(_knob(f"condensation_train.{field}", low=0.0, high=1.0,
+                bounds_source="owner d-279 purity mass fraction; (0, 1]",
+                search_enabled=False) for field in STAGE3_PURITY_FIELDS),
         *(_knob(
             f"campaigns.{phase}.stage3_route", "categorical",
             choices=STAGE3_ROUTES,
@@ -2792,6 +2795,13 @@ def _default_setpoint_value(path: KeyPath) -> Any:
 
 
 def _validate_value(spec: KnobSpec, value: Any, schema: RecipeSchema) -> None:
+    if spec.path[-1] in STAGE3_PURITY_FIELDS:
+        from simulator.condensation_routing import validate_stage3_purity
+        try:
+            validate_stage3_purity(value, spec.path[-1])
+        except ValueError as exc:
+            raise RecipeValidationError(str(exc)) from exc
+
     if spec.kind == "categorical":
         if not isinstance(value, str):
             raise RecipeValidationError(

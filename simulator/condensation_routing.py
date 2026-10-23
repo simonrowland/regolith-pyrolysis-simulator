@@ -184,3 +184,15 @@ def is_designated_for_stage(species: str, stage_number: int) -> bool:
     """True when species belongs to the stage's accepted-species set."""
 
     return species in accepted_species_for_stage_number(stage_number)
+
+
+STAGE3_PURITY_FIELDS = ("stage3_product_purity", "stage3_instantaneous_purity")
+
+
+def validate_stage3_purity(value, field):
+    """Mass fraction of SiO2 in SiO2 plus alkali-oxide contamination."""
+    from simulator.scalar_boundary import require_finite_float
+    purity = require_finite_float(value, field)
+    if not 0.0 < purity <= 1.0:
+        raise ValueError(f'{field} must be in (0, 1]')
+    return purity

@@ -7,7 +7,7 @@ import pytest
 
 from simulator.campaigns import CampaignManager
 from simulator.condensation import (
-    CondensationModel, DepositionInputRefusal, Stage3SilicaExposureRefusal,
+    CondensationModel, CondensationRouteResult, DepositionInputRefusal, Stage3SilicaExposureRefusal,
 )
 from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
@@ -89,9 +89,9 @@ def test_open_zero_alkali_sio_window_reaches_stage3(monkeypatch):
 
 @pytest.mark.parametrize("carrier", ["Na", "K", "Na2", "K2O", "NaCl", "Na2O"])
 @pytest.mark.parametrize("amount", [1.0, 1e-30])
-def test_open_refuses_every_positive_alkali_carrier_before_route(carrier, amount, monkeypatch):
+def test_open_refuses_every_positive_alkali_carrier_with_zero_capture(carrier, amount, monkeypatch):
     model = _model("through")
-    monkeypatch.setattr(model, "_route", lambda *args: pytest.fail("admission must precede contact"))
+    monkeypatch.setattr(model, "_route", lambda *args: CondensationRouteResult())
     with pytest.raises(Stage3SilicaExposureRefusal, match="silica_exposed_to_alkali") as caught:
         model.route(EvaporationFlux({carrier: amount}), MeltState())
     finding = caught.value.stage3_route_diagnostic["findings"][0]
@@ -309,3 +309,165 @@ def test_existing_numeric_override_boundaries_and_silica_mass_pin():
     result = CondensationRouteResult(condensed_by_stage_species={3: {"SiO": 1.0}})
     assert result.silica_fume_fraction_of_feedstock(1.0) == pytest.approx(
         0.6814603937936665, rel=1e-12)
+
+
+@pytest.mark.parametrize("entry", ["session_start", "script_adjust", "script_setpoint", "script_json", "batch_json"])
+@pytest.mark.parametrize("route", ["divert", "through"])
+def test_route_enum_at_every_runtime_entry(entry, route):
+    import json
+    from simulator.session import SimSession, SimSessionConfig
+    from simulator.session_cli import SessionScriptRunner
+    from simulator.runner import _parse_runtime_campaign_overrides_json
+    fields = {"C0": {"stage3_route": route, "stage3_product_purity": 0.998,
+                     "stage3_instantaneous_purity": 0.98}}
+    if entry == "batch_json":
+        assert _parse_runtime_campaign_overrides_json(json.dumps(fields), flag_name="pin") == fields
+        return
+    runner = SessionScriptRunner()
+    if entry == "session_start":
+        bundle = load_config_bundle()
+        runner.session.start(SimSessionConfig(
+            feedstock_id="lunar_mare_low_ti", mass_kg=1.0, campaign="C0",
+            feedstocks=bundle.feedstocks, setpoints=bundle.setpoints,
+            vapor_pressures=bundle.vapor_pressures, backend_name="internal-analytical",
+            runtime_campaign_overrides=fields))
+    else:
+        args = ["--feedstock=lunar_mare_low_ti", "--campaign=C0", "--mass-kg=1", "--backend=internal-analytical"]
+        if entry == "script_setpoint":
+            args += [f"--setpoint=C0.stage3_route={route}", "--setpoint=C0.stage3_product_purity=0.998",
+                     "--setpoint=C0.stage3_instantaneous_purity=0.98"]
+        elif entry == "script_json":
+            args += ["--runtime-campaign-overrides=" + json.dumps(fields)]
+        runner.execute(["start", *args], "test")
+        if entry == "script_adjust":
+            runner.execute(["adjust", "campaign_override", "C0", "stage3_route", route], "test")
+            runner.execute(["adjust", "campaign_override", "C0", "stage3_product_purity", "0.998"], "test")
+            runner.execute(["adjust", "campaign_override", "C0", "stage3_instantaneous_purity", "0.98"], "test")
+    selected = runner.session._sim.condensation_model.train.collection_route
+    assert selected["stage3_route"] == route
+    assert selected["stage3_product_purity"] == 0.998
+    assert selected["stage3_instantaneous_purity"] == 0.98
+
+
+@pytest.mark.parametrize("value", [None, "bad"])
+def test_complete_file_requires_valid_mre_route(tmp_path, value):
+    import yaml
+    cfg = load_config_bundle().setpoints
+    if value is None:
+        cfg["campaigns"]["mre_baseline"].pop("stage3_route")
+    else:
+        cfg["campaigns"]["mre_baseline"]["stage3_route"] = value
+    path = tmp_path / "setpoints.yaml"
+    path.write_text(yaml.safe_dump(cfg))
+    with pytest.raises(ValueError, match="mre_baseline.stage3_route"):
+        load_config_bundle(setpoints_path=path)
+
+
+def test_known_nonalkali_retained_roundoff_is_not_alkali_exposure():
+    model = _model("through")
+    model.retained_vapor_mol = {"Al": 3.2311742677852644e-27, "Mg": -8.470329472543003e-22}
+    model.route(EvaporationFlux({"SiO": 1.0}), MeltState(temperature_C=1650))
+    assert model.last_stage3_route_diagnostic["unavailable"] == []
+    assert model.last_stage3_route_diagnostic["alkali_oxide_kg_hr"] == 0.0
+
+
+@pytest.mark.parametrize("purity, factor, capture, admitted", [
+    (0.999, 0.5, 1.0, True), (0.999, 2.0, 1.0, False),
+    (1.0, 0.5, 1.0, False), (0.999, 0.5, 0.0, False),
+])
+def test_live_capture_purity_bound_and_limits(monkeypatch, purity, factor, capture, admitted):
+    from simulator.accounting import resolve_species_formula
+    from simulator.condensation import CondensationRouteResult
+    model = _model("through")
+    model.train.collection_route["stage3_product_purity"] = purity
+    projection = CondensationRouteResult(condensed_by_stage_species={3: {"SiO": capture}})
+    monkeypatch.setattr(model, "_route", lambda *args: projection)
+    # Set an oxide-equivalent dose independently via the production formula resolver.
+    na = resolve_species_formula("Na", {}).molar_mass_kg_per_mol()
+    oxide = resolve_species_formula("Na2O", {}).molar_mass_kg_per_mol()
+    oxide_dose = projection.silica_capture_kg(3) * 0.001 * factor if capture else 1e-30
+    flux = EvaporationFlux({"SiO": 1.0, "Na": oxide_dose * 2 * na / oxide})
+    if admitted:
+        assert model.route(flux, MeltState()) is projection
+    else:
+        with pytest.raises(Stage3SilicaExposureRefusal):
+            model.route(flux, MeltState())
+    diag = model.last_stage3_route_diagnostic
+    assert diag["alkali_oxide_kg_hr"] == pytest.approx(oxide_dose)
+    assert diag["silica_capture_kg_hr"] == projection.silica_capture_kg(3)
+    assert diag["stage3_product_purity"] == purity
+    assert model.train.stages[3].collected_kg == {}
+
+
+@pytest.mark.parametrize("field", ["stage3_product_purity", "stage3_instantaneous_purity"])
+@pytest.mark.parametrize("value", [None, 0, -1, 1.001, float("nan"), True])
+def test_purity_config_recipe_and_runtime_reject_invalid(field, value, tmp_path):
+    import yaml
+    from simulator.campaigns import parse_campaign_override_value
+    path = ("condensation_train", field)
+    with pytest.raises(RecipeValidationError):
+        RecipePatch({path: value}).validated(RecipeSchema())
+    with pytest.raises(ValueError):
+        parse_campaign_override_value(field, value)
+    cfg = load_config_bundle().setpoints
+    cfg["condensation_train"][field] = value
+    file = tmp_path / "setpoints.yaml"
+    file.write_text(yaml.safe_dump(cfg))
+    with pytest.raises(ValueError, match=f"{field}|rejects NaN"):
+        load_config_bundle(setpoints_path=file)
+
+
+@pytest.mark.parametrize("field, default, value", [
+    ("stage3_product_purity", 0.999, 0.998),
+    ("stage3_instantaneous_purity", 0.99, 0.98),
+])
+def test_recipe_purity_reaches_same_train_after_lazy_init_and_reset(field, default, value):
+    bundle = load_config_bundle()
+    assert bundle.setpoints["condensation_train"][field] == default
+    path = ("condensation_train", field)
+    patch = RecipeSchema().to_setpoints_patch(RecipePatch({path: value}))
+    cfg = copy.deepcopy(bundle.setpoints)
+    cfg["condensation_train"].update(patch["condensation_train"])
+    sim = _sim(cfg)
+    assert sim._condensation_model is None
+    assert sim.condensation_model.train is sim.train
+    assert sim.train.collection_route[field] == value
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    assert sim.condensation_model.train is sim.train
+    assert sim.train.collection_route[field] == value
+
+
+@pytest.mark.parametrize("dose_factor", [0.5, 2.0])
+def test_retained_alkali_is_charged_to_live_purity_budget(monkeypatch, dose_factor):
+    from simulator.accounting import resolve_species_formula
+    model = _model("through")
+    projection = CondensationRouteResult(condensed_by_stage_species={3: {"SiO": 1.0}})
+    monkeypatch.setattr(model, "_route", lambda *args: projection)
+    oxide = resolve_species_formula("K2O", {}).molar_mass_kg_per_mol()
+    # One hour of retained K, converted on the production formula basis.
+    allowance = projection.silica_capture_kg(3) * (1 - 0.999) / 0.999
+    model.retained_vapor_mol = {"K": 2 * dose_factor * allowance / oxide}
+    if dose_factor > 1:
+        with pytest.raises(Stage3SilicaExposureRefusal):
+            model.route(EvaporationFlux({"SiO": 1.0}), MeltState())
+    else:
+        assert model.route(EvaporationFlux({"SiO": 1.0}), MeltState()) is projection
+    assert model.last_stage3_route_diagnostic["alkali_oxide_kg_hr"] == pytest.approx(dose_factor * allowance)
+
+
+def test_interim_gate_uses_product_grade_before_chunk4_burst_ceiling(monkeypatch):
+    model = _model("through")
+    model.train.collection_route.update({
+        "stage3_product_purity": 0.999, "stage3_instantaneous_purity": 0.99})
+    projection = CondensationRouteResult(condensed_by_stage_species={3: {"SiO": 1.0}})
+    monkeypatch.setattr(model, "_route", lambda *args: projection)
+    # A 99.5% silica/oxide mixture lies between the two owner specifications.
+    # Na2O is already the oxide mass basis, so no carrier conversion is needed.
+    oxide_dose = projection.silica_capture_kg(3) * (1 - 0.995) / 0.995
+    with pytest.raises(Stage3SilicaExposureRefusal) as caught:
+        model.route(EvaporationFlux({"SiO": 1.0, "Na2O": oxide_dose}), MeltState())
+    diag = caught.value.stage3_route_diagnostic
+    assert diag["capture_purity"] == pytest.approx(0.995)
+    assert diag["stage3_product_purity"] == 0.999
+    assert diag["stage3_instantaneous_purity"] == 0.99
+    assert diag["effective_instantaneous_purity"] == 0.999

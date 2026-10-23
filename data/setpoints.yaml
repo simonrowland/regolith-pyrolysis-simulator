@@ -991,6 +991,11 @@ completion_contracts:
 # 2. CONDENSATION TRAIN
 # ============================================================================
 condensation_train:
+  # SiO2 / (SiO2 + Na2O/K2O equivalent inflow), owner d-279.
+  stage3_product_purity: 0.999
+  # ENGINEERING DEFAULT: an order looser than the product spec; owner may revise.
+  # Chunk 3 conservatively uses p_product; chunk 4 activates this burst ceiling.
+  stage3_instantaneous_purity: 0.99
   stage3_bypass:
     liner_material: hot_wall_refractory_liner
     length_m: 1.0

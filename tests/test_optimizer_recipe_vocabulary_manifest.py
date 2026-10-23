@@ -36,9 +36,9 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     # d-268 chunk 3 adds explicit route commands; four existing staged intervals
     # expose the diverter to search. Receiver accounting remains a later chunk.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "858895e91b906dfb28709cb2bedc6becea4464859aab6cd8f24470a8d032e685"
+        "d35c97cc003f47f4aa7e2d7f1fcfd7eb860330d3003b03c7ba8309285718c6c0"
     )
-    assert digest == "cd08dc8439b4a9f9023ac543c78c7ca16e02ce2ea2ead69a85673602352f4af4"
+    assert digest == "c48fcc639c138598b568b51b86d21bf4d409ff5341d6acaf0a594470375b59e3"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
