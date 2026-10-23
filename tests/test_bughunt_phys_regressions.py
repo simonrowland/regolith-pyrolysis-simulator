@@ -856,6 +856,132 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     assert isinstance(direct_snapshot.value.__cause__, AssertionError)
 
 
+def test_successful_step_shares_committed_target_inventory_history() -> None:
+    class HistoricalTargetInventory:
+        deepcopy_count = 0
+
+        def __deepcopy__(self, memo):
+            type(self).deepcopy_count += 1
+            copied = type(self)()
+            memo[id(self)] = copied
+            return copied
+
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    HistoricalTargetInventory.deepcopy_count = 0
+    committed = HistoricalTargetInventory()
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = BatchRecord(snapshots=[])
+    sim._condensation_model = SimpleNamespace(
+        operating_history=[],
+        last_sticking_alpha_provenance_notice={},
+    )
+    sim._target_inventory_by_hour = [committed]
+    sim.atom_ledger = FakeLedger()
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+    sim._build_chemistry_kernel = lambda: object()
+    sim._step_one_hour = lambda: HourSnapshot(hour=4)
+
+    assert sim.step().hour == 4
+
+    assert HistoricalTargetInventory.deepcopy_count == 0
+    assert sim._target_inventory_by_hour == [committed]
+    assert sim._target_inventory_by_hour[0] is committed
+
+
+def test_terminal_refusal_does_not_leak_target_inventory_history_append(
+    monkeypatch,
+) -> None:
+    class TerminalRefusal(RuntimeError):
+        terminal_refusal = True
+
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    def make_simulator():
+        committed = {"hour": 3, "targets": [{"remaining_kg": 1.0}]}
+        sim = object.__new__(PyrolysisSimulator)
+        sim._poisoned_hour = None
+        sim._pending_shuttle_bakeout_cycle_increment = ""
+        sim.melt = SimpleNamespace(hour=4)
+        sim.record = SimpleNamespace(snapshots=[])
+        sim._condensation_model = SimpleNamespace(
+            operating_history=[],
+            last_sticking_alpha_provenance_notice={},
+        )
+        sim.runtime_state = {"target_record": committed}
+        sim._target_inventory_by_hour = [committed]
+        sim.atom_ledger = FakeLedger()
+        sim._chem_registry = object()
+        sim._chem_kernel = object()
+        sim._build_chemistry_kernel = lambda: object()
+        refusal = TerminalRefusal("refused after recording target inventory")
+
+        def refuse_after_append():
+            sim._target_inventory_by_hour.append(
+                {"hour": 4, "targets": [{"remaining_kg": 0.0}]}
+            )
+            raise refusal
+
+        sim._step_one_hour = refuse_after_append
+        return sim, committed, refusal
+
+    def assert_refusal_rolls_back(sim, committed, refusal):
+        with pytest.raises(TerminalRefusal) as raised:
+            sim.step()
+
+        assert raised.value is refusal
+        assert sim._target_inventory_by_hour == [
+            {"hour": 3, "targets": [{"remaining_kg": 1.0}]}
+        ]
+        assert sim._target_inventory_by_hour[0] is sim.runtime_state["target_record"]
+        assert sim._target_inventory_by_hour[0] is not committed
+
+    sim, committed, refusal = make_simulator()
+    assert_refusal_rolls_back(sim, committed, refusal)
+
+    sim, committed, refusal = make_simulator()
+    snapshot = sim._snapshot_terminal_refusal_hour_state
+
+    def broken_snapshot(*, defer_committed_history=False):
+        state, ledger, cost_state = snapshot(
+            defer_committed_history=defer_committed_history,
+        )
+        state["_target_inventory_by_hour"] = sim._target_inventory_by_hour
+        return state, ledger, cost_state
+
+    monkeypatch.setattr(
+        sim,
+        "_snapshot_terminal_refusal_hour_state",
+        broken_snapshot,
+    )
+    with pytest.raises(AssertionError):
+        assert_refusal_rolls_back(sim, committed, refusal)
+
+
 def test_terminal_refusal_materializes_detached_committed_history() -> None:
     class FakeLedger:
         def __init__(self) -> None:
