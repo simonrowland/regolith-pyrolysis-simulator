@@ -1331,12 +1331,22 @@ def _unverified_apparatus_notices(
         and author_reported_activity
         and _has_calibration_not_grounded(gates.checks)
     )
+    uncomputable_effusion_sum = any(
+        _missing_apparatus_fact(
+            check,
+            allow_calibration=False,
+            allow_unknown_method=False,
+        )
+        == "in_cell_partial_pressure_sum"
+        for check in gates.checks
+    )
     if not (
         measured_pressure
         or comparison_activity
         or unknown_method_activity
         or calibration_flagged_partial_pressure
         or calibration_flagged_activity
+        or uncomputable_effusion_sum
     ):
         return ()
     allow_calibration = (
