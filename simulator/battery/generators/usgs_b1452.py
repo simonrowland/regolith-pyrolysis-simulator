@@ -53,6 +53,7 @@ from simulator.battery.records import (
     ReactionTerm,
     Species,
     State,
+    phase_token,
     Uncertainty,
     Value,
 )
@@ -1367,6 +1368,22 @@ def _element_reference_species(symbol: str) -> Species:
         else State.unknown("elemental reference crystals")
     )
     return make_species(symbol, Phase.CR, polymorph, charge=0)
+
+
+def reference_enthalpy_zero_is_ideal_gas(formula: str) -> bool:
+    """True when B1452's elemental reference for this formula is the ideal gas.
+
+    Diatomic gases are that reference. Every other element is the crystal,
+    so its H−H298 zero is not a JANAF ideal-gas table.
+    `_element_reference_species` owns the assignment.
+    """
+
+    counts = _parse_counts(formula)
+    if counts is None or len(counts) != 1:
+        return False
+    symbol = next(iter(counts))
+    species = _element_reference_species(symbol)
+    return phase_token(species) is Phase.G and species.formula == formula
 
 
 def _oxide_species(formula: str) -> Species:

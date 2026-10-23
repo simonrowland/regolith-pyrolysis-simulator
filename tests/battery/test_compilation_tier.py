@@ -61,6 +61,10 @@ from simulator.battery.score import (
 )
 from simulator.chemistry.ellingham_thermo import ELLINGHAM_FIT_SEGMENTS
 from tests.battery import factories as F
+from tests.engine_availability import (
+    magemin_binary_available,
+    thermoengine_package_available,
+)
 
 _PRINTED_DFG = Decimal("-3.886")
 _PRINTED_LOGK = Decimal("0.092")
@@ -74,6 +78,9 @@ def _na2o_liquid(quantity: Quantity = Quantity.DELTA_FG):
         T_K=_T,
         per=PerBasis.MOL_SPECIES,
         metal_formula="Na",
+        # 2200 K segment is 4 Na(g) + O2 -> 2 Na2O(l). Liquid Na is a
+        # different element basis and must not receive this number.
+        metal_phase=Phase.G,
         nu_metal=Fraction(4),
         nu_o2=Fraction(1),
     )
@@ -290,6 +297,14 @@ def test_fusion_predictor_refuses_a_noncrystalline_solid_identity() -> None:
     assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
 
 
+_VAPOROCK_GAS_TABLE = {
+    "K": "K-005",
+    "Fe": "Fe-008",
+    "O2": "O-029",
+    "Co": "Co-005",
+}
+
+
 def _gas_thermo(
     formula: str = "K",
     quantity: Quantity = Quantity.CP,
@@ -304,6 +319,31 @@ def _gas_thermo(
         formation_elements=State.not_applicable("not a formation quantity"),
     )
     return identity
+
+
+def _same_table_gas(
+    observation_id: str,
+    formula: str,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    value: Decimal,
+    **kwargs,
+):
+    """JANAF gas-thermo observation whose locator is that species' gas table."""
+
+    from simulator.battery.records import Locator
+
+    table_id = _VAPOROCK_GAS_TABLE[formula]
+    return replace(
+        F.observation(
+            observation_id,
+            "exp-1",
+            _gas_thermo(formula, quantity, temperature_K),
+            value,
+            **kwargs,
+        ),
+        locator=Locator(table=table_id, record=table_id),
+    )
 
 
 def _context(*observations, works=None, experiments=None, origins=None):
@@ -1469,6 +1509,8 @@ def test_ellingham_rejects_element_reference_phase_mismatch() -> None:
     assert refused.refusal_detail["element"] == "Ca"
     assert refused.refusal_detail["cell_phase"] == Phase.CR.value
     assert refused.refusal_detail["segment_phase"] == Phase.G.value
+    assert refused.refusal_detail["observation_element_basis"] == "Ca(cr)"
+    assert refused.refusal_detail["segment_element_basis"] == "Ca(g)"
 
     gas_bar = F.cao_identity(
         Phase.CR,
@@ -1494,11 +1536,284 @@ def test_ellingham_rejects_element_reference_phase_mismatch() -> None:
     assert abs((atm_attempt.value - bar_attempt.value) - expected_shift) < Decimal("1e-12")
 
 
+# Fe(gamma) is the 1200 K segment allotrope, so it keeps the segment number,
+# including the 1 atm shift. The mismatched bases below are refused.
+_FEO_CRYSTAL_1200K = Decimal("-194.25060000000002")
+_FEO_CRYSTAL_1200K_ATM = Decimal("-194.3162658956496301986338624")
+
+
+def _with_reactant_basis(
+    identity,
+    phase: Phase,
+    polymorph: Polymorph | None,
+):
+    """Replace the negative non-O2 reactant phase and allotrope."""
+
+    reaction = identity.reaction.value
+    assert reaction is not None
+
+    def species_for(formula: str) -> Species:
+        return Species(
+            formula,
+            phase,
+            polymorph=None if polymorph is None else State.of(polymorph),
+        )
+
+    terms = tuple(
+        replace(term, species=species_for(term.species.formula))
+        if term.coefficient < 0 and term.species.formula != "O2"
+        else term
+        for term in reaction.terms
+    )
+    elements = tuple(
+        (name, species_for(species.formula)) if species.formula != "O2" else (name, species)
+        for name, species in identity.formation_elements.value
+    )
+    return replace(
+        identity,
+        reaction=State.of(replace(reaction, terms=terms)),
+        formation_elements=State.of(elements),
+    )
+
+
+def _assert_ellingham_number(observation_id: str, identity, value: Decimal, evidence: str):
+    attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(observation_id, "exp-1", identity, Decimal("0")),
+    )
+    assert attempt.refusal_reason is None
+    assert attempt.refusal_detail == {}
+    assert attempt.value == value
+    assert attempt.call_evidence == evidence
+    return attempt
+
+
+def _assert_element_basis_refusal(
+    observation_id: str,
+    identity,
+    detail: str,
+    observation_basis: str,
+    segment_basis: str,
+    *,
+    cell_phase: str,
+    segment_phase: str,
+):
+    attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(observation_id, "exp-1", identity, Decimal("0")),
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert attempt.refusal_detail["reason"] == detail
+    assert attempt.refusal_detail["observation_element_basis"] == observation_basis
+    assert attempt.refusal_detail["segment_element_basis"] == segment_basis
+    assert attempt.refusal_detail["cell_phase"] == cell_phase
+    assert attempt.refusal_detail["segment_phase"] == segment_phase
+    return attempt
+
+
+def test_ellingham_refuses_element_basis_mismatch_at_every_pressure() -> None:
+    feo_liquid = F.oxide_identity(
+        "FeO",
+        Phase.L,
+        T_K=Decimal("2000"),
+        metal_formula="Fe",
+        metal_phase=Phase.L,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1, 2),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    fe_alpha_liquid = _with_reactant_basis(feo_liquid, Phase.CR, Polymorph.ALPHA)
+    for observation_id, identity in (
+        ("feo-alpha-liquid-1bar", fe_alpha_liquid),
+        (
+            "feo-alpha-liquid-missing-pressure",
+            replace(
+                fe_alpha_liquid,
+                standard_pressure_Pa=State.unknown("pressure not printed"),
+            ),
+        ),
+    ):
+        _assert_element_basis_refusal(
+            observation_id,
+            identity,
+            "identity-mismatch-element-reference-phase",
+            "Fe(cr,alpha)",
+            "Fe(l)",
+            cell_phase=Phase.CR.value,
+            segment_phase=Phase.L.value,
+        )
+
+    feo_crystal = F.oxide_identity(
+        "FeO",
+        Phase.CR,
+        T_K=Decimal("1200"),
+        metal_formula="Fe",
+        metal_phase=Phase.CR,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1, 2),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+        polymorph="crystalline",
+    )
+    crystal_evidence = "ellingham:Fe:s:T=1200:generic-solid"
+    refused = _assert_element_basis_refusal(
+        "feo-crystal-alpha-1bar",
+        _with_reactant_basis(feo_crystal, Phase.CR, Polymorph.ALPHA),
+        "identity-mismatch-element-reference-allotrope",
+        "Fe(cr,alpha)",
+        "Fe(cr,gamma)",
+        cell_phase=Phase.CR.value,
+        segment_phase=Phase.CR.value,
+    )
+    assert refused.refusal_detail["element"] == "Fe"
+    assert refused.refusal_detail["cell_allotrope"] == Polymorph.ALPHA.value
+    assert refused.refusal_detail["segment_allotrope"] == "gamma"
+    # REFERENCE at 1200 K is gamma on Fe-003, the same allotrope as the segment.
+    for name, polymorph in (
+        ("gamma", Polymorph.GAMMA),
+        ("omitted", None),
+        ("reference", Polymorph.REFERENCE),
+    ):
+        answered = _assert_ellingham_number(
+            f"feo-crystal-{name}-1bar",
+            _with_reactant_basis(feo_crystal, Phase.CR, polymorph),
+            _FEO_CRYSTAL_1200K,
+            crystal_evidence,
+        )
+        assert not any(
+            notice.reason.startswith("element-reference-state-unresolved")
+            for notice in answered.notices
+        )
+    fe_alpha_crystal = _with_reactant_basis(feo_crystal, Phase.CR, Polymorph.ALPHA)
+    _assert_element_basis_refusal(
+        "feo-crystal-alpha-1atm",
+        replace(fe_alpha_crystal, standard_pressure_Pa=State.of(Decimal("101325"))),
+        "identity-mismatch-element-reference-allotrope",
+        "Fe(cr,alpha)",
+        "Fe(cr,gamma)",
+        cell_phase=Phase.CR.value,
+        segment_phase=Phase.CR.value,
+    )
+    fe_gamma_crystal = _with_reactant_basis(feo_crystal, Phase.CR, Polymorph.GAMMA)
+    _assert_ellingham_number(
+        "feo-crystal-gamma-1atm",
+        replace(fe_gamma_crystal, standard_pressure_Pa=State.of(Decimal("101325"))),
+        _FEO_CRYSTAL_1200K_ATM,
+        crystal_evidence,
+    )
+
+    cao_crystal = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1800"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    for observation_id, identity in (
+        ("cao-cr-1bar", cao_crystal),
+        ("cao-cr-log10-1bar", replace(cao_crystal, quantity=Quantity.LOG10_KF)),
+    ):
+        refused = _assert_element_basis_refusal(
+            observation_id,
+            identity,
+            "identity-mismatch-element-reference-phase",
+            "Ca(cr)",
+            "Ca(g)",
+            cell_phase=Phase.CR.value,
+            segment_phase=Phase.G.value,
+        )
+        assert refused.refusal_detail["element"] == "Ca"
+
+
+_MNO_CRYSTAL_1800K = Decimal("-248.185")
+
+
+def _mno_identity(phase: Phase, temperature: str, metal_phase: Phase = Phase.L):
+    return F.oxide_identity(
+        "MnO",
+        phase,
+        T_K=Decimal(temperature),
+        metal_formula="Mn",
+        metal_phase=metal_phase,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1, 2),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+        polymorph="crystalline" if phase is Phase.CR else None,
+    )
+
+
+def test_ellingham_mno_liquid_label_refuses_copied_crystal_coefficients() -> None:
+    """A liquid MnO identity does not receive the crystal neighbour's dH and dS.
+
+    The crystal neighbour at 1800 K keeps that number. Solid MnO at 2200 K
+    and liquid MnO at 1800 K stay phase-incompatible. Liquid MnO above the
+    label's range stays an outside-segment refusal.
+    """
+
+    liquid = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "mno-liquid-2200",
+            "exp-1",
+            _mno_identity(Phase.L, "2200"),
+            Decimal("0"),
+        ),
+    )
+    assert liquid.value is None
+    assert liquid.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert liquid.refusal_detail["reason"] == (
+        "ellingham-liquid-label-copies-crystal-coefficients"
+    )
+    assert liquid.refusal_detail["observation_product_basis"] == "MnO(l)"
+    assert "MnO(lit. liquid range)" in liquid.refusal_detail["segment_phase_basis"]
+    assert "MnO(s)" in liquid.refusal_detail["crystal_neighbour_phase_basis"]
+    assert liquid.call_evidence == "ellingham:Mn:lit. liquid range:T=2200"
+    crystal = _assert_ellingham_number(
+        "mno-crystal-1800",
+        _mno_identity(Phase.CR, "1800"),
+        _MNO_CRYSTAL_1800K,
+        "ellingham:Mn:s:T=1800:generic-solid",
+    )
+    assert crystal.notices[0].reason == (
+        "Ellingham segment (1519.0, 2058.0) authority reconstructed_limited"
+    )
+    for observation_id, identity in (
+        ("mno-crystal-2200", _mno_identity(Phase.CR, "2200")),
+        ("mno-liquid-1800", _mno_identity(Phase.L, "1800")),
+    ):
+        refused = predict_thermo_attempt(
+            Engine.INTERNAL_ANALYTICAL,
+            F.observation(observation_id, "exp-1", identity, Decimal("0")),
+        )
+        assert refused.value is None
+        assert refused.refusal_reason is RefusalReason.UNSUPPORTED
+        assert refused.refusal_detail["reason"] == (
+            "ellingham-phase-or-polymorph-not-in-fit"
+        )
+    outside = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "mno-liquid-2700",
+            "exp-1",
+            _mno_identity(Phase.L, "2700"),
+            Decimal("0"),
+        ),
+    )
+    assert outside.value is None
+    assert outside.refusal_detail["reason"] == "ellingham-formation-outside-segment"
+    assert outside.call_evidence == "ellingham:Mn:lit. liquid range:T=2700:outside-segment"
+
+
 def test_ellingham_pressure_transform_refuses_unknown_reaction_or_phase() -> None:
+    # The 1200 K segment is Ca(l). The metal matches it, so an unknown
+    # product phase stays the pressure transform's refusal.
     identity = F.cao_identity(
         Phase.CR,
         T_K=Decimal("1200"),
-        metal_phase=Phase.CR,
+        metal_phase=Phase.L,
         per=PerBasis.MOL_SPECIES,
         p_std=Decimal("101325"),
     )
@@ -1533,6 +1848,180 @@ def test_ellingham_pressure_transform_refuses_unknown_reaction_or_phase() -> Non
     assert refused_phase.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
     assert refused_phase.refusal_detail["reason"] == (
         "standard-pressure-transform-phase-unknown"
+    )
+
+
+def _with_term_phase(identity, formula: str, phase: State):
+    reaction = identity.reaction.value
+    assert reaction is not None
+    terms = tuple(
+        replace(term, species=replace(term.species, phase=phase))
+        if term.species.formula == formula
+        else term
+        for term in reaction.terms
+    )
+    return replace(identity, reaction=State.of(replace(reaction, terms=terms)))
+
+
+# Captured from predict_thermo_attempt on the matching element basis.
+_CAO_CRYSTAL_1100K = Decimal("-520.29700025")
+_NIO_CRYSTAL_1100K = Decimal("-140.6632534284")
+_ZRO2_BETA_1500K = Decimal("-819.6519385441172")
+
+
+def test_unknown_phase_on_one_term_does_not_skip_a_known_element_mismatch() -> None:
+    """Unknown O2 does not hide Fe(cr) against the Fe(l) segment.
+
+    The element gate refuses at 1 bar, with pressure missing, and at 1 atm
+    before the pressure transform.
+    """
+
+    feo_liquid = F.oxide_identity(
+        "FeO",
+        Phase.L,
+        T_K=Decimal("2000"),
+        metal_formula="Fe",
+        metal_phase=Phase.CR,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1, 2),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    unknown_o2 = _with_term_phase(
+        feo_liquid, "O2", State.unknown("O2 phase absent")
+    )
+    for observation_id, identity in (
+        ("feo-unknown-o2-1bar", unknown_o2),
+        (
+            "feo-unknown-o2-missing-pressure",
+            replace(unknown_o2, standard_pressure_Pa=State.unknown("pressure not printed")),
+        ),
+        (
+            "feo-unknown-o2-1atm",
+            replace(unknown_o2, standard_pressure_Pa=State.of(Decimal("101325"))),
+        ),
+    ):
+        _assert_element_basis_refusal(
+            observation_id,
+            identity,
+            "identity-mismatch-element-reference-phase",
+            "Fe(cr)",
+            "Fe(l)",
+            cell_phase=Phase.CR.value,
+            segment_phase=Phase.L.value,
+        )
+
+
+def test_declared_allotrope_against_generic_solid_uses_the_reference_table() -> None:
+    """Ca(s) at 1100 K is beta on Ca-001. Ni(s) names no allotrope.
+
+    Crystalline names no allotrope. Its answer is the omitted-allotrope
+    value from this same production call.
+    """
+
+    cao = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1100"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    evidence = "ellingham:Ca:s:T=1100:generic-solid"
+    refused = _assert_element_basis_refusal(
+        "cao-1100-alpha",
+        _with_reactant_basis(cao, Phase.CR, Polymorph.ALPHA),
+        "identity-mismatch-element-reference-allotrope",
+        "Ca(cr,alpha)",
+        "Ca(cr,beta)",
+        cell_phase=Phase.CR.value,
+        segment_phase=Phase.CR.value,
+    )
+    assert refused.refusal_detail["cell_allotrope"] == "alpha"
+    assert refused.refusal_detail["segment_allotrope"] == "beta"
+    omitted_answer = None
+    for name, polymorph in (
+        ("beta", Polymorph.BETA),
+        ("omitted", None),
+        ("reference", Polymorph.REFERENCE),
+    ):
+        attempt = _assert_ellingham_number(
+            f"cao-1100-{name}",
+            _with_reactant_basis(cao, Phase.CR, polymorph),
+            _CAO_CRYSTAL_1100K,
+            evidence,
+        )
+        if name == "omitted":
+            omitted_answer = attempt.value
+    assert omitted_answer is not None
+    _assert_ellingham_number(
+        "cao-1100-crystalline",
+        _with_reactant_basis(cao, Phase.CR, Polymorph.CRYSTALLINE),
+        omitted_answer,
+        evidence,
+    )
+    nio = F.oxide_identity(
+        "NiO",
+        Phase.CR,
+        T_K=Decimal("1100"),
+        metal_formula="Ni",
+        metal_phase=Phase.CR,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1, 2),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+        polymorph="crystalline",
+    )
+    ni_evidence = "ellingham:Ni:s:T=1100:generic-solid"
+    refused_ni = _assert_element_basis_refusal(
+        "nio-1100-alpha",
+        _with_reactant_basis(nio, Phase.CR, Polymorph.ALPHA),
+        "identity-mismatch-element-reference-allotrope",
+        "Ni(cr,alpha)",
+        "Ni(cr)",
+        cell_phase=Phase.CR.value,
+        segment_phase=Phase.CR.value,
+    )
+    assert refused_ni.refusal_detail["segment_allotrope"] is None
+    for name, polymorph in (("omitted", None), ("reference", Polymorph.REFERENCE)):
+        _assert_ellingham_number(
+            f"nio-1100-{name}",
+            _with_reactant_basis(nio, Phase.CR, polymorph),
+            _NIO_CRYSTAL_1100K,
+            ni_evidence,
+        )
+
+
+def test_zr_cea_letter_is_the_janaf_allotrope() -> None:
+    """CEA Zr(b) and JANAF beta are one allotrope. Alpha is the other."""
+
+    zro2 = F.oxide_identity(
+        "ZrO2",
+        Phase.CR,
+        T_K=Decimal("1500"),
+        metal_formula="Zr",
+        metal_phase=Phase.CR,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+        polymorph="ii",
+    )
+    evidence = "ellingham:Zr:II:T=1500"
+    for name, polymorph in (("beta", Polymorph.BETA), ("omitted", None)):
+        _assert_ellingham_number(
+            f"zro2-{name}-1500",
+            _with_reactant_basis(zro2, Phase.CR, polymorph),
+            _ZRO2_BETA_1500K,
+            evidence,
+        )
+    _assert_element_basis_refusal(
+        "zro2-alpha-1500",
+        _with_reactant_basis(zro2, Phase.CR, Polymorph.ALPHA),
+        "identity-mismatch-element-reference-allotrope",
+        "Zr(cr,alpha)",
+        "Zr(cr,beta)",
+        cell_phase=Phase.CR.value,
+        segment_phase=Phase.CR.value,
     )
 
 
@@ -2368,7 +2857,6 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
 
     pytest.importorskip("vaporock.equil")
 
-    identity = _gas_thermo(temperature_K=Decimal("1200"))
     expected = {
         Quantity.CP: (Decimal("20.787"), Decimal("0.01")),
         Quantity.S: (Decimal("189.284"), Decimal("0.3")),
@@ -2378,10 +2866,11 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
     for quantity, (printed, tolerance) in expected.items():
         attempt = predict_thermo_attempt(
             Engine.VAPOROCK,
-            F.observation(
+            _same_table_gas(
                 f"kgas-{quantity.value}",
-                "exp-1",
-                replace(identity, quantity=quantity),
+                "K",
+                quantity,
+                Decimal("1200"),
                 printed,
             ),
         )
@@ -2413,10 +2902,11 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
     assert attempts[Quantity.S].unit == "J_per_declared_mol_basis_per_K"
     assert attempts[Quantity.H_MINUS_H298].unit == "kJ_per_declared_mol_basis"
 
-    reference = F.observation(
+    reference = _same_table_gas(
         "kgas-cp-janaf",
-        "exp-1",
-        replace(identity, quantity=Quantity.CP),
+        "K",
+        Quantity.CP,
+        Decimal("1200"),
         Decimal("20.787"),
         evidence=EvidenceClass.COMPILATION_ASSESSED,
         source_id="nist-janaf-4th",
@@ -2457,6 +2947,198 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
     assert decision_band_for(Quantity.CP, SourceRelation.SAME_INPUT) is None
 
 
+# Exact outputs of the base in-band resolver. K at 1800 K is the join:
+# T == T_max of the lower segment, so that segment owns it. K at 6000 K
+# and Fe at 4000 K are the upper segment's certified interior or end.
+_VAPOROCK_IN_BAND_PIN = (
+    (
+        "K",
+        Decimal("1200"),
+        {
+            Quantity.CP: Decimal("20.78466702488889"),
+            Quantity.S: Decimal("189.01928920321794"),
+            Quantity.H_MINUS_H298: Decimal("18.746192578133332"),
+        },
+    ),
+    (
+        "K",
+        Decimal("1800"),
+        {
+            Quantity.CP: Decimal("20.864585592395063"),
+            Quantity.S: Decimal("197.45608706041142"),
+            Quantity.H_MINUS_H298: Decimal("31.232321333688887"),
+        },
+    ),
+    (
+        "K",
+        Decimal("6000"),
+        {
+            Quantity.CP: Decimal("45.086233055555525"),
+            Quantity.S: Decimal("230.09770134488363"),
+            Quantity.H_MINUS_H298: Decimal("155.28008366666666"),
+        },
+    ),
+    (
+        "Fe",
+        Decimal("4000"),
+        {
+            Quantity.CP: Decimal("29.672713874999996"),
+            Quantity.S: Decimal("243.52268739094387"),
+            Quantity.H_MINUS_H298: Decimal("91.8760058333333"),
+        },
+    ),
+)
+
+
+def test_vaporock_gas_in_band_outputs_are_pinned() -> None:
+    """In-band Shomate Cp, S, and H−H298 stay on these exact values.
+
+    The numbers are the base resolver's outputs for the containing
+    JANAF row, not a re-fit. These rows verify as subtract-H, so the
+    enthalpy convention leaves them bit-identical. The locator is that
+    species' gas table; the basis gate runs before the in-band return.
+    A later out-of-band change must leave them bit-identical, still
+    BRIDGE, and still without a notice.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    for formula, temperature, expected in _VAPOROCK_IN_BAND_PIN:
+        for quantity, pinned in expected.items():
+            attempt = predict_thermo_attempt(
+                Engine.VAPOROCK,
+                _same_table_gas(
+                    f"pin-{formula}-{quantity.value}-{temperature}",
+                    formula,
+                    quantity,
+                    temperature,
+                    pinned,
+                ),
+            )
+            assert attempt.refusal_reason is None
+            assert attempt.value == pinned
+            assert attempt.authority is Authority.BRIDGE
+            assert attempt.notices == ()
+
+
+def _printed_janaf_node(table_id: str, temperature: Decimal, column: str) -> Decimal:
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    for row in document["table"]["values"]:
+        if Decimal(str(row["temperature"]["as_published"])) == temperature:
+            return Decimal(str(row[column]["as_published"]))
+    raise AssertionError(f"{table_id} has no {column} node at {temperature} K")
+
+
+def _printed_janaf_bracket(
+    table_id: str, temperature: Decimal, column: str
+) -> tuple[Decimal, Decimal, Decimal, Decimal]:
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    points = []
+    for row in document["table"]["values"]:
+        cell = row[column]
+        token = cell.get("as_published")
+        if token in (None, ""):
+            continue
+        points.append(
+            (
+                Decimal(str(row["temperature"]["as_published"])),
+                Decimal(str(token)),
+            )
+        )
+    points.sort()
+    for (left_T, left_y), (right_T, right_y) in zip(points, points[1:]):
+        if left_T <= temperature <= right_T:
+            return left_T, left_y, right_T, right_y
+    raise AssertionError(f"{table_id} {column} does not bracket {temperature} K")
+
+
+def test_janaf_tabulated_gas_thermo_matches_printed_nodes() -> None:
+    """Tabulated nodes are exact. An interior point is the printed chord.
+
+    Cr, CaO, Na2, and MgO are the rows whose Shomate continuation is
+    physically invalid. 1050 K sits between CaO's printed 1000 K and
+    1100 K nodes. 6500 K is past every gas table's last node. O2's
+    neutral table is the reference-phase gas O-029, not a phase-g row.
+    Carbon's reference table stays crystal, so the gas id is C-003.
+    """
+
+    import pytest
+
+    from simulator.battery.generators.janaf import (
+        _janaf_gas_table_ids,
+        janaf_tabulated_gas_thermo,
+    )
+
+    nodes = (
+        ("Cr", Decimal("500"), "Cr-005"),
+        ("CaO", Decimal("1000"), "Ca-030"),
+        ("Na2", Decimal("500"), "Na-011"),
+        ("MgO", Decimal("100"), "Mg-011"),
+    )
+    for formula, temperature, table_id in nodes:
+        sample = janaf_tabulated_gas_thermo(formula, temperature)
+        assert sample.table_id == table_id
+        assert sample.bracket_width_K == 0
+        assert sample.low_K == 0
+        assert sample.high_K == Decimal("6000")
+        assert sample.heat_capacity == _printed_janaf_node(
+            table_id, temperature, "heat_capacity"
+        )
+        assert sample.entropy == _printed_janaf_node(table_id, temperature, "entropy")
+        assert sample.enthalpy_increment == _printed_janaf_node(
+            table_id, temperature, "enthalpy_increment"
+        )
+        assert sample.heat_capacity > 0
+        assert sample.entropy > 0
+        assert sample.enthalpy_increment.is_finite()
+
+    interior_T = Decimal("1050")
+    interior = janaf_tabulated_gas_thermo("CaO", interior_T)
+    left_T, left_y, right_T, right_y = _printed_janaf_bracket(
+        "Ca-030", interior_T, "heat_capacity"
+    )
+    chord = left_y + (right_y - left_y) * (interior_T - left_T) / (right_T - left_T)
+    assert left_T < interior_T < right_T
+    assert interior.bracket_width_K == right_T - left_T
+    assert interior.heat_capacity == chord
+    assert abs(interior.heat_capacity - left_y) <= abs(right_y - left_y)
+
+    zero = janaf_tabulated_gas_thermo("Cr", Decimal("0"))
+    assert zero.heat_capacity == 0
+    assert zero.entropy == 0
+
+    oxygen = janaf_tabulated_gas_thermo("O2", Decimal("500"))
+    assert oxygen.table_id == "O-029"
+    assert oxygen.bracket_width_K == 0
+    assert oxygen.heat_capacity == Decimal("31.091")
+    assert oxygen.entropy == Decimal("220.693")
+    assert oxygen.enthalpy_increment == Decimal("6.084")
+    assert oxygen.heat_capacity == _printed_janaf_node(
+        "O-029", Decimal("500"), "heat_capacity"
+    )
+    assert oxygen.entropy == _printed_janaf_node("O-029", Decimal("500"), "entropy")
+    assert oxygen.enthalpy_increment == _printed_janaf_node(
+        "O-029", Decimal("500"), "enthalpy_increment"
+    )
+
+    gas_ids = _janaf_gas_table_ids()
+    assert gas_ids["O2"] == ("O-029",)
+    assert gas_ids["C"] == ("C-003",)
+
+    with pytest.raises(ValueError, match="outside the JANAF table range"):
+        janaf_tabulated_gas_thermo("Cr", Decimal("6500"))
+    with pytest.raises(ValueError, match="no JANAF gas table"):
+        janaf_tabulated_gas_thermo("NiO", Decimal("500"))
+    with pytest.raises(ValueError, match="ambiguous JANAF gas tables"):
+        janaf_tabulated_gas_thermo("HONO", Decimal("500"))
+
+
 def test_vaporock_gas_census_preserves_same_input_relation(monkeypatch) -> None:
     import pytest
 
@@ -2465,10 +3147,11 @@ def test_vaporock_gas_census_preserves_same_input_relation(monkeypatch) -> None:
     from simulator.battery import score as score_module
     from simulator.battery.compilation_tier import compilation_tier_census
 
-    reference = F.observation(
+    reference = _same_table_gas(
         "kgas-cp-janaf",
-        "exp-1",
-        _gas_thermo(temperature_K=Decimal("1200")),
+        "K",
+        Quantity.CP,
+        Decimal("1200"),
         Decimal("20.787"),
         evidence=EvidenceClass.COMPILATION_ASSESSED,
         source_id="nist-janaf-4th",
@@ -2500,7 +3183,7 @@ def test_vaporock_gas_census_preserves_same_input_relation(monkeypatch) -> None:
     assert residuals[0].source_relation is SourceRelation.SAME_INPUT
 
 
-def test_vaporock_gas_refuses_missing_species_and_out_of_interval() -> None:
+def test_vaporock_gas_refuses_missing_and_charged_species() -> None:
     import pytest
 
     pytest.importorskip("vaporock.equil")
@@ -2524,19 +3207,815 @@ def test_vaporock_gas_refuses_missing_species_and_out_of_interval() -> None:
     )
     assert missing.value is None
     assert missing.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert missing.refusal_detail["reason"] == "vaporock-species-not-in-janaf-table"
 
-    outside = predict_thermo_attempt(
-        Engine.VAPOROCK,
+
+_OUTSIDE_SHOMATE_TABLE_CASES = (
+    ("Cr", Decimal("500"), "Cr-005"),
+    ("CaO", Decimal("1000"), "Ca-030"),
+    ("Na2", Decimal("500"), "Na-011"),
+    ("MgO", Decimal("100"), "Mg-011"),
+    ("K", Decimal("1000"), "K-005"),
+    ("Fe", Decimal("2200"), "Fe-008"),
+    ("O2", Decimal("500"), "O-029"),
+)
+
+
+def test_vaporock_gas_outside_shomate_uses_janaf_table() -> None:
+    """Outside the Shomate row, the attempt returns the printed gas-table node.
+
+    Cr 500 K, CaO 1000 K, Na2 500 K, and MgO 100 K are the continuations
+    that go non-positive on the polynomial. K 1000 K is 39.54 K below its
+    first Shomate row. Fe 2200 K is the lunar shape, below its only row.
+    O2 at 500 K is below its first coefficient row and on O-029, the
+    reference-phase gas table. Each temperature is a printed JANAF node,
+    so the interpolation remainder is 0.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    from simulator.battery.compilation_tier import _JANAF_TABLE_NOTICE
+    from simulator.battery.records import Locator
+
+    columns = {
+        Quantity.CP: "heat_capacity",
+        Quantity.S: "entropy",
+        Quantity.H_MINUS_H298: "enthalpy_increment",
+    }
+    for formula, temperature, table_id in _OUTSIDE_SHOMATE_TABLE_CASES:
+        for quantity, column in columns.items():
+            printed = _printed_janaf_node(table_id, temperature, column)
+            observation = replace(
+                F.observation(
+                    f"table-{formula}-{quantity.value}-{temperature}",
+                    "exp-1",
+                    _gas_thermo(formula, quantity, temperature),
+                    printed,
+                    source_id="nist-janaf-4th",
+                ),
+                locator=Locator(table=table_id, record=table_id),
+            )
+            attempt = predict_thermo_attempt(Engine.VAPOROCK, observation)
+            assert attempt.refusal_reason is None
+            assert attempt.value == printed
+            assert attempt.authority is Authority.BRIDGE
+            assert attempt.authority is not Authority.EXTRAPOLATED
+            assert len(attempt.notices) == 1
+            notice = attempt.notices[0]
+            assert notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+            assert notice.authority is Authority.BRIDGE
+            assert notice.reason == f"{_JANAF_TABLE_NOTICE}; table_id={table_id}"
+            assert notice.band == "[0, 6000] K"
+            assert f"janaf_table_id={table_id}" in attempt.call_evidence
+
+
+def test_vaporock_gas_outside_janaf_table_stays_refused() -> None:
+    """Past the tabulated gas table, the refusal is the base token.
+
+    K at 6500 K is above its Shomate end and above K-005. No continuation
+    and no clamp.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    for quantity in (Quantity.CP, Quantity.S, Quantity.H_MINUS_H298):
+        outside = predict_thermo_attempt(
+            Engine.VAPOROCK,
+            _same_table_gas(
+                f"potassium-above-table-{quantity.value}",
+                "K",
+                quantity,
+                Decimal("6500"),
+                Decimal("0"),
+            ),
+        )
+        assert outside.value is None
+        assert outside.refusal_reason is RefusalReason.UNSUPPORTED
+        assert (
+            outside.refusal_detail["reason"]
+            == "vaporock-temperature-outside-janaf-row"
+        )
+
+
+def test_tabulated_gas_attempt_refuses_nonpositive_heat_capacity(monkeypatch) -> None:
+    """Cp > 0, S > 0, and a finite H are one gate for every quantity.
+
+    The installed positive-temperature nodes of these gas tables are
+    admissible. Cr-005 at 0 K is not (Cp = 0, S = 0), and a non-positive
+    temperature never reaches this path. Substitute that inadmissible
+    sample at a positive temperature and require Cp, S, and H−H298 all
+    to refuse with no number.
+    """
+
+    from simulator.battery.compilation_tier import _vaporock_tabulated_gas_attempt
+    from simulator.battery.generators import janaf as janaf_module
+    from simulator.battery.generators.janaf import JANAFTabulatedGas
+    from simulator.battery.records import Locator
+
+    def nonpositive(_formula: str, _temperature: Decimal) -> JANAFTabulatedGas:
+        return JANAFTabulatedGas(
+            table_id="Cr-005",
+            heat_capacity=Decimal("0"),
+            entropy=Decimal("0"),
+            enthalpy_increment=Decimal("-6.197"),
+            low_K=Decimal("0"),
+            high_K=Decimal("6000"),
+            bracket_width_K=Decimal("0"),
+        )
+
+    monkeypatch.setattr(janaf_module, "janaf_tabulated_gas_thermo", nonpositive)
+    for quantity in (Quantity.CP, Quantity.S, Quantity.H_MINUS_H298):
+        observation = replace(
+            F.observation(
+                f"chromium-nonpositive-{quantity.value}",
+                "exp-1",
+                _gas_thermo("Cr", quantity, Decimal("500")),
+                Decimal("0"),
+                source_id="nist-janaf-4th",
+            ),
+            locator=Locator(table="Cr-005", record="Cr-005"),
+        )
+        attempt = _vaporock_tabulated_gas_attempt(
+            "Cr",
+            quantity,
+            Decimal("500"),
+            observation=observation,
+            origin="chromium-nonpositive",
+            species_name="Cr(g)",
+            call_evidence="test",
+        )
+        assert attempt.value is None
+        assert attempt.refusal_reason is RefusalReason.METRIC_DOMAIN
+        assert (
+            attempt.refusal_detail["reason"]
+            == "vaporock-gas-thermo-not-admissible"
+        )
+
+
+def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
+    """H−H298 keeps the enthalpy zero. S and Cp do not.
+
+    Mg-001 at 1366.104 K is the reference-state gas: published H−H298 is
+    169.298, which includes vaporization. Mg-005 at that node is 22.198.
+    That enthalpy still refuses. B1259 magnesium S at 298.15 K declares
+    101325 Pa, so S refuses on pressure and the detail carries both
+    pressures. B1452 magnesium S at 1361 K declares 100000 Pa, so S
+    answers the gas table even though the elemental zero is the crystal.
+    B1452 SiO has no elemental ideal-gas enthalpy reference; Cp and S
+    still answer O-012, and H−H298 refuses. B1259 and B1452 oxygen are
+    the ideal gas at 298.15 K, so those rows return the printed O-029
+    node.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
+    from simulator.battery.generators.usgs_b1259 import (
+        STANDARD_PRESSURE_PA as b1259_pressure,
+    )
+    from simulator.battery.generators.usgs_b1452 import (
+        STANDARD_PRESSURE_PA as b1452_pressure,
+        reference_enthalpy_zero_is_ideal_gas as b1452_ideal_gas,
+    )
+    from simulator.battery.records import Locator
+
+    magnesium = replace(
         F.observation(
-            "potassium-below-table",
+            "mg-001-enthalpy-at-boiling",
             "exp-1",
-            _gas_thermo(temperature_K=Decimal("1000")),
-            Decimal("0"),
+            _gas_thermo("Mg", Quantity.H_MINUS_H298, Decimal("1366.104")),
+            Decimal("169.298"),
+            source_id="nist-janaf-4th",
+        ),
+        locator=Locator(table="Mg-001", record="Mg-001"),
+    )
+    attempt = predict_thermo_attempt(Engine.VAPOROCK, magnesium)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    assert attempt.refusal_detail["observation_table"] == "Mg-001"
+    assert attempt.refusal_detail["gas_table"] == "Mg-005"
+    assert attempt.refusal_detail["gas_phase"] == Phase.G.value
+
+    robie = replace(
+        F.observation(
+            "robie-magnesium-reference-entropy",
+            "exp-1",
+            replace(
+                _gas_thermo("Mg", Quantity.S, Decimal("298.15")),
+                standard_pressure_Pa=State.of(b1259_pressure),
+            ),
+            Decimal("32.67704"),
+            source_id="robie-waldbaum-1968-usgs-b1259",
+        ),
+        locator=Locator(
+            table="b1259-ht-0027-magnesium-reference-state",
+            record="b1259-ht-0027-magnesium-reference-state",
         ),
     )
-    assert outside.value is None
-    assert outside.refusal_reason is RefusalReason.UNSUPPORTED
-    assert outside.refusal_detail["reason"] == "vaporock-temperature-outside-janaf-row"
+    robie_attempt = predict_thermo_attempt(Engine.VAPOROCK, robie)
+    assert robie_attempt.value is None
+    assert robie_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert (
+        robie_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    )
+    assert robie_attempt.refusal_detail["gas_table"] == "Mg-005"
+    assert robie_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
+    assert robie_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
+    assert robie_attempt.refusal_detail["coefficient_interval"] == "outside"
+    assert robie_attempt.refusal_detail["branch"] == "table"
+    assert (
+        robie_attempt.refusal_detail["observation_table"]
+        == "b1259-ht-0027-magnesium-reference-state"
+    )
+
+    assert b1452_ideal_gas("Mg") is False
+    near_boiling = replace(
+        F.observation(
+            "b1452-magnesium-near-boiling-entropy",
+            "exp-1",
+            replace(
+                _gas_thermo("Mg", Quantity.S, Decimal("1361")),
+                standard_pressure_Pa=State.of(b1452_pressure),
+            ),
+            Decimal("180.2"),
+            source_id="robie-hemingway-fisher-1978-usgs-b1452",
+        ),
+        locator=Locator(table="b1452-magnesium", record="b1452-magnesium"),
+    )
+    near_boiling_attempt = predict_thermo_attempt(Engine.VAPOROCK, near_boiling)
+    magnesium_table = janaf_tabulated_gas_thermo("Mg", Decimal("1361"))
+    assert near_boiling_attempt.refusal_reason is None
+    assert near_boiling_attempt.value == magnesium_table.entropy
+    assert near_boiling_attempt.authority is Authority.BRIDGE
+    assert len(near_boiling_attempt.notices) == 1
+    assert "janaf_table_id=Mg-005" in near_boiling_attempt.call_evidence
+
+    assert b1452_ideal_gas("SiO") is False
+    for quantity, column, tolerance in (
+        (Quantity.CP, "heat_capacity", Decimal("0.01")),
+        (Quantity.S, "entropy", Decimal("0.001")),
+    ):
+        printed = _printed_janaf_node("O-012", Decimal("1500"), column)
+        same_table = replace(
+            F.observation(
+                f"sio-012-{quantity.value}",
+                "exp-1",
+                _gas_thermo("SiO", quantity, Decimal("1500")),
+                printed,
+                source_id="nist-janaf-4th",
+            ),
+            locator=Locator(table="O-012", record="O-012"),
+        )
+        bulletin = replace(
+            F.observation(
+                f"b1452-sio-{quantity.value}",
+                "exp-1",
+                replace(
+                    _gas_thermo("SiO", quantity, Decimal("1500")),
+                    standard_pressure_Pa=State.of(b1452_pressure),
+                ),
+                printed,
+                source_id="robie-hemingway-fisher-1978-usgs-b1452",
+            ),
+            locator=Locator(
+                table="b1452-silicon-monoxide",
+                record="b1452-silicon-monoxide",
+            ),
+        )
+        same_attempt = predict_thermo_attempt(Engine.VAPOROCK, same_table)
+        bulletin_attempt = predict_thermo_attempt(Engine.VAPOROCK, bulletin)
+        assert same_attempt.refusal_reason is None
+        assert bulletin_attempt.refusal_reason is None
+        assert bulletin_attempt.value == same_attempt.value
+        assert bulletin_attempt.value is not None
+        assert abs(bulletin_attempt.value - printed) <= tolerance
+        assert bulletin_attempt.notices == ()
+    sio_enthalpy = replace(
+        F.observation(
+            "b1452-sio-enthalpy",
+            "exp-1",
+            replace(
+                _gas_thermo("SiO", Quantity.H_MINUS_H298, Decimal("1500")),
+                standard_pressure_Pa=State.of(b1452_pressure),
+            ),
+            Decimal("0"),
+            source_id="robie-hemingway-fisher-1978-usgs-b1452",
+        ),
+        locator=Locator(
+            table="b1452-silicon-monoxide",
+            record="b1452-silicon-monoxide",
+        ),
+    )
+    sio_enthalpy_attempt = predict_thermo_attempt(Engine.VAPOROCK, sio_enthalpy)
+    assert sio_enthalpy_attempt.value is None
+    assert sio_enthalpy_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert (
+        sio_enthalpy_attempt.refusal_detail["reason"]
+        == "tabulated_table_basis_mismatch"
+    )
+    assert sio_enthalpy_attempt.refusal_detail["gas_table"] == "O-012"
+    assert "gas_pressure_Pa" not in sio_enthalpy_attempt.refusal_detail
+
+    oxygen_printed = _printed_janaf_node(
+        "O-029", Decimal("500"), "enthalpy_increment"
+    )
+    # B1259's standard pressure is 1 atm. H−H298 does not depend on it.
+    oxygen = replace(
+        F.observation(
+            "b1259-oxygen-enthalpy",
+            "exp-1",
+            replace(
+                _gas_thermo("O2", Quantity.H_MINUS_H298, Decimal("500")),
+                standard_pressure_Pa=State.of(b1259_pressure),
+            ),
+            oxygen_printed,
+            source_id="robie-waldbaum-1968-usgs-b1259",
+        ),
+        locator=Locator(
+            table="b1259-ht-0034-oxygen-reference-state",
+            record="b1259-ht-0034-oxygen-reference-state",
+        ),
+    )
+    oxygen_attempt = predict_thermo_attempt(Engine.VAPOROCK, oxygen)
+    assert oxygen_attempt.refusal_reason is None
+    assert oxygen_attempt.value == oxygen_printed
+    assert oxygen_attempt.authority is Authority.BRIDGE
+
+    oxygen_entropy = _printed_janaf_node("O-029", Decimal("298.15"), "entropy")
+    # B1452's standard pressure is 1 bar, the JANAF gas-table pressure.
+    b1452_oxygen = replace(
+        F.observation(
+            "b1452-oxygen-entropy",
+            "exp-1",
+            replace(
+                _gas_thermo("O2", Quantity.S, Decimal("298.15")),
+                standard_pressure_Pa=State.of(b1452_pressure),
+            ),
+            oxygen_entropy,
+            source_id="robie-hemingway-fisher-1978-usgs-b1452",
+        ),
+        locator=Locator(table="b1452-oxygen", record="b1452-oxygen"),
+    )
+    b1452_attempt = predict_thermo_attempt(Engine.VAPOROCK, b1452_oxygen)
+    assert b1452_attempt.refusal_reason is None
+    assert b1452_attempt.value == oxygen_entropy
+    assert b1452_attempt.authority is Authority.BRIDGE
+    assert b1452_pressure == Decimal("100000")
+    assert b1259_pressure == Decimal("101325")
+    assert b1259_pressure != b1452_pressure
+
+
+def test_vaporock_gas_entropy_refuses_one_atmosphere_against_janaf() -> None:
+    """The stored B1259 oxygen entropy is 1 atm. JANAF's gas table is 0.1 MPa.
+
+    b1259-298k-0060-oxygen S at 298.15 K is 204.999264 J/(mol·K) with
+    standard_pressure_Pa 101325. O-029's entropy is the 1 bar value.
+    S refuses and the detail carries both pressures. Cp at that same
+    declared pressure still returns the printed O-029 node.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    from pathlib import Path
+
+    from simulator.battery.generators.janaf import STANDARD_PRESSURE_PA
+    from simulator.battery.migrate import load_yaml, observation_from_plain
+    from simulator.battery.records import as_decimal
+
+    root = Path(__file__).resolve().parents[2]
+    document = load_yaml(
+        root
+        / "data/literature/observations-v2"
+        / "compilations-robie-waldbaum-1968-usgs-b1259"
+        / "b1259-298k-0060-oxygen.yaml"
+    )
+    raw = next(
+        row
+        for row in document["observations"]
+        if row["identity"]["quantity"]["value"] == "S"
+    )
+    observation = observation_from_plain(raw)
+    declared = as_decimal(observation.identity.standard_pressure_Pa.value)
+    assert declared == Decimal("101325")
+    assert observation.value.point == Decimal("204.999264")
+
+    attempt = predict_thermo_attempt(Engine.VAPOROCK, observation)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    assert attempt.refusal_detail["observation_pressure_Pa"] == "101325"
+    assert attempt.refusal_detail["gas_pressure_Pa"] == "100000"
+    assert attempt.refusal_detail["gas_pressure_Pa"] == format(STANDARD_PRESSURE_PA, "f")
+    assert attempt.refusal_detail["gas_table"] == "O-029"
+
+    printed_cp = _printed_janaf_node("O-029", Decimal("500"), "heat_capacity")
+    heat_capacity = replace(
+        observation,
+        observation_id=f"{observation.observation_id}:cp-500",
+        identity=replace(
+            observation.identity,
+            quantity=Quantity.CP,
+            temperature_K=State.of(Decimal("500")),
+        ),
+        value=Value.point_of(printed_cp),
+    )
+    heat_attempt = predict_thermo_attempt(Engine.VAPOROCK, heat_capacity)
+    assert heat_attempt.refusal_reason is None
+    assert heat_attempt.value == printed_cp
+    assert heat_attempt.authority is Authority.BRIDGE
+
+
+def _b1259_point(filename: str, observation_id: str):
+    from pathlib import Path
+
+    from simulator.battery.migrate import load_yaml, observation_from_plain
+
+    root = Path(__file__).resolve().parents[2]
+    document = load_yaml(
+        root
+        / "data/literature/observations-v2"
+        / "compilations-robie-waldbaum-1968-usgs-b1259"
+        / filename
+    )
+    raw = next(
+        row for row in document["observations"] if row["observation_id"] == observation_id
+    )
+    return observation_from_plain(raw)
+
+
+def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
+    """Inside a coefficient row, each quantity keeps its own basis axis.
+
+    B1259 O2 entropy at 800 K is 1 atm, so S refuses with both pressures.
+    B1259 magnesium entropy at 1500 K is the same pressure refusal, not
+    an enthalpy-zero refusal. Mg-001 at 1500 K and 1 bar answers S and
+    Cp; its H−H298 still refuses. O2 H−H298 at 800 K follows the printed
+    O-029 node. K entropy at 1200 K answers on K-005 and on locator I.
+    The negative entropy case is 101325 Pa, not a different table id.
+    Co, Mn, and Ni on (1000, 3000] store H = 0 and do not reproduce
+    printed H−H298, so that enthalpy refuses. Co heat capacity on the
+    same row still answers.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    oxygen_entropy = _b1259_point(
+        "b1259-ht-0034-oxygen-reference-state.yaml",
+        "robie-waldbaum-1968-usgs-b1259:b1259-ht-0034-oxygen-reference-state:"
+        "S:shared:T=800:col=entropy:name=oxygen-(reference-state):v=b128b3593f",
+    )
+    entropy_attempt = predict_thermo_attempt(Engine.VAPOROCK, oxygen_entropy)
+    assert entropy_attempt.value is None
+    assert entropy_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert entropy_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    assert entropy_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
+    assert entropy_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
+    assert entropy_attempt.refusal_detail["gas_table"] == "O-029"
+    assert entropy_attempt.refusal_detail["coefficient_interval"] == "inside"
+    assert entropy_attempt.refusal_detail["branch"] == "shomate"
+
+    magnesium_entropy = _b1259_point(
+        "b1259-ht-0027-magnesium-reference-state.yaml",
+        "robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:"
+        "S:shared:T=1500:col=entropy:name=magnesium-(reference-state):v=48985b088a",
+    )
+    magnesium_attempt = predict_thermo_attempt(Engine.VAPOROCK, magnesium_entropy)
+    assert magnesium_attempt.value is None
+    assert magnesium_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert (
+        magnesium_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    )
+    assert magnesium_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
+    assert magnesium_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
+    assert magnesium_attempt.refusal_detail["gas_table"] == "Mg-005"
+    assert magnesium_attempt.refusal_detail["coefficient_interval"] == "inside"
+    assert magnesium_attempt.refusal_detail["branch"] == "shomate"
+
+    from simulator.battery.records import Locator
+
+    printed_entropy = _printed_janaf_node("Mg-005", Decimal("1500"), "entropy")
+    printed_heat = _printed_janaf_node("Mg-005", Decimal("1500"), "heat_capacity")
+    assert printed_entropy == Decimal("182.230")
+    assert printed_heat == Decimal("20.786")
+    for quantity, printed in (
+        (Quantity.S, printed_entropy),
+        (Quantity.CP, printed_heat),
+    ):
+        same_table = replace(
+            F.observation(
+                f"mg-005-{quantity.value}-1500",
+                "exp-1",
+                _gas_thermo("Mg", quantity, Decimal("1500")),
+                printed,
+                source_id="nist-janaf-4th",
+            ),
+            locator=Locator(table="Mg-005", record="Mg-005"),
+        )
+        reference_state = replace(
+            same_table,
+            observation_id=f"mg-001-{quantity.value}-1500",
+            locator=Locator(table="Mg-001", record="Mg-001"),
+        )
+        same_attempt = predict_thermo_attempt(Engine.VAPOROCK, same_table)
+        reference_attempt = predict_thermo_attempt(Engine.VAPOROCK, reference_state)
+        assert same_attempt.refusal_reason is None
+        assert reference_attempt.refusal_reason is None
+        assert reference_attempt.value == same_attempt.value
+        assert reference_attempt.value is not None
+        assert abs(reference_attempt.value - printed) <= Decimal("0.001")
+        assert reference_attempt.notices == ()
+        assert reference_attempt.authority is Authority.BRIDGE
+        assert "branch=shomate" in reference_attempt.call_evidence
+        assert "gas_table=Mg-005" in reference_attempt.call_evidence
+        if quantity is Quantity.S:
+            assert reference_attempt.value == Decimal("182.23027757419294")
+
+    magnesium_enthalpy = replace(
+        F.observation(
+            "mg-001-enthalpy-1500",
+            "exp-1",
+            _gas_thermo("Mg", Quantity.H_MINUS_H298, Decimal("1500")),
+            Decimal("0"),
+            source_id="nist-janaf-4th",
+        ),
+        locator=Locator(table="Mg-001", record="Mg-001"),
+    )
+    magnesium_enthalpy_attempt = predict_thermo_attempt(
+        Engine.VAPOROCK, magnesium_enthalpy
+    )
+    assert magnesium_enthalpy_attempt.value is None
+    assert (
+        magnesium_enthalpy_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    )
+    assert (
+        magnesium_enthalpy_attempt.refusal_detail["reason"]
+        == "tabulated_table_basis_mismatch"
+    )
+    assert magnesium_enthalpy_attempt.refusal_detail["observation_table"] == "Mg-001"
+    assert magnesium_enthalpy_attempt.refusal_detail["gas_table"] == "Mg-005"
+    assert magnesium_enthalpy_attempt.refusal_detail["coefficient_interval"] == "inside"
+    assert magnesium_enthalpy_attempt.refusal_detail["branch"] == "shomate"
+    assert "gas_pressure_Pa" not in magnesium_enthalpy_attempt.refusal_detail
+
+    oxygen_enthalpy = _b1259_point(
+        "b1259-ht-0034-oxygen-reference-state.yaml",
+        "robie-waldbaum-1968-usgs-b1259:b1259-ht-0034-oxygen-reference-state:"
+        "H_minus_H298:shared:T=800:col=H_minus_H298:name=oxygen-(reference-state):"
+        "v=29ef8ac3ab",
+    )
+    printed = _printed_janaf_node("O-029", Decimal("800"), "enthalpy_increment")
+    assert printed == Decimal("15.835")
+    enthalpy_attempt = predict_thermo_attempt(Engine.VAPOROCK, oxygen_enthalpy)
+    assert enthalpy_attempt.refusal_reason is None
+    assert enthalpy_attempt.value is not None
+    assert abs(enthalpy_attempt.value - printed) <= Decimal("0.001")
+    assert enthalpy_attempt.value < Decimal("20")
+    assert enthalpy_attempt.authority is Authority.BRIDGE
+    assert enthalpy_attempt.notices == ()
+    assert "enthalpy_form=through_F" in enthalpy_attempt.call_evidence
+    assert "green_subtract_H=" in enthalpy_attempt.call_evidence
+
+    potassium = _same_table_gas(
+        "k-005-entropy-1200",
+        "K",
+        Quantity.S,
+        Decimal("1200"),
+        Decimal("189.01928920321794"),
+        source_id="nist-janaf-4th",
+    )
+    potassium_attempt = predict_thermo_attempt(Engine.VAPOROCK, potassium)
+    assert potassium_attempt.refusal_reason is None
+    assert potassium_attempt.value == Decimal("189.01928920321794")
+    assert potassium_attempt.notices == ()
+    assert potassium_attempt.authority is Authority.BRIDGE
+
+    # A different JANAF table id is not an entropy distinction. The
+    # negative case is a different standard pressure.
+    locator_only = replace(
+        potassium,
+        observation_id="k-entropy-locator-i",
+        locator=Locator(table="I", record="I"),
+    )
+    locator_attempt = predict_thermo_attempt(Engine.VAPOROCK, locator_only)
+    assert locator_attempt.refusal_reason is None
+    assert locator_attempt.value == potassium_attempt.value
+    enthalpy_locator = replace(
+        potassium,
+        observation_id="k-enthalpy-locator-i",
+        identity=replace(potassium.identity, quantity=Quantity.H_MINUS_H298),
+        locator=Locator(table="I", record="I"),
+    )
+    enthalpy_locator_attempt = predict_thermo_attempt(Engine.VAPOROCK, enthalpy_locator)
+    assert enthalpy_locator_attempt.value is None
+    assert (
+        enthalpy_locator_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    )
+    assert (
+        enthalpy_locator_attempt.refusal_detail["reason"]
+        == "tabulated_table_basis_mismatch"
+    )
+    assert "gas_pressure_Pa" not in enthalpy_locator_attempt.refusal_detail
+    one_atmosphere = replace(
+        potassium,
+        observation_id="k-entropy-one-atmosphere",
+        identity=replace(
+            potassium.identity,
+            standard_pressure_Pa=State.of(Decimal("101325")),
+        ),
+    )
+    atmosphere_attempt = predict_thermo_attempt(Engine.VAPOROCK, one_atmosphere)
+    assert atmosphere_attempt.value is None
+    assert atmosphere_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert (
+        atmosphere_attempt.refusal_detail["reason"]
+        == "tabulated_table_basis_mismatch"
+    )
+    assert atmosphere_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
+    assert atmosphere_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
+    assert atmosphere_attempt.refusal_detail["gas_table"] == "K-005"
+
+    cobalt_enthalpy = _same_table_gas(
+        "co-unverified-enthalpy",
+        "Co",
+        Quantity.H_MINUS_H298,
+        Decimal("2000"),
+        Decimal("0"),
+        source_id="nist-janaf-4th",
+    )
+    cobalt_attempt = predict_thermo_attempt(Engine.VAPOROCK, cobalt_enthalpy)
+    assert cobalt_attempt.value is None
+    assert cobalt_attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert (
+        cobalt_attempt.refusal_detail["reason"]
+        == "shomate_enthalpy_normalisation_unverified"
+    )
+    assert cobalt_attempt.refusal_detail["coefficient_interval"] == "inside"
+    cobalt_heat = _same_table_gas(
+        "co-unverified-heat-capacity",
+        "Co",
+        Quantity.CP,
+        Decimal("2000"),
+        Decimal("0"),
+        source_id="nist-janaf-4th",
+    )
+    heat_attempt = predict_thermo_attempt(Engine.VAPOROCK, cobalt_heat)
+    assert heat_attempt.refusal_reason is None
+    assert heat_attempt.value is not None
+    assert heat_attempt.value > 0
+    assert heat_attempt.notices == ()
+    assert "enthalpy_form=unverified" in heat_attempt.call_evidence
+
+    for formula, table_id in (("Mn", "Mn-005"), ("Ni", "Ni-005")):
+        unverified = replace(
+            F.observation(
+                f"{formula.lower()}-unverified-enthalpy",
+                "exp-1",
+                _gas_thermo(formula, Quantity.H_MINUS_H298, Decimal("2000")),
+                Decimal("0"),
+                source_id="nist-janaf-4th",
+            ),
+            locator=Locator(table=table_id, record=table_id),
+        )
+        unverified_attempt = predict_thermo_attempt(Engine.VAPOROCK, unverified)
+        assert unverified_attempt.value is None
+        assert unverified_attempt.refusal_reason is RefusalReason.UNSUPPORTED
+        assert (
+            unverified_attempt.refusal_detail["reason"]
+            == "shomate_enthalpy_normalisation_unverified"
+        )
+        assert unverified_attempt.refusal_detail["gas_table"] == table_id
+        assert unverified_attempt.refusal_detail["coefficient_interval"] == "inside"
+
+
+def test_vaporock_in_band_shomate_uses_the_shared_admissibility_guard(
+    monkeypatch,
+) -> None:
+    """A containing Shomate row uses the same Cp/S/H gate as the gas table.
+
+    Cp <= 0, S <= 0, or a non-finite H refuses every quantity, including
+    a request for a quantity that would otherwise be finite. An admissible
+    row still returns that quantity at BRIDGE with no notice. The
+    admissible numbers are the stubbed evaluator outputs after
+    as_decimal(str(float(raw))), not a second formula.
+    """
+
+    import sys
+    import types
+
+    from simulator.battery import compilation_tier
+
+    equil = types.ModuleType("vaporock.equil")
+    equil.__file__ = "vaporock/equil.py"
+    package = types.ModuleType("vaporock")
+    package.equil = equil
+    monkeypatch.setitem(sys.modules, "vaporock", package)
+    monkeypatch.setitem(sys.modules, "vaporock.equil", equil)
+    monkeypatch.setattr(
+        compilation_tier,
+        "_vaporock_gas_provenance",
+        lambda _module: "test-provenance",
+    )
+    # The stub row is not K's coefficient row. The production classifier
+    # would call it unverified. This test pins the shared numeric gate,
+    # so the convention is fixed as subtract-H, which is what the stub's
+    # _janaf_dH (enthalpy + H) undoes.
+    monkeypatch.setattr(
+        compilation_tier,
+        "_shomate_enthalpy_form",
+        lambda _vapor, _row, _table_id: "subtract_H",
+    )
+
+    class _Coefs:
+        def __init__(self, row: dict[str, float]) -> None:
+            self.loc = {"K(g)": row}
+
+    class _Vapor:
+        def __init__(self, row: dict[str, float], entropy: float, enthalpy: float) -> None:
+            self.vapor_coefs = _Coefs(row)
+            self.entropy = entropy
+            self.enthalpy = enthalpy
+
+        def _janaf_S(self, _temperature: float, _row: dict[str, float]) -> float:
+            return self.entropy
+
+        def _janaf_dH(self, _temperature: float, _row: dict[str, float]) -> float:
+            return self.enthalpy + _row["H"]
+
+    def install(heat_capacity: float, entropy: float, enthalpy: float) -> None:
+        row = {
+            "A": heat_capacity,
+            "B": 0.0,
+            "C": 0.0,
+            "D": 0.0,
+            "E": 0.0,
+            "H": 0.0,
+            "T_min": 100.0,
+            "T_max": 2000.0,
+        }
+        monkeypatch.setattr(
+            compilation_tier._vaporock_gas_attempt,
+            "_janaf_vapor",
+            _Vapor(row, entropy, enthalpy),
+            raising=False,
+        )
+
+    refused = (
+        (-1.0, 180.0, 10.0),
+        (20.0, -1.0, 10.0),
+        (20.0, 180.0, float("nan")),
+    )
+    for index, (heat_capacity, entropy, enthalpy) in enumerate(refused):
+        install(heat_capacity, entropy, enthalpy)
+        for quantity in (Quantity.CP, Quantity.S, Quantity.H_MINUS_H298):
+            attempt = predict_thermo_attempt(
+                Engine.VAPOROCK,
+                _same_table_gas(
+                    f"k-inadmissible-{index}-{quantity.value}",
+                    "K",
+                    quantity,
+                    Decimal("1000"),
+                    Decimal("0"),
+                ),
+            )
+            assert attempt.value is None
+            assert attempt.refusal_reason is RefusalReason.METRIC_DOMAIN
+            assert (
+                attempt.refusal_detail["reason"]
+                == "vaporock-gas-thermo-not-admissible"
+            )
+
+    install(20.5, 100.25, 1.5)
+    expected = {
+        Quantity.CP: Decimal("20.5"),
+        Quantity.S: Decimal("100.25"),
+        Quantity.H_MINUS_H298: Decimal("1.5"),
+    }
+    for quantity, pinned in expected.items():
+        attempt = predict_thermo_attempt(
+            Engine.VAPOROCK,
+            _same_table_gas(
+                f"k-admissible-{quantity.value}",
+                "K",
+                quantity,
+                Decimal("1000"),
+                pinned,
+            ),
+        )
+        assert attempt.refusal_reason is None
+        assert attempt.value == pinned
+        assert attempt.authority is Authority.BRIDGE
+        assert attempt.notices == ()
 
 
 def test_vaporock_import_failure_is_a_typed_unavailable_refusal(monkeypatch) -> None:
@@ -3945,3 +5424,163 @@ def test_fusion_janaf_tables_do_not_make_other_works_training() -> None:
     )
     assert residual.numeric is not None
     assert residual.source_relation is SourceRelation.INDEPENDENT
+
+
+def _printed_janaf_entropy(table_id: str, temperature_K: float) -> Decimal:
+    """Entropy ``as_published`` at one printed JANAF temperature."""
+
+    from simulator.melt_backend.pure_phase_janaf_score import load_janaf_table
+
+    document = load_janaf_table(table_id)
+    for row in (document.get("table") or {}).get("values") or []:
+        temperature = (row.get("temperature") or {}).get("value")
+        if temperature is None or float(temperature) != float(temperature_K):
+            continue
+        published = (row.get("entropy") or {}).get("as_published")
+        assert published not in (None, "")
+        return Decimal(str(published).strip())
+    raise AssertionError(f"{table_id} has no entropy row at {temperature_K} K")
+
+
+def _crystal_thermo_identity(formula: str, polymorph: str | None, temperature_K: Decimal):
+    identity = F.oxide_identity(
+        formula,
+        Phase.CR,
+        T_K=temperature_K,
+        per=PerBasis.MOL_SPECIES,
+        polymorph=polymorph if polymorph is not None else Polymorph.RUTILE.value,
+    )
+    if polymorph is None:
+        identity = replace(
+            identity,
+            species=replace(
+                identity.species,
+                polymorph=State.unknown("printed polymorph unknown"),
+            ),
+        )
+    return _pure_standard_identity(identity, Quantity.S)
+
+
+def _close_cached_backend(engine: Engine) -> None:
+    from simulator.battery import compilation_tier
+
+    backend = compilation_tier._BACKENDS.pop(engine, None)
+    close = getattr(backend, "close", None)
+    if close is not None:
+        close()
+
+
+def test_magemin_lunar_unset_tio2_entropy_matches_janaf_o045() -> None:
+    """Unset TiO2 at 2000 K is ig ``ru``. O-045 does not name a polymorph.
+
+    2000 K is inside 1950–2473 K and below the O-045 crystal–liquid
+    point at 2130 K. The 2% band is the accessor's S band: a divisor
+    of two would miss it.
+    """
+
+    expected = _printed_janaf_entropy("O-045", 2000.0)
+    observation = F.observation(
+        "tio2-unset-s-2000",
+        "exp-1",
+        _crystal_thermo_identity("TiO2", None, Decimal("2000")),
+        expected,
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    held = predict_thermo_attempt(
+        Engine.MAGEMIN, observation, invoke_pure_phase=False
+    )
+    assert held.value is None
+    assert held.refusal_detail["reason"] == "pure-phase-call-required"
+    assert held.refusal_detail["symbol"] == "ru"
+    if not magemin_binary_available():
+        pytest.skip("no MAGEMin binary")
+    try:
+        attempt = predict_thermo_attempt(Engine.MAGEMIN, observation)
+    finally:
+        _close_cached_backend(Engine.MAGEMIN)
+    assert attempt.refusal_reason is None
+    assert attempt.unit == "J_per_declared_mol_basis_per_K"
+    assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
+
+
+def test_thermoengine_lunar_rutile_entropy_matches_janaf_o043() -> None:
+    """Rutile at 2000 K is Berman ``Rt``. O-043 prints the rutile table.
+
+    Same lunar point and 2% S band as the MAGEMin TiO2 test.
+    """
+
+    expected = _printed_janaf_entropy("O-043", 2000.0)
+    observation = F.observation(
+        "tio2-rutile-s-2000",
+        "exp-1",
+        _crystal_thermo_identity("TiO2", Polymorph.RUTILE.value, Decimal("2000")),
+        expected,
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    held = predict_thermo_attempt(
+        Engine.THERMOENGINE, observation, invoke_pure_phase=False
+    )
+    assert held.value is None
+    assert held.refusal_detail["reason"] == "pure-phase-call-required"
+    assert held.refusal_detail["symbol"] == "Rt"
+    if not thermoengine_package_available():
+        pytest.skip("ThermoEngine package unavailable")
+    try:
+        attempt = predict_thermo_attempt(Engine.THERMOENGINE, observation)
+    finally:
+        _close_cached_backend(Engine.THERMOENGINE)
+    assert attempt.refusal_reason is None
+    assert attempt.unit == "J_per_declared_mol_basis_per_K"
+    assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
+
+
+def test_ambiguous_pure_phase_cases_stay_refused() -> None:
+    """Rutile and anatase stay off unlabeled ``ru``. Unset CaSiO3 stays off ``Wo``.
+
+    ``pWo`` is on the ThermoEngine map so unset CaSiO3 is not the unique
+    CaSiO3 candidate. Wollastonite still resolves to ``Wo``.
+    """
+
+    def forbid_engine(*_args, **_kwargs):
+        raise AssertionError("ambiguous identity must refuse before an engine call")
+
+    for polymorph in (Polymorph.RUTILE.value, Polymorph.ANATASE.value):
+        observation = F.observation(
+            f"tio2-{polymorph}",
+            "exp-1",
+            _crystal_thermo_identity("TiO2", polymorph, Decimal("2000")),
+            Decimal("1"),
+        )
+        attempt = predict_thermo_attempt(
+            Engine.MAGEMIN, observation, pure_phase=forbid_engine
+        )
+        assert attempt.value is None
+        assert attempt.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
+
+    unset = F.observation(
+        "casio3-unset",
+        "exp-1",
+        _crystal_thermo_identity("CaSiO3", None, Decimal("1000")),
+        Decimal("1"),
+    )
+    refused = predict_thermo_attempt(
+        Engine.THERMOENGINE, unset, pure_phase=forbid_engine
+    )
+    assert refused.value is None
+    assert refused.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
+
+    named = F.observation(
+        "casio3-wollastonite",
+        "exp-1",
+        _crystal_thermo_identity(
+            "CaSiO3", Polymorph.WOLLASTONITE.value, Decimal("1000")
+        ),
+        Decimal("1"),
+    )
+    held = predict_thermo_attempt(
+        Engine.THERMOENGINE, named, invoke_pure_phase=False
+    )
+    assert held.refusal_detail["reason"] == "pure-phase-call-required"
+    assert held.refusal_detail["symbol"] == "Wo"

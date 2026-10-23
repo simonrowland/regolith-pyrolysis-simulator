@@ -3852,6 +3852,7 @@ def test_provider_short_circuits_below_400_k(vapor_pressure_data):
     result = provider.dispatch(request)
     assert result.status == "ok"
     assert (result.diagnostic or {}).get("vapor_pressures_Pa") == {}
+    assert (result.diagnostic or {}).get("below_reporting_threshold_omissions") == {}
 
 
 def test_inactive_metal_consumer_status_suppresses_builtin_fallback(
