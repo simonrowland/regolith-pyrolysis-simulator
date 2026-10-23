@@ -8,15 +8,22 @@ cheap half of that assertion: it finds the newest commit that touched store
 outputs and fails if any later commit touched migrate inputs.
 
 It cannot prove byte equality — that needs a full regen + diff (minutes,
-nightly-tier). It proves two cheaper facts: nobody changed an input and walked
-away without touching the store, and no extract silently lacks a store trace.
+nightly-tier). At the train gate, run it after the batch regen: it proves two
+cheaper facts, that no unacknowledged input changed after the store and no
+extract silently lacks a store trace. Under d-255, offers carry extracts and
+code without regenerated store outputs, so an offer with migrate-input changes
+is expected to report STALE before the train gate. Offer authors can use
+--pre-gate to label that result. This checker currently recognizes historical
+store-neutral commits through STORE_NEUTRAL_INPUT_COMMITS; the separately
+accepted ackdir change adds validated per-file train acknowledgements under
+scripts/store_neutral_acks/ after the gate regen.
 
 Exit 0: store is at least as new as every migrate input, and every extract
 has an extracts-v2 sibling or a migration-queue entry.
 Exit 1: input commits landed after the last store touch, or an extract has
 no store trace at all (store suspect).
 
-Usage: scripts/check_store_freshness.py [--head REF]
+Usage: scripts/check_store_freshness.py [--head REF] [--pre-gate]
 """
 
 from __future__ import annotations
@@ -59,11 +66,13 @@ CODE_INPUTS = (
 )
 
 
-# Migrate-input commits that are PROVEN store-neutral: a full regen on a tree
-# containing them leaves every STORE_OUTPUT byte-identical, so no regen commit
-# can exist to follow them, and they would read as STALE forever. Each entry
-# needs that receipt (regen run, no store diff). Short shas, 9 characters,
-# matching the keys stale_input_commits() emits.
+# Historical migrate-input commits that are PROVEN store-neutral: a full regen
+# on a tree containing them leaves every STORE_OUTPUT byte-identical, so no
+# regen commit can exist to follow them, and they would read as STALE forever.
+# Each entry has its evidence described in the notes below. New train
+# acknowledgements use validated per-file records in the separately accepted
+# ackdir change. Short shas, 9 characters, match the keys
+# stale_input_commits() emits.
 #   037f97ff6, 5d46c88e1: d-216, source-oxygen scoring. They score Knudsen
 #     vapour rows at typed source oxygen conditions and keep typed reasons for
 #     closure fallbacks, in simulator/battery/source_oxygen.py and score.py.
@@ -362,6 +371,11 @@ def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--head", default="HEAD", help="ref to inspect (default: HEAD)")
+    parser.add_argument(
+        "--pre-gate",
+        action="store_true",
+        help="label stale migrate inputs as awaiting the train gate regen under d-255",
+    )
     args = parser.parse_args(argv)
     head = _git("rev-parse", args.head).strip()
 
@@ -384,8 +398,12 @@ def main(argv: list[str] | None = None) -> int:
         for title, paths in stale.items():
             sample = ", ".join(paths[:3]) + (" ..." if len(paths) > 3 else "")
             print(f"  {title}\n    {sample}")
-        print("regenerate: .venv/bin/python scripts/battery_migrate.py && "
-              "data/literature/build_index.py --write-store-summary")
+        if args.pre_gate:
+            print("d-255: listed migrate-input commits await the train's gate regen; "
+                  "this STALE result is expected before the gate and a defect after it.")
+        else:
+            print("regenerate: .venv/bin/python scripts/battery_migrate.py && "
+                  "data/literature/build_index.py --write-store-summary")
     if untraced:
         print(f"UNTRACED: {len(untraced)} extract(s) have no extracts-v2 sibling and "
               "no migration-queue entry:")
