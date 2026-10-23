@@ -723,7 +723,8 @@ def test_invalid_explicit_value_ref_fails_closed_in_both_alpha_consumers():
 
 
 def test_configured_stage_area_scales_baffle_capture(monkeypatch):
-    model = CondensationModel(CondensationTrain.create_default())
+    model = _configure_knudsen_policy(CondensationModel(CondensationTrain.create_default()))
+    model.wall_species_partial_pressures_pa = {"SiO": 100.0}
     stage = next(item for item in model.train.stages if item.stage_number == 3)
     monkeypatch.setattr(
         condensation_module,
@@ -762,7 +763,9 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
 
 
 def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
-    model = CondensationModel(CondensationTrain.create_default())
+    model = _configure_knudsen_policy(CondensationModel(CondensationTrain.create_default()))
+    model.wall_species_partial_pressures_pa = {"SiO": 100.0}
+    model.stage_area_m2_by_stage = {}
     stage = next(item for item in model.train.stages if item.stage_number == 3)
     monkeypatch.setattr(
         condensation_module,
