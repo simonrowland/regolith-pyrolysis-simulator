@@ -1037,8 +1037,8 @@ species:
         relation: 'Eq. (16) has no numeric output at 1851 K because the required pAl2O input is not detected.'
         output_unit: atm
         inputs:
-          - 'Table 2 input series shornikov_2017_table2_al2o_not_detected_1851.'
-          - 'Table 2 input series shornikov_2017_table2_al_partial_pressure.'
+          - shornikov_2017_table2_al2o_not_detected_1851
+          - shornikov_2017_table2_al_partial_pressure
       values:
         quantity: partial_pressure
         method_class: model_derived
@@ -1072,8 +1072,8 @@ species:
         relation: 'Eq. (16) has no numeric output at 1859 K because the required pAl2O input is not detected.'
         output_unit: atm
         inputs:
-          - 'Table 2 input series shornikov_2017_table2_al2o_not_detected_1859.'
-          - 'Table 2 input series shornikov_2017_table2_al_partial_pressure.'
+          - shornikov_2017_table2_al2o_not_detected_1859
+          - shornikov_2017_table2_al_partial_pressure
       values:
         quantity: partial_pressure
         method_class: model_derived
