@@ -60,7 +60,7 @@ METAL_PHASE_DESTINATIONS: dict[str, str] = {
 # destination and no condenser-stage projection should be minted.
 PRODUCT_DESTINATIONS: dict[str, dict[str, str]] = {
     'C3': {
-        'Fe': 'stage_1_fe_condenser',
+        'Fe': 'metal_phase_bottom_pool',
         'Cr': 'stage_2_cr_oxide_harvest',
         'CrO2': 'stage_2_cr_oxide_harvest',
         'Ti': 'metal_phase_ti',

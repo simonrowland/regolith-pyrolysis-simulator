@@ -190,21 +190,8 @@ def test_staged_na_cleanup_records_k_thermodynamic_refusal_without_draw(
     sim.melt.temperature_C = 1150.0
     sim.record.path = "A_staged"
     sim.shuttle_Na_inventory_kg = 0.0
-
-    dispatches = []
-
-    def refuse_k(intent, control_inputs=None, **kwargs):
-        dispatches.append((intent, dict(control_inputs or {})))
-        return SimpleNamespace(
-            status="refused",
-            transition=None,
-            diagnostic={
-                "reason_refused": "thermodynamic_margin_nonpositive",
-                "margin_kJ_per_mol_O2": -1.0,
-            },
-        )
-
-    monkeypatch.setattr(sim, "_dispatch_only", refuse_k)
+    sim.setpoints["campaigns"]["C3"]["alkali_dosing"]["K_kg"] = 0.023
+    monkeypatch.setattr(sim, "_freeze_gate_enabled", lambda: False)
     monkeypatch.setattr(sim, "_transfer_condensed_species", lambda species: 0.0)
     monkeypatch.setattr(sim, "_top_up_c3_alkali_credit", lambda species: 0.0)
 
@@ -214,12 +201,13 @@ def test_staged_na_cleanup_records_k_thermodynamic_refusal_without_draw(
     }
     sim._step_shuttle()
 
-    assert len(dispatches) == 1
-    assert dispatches[0][0] is ChemistryIntent.METALLOTHERMIC_STEP
-    assert dispatches[0][1]["reaction_family"] == REACTION_FAMILY_C3_K
-    assert len(sim._shuttle_refusal_history) == 1
-    assert sim._shuttle_refusal_history[0]["reaction_family"] == REACTION_FAMILY_C3_K
-    assert sim._shuttle_refusal_history[0]["diagnostic"]["reason_refused"] == (
+    k_refusals = [
+        row
+        for row in sim._shuttle_refusal_history
+        if row["reaction_family"] == REACTION_FAMILY_C3_K
+    ]
+    assert len(k_refusals) == 1
+    assert k_refusals[0]["diagnostic"]["reason_refused"] == (
         "thermodynamic_margin_nonpositive"
     )
     assert sim._c3_alkali_credit_drawn_kg_by_species.get("K", 0.0) == 0.0

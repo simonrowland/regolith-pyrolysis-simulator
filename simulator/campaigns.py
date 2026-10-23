@@ -1140,9 +1140,8 @@ class CampaignManager:
         target = self._float(na_stage.get('target_C'), 1150.0)
         return {
             'inject_target_C': target,
-            'bakeout_target_C': target,
             'ramp_rate': self._float(na_stage.get('ramp_rate_C_per_hr'), 600.0),
-            'staged_duration_h': self._float(na_stage.get('duration_h'), 3.0),
+            'staged_duration_h': self._float(na_stage.get('duration_h'), 6.0),
         }
 
     def _c2a_staged_stage_by_hour(
@@ -2465,14 +2464,15 @@ class CampaignManager:
             # migration retargeted ``C2A_STAGED -> C3_NA`` (was
             # ``C2A_STAGED -> C3_K`` pre-V1c) and the
             # ``na_shuttle_stage`` override now sets
-            # ``staged_duration_h`` as the cool cleanup endpoint.  The
-            # C3_K branch above honors the override via the
+            # ``staged_duration_h`` for the full staged shuttle window:
+            # three hours of cool cleanup followed by three hours of
+            # bakeout. The C3_K branch above honors the override via the
             # ``record.path == 'A_staged'`` check; this branch did not,
             # so staged runs (``record.path == 'A_staged'``) fell into
             # the ``else`` arm of the ternary and ran C3_NA for the
-            # default 35 hours instead of the intended ~3-hour cool
-            # cleanup.  Mirror the C3_K handling so the staged endpoint
-            # is honored at its configured value.
+            # default 35 hours instead of the configured staged window.
+            # Mirror the C3_K handling so the staged endpoint is honored
+            # at its configured value.
             if record.path == 'A_staged':
                 staged_hours = int(self._float(
                     self._campaign_overrides(campaign).get('staged_duration_h'),

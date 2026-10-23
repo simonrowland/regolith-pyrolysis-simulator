@@ -2664,6 +2664,36 @@ class ExtractionMixin:
             liquid_fraction = None
             if self._freeze_gate_enabled():
                 liquid_fraction = self._freeze_gate_liquid_fraction_factor()
+            if (
+                campaign == CampaignPhase.C3_NA
+                and self.record.path == 'A_staged'
+                and self.melt.campaign_hour == 1
+            ):
+                from simulator.chemistry.kernel.capabilities import ChemistryIntent
+                from engines.builtin.metallothermic_step import REACTION_FAMILY_C3_K
+
+                k_dose_kg = self._c3_alkali_requested_dose_kg('K')
+                if k_dose_kg > 0.01:
+                    k_result = self._dispatch_only(
+                        ChemistryIntent.METALLOTHERMIC_STEP,
+                        control_inputs={
+                            'reaction_family': REACTION_FAMILY_C3_K,
+                            'reagent_available_kg': k_dose_kg,
+                            'true_available_mol_by_species': (
+                                self._cleaned_melt_available_mol_by_species(
+                                    ('FeO',),
+                                )
+                            ),
+                            'liquid_fraction': liquid_fraction,
+                            'dt_hr': 1.0,
+                        },
+                    )
+                    if getattr(k_result, 'status', '') == 'refused':
+                        self._record_shuttle_refusal(
+                            REACTION_FAMILY_C3_K,
+                            'K',
+                            dict(k_result.diagnostic or {}),
+                        )
             if campaign == CampaignPhase.C3_K:
                 self._shuttle_inject_K(liquid_fraction=liquid_fraction)
                 self._shuttle_inject_Na(
@@ -2684,7 +2714,13 @@ class ExtractionMixin:
             self._shuttle_phase = 'bakeout'
             # Bakeout is handled by normal evaporation (K/Na have high
             # vapor pressure at 1520-1680°C).  Track cycle transitions.
-            if self.melt.campaign_hour % cycle_period == 3:
+            if (
+                self.melt.campaign_hour > 0
+                and self.campaign_mgr._c3_is_injection_phase(
+                    self.melt.campaign_hour - 1,
+                    staged=self.record.path == 'A_staged',
+                )
+            ):
                 # Just entered bakeout. Defer the diagnostic counter until the
                 # hour snapshots successfully; zero-transition aborts must be
                 # replayable without mutating state.
