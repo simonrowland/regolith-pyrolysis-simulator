@@ -7520,10 +7520,24 @@ def test_borisov_combined_iron_composition_migrates_without_a_redox_split(
     )
     rows = source["species"]["Fe"]["observations"]
     assert len(rows) == 435
+    # Article Table 1 (1175b49fc) prints oxide wt% and an incomplete mole
+    # inventory. It has no composition_mol. The 404 quoted Supplementary
+    # Table 2 rows keep the combined FeO+FeO1.5 mole map.
+    table1_rows = [
+        row
+        for row in rows
+        if str(row.get("observation_id") or "").startswith("borisov_2018_table1_")
+    ]
+    quoted_rows = [row for row in rows if "composition_mol" in row["values"]]
+    assert len(table1_rows) == 31
+    assert len(quoted_rows) == 404
+    assert {row["observation_id"] for row in table1_rows}.isdisjoint(
+        {row["observation_id"] for row in quoted_rows}
+    )
 
     # Bound closure by half a unit of the last printed decimal place for each
     # component, rather than imposing a tolerance unrelated to row precision.
-    for row in rows:
+    for row in quoted_rows:
         printed = row["values"]["composition_mol"]
         amounts = [as_decimal(amount) for amount in printed.values()]
         rounding_bound = sum(
@@ -7555,7 +7569,6 @@ def test_borisov_combined_iron_composition_migrates_without_a_redox_split(
     }
     for row_id, expected_total_iron, expected_temperature in (
         ("borisov_2018_table2_row_4", "0.0753203", "1775.15"),
-        ("borisov_2018_table2_row_155", "0.0428978", "1574.15"),
         ("borisov_2018_table2_row_438", "0.0342061", "1523.15"),
     ):
         observation = by_id[row_id]
@@ -7566,11 +7579,19 @@ def test_borisov_combined_iron_composition_migrates_without_a_redox_split(
             observation.identity.species.phase.reason
             == "source does not state phase"
         )
-        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
-        assert observation.evidence.original_method_class == "measured_reduced"
+        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert observation.evidence.original_method_class == "quoted_attributed"
         assert observation.identity.temperature_K.value == as_decimal(expected_temperature)
         assert observation.point_conditions is not None
         assert "fO2_log" in observation.point_conditions
+    # Spreadsheet rows 155–185 are this paper's Table 1, not quoted Table 2.
+    # Table 1 keeps the wet-chemical ratio and leaves composition incomplete.
+    assert "borisov_2018_table2_row_155" not in by_id
+    table1 = by_id["borisov_2018_table1_row_1"]
+    assert table1.identity.temperature_K.value == as_decimal("1574.15")
+    assert table1.identity.composition is not None
+    assert not table1.identity.composition.is_value
+    assert table1.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
 
 
 def test_unknown_mole_fraction_component_is_queued_and_withholds_composition() -> None:

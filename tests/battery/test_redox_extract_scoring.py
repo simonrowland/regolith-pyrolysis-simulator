@@ -309,7 +309,23 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     result = migrator.result
     source_rows = source["species"]["Fe"]["observations"]
     assert len(source_rows) == 435
-    for row in source_rows:
+    # Article Table 1 (1175b49fc) is the wet-chemical ratio itself: 31 rows,
+    # no values.inference. The 404 quoted Supplementary Table 2 rows keep the
+    # log10 conversion. Quoted evidence does not require derived_from.
+    inferred_rows = [
+        row for row in source_rows if "inference" in (row.get("values") or {})
+    ]
+    table1_rows = [
+        row
+        for row in source_rows
+        if str(row.get("observation_id") or "").startswith("borisov_2018_table1_")
+    ]
+    assert len(table1_rows) == 31
+    assert len(inferred_rows) == 404
+    assert {row["observation_id"] for row in table1_rows}.isdisjoint(
+        {row["observation_id"] for row in inferred_rows}
+    )
+    for row in inferred_rows:
         values = row["values"]
         inference = values["inference"]
         assert inference["relation"] == values["ratio_derivation"]
@@ -323,10 +339,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         assert conversion is not None
         assert conversion.relation == values["ratio_derivation"]
 
-    hard_issue_details = [issue.detail for issue in result.validation.hard_issues]
-    assert hard_issue_details.count("derived observation requires derived_from") == 435
-    assert "derived observation requires derivation" not in hard_issue_details
-    assert set(hard_issue_details) == {"derived observation requires derived_from"}
+    assert result.validation.hard_issues == ()
 
     origins = {
         observation_id: "extracts/borisov-2018-compilation.yaml"
@@ -343,20 +356,17 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert len(comparison_candidates(context)) == 435
     rows_by_id = {row.observation_id: row for row in result.observations.values()}
     row4 = rows_by_id[f"{extract.stem}::borisov_2018_table2_row_4"]
-    row155 = rows_by_id[f"{extract.stem}::borisov_2018_table2_row_155"]
+    # Spreadsheet row 155 is article Table 1 (1175b49fc), not a quoted Table 2 id.
+    assert f"{extract.stem}::borisov_2018_table2_row_155" not in rows_by_id
 
-    # Hand evaluation of Kress & Carmichael 1991 at each printed T and log fO2,
-    # with 1 atm from the cited compilation: row 4 gives Fe2O3/FeO=0.9191803065,
-    # hence Fe3+/Fe2+=2*0.9191803065=1.838361; row 155 gives 1.6385001231,
-    # hence 3.277000. The factor two converts oxide formula units to Fe cations.
+    # Hand evaluation of Kress & Carmichael 1991 at row 4's printed T and log fO2,
+    # with 1 atm from the cited compilation: Fe2O3/FeO=0.9191803065, hence
+    # Fe3+/Fe2+=2*0.9191803065=1.838361. The factor two converts oxide formula
+    # units to Fe cations.
     prediction4 = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row4)
-    prediction155 = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row155)
     assert prediction4.value is not None
     assert abs(prediction4.value - Decimal("1.838360613")) < Decimal("1e-9")
-    assert prediction155.value is not None
-    assert abs(prediction155.value - Decimal("3.277000246")) < Decimal("1e-9")
     assert prediction4.refusal_reason is None
-    assert prediction155.refusal_reason is None
 
     glass_row = replace(
         row4,
