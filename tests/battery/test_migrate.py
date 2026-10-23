@@ -38,6 +38,7 @@ from simulator.battery.enums import (
     PolymorphRejectionKind,
     Quantity,
     Rail,
+    RawInputStatus,
     ResidualStatus,
     ReferenceStateConvention,
     RefusalReason,
@@ -73,6 +74,7 @@ from simulator.battery.migrate import (
     iter_observation_store_paths,
     lineage_parents_from_source,
     source_derivation_from_source,
+    _derivation_inputs_requirement_error,
     load_migrated_context,
     map_phase,
     map_quantity,
@@ -334,6 +336,9 @@ def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_v
 from simulator.battery.records import (
     Bench,
     BenchIdentity,
+    Derivation,
+    Located,
+    Locator,
     Notice,
     Reaction,
     Species,
@@ -342,7 +347,12 @@ from simulator.battery.records import (
     as_decimal,
 )
 from tests.battery import load_observation_store_summary
-from simulator.battery.validate import validate_corpus
+from simulator.battery.validate import (
+    AncestryFailure,
+    _asset_ids,
+    _observation_lineage,
+    validate_corpus,
+)
 from simulator.yaml_cache import YAML12SafeLoader, load_cached_safe_yaml
 from tests.battery import factories as F
 
@@ -2656,19 +2666,19 @@ def test_merge_located_mapping_order_is_hash_seed_stable() -> None:
 
 
 def test_lineage_parents_from_source_never_invents_pointer() -> None:
-    """b-549: bare prose in derived_from must not get a source prefix slapped
-    on — it can never resolve by construction. It is returned as prose so the
-    caller can route it to the queue instead of minting a dangling pointer.
+    """b-549 / b-979: a printed string is prose, not a parent. Prefixing it
+    would mint an id the source did not write, and storing it would dangle.
     """
 
+    printed = "author geometric calculation from assumed cube dimensions"
     parents, prose = lineage_parents_from_source(
-        {"derived_from": "author geometric calculation from assumed cube dimensions"},
+        {"derived_from": printed},
         {},
         "src",
         set(),
     )
     assert parents == ()
-    assert prose == ("author geometric calculation from assumed cube dimensions",)
+    assert prose == (printed,)
 
     parents, prose = lineage_parents_from_source(
         {"derived_from": ["local_a", "other::obs", "prose note", "src::local_b"]},
@@ -2701,38 +2711,430 @@ def test_lineage_parents_from_source_never_invents_pointer() -> None:
     assert lineage_parents_from_source({}, {}, "src", {"local_a"}) == ((), ())
 
 
-def test_prose_derived_from_is_queued_never_pointed(tmp_path: Path) -> None:
-    """b-549 end-to-end: a prose derived_from on a derived observation yields
-    no pointer on the record, no referential_integrity hard issue, and a queue
-    entry carrying the prose plus locator (the text is never silently dropped).
+def test_whitespace_qualified_token_is_prose_and_keeps_derivation(
+    tmp_path: Path,
+) -> None:
+    """b-979: a colon token with whitespace is printed prose. The derivation
+    stays, and the verbatim text is a conditional_field plus a queue entry.
     """
 
+    text = "not a citation::not a record"
+    parents, prose = lineage_parents_from_source(
+        {"derived_from": text}, {}, "src", set()
+    )
+    assert parents == ()
+    assert prose == (text,)
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    _model_derived_child(
+        extract,
+        "child_spaced_ref",
+        derived_from=text,
+        derivation={
+            "relation": "substitution of printed equilibrium relations",
+            "inputs": text,
+            "output_unit": "dimensionless",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    rows = _rows_for(result, "child_spaced_ref")
+    assert rows
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == ()
+        assert text not in (obs.derived_from or ())
+    _assert_printed_lineage_flagged(result, text, "derived_from")
+    _assert_printed_lineage_flagged(result, text, "derivation.inputs")
+    assert sum(
+        1 for entry in result.queue if entry.why == _printed_lineage_detail(text)
+    ) == 1
+
+
+_PRINTED_CITATION = (
+    "Knacke et al. thermochemical data and prior Mg, Ca and Al "
+    "deoxidation-equilibrium data cited by the authors"
+)
+_PRINTED_NON_CITATION = (
+    "present 1873 K equilibrium observations plus prior Mg, Ca and Al "
+    "deoxidation-equilibrium parameters"
+)
+
+
+def _model_derived_child(extract: dict, observation_id: str, **fields: object) -> dict:
+    parent = extract["species"]["Na"]["observations"][0]
+    child = yaml.safe_load(yaml.safe_dump(parent))
+    child["observation_id"] = observation_id
+    child["values"]["method_class"] = "model_derived"
+    child.update(fields)
+    extract["species"]["Na"]["observations"].append(child)
+    return child
+
+
+def _rows_for(result, observation_id: str) -> list:
+    return [
+        obs
+        for obs in result.observations.values()
+        if observation_id in obs.observation_id
+    ]
+
+
+def _issue_pairs(result, observation) -> set[tuple[str, str]]:
+    prefix = f"observation[{observation.observation_id}]."
+    return {
+        (issue.path[len(prefix):], issue.reason.value)
+        for issue in result.validation.hard_issues
+        if issue.path.startswith(prefix)
+    }
+
+
+def _printed_lineage_detail(text: str) -> str:
+    return (
+        f"derived_from {text!r} is prose, not a resolvable "
+        "observation id; retained here, never minted as a pointer"
+    )
+
+
+def _assert_printed_lineage_flagged(result, text: str, field: str) -> None:
+    """Printed text stays off pointer fields and is flagged, not dropped."""
+
+    assert any(
+        issue.reason is RefusalReason.CONDITIONAL_FIELD
+        and issue.path.endswith(f".{field}")
+        and issue.detail == _printed_lineage_detail(text)
+        for issue in result.validation.hard_issues
+    )
+    assert any(entry.why == _printed_lineage_detail(text) for entry in result.queue)
+    assert not any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY and text in issue.detail
+        for issue in result.validation.hard_issues
+    )
+    for obs in result.observations.values():
+        assert text not in (obs.derived_from or ())
+        if obs.derivation is not None:
+            assert text not in obs.derivation.inputs
+
+
+def test_printed_derived_from_is_kept_and_flagged(tmp_path: Path) -> None:
+    """b-979: a printed derived_from is not stored as a pointer. It is a hard
+    conditional_field and a page-grounding queue entry, both with the
+    verbatim text. referential_integrity stays clear.
+    """
+
+    printed = "author estimate from assumed grain population"
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     values = extract["species"]["Na"]["observations"][0]["values"]
     values["method_class"] = "model_derived"
-    values["derived_from"] = "author estimate from assumed grain population"
-    root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=True)
-    assert result.observations
-    for obs in result.observations.values():
-        assert not obs.derived_from
-    queued = [
-        e
-        for e in result.queue
-        if "author estimate from assumed grain population" in e.why
-    ]
-    assert len(queued) == 1
-    # _resolve_queue_ids re-points entries to the realised observation id.
-    assert queued[0].observation_id.startswith("fixture-source::na_psat")
-    assert queued[0].axes == ["derived_from"]
-    assert queued[0].locator  # locator rides along — the text keeps its address
+    values["derived_from"] = printed
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    rows = _rows_for(result, "na_psat")
+    assert rows
+    for obs in rows:
+        assert obs.derived_from is None
+    _assert_printed_lineage_flagged(result, printed, "derived_from")
     report = validate_corpus(
         result.works, result.experiments, result.observations, residuals=None
     )
-    reasons = {(i.path.rsplit(".", 1)[-1], i.reason.value) for i in report.hard_issues}
-    assert ("derived_from", "referential_integrity") not in reasons
-    # Unstated ancestry is still a hard conditional_field — surfaced, not hidden.
-    assert ("derived_from", "conditional_field") in reasons
+    assert not any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY for issue in report.hard_issues
+    )
+
+
+def test_citation_parent_model_derived_keeps_typed_lineage(tmp_path: Path) -> None:
+    """b-979: a printed citation does not enter derivation.inputs. The
+    derivation is not nulled, and the citation is a conditional_field.
+    """
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["observation_id"] = "parent_meas"
+    _model_derived_child(
+        extract,
+        "child_citation",
+        derived_from="parent_meas",
+        derivation={
+            "relation": "substitution of printed equilibrium relations",
+            "inputs": _PRINTED_CITATION,
+            "output_unit": "dimensionless",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    rows = _rows_for(result, "child_citation")
+    assert rows
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == ()
+        assert obs.derived_from
+        assert all(
+            "parent_meas" in parent and " " not in parent for parent in obs.derived_from
+        )
+    _assert_printed_lineage_flagged(result, _PRINTED_CITATION, "derivation.inputs")
+
+
+def test_observation_id_derivation_parent_is_unchanged(tmp_path: Path) -> None:
+    """An observation-id parent stays a qualified observation id and does not
+    raise referential_integrity.
+    """
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["observation_id"] = "parent_meas"
+    _model_derived_child(
+        extract,
+        "child_observed",
+        derived_from=["parent_meas"],
+        derivation={
+            "relation": "taken from the paired observation",
+            "inputs": ["parent_meas"],
+            "output_unit": "Pa",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    rows = _rows_for(result, "child_observed")
+    assert rows
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derived_from
+        assert obs.derivation.inputs == obs.derived_from
+        assert all(
+            parent.startswith("fixture-source::parent_meas::") for parent in obs.derived_from
+        )
+        assert _issue_pairs(result, obs) == set()
+
+
+def test_restoring_the_printed_lineage_drop_fails(tmp_path: Path) -> None:
+    """b-979 mutant: nulling the derivation, or storing the printed string, fails.
+
+    A derivation whose only input is printed text stays, with empty pointer
+    inputs. A printed input beside a resolvable observation id stays off
+    inputs. Both strings are conditional_field plus a queue entry. No year
+    or 'et al' test. referential_integrity stays clear.
+    """
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["observation_id"] = "parent_meas"
+    _model_derived_child(
+        extract,
+        "child_prose_only",
+        derived_from="parent_meas",
+        derivation={
+            "relation": "fit from the present observations",
+            "inputs": _PRINTED_NON_CITATION,
+            "output_unit": "dimensionless",
+        },
+    )
+    _model_derived_child(
+        extract,
+        "child_mixed",
+        derived_from=["parent_meas"],
+        derivation={
+            "relation": "Gibbs-energy minimization using thermodynamic data [19]",
+            "inputs": ["parent_meas", "thermodynamic data cited as [19]"],
+            "output_unit": "Pa",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    prose_only = _rows_for(result, "child_prose_only")
+    assert prose_only
+    for obs in prose_only:
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == ()
+    _assert_printed_lineage_flagged(result, _PRINTED_NON_CITATION, "derivation.inputs")
+
+    cited = "thermodynamic data cited as [19]"
+    mixed = _rows_for(result, "child_mixed")
+    assert mixed
+    for obs in mixed:
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == obs.derived_from
+        assert obs.derived_from
+        assert all(
+            parent.startswith("fixture-source::parent_meas::") for parent in obs.derived_from
+        )
+    _assert_printed_lineage_flagged(result, cited, "derivation.inputs")
+
+
+def test_all_prose_derivation_inputs_are_located_printed_unresolved(
+    tmp_path: Path,
+) -> None:
+    """b-979: every printed input becomes a located printed_unresolved.
+    The text stays a conditional_field and a queue entry, and the store
+    loader accepts the empty inputs.
+    """
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    _model_derived_child(
+        extract,
+        "child_prose_inputs",
+        derivation={
+            "relation": "fit from the present observations",
+            "inputs": _PRINTED_NON_CITATION,
+            "output_unit": "dimensionless",
+        },
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=True)
+    rows = _rows_for(result, "child_prose_inputs")
+    assert rows
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == ()
+        assert obs.derivation.has_located_unresolved_printed_inputs
+        assert (
+            obs.derivation.raw_inputs.state.value
+            is RawInputStatus.PRINTED_UNRESOLVED
+        )
+        assert obs.derivation.raw_inputs.locator == obs.locator
+    _assert_printed_lineage_flagged(
+        result, _PRINTED_NON_CITATION, "derivation.inputs"
+    )
+    _loaded_works, _loaded_experiments, loaded = load_migrated_store(root)
+    reloaded = [
+        obs
+        for obs in loaded.values()
+        if "child_prose_inputs" in obs.observation_id
+    ]
+    assert reloaded
+    for obs in reloaded:
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == ()
+        assert (
+            obs.derivation.raw_inputs.state.value
+            is RawInputStatus.PRINTED_UNRESOLVED
+        )
+        assert obs.derivation.raw_inputs.locator is not None
+
+
+def test_mixed_resolved_inputs_leave_raw_inputs_absent(tmp_path: Path) -> None:
+    """b-979: a resolved input stays on the derivation. raw_inputs stays absent."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["observation_id"] = "parent_meas"
+    _model_derived_child(
+        extract,
+        "child_mixed_raw",
+        derived_from=["parent_meas"],
+        derivation={
+            "relation": "Gibbs-energy minimization using thermodynamic data [19]",
+            "inputs": ["parent_meas", "thermodynamic data cited as [19]"],
+            "output_unit": "Pa",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    rows = _rows_for(result, "child_mixed_raw")
+    assert rows
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == obs.derived_from
+        assert obs.derivation.raw_inputs is None
+    _assert_printed_lineage_flagged(
+        result, "thermodynamic data cited as [19]", "derivation.inputs"
+    )
+
+
+def test_unlocated_printed_unresolved_requires_a_locator() -> None:
+    """b-979: an unlocated printed_unresolved does not satisfy empty inputs."""
+
+    bare = Derivation(
+        relation="author calculation",
+        inputs=(),
+        parameters=(),
+        output_unit="Pa",
+        raw_inputs=Located(State.of(RawInputStatus.PRINTED_UNRESOLVED)),
+    )
+    assert _derivation_inputs_requirement_error(bare) == (
+        "raw_inputs printed_unresolved declaration requires a locator"
+    )
+    located = replace(
+        bare,
+        raw_inputs=Located(
+            State.of(RawInputStatus.PRINTED_UNRESOLVED),
+            locator=Locator(page=2),
+        ),
+    )
+    assert _derivation_inputs_requirement_error(located) is None
+
+
+def _assert_reloaded_printed_unresolved(
+    root: Path, marker: str, *, resolved_parent: str
+) -> None:
+    works, experiments, loaded = load_migrated_store(root)
+    report = validate_corpus(works, experiments, loaded, residuals=None)
+    asset_ids = _asset_ids(works)
+    rows = [obs for obs in loaded.values() if marker in obs.observation_id]
+    assert rows
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derivation.declares_unresolved_printed_inputs
+        locator = obs.derivation.raw_inputs.locator
+        assert any(
+            issue.reason is RefusalReason.CONDITIONAL_FIELD
+            and issue.path == f"observation[{obs.observation_id}].derivation"
+            and issue.detail
+            == f"printed derivation inputs do not resolve; locator {locator!r}"
+            for issue in report.hard_issues
+        )
+        assert (
+            _observation_lineage(
+                obs.observation_id, loaded, set(), asset_ids=asset_ids
+            ).failure
+            is AncestryFailure.PRINTED_UNRESOLVED
+        )
+    parents = [
+        obs for obs in loaded.values() if resolved_parent in obs.observation_id
+    ]
+    assert parents
+    for obs in parents:
+        assert obs.derivation is None or not obs.derivation.declares_unresolved_printed_inputs
+        walked = _observation_lineage(
+            obs.observation_id, loaded, set(), asset_ids=asset_ids
+        )
+        assert walked.complete and walked.ids == frozenset({obs.observation_id})
+
+
+def test_printed_unresolved_stays_flagged_after_reload(tmp_path: Path) -> None:
+    """b-979: a resolved derived_from does not clear printed inputs after load."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["observation_id"] = "parent_meas"
+    _model_derived_child(
+        extract,
+        "child_citation",
+        derived_from="parent_meas",
+        derivation={
+            "relation": "substitution of printed equilibrium relations",
+            "inputs": _PRINTED_CITATION,
+            "output_unit": "dimensionless",
+        },
+    )
+    root = _write_min_tree(tmp_path, extract)
+    migrate(root, write=True)
+    _assert_reloaded_printed_unresolved(
+        root, "child_citation", resolved_parent="parent_meas"
+    )
+
+
+def test_measured_reduced_printed_unresolved_stays_flagged_after_reload(
+    tmp_path: Path,
+) -> None:
+    """b-979: measured_reduced keeps the same loaded flag and incomplete ancestry."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["observation_id"] = "parent_meas"
+    child = _model_derived_child(
+        extract,
+        "child_reduced",
+        derived_from="parent_meas",
+        derivation={
+            "relation": "author reduction of the paired measurement",
+            "inputs": _PRINTED_NON_CITATION,
+            "output_unit": "dimensionless",
+        },
+    )
+    child["values"]["method_class"] = "measured_reduced"
+    root = _write_min_tree(tmp_path, extract)
+    migrate(root, write=True)
+    _assert_reloaded_printed_unresolved(
+        root, "child_reduced", resolved_parent="parent_meas"
+    )
 
 
 def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:
@@ -3514,6 +3916,61 @@ def test_g02_langmuir_ledger_keeps_qualified_derived_from(tmp_path: Path) -> Non
     )
     observation = migrate(root, write=False).observations["potassium_silicate_vacuum"]
     assert observation.derived_from == (parent,)
+
+
+def test_langmuir_migrated_rows_keep_qualified_derived_from() -> None:
+    """b-979: the real Langmuir ledger's qualified parents, pinned before
+    that parser joins ``lineage_parents_from_source``.
+    """
+
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_langmuir(
+        REPO_ROOT / "data" / "literature" / "langmuir_knudsen_flux_validation.yaml"
+    )
+    observations = migrator.result.observations
+    assert observations["chromium_solid_langmuir_knudsen"].derived_from == (
+        "kems-003-pound-1972::pound_1972_cr_solid_alpha_mccabe",
+    )
+    assert observations["potassium_silicate_vacuum"].derived_from == (
+        "kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir",
+        "kems-005-fedkin-2006::fedkin_2006_k_class_b1",
+    )
+    assert observations["iron_olivine_kems"].derived_from is None
+
+
+def test_langmuir_printed_derived_from_is_flagged_verbatim(tmp_path: Path) -> None:
+    """b-979: Langmuir printed derived_from is not stripped into a pointer.
+    The source states no derivation, so none is invented.
+    """
+
+    printed = "  author estimate  "
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "langmuir_knudsen_flux_validation.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "measurements": {
+                    "potassium_silicate_vacuum": {
+                        "species": "K",
+                        "temperature_range_k": [1723.15, 1723.15],
+                        "measured_langmuir_to_effusion_flux_ratio": {"value": 0.13},
+                        "derived_from": printed,
+                        "source": {
+                            "citation_id": "REF-014",
+                            "citation": "Fedkin et al. (2006)",
+                        },
+                    }
+                }
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    observation = result.observations["potassium_silicate_vacuum"]
+    assert observation.derived_from is None
+    assert observation.derivation is None
+    assert observation.value.kind is ValueKind.POINT
+    _assert_printed_lineage_flagged(result, printed, "derived_from")
 
 
 def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
@@ -10162,9 +10619,16 @@ def test_registered_unknown_placeholder_resolves_as_lineage(tmp_path: Path) -> N
     )
 
 
-def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
+def test_measured_reduced_derivation_printed_input_is_kept_and_flagged(
     tmp_path: Path,
 ) -> None:
+    """b-979: printed derivation inputs are not stored as pointers.
+
+    The derivation stays. Each printed input is a conditional_field and a
+    queue entry carrying the same verbatim text. referential_integrity
+    stays clear, including on validate_corpus of the stored rows.
+    """
+
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     raw = extract["species"]["Na"]["observations"][0]
     raw["values"]["method_class"] = "measured_reduced"
@@ -10184,22 +10648,19 @@ def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
         if obs.observation_id.startswith("fixture-source::na_psat::T=1200.0")
     )
     assert observation.derived_from is None
-    queued = [
-        entry
-        for entry in result.queue
-        if entry.observation_id == observation.observation_id
-        and "Table 2 DSC Cp points" in (entry.why or "")
-    ]
-    assert len(queued) == 1
-    assert queued[0].axes == ["derived_from"]
-    assert queued[0].locator
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == ()
+    assert observation.locator
+    for printed in (
+        "Table 2 DSC Cp points",
+        "Table 3 drop-calorimetric heat contents",
+    ):
+        _assert_printed_lineage_flagged(result, printed, "derivation.inputs")
     report = validate_corpus(
         result.works, result.experiments, result.observations, residuals=None
     )
     assert not any(
-        issue.path.startswith(f"observation[{observation.observation_id}].")
-        and issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
-        for issue in report.hard_issues
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY for issue in report.hard_issues
     )
 
 

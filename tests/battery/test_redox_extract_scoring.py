@@ -300,6 +300,85 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     )
 
 
+def _assert_kress91_citation_is_unknown(residuals, observations) -> None:
+    """Every Borisov redox residual is UNKNOWN, and the dex pins stay put.
+
+    Kress & Carmichael 1991 is not a registered work. regolith-main is
+    registering it under kc91-1022, and these source-relation pins are
+    re-pinned once that work lands. The numeric predictions are the
+    previous attribution split: calibration overlap versus the other
+    printed sources. That split is no longer the source relation.
+    """
+
+    assert len(residuals) == 435
+    assert all(
+        residual.source_relation is score_module.SourceRelation.UNKNOWN
+        for residual in residuals
+    )
+    assert all(not residual.score_eligible for residual in residuals)
+    overlap_all: list[Decimal] = []
+    held_all: list[Decimal] = []
+    overlap_admitted: list[Decimal] = []
+    held_admitted: list[Decimal] = []
+    for residual in residuals:
+        observation = observations[residual.reference]
+        overlap = score_module._kc91_calibration_source_overlap(
+            observation.evidence.attribution
+        )
+        assert residual.numeric is not None
+        value = residual.numeric.value
+        (overlap_all if overlap else held_all).append(value)
+        if score_module._headline_payload_admits(
+            residual_to_plain(residual), tier="measured"
+        ):
+            (overlap_admitted if overlap else held_admitted).append(value)
+    assert (len(overlap_all), len(held_all)) == (223, 212)
+    assert (len(overlap_admitted), len(held_admitted)) == (213, 212)
+    assert Decimal(str(score_module._rms(overlap_all))).quantize(
+        Decimal("0.00001")
+    ) == Decimal("0.11250")
+    assert abs(
+        score_module._rms(overlap_admitted)
+        - Decimal("0.1126289501574099044023575236")
+    ) < Decimal("0.00001")
+    assert abs(
+        score_module._median(overlap_admitted) - Decimal("-0.04086499066062312")
+    ) < Decimal("0.00001")
+    assert abs(
+        score_module._rms(held_admitted) - Decimal("0.10468")
+    ) < Decimal("0.00001")
+    assert abs(
+        score_module._median(held_admitted) - Decimal("-0.01574")
+    ) < Decimal("0.00001")
+
+
+def _assert_unknown_redox_headline(records) -> None:
+    """The redox headline is one UNKNOWN row, not the retired split."""
+
+    retired = {
+        "calibration_source_overlap_fit_fidelity",
+        "independent_source_accuracy",
+    }
+    redox = [
+        record
+        for record in records
+        if record.get("rail") == Rail.REDOX.value
+        and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+    ]
+    assert not any(record.get("population") in retired for record in redox)
+    measured = [
+        record
+        for record in redox
+        if record.get("tier") == "measured"
+        and record.get("source_relation") == "unknown"
+    ]
+    assert len(measured) == 1
+    row = measured[0]
+    assert "population" not in row
+    assert (row["n_candidates"], row["n"]) == (425, 425)
+    assert row["n_score_eligible"] == 0
+
+
 def test_borisov_2018_rows_reach_redox_scoring_population():
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
@@ -434,28 +513,23 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         engines=(Engine.INTERNAL_ANALYTICAL,),
         rail=Rail.REDOX,
     )
-    relation_counts = {
-        relation.value: sum(residual.source_relation is relation for residual in residuals)
-        for relation in (score_module.SourceRelation.TRAINING, score_module.SourceRelation.INDEPENDENT)
-    }
-    assert relation_counts == {"training": 223, "independent": 212}
+    # Kress & Carmichael 1991 is not a registered work. regolith-main is
+    # registering it under kc91-1022, and these pins are re-pinned once it lands.
+    _assert_kress91_citation_is_unknown(residuals, result.observations)
     measured_rows = score_module.measured_engine_rail_records(
         [residual_to_plain(residual) for residual in residuals],
         context=context,
         engines=(Engine.INTERNAL_ANALYTICAL,),
     )
-    measured_training = next(
+    measured_unknown = next(
         row for row in measured_rows
         if row.get("rail") == Rail.REDOX.value
-        and row.get("source_relation") == "training"
+        and row.get("source_relation") == "unknown"
         and row.get("candidates")
     )
-    assert measured_training["population"] == "calibration_source_overlap_fit_fidelity"
-    assert (measured_training["candidates"], measured_training["numeric"]) == (223, 223)
-    assert (measured_training["certified_numeric"], measured_training["flagged_numeric"]) == (213, 10)
-    assert Decimal(measured_training["metrics"][0]["all_numeric"]["rms"]).quantize(
-        Decimal("0.00001")
-    ) == Decimal("0.11250")
+    assert "population" not in measured_unknown
+    assert (measured_unknown["candidates"], measured_unknown["numeric"]) == (435, 435)
+    assert (measured_unknown["certified_numeric"], measured_unknown["flagged_numeric"]) == (425, 10)
     assert len(residuals) == 435
     assert all(residual.numeric is not None for residual in residuals)
     assert all(residual.status is not ResidualStatus.REFUSED for residual in residuals)
@@ -496,7 +570,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert zero_residuals[0].refusal.reason is RefusalReason.METRIC_DOMAIN
 
 
-def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_path):
+def test_borisov_redox_headline_is_unknown_pending_kc91_registration(tmp_path):
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
     migrator = migrate_one_extract(root, extract)
@@ -514,48 +588,16 @@ def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_pat
         engines=(Engine.INTERNAL_ANALYTICAL,),
         rail=Rail.REDOX,
     )
+    # Kress & Carmichael 1991 is not a registered work. regolith-main is
+    # registering it under kc91-1022, and these pins are re-pinned once it lands.
+    _assert_kress91_citation_is_unknown(residuals, result.observations)
     records = headline_payload_records(
         [residual_to_plain(residual) for residual in residuals],
         engines=(Engine.INTERNAL_ANALYTICAL,),
         observations=result.observations,
         origins={key: extract.name for key in result.observations},
     )
-    split = {
-        record["population"]: record
-        for record in records
-        if record.get("rail") == Rail.REDOX.value
-        and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-        and record.get("population")
-    }
-    assert set(split) == {
-        "calibration_source_overlap_fit_fidelity",
-        "independent_source_accuracy",
-    }
-    assert split["calibration_source_overlap_fit_fidelity"]["n"] == 213
-    assert split["independent_source_accuracy"]["n"] == 212
-    assert abs(
-        Decimal(split["calibration_source_overlap_fit_fidelity"]["rms_dex"])
-        - Decimal("0.1126289501574099044023575236")
-    ) < Decimal("0.00001")
-    assert abs(
-        Decimal(split["calibration_source_overlap_fit_fidelity"]["median_dex"])
-        - Decimal("-0.04086499066062312")
-    ) < Decimal("0.00001")
-    assert abs(
-        Decimal(split["independent_source_accuracy"]["rms_dex"])
-        - Decimal("0.10468")
-    ) < Decimal("0.00001")
-    assert abs(
-        Decimal(split["independent_source_accuracy"]["median_dex"])
-        - Decimal("-0.01574")
-    ) < Decimal("0.00001")
-    assert not any(
-        record.get("tier") == "measured"
-        and record.get("rail") == Rail.REDOX.value
-        and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-        and not record.get("population")
-        for record in records
-    )
+    _assert_unknown_redox_headline(records)
 
     object_records = score_module.headline_records(
         residuals,
@@ -569,25 +611,7 @@ def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_pat
         accumulator.add(score_module.residual_to_plain(residual))
     accumulator_records = accumulator.headline_records()
     for headline in (object_records, accumulator_records):
-        split = {
-            record["population"]: record
-            for record in headline
-            if record.get("tier") == "measured"
-            and record.get("rail") == Rail.REDOX.value
-            and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-            and record.get("population")
-        }
-        assert split["calibration_source_overlap_fit_fidelity"]["n"] == 213
-        assert split["independent_source_accuracy"]["n"] == 212
-        assert split["calibration_source_overlap_fit_fidelity"]["source_relation"] == "training"
-        assert split["independent_source_accuracy"]["source_relation"] == "independent"
-        assert not any(
-            record.get("rail") == Rail.REDOX.value
-            and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-            and record.get("tier") == "measured"
-            and not record.get("population")
-            for record in headline
-        )
+        _assert_unknown_redox_headline(headline)
 
     fixture_extract = tmp_path / "data/literature/extracts" / extract.name
     fixture_extract.parent.mkdir(parents=True)
@@ -633,42 +657,26 @@ def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_pat
     summary = json.loads(
         (tmp_path / "data/battery/score-summary.json").read_text(encoding="utf-8")
     )
-    production_rows = {
-        row["population"]: row
-        for row in summary["records"]
-        if row.get("tier") == "measured"
-        and row.get("rail") == Rail.REDOX.value
-        and row.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-        and row.get("population")
-    }
-    assert production_rows["calibration_source_overlap_fit_fidelity"]["n"] == 213
-    assert production_rows["independent_source_accuracy"]["n"] == 212
-    assert production_rows["calibration_source_overlap_fit_fidelity"]["source_relation"] == "training"
-    assert production_rows["independent_source_accuracy"]["source_relation"] == "independent"
-    assert abs(
-        Decimal(production_rows["calibration_source_overlap_fit_fidelity"]["rms_dex"])
-        - Decimal("0.1126289501574099044023575236")
-    ) < Decimal("0.00001")
-    assert abs(
-        Decimal(production_rows["independent_source_accuracy"]["rms_dex"])
-        - Decimal("0.10468")
-    ) < Decimal("0.00001")
+    _assert_unknown_redox_headline(summary["records"])
     report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
-    report_rows = {
-        parts[2]: parts
+    retired = (
+        "calibration_source_overlap_fit_fidelity",
+        "independent_source_accuracy",
+    )
+    assert not any(
+        population in line
         for line in report.splitlines()
-        if line.startswith("| redox | internal-analytical | ")
-        if (parts := [part.strip() for part in line.strip("|").split("|")])
-        and len(parts) == 15
-    }
-    fit_row = report_rows["calibration_source_overlap_fit_fidelity"]
-    independent_row = report_rows["independent_source_accuracy"]
-    assert fit_row[3] == fit_row[5] == "213"
-    assert independent_row[3] == independent_row[5] == "212"
-    assert abs(
-        Decimal(fit_row[8]) - Decimal("0.1126289501574099044023575236")
-    ) < Decimal("0.00001")
-    assert abs(Decimal(independent_row[8]) - Decimal("0.10468")) < Decimal("0.00001")
+        if line.startswith("| redox |")
+        for population in retired
+    )
+    fit_row = next(
+        [part.strip() for part in line.strip("|").split("|")]
+        for line in report.splitlines()
+        if line.startswith("| redox | internal-analytical | unknown |")
+    )
+    assert fit_row[2] == "unknown"
+    assert fit_row[3] == fit_row[5] == "425"
+    assert fit_row[6] == "0"
 
     measured_completed = subprocess.run(
         [
@@ -693,22 +701,35 @@ def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_pat
     measured_summary = json.loads(
         (tmp_path / "data/battery/score-summary.json").read_text(encoding="utf-8")
     )
-    measured_training = next(
+    measured_unknown = next(
         row for row in measured_summary["records"]
         if row.get("rail") == Rail.REDOX.value
         and row.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-        and row.get("source_relation") == "training"
+        and row.get("source_relation") == "unknown"
         and row.get("candidates")
     )
-    assert measured_training["population"] == "calibration_source_overlap_fit_fidelity"
-    assert (measured_training["candidates"], measured_training["certified_numeric"]) == (223, 213)
+    assert "population" not in measured_unknown
+    assert (measured_unknown["candidates"], measured_unknown["numeric"]) == (435, 435)
+    assert (measured_unknown["certified_numeric"], measured_unknown["flagged_numeric"]) == (425, 10)
     measured_report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
+    assert not any(
+        population in line
+        for line in measured_report.splitlines()
+        if line.startswith("| redox |")
+        for population in (
+            "calibration_source_overlap_fit_fidelity",
+            "independent_source_accuracy",
+        )
+    )
     measured_fit = next(
         [part.strip() for part in line.strip("|").split("|")]
         for line in measured_report.splitlines()
-        if line.startswith("| redox | dex / dex | internal-analytical | calibration_source_overlap_fit_fidelity |")
+        if line.startswith("| redox | dex / dex | internal-analytical | unknown |")
     )
-    assert measured_fit[3] == "calibration_source_overlap_fit_fidelity"
+    assert measured_fit[3] == "unknown"
+    assert measured_fit[4] == measured_fit[5] == "435"
+    assert measured_fit[6] == "425"
+    assert measured_fit[7] == "10"
 
 
 def test_kress91_redox_flags_oxide_outside_its_converter_domain():

@@ -1042,6 +1042,12 @@ def _derivation_inputs_requirement_error(
         return "raw_inputs not_printed declaration requires a locator"
     if (
         not derivation.inputs
+        and derivation.declares_unresolved_printed_inputs
+        and not derivation.has_located_unresolved_printed_inputs
+    ):
+        return "raw_inputs printed_unresolved declaration requires a locator"
+    if (
+        not derivation.inputs
         and derivation.raw_inputs is None
         and not has_resolved_lineage
     ):
@@ -6724,9 +6730,12 @@ def lineage_parents_from_source(
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
     """Source-stated lineage as (parents, prose), without inventing pointers.
 
-    Unqualified prose is returned separately for queueing. Namespaced
-    references are kept for store validation, which checks them against the
-    observation's Work assets and observation ids.
+    A local observation id is qualified with ``source_id::``. A ``pdf:`` or
+    other asset id stays a parent. A whitespace-free colon token stays a
+    parent too: a broken reference is a data error for store validation.
+    Any string that contains whitespace is printed text, even with a colon.
+    ``prose`` keeps that text verbatim. The caller flags it as a hard
+    ``conditional_field`` and queues the same string for page-grounding.
     """
 
     raw = values.get("derived_from")
@@ -6753,16 +6762,28 @@ def lineage_parents_from_source(
             parents.append(f"{prefix}{local}")
         elif item in asset_ids:
             parents.append(item)
-        elif "::" in item or (":" in item and not any(char.isspace() for char in item)):
-            # Keep source-stated qualified references for store validation;
-            # the store validator checks them against registered assets.
+        elif ":" in item and not any(char.isspace() for char in item):
+            # A broken whitespace-free reference is a data error, not prose.
             parents.append(item)
         else:
+            # Printed text is not a pointer. Do not mint ``source_id::``.
             prose.append(item)
     return tuple(parents), tuple(prose)
 
 
 _CONDITIONAL_REDUCED_METHODS = frozenset({"calculated", "author_derived"})
+
+
+def _derivation_source_locator(
+    obs: Mapping[str, Any], values: Mapping[str, Any]
+) -> Locator | None:
+    """Locator the source wrote on the derivation, if any."""
+
+    for payload in (obs, values):
+        raw = payload.get("derivation")
+        if isinstance(raw, Mapping) and raw.get("locator") is not None:
+            return _locator_from_plain(raw.get("locator"))
+    return None
 
 
 def source_derivation_from_source(
@@ -15082,8 +15103,11 @@ class Migrator:
         if method_class is None:
             measured.absent_classes += 1
         source_asset_ids = {asset.asset_id for asset in work.source_files.files}
+        derived_from_prose: tuple[str, ...] = ()
+        derivation_prose: tuple[str, ...] = ()
+        lineage_errors: tuple[str, ...] = ()
         try:
-            derived_parents, derived_prose = lineage_parents_from_source(
+            derived_parents, derived_from_prose = lineage_parents_from_source(
                 obs,
                 values,
                 source_id,
@@ -15091,7 +15115,8 @@ class Migrator:
                 source_asset_ids,
             )
         except ValueError as exc:
-            derived_parents, derived_prose = (), (str(exc),)
+            derived_parents = ()
+            lineage_errors = (str(exc),)
             self.result.registry_issues.append(ValidationIssue(
                 path=f"observations.{obs_id}.derived_from",
                 reason=RefusalReason.INVALID_SOURCE,
@@ -15121,17 +15146,38 @@ class Migrator:
                 local_ids,
                 source_asset_ids,
             )
-            derived_prose = tuple(dict.fromkeys((*derived_prose, *derivation_prose)))
             if derivation_parents:
                 source_derivation = replace(
                     source_derivation, inputs=derivation_parents
                 )
+            elif derivation_prose:
+                # Printed inputs do not resolve. Keep the derivation and
+                # leave the text off the pointer fields. A located
+                # printed_unresolved satisfies the empty-inputs contract.
+                prose_locator = _derivation_source_locator(obs, values) or locator
+                if prose_locator is None:
+                    source_derivation = replace(source_derivation, inputs=())
+                else:
+                    source_derivation = replace(
+                        source_derivation,
+                        inputs=(),
+                        raw_inputs=Located(
+                            State.of(RawInputStatus.PRINTED_UNRESOLVED),
+                            locator=prose_locator,
+                        ),
+                    )
             elif source_derivation.raw_inputs is None:
+                # No input was stated.
                 source_derivation = None
             # Invalid declarations stay attached for validate_corpus to report.
-            if not derived_prose:
-                if source_derivation is not None:
-                    self._author_derivations[obs_id] = source_derivation
+            # Printed prose blocks author-reduction registration, as on green.
+            if (
+                source_derivation is not None
+                and not derived_from_prose
+                and not derivation_prose
+                and not lineage_errors
+            ):
+                self._author_derivations[obs_id] = source_derivation
         evidence, ev_reason = self._evidence_for(
             method_class,
             evaluator_family=values.get("evaluator_family"),
@@ -16027,18 +16073,26 @@ class Migrator:
                     value_derivation,
                     relation=f"{value_derivation.relation}; {phase_provenance}",
                 )
-        for prose_item in derived_prose:
-            self.result.add_queue(
-                work.work_id,
-                locator,
-                ["derived_from"],
-                (
-                    f"derived_from {prose_item!r} is prose, not a resolvable "
-                    "observation id; retained here, never minted as a pointer"
-                ),
-                source=source_key,
-                observation_id=obs_id,
-            )
+        stored_lineage = set(derived_from or ())
+        if value_derivation is not None:
+            stored_lineage.update(value_derivation.inputs)
+        queued_prose: set[str] = set()
+        flag_kwargs = dict(
+            work_id=work.work_id,
+            locator=locator,
+            source_key=source_key,
+            observation_id=obs_id,
+            stored_lineage=stored_lineage,
+            queued=queued_prose,
+        )
+        self._flag_printed_lineage(
+            derived_from_prose, field="derived_from", **flag_kwargs
+        )
+        self._flag_printed_lineage(
+            derivation_prose, field="derivation.inputs", **flag_kwargs
+        )
+        for prose_item in lineage_errors:
+            self._queue_printed_lineage(prose_item, **flag_kwargs)
         yield_key, yield_items = _yield_table_items(values)
         if (
             yield_items is None
@@ -18722,6 +18776,69 @@ class Migrator:
                     value_reason=value_sel.reason,
                 )
 
+    def _queue_printed_lineage(
+        self,
+        prose_item: str,
+        *,
+        work_id: str,
+        locator: Locator,
+        source_key: str,
+        observation_id: str,
+        stored_lineage: set[str],
+        queued: set[str],
+    ) -> str:
+        """Queue one printed lineage string, verbatim, for page-grounding."""
+
+        detail = (
+            f"derived_from {prose_item!r} is prose, not a resolvable "
+            "observation id; retained here, never minted as a pointer"
+        )
+        if prose_item in stored_lineage or prose_item in queued:
+            return detail
+        self.result.add_queue(
+            work_id,
+            locator,
+            ["derived_from"],
+            detail,
+            source=source_key,
+            observation_id=observation_id,
+        )
+        queued.add(prose_item)
+        return detail
+
+    def _flag_printed_lineage(
+        self,
+        prose: tuple[str, ...],
+        *,
+        field: str,
+        work_id: str,
+        locator: Locator,
+        source_key: str,
+        observation_id: str,
+        stored_lineage: set[str],
+        queued: set[str],
+    ) -> None:
+        """Flag printed lineage as conditional_field without storing it."""
+
+        for prose_item in prose:
+            if prose_item in stored_lineage:
+                continue
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observation[{observation_id}].{field}",
+                    reason=RefusalReason.CONDITIONAL_FIELD,
+                    detail=self._queue_printed_lineage(
+                        prose_item,
+                        work_id=work_id,
+                        locator=locator,
+                        source_key=source_key,
+                        observation_id=observation_id,
+                        stored_lineage=stored_lineage,
+                        queued=queued,
+                    ),
+                )
+            )
+
     def _migrate_langmuir(self, path: Path) -> None:
         if not path.is_file():
             return
@@ -18797,23 +18914,36 @@ class Migrator:
                     source=rel,
                     observation_id=str(meas_id),
                 )
+            source_id = str((src or {}).get("citation_id") or meas_id)
             raw_derived_from = meas.get("derived_from")
-            if isinstance(raw_derived_from, str) and raw_derived_from.strip():
-                derived_from = (raw_derived_from.strip(),)
-            elif isinstance(raw_derived_from, (list, tuple)) and all(
-                isinstance(parent, str) and parent.strip()
-                for parent in raw_derived_from
+            if raw_derived_from is not None and not isinstance(
+                raw_derived_from, (str, list, tuple)
             ):
-                derived_from = tuple(parent.strip() for parent in raw_derived_from)
-            elif raw_derived_from is None:
-                derived_from = None
-            else:
                 raise ValueError(
                     f"malformed derived_from for Langmuir ledger row {meas_id!r}"
                 )
+            try:
+                derived_parents, derived_prose = lineage_parents_from_source(
+                    meas, {}, source_id, set()
+                )
+            except ValueError as exc:
+                raise ValueError(
+                    f"malformed derived_from for Langmuir ledger row {meas_id!r}"
+                ) from exc
+            derived_from = derived_parents or None
+            self._flag_printed_lineage(
+                derived_prose,
+                field="derived_from",
+                work_id=work.work_id,
+                locator=loc,
+                source_key=rel,
+                observation_id=str(meas_id),
+                stored_lineage=set(derived_from or ()),
+                queued=set(),
+            )
             self._generic_obs(
                 work=work,
-                source_id=str((src or {}).get("citation_id") or meas_id),
+                source_id=source_id,
                 source_key=rel,
                 observation_id=str(meas_id),
                 locator=loc,

@@ -3217,12 +3217,13 @@ def test_replaced_observation_is_not_served_from_the_work_cache() -> None:
     works = {work.work_id: work}
     table_ids = _table_ids(works)
     first = _inputs_registered_under_work(work, observations, experiments, table_ids)
-    assert "obs-A" in first
+    assert first.ids is not None and "obs-A" in first.ids
     observations.clear()
     observations[second_obs.observation_id] = second_obs
     second = _inputs_registered_under_work(work, observations, experiments, table_ids)
-    assert "obs-A" not in second
-    assert "obs-B" in second
+    assert second.ids is not None
+    assert "obs-A" not in second.ids
+    assert "obs-B" in second.ids
 
 
 def test_score_store_pairs_tables_from_one_index(monkeypatch) -> None:
