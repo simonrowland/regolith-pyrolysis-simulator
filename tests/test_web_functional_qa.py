@@ -23,6 +23,7 @@ from simulator.account_ids import (
 from simulator.accounting.queries import (
     CONDENSATION_TRAIN_ACCOUNT,
     PRODUCT_LEDGER_ACCOUNTS,
+    TERMINAL_ESCAPE_ACCOUNT,
     TERMINAL_RUMP_REFRACTORY_OXIDES,
 )
 from simulator.core import PyrolysisSimulator
@@ -403,44 +404,72 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
 
     stage_collection = sim._stage_collection_kg_by_source
     # _product_story_bucket omits positive species that display as 0.00 kg.
-    def _rounded_stage_species_kg(stage_number, allowed_species):
+    def _displayed_species_kg(species_kg):
+        displayed_species_kg = {}
+        for species, mass in species_kg.items():
+            if float(mass) <= 0.0:
+                continue
+            displayed_mass = round(mass, 2)
+            if displayed_mass != 0.0:
+                displayed_species_kg[species] = displayed_mass
+        return displayed_species_kg
+
+    def _stage_story_species_kg(stage_number, allowed_species):
         species_kg = {}
         for (account, stage, species), mass in stage_collection.items():
             if (
-                account == "process.condensation_train"
+                account == CONDENSATION_TRAIN_ACCOUNT
                 and stage == stage_number
                 and species in allowed_species
-                and mass > 0
+                and float(mass) > 0.0
             ):
                 species_kg[species] = species_kg.get(species, 0.0) + mass
-        return {
-            species: round(mass, 2)
-            for species, mass in species_kg.items()
-            if round(mass, 2) != 0.0
-        }
+        return _displayed_species_kg(species_kg)
 
-    assert story["glass"]["species_kg"] == _rounded_stage_species_kg(
+    assert story["glass"]["species_kg"] == _stage_story_species_kg(
         3, {"SiO", "SiO2"}
     )
     assert story["captured_volatiles"]["species_kg"] == (
-        _rounded_stage_species_kg(4, {"Na", "K", "Mg"})
+        _stage_story_species_kg(4, {"Na", "K", "Mg"})
     )
-    assert story["escaped_to_vacuum"]["species_kg"] == {
-        species: round(mass, 2)
-        for species, mass in offgas_kg.items()
-        if mass > 0 and round(mass, 2) != 0.0
-    }
+    escape_species_kg = {}
+    escape_accounts = (
+        TERMINAL_ESCAPE_ACCOUNT,
+        *OXYGEN_VENTED_ACCOUNTS,
+        OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
+    )
+    for account in escape_accounts:
+        account_species_kg = (
+            offgas_kg
+            if account == TERMINAL_ESCAPE_ACCOUNT
+            else sim.atom_ledger.project_account_kg(account)
+        )
+        for species, mass in account_species_kg.items():
+            if float(mass) > 0.0:
+                escape_species_kg[species] = (
+                    escape_species_kg.get(species, 0.0) + mass
+                )
+    assert story["escaped_to_vacuum"]["species_kg"] == (
+        _displayed_species_kg(escape_species_kg)
+    )
     assert story["escaped_to_vacuum"]["class_total_kg"] == round(
-        sum(offgas_kg.values()), 2
+        sum(escape_species_kg.values()), 2
     )
     rump = sim._terminal_rump_by_species()
-    assert story["refractory_ceramic"]["species_kg"] == {
-        species: round(mass, 2)
+    assert story["refractory_ceramic"]["species_kg"] == _displayed_species_kg(
+        {
+            species: mass
+            for species, mass in rump.items()
+            if species in TERMINAL_RUMP_REFRACTORY_OXIDES
+        }
+    )
+    terminal_residue_species_kg = {
+        species: mass
         for species, mass in rump.items()
-        if species in TERMINAL_RUMP_REFRACTORY_OXIDES and mass > 0
+        if species not in TERMINAL_RUMP_REFRACTORY_OXIDES
     }
-    assert set(story["terminal_residue"]["species_kg"]) == (
-        set(rump) - TERMINAL_RUMP_REFRACTORY_OXIDES
+    assert set(story["terminal_residue"]["species_kg"]) == set(
+        _displayed_species_kg(terminal_residue_species_kg)
     )
 
     product_class_species = [
