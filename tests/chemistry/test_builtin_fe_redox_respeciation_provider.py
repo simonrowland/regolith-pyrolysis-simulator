@@ -351,6 +351,11 @@ def test_reducing_split_settles_only_released_exchange_and_routes_excess_to_gas(
     assert result.status == "ok"
     proposal = result.transition
     validate_atom_balance(proposal, formula_registry)
+    # Pre-d-263 production capture: settlement routing must preserve the finite
+    # Kress map and its reaction extent (mol), including its binary64 rounding.
+    assert result.diagnostic["target_fe2o3_mol"].hex() == "0x1.63e816abd4730p-12"
+    assert result.diagnostic["delta_fe2o3_mol"].hex() == "-0x1.fff4e0bf4aa16p+1"
+    assert result.diagnostic["o2_credit_mol"].hex() == "0x1.fff4e0bf4aa16p+0"
     # Reaction stoichiometry: two ferric Fe atoms release one O atom on
     # reduction, hence 1/2 mol O2 per mol Fe2O3, independent of the Kress target.
     released = proposal.debits["process.cleaned_melt"]["Fe2O3"] / 2
