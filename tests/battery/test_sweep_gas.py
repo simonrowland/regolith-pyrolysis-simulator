@@ -69,10 +69,14 @@ def test_existing_single_species_migrates_byte_identically(tmp_path) -> None:
     assert gas["species"] == "N2"
     payload = json.dumps(to_plain(experiment), sort_keys=True, separators=(",", ":")).encode()
     # Pin the extract-derived payload with its typed, source-quantized initial
-    # composition carried through migration.
-    assert len(payload) == 4444
+    # composition carried through migration. Offer 20 r9 serialized this
+    # experiment in 4444 bytes. The merged tree also writes the empty
+    # inference.references lists on total_pressure_Pa (atm_to_Pa) and on
+    # initial_composition (wt% to mole fraction), the same way it already
+    # writes an empty parameters list. Those two fields are the extra 32 bytes.
+    assert len(payload) == 4476
     assert hashlib.sha256(payload).hexdigest() == (
-        "bffc8e9c562bb69d558d776abf9204b2c22d2c81ca5d9064afc3f7c5a675da4c"
+        "f7d3bb2458192701fc7479d3a8a216cfd60e930a602b21aace50cca7fa3b2401"
     )
     assert to_plain(experiment_from_plain(plain)) == plain
 
