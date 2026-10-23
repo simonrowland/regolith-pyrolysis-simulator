@@ -8185,15 +8185,9 @@ def fill_identity(
         changed = False
         for name in profile.required:
             state = payload.get(name)
-            if name in profile.permitted_not_applicable:
-                # Printed value and explicit not_applicable are different
-                # identities. A hole becomes not_applicable; neither is
-                # rewritten to unknown.
-                if state is None:
-                    payload[name] = State.not_applicable(
-                        f"profile {token.value} permits omitted {name}"
-                    )
-                    changed = True
+            if name in profile.permitted_not_applicable and state is not None:
+                # A printed value and an explicit not_applicable stay as
+                # written. A None hole falls through and stays unknown.
                 continue
             if state is None or (isinstance(state, State) and state.is_not_applicable):
                 payload[name] = State.unknown(
@@ -9337,11 +9331,13 @@ def _bound_selection(
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
 ) -> SourceSelection:
     return SourceSelection(
-        value=Value(
-            ValueKind.BOUND,
-            bound_operator=operator,
-            bound_value=amount,
-            approximate=bool(payload.get("approximate")),
+        value=_value_from_plain(
+            {
+                "kind": ValueKind.BOUND.value,
+                "bound_operator": operator,
+                "bound_value": amount,
+                "approximate": bool(payload.get("approximate")),
+            }
         ),
         field_name=field_name,
         unit_trail="dimensionless",
