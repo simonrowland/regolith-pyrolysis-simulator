@@ -39,9 +39,12 @@ def test_table2_render_values_and_all_18_rows_migrate_without_invented_pressure(
         assert printed["Al_pressure_values_as_printed"] == expected_pressures
         assert printed["Al_pressure_units_as_printed"] == "10^-9 atm"
         assert not {"P_total", "pressure", "vacuum"} & row["values"].keys()
+        assert row["values"]["vapour_source_T_C"] == "1705"
+        assert row["values"]["vapour_source_T_locator"]["page"] == 15
         assert row["T_C"] == "1575"
         assert row["point_conditions"]["temperature_C"]["state"]["value"] == "1575"
         assert row["point_conditions"]["temperature_C"]["locator"]["page"] == 10
+        assert row["locator"]["published_page"] == 10
 
     migrator = factories.migrate_one_extract(REPO_ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
@@ -59,3 +62,4 @@ def test_table2_render_values_and_all_18_rows_migrate_without_invented_pressure(
         assert obs.point_conditions["temperature_K"].state.value == Decimal("1848.15")
         assert obs.identity.total_pressure_Pa.is_unknown
         assert "total pressure" in obs.identity.total_pressure_Pa.reason
+        assert obs.provenance["vapour_source_T"]["vapour_source_T_C"] == "1705"

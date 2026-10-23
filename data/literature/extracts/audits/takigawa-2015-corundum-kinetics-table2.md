@@ -1,6 +1,6 @@
 # Takigawa et al. (2015), Table 2 extraction audit
 
-Table 2 is on PDF page 10 (journal page 9). It prints six β rows and three αc columns (//c, //a, //m), for 18 coefficients. The printed Al pressures are the six location-specific columns u1–u3 and d1–d3, each headed `10^-9 atm`. Total pressure is not printed; none of the Al pressure fields is treated as total pressure. β and each pressure value are retained as printed on every corresponding coefficient observation.
+Table 2 is on PDF page 10 (printed journal folio 10). It prints six β rows and three αc columns (//c, //a, //m), for 18 coefficients. The printed Al pressures are the six location-specific columns u1–u3 and d1–d3, each headed `10^-9 atm`. Total pressure is not printed; none of the Al pressure fields is treated as total pressure. β and each pressure value are retained as printed on every corresponding coefficient observation. The gas-source temperature is 1705 °C for the condensation series (Table 4, PDF page 15; experimental-method statement on PDF page 3) and is stored as `vapour_source_T_C` on all 18 rows.
 
 ## Cell audit
 
