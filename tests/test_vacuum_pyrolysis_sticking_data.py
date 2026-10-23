@@ -460,6 +460,19 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
         )
 
 
+def test_capture_budget_allocation_respects_each_sink_capacity():
+    stage_deposits, wall_deposits = (
+        condensation._regularized_capture_allocations(
+            10.0,
+            {1: 2.0, 3: 1.0},
+            {"stage_0_to_stage_1": 4.0},
+        )
+    )
+
+    assert stage_deposits == {"1": 2.0, "3": 1.0}
+    assert wall_deposits == {"stage_0_to_stage_1": 4.0}
+
+
 def test_capture_budget_regularizer_is_marked_numerical_uncertified():
     data = _load_sticking_data()
     floor = data["capture_budget_regularizer_floor"]
