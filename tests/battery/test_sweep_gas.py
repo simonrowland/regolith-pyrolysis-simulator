@@ -383,19 +383,44 @@ def test_ohno_printed_chamber_pressure_is_an_interval(tmp_path) -> None:
     assert pressure.locator.page == 1164
 
 
+def _context_pressures(value):
+    found = []
+    if isinstance(value, dict):
+        pressure = value.get("total_pressure_Pa")
+        if isinstance(pressure, dict):
+            found.append(pressure)
+        for child in value.values():
+            found.extend(_context_pressures(child))
+    elif isinstance(value, list):
+        for child in value:
+            found.extend(_context_pressures(child))
+    return found
+
+
 def test_richter_h2_pressure_note_does_not_demote_its_point(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-037-richter-2002.yaml")
-    pressures = [
-        experiment.pressure_environment.total_pressure_Pa
-        for experiment in result.experiments.values()
-        if experiment.pressure_environment.total_pressure_Pa.inference is not None
-        and "as_published=0.000187 bar"
-        in experiment.pressure_environment.total_pressure_Pa.inference.inputs
+    assert result.observations == {}
+    assert result.experiments
+    for experiment in result.experiments.values():
+        pressure = experiment.pressure_environment.total_pressure_Pa
+        assert pressure.state.is_unknown
+        assert pressure.inference is None
+        assert "no single series pressure assigned" in (pressure.locator.note or "")
+
+    pressures = []
+    for records in result.context_by_work.values():
+        pressures.extend(_context_pressures(records))
+    hydrogen = [
+        pressure
+        for pressure in pressures
+        if "1.87e-4 bar H2" in ((pressure.get("locator") or {}).get("note") or "")
     ]
-    assert len(pressures) == 1
-    assert pressures[0].state.is_value
-    assert pressures[0].state.value.kind is ValueKind.POINT
-    assert pressures[0].state.value.point == Decimal("18.7")
+    assert len(hydrogen) == 24
+    for pressure in hydrogen:
+        state = pressure["state"]
+        assert state["tag"] == "value"
+        assert state["value"]["kind"] == "point"
+        assert Decimal(state["value"]["point"]) == Decimal("18.7")
 
 
 def test_heck_inferred_one_atmosphere_remains_a_point(tmp_path) -> None:
