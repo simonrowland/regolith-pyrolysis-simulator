@@ -1,0 +1,2233 @@
+{
+  "schema_version": 1,
+  "strict_env": "REGOLITH_DOCS_PRIVATE_MANIFEST_STRICT=1",
+  "entries": [
+    {
+      "kind": "directory",
+      "path": "docs-private/deep-research/literature/",
+      "readers": [
+        "tests/chemistry/corpus_fixtures.py"
+      ],
+      "copy": false
+    },
+    {
+      "kind": "glob",
+      "path": "docs-private/deep-research/literature/*/benchmark-fixture.yaml",
+      "readers": [
+        "tests/chemistry/corpus_fixtures.py"
+      ],
+      "required": [
+        {
+          "path": "docs-private/deep-research/literature/arxiv-2509-sio-flame-nucleation/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/bencze-yazhenskikh-2016-gasifier-slag-kems-si/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/boulliung-2025-mercury-volatile-metals-magmatic/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/boulliung-wood-2022-so2-solubility-silicate-melts/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/britt-2019-asteroid-simulants/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/busemann-2024-noble-gases-ryugu-bennu/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/cardiff-2007-vacuum-pyrolysis-gsfc/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/charnoz-2023-hydrogen-magma-ocean/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/cooper-2007-sintering-lunar-simulant/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/deguzman-2026-simulant-physicochemical/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/demaria-1971-apollo-12022-kems/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/engelschion-2020-eac1a-simulant/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/fegley-2016-rock-steam-solubility/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/hashimoto-nakano-2021-bubbles-to-chondrites-ii/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/hendrix-2024-reactivity-reduced-simulants/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/jaggi-2021-mercury-atmosphere/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/jgr-p-2024-mars-sam-clay-sulfate-ega/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/lebrun-2013-magma-ocean-atmosphere/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/llnl-2021-cai-aerodynamic-levitation/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/lpsc-2024-bennu-pyrolysis-vandam/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/marcq-2017-magma-ocean-radiation/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/matchett-2006-vacuum-pyrolysis-thesis/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/mendybaev-2017-fun-cai-lab-evaporation/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/mendybaev-2021-cai-low-pressure-h2-evap/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/mogul-2023-pioneer-venus-co2-icarus/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/murchison-degassing-2023-springer/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/murchison-hydropyrolysis-1990s-gca/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/nagahara-ozawa-1999-forsterite-surface-microstructures/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/nakamura-2022-science-ryugu-thermal/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/nakano-hashimoto-2020-bubbles-to-chondrites-i/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/nasa-tm-2024-simulant-guide/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/norris-2017-earth-volatiles-nature/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/okazaki-2022-ryugu-gas-treasure-box/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/pahlevan-2026-protolunar-volatile-outflows/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/reiss-2019-thermal-extraction-nulht2m/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/richter-2002-gca-evaporation-isotope-frac/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/richter-2008-cai-like-liquids-lpsc-abstract/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/robinot-2025-promes-review/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/sauerborn-2004-dlr-solar-furnace/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/schaefer-fegley-2011-vaporization-earth/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/senior-1991-vacuum-pyrolysis/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/senior-1992-vacuum-pyrolysis/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/sesko-2022-thesis-solar-vapor-pyrolysis/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/sossi-2019-gca-hkl-evaporation/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/sossi-2020-cu-zn-isotope-evap-formalism/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/spaargaren-2025-disk-element-volatility/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/steurer-1985-vapor-phase-pyrolysis/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/steurer-1992-vapor-phase-pyrolysis/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/street-2010-thermal-properties-simulants/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/sublimation-kinetics-2023-minerals/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/tachibana-tsuchiyama-1998-forsterite-dust-lpsc/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/tenkate-2010-vapor-instrument/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/thomas-2022-chlorine-bonding-silicate-melts/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/thomas-wood-2021-chlorine-silicate-melts/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/tsuchiyama-1998-forsterite-mg2sio4-h2/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/van-kooten-2020-lunar-outgassing/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/vanbuchem-2023-lavatmos/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/vanbuchem-2025-lavatmos2/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/wilkerson-2021-jsc1a-tga-ms-poster/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/wilkerson-2023-jsc1a-outgassing/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        },
+        {
+          "path": "docs-private/deep-research/literature/wimpenny-2019-zn-isotope-evaporation-extreme-t/benchmark-fixture.yaml",
+          "readers": [
+            "tests/chemistry/corpus_fixtures.py"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/launch-c6-studio.sh",
+      "readers": [
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "glob",
+      "path": "docs-private/grind/manifest-c6-*.json",
+      "readers": [
+        "tests/test_c6_grind_manifests.py"
+      ],
+      "required": [
+        {
+          "path": "docs-private/grind/manifest-c6-kreep-studio3.json",
+          "readers": [
+            "tests/test_c6_grind_manifests.py"
+          ]
+        },
+        {
+          "path": "docs-private/grind/manifest-c6-mare-studio1.json",
+          "readers": [
+            "tests/test_c6_grind_manifests.py"
+          ]
+        },
+        {
+          "path": "docs-private/grind/manifest-c6-mars-stype-studio2.json",
+          "readers": [
+            "tests/test_c6_grind_manifests.py"
+          ]
+        },
+        {
+          "path": "docs-private/grind/manifest-c6-moon-studio1.json",
+          "readers": [
+            "tests/test_c6_grind_manifests.py"
+          ]
+        },
+        {
+          "path": "docs-private/grind/manifest-c6-stype-studio2.json",
+          "readers": [
+            "tests/test_c6_grind_manifests.py"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ceres_regolith__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ceres_regolith__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ceres_regolith__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ceres_regolith__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ceres_regolith__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ceres_regolith__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ceres_regolith__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ceres_regolith__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ceres_regolith__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ci_carbonaceous_chondrite__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ci_carbonaceous_chondrite__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ci_carbonaceous_chondrite__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ci_carbonaceous_chondrite__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ci_carbonaceous_chondrite__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ci_carbonaceous_chondrite__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ci_carbonaceous_chondrite__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ci_carbonaceous_chondrite__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/ci_carbonaceous_chondrite__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/cm_carbonaceous_chondrite__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/cm_carbonaceous_chondrite__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/cm_carbonaceous_chondrite__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/cm_carbonaceous_chondrite__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/cm_carbonaceous_chondrite__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/cm_carbonaceous_chondrite__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/cm_carbonaceous_chondrite__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/cm_carbonaceous_chondrite__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/cm_carbonaceous_chondrite__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/comet_nucleus__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/comet_nucleus__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/comet_nucleus__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/comet_nucleus__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/comet_nucleus__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/comet_nucleus__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/comet_nucleus__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/comet_nucleus__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/comet_nucleus__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/e_type_enstatite_aubrite__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/e_type_enstatite_aubrite__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/e_type_enstatite_aubrite__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/e_type_enstatite_aubrite__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/e_type_enstatite_aubrite__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/e_type_enstatite_aubrite__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/e_type_enstatite_aubrite__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/e_type_enstatite_aubrite__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/e_type_enstatite_aubrite__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_eac_1a__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_eac_1a__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_eac_1a__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_eac_1a__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_eac_1a__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_eac_1a__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_eac_1a__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_eac_1a__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_eac_1a__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highland__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highland__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highland__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highland__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highland__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highland__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highland__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highland__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highland__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highlands_lhs1__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highlands_lhs1__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highlands_lhs1__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highlands_lhs1__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highlands_lhs1__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highlands_lhs1__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highlands_lhs1__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highlands_lhs1__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_highlands_lhs1__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_high_ti__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_high_ti__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_high_ti__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_high_ti__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_high_ti__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_high_ti__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_high_ti__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_high_ti__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_high_ti__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_lms1__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_lms1__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_lms1__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_lms1__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_lms1__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_lms1__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_lms1__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_lms1__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_lms1__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_low_ti__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_low_ti__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_low_ti__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_low_ti__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_low_ti__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_low_ti__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_low_ti__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_low_ti__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mare_low_ti__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mls_1a__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mls_1a__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mls_1a__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mls_1a__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mls_1a__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mls_1a__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mls_1a__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mls_1a__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_mls_1a__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_pkt_kreep_average__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_pkt_kreep_average__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_pkt_kreep_average__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_pkt_kreep_average__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_pkt_kreep_average__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_pkt_kreep_average__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_pkt_kreep_average__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_pkt_kreep_average__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_pkt_kreep_average__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_spa_kreep_influenced__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_spa_kreep_influenced__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_spa_kreep_influenced__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_spa_kreep_influenced__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_spa_kreep_influenced__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_spa_kreep_influenced__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_spa_kreep_influenced__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_spa_kreep_influenced__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/lunar_spa_kreep_influenced__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_metallic_phase__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_metallic_phase__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_metallic_phase__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_metallic_phase__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_metallic_phase__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_metallic_phase__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_metallic_phase__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_metallic_phase__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_metallic_phase__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_silicate_phase__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_silicate_phase__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_silicate_phase__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_silicate_phase__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_silicate_phase__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_silicate_phase__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_silicate_phase__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_silicate_phase__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/m_type_silicate_phase__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_basalt__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_basalt__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_basalt__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_basalt__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_basalt__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_basalt__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_basalt__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_basalt__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_basalt__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_global_mgs1__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_global_mgs1__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_global_mgs1__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_global_mgs1__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_global_mgs1__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_global_mgs1__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_global_mgs1__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_global_mgs1__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_global_mgs1__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_perchlorate_rich__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_perchlorate_rich__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_perchlorate_rich__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_perchlorate_rich__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_perchlorate_rich__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_perchlorate_rich__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_perchlorate_rich__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_perchlorate_rich__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_perchlorate_rich__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_phyllosilicate_clay__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_phyllosilicate_clay__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_phyllosilicate_clay__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_phyllosilicate_clay__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_phyllosilicate_clay__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_phyllosilicate_clay__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_phyllosilicate_clay__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_phyllosilicate_clay__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_phyllosilicate_clay__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_sulfate_rich__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_sulfate_rich__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_sulfate_rich__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_sulfate_rich__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_sulfate_rich__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_sulfate_rich__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_sulfate_rich__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_sulfate_rich__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/mars_sulfate_rich__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/s_type_asteroid_silicate__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/s_type_asteroid_silicate__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/s_type_asteroid_silicate__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/s_type_asteroid_silicate__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/s_type_asteroid_silicate__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/s_type_asteroid_silicate__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/s_type_asteroid_silicate__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/s_type_asteroid_silicate__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/s_type_asteroid_silicate__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/targeted_super_kreep_ore__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/targeted_super_kreep_ore__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/targeted_super_kreep_ore__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/targeted_super_kreep_ore__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/targeted_super_kreep_ore__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/targeted_super_kreep_ore__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/targeted_super_kreep_ore__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/targeted_super_kreep_ore__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/targeted_super_kreep_ore__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/v_type_vesta_hed__pc-ceramic-ca-al-ratio-seed.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/v_type_vesta_hed__pc-ceramic-ca-al-ree.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/v_type_vesta_hed__pc-extract-al.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/v_type_vesta_hed__pc-extract-fe.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/v_type_vesta_hed__pc-extract-k.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/v_type_vesta_hed__pc-extract-mg.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/v_type_vesta_hed__pc-extract-na.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/v_type_vesta_hed__pc-extract-o2.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/grind/profiles/v_type_vesta_hed__pc-glass-clear.real.yaml",
+      "readers": [
+        "scripts/epoch_grind.py",
+        "tests/test_c6_grind_manifests.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/recipe-db/grind-accumulator.db",
+      "readers": [
+        "simulator/chemistry/phase_context.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/recipe-db/reduced-real.db",
+      "readers": [
+        "tests/test_cache_convert.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/research/2026-07-25-trace-vp-refs/vp-volatile-rows-DRAFT.yaml",
+      "readers": [
+        "tests/test_vp_cea_ingest.py",
+        "tests/test_vr7_transcription.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/research/2026-07-26-vp-acquire/vp-t14-rows-DRAFT.yaml",
+      "readers": [
+        "tests/test_vr7_transcription.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/research/2026-07-27-vp-acquire-2/draft-rows-DRAFT.yaml",
+      "readers": [
+        "tests/test_vr7_transcription.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/research/2026-07-27-vp-acquire-3/draft-rows-DRAFT.yaml",
+      "readers": [
+        "tests/test_vr7_transcription.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md",
+      "readers": [
+        "simulator/vapour_rail/u0_manifest.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/research/2026-07-30-rail-seams/species-inventory.md",
+      "readers": [
+        "simulator/vapour_rail/u0_manifest.py"
+      ]
+    },
+    {
+      "kind": "file",
+      "path": "docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json",
+      "readers": [
+        "tests/test_rail_conformance.py"
+      ]
+    }
+  ]
+}
