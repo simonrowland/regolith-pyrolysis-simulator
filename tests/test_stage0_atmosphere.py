@@ -134,24 +134,6 @@ _PYSULFSAT_MUTABLE_EXPORTS = (
 )
 
 
-class _ForecastReplayStore:
-    replay_enabled = True
-
-    def __init__(self):
-        self.replay_calls = 0
-        self.entries = {"equilibrium": []}
-
-    def clone_for_forecast(self):
-        clone = _ForecastReplayStore()
-        clone.replay_calls = self.replay_calls
-        clone.entries = deepcopy(self.entries)
-        return clone
-
-    def replay_equilibrium(self, forecast_sim):
-        self.replay_calls += 1
-        return forecast_sim._internal_analytical_equilibrium()
-
-
 def _attach_mutable_sulfsat_module(sim):
     module = ModuleType("forecast_test_sulfsat")
     module.oxide_mass_liq_anhyd = {"SiO2_Liq": [60.0]}
@@ -198,7 +180,7 @@ def _short_c0_trajectory(feedstocks, prediction=None):
     sim = _sim(feedstocks)
     sim.load_batch("lunar_mare_low_ti", 1000.0)
     _attach_mutable_sulfsat_module(sim)
-    sim.configure_pt0_determinism_store(_ForecastReplayStore())
+    sim.configure_pt0_determinism_store(PT0DeterminismStore("capture"))
     if prediction is not None:
         sim._predict_c0_exit = lambda **_kwargs: deepcopy(prediction)
     sim.start_campaign(CampaignPhase.C0)
