@@ -1,0 +1,28 @@
+source_id: jeon-2025-metal-slag-refractory-thesis
+source:
+  title: Experimental studies and thermodynamic modeling of metal-slag-refractory interactions in non-ferrous pyrometallurgical processes
+  citation: Aalto University publication series, Doctoral Theses 119/2025
+extraction:
+  source_text: born-digital pdftotext-layout.txt
+  table8_method: manually transcribed from pdftotext layout; all numeric cells cross-checked against 600 dpi PDF renders
+  table8_pdf_pages: [57, 58]
+  table8_published_pages: [45, 46]
+  table8_phase_rows: 55
+  table8_numeric_values: 330
+  table8_columns: [EDS MgO, EDS ZnO, EDS SiO2, EPMA MgO, EPMA ZnO, EPMA SiO2]
+  table8_conditions_from_table2_pdf_page: 35
+  printed_zero_uncertainties: omitted under the never-store-zero-uncertainty rule
+  copied_tables:
+    - table: '5'
+      pdf_pages: [46, 47]
+      linked_published_extract: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
+      disposition: context-only links to existing scored observations
+    - table: '9'
+      pdf_page: 66
+      linked_published_extract: jeon-lindberg-2025-mgo-refractory-slag-interface
+      disposition: context-only links to existing scored observations
+    - table: '10'
+      pdf_page: 69
+      linked_published_extract: jeon-lindberg-2025-mgo-refractory-slag-interface
+      disposition: context-only links to existing scored observations
+  figures: all 32 thesis figures have deferred, no-point context records

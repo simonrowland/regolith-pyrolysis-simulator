@@ -1,0 +1,26 @@
+source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
+source:
+  citation: Jeon, Junmo, and Daniel Lindberg (2023). Thermodynamic optimization and phase equilibria study of the MgO–ZnO, CaO–ZnO, and CaO–MgO–ZnO systems. Ceramics International 49(8), 12736–12744.
+  doi: 10.1016/j.ceramint.2022.12.138
+extraction:
+  method: MinerU table draft emit, manually enriched with sample identities and experimental conditions from Tables 1 and 2
+  date: '2026-10-20'
+  worker: codex-resume-89514-1792530821
+review_status: draft
+tables:
+  - page: 5
+    table_index: 2
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    unit: mol%
+    evidence_class: measured_direct
+    temperature:
+      column: 3
+      unit: C
+    values:
+      - column: 6
+        species: CaO
+      - column: 7
+        species: MgO
+      - column: 8
+        species: ZnO
