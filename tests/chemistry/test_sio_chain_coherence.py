@@ -7,7 +7,11 @@ from typing import Any
 
 import pytest
 
-from simulator.runner import build_sio_yield_report
+from tests.studio_pin_support import (
+    sio_evolved_baseline,
+    sio_pin_values,
+    sio_report_at_wall_temperature,
+)
 
 
 MAX_BALANCE_ERR_PCT = 5.0e-12
@@ -112,21 +116,12 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # (-1.103% on the C2A SiO ledger). Kept equal to BASELINE_SIO_EVOLVED_KG.
 # 2026-10-13 b-850 round 2: same CLI regenerated pin after corrected alkali
 # dimer source activity; kept equal to BASELINE_SIO_EVOLVED_KG.
-PHASE3BIS_SIO_EVOLVED_KG = 1.04099076417e-05
+PHASE3BIS_SIO_EVOLVED_KG = sio_evolved_baseline("lunar_mare_low_ti")
 
 
 @lru_cache(maxsize=None)
 def _report_at_wall_T(liner_temperature_c: float) -> tuple[dict[str, Any], dict[str, float]]:
-    return build_sio_yield_report(
-        feedstock_id="lunar_mare_low_ti",
-        hours=24,
-        mass_kg=1000.0,
-        include_diagnostics=True,
-        liner_temperature_c=liner_temperature_c,
-        pO2_mbar=None,
-        # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
-        allow_unmeasured_alpha_fallback=True,
-    )
+    return sio_report_at_wall_temperature(liner_temperature_c)
 
 
 def test_sio_chain_closes_evolved_to_stage_wall_and_terminal_products():
@@ -154,7 +149,7 @@ def test_sio_evolved_is_invariant_to_wall_temperature_at_fixed_po2_mode():
     evolved = []
     for liner_temperature_c in wall_t_sweep_c:
         report, diagnostics = _report_at_wall_T(liner_temperature_c)
-        evolved.append(float(report["sio_evolved_kg"]))
+        evolved.append(sio_pin_values(report)["sio_evolved_kg"])
         assert abs(diagnostics["mass_balance_error_pct"]) <= MAX_BALANCE_ERR_PCT
 
     # Two SEPARATE claims, asserted separately. 2026-08-29: they used to be one

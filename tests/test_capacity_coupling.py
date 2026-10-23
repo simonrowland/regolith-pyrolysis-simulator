@@ -998,9 +998,11 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     snapshot = sim.step()
 
     ceiling_flux_species = {"Ca", "CaO_gas", "Ti", "TiO", "TiO2_gas"}
-    p_flux = sum(snapshot.evap_flux.species_kg_hr[species] for species in ("PO", "PO2", "P2"))
+    from tests.studio_pin_support import capacity_pin_values
+
+    pins = capacity_pin_values(snapshot)
     # b-850: alkali composite vapour rows now use the parent-oxide activity.
-    assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(3.1212881367580105, rel=1e-12, abs=1e-12)
+    assert pins["non_phosphorus_kg_hr"] == pytest.approx(3.1212881367580105, rel=1e-12, abs=1e-12)
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
     )
@@ -1017,13 +1019,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         sim._equipment.pipe.initial_throat_area_m2
     )
 
-    assert (
-        snapshot.hour,
-        snapshot.temperature_C,
-        snapshot.evap_flux.total_kg_hr,
-        snapshot.overhead.transport_saturation_pct,
-        snapshot.melt_mass_kg,
-    ) == pytest.approx(
+    assert tuple(pins[key] for key in (
+        "hour", "temperature_C", "total_kg_hr", "transport_saturation_pct", "melt_mass_kg"
+    )) == pytest.approx(
         # 2026-07-21 B1 vapor-package regen: corrected (higher) P_sat raises
         # hour-1 total evaporation 1.422 -> 2.621 kg/hr; transport saturation
         # and evaporated melt mass follow the same shift. Head-result values

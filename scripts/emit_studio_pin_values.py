@@ -15,16 +15,16 @@ Probes match the divergent train11 pin tests exactly:
 from __future__ import annotations
 
 import json
-import shlex
 import sys
-from dataclasses import replace
 from pathlib import Path
-from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+from tests.studio_pin_support import (  # noqa: E402
+    capacity_pin_values, sio_pin_values, sio_report_at_wall_temperature,
+    sio_evolved_baseline, staged_pin_values, sio_wall_report_at_temperature,
+)
 
 REPORT_PATH = ROOT / "studio-pin-report.json"
 
@@ -44,19 +44,9 @@ LAPTOP_BASELINES: dict[str, float] = {
 
 def _emit_capacity() -> dict:
     from simulator.state import CampaignPhase
-    from tests.chemistry.conftest import _build_sim
+    from tests.test_capacity_coupling import _real_capacity_sim
 
-    data = ROOT / "data"
-
-    def load(name: str) -> dict:
-        return load_cached_safe_yaml((data / name).read_text())
-
-    sim = _build_sim(
-        "lunar_mare_low_ti",
-        load("vapor_pressures.yaml"),
-        load("feedstocks.yaml"),
-        load("setpoints.yaml"),
-    )
+    sim = _real_capacity_sim()
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0
     # Match test_default_off_preserves_hot_fe_redox_split_head_result: default-off
@@ -66,11 +56,7 @@ def _emit_capacity() -> dict:
     )
     snapshot = sim.step()
     return {
-        "hour": snapshot.hour,
-        "temperature_C": snapshot.temperature_C,
-        "total_kg_hr": float(snapshot.evap_flux.total_kg_hr),
-        "transport_saturation_pct": float(snapshot.overhead.transport_saturation_pct),
-        "melt_mass_kg": float(snapshot.melt_mass_kg),
+        **capacity_pin_values(snapshot),
         "n_transitions": len(sim.atom_ledger.transitions),
         "last5_reasons": [
             t.reason for t in sim.atom_ledger.transitions[-5:]
@@ -80,43 +66,22 @@ def _emit_capacity() -> dict:
 
 
 def _emit_sio() -> dict:
-    from simulator.runner import build_sio_yield_report
-
-    def report_at(liner_c: float):
-        return build_sio_yield_report(
-            feedstock_id="lunar_mare_low_ti",
-            hours=24,
-            mass_kg=1000.0,
-            include_diagnostics=True,
-            liner_temperature_c=liner_c,
-            pO2_mbar=None,
-            allow_unmeasured_alpha_fallback=True,
-        )
+    report_at = sio_report_at_wall_temperature
 
     evolved = []
     for liner in (1050.0, 1300.0, 1400.0, 1500.0):
         report, diagnostics = report_at(liner)
-        evolved.append(float(report["sio_evolved_kg"]))
+        evolved.append(sio_pin_values(report)["sio_evolved_kg"])
         assert abs(float(diagnostics["mass_balance_error_pct"])) <= 5e-12
 
     report_1400, _ = report_at(1400.0)
-    report_1050, _ = report_at(1050.0)
-    wall_1050 = report_1050["wall_deposit_kg"]
-    wall_1400 = report_1400["wall_deposit_kg"]
-    wall_1500 = report_at(1500.0)[0]["wall_deposit_kg"]
-
-    stage3 = float(
-        report_1400["sio_to_silica_fume_kg"]["stage_3_sio_zone_product"]
-    )
-    deposit_1050 = float(wall_1050.get("Si", 0.0)) + float(
-        wall_1050.get("SiO2", 0.0)
-    )
-    deposit_1400 = float(wall_1400.get("Si", 0.0)) + float(
-        wall_1400.get("SiO2", 0.0)
-    )
-    deposit_1500 = float(wall_1500.get("Si", 0.0)) + float(
-        wall_1500.get("SiO2", 0.0)
-    )
+    pins_1400 = sio_pin_values(report_1400)
+    # Match the wall-step test's explicit fallback probe, independently of
+    # the live-engine evolved-yield and designated-stage capture above.
+    wall_pins = {
+        temperature: sio_pin_values(sio_wall_report_at_temperature(temperature)[0])
+        for temperature in (1050.0, 1400.0, 1500.0)
+    }
 
     # Wall-T invariance of evolved SiO is a physics contract.
     spread = max(evolved) - min(evolved)
@@ -128,62 +93,32 @@ def _emit_sio() -> dict:
             "1500": evolved[3],
         },
         "sio_evolved_kg": evolved[0],
+        "sio_evolved_kg_by_feedstock": {
+            "lunar_mare_low_ti": evolved[0],
+            "mars_basalt": sio_pin_values(sio_report_at_wall_temperature(1400.0, feedstock="mars_basalt")[0])["sio_evolved_kg"],
+        },
+        "committed_sio_evolved_kg_by_feedstock": {
+            feedstock: sio_evolved_baseline(feedstock)
+            for feedstock in ("lunar_mare_low_ti", "mars_basalt")
+        },
         "sio_evolved_wall_T_spread_kg": spread,
-        "sio_stage3_silica_kg": stage3,
-        "sio_wall_deposit_1050_kg": deposit_1050,
-        "sio_wall_deposit_1400_kg": deposit_1400,
-        "sio_wall_deposit_1500_kg": deposit_1500,
-        "wall_SiO_kg_1050": float(wall_1050.get("SiO", 0.0)),
+        "sio_stage3_silica_kg": pins_1400["sio_stage3_silica_kg"],
+        "sio_wall_deposit_1050_kg": wall_pins[1050.0]["sio_wall_deposit_kg"],
+        "sio_wall_deposit_1400_kg": wall_pins[1400.0]["sio_wall_deposit_kg"],
+        "sio_wall_deposit_1500_kg": wall_pins[1500.0]["sio_wall_deposit_kg"],
+        "wall_SiO_kg_1050": wall_pins[1050.0]["wall_SiO_kg"],
+        "wall_probe": "unavailable_magemin_fallback_test_only_not_real_engine_evidence",
     }
 
 
 def _emit_staged() -> dict:
-    from simulator.session_cli import SessionScriptRunner
-    import simulator.session_cli as session_cli_module
+    from tests.test_staged_bakeout import _run_staged
 
-    FEEDSTOCK = "lunar_mare_low_ti"
-    NA_DOSE_KG = 12.0
-    HOT_HOLD_C = 1750.0
-
-    def run_staged():
-        runner = SessionScriptRunner()
-        lines = [
-            (
-                f"start --feedstock={FEEDSTOCK} --campaign=C2A_staged "
-                f"--additive=Na={NA_DOSE_KG}"
-            ),
-            f"adjust campaign_override C2A_staged hold_temp_C {HOT_HOLD_C}",
-            "advance 30",
-        ]
-        for line in lines:
-            if line.startswith("start "):
-                original = session_cli_module.load_config_bundle
-
-                def load_with_alpha(*args, **kwargs):
-                    bundle = original(*args, **kwargs)
-                    setpoints = dict(bundle.setpoints)
-                    kernel = dict(setpoints.get("chemistry_kernel", {}) or {})
-                    kernel["allow_unmeasured_alpha_fallback"] = True
-                    setpoints["chemistry_kernel"] = kernel
-                    return replace(bundle, setpoints=setpoints)
-
-                with patch.object(
-                    session_cli_module, "load_config_bundle", load_with_alpha
-                ):
-                    runner.execute(shlex.split(line), line)
-            else:
-                runner.execute(shlex.split(line), line)
-        return runner.session._sim
-
-    sim = run_staged()
+    sim = _run_staged()
     products = sim.product_ledger()
     sio_stage = sim.train.stages[3].collected_kg
-    staged_silica = float(sio_stage.get("Si", 0.0)) + float(
-        sio_stage.get("SiO2", 0.0)
-    )
     return {
-        "staged_silica_kg": staged_silica,
-        "staged_product_sio_kg": float(products.get("SiO", 0.0)),
+        **staged_pin_values(sim),
         "staged_sio_stage_keys": sorted(sio_stage.keys()),
         "staged_sio_stage_Fe_kg": float(sio_stage.get("Fe", 0.0)),
         "staged_products_Na_kg": float(products.get("Na", 0.0)),
@@ -234,6 +169,7 @@ def main() -> int:
 
     flat = {
         "capacity_total_kg_hr": capacity["total_kg_hr"],
+        "capacity_non_phosphorus_kg_hr": capacity["non_phosphorus_kg_hr"],
         "capacity_transport_saturation_pct": capacity["transport_saturation_pct"],
         "capacity_melt_mass_kg": capacity["melt_mass_kg"],
         "sio_evolved_kg": sio["sio_evolved_kg"],
