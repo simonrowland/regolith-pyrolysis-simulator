@@ -195,6 +195,23 @@ def test_foulant_consumer_refuses_missing_antoine_A_as_invalid_input():
     assert str(refusal) == "missing_antoine_coefficient: coefficient=A value=None"
 
 
+def test_foulant_consumer_refuses_missing_C_for_three_parameter_form():
+    coefficients = {
+        "A": 5.0,
+        "B": 1000.0,
+        "runtime_form": "log10(P_Pa) = A - B / (T_K + C)",
+    }
+
+    with pytest.raises(
+        ValueError,
+        match="missing_antoine_coefficient: coefficient=C",
+    ):
+        _pure_component_antoine_pa(
+            {"pure_component_antoine": coefficients},
+            1000.0,
+        )
+
+
 def test_melt_effect_antoine_forms_keep_stull_pressure_pins():
     forms = WARN_TIER_ANALYTICAL_MODELS["cl_halide"]["forms"]
     result = _evaluate_analytical_forms(forms, T_K=1473.15)["vapor_pressure"]
