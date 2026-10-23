@@ -1637,7 +1637,7 @@ def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels():
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
-def test_runner_golden_fixture_matches(scenario, isolated_engine_config):
+def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     """A live run must reproduce the committed golden fixture exactly."""
 
     # lunar_mare_low_ti_C0_24h.json + mars_basalt_C2A_12h.json: regenerated
@@ -1647,8 +1647,8 @@ def test_runner_golden_fixture_matches(scenario, isolated_engine_config):
     # after repair: melt_redox_gate_floor_fallback_engagement = {engaged:
     # false, total_count: 0}. ci_carbonaceous_chondrite_C2B_12h.json was
     # unchanged. docs-private/research/2026-08-02-train13-adjudication.md
-    expected = json.loads((FIXTURES_DIR / scenario["fixture"]).read_text())
-    actual, capture = _run_scenario(scenario, capture=True)
+    actual, capture, expected_text = runner_golden_loader(scenario)
+    expected = json.loads(expected_text)
 
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)

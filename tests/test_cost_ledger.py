@@ -1,6 +1,5 @@
 import copy
 import json
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -30,10 +29,8 @@ from simulator.cost_ledger import (
 from simulator.cost_ledger import build_cost_rollup_diagnostic, run_pumping_input_cost
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.runner import PyrolysisRun
 
 
-ROOT = Path(__file__).resolve().parent.parent
 MASS_BALANCE_HARD_GATE_PCT = 5.0e-12
 
 
@@ -632,29 +629,15 @@ def test_cost_rollup_empty_electrical_breakdown_mapping_means_zero():
 
 
 def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture(
-    isolated_engine_config,
+    runner_golden_loader,
 ):
     # Fixture regenerated 2026-08-02 under REPAIRED MAGEMin config per the
     # train13 adjudication; prior value was generated against the
     # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md
-    run = PyrolysisRun(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=24,
-        additives_kg={},
-        allow_fallback_vapor=True,
-        allow_unmeasured_alpha_fallback=True,
-        run_metadata_overrides={
-            "started_at_utc": "2026-05-15T00:00:00Z",
-            "kernel_commit_sha": "goal-18-fixture",
-        },
-    )
+    from tests.test_runner_smoke import SCENARIOS
 
-    actual = run.run()
-    expected = json.loads(
-        (ROOT / "tests" / "fixtures" / "runner" / "lunar_mare_low_ti_C0_24h.json")
-        .read_text(encoding="utf-8")
-    )
+    actual, _, expected_text = runner_golden_loader(SCENARIOS[0])
+    expected = json.loads(expected_text)
     assert "cost_rollup_diagnostic" in actual["run_metadata"]
     assert actual["run_metadata"]["cost_rollup_diagnostic"]["price_basis"] == (
         "legacy_placeholder_awaiting_owner_ratification"

@@ -412,27 +412,14 @@ def test_runner_malformed_recipe_cli_fails_loud(tmp_path: Path) -> None:
 
 
 def test_no_recipe_run_matches_committed_golden_text(
-    isolated_engine_config,
+    runner_golden_loader,
 ) -> None:
     # Fixture regenerated 2026-08-02 under REPAIRED MAGEMin config per the
     # train13 adjudication; prior value was generated against the
     # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md
-    run = PyrolysisRun(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=24,
-        additives_kg={},
-        allow_fallback_vapor=True,
-        allow_unmeasured_alpha_fallback=True,
-        run_metadata_overrides={
-            "started_at_utc": "2026-05-15T00:00:00Z",
-            "kernel_commit_sha": "goal-18-fixture",
-        },
-    )
+    from tests.test_runner_smoke import SCENARIOS
 
-    actual = json.dumps(run.run(), indent=2, sort_keys=False)
-    expected = (
-        ROOT / "tests" / "fixtures" / "runner" / "lunar_mare_low_ti_C0_24h.json"
-    ).read_text(encoding="utf-8")
+    payload, _, expected = runner_golden_loader(SCENARIOS[0])
+    actual = json.dumps(payload, indent=2, sort_keys=False)
     assert expected.endswith("\n")
     assert actual == expected.removesuffix("\n")
