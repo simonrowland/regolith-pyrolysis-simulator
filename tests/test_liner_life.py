@@ -848,6 +848,29 @@ def test_runner_wires_liner_life_diagnostic_end_to_end_mutation_proven():
     assert "liner_life_diagnostic" not in severed_meta
 
 
+def test_runner_liner_life_failure_keeps_exception_evidence():
+    def _boom(**_kwargs):
+        raise RuntimeError("injected liner-life failure")
+
+    with patch("simulator.runner.build_liner_life_run_diagnostic", _boom):
+        payload = PyrolysisRun(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C0",
+            hours=1,
+            allow_fallback_vapor=True,
+            allow_unmeasured_alpha_fallback=True,
+            run_metadata_overrides={
+                "furnace_material_id": DEFAULT_DIAGNOSTIC_MATERIAL_ID,
+            },
+        ).run()
+
+    diagnostic = payload["run_metadata"]["liner_life_diagnostic"]
+    assert diagnostic["status"] == "failed"
+    assert diagnostic["section"] == "run_metadata.liner_life_diagnostic"
+    assert diagnostic["exception_type"] == "RuntimeError"
+    assert diagnostic["reason"] == "injected liner-life failure"
+
+
 def test_web_start_forwards_furnace_material_id_into_run_metadata_overrides():
     """SC-50 producer: web start forwards selected wall into runner overrides."""
     import inspect

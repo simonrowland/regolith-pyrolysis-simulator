@@ -1575,6 +1575,14 @@ def test_sc50_vr_instrumentation_surface_fields_have_consumers() -> None:
         r'["\']([a-z_]+)["\']\s*:\s*_json_safe\(\s*\n\s*_condensation_refusals_report',
         r'["\']([a-z_]+)["\']\s*:\s*_json_safe\(\s*_vapour_rail_instrumentation_report',
         r'["\']([a-z_]+)["\']\s*:\s*_json_safe\(\s*_condensation_refusals_report',
+        (
+            r'["\']([a-z_]+)["\']\s*:\s*_safe_failure_value\('
+            r'\s*lambda:\s*_json_safe\(\s*_vapour_rail_instrumentation_report'
+        ),
+        (
+            r'["\']([a-z_]+)["\']\s*:\s*_safe_failure_value\('
+            r'\s*lambda:\s*_json_safe\(\s*_condensation_refusals_report'
+        ),
     ):
         import re
 
