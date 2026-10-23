@@ -13,6 +13,15 @@ fidelity_samples:
 - path: species.TiO2.observations[borisov_2004_table_2_dat32n_activity_coefficient].values.gamma
   value: 6.63
   locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'DAT32n rutile-saturated melt activity coefficient'}
+- path: species.Ti.observations[borisov_2004_table_3_dat32_6_ti4_ti3].values.points[0].value
+  value: 26.39
+  locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-6, column: Ti4+/Ti3+}
+- path: species.Ti.observations[borisov_2004_table_3_dat32_7_ti4_ti3].values.points[0].value
+  value: 21.40
+  locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-7, column: Ti4+/Ti3+}
+- path: species.Ti.observations[borisov_2004_table_3_dat32_5_ti4_ti3].values.points[0].value
+  value: 15.91
+  locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-5, column: Ti4+/Ti3+}
 species:
   TiO2:
     observations:
@@ -163,6 +172,206 @@ species:
       derivation: {relation: "gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation", inputs: [borisov_2004_rutile_saturation_standard_state], note: "The shared rutile-saturation standard-state definition fixes a(TiO2)=1; XTiO2 and TiO2 wt% are printed for each melt."}
       units: dimensionless activity coefficient; XTiO2 mole fraction; TiO2 wt%
       values: {quantity: activity_coefficient, method_class: measured_reduced, species: TiO2, gamma: 2.8, excess_G_kJ_mol: 14.73}
+    - observation_id: borisov_2004_table_3_dat32_6_tio2
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-6, column: TiO2}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -9.84}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-6, column: '−log fO2', note: 'Source prints −log fO2 = 9.84; condition is log10 fO2 (atm) = −9.84.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 wt% as printed', component_as_published: TiO2, method_class: measured_direct, value: 26.29, value_as_published: '26.29'}
+    - observation_id: borisov_2004_table_3_dat32_6_tio2_excess
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-6, column: 'TiO2ex'}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -9.84}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-6, column: '−log fO2', note: 'Source prints −log fO2 = 9.84; condition is log10 fO2 (atm) = −9.84.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_6_tio2]
+      derivation: {relation: 'TiO2ex = (TiO2)i - 25.23 wt%', inputs: [borisov_2004_table_3_dat32_6_tio2], note: 'At low oxygen fugacities, we defined an “excess” TiO2 as (TiO2)i − 25.2.'}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 excess wt% as printed', component_as_published: TiO2, method_class: measured_reduced, value: 1.06, value_as_published: '1.06'}
+    - observation_id: borisov_2004_table_3_dat32_18_tio2
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18, column: TiO2}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.11}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18, column: '−log fO2', note: 'Source prints −log fO2 = 10.11; condition is log10 fO2 (atm) = −10.11.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 wt% as printed', component_as_published: TiO2, method_class: measured_direct, value: 26.18, value_as_published: '26.18'}
+    - observation_id: borisov_2004_table_3_dat32_18_tio2_excess
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18, column: 'TiO2ex'}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.11}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18, column: '−log fO2', note: 'Source prints −log fO2 = 10.11; condition is log10 fO2 (atm) = −10.11.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_18_tio2]
+      derivation: {relation: 'TiO2ex = (TiO2)i - 25.23 wt%', inputs: [borisov_2004_table_3_dat32_18_tio2], note: 'At low oxygen fugacities, we defined an “excess” TiO2 as (TiO2)i − 25.2.'}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 excess wt% as printed', component_as_published: TiO2, method_class: measured_reduced, value: 0.95, value_as_published: '0.95'}
+    - observation_id: borisov_2004_table_3_dat32_18a_tio2
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18a, column: TiO2}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.11}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18a, column: '−log fO2', note: 'Source prints −log fO2 = 10.11; condition is log10 fO2 (atm) = −10.11.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 wt% as printed', component_as_published: TiO2, method_class: measured_direct, value: 26.34, value_as_published: '26.34'}
+    - observation_id: borisov_2004_table_3_dat32_18a_tio2_excess
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18a, column: 'TiO2ex'}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.11}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18a, column: '−log fO2', note: 'Source prints −log fO2 = 10.11; condition is log10 fO2 (atm) = −10.11.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_18a_tio2]
+      derivation: {relation: 'TiO2ex = (TiO2)i - 25.23 wt%', inputs: [borisov_2004_table_3_dat32_18a_tio2], note: 'At low oxygen fugacities, we defined an “excess” TiO2 as (TiO2)i − 25.2.'}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 excess wt% as printed', component_as_published: TiO2, method_class: measured_reduced, value: 1.11, value_as_published: '1.11'}
+    - observation_id: borisov_2004_table_3_dat32_16_tio2
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-16, column: TiO2}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.28}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-16, column: '−log fO2', note: 'Source prints −log fO2 = 10.28; condition is log10 fO2 (atm) = −10.28.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 wt% as printed', component_as_published: TiO2, method_class: measured_direct, value: 26.63, value_as_published: '26.63'}
+    - observation_id: borisov_2004_table_3_dat32_16_tio2_excess
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-16, column: 'TiO2ex'}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.28}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-16, column: '−log fO2', note: 'Source prints −log fO2 = 10.28; condition is log10 fO2 (atm) = −10.28.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_16_tio2]
+      derivation: {relation: 'TiO2ex = (TiO2)i - 25.23 wt%', inputs: [borisov_2004_table_3_dat32_16_tio2], note: 'At low oxygen fugacities, we defined an “excess” TiO2 as (TiO2)i − 25.2.'}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 excess wt% as printed', component_as_published: TiO2, method_class: measured_reduced, value: 1.40, value_as_published: '1.40'}
+    - observation_id: borisov_2004_table_3_dat32_7_tio2
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-7, column: TiO2}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.44}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-7, column: '−log fO2', note: 'Source prints −log fO2 = 10.44; condition is log10 fO2 (atm) = −10.44.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 wt% as printed', component_as_published: TiO2, method_class: measured_direct, value: 26.54, value_as_published: '26.54'}
+    - observation_id: borisov_2004_table_3_dat32_7_tio2_excess
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-7, column: 'TiO2ex'}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.44}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-7, column: '−log fO2', note: 'Source prints −log fO2 = 10.44; condition is log10 fO2 (atm) = −10.44.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_7_tio2]
+      derivation: {relation: 'TiO2ex = (TiO2)i - 25.23 wt%', inputs: [borisov_2004_table_3_dat32_7_tio2], note: 'At low oxygen fugacities, we defined an “excess” TiO2 as (TiO2)i − 25.2.'}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 excess wt% as printed', component_as_published: TiO2, method_class: measured_reduced, value: 1.31, value_as_published: '1.31'}
+    - observation_id: borisov_2004_table_3_dat32_17_tio2
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17, column: TiO2}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.75}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17, column: '−log fO2', note: 'Source prints −log fO2 = 10.75; condition is log10 fO2 (atm) = −10.75.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 wt% as printed', component_as_published: TiO2, method_class: measured_direct, value: 26.69, value_as_published: '26.69'}
+    - observation_id: borisov_2004_table_3_dat32_17_tio2_excess
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17, column: 'TiO2ex'}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.75}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17, column: '−log fO2', note: 'Source prints −log fO2 = 10.75; condition is log10 fO2 (atm) = −10.75.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_17_tio2]
+      derivation: {relation: 'TiO2ex = (TiO2)i - 25.23 wt%', inputs: [borisov_2004_table_3_dat32_17_tio2], note: 'At low oxygen fugacities, we defined an “excess” TiO2 as (TiO2)i − 25.2.'}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 excess wt% as printed', component_as_published: TiO2, method_class: measured_reduced, value: 1.46, value_as_published: '1.46'}
+    - observation_id: borisov_2004_table_3_dat32_17a_tio2
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17a, column: TiO2}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.75}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17a, column: '−log fO2', note: 'Source prints −log fO2 = 10.75; condition is log10 fO2 (atm) = −10.75.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 wt% as printed', component_as_published: TiO2, method_class: measured_direct, value: 26.69, value_as_published: '26.69'}
+    - observation_id: borisov_2004_table_3_dat32_17a_tio2_excess
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17a, column: 'TiO2ex'}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.75}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17a, column: '−log fO2', note: 'Source prints −log fO2 = 10.75; condition is log10 fO2 (atm) = −10.75.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_17a_tio2]
+      derivation: {relation: 'TiO2ex = (TiO2)i - 25.23 wt%', inputs: [borisov_2004_table_3_dat32_17a_tio2], note: 'At low oxygen fugacities, we defined an “excess” TiO2 as (TiO2)i − 25.2.'}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 excess wt% as printed', component_as_published: TiO2, method_class: measured_reduced, value: 1.46, value_as_published: '1.46'}
+    - observation_id: borisov_2004_table_3_dat32_17b_tio2
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17b, column: TiO2}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.75}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17b, column: '−log fO2', note: 'Source prints −log fO2 = 10.75; condition is log10 fO2 (atm) = −10.75.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 wt% as printed', component_as_published: TiO2, method_class: measured_direct, value: 26.89, value_as_published: '26.89'}
+    - observation_id: borisov_2004_table_3_dat32_17b_tio2_excess
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17b, column: 'TiO2ex'}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.75}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17b, column: '−log fO2', note: 'Source prints −log fO2 = 10.75; condition is log10 fO2 (atm) = −10.75.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_17b_tio2]
+      derivation: {relation: 'TiO2ex = (TiO2)i - 25.23 wt%', inputs: [borisov_2004_table_3_dat32_17b_tio2], note: 'At low oxygen fugacities, we defined an “excess” TiO2 as (TiO2)i − 25.2.'}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 excess wt% as printed', component_as_published: TiO2, method_class: measured_reduced, value: 1.66, value_as_published: '1.66'}
+    - observation_id: borisov_2004_table_3_dat32_11_tio2
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-11, column: TiO2}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.99}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-11, column: '−log fO2', note: 'Source prints −log fO2 = 10.99; condition is log10 fO2 (atm) = −10.99.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 wt% as printed', component_as_published: TiO2, method_class: measured_direct, value: 27.46, value_as_published: '27.46'}
+    - observation_id: borisov_2004_table_3_dat32_11_tio2_excess
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-11, column: 'TiO2ex'}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -10.99}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-11, column: '−log fO2', note: 'Source prints −log fO2 = 10.99; condition is log10 fO2 (atm) = −10.99.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_11_tio2]
+      derivation: {relation: 'TiO2ex = (TiO2)i - 25.23 wt%', inputs: [borisov_2004_table_3_dat32_11_tio2], note: 'At low oxygen fugacities, we defined an “excess” TiO2 as (TiO2)i − 25.2.'}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 excess wt% as printed', component_as_published: TiO2, method_class: measured_reduced, value: 2.23, value_as_published: '2.23'}
+    - observation_id: borisov_2004_table_3_dat32_5_tio2
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-5, column: TiO2}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -11.12}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-5, column: '−log fO2', note: 'Source prints −log fO2 = 11.12; condition is log10 fO2 (atm) = −11.12.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 wt% as printed', component_as_published: TiO2, method_class: measured_direct, value: 26.99, value_as_published: '26.99'}
+    - observation_id: borisov_2004_table_3_dat32_5_tio2_excess
+      type: equilibrium_phase_composition
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-5, column: 'TiO2ex'}
+      phase: glass
+      units: wt% as printed
+      point_conditions:
+        fO2_log: {state: {tag: value, value: -11.12}, locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-5, column: '−log fO2', note: 'Source prints −log fO2 = 11.12; condition is log10 fO2 (atm) = −11.12.'}}
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_5_tio2]
+      derivation: {relation: 'TiO2ex = (TiO2)i - 25.23 wt%', inputs: [borisov_2004_table_3_dat32_5_tio2], note: 'At low oxygen fugacities, we defined an “excess” TiO2 as (TiO2)i − 25.2.'}
+      values: {T_C: 1300, quantity: equilibrium_phase_composition, basis_as_published: 'TiO2 excess wt% as printed', component_as_published: TiO2, method_class: measured_reduced, value: 1.76, value_as_published: '1.76'}
     context:
     - observation_id: borisov_2004_table_1_redox_conditions_and_liquidus_phases
       type: experiment_series
@@ -172,6 +381,7 @@ species:
         method_class: measured_direct
         caption: 'Experimental conditions and stability of rutile and karrooite on the liquidus of melts of the Di–An–TiO2 system.'
         row_count: 34
+        reason: 'No phase_assemblage quantity token exists for these qualitative run outcomes. equilibrium_phase_composition requires a measured phase composition, while transition_temperature/liquidus records a transition point; neither represents phase presence in a run.'
         note: 'All rows and conditions were checked against the 600 dpi page render. Temperatures, pressure and liquid composition are retained in the paper’s printed system notation; the underlying Di–An eutectic composition is not fully specified here.'
         rows:
         - {sample: DAT32n, T_C: 1222, minus_log_fO2: 0.68, duration_h: 36, loop: Pt, phases: Rut+Gl}
@@ -209,25 +419,6 @@ species:
         - {sample: 'DAT32 g', T_C: 1249, minus_log_fO2: 12.11, duration_h: 29, loop: Pt, phases: Kar+Gl}
         - {sample: 'DAT32 h', T_C: 1220, minus_log_fO2: 12.32, duration_h: 29, loop: Pt, phases: Rut+Sph+Gl, fO2_note: calculated}
         note_on_superscripts: 'Rows marked with superscript a share the preceding run conditions; c marks reversal experiments; b marks calculated fO2.'
-    - observation_id: borisov_2004_table_3_reduced_redox_values
-      type: experiment_series
-      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3'}
-      units: −log fO2; TiO2 and excess TiO2 wt%; Ti4+/Ti3+ ratio
-      values:
-        method_class: measured_reduced
-        caption: '“Excess” rutile solubility and Ti4+/Ti3+ ratio in Di–An–TiO2 melts at 1,300°C.'
-        reason: 'The printed ratio is calculated from the excess TiO2 under the paper’s stated assumption that baseline Ti is Ti4+; retained unscored until its typed valence-ratio identity and lineage are reviewed.'
-        rows:
-        - {sample: DAT32-6, minus_log_fO2: 9.84, TiO2_wt_pct: 26.29, excess_TiO2_wt_pct: 1.06, Ti4_over_Ti3: 26.39}
-        - {sample: DAT32-18, minus_log_fO2: 10.11, TiO2_wt_pct: 26.18, excess_TiO2_wt_pct: 0.95, Ti4_over_Ti3: 29.46}
-        - {sample: DAT32-18a, minus_log_fO2: 10.11, TiO2_wt_pct: 26.34, excess_TiO2_wt_pct: 1.11, Ti4_over_Ti3: 25.33}
-        - {sample: DAT32-16, minus_log_fO2: 10.28, TiO2_wt_pct: 26.63, excess_TiO2_wt_pct: 1.40, Ti4_over_Ti3: 19.97}
-        - {sample: DAT32-7, minus_log_fO2: 10.44, TiO2_wt_pct: 26.54, excess_TiO2_wt_pct: 1.31, Ti4_over_Ti3: 21.40}
-        - {sample: DAT32-17, minus_log_fO2: 10.75, TiO2_wt_pct: 26.69, excess_TiO2_wt_pct: 1.46, Ti4_over_Ti3: 19.19}
-        - {sample: DAT32-17a, minus_log_fO2: 10.75, TiO2_wt_pct: 26.69, excess_TiO2_wt_pct: 1.46, Ti4_over_Ti3: 19.14}
-        - {sample: DAT32-17b, minus_log_fO2: 10.75, TiO2_wt_pct: 26.89, excess_TiO2_wt_pct: 1.66, Ti4_over_Ti3: 16.88}
-        - {sample: DAT32-11, minus_log_fO2: 10.99, TiO2_wt_pct: 27.46, excess_TiO2_wt_pct: 2.23, Ti4_over_Ti3: 12.57}
-        - {sample: DAT32-5, minus_log_fO2: 11.12, TiO2_wt_pct: 26.99, excess_TiO2_wt_pct: 1.76, Ti4_over_Ti3: 15.91}
     - observation_id: borisov_2004_table_4_karrooite_composition
       type: experiment_series
       locator: {page: 7, pdf_page_index: 6, published_page: 75, table: '4'}
@@ -289,3 +480,226 @@ species:
       locator: {page: 9, pdf_page_index: 8, published_page: 77, figure: '6'}
       units: Ti3O5 component mole fraction; oxygen fugacity as printed
       values: {quantity: Ti3O5_component_fraction, method_class: figure_only, phase: karrooite, caption: 'The content of the Ti3O5 component of karrooites; dashed 1,300°C lines are from a regression and two other lines are parallel.', panels: [main], axes_as_printed: {x: log_fO2_or_inverse_temperature, y: mole_fraction_Ti3O5}, series: [measured_component_fractions, regressions], marker_counts: not counted, attribution: this_work, digitisation: deferred to a figure pass}
+  Ti:
+    observations:
+    - observation_id: borisov_2004_table_3_dat32_6_ti4_ti3
+      type: concentration_series
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-6, column: Ti4+/Ti3+}
+      phase: glass
+      units: dimensionless ratio
+      point_conditions:
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_6_tio2, borisov_2004_table_3_dat32_6_tio2_excess]
+      derivation: {relation: 'Authors calculate Ti4+/Ti3+ from total and excess TiO2.', inputs: [borisov_2004_table_3_dat32_6_tio2, borisov_2004_table_3_dat32_6_tio2_excess], note: 'In experiments in air we assumed all Ti as Ti4+ (25.2wt% TiO2 at 1,300°C).'}
+      values:
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [4], denominator_kind: oxidation_state, denominator_oxidation_state: 3, value_form: ratio}
+        method_class: measured_reduced
+        points:
+        - sample: DAT32-6
+          value: 26.39
+          as_published: '26.39'
+          T_C: 1300
+          log_fO2: {value: -9.84, units: 'log10(atm)', locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-6, column: '−log fO2', note: 'Source prints −log fO2 = 9.84; condition is log10 fO2 (atm) = -9.84.'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-6, column: Ti4+/Ti3+}
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Introduction, note: 'The experiments were conducted using the loop technique in a one atm vertical tube furnace.'}}
+    - observation_id: borisov_2004_table_3_dat32_18_ti4_ti3
+      type: concentration_series
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18, column: Ti4+/Ti3+}
+      phase: glass
+      units: dimensionless ratio
+      point_conditions:
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_18_tio2, borisov_2004_table_3_dat32_18_tio2_excess]
+      derivation: {relation: 'Authors calculate Ti4+/Ti3+ from total and excess TiO2.', inputs: [borisov_2004_table_3_dat32_18_tio2, borisov_2004_table_3_dat32_18_tio2_excess], note: 'In experiments in air we assumed all Ti as Ti4+ (25.2wt% TiO2 at 1,300°C).'}
+      values:
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [4], denominator_kind: oxidation_state, denominator_oxidation_state: 3, value_form: ratio}
+        method_class: measured_reduced
+        points:
+        - sample: DAT32-18
+          value: 29.46
+          as_published: '29.46'
+          T_C: 1300
+          log_fO2: {value: -10.11, units: 'log10(atm)', locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18, column: '−log fO2', note: 'Source prints −log fO2 = 10.11; condition is log10 fO2 (atm) = -10.11.'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18, column: Ti4+/Ti3+}
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Introduction, note: 'The experiments were conducted using the loop technique in a one atm vertical tube furnace.'}}
+    - observation_id: borisov_2004_table_3_dat32_18a_ti4_ti3
+      type: concentration_series
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18a, column: Ti4+/Ti3+}
+      phase: glass
+      units: dimensionless ratio
+      point_conditions:
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_18a_tio2, borisov_2004_table_3_dat32_18a_tio2_excess]
+      derivation: {relation: 'Authors calculate Ti4+/Ti3+ from total and excess TiO2.', inputs: [borisov_2004_table_3_dat32_18a_tio2, borisov_2004_table_3_dat32_18a_tio2_excess], note: 'In experiments in air we assumed all Ti as Ti4+ (25.2wt% TiO2 at 1,300°C).'}
+      values:
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [4], denominator_kind: oxidation_state, denominator_oxidation_state: 3, value_form: ratio}
+        method_class: measured_reduced
+        points:
+        - sample: DAT32-18a
+          value: 25.33
+          as_published: '25.33'
+          T_C: 1300
+          log_fO2: {value: -10.11, units: 'log10(atm)', locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18a, column: '−log fO2', note: 'Source prints −log fO2 = 10.11; condition is log10 fO2 (atm) = -10.11.'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-18a, column: Ti4+/Ti3+}
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Introduction, note: 'The experiments were conducted using the loop technique in a one atm vertical tube furnace.'}}
+    - observation_id: borisov_2004_table_3_dat32_16_ti4_ti3
+      type: concentration_series
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-16, column: Ti4+/Ti3+}
+      phase: glass
+      units: dimensionless ratio
+      point_conditions:
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_16_tio2, borisov_2004_table_3_dat32_16_tio2_excess]
+      derivation: {relation: 'Authors calculate Ti4+/Ti3+ from total and excess TiO2.', inputs: [borisov_2004_table_3_dat32_16_tio2, borisov_2004_table_3_dat32_16_tio2_excess], note: 'In experiments in air we assumed all Ti as Ti4+ (25.2wt% TiO2 at 1,300°C).'}
+      values:
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [4], denominator_kind: oxidation_state, denominator_oxidation_state: 3, value_form: ratio}
+        method_class: measured_reduced
+        points:
+        - sample: DAT32-16
+          value: 19.97
+          as_published: '19.97'
+          T_C: 1300
+          log_fO2: {value: -10.28, units: 'log10(atm)', locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-16, column: '−log fO2', note: 'Source prints −log fO2 = 10.28; condition is log10 fO2 (atm) = -10.28.'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-16, column: Ti4+/Ti3+}
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Introduction, note: 'The experiments were conducted using the loop technique in a one atm vertical tube furnace.'}}
+    - observation_id: borisov_2004_table_3_dat32_7_ti4_ti3
+      type: concentration_series
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-7, column: Ti4+/Ti3+}
+      phase: glass
+      units: dimensionless ratio
+      point_conditions:
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_7_tio2, borisov_2004_table_3_dat32_7_tio2_excess]
+      derivation: {relation: 'Authors calculate Ti4+/Ti3+ from total and excess TiO2.', inputs: [borisov_2004_table_3_dat32_7_tio2, borisov_2004_table_3_dat32_7_tio2_excess], note: 'In experiments in air we assumed all Ti as Ti4+ (25.2wt% TiO2 at 1,300°C).'}
+      values:
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [4], denominator_kind: oxidation_state, denominator_oxidation_state: 3, value_form: ratio}
+        method_class: measured_reduced
+        points:
+        - sample: DAT32-7
+          value: 21.40
+          as_published: '21.40'
+          T_C: 1300
+          log_fO2: {value: -10.44, units: 'log10(atm)', locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-7, column: '−log fO2', note: 'Source prints −log fO2 = 10.44; condition is log10 fO2 (atm) = -10.44.'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-7, column: Ti4+/Ti3+}
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Introduction, note: 'The experiments were conducted using the loop technique in a one atm vertical tube furnace.'}}
+    - observation_id: borisov_2004_table_3_dat32_17_ti4_ti3
+      type: concentration_series
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17, column: Ti4+/Ti3+}
+      phase: glass
+      units: dimensionless ratio
+      point_conditions:
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_17_tio2, borisov_2004_table_3_dat32_17_tio2_excess]
+      derivation: {relation: 'Authors calculate Ti4+/Ti3+ from total and excess TiO2.', inputs: [borisov_2004_table_3_dat32_17_tio2, borisov_2004_table_3_dat32_17_tio2_excess], note: 'In experiments in air we assumed all Ti as Ti4+ (25.2wt% TiO2 at 1,300°C).'}
+      values:
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [4], denominator_kind: oxidation_state, denominator_oxidation_state: 3, value_form: ratio}
+        method_class: measured_reduced
+        points:
+        - sample: DAT32-17
+          value: 19.19
+          as_published: '19.19'
+          T_C: 1300
+          log_fO2: {value: -10.75, units: 'log10(atm)', locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17, column: '−log fO2', note: 'Source prints −log fO2 = 10.75; condition is log10 fO2 (atm) = -10.75.'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17, column: Ti4+/Ti3+}
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Introduction, note: 'The experiments were conducted using the loop technique in a one atm vertical tube furnace.'}}
+    - observation_id: borisov_2004_table_3_dat32_17a_ti4_ti3
+      type: concentration_series
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17a, column: Ti4+/Ti3+}
+      phase: glass
+      units: dimensionless ratio
+      point_conditions:
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_17a_tio2, borisov_2004_table_3_dat32_17a_tio2_excess]
+      derivation: {relation: 'Authors calculate Ti4+/Ti3+ from total and excess TiO2.', inputs: [borisov_2004_table_3_dat32_17a_tio2, borisov_2004_table_3_dat32_17a_tio2_excess], note: 'In experiments in air we assumed all Ti as Ti4+ (25.2wt% TiO2 at 1,300°C).'}
+      values:
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [4], denominator_kind: oxidation_state, denominator_oxidation_state: 3, value_form: ratio}
+        method_class: measured_reduced
+        points:
+        - sample: DAT32-17a
+          value: 19.14
+          as_published: '19.14'
+          T_C: 1300
+          log_fO2: {value: -10.75, units: 'log10(atm)', locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17a, column: '−log fO2', note: 'Source prints −log fO2 = 10.75; condition is log10 fO2 (atm) = -10.75.'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17a, column: Ti4+/Ti3+}
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Introduction, note: 'The experiments were conducted using the loop technique in a one atm vertical tube furnace.'}}
+    - observation_id: borisov_2004_table_3_dat32_17b_ti4_ti3
+      type: concentration_series
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17b, column: Ti4+/Ti3+}
+      phase: glass
+      units: dimensionless ratio
+      point_conditions:
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_17b_tio2, borisov_2004_table_3_dat32_17b_tio2_excess]
+      derivation: {relation: 'Authors calculate Ti4+/Ti3+ from total and excess TiO2.', inputs: [borisov_2004_table_3_dat32_17b_tio2, borisov_2004_table_3_dat32_17b_tio2_excess], note: 'In experiments in air we assumed all Ti as Ti4+ (25.2wt% TiO2 at 1,300°C).'}
+      values:
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [4], denominator_kind: oxidation_state, denominator_oxidation_state: 3, value_form: ratio}
+        method_class: measured_reduced
+        points:
+        - sample: DAT32-17b
+          value: 16.88
+          as_published: '16.88'
+          T_C: 1300
+          log_fO2: {value: -10.75, units: 'log10(atm)', locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17b, column: '−log fO2', note: 'Source prints −log fO2 = 10.75; condition is log10 fO2 (atm) = -10.75.'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-17b, column: Ti4+/Ti3+}
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Introduction, note: 'The experiments were conducted using the loop technique in a one atm vertical tube furnace.'}}
+    - observation_id: borisov_2004_table_3_dat32_11_ti4_ti3
+      type: concentration_series
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-11, column: Ti4+/Ti3+}
+      phase: glass
+      units: dimensionless ratio
+      point_conditions:
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_11_tio2, borisov_2004_table_3_dat32_11_tio2_excess]
+      derivation: {relation: 'Authors calculate Ti4+/Ti3+ from total and excess TiO2.', inputs: [borisov_2004_table_3_dat32_11_tio2, borisov_2004_table_3_dat32_11_tio2_excess], note: 'In experiments in air we assumed all Ti as Ti4+ (25.2wt% TiO2 at 1,300°C).'}
+      values:
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [4], denominator_kind: oxidation_state, denominator_oxidation_state: 3, value_form: ratio}
+        method_class: measured_reduced
+        points:
+        - sample: DAT32-11
+          value: 12.57
+          as_published: '12.57'
+          T_C: 1301
+          log_fO2: {value: -10.99, units: 'log10(atm)', locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-11, column: '−log fO2', note: 'Source prints −log fO2 = 10.99; condition is log10 fO2 (atm) = -10.99.'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-11, column: Ti4+/Ti3+}
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Introduction, note: 'The experiments were conducted using the loop technique in a one atm vertical tube furnace.'}}
+    - observation_id: borisov_2004_table_3_dat32_5_ti4_ti3
+      type: concentration_series
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-5, column: Ti4+/Ti3+}
+      phase: glass
+      units: dimensionless ratio
+      point_conditions:
+        quench_state: {state: {tag: value, value: not_stated}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Experimental procedures, note: 'The source states experimentally produced glasses were analyzed but does not state whether quenching preserves redox.'}}
+      derived_from: [borisov_2004_table_3_dat32_5_tio2, borisov_2004_table_3_dat32_5_tio2_excess]
+      derivation: {relation: 'Authors calculate Ti4+/Ti3+ from total and excess TiO2.', inputs: [borisov_2004_table_3_dat32_5_tio2, borisov_2004_table_3_dat32_5_tio2_excess], note: 'In experiments in air we assumed all Ti as Ti4+ (25.2wt% TiO2 at 1,300°C).'}
+      values:
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [4], denominator_kind: oxidation_state, denominator_oxidation_state: 3, value_form: ratio}
+        method_class: measured_reduced
+        points:
+        - sample: DAT32-5
+          value: 15.91
+          as_published: '15.91'
+          T_C: 1298
+          fO2_note: calculated
+          log_fO2: {value: -11.12, units: 'log10(atm)', locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-5, column: '−log fO2', note: 'Source prints −log fO2 = 11.12; condition is log10 fO2 (atm) = -11.12.'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3', row: DAT32-5, column: Ti4+/Ti3+}
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 1, pdf_page_index: 0, published_page: 69, section: Introduction, note: 'The experiments were conducted using the loop technique in a one atm vertical tube furnace.'}}

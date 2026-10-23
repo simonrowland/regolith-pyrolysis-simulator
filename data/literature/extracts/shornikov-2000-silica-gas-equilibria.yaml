@@ -15,13 +15,16 @@ extraction:
   method: >-
     Born-digital source: pdftotext-layout.txt was transcribed by table row and
     checked against 600 dpi PDF renders for Tables 1-6 (published pp. 361-366),
-    Table 4 appearance potentials, and Figure 1 (p. 368). The six tables' full
-    rows are retained below. Figure 1 is deferred without numeric points.
-    Table 3 and the prose report measured ion-current ratios. Those values are
-    stored as measured ion_intensity_ratio observations following the existing
-    KEMS extraction pattern. The printed ion-pair subtype remains unmapped by
-    the current migrator and is tracked under t-1329; no schema or migrator
-    change is made here.
+    Table 4 appearance potentials, and Figure 1 (p. 368). Tables 1, 2, 4, 5,
+    and 6 retain context rows for quantities without store tokens; Table 3
+    numeric ion-current ratios are typed and its qualitative cells remain in
+    context. Figure 1 is deferred without numeric points.
+    Table 3 prior-literature ion-current ratios are stored as
+    quoted_attributed ion_intensity_ratio observations with each printed
+    reference. This-work Table 3 and prose ratios remain measured_direct. The
+    printed ion-pair subtype remains unmapped by the current migrator and is
+    tracked under t-1329; no schema or migrator change is made here. The
+    context table retains only qualitative detection marks and unreported cells.
   date: '2026-10-18'
   worker: fam2-1018
   provenance_path: text/shornikov-2000-silica-gas-equilibria/pdftotext-layout.txt
@@ -30,7 +33,11 @@ fidelity_samples:
   - path: species.SiO2.observations[shornikov_2000_table3_ratio_sio2_sio].values.ion_intensity_ratio
     value: 1.13e-3
     note: Table 3 this-work SiO2-system ion-intensity ratio at 1950 K.
-    locator: {table: '3', row: 'Mo cell, 1950 K, this work', published_page: 363, pdf_page_index: 3}
+    locator: {table: '3', row: 'Mo cell, 1950 K, this work', page: 4, published_page: 363, pdf_page_index: 3}
+  - path: species.Si2O2.observations[shornikov_2000_table3_prev_r01_si2o2_sio].values.ion_intensity_ratio
+    value: 7.83e-4
+    note: Table 3 prior Si2O2+ to SiO+ ion-intensity ratio attributed to reference [3].
+    locator: {table: '3', row: 'Al2O3 cell, Si–SiO2 system, 1463 K', page: 4, published_page: 363, pdf_page_index: 3}
   - path: species.MoO.observations[shornikov_2000_text_ratio_moo_moo2].values.ion_intensity_ratio
     value: 0.04
     note: Prose ratio I(MoO+)/I(MoO2+) at 1950 K.
@@ -42,6 +49,7 @@ species:
       type: rate_series
       locator:
         table: '3'
+        page: 4
         published_page: 363
         pdf_page_index: 3
         note: 'Table 3, this-work row, Mo cell, SiO2 system, 1950 K'
@@ -55,7 +63,7 @@ species:
       point_conditions:
         temperature_K:
           state: {tag: value, value: '1950'}
-          locator: {table: '3', published_page: 363, pdf_page_index: 3}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
       values:
         quantity: ion_intensity_ratio
         method_class: measured_direct
@@ -67,6 +75,90 @@ species:
         ionizing_energy_eV: 20
         method: Knudsen mass-spectrometric effusion
         note: t-1329; ion-pair subtype is not mapped by the current identity migrator.
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r03_sio2_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Mo cell, Si–Li2O system, 1538 K, reference [27]'
+      T_range_K: [1538.0, 1538.0]
+      phase: gas
+      standard_state: I((SiO2)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1538'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[27]'
+        ion_pair: I((SiO2)+)/I((SiO)+)
+        ion_intensity_ratio: 1.88e-5
+        T_K: 1538.0
+        system_as_printed: Si–Li2O
+        cell_material_as_printed: Mo
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r08_sio2_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Al2O3 cell, SiO2 system, 1900 K, reference [3]'
+      T_range_K: [1900.0, 1900.0]
+      phase: gas
+      standard_state: I((SiO2)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1900'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[3]'
+        ion_pair: I((SiO2)+)/I((SiO)+)
+        ion_intensity_ratio: 4.44e-3
+        T_K: 1900.0
+        system_as_printed: SiO2
+        cell_material_as_printed: Al2O3
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r09_sio2_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Pt cell, SiO2 system, 1950 K, reference [5]'
+      T_range_K: [1950.0, 1950.0]
+      phase: gas
+      standard_state: I((SiO2)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1950'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[5]'
+        ion_pair: I((SiO2)+)/I((SiO)+)
+        ion_intensity_ratio: 6.32e-2
+        T_K: 1950.0
+        system_as_printed: SiO2
+        cell_material_as_printed: Pt
       uncertainty:
         note: No uncertainty is printed for the ion intensity ratio.
     context:
@@ -431,13 +523,17 @@ species:
       type: mass_spectrum
       locator:
         table: '3'
+        page: 4
         published_page: 363
         pdf_page_index: 3
       units: normalized ion intensity relative to (SiO)+ as printed
       values:
         quantity: ion_intensity_ratio
         method_class: quoted_attributed
-        note: t-1329 tracks the unmapped ion-pair identity subtype for this-work rows.
+        note: >-
+          Numeric prior-literature ratios are typed below. The ion-pair subtype
+          remains unmapped by the current identity migrator and is tracked under
+          t-1329.
         source_row_count: 10
         this_work_observation_ids:
         - shornikov_2000_table3_ratio_si_sio
@@ -449,74 +545,64 @@ species:
         - cell_material: Al2O3
           system_as_printed: Si–SiO2
           T_as_printed: '1463'
-          Si_plus_as_printed: '—'
-          SiO_plus_as_printed: '1.00'
-          SiO2_plus_as_printed: '—'
-          Si2O2_plus_as_printed: '7.83 × 10−4'
+          qualitative_cells_as_printed:
+            Si_plus: '—'
+            SiO2_plus: '—'
           attribution: '[3]'
         - cell_material: ZrO2
           system_as_printed: Si–SiO2
           T_as_printed: '1467'
-          Si_plus_as_printed: '—'
-          SiO_plus_as_printed: '1.00'
-          SiO2_plus_as_printed: '—'
-          Si2O2_plus_as_printed: '1.11 × 10−4'
+          qualitative_cells_as_printed:
+            Si_plus: '—'
+            SiO2_plus: '—'
           attribution: '[4]'
         - cell_material: Mo
           system_as_printed: Si–Li2O
           T_as_printed: '1538'
-          Si_plus_as_printed: '+'
-          SiO_plus_as_printed: '1.00'
-          SiO2_plus_as_printed: '1.88 × 10−5'
-          Si2O2_plus_as_printed: '3.44 × 10−4'
+          qualitative_cells_as_printed:
+            Si_plus: '+'
           attribution: '[27]'
         - cell_material: Mo
           system_as_printed: Si–Ge–SiO2
           T_as_printed: '1548'
-          Si_plus_as_printed: '2.29 × 10−4'
-          SiO_plus_as_printed: '1.00'
-          SiO2_plus_as_printed: '—'
-          Si2O2_plus_as_printed: '—'
+          qualitative_cells_as_printed:
+            SiO2_plus: '—'
+            Si2O2_plus: '—'
           attribution: '[41]'
         - cell_material: C
           system_as_printed: Si–SiO2
           T_as_printed: '1550'
-          Si_plus_as_printed: '1.50 × 10−1'
-          SiO_plus_as_printed: '1.00'
-          SiO2_plus_as_printed: '—'
-          Si2O2_plus_as_printed: '—'
+          qualitative_cells_as_printed:
+            SiO2_plus: '—'
+            Si2O2_plus: '—'
           attribution: '[17,18]'
         - cell_material: Si3N4
           system_as_printed: Si–Si2N2O–Si3N4
           T_as_printed: '1550'
-          Si_plus_as_printed: '1.50 × 10−1'
-          SiO_plus_as_printed: '1.00'
-          SiO2_plus_as_printed: '—'
-          Si2O2_plus_as_printed: '+'
+          qualitative_cells_as_printed:
+            SiO2_plus: '—'
+            Si2O2_plus: '+'
           attribution: '[19]'
         - cell_material: Mo
           system_as_printed: Si–Ge–SiO2
           T_as_printed: '1560'
-          Si_plus_as_printed: '3.19 × 10−2'
-          SiO_plus_as_printed: '1.00'
-          SiO2_plus_as_printed: '—'
-          Si2O2_plus_as_printed: '—'
+          qualitative_cells_as_printed:
+            SiO2_plus: '—'
+            Si2O2_plus: '—'
           attribution: '[39]'
         - cell_material: Al2O3
           system_as_printed: SiO2
           T_as_printed: '1900'
-          Si_plus_as_printed: '—'
-          SiO_plus_as_printed: '1.00'
-          SiO2_plus_as_printed: '4.44 × 10−3'
-          Si2O2_plus_as_printed: '—'
+          qualitative_cells_as_printed:
+            Si_plus: '—'
+            Si2O2_plus: '—'
           attribution: '[3]'
         - cell_material: Pt
           system_as_printed: SiO2
           T_as_printed: '1950'
-          Si_plus_as_printed: '—'
-          SiO_plus_as_printed: '1.00'
-          SiO2_plus_as_printed: '6.32 × 10−2'
-          Si2O2_plus_as_printed: '—'
+          qualitative_cells_as_printed:
+            Si_plus: '—'
+            Si2O2_plus: '—'
           attribution: '[5]'
     - observation_id: shornikov_2000_table4_appearance_potentials
       type: appearance_potential
@@ -970,6 +1056,7 @@ species:
       type: rate_series
       locator:
         table: '3'
+        page: 4
         published_page: 363
         pdf_page_index: 3
         note: Table 3, Mo cell, SiO2 system, 1950 K
@@ -987,6 +1074,7 @@ species:
             value: '1950'
           locator:
             table: '3'
+            page: 4
             published_page: 363
             pdf_page_index: 3
       values:
@@ -1002,12 +1090,125 @@ species:
         note: t-1329; ion-pair subtype is not mapped by the current identity migrator.
       uncertainty:
         note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r04_si_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Mo cell, Si–Ge–SiO2 system, 1548 K, reference [41]'
+      T_range_K: [1548.0, 1548.0]
+      phase: gas
+      standard_state: I((Si)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1548'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[41]'
+        ion_pair: I((Si)+)/I((SiO)+)
+        ion_intensity_ratio: 2.29e-4
+        T_K: 1548.0
+        system_as_printed: Si–Ge–SiO2
+        cell_material_as_printed: Mo
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r05_si_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'C cell, Si–SiO2 system, 1550 K, references [17,18]'
+      T_range_K: [1550.0, 1550.0]
+      phase: gas
+      standard_state: I((Si)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1550'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[17,18]'
+        ion_pair: I((Si)+)/I((SiO)+)
+        ion_intensity_ratio: 1.50e-1
+        T_K: 1550.0
+        system_as_printed: Si–SiO2
+        cell_material_as_printed: C
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r06_si_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Si3N4 cell, Si–Si2N2O–Si3N4 system, 1550 K, reference [19]'
+      T_range_K: [1550.0, 1550.0]
+      phase: gas
+      standard_state: I((Si)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1550'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[19]'
+        ion_pair: I((Si)+)/I((SiO)+)
+        ion_intensity_ratio: 1.50e-1
+        T_K: 1550.0
+        system_as_printed: Si–Si2N2O–Si3N4
+        cell_material_as_printed: Si3N4
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r07_si_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Mo cell, Si–Ge–SiO2 system, 1560 K, reference [39]'
+      T_range_K: [1560.0, 1560.0]
+      phase: gas
+      standard_state: I((Si)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1560'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[39]'
+        ion_pair: I((Si)+)/I((SiO)+)
+        ion_intensity_ratio: 3.19e-2
+        T_K: 1560.0
+        system_as_printed: Si–Ge–SiO2
+        cell_material_as_printed: Mo
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
   SiO:
     observations:
     - observation_id: shornikov_2000_table3_ratio_sio_sio
       type: rate_series
       locator:
         table: '3'
+        page: 4
         published_page: 363
         pdf_page_index: 3
         note: Table 3, Mo cell, SiO2 system, 1950 K
@@ -1025,6 +1226,7 @@ species:
             value: '1950'
           locator:
             table: '3'
+            page: 4
             published_page: 363
             pdf_page_index: 3
       values:
@@ -1040,12 +1242,265 @@ species:
         note: t-1329; ion-pair subtype is not mapped by the current identity migrator.
       uncertainty:
         note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r01_sio_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Al2O3 cell, Si–SiO2 system, 1463 K, reference [3]'
+      T_range_K: [1463.0, 1463.0]
+      phase: gas
+      standard_state: I((SiO)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1463'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[3]'
+        ion_pair: I((SiO)+)/I((SiO)+)
+        ion_intensity_ratio: 1.0
+        T_K: 1463.0
+        system_as_printed: Si–SiO2
+        cell_material_as_printed: Al2O3
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r02_sio_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'ZrO2 cell, Si–SiO2 system, 1467 K, reference [4]'
+      T_range_K: [1467.0, 1467.0]
+      phase: gas
+      standard_state: I((SiO)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1467'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[4]'
+        ion_pair: I((SiO)+)/I((SiO)+)
+        ion_intensity_ratio: 1.0
+        T_K: 1467.0
+        system_as_printed: Si–SiO2
+        cell_material_as_printed: ZrO2
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r03_sio_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Mo cell, Si–Li2O system, 1538 K, reference [27]'
+      T_range_K: [1538.0, 1538.0]
+      phase: gas
+      standard_state: I((SiO)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1538'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[27]'
+        ion_pair: I((SiO)+)/I((SiO)+)
+        ion_intensity_ratio: 1.0
+        T_K: 1538.0
+        system_as_printed: Si–Li2O
+        cell_material_as_printed: Mo
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r04_sio_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Mo cell, Si–Ge–SiO2 system, 1548 K, reference [41]'
+      T_range_K: [1548.0, 1548.0]
+      phase: gas
+      standard_state: I((SiO)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1548'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[41]'
+        ion_pair: I((SiO)+)/I((SiO)+)
+        ion_intensity_ratio: 1.0
+        T_K: 1548.0
+        system_as_printed: Si–Ge–SiO2
+        cell_material_as_printed: Mo
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r05_sio_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'C cell, Si–SiO2 system, 1550 K, references [17,18]'
+      T_range_K: [1550.0, 1550.0]
+      phase: gas
+      standard_state: I((SiO)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1550'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[17,18]'
+        ion_pair: I((SiO)+)/I((SiO)+)
+        ion_intensity_ratio: 1.0
+        T_K: 1550.0
+        system_as_printed: Si–SiO2
+        cell_material_as_printed: C
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r06_sio_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Si3N4 cell, Si–Si2N2O–Si3N4 system, 1550 K, reference [19]'
+      T_range_K: [1550.0, 1550.0]
+      phase: gas
+      standard_state: I((SiO)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1550'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[19]'
+        ion_pair: I((SiO)+)/I((SiO)+)
+        ion_intensity_ratio: 1.0
+        T_K: 1550.0
+        system_as_printed: Si–Si2N2O–Si3N4
+        cell_material_as_printed: Si3N4
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r07_sio_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Mo cell, Si–Ge–SiO2 system, 1560 K, reference [39]'
+      T_range_K: [1560.0, 1560.0]
+      phase: gas
+      standard_state: I((SiO)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1560'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[39]'
+        ion_pair: I((SiO)+)/I((SiO)+)
+        ion_intensity_ratio: 1.0
+        T_K: 1560.0
+        system_as_printed: Si–Ge–SiO2
+        cell_material_as_printed: Mo
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r08_sio_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Al2O3 cell, SiO2 system, 1900 K, reference [3]'
+      T_range_K: [1900.0, 1900.0]
+      phase: gas
+      standard_state: I((SiO)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1900'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[3]'
+        ion_pair: I((SiO)+)/I((SiO)+)
+        ion_intensity_ratio: 1.0
+        T_K: 1900.0
+        system_as_printed: SiO2
+        cell_material_as_printed: Al2O3
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r09_sio_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Pt cell, SiO2 system, 1950 K, reference [5]'
+      T_range_K: [1950.0, 1950.0]
+      phase: gas
+      standard_state: I((SiO)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1950'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[5]'
+        ion_pair: I((SiO)+)/I((SiO)+)
+        ion_intensity_ratio: 1.0
+        T_K: 1950.0
+        system_as_printed: SiO2
+        cell_material_as_printed: Pt
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
   Si2O2:
     observations:
     - observation_id: shornikov_2000_table3_ratio_si2o2_sio
       type: rate_series
       locator:
         table: '3'
+        page: 4
         published_page: 363
         pdf_page_index: 3
         note: Table 3, Mo cell, SiO2 system, 1950 K
@@ -1063,6 +1518,7 @@ species:
             value: '1950'
           locator:
             table: '3'
+            page: 4
             published_page: 363
             pdf_page_index: 3
       values:
@@ -1076,6 +1532,90 @@ species:
         ionizing_energy_eV: 20
         method: Knudsen mass-spectrometric effusion
         note: t-1329; ion-pair subtype is not mapped by the current identity migrator.
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r01_si2o2_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Al2O3 cell, Si–SiO2 system, 1463 K, reference [3]'
+      T_range_K: [1463.0, 1463.0]
+      phase: gas
+      standard_state: I((Si2O2)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1463'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[3]'
+        ion_pair: I((Si2O2)+)/I((SiO)+)
+        ion_intensity_ratio: 7.83e-4
+        T_K: 1463.0
+        system_as_printed: Si–SiO2
+        cell_material_as_printed: Al2O3
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r02_si2o2_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'ZrO2 cell, Si–SiO2 system, 1467 K, reference [4]'
+      T_range_K: [1467.0, 1467.0]
+      phase: gas
+      standard_state: I((Si2O2)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1467'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[4]'
+        ion_pair: I((Si2O2)+)/I((SiO)+)
+        ion_intensity_ratio: 1.11e-4
+        T_K: 1467.0
+        system_as_printed: Si–SiO2
+        cell_material_as_printed: ZrO2
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+    - observation_id: shornikov_2000_table3_prev_r03_si2o2_sio
+      type: rate_series
+      locator:
+        table: '3'
+        page: 4
+        published_page: 363
+        pdf_page_index: 3
+        row: 'Mo cell, Si–Li2O system, 1538 K, reference [27]'
+      T_range_K: [1538.0, 1538.0]
+      phase: gas
+      standard_state: I((Si2O2)+)/I((SiO)+), relative ion current as printed
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1538'}
+          locator: {table: '3', page: 4, published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: '[27]'
+        ion_pair: I((Si2O2)+)/I((SiO)+)
+        ion_intensity_ratio: 3.44e-4
+        T_K: 1538.0
+        system_as_printed: Si–Li2O
+        cell_material_as_printed: Mo
       uncertainty:
         note: No uncertainty is printed for the ion intensity ratio.
   MoO:
