@@ -1,0 +1,69 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 3a5453746def54cb6d414b6c383281227aab53a26a258a3f3a3006aba936f135
+  citation: Tranell, G., Ostrovski, O. & Jahanshahi, S. (2002), The equilibrium partitioning of titanium between Ti3+ and
+    Ti4+ valency states in CaO-SiO2-TiOx slags, Metallurgical and Materials Transactions B 33B:61-67.
+  source_ids:
+  - tranell-2002-titanium-valence
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:tranell-2002-titanium-valence
+      role: pdf
+      path: raw/tranell-2002-titanium-valence/tranell-2002-titanium-valence.pdf
+      sha256:
+        tag: value
+        value: f1de801ff8fde330edcc159782a2688ec25996bf2512ac6f14abfa25a59db8ee
+    - asset_id: pdftotext:tranell-2002-titanium-valence
+      role: pdftotext
+      path: text/tranell-2002-titanium-valence
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:tranell-2002-titanium-valence
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 3a5453746def54cb6d414b6c383281227aab53a26a258a3f3a3006aba936f135::tranell-2002-titanium-valence
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 3a5453746def54cb6d414b6c383281227aab53a26a258a3f3a3006aba936f135
+  locator:
+    published_page: 63
+    pdf_page_index: 2
+    table: I
+    note: Table I row 1, slag CST1
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel

@@ -1,0 +1,69 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.chemgeo.2015.07.002
+  citation: 'Burnham, A. D., Berry, A. J., Halse, H. R., Schofield, P. F., Cibin, G. & Mosselmans, J. F. W. (2015). The oxidation
+    state of europium in silicate melts as a function of oxygen fugacity, composition and temperature. Chemical Geology 411,
+    248-259. doi: 10.1016/j.chemgeo.2015.07.002.'
+  source_ids:
+  - burnham-2015-europium-redox
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:burnham-2015-europium-redox
+      role: pdf
+      path: raw/burnham-2015-europium-redox/burnham-2015-europium-redox.pdf
+      sha256:
+        tag: value
+        value: 43ebfe4fcb5b4a814df05bfd8a7c41790a5414da2fe783cddac9e0e0ba93b3af
+    - asset_id: pdftotext:burnham-2015-europium-redox
+      role: pdftotext
+      path: text/burnham-2015-europium-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:burnham-2015-europium-redox
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.chemgeo.2015.07.002
+experiments:
+- experiment_id: 10.1016/j.chemgeo.2015.07.002::burnham-2015-europium-redox
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.chemgeo.2015.07.002
+  locator:
+    page: 34
+    published_page: 255
+    pdf_page_index: 33
+    table: '2'
+    note: Table 2 glasses AD at 1300 °C; printed log fO2 0.0. Stored value is from the Eu3+ peak column only; Table 3 logK
+      prime averages estimates from both Eu2+ and Eu3+ peak heights.

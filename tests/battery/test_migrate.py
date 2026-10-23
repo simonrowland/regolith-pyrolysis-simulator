@@ -53,6 +53,8 @@ from simulator.battery.migrate import (
     DuplicateContextIdError,
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
+    _convert_compilation_amount,
+    fe3_fe2_ratio_from_ferric_fraction,
     MigrationResult,
     Migrator,
     UnknownRailSpellingError,
@@ -85,6 +87,7 @@ from simulator.battery.migrate import (
     compilation_record_asset_id,
     compilation_column_series_from_record,
     _provenance_from_extract,
+    _source_method_uncertainty_from_plain,
     _initial_oxide_map_from_values,
     _located_printed_and_initial,
     load_migrated_store,
@@ -106,6 +109,7 @@ from simulator.battery.migrate import (
     write_outputs,
 
 )
+from simulator.battery.stable_ids import series_row_extra
 
 
 def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
@@ -469,6 +473,127 @@ def _migrate_real_extract(
     )
     (extracts / name).write_text(extract_text, encoding="utf-8")
     return migrate(root, write=write)
+
+
+def test_extract_source_method_uncertainty_migrates_on_its_work(
+    tmp_path: Path,
+) -> None:
+    name = "kems-014-drowart-2005.yaml"
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
+    original_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    baseline = _migrate_real_extract(
+        tmp_path / "without-method-uncertainty", name, extract_doc=original_doc
+    )
+    doc = deepcopy(original_doc)
+    source_id = str(doc["source_id"])
+    doc["source"]["method_uncertainty"] = {
+        "value": "0.10",
+        "meaning": "one_sigma",
+        "quantity": "activity",
+        "basis": "log10_dex",
+        "quantity_basis": "log10 activity in dex",
+        "locator": {
+            "page": 7,
+            "note": "The standard deviation of log10(a) is 0.10.",
+        },
+    }
+
+    result = _migrate_real_extract(
+        tmp_path / "with-method-uncertainty", name, extract_doc=doc
+    )
+    assert {
+        observation_id: to_plain(observation)
+        for observation_id, observation in baseline.observations.items()
+    } == {
+        observation_id: to_plain(observation)
+        for observation_id, observation in result.observations.items()
+    }
+    baseline_work = next(
+        work for work in baseline.works.values() if source_id in work.source_ids
+    )
+    assert "source_method_uncertainties" not in to_plain(baseline_work)
+    work = next(work for work in result.works.values() if source_id in work.source_ids)
+    uncertainty = work.source_method_uncertainties[source_id]
+
+    assert uncertainty.value == Decimal("0.10")
+    assert uncertainty.meaning == "one_sigma"
+    assert uncertainty.quantity is Quantity.ACTIVITY
+    assert uncertainty.basis == "log10_dex"
+    assert uncertainty.quantity_basis == "log10 activity in dex"
+    assert uncertainty.locator.page == 7
+    assert uncertainty.locator.note == doc["source"]["method_uncertainty"]["locator"]["note"]
+    assert result.validation is not None
+    assert not any(
+        issue.path.startswith("work.source_method_uncertainties")
+        for issue in result.validation.issues
+    )
+    plain_work = to_plain(work)
+    assert plain_work["source_method_uncertainties"][source_id]["locator"] == {
+        "page": 7,
+        "note": "The standard deviation of log10(a) is 0.10.",
+    }
+
+
+@pytest.mark.parametrize(
+    "payload",
+    (
+        {
+            "value": "0.10",
+            "meaning": "one_sigma",
+            "basis": "log10_dex",
+            "quantity_basis": "log10 activity in dex",
+            "locator": {"page": 7, "note": "Printed method uncertainty."},
+        },
+        {
+            "value": "0.10",
+            "meaning": "one_sigma",
+            "quantity": "not_a_quantity",
+            "basis": "log10_dex",
+            "quantity_basis": "log10 activity in dex",
+            "locator": {"page": 7, "note": "Printed method uncertainty."},
+        },
+    ),
+    ids=("missing-quantity", "invalid-quantity"),
+)
+def test_source_method_uncertainty_requires_quantity_enum(payload) -> None:
+    with pytest.raises(ValueError):
+        _source_method_uncertainty_from_plain(payload)
+
+
+def test_source_method_uncertainty_rejects_zero_value() -> None:
+    from simulator.battery.records import SourceMethodUncertainty
+    from simulator.battery.validate import validate_work
+    from tests.battery import factories as F
+
+    uncertainty = SourceMethodUncertainty(
+        value=Decimal("0"),
+        meaning="one_sigma",
+        quantity=Quantity.ACTIVITY,
+        basis="log10_dex",
+        quantity_basis="log10 activity in dex",
+        locator=F.loc(page=7, note="The standard deviation is zero."),
+    )
+    work = replace(
+        F.work(),
+        source_method_uncertainties={"work-1": uncertainty},
+    )
+
+    assert any(
+        issue.path.endswith(".value")
+        and "finite positive value" in issue.detail
+        for issue in validate_work(work)
+    )
+
+    invalid_basis = replace(
+        uncertainty, value=Decimal("0.10"), basis="not_a_basis"
+    )
+    invalid_basis_work = replace(
+        work,
+        source_method_uncertainties={"work-1": invalid_basis},
+    )
+    assert any(
+        issue.path.endswith(".basis") for issue in validate_work(invalid_basis_work)
+    )
 
 
 def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
@@ -1148,6 +1273,146 @@ def test_registry_composition_accepts_existing_mapping_inference_inputs() -> Non
             "inputs"
         ][0]
     )
+
+
+def test_fo2_gas_ratio_round_trips_as_a_located_printed_value() -> None:
+    from simulator.battery.migrate import _experiment_from_plain, to_plain
+
+    extract_path = Path(__file__).parents[2] / "data/literature/extracts/ta-badro-2021.yaml"
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    raw = extract["experiments"][0]
+    raw["fO2_control"] = {
+        "channel": {"tag": "value", "value": "gas_mix"},
+        "gas_ratio": {
+            "numerator_species": "CO2",
+            "denominator_species": "CO",
+            "value": {
+                "state": {"tag": "value", "value": 1.4},
+                "locator": {"published_page": 800, "table": "I"},
+            },
+            "basis": "partial_pressure",
+        },
+    }
+
+    experiment = _experiment_from_plain(raw, registry_issues=[])
+    serialized = to_plain(experiment)
+
+    ratio = serialized["fO2_control"]["gas_ratio"]
+    assert ratio["numerator_species"] == "CO2"
+    assert ratio["denominator_species"] == "CO"
+    assert ratio["basis"] == "partial_pressure"
+    assert ratio["value"]["state"]["value"]["point"] == "1.4"
+    assert ratio["value"]["locator"] == {"published_page": 800, "table": "I"}
+
+
+def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml"
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    observations = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "darken-gurry-1946-iron-oxygen-ii"
+    }
+    assert len(observations) == 92
+    assert not migrator.result.validation.hard_issues
+    assert all(
+        observation.identity.temperature_K.is_value
+        for observation in observations.values()
+    )
+    assert all(observation.point_conditions for observation in observations.values())
+
+    table_i = observations["dg46_t1_a_1383_wustite"]
+    assert table_i.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    assert table_i.identity.subtype.value == "r=(Fe++ + Fe+++)/Fe++ as printed"
+    assert table_i.value.point == Decimal("1.096")
+    assert table_i.identity.temperature_K.value == Decimal("1656.15")
+    assert "starting_material" in table_i.point_conditions
+    control = migrator.result.experiments[table_i.experiment_id].fO2_control
+    assert control is not None and control.gas_ratio is not None
+    assert control.gas_ratio.numerator_species == "CO2"
+    assert control.gas_ratio.denominator_species == "CO"
+    assert control.gas_ratio.basis == "partial_pressure"
+    assert control.gas_ratio.value.state.value.point == Decimal("0.376")
+
+    table_iii_a = observations["dg46_t3a_1390_fe2o3"]
+    assert table_iii_a.value.point == Decimal("1.081")
+    assert "equilibrium_boundary" in table_iii_a.point_conditions
+    assert observations["dg46_t3a_1455_iron"].value.point == Decimal("1.067")
+
+    assert [
+        observations[row_id].value.point
+        for row_id in (
+            "dg46_t1_j_1605_fe2o3_a",
+            "dg46_t1_j_1605_fe2o3_b",
+        )
+    ] == [Decimal("2.824"), Decimal("2.850")]
+
+    for row_id, temperature, value, starting_material in (
+        ("dg46_t1_l_1596_fe2o3", "1596", "4.067", "Fe2O3"),
+        ("dg46_t1_l_1615_fe2o3", "1615", "3.881", "Fe2O3"),
+        ("dg46_t1_l_1632_fe2o3", "1632", "4.033", "Fe2O3"),
+        ("dg46_t1_l_1632_wustite", "1632", "3.958", "Wustite"),
+        ("dg46_t1_l_1636_fe2o3", "1636", "3.998", "Fe2O3"),
+    ):
+        observation = observations[row_id]
+        assert observation.identity.temperature_K.value == (
+            Decimal(temperature) + Decimal("273.15")
+        )
+        assert observation.value.point == Decimal(value)
+        assert (
+            observation.point_conditions["starting_material"].state.value
+            == starting_material
+        )
+
+    condensed_rows = [
+        observation
+        for observation in observations.values()
+        if observation.identity.species.formula == "Fe(1-x)O"
+    ]
+    assert len(condensed_rows) == 89
+    assert Counter(
+        (
+            row.identity.species.formula,
+            row.identity.species.phase.value.value,
+            row.identity.species.charge.value,
+        )
+        for row in condensed_rows
+    ) == {("Fe(1-x)O", "l", 0): 89}
+    assert all(
+        row.identity.subtype.value == "r=(Fe++ + Fe+++)/Fe++ as printed"
+        for row in condensed_rows
+    )
+
+    table_iii_b = observations["dg46_t3b_1436"]
+    assert (
+        table_iii_b.identity.quantity.value
+        is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    assert table_iii_b.identity.species.phase.value is Phase.G
+    assert table_iii_b.identity.subtype.value == "pCO2/pCO"
+    assert table_iii_b.value.point == Decimal("0.233")
+    assert "equilibrium_boundary" in table_iii_b.point_conditions
+
+    oxygen_run = observations["dg46_t1_l_1589_fe2o3"]
+    oxygen_control = migrator.result.experiments[
+        oxygen_run.experiment_id
+    ].fO2_control
+    assert oxygen_control is not None
+    assert oxygen_control.oxygen_partial_pressure_Pa is not None
+    assert oxygen_control.oxygen_partial_pressure_Pa.state.value.point == Decimal(
+        "101325"
+    )
+    for row_id, observation in observations.items():
+        if row_id.startswith("dg46_t1_l_"):
+            assert observation.experiment_id == oxygen_run.experiment_id
+            assert migrator.result.experiments[
+                observation.experiment_id
+            ].fO2_control.oxygen_partial_pressure_Pa.state.value.point == Decimal(
+                "101325"
+            )
 
 
 def test_malformed_registry_inference_records_issue_without_dropping_value() -> None:
@@ -5273,6 +5538,9 @@ def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
     for spelling, token in (
         ("aq", Phase.AQ),
         ("glass", Phase.GLASS),
+        ("quenched silicate glass", Phase.GLASS),
+        ("quenched synthetic Martian basalt glass", Phase.GLASS),
+        ("quenched peridotite glass", Phase.GLASS),
         ("supercooled_l", Phase.SUPERCOOLED_L),
         ("g", Phase.G),
         ("cr", Phase.CR),
@@ -5283,6 +5551,14 @@ def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
         assert mapped.is_value and mapped.value is token and why is None
     mapped, why = map_phase("silicate_melt")
     assert mapped.is_unknown and why is not None
+
+    for spelling in (
+        "quenched_silicate_glass",
+        "quenched silicate glass; recalculated",
+    ):
+        assert spelling not in PHASE_MAP
+        mapped, why = map_phase(spelling)
+        assert mapped.is_unknown and why is not None
 
 
 def test_g01_map_phase_refuses_heuristics() -> None:
@@ -5864,6 +6140,7 @@ _CENSUS_QUANTITY_ALIASES = {
     "deltafG": "delta_fG",
     "delta_fG": "delta_fG",
     "delta_fG_kJ_mol": "delta_fG",
+    "log10_Ce4plus_over_Ce3plus": "valence_ratio",
     "log10_Kf": "log10_Kf",
     "log10_kf": "log10_Kf",
     "log10_K_star_equilibrium_fit": "log10_K_star",
@@ -5890,6 +6167,8 @@ _CENSUS_CLOSED_QUANTITIES = {
     "p_reference",
     "fugacity",
     "log10_Kf",
+    "delta_fH",
+    "valence_ratio",
     "log10_K_star",
     "activity",
     "activity_coefficient",
@@ -5989,6 +6268,56 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
 
     if q_token is None:
         return None
+    if q_token == "cp":
+        amount = _num(item.get("cp"))
+        if amount is None or str(units or "").strip().lower() != "cal/deg-mole":
+            return None
+        # Beyer RI 8410 Table 1 prints Cp in thermochemical calories per degree-mole.
+        return amount * as_decimal("4.184")
+    if q_token == "S":
+        amount = next(
+            (
+                parsed
+                for key in (
+                    "entropy",
+                    "entropy_recommended",
+                    "entropy_third_law",
+                    "entropy_spectrographic_or_molecular_constants",
+                    "entropy_other_sources",
+                    "value",
+                )
+                if (parsed := _num(item.get(key))) is not None
+            ),
+            None,
+        )
+        if amount is None:
+            return None
+        unit = (
+            "".join(str(units or "").lower().split())
+            .replace("·", "")
+            .replace(".", "")
+            .replace("deg-", "deg")
+            .replace("_", "")
+        )
+        if unit in {
+            "cal/mol/k",
+            "cal/molk",
+            "cal/degmole",
+            "calmol^-1k^-1",
+            "caldeg^-1gfw^-1",
+            "caldeg-1gfw-1",
+        }:
+            # Beyer RI 8410 Tables 2-4 print S in thermochemical calories per degree-mole.
+            return amount * as_decimal("4.184")
+        if unit in {
+            "j/mol/k",
+            "j/molk",
+            "j/degmole",
+            "jk^-1mol^-1",
+            "jmol^-1k^-1",
+        }:
+            return amount
+        return None
     if q_token == "activity_coefficient":
         if "gamma" in item:
             return _num(item.get("gamma"))
@@ -6085,14 +6414,40 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
                 return amount / as_decimal("1000")
             if unit in {"kj/mol", "kjmol-1", "kjmol^-1", "kj_per_mol"}:
                 return amount
+            if unit in {"kcal/mol", "kcal/mole"}:
+                converted = _convert_compilation_amount(
+                    amount, Quantity.H_MINUS_H298, units
+                )
+                return converted[0] if converted is not None else None
             return None
         return None
     if q_token == "delta_fG":
-        if "delta_fG" in item:
-            return _num(item.get("delta_fG"))
-        if "value" in item:
-            return _num(item.get("value"))
-        return None
+        amount = _num(item.get("delta_fG", item.get("value")))
+        if amount is None:
+            return None
+        if str(units or "").strip().lower() in {"kcal/mol", "kcal/mole"}:
+            converted = _convert_compilation_amount(amount, Quantity.DELTA_FG, units)
+            return converted[0] if converted is not None else None
+        return amount
+    if q_token == "delta_fH":
+        amount = _num(item.get("delta_fH", item.get("value")))
+        if amount is None:
+            return None
+        if str(units or "").strip().lower() in {"kcal/mol", "kcal/mole"}:
+            converted = _convert_compilation_amount(amount, Quantity.DELTA_FH, units)
+            return converted[0] if converted is not None else None
+        return amount
+    if q_token == "log10_Kf":
+        return _num(item.get("log10_Kf"))
+    if q_token == "fe3_fe2_ratio":
+        ratio = _num(item.get("Fe3_over_FeT"))
+        if ratio is None:
+            return None
+        if str(units or "").strip().lower() == "fraction (fe3+/sumfe)":
+            return fe3_fe2_ratio_from_ferric_fraction(ratio)
+        return ratio
+    if q_token == "valence_ratio":
+        return _num(item.get("value"))
     if q_token == "fugacity":
         return _num(item.get("fugacity_Pa")) if "fugacity_Pa" in item else None
     if q_token in {"p_sat", "p_partial"}:
@@ -6264,7 +6619,21 @@ def _series_census(
                             and str(observation.get("observation_id") or "")
                             not in used_stable_ids
                         ]
-                        if expected is not None:
+                        if expected is None:
+                            row_extra = series_row_extra(item, include_locator=False)
+                            if row_extra is not None:
+                                row_suffix = f":{row_extra}"
+                                stored_obs = next(
+                                    (
+                                        observation
+                                        for observation in stable_points
+                                        if str(observation.get("observation_id") or "").endswith(
+                                            row_suffix
+                                        )
+                                    ),
+                                    None,
+                                )
+                        else:
                             stored_obs = next(
                                 (
                                     observation
@@ -6278,8 +6647,6 @@ def _series_census(
                                 ),
                                 None,
                             )
-                        elif stable_points:
-                            stored_obs = stable_points[0]
                     if stored_obs is None:
                         mismatches.append(f"missing stored point {oid}")
                         continue
@@ -6424,7 +6791,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # cells: four components across eight evaporated samples. The count moved
     # because the data was added, not because a check was relaxed; mismatches
     # stays 0.
-    assert census.get("residue_component_composition") == 1314
+    # kems-010 adds 51 rows × 4 residue cells = 204; every cell matches.
+    assert census.get("residue_component_composition") == 1518
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
@@ -6443,23 +6811,25 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # belite 6); Sugawara & Akaogi adds six measured heat-content cells, including
     # the Table 1 series. Per-source deltas: Abdul 0->13, Sugawara 0->6.
     # The independent census checks all six source cells; mismatches stay 0.
-    assert census.get("H_minus_H298") == 19
+    # Beyer adds 117 printed kcal heat-content cells now checked after conversion.
+    assert census.get("H_minus_H298") == 136
     assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
     assert per_source.get("sugawara-akaogi-2004-liquid-calorimetry") == {
         "H_minus_H298": 6
     }
-    # Fresh regeneration restores 33 missing extract siblings. Three add numeric
-    # series cells: Gaillard (82 activity), Ivanova (32 residue oxides), and
-    # Tsuchiyama (18 areal mass-loss cells). Their 132 cells have zero mismatches;
-    # the merged numeric-series count moves 2071->2203 because the data became
-    # visible, not because a check was relaxed.
+    # Fresh regeneration restores 33 missing extract siblings (+132); this fix
+    # checks all 433 existing converted cells, moving 2681->3114 with no exceptions.
     # Sossi 2020 adds 22 isotope_delta rows under the field shared with the
-    # migrator's Quantity.ISOTOPE_DELTA source map.
+    # migrator's Quantity.ISOTOPE_DELTA source map. The census falls back to
+    # QUANTITY_SOURCE_FIELDS for quantities without a unit-conversion case.
+    # Measured on the b146r2 merge regen: isotope_delta 0->22 and n_numeric
+    # 3114->3136. mismatches stays 0; the count moved because those rows
+    # became visible, not because a check was relaxed.
     assert census.get("isotope_delta") == 22
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
-    assert n_numeric == 2225, (n_numeric, census, n_unavailable)
+    assert n_numeric == 3136, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
@@ -6717,6 +7087,57 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> N
         extracts, dest
     )
     assert mismatches, "census must go red when stored alpha points are corrupted"
+
+
+def test_j01_census_rejects_numeric_values_for_unavailable_rows(
+    tmp_path: Path,
+) -> None:
+    import shutil
+
+    source_id = "cottrell-2009-iron-xanes"
+    extracts = tmp_path / "extracts"
+    extracts_v2 = tmp_path / "extracts-v2"
+    extracts.mkdir()
+    extracts_v2.mkdir()
+    shutil.copy2(
+        REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml",
+        extracts / f"{source_id}.yaml",
+    )
+    store_path = REPO_ROOT / "data" / "literature" / "extracts-v2" / f"{source_id}.yaml"
+    mutated_path = extracts_v2 / f"{source_id}.yaml"
+    shutil.copy2(store_path, mutated_path)
+    store = yaml.safe_load(mutated_path.read_text(encoding="utf-8"))
+    mutated_ids = []
+    for observation in store.get("observations") or []:
+        oid = str(observation.get("observation_id") or "")
+        value = observation.get("value") or {}
+        if (
+            "::cottrell_2009_basalt_mossbauer::" in oid
+            and value.get("kind") == "unavailable"
+            and str(value.get("unavailable_reason") or "").startswith(
+                "printed Fe3+/sum Fe Fe3_over_FeT"
+            )
+        ):
+            observation["value"] = {
+                "kind": "point",
+                "point": "42",
+                "approximate": False,
+            }
+            mutated_ids.append(oid)
+    assert len(mutated_ids) == 3, mutated_ids
+    mutated_path.write_text(
+        yaml.safe_dump(store, sort_keys=False, allow_unicode=True), encoding="utf-8"
+    )
+
+    _census, mismatches, n_numeric, _n_unavailable, _per_source = _series_census(
+        extracts, extracts_v2
+    )
+    assert n_numeric == 38
+    assert sum(
+        "::cottrell_2009_basalt_mossbauer::" in mismatch
+        and "stored numeric 42" in mismatch
+        for mismatch in mismatches
+    ) == 3, mismatches
 
 
 def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = "psat_series") -> dict:
@@ -7636,6 +8057,8 @@ def test_l01_map_quantity_direct_witnesses() -> None:
     [
         ("pure_vapor_pressure", Quantity.P_SAT),
         ("partial_pressure_overlay_figure_only", Quantity.P_PARTIAL),
+        ("partial_pressure_BC_12065", Quantity.P_PARTIAL),
+        ("partial_pressure_intermediate_range_reliable", Quantity.P_PARTIAL),
         ("partial_pressure_O2", Quantity.P_PARTIAL),
         ("partial_pressure_CsBO2", Quantity.P_PARTIAL),
         ("partial_pressure_LiBO2", Quantity.P_PARTIAL),
@@ -7654,6 +8077,7 @@ def test_l01_map_quantity_direct_witnesses() -> None:
         ("henrian_activity_coefficient", Quantity.ACTIVITY_COEFFICIENT),
         ("evaporation_coefficient_gamma_Si", Quantity.EVAPORATION_COEFFICIENT_ALPHA),
         ("mass_loss", Quantity.MASS_LOSS_FRACTION),
+        ("assembly_mass_loss_relative_to_initial_mass", Quantity.MASS_LOSS_FRACTION),
         ("total_integrated_mass_loss", Quantity.MASS_LOSS_FRACTION),
         ("total_gas_evolution_mass_loss", Quantity.MASS_LOSS_FRACTION),
         ("isothermal_hold_mass_loss", Quantity.MASS_LOSS_FRACTION),
@@ -7717,6 +8141,33 @@ def test_l02_empirical_quantity_aliases_map_numeric_witnesses() -> None:
             {"quantity": "solidus", "T_K": 2050},
             "K",
             Quantity.TRANSITION_TEMPERATURE,
+        ),
+        (
+            "partial_pressure_intermediate_range_reliable",
+            {
+                "quantity": "partial_pressure_intermediate_range_reliable",
+                "points": [{"T_K": 2060, "p_Pa": 0.0005137178}],
+            },
+            "atm as published",
+            Quantity.P_PARTIAL,
+        ),
+        (
+            "partial_pressure_BC_12065",
+            {
+                "quantity": "partial_pressure_BC_12065",
+                "points": [{"T_K": 2320, "p_Pa": 0.0001}],
+            },
+            "atm as published",
+            Quantity.P_PARTIAL,
+        ),
+        (
+            "assembly_mass_loss_relative_to_initial_mass",
+            {
+                "quantity": "assembly_mass_loss_relative_to_initial_mass",
+                "runs": [{"Tmax_C": 2183, "mass_loss_wt_pct": 97.4}],
+            },
+            "wt_pct_mass_loss",
+            Quantity.MASS_LOSS_FRACTION,
         ),
         (
             "ion_count_rate",
@@ -9980,6 +10431,19 @@ def test_g1_formation_enthalpy_maps_to_delta_fh_quantity() -> None:
     assert sel.amount == as_decimal("-393.51")
     assert sel.value.kind is ValueKind.POINT
     assert sel.field_name == "delta_f_H_298_15"
+
+
+def test_thermochemical_calorie_to_kilojoule_conversion_is_independently_pinned(
+) -> None:
+    # 1000 thermochemical cal/mol = 4184 J/mol = 4.184 kJ/mol.
+    named = select_declared_source(
+        Quantity.DELTA_FH,
+        None,
+        {"delta_h": "1000", "units": {"delta_h": "cal/mol"}},
+    )
+    assert named.value.kind is ValueKind.POINT
+    assert named.amount == as_decimal("4.184")
+    assert named.unit_trail == "thermochemical_cal_to_kJ_exact"
 
 
 def test_g1_delta_fh_migrate_refuses_blank_units_and_admits_declared_point(
@@ -14770,6 +15234,8 @@ def test_shornikov_1994_printed_mullite_composition_reaches_every_point(
     )
     rows = [obs for obs in result.observations.values() if obs.source_id == source_id]
     assert len(rows) == 41
+    assert result.validation is not None
+    assert len(result.validation.hard_issues) == 0
     assert all("::T=" in obs.observation_id for obs in rows)
 
     named = {
@@ -14802,8 +15268,17 @@ def test_shornikov_1994_printed_mullite_composition_reaches_every_point(
             assert identity.species.phase.value is Phase.G
             assert identity.fO2_Pa.is_unknown
             assert identity.total_pressure_Pa.is_unknown
+        elif "_activity_" in obs.observation_id:
+            assert identity.quantity.value is Quantity.ACTIVITY
+            assert identity.species.phase.is_value
+            assert identity.species.phase.value is Phase.CR
+            if "shornikov_1994_al2o3_activity_1833k" in obs.observation_id:
+                assert obs.value.point == Decimal("1.05")
+            elif "shornikov_1994_sio2_activity_2033k" in obs.observation_id:
+                assert obs.value.point == Decimal("0.17")
 
     assert found_named == set(named)
+
 
 def test_ohara_1987_printed_compositions_reach_migrated_observations(
     tmp_path: Path,

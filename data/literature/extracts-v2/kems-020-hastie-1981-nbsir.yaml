@@ -13958,6 +13958,92 @@ observations:
         pdf_page_index: 48
         table: '3'
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1642467099008939029808868101'
+          - - CaO
+            - '0.1281402488755988200303977262'
+          - - SiO2
+            - '0.7076130412235072769887154639'
+          amount_basis: mole_fraction
+      locator:
+        page: 43
+        published_page: 43
+        pdf_page_index: 48
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '17'
+            locator:
+              page: 43
+              published_page: 43
+              pdf_page_index: 48
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 43
+              published_page: 43
+              pdf_page_index: 48
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '12'
+            locator:
+              page: 43
+              published_page: 43
+              pdf_page_index: 48
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 43
+              published_page: 43
+              pdf_page_index: 48
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '71'
+            locator:
+              page: 43
+              published_page: 43
+              pdf_page_index: 48
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 43
+              published_page: 43
+              pdf_page_index: 48
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        output_unit: mole_fraction
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=0f36488eae22
   experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
   identity:

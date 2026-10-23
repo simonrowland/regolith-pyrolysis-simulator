@@ -1,0 +1,115 @@
+schema_version = 1
+
+# Git commits came from the studio clone identities where available. AlphaMELTS
+# release checksums are the upstream archive hashes already used by the installer.
+
+[engines.alphamelts]
+name = "alphaMELTS"
+source_kind = "artifact"
+directory = "alphaMELTS"
+version = "2.3.1"
+
+[engines.alphamelts.platform_assets.Darwin-arm64]
+url = "https://github.com/magmasource/alphaMELTS/releases/download/v2.3.1/alphamelts-app-2.3.1-macos-arm64.zip"
+sha256 = "f233ff5180df4e8318af922183beb85c20c33c28d3cb1be1254916f856327136"
+archive_filename = "alphamelts-app-2.3.1-macos-arm64.zip"
+artifacts = [
+    "alphamelts-app-2.3.1-macos-arm64.zip",
+    "alphamelts-app-2.3.1-macos-arm64/alphamelts_macos",
+]
+runtime_artifact = "alphamelts-app-2.3.1-macos-arm64/alphamelts_macos"
+reference_sha256 = "d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85"
+reference_sha256_source = "alphamelts-app-2.3.1-macos-arm64/alphamelts_macos"
+
+[engines.alphamelts.platform_assets.Darwin-x86_64]
+url = "https://github.com/magmasource/alphaMELTS/releases/download/v2.3.1/alphamelts-app-2.3.1-macos-x86_64.zip"
+sha256 = "68017f2bb67547524bb6bbe940304c5ddf72a1e98cc0092b072b7e267b4a0f0c"
+archive_filename = "alphamelts-app-2.3.1-macos-x86_64.zip"
+artifacts = [
+    "alphamelts-app-2.3.1-macos-x86_64.zip",
+    "alphamelts-app-2.3.1-macos-x86_64/alphamelts_macos",
+]
+runtime_artifact = "alphamelts-app-2.3.1-macos-x86_64/alphamelts_macos"
+
+[engines.alphamelts.platform_assets.Linux-x86_64]
+url = "https://github.com/magmasource/alphaMELTS/releases/download/v2.3.1/alphamelts-app-2.3.1-linux.zip"
+sha256 = "d8c26879a6c84807d976181d5132ab0107d90598f20ad9798eac4822403effbb"
+archive_filename = "alphamelts-app-2.3.1-linux.zip"
+artifacts = [
+    "alphamelts-app-2.3.1-linux.zip",
+    "alphamelts-app-2.3.1-linux/alphamelts_linux",
+]
+runtime_artifact = "alphamelts-app-2.3.1-linux/alphamelts_linux"
+
+[engines.alphamelts.platform_assets.Windows-AMD64]
+url = "https://github.com/magmasource/alphaMELTS/releases/download/v2.3.1/alphamelts-app-2.3.1-win64.zip"
+sha256 = "a7df461a261ded5347abbd95dd55cbbc489ae9fa7697903a31db8c13e5a5d6c6"
+archive_filename = "alphamelts-app-2.3.1-win64.zip"
+artifacts = [
+    "alphamelts-app-2.3.1-win64.zip",
+    "alphamelts-app-2.3.1-win64/alphamelts_win64.exe",
+]
+runtime_artifact = "alphamelts-app-2.3.1-win64/alphamelts_win64.exe"
+
+[engines.magemin]
+name = "MAGEMin"
+source_kind = "git"
+url = "https://github.com/ComputationalThermodynamics/MAGEMin.git"
+commit = "40ed109d07d4246001cab59382596d33fed79086"
+directory = "MAGEMin"
+build_commands = [["make", "clean"], ["make", "all"], ["make", "lib"]]
+artifacts = ["MAGEMin", "libMAGEMin.dylib"]
+runtime_artifact = "MAGEMin"
+identity_extra = { db = "ig" }
+reference_sha256 = "7c96be571e4ea8cfc8e0ec0293a34d4be2d18f7c0d048700c0ec7b846764c4e9"
+reference_sha256_source = "MAGEMin"
+
+[engines.petthermotools]
+name = "PetThermoTools"
+source_kind = "git"
+url = "https://github.com/gleesonm1/PetThermoTools.git"
+commit = "74a41ff5685d9c8280b90667bfa43efe97fca87c"
+directory = "PetThermoTools"
+editable_subdir = "."
+
+[engines.pysulfsat]
+name = "PySulfSat"
+source_kind = "git"
+url = "https://github.com/PennyWieser/PySulfSat.git"
+commit = "ed7c4a03e2e03b327e962d83f7f07ebf418c7bb7"
+directory = "PySulfSat"
+editable_subdir = "."
+
+[engines.thermobar]
+name = "Thermobar"
+source_kind = "git"
+url = "https://github.com/PennyWieser/Thermobar.git"
+commit = "90ea2cd71eb41ea7d507263787a2b232446bc822"
+directory = "Thermobar"
+editable_subdir = "."
+
+[engines.thermoengine]
+name = "ThermoEngine"
+source_kind = "git"
+url = "https://gitlab.com/ENKI-portal/ThermoEngine.git"
+commit = "df7a5f4609116a83bf40a5a352a19e3826a822d9"
+directory = "ThermoEngine"
+build_commands = [["make", "clean"], ["make", "all"]]
+build_env = { CPATH = "/opt/homebrew/include", LIBRARY_PATH = "/opt/homebrew/lib" }
+patches = ["python312-hashability"]
+artifacts = [
+    "lib/libphaseobjc.dylib",
+    "lib/libswimdew.dylib",
+    "lib/libspeciation.dylib",
+]
+runtime_directory = "lib"
+reference_sha256 = "e7f3f959424820e0ebe712b95b5d66b7a4e23a29b9869dd1e2a484affe409f74"
+reference_sha256_source = "combined"
+
+[engines.vaporock]
+name = "VapoRock"
+source_kind = "git"
+url = "https://gitlab.com/ENKI-portal/vaporock.git"
+commit = "0159678a8eefb51dfe3f12bb646dc38507a07230"
+directory = "VapoRock"
+editable_subdir = "src"

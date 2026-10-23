@@ -131,6 +131,7 @@ def test_kernel_ok_empty_note_on_diagnostic_surface() -> None:
         _allow_fallback_vapor=False,
         _last_vapor_pressure_diagnostic={},
         _silent_zero_notes=[],
+        atom_ledger=SimpleNamespace(project_account_mol=lambda account: {}),
         _dispatch_only=_dispatch,
         _record_degraded_path_engagement=lambda *a, **k: None,
         _vapor_pressure_dispatch_pO2_bar=lambda: 1e-12,
