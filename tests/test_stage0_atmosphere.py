@@ -1,7 +1,8 @@
 from copy import deepcopy
 import json
 from pathlib import Path
-from types import ModuleType
+import threading
+from types import ModuleType, SimpleNamespace
 
 import pytest
 import yaml
@@ -13,6 +14,7 @@ from simulator.core import (
 )
 from simulator.campaigns import c0_exit_run_notice
 from simulator.accounting.ledger import snapshot_atom_ledger
+from simulator.chemistry.kernel import ChemistryIntent
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.reduced_real_determinism import PT0DeterminismStore
 from simulator.runner import build_per_hour_summary
@@ -262,6 +264,67 @@ def test_c0_forecast_context_does_not_retain_loaded_sulfsat_module():
         name: getattr(sulfur_module, name)
         for name in _PYSULFSAT_MUTABLE_EXPORTS
     } == mutable_exports_before
+
+
+def test_c0_forecast_rebuilds_registry_around_live_engine_pool_locks():
+    feedstocks = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "feedstocks.yaml").read_text()
+    )
+    sim = _sim(feedstocks)
+    sim.load_batch("lunar_mare_low_ti", 1000.0)
+    sim._register_freeze_gate_liquid_fraction_providers()
+
+    fallback = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    vaporock_shadow = sim._chem_registry.shadows_for(
+        ChemistryIntent.VAPOR_PRESSURE
+    )[0]
+    subprocess_pool = SimpleNamespace(
+        _active_requests_lock=threading.Lock(),
+        _lifecycle_lock=threading.Lock(),
+        _queue=SimpleNamespace(mutex=threading.Lock()),
+    )
+    warm_pool = SimpleNamespace(
+        _active_requests_lock=threading.Lock(),
+        _lifecycle_lock=threading.Lock(),
+    )
+    fallback._backend = SimpleNamespace(_subprocess_pool=subprocess_pool)
+    fallback._backend_initialised = True
+    vaporock_shadow._backend = SimpleNamespace(_warm_pool=warm_pool)
+    vaporock_shadow._backend_initialised = True
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    assert context._chem_registry is not sim._chem_registry
+    assert context._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ) is not fallback
+    assert context._chem_registry.shadows_for(
+        ChemistryIntent.VAPOR_PRESSURE
+    )[0] is not vaporock_shadow
+    assert fallback._backend._subprocess_pool is subprocess_pool
+    assert vaporock_shadow._backend._warm_pool is warm_pool
+
+
+def test_c0_forecast_context_refusal_reports_snapshot_exception_detail():
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    sim._forecast_uncopyable_state = threading.Lock()
+
+    prediction = sim._predict_c0_exit()
+
+    assert prediction["prediction_status"] == "unavailable_forecast_context"
+    assert prediction["forecast_context_refusal_detail"]["exception_class"] == (
+        "TypeError"
+    )
+    assert "cannot pickle" in prediction["forecast_context_refusal_detail"][
+        "exception_message"
+    ]
 
 
 def test_c0_forecast_refuses_post_equilibrium_sulfsat_path():
