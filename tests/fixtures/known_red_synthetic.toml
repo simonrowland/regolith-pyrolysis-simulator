@@ -1,0 +1,20 @@
+[[test]]
+node = "test_quarantine.py::test_known_red_failure"
+ticket = "b-10000"
+tier = "pr"
+reason = "synthetic expected failure"
+since = "7dd268c6f"
+
+[[test]]
+node = "test_quarantine.py::test_known_red_pass"
+ticket = "b-10001"
+tier = "pr"
+reason = "synthetic strict xpass"
+since = "7dd268c6f"
+
+[[test]]
+node = "test_quarantine.py::test_removed"
+ticket = "b-10002"
+tier = "nightly"
+reason = "synthetic stale roster entry"
+since = "7dd268c6f"
