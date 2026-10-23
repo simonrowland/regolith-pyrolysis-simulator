@@ -99,31 +99,24 @@ species:
         points:
         - T_K: 1396.0
           p_atm: 5.54e-09
-          p_Pa: 0.0005613405
           sample: '12022'
         - T_K: 1475.0
           p_atm: 4.96e-08
-          p_Pa: 0.00502572
           sample: '12022'
         - T_K: 1433.0
           p_atm: 3.78e-09
-          p_Pa: 0.0003830085
           sample: '12065'
         - T_K: 1482.0
           p_atm: 1.22e-08
-          p_Pa: 0.001236165
           sample: '12065'
         - T_K: 1499.0
           p_atm: 2.11e-08
-          p_Pa: 0.0021379575
           sample: '12065'
         - T_K: 1471.0
           p_atm: 1.27e-08
-          p_Pa: 0.0012868274999999999
           sample: '12065'
         - T_K: 1459.0
           p_atm: 8.78e-09
-          p_Pa: 0.0008896335
           sample: '12065'
         co_measured_context: same alkali T window as Na/K figure series (Figs 1–2); tabulated co-species
           O2 only
@@ -250,21 +243,19 @@ species:
       values:
         gas_species: Mn(g)
         quantity: partial_pressure_initial_points
+        method_class: measured_reduced
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         activity_order: 1e-5 to 1e-6 (authors)
         points:
         - T_K: 1583.0
           p_atm: 7.66e-09
-          p_Pa: 0.0007761495
           sample: '12022'
         - T_K: 1609.0
           p_atm: 1.32e-08
-          p_Pa: 0.00133749
           sample: '12022'
         - T_K: 1725.0
           p_atm: 8.47e-08
-          p_Pa: 0.0085822275
           sample: '12022'
         co_measured_with:
         - demaria_1971_cr_psat_table2_sample_12022
@@ -311,17 +302,16 @@ species:
       values:
         gas_species: Cr(g)
         quantity: partial_pressure_initial_points
+        method_class: measured_reduced
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         activity_order: 1e-5 to 1e-6 (authors)
         points:
         - T_K: 1725.0
           p_atm: 1.03e-08
-          p_Pa: 0.0010436475
           sample: '12022'
         - T_K: 1794.0
           p_atm: 6.2e-08
-          p_Pa: 0.00628215
           sample: '12022'
         co_measured_with:
         - demaria_1971_mn_psat_table2_sample_12022
@@ -367,48 +357,41 @@ species:
       values:
         gas_species: Mg(g)
         quantity: partial_pressure_initial_points
+        method_class: measured_reduced
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         activity_note: low activity; same order as pure-oxide decomposition pressures (Altman 1963)
         points:
         - T_K: 1650.0
           p_atm: 1.6e-08
-          p_Pa: 0.0016212000000000002
           instrument: BC
           sample: '12022'
         - T_K: 1694.0
           p_atm: 5.7e-08
-          p_Pa: 0.005775525
           instrument: NAA
           sample: '12022'
         - T_K: 1815.0
           p_atm: 3.96e-06
-          p_Pa: 0.401247
           instrument: NAA
           sample: '12022'
         - T_K: 1747.0
           p_atm: 1.65e-09
-          p_Pa: 0.0001671862
           instrument: NAA
           sample: '12065'
         - T_K: 1854.0
           p_atm: 9.4e-09
-          p_Pa: 0.000952455
           instrument: NAA
           sample: '12065'
         - T_K: 1776.0
           p_atm: 2.4e-09
-          p_Pa: 0.00024318
           instrument: NAA
           sample: '12065'
         - T_K: 1857.0
           p_atm: 8.85e-08
-          p_Pa: 0.0089672625
           instrument: NAA
           sample: '12065'
         - T_K: 1927.0
           p_atm: 3.2e-08
-          p_Pa: 0.0032424000000000003
           instrument: NAA
           sample: '12065'
         caveat: 'Authors: Mg activity decreased after initial observation — attribution of reported data
@@ -1252,6 +1235,7 @@ species:
       values:
         gas_species: Al2O(g)
         quantity: partial_pressure_intermediate_range_reliable
+        method_class: measured_reduced
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         reliability_note: Only intermediate-range data included by authors; initial (other species still
@@ -1259,72 +1243,58 @@ species:
         points:
         - T_K: 2060.0
           p_atm: 5.07e-09
-          p_Pa: 0.0005137178
           instrument: NAA
           sample: '12022'
         - T_K: 2104.0
           p_atm: 1.13e-08
-          p_Pa: 0.0011449725000000001
           instrument: NAA
           sample: '12022'
         - T_K: 2125.0
           p_atm: 1.57e-08
-          p_Pa: 0.0015908025000000003
           instrument: NAA
           sample: '12022'
         - T_K: 2146.0
           p_atm: 2.24e-08
-          p_Pa: 0.00226968
           instrument: NAA
           sample: '12022'
         - T_K: 2180.0
           p_atm: 3.65e-08
-          p_Pa: 0.0036983625000000003
           instrument: NAA
           sample: '12022'
         - T_K: 2183.0
           p_atm: 3.82e-08
-          p_Pa: 0.003870615
           instrument: NAA
           sample: '12022'
         - T_K: 2194.0
           p_atm: 4.01e-08
-          p_Pa: 0.0040631325
           instrument: NAA
           sample: '12022'
         - T_K: 2290.0
           p_atm: 1.55e-07
-          p_Pa: 0.015705375
           instrument: NAA
           sample: '12022'
         - T_K: 2270.0
           p_atm: 1.04e-07
-          p_Pa: 0.0105378
           instrument: NAA
           sample: '12022'
         - T_K: 2360.0
           p_atm: 6.9e-07
-          p_Pa: 0.06991425
           instrument: BC
           sample: '12065'
         - T_K: 2395.0
           p_atm: 9.88e-07
-          p_Pa: 0.10010909999999999
           instrument: BC
           sample: '12065'
         - T_K: 2425.0
           p_atm: 1.9e-06
-          p_Pa: 0.1925175
           instrument: BC
           sample: '12065'
         - T_K: 2465.0
           p_atm: 3.39e-06
-          p_Pa: 0.34349175000000004
           instrument: BC
           sample: '12065'
         - T_K: 2500.0
           p_atm: 4.73e-06
-          p_Pa: 0.47926725
           instrument: BC
           sample: '12065'
         co_measured_with:
@@ -1422,38 +1392,33 @@ species:
       values:
         gas_species: AlO(g)
         quantity: partial_pressure_BC_12065
+        method_class: measured_reduced
         material: Apollo_12_12065
         condensed_phase: lunar_basalt_melt
         reliability_note: AlO NAA points mostly final-range — excluded by authors from tables
         points:
         - T_K: 2320.0
           p_atm: 1.05e-06
-          p_Pa: 0.10639124999999999
           instrument: BC
           sample: '12065'
         - T_K: 2360.0
           p_atm: 1.3e-06
-          p_Pa: 0.1317225
           instrument: BC
           sample: '12065'
         - T_K: 2395.0
           p_atm: 2.22e-06
-          p_Pa: 0.2249415
           instrument: BC
           sample: '12065'
         - T_K: 2425.0
           p_atm: 3.79e-06
-          p_Pa: 0.38402175
           instrument: BC
           sample: '12065'
         - T_K: 2465.0
           p_atm: 6.84e-06
-          p_Pa: 0.693063
           instrument: BC
           sample: '12065'
         - T_K: 2500.0
           p_atm: 8.96e-06
-          p_Pa: 0.907872
           instrument: BC
           sample: '12065'
         co_measured_with:
@@ -1694,67 +1659,54 @@ species:
         points:
         - T_K: 2015.0
           p_atm: 9.2e-08
-          p_Pa: 0.009321900000000001
           instrument: NAA
           sample: '12022'
         - T_K: 2060.0
           p_atm: 2.2e-07
-          p_Pa: 0.022291500000000002
           instrument: NAA
           sample: '12022'
         - T_K: 2104.0
           p_atm: 3.2e-07
-          p_Pa: 0.032424
           instrument: NAA
           sample: '12022'
         - T_K: 2146.0
           p_atm: 6.5e-07
-          p_Pa: 0.06586125
           instrument: NAA
           sample: '12022'
         - T_K: 2162.0
           p_atm: 9.0e-07
-          p_Pa: 0.0911925
           instrument: NAA
           sample: '12022'
         - T_K: 2194.0
           p_atm: 8.54e-07
-          p_Pa: 0.08653155
           instrument: NAA
           sample: '12022'
         - T_K: 2270.0
           p_atm: 2.0e-06
-          p_Pa: 0.20265
           instrument: NAA
           sample: '12022'
         - T_K: 2320.0
           p_atm: 1.63e-06
-          p_Pa: 0.16515975
           instrument: BC
           sample: '12065'
         - T_K: 2360.0
           p_atm: 2.91e-06
-          p_Pa: 0.29485575
           instrument: BC
           sample: '12065'
         - T_K: 2395.0
           p_atm: 3.8e-06
-          p_Pa: 0.385035
           instrument: BC
           sample: '12065'
         - T_K: 2425.0
           p_atm: 7.4e-06
-          p_Pa: 0.749805
           instrument: BC
           sample: '12065'
         - T_K: 2465.0
           p_atm: 1.13e-05
-          p_Pa: 1.1449725
           instrument: BC
           sample: '12065'
         - T_K: 2500.0
           p_atm: 1.42e-05
-          p_Pa: 1.438815
           instrument: BC
           sample: '12065'
         co_measured_with:
@@ -1954,7 +1906,6 @@ species:
           T_K: 1429.0
           invT_times_1e4_K_inv: 6.9979
           log10_p_atm: -6.106
-          p_Pa: 0.0793
           note: Fitted-line evaluation at investigation T (July Na report); consistent with upper-line
             visual digitization. Held-out only.
         points:
@@ -1962,7 +1913,6 @@ species:
           invT_times_1e4_K_inv: 6.946
           log10_p_atm: -6.039
           p_atm: 9.1411324e-07
-          p_Pa: 0.092622524
           marker_id: C1
           shape: circle
           fill: open
@@ -1978,7 +1928,6 @@ species:
           invT_times_1e4_K_inv: 7.037
           log10_p_atm: -6.145
           p_atm: 7.1614341e-07
-          p_Pa: 0.072563231
           marker_id: C2
           shape: circle
           fill: open
@@ -1994,7 +1943,6 @@ species:
           invT_times_1e4_K_inv: 7.262
           log10_p_atm: -6.716
           p_atm: 1.9230917e-07
-          p_Pa: 0.019485727
           marker_id: C3
           shape: circle
           fill: full
@@ -2010,7 +1958,6 @@ species:
           invT_times_1e4_K_inv: 7.362
           log10_p_atm: -7.148
           p_atm: 7.1121351e-08
-          p_Pa: 0.0072063709
           marker_id: C4
           shape: circle
           fill: open
@@ -2026,7 +1973,6 @@ species:
           invT_times_1e4_K_inv: 7.491
           log10_p_atm: -7.460
           p_atm: 3.4673685e-08
-          p_Pa: 0.0035133111
           marker_id: C5
           shape: circle
           fill: full
@@ -2042,7 +1988,6 @@ species:
           invT_times_1e4_K_inv: 7.708
           log10_p_atm: -8.037
           p_atm: 9.1833260e-09
-          p_Pa: 0.00093050050
           marker_id: C6
           shape: circle
           fill: open
@@ -2207,7 +2152,6 @@ species:
           T_K: 1429.0
           invT_times_1e4_K_inv: 6.9979
           log10_p_atm: -7.743
-          p_Pa: 0.00183
           note: Fitted-line evaluation at investigation T (July Na report); consistent with lower-line
             visual digitization. Held-out only.
         points:
@@ -2215,7 +2159,6 @@ species:
           invT_times_1e4_K_inv: 6.567
           log10_p_atm: -6.463
           p_atm: 3.4434993e-07
-          p_Pa: 0.034891257
           marker_id: S1
           shape: square
           fill: open
@@ -2231,7 +2174,6 @@ species:
           invT_times_1e4_K_inv: 6.679
           log10_p_atm: -6.739
           p_atm: 1.8238957e-07
-          p_Pa: 0.018480623
           marker_id: S2
           shape: square
           fill: open
@@ -2247,7 +2189,6 @@ species:
           invT_times_1e4_K_inv: 6.766
           log10_p_atm: -6.945
           p_atm: 1.1350108e-07
-          p_Pa: 0.011500497
           marker_id: S3
           shape: square
           fill: open
@@ -2263,7 +2204,6 @@ species:
           invT_times_1e4_K_inv: 6.725
           log10_p_atm: -7.117
           p_atm: 7.6383578e-08
-          p_Pa: 0.0077395661
           marker_id: S4
           shape: square
           fill: full
@@ -2279,7 +2219,6 @@ species:
           invT_times_1e4_K_inv: 6.826
           log10_p_atm: -7.170
           p_atm: 6.7608298e-08
-          p_Pa: 0.0068504107
           marker_id: S5
           shape: square
           fill: open
@@ -2295,7 +2234,6 @@ species:
           invT_times_1e4_K_inv: 6.872
           log10_p_atm: -7.186
           p_atm: 6.5162839e-08
-          p_Pa: 0.0066026247
           marker_id: S6
           shape: square
           fill: open
@@ -2311,7 +2249,6 @@ species:
           invT_times_1e4_K_inv: 6.793
           log10_p_atm: -7.248
           p_atm: 5.6493697e-08
-          p_Pa: 0.0057242239
           marker_id: S7
           shape: square
           fill: full
@@ -2327,7 +2264,6 @@ species:
           invT_times_1e4_K_inv: 6.829
           log10_p_atm: -7.313
           p_atm: 4.8640721e-08
-          p_Pa: 0.004928521
           marker_id: S8
           shape: square
           fill: full
@@ -2343,7 +2279,6 @@ species:
           invT_times_1e4_K_inv: 6.889
           log10_p_atm: -7.409
           p_atm: 3.8994199e-08
-          p_Pa: 0.0039510872
           marker_id: S9
           shape: square
           fill: full
@@ -2359,7 +2294,6 @@ species:
           invT_times_1e4_K_inv: 6.933
           log10_p_atm: -7.467
           p_atm: 3.4119291e-08
-          p_Pa: 0.0034571372
           marker_id: S10
           shape: square
           fill: open
@@ -2375,7 +2309,6 @@ species:
           invT_times_1e4_K_inv: 7.101
           log10_p_atm: -8.025
           p_atm: 9.4406088e-09
-          p_Pa: 0.00095656968
           marker_id: S12
           shape: square
           fill: full
@@ -2391,7 +2324,6 @@ species:
           invT_times_1e4_K_inv: 7.147
           log10_p_atm: -8.136
           p_atm: 7.3113908e-09
-          p_Pa: 0.00074082668
           marker_id: S13
           shape: square
           fill: full
@@ -2407,7 +2339,6 @@ species:
           invT_times_1e4_K_inv: 7.329
           log10_p_atm: -8.706
           p_atm: 1.9678863e-09
-          p_Pa: 0.00019939608
           marker_id: S14
           shape: square
           fill: full
@@ -2423,7 +2354,6 @@ species:
           invT_times_1e4_K_inv: 7.529
           log10_p_atm: -9.413
           p_atm: 3.8636698e-10
-          p_Pa: 3.9148634e-05
           marker_id: S15
           shape: square
           fill: full
