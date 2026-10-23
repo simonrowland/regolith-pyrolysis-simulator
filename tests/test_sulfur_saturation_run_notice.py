@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from types import SimpleNamespace
 
+from simulator.core import PyrolysisSimulator
 from simulator.optimize.evaluate import _run_reference
 from simulator.optimize.objective import compute_objectives
 from simulator.optimize.profiles import load_profile
@@ -51,7 +52,21 @@ def _summary_numbers(summary: object) -> object:
     return json.loads(json.dumps(payload, default=str))
 
 
-def test_in_range_sulfsat_leaves_run_notice_absent() -> None:
+def test_in_range_sulfsat_leaves_run_notice_absent(monkeypatch) -> None:
+    sulfur_before_campaign_start: list[object] = []
+    original_start_campaign = PyrolysisSimulator.start_campaign
+
+    def capture_stage0_sulfur_before_c0_forecast(sim, campaign):
+        sulfur_before_campaign_start.append(
+            getattr(sim, "_last_sulfur_saturation_result", None)
+        )
+        return original_start_campaign(sim, campaign)
+
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "start_campaign",
+        capture_stage0_sulfur_before_c0_forecast,
+    )
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
@@ -64,7 +79,9 @@ def test_in_range_sulfsat_leaves_run_notice_absent() -> None:
     # Starting C0 performs a forecast, not a physical step. Forecast-only
     # equilibrium and evaporation diagnostics must not become run evidence.
     assert sim.sulfur_saturation_run_notice() is None
-    assert getattr(sim, "_last_sulfur_saturation_result", None) is None
+    assert sulfur_before_campaign_start
+    assert sulfur_before_campaign_start[0] is not None
+    assert sim._last_sulfur_saturation_result is sulfur_before_campaign_start[0]
     assert sim._last_vapour_batch_report is None
     assert sim._last_vapour_batch_flux_overlay == {}
     assert sim.condensation_model.last_sticking_alpha_provenance_notice == {}
