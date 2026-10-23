@@ -128,6 +128,18 @@ def test_exact_declared_move_passes(declared_move):
     _check(*declared_move)
 
 
+def test_single_offer_contract_pin_before_cli_extension():
+    old, new = {"value": -0.0}, {"value": 0.0}
+    manifest, rows = _declaration(old, new)
+    assert rows == [{"artifact": "runner/example", "section": "envelope.json",
+                     "path": "/value", "old": {"kind": "f64", "hex": "-0x0.0p+0"},
+                     "new": {"kind": "f64", "hex": "0x0.0p+0"}, "cause": "measured"}]
+    _check(old, new, manifest, rows)
+    rows[0]["old"]["hex"] = "0x1.0000000000000p+0"
+    with pytest.raises(ValueError, match="^wrong old value$"):
+        _check(old, new, manifest, rows)
+
+
 @pytest.mark.parametrize("mutation", [
     "undeclared-leaf", "missing-declared", "wrong-old", "reordered-list",
     "type-change", "added-key", "removed-key",
