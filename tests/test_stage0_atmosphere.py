@@ -1,6 +1,7 @@
 from copy import deepcopy
 import json
 from pathlib import Path
+from types import ModuleType
 
 import pytest
 import yaml
@@ -124,6 +125,7 @@ def test_c0_forecast_and_supplied_decision_have_identical_realized_trajectory():
     forecasted, forecast_phase_context, forecast_payloads = _short_c0_trajectory(
         feedstocks
     )
+    assert forecasted.campaign_mgr.c0_exit_prediction["prediction_status"] == "ok"
     decision = deepcopy(forecasted.campaign_mgr.c0_exit_prediction)
     supplied, supplied_phase_context, supplied_payloads = _short_c0_trajectory(
         feedstocks,
@@ -155,6 +157,23 @@ def test_c0_forecast_and_supplied_decision_have_identical_realized_trajectory():
     assert _canonical_bytes(forecast_payloads) == _canonical_bytes(
         supplied_payloads
     )
+
+
+def test_c0_forecast_context_keeps_loaded_sulfsat_module_shared():
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    sulfur_module = ModuleType("forecast_test_sulfsat")
+    sim._sulfsat_gate._module = sulfur_module
+    sim._sulfsat_gate._available = True
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    assert context._sulfsat_gate is not sim._sulfsat_gate
+    assert context._sulfsat_gate._module is sulfur_module
 
 
 def test_c0_cached_replay_forecast_preserves_live_sulfur_and_authority_state():
