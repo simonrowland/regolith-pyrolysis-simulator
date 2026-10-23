@@ -2493,23 +2493,6 @@ def fusion_comparison_reference(
     if _source_polymorph_is_rejected(standard_state.endmember.polymorph):
         return reference
 
-    # A source that records the solid but not its polymorph is a missing
-    # comparison input for every engine; do not let an engine-specific
-    # reference contract replace that reason with a generic mismatch.
-    if (
-        observed_reference_phase is Phase.CR
-        and standard_state.endmember.polymorph is not None
-        and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
-    ):
-        notice = Notice(
-            kind=NoticeKind.INPUT_OMITTED,
-            affected_quantities=(Quantity.ACTIVITY,),
-            reason="fusion_source_reference_phase_unprinted",
-            origin=reference.observation_id,
-            band="JANAF fusion conversion requires the source-named solid polymorph",
-        )
-        return replace(reference, notices=union_notices(reference.notices, (notice,)))
-
     if engine is not None:
         from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
 
@@ -2546,6 +2529,22 @@ def fusion_comparison_reference(
             ),
             origin=reference.observation_id,
             band="JANAF fusion conversion requires temperature_K",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+    # A source that records the solid but not its polymorph is a missing
+    # comparison input for every supported melt-activity engine.
+    if (
+        observed_reference_phase is Phase.CR
+        and standard_state.endmember.polymorph is not None
+        and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
+    ):
+        notice = Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason="fusion_source_reference_phase_unprinted",
+            origin=reference.observation_id,
+            band="JANAF fusion conversion requires the source-named solid polymorph",
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
@@ -9780,7 +9779,7 @@ def compile_residual(
         ),
         None,
     )
-    if unprinted_reference_phase is not None:
+    if unprinted_reference_phase is not None and prediction is None:
         if (
             engine is Engine.INTERNAL_ANALYTICAL
             and experiment is not None
