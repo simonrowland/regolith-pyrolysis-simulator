@@ -389,7 +389,8 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         + float(offgas_kg.get("CrO2", 0.0) or 0.0) * (_CR_MW / _CRO2_MW)
         + float(offgas_kg.get("CrO3", 0.0) or 0.0) * (_CR_MW / _CRO3_MW)
     )
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.429852312059024, rel=1e-9)
+    # Cr conserved; the residual moved via run trajectory/end hour (257 -> 188 h across the t-470..d-019 refusal window), not Cr accounting.
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3280281761957307, rel=1e-9)
     assert cr_ingot_kg == pytest.approx(0.06, abs=0.005)
     # Offgas kg has ~1e-9 relative run-to-run noise on a full multi-hour path;
     # pin at 1e-6 rel (same class as unit-activity pressure pins).
