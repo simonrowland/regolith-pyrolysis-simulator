@@ -12,16 +12,16 @@ nightly-tier). At the train gate, run it after the batch regen: it proves two
 cheaper facts, that no unacknowledged input changed after the store and no
 extract silently lacks a store trace. Under d-255, offers carry extracts and
 code without regenerated store outputs, so an offer with migrate-input changes
-is expected to report STALE before the train gate. The train regenerates once
-per batch and records fixed-point store-neutral inputs under
-scripts/store_neutral_acks/.
+is expected to report STALE before the train gate. Offer authors can use
+--pre-gate to label that result; the train regenerates once per batch and
+records fixed-point store-neutral inputs under scripts/store_neutral_acks/.
 
 Exit 0: store is at least as new as every migrate input, and every extract
 has an extracts-v2 sibling or a migration-queue entry.
 Exit 1: input commits landed after the last store touch, or an extract has
 no store trace at all (store suspect).
 
-Usage: scripts/check_store_freshness.py [--head REF]
+Usage: scripts/check_store_freshness.py [--head REF] [--pre-gate]
 """
 
 from __future__ import annotations
@@ -224,26 +224,6 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
 })
 
 
-def store_neutral_input_commits(head: str) -> frozenset[str]:
-    """Return historical receipts plus train ack filenames present at ``head``.
-
-    d-255 records new fixed-point acknowledgements as
-    ``scripts/store_neutral_acks/<sha>.txt``. Their filenames identify the
-    migrate-input commits; the files themselves cite the gate regen evidence.
-    """
-    paths = _git(
-        "ls-tree", "-r", "--name-only", head, "--", "scripts/store_neutral_acks"
-    ).splitlines()
-    recorded = {
-        Path(path).stem[:9]
-        for path in paths
-        if path.startswith("scripts/store_neutral_acks/")
-        and Path(path).suffix == ".txt"
-        and len(Path(path).stem) >= 9
-    }
-    return STORE_NEUTRAL_INPUT_COMMITS | recorded
-
-
 def _git(*args: str) -> str:
     return subprocess.run(
         ["git", *args], cwd=ROOT, capture_output=True, text=True, check=True
@@ -308,8 +288,7 @@ def _untraced_extracts(head: str) -> list[str]:
 
 def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
     """Migrate-input commits after the last store-output commit, keyed
-    "<sha9> <subject>", minus recorded store-neutral receipts."""
-    neutral_commits = store_neutral_input_commits(head)
+    "<sha9> <subject>", minus the acknowledged STORE_NEUTRAL_INPUT_COMMITS."""
     stale: dict[str, list[str]] = {}
     log = _git(
         "log", "--format=%H%x00%s", "--name-only", f"{last_store}..{head}", "--",
@@ -323,7 +302,7 @@ def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
         elif (
             line.strip()
             and commit is not None
-            and commit[:9] not in neutral_commits
+            and commit[:9] not in STORE_NEUTRAL_INPUT_COMMITS
             and _is_input(line.strip())
         ):
             stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
@@ -333,6 +312,11 @@ def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--head", default="HEAD", help="ref to inspect (default: HEAD)")
+    parser.add_argument(
+        "--pre-gate",
+        action="store_true",
+        help="label stale migrate inputs as awaiting the train gate regen under d-255",
+    )
     args = parser.parse_args(argv)
     head = _git("rev-parse", args.head).strip()
 
@@ -355,11 +339,12 @@ def main(argv: list[str] | None = None) -> int:
         for title, paths in stale.items():
             sample = ", ".join(paths[:3]) + (" ..." if len(paths) > 3 else "")
             print(f"  {title}\n    {sample}")
-        print("d-255: offers intentionally omit regenerated store outputs, so this is the "
-              "expected pre-gate state when offer commits change migrate inputs. The train "
-              "regenerates once per batch; if stale remains after regen, investigate the "
-              "gate result. For fixed-point inputs, the train records "
-              "scripts/store_neutral_acks/<sha>.txt citing the regen.")
+        if args.pre_gate:
+            print("d-255: listed migrate-input commits await the train's gate regen; "
+                  "this STALE result is expected before the gate and a defect after it.")
+        else:
+            print("regenerate: .venv/bin/python scripts/battery_migrate.py && "
+                  "data/literature/build_index.py --write-store-summary")
     if untraced:
         print(f"UNTRACED: {len(untraced)} extract(s) have no extracts-v2 sibling and "
               "no migration-queue entry:")

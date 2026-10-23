@@ -143,20 +143,8 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
     if _git("rev-parse", "--is-shallow-repository").strip() == "true":
         pytest.skip("git_history_unavailable: freshness requires a full checkout")
     freshness = _load_freshness()
-    neutral = freshness.store_neutral_input_commits("HEAD")
+    neutral = freshness.STORE_NEUTRAL_INPUT_COMMITS
     require_git_history(REPO_ROOT, *sorted(neutral))
-    for revision in neutral:
-        if subprocess.run(
-            ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
-            cwd=REPO_ROOT,
-            capture_output=True,
-            text=True,
-            check=False,
-        ).returncode != 0:
-            pytest.skip(
-                "git_history_unavailable: acknowledged store-neutral input "
-                f"{revision} is not in HEAD history"
-            )
     head = _git("rev-parse", "HEAD").strip()
     last_store = _git(
         "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS
@@ -231,16 +219,3 @@ def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
     stale = freshness.stale_input_commits(head, last_store)
     assert stale, "expected STALE_TIP to have post-regen migrate-input commits"
     assert any("950c88655" in k for k in stale), stale
-
-
-def test_train_ack_files_are_read_from_the_checked_tree(monkeypatch) -> None:
-    freshness = _load_freshness()
-    monkeypatch.setattr(
-        freshness,
-        "_git",
-        lambda *args: "scripts/store_neutral_acks/123456789abcdef.txt\n"
-        "scripts/store_neutral_acks/README.md\n",
-    )
-    neutral = freshness.store_neutral_input_commits("gate-tip")
-    assert "123456789" in neutral
-    assert "README" not in neutral

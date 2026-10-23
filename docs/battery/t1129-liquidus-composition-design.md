@@ -21,10 +21,11 @@ schema change is needed.
 Görnerup & Wijk 1996 Table 1 is encoded as a 39-row extract. Migration stores
 each row's own liquid map (including printed zeros), printed temperature,
 unknown Sample composition, and saturating solid in `point_conditions`. The
-Under train-only store generation (d-255), offers carry the extract and code,
-not regenerated derived store files or offer-local store-neutral
-acknowledgements. Migrating the extract is expected to add 39 liquidus
-observation rows. The train regenerates once per batch at the gate; when that
-regen is a fixed point and inputs changed, the train records the store-neutral
-acknowledgement in `scripts/store_neutral_acks/<sha>.txt`, citing the gate
-regen.
+The derived observation store is not committed with offers. Under train-only
+store generation (d-255), offers carry the extract and code, and the train
+regenerates once per batch at the gate. Offer authors can run
+`scripts/check_store_freshness.py --pre-gate` to label stale migrate inputs as
+awaiting that gate regen. If the gate regen is a fixed point and inputs
+changed, the train records the store-neutral acknowledgement in
+`scripts/store_neutral_acks/<sha>.txt`, citing the gate regen. Migrating this
+extract is expected to add 39 liquidus observation rows.

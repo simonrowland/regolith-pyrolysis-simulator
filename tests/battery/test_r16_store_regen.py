@@ -88,28 +88,6 @@ def test_committed_printed_fo2_stems_land_fO2_log_in_extracts_v2() -> None:
         )
 
 
-def test_committed_store_has_no_stale_migrate_input_commits() -> None:
-    """No migrate-input commit may land after the last store-output touch.
-
-    Mirrors the STALE half of ``scripts/check_store_freshness.py`` so a
-    train regen followed by extract/migrate edits without another gate regen
-    fails in CI. Offers may be stale before this gate regen under d-255.
-    Does not assert UNTRACED (pre-existing, out of R16 P1).
-    """
-    freshness = _load_freshness()
-    head = _git("rev-parse", "HEAD").strip()
-    last_store = _git(
-        "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS
-    ).strip()
-    assert last_store, "no store-output commit found"
-    stale = freshness.stale_input_commits(head, last_store)
-    assert not stale, (
-        "store is STALE w.r.t. migrate inputs; regenerate with "
-        "scripts/battery_migrate.py + build_index --write-store-summary:\n"
-        + "\n".join(f"  {k}: {v[:3]}" for k, v in stale.items())
-    )
-
-
 def test_mutation_pre_regen_tip_extracts_v2_have_zero_fo2_log() -> None:
     """Mutation proof: the stale tip's extracts-v2 fail the census bounds.
 
