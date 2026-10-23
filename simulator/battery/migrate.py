@@ -12380,12 +12380,15 @@ _B677_FORMATION_BASIS_REASON = (
 )
 # Kelley, K. K., and King, E. G., 1961, Contributions to the data on
 # theoretical metallurgy, XIV, USBM Bulletin 592.
-_B592_GAS_BASIS_REASON = (
+_B592_CP_BASIS_REASON = (
+    "kelley-king-1961-usbm-b592-p101-p120.md:263 heads table 6 "
+    "\"Heat capacities, cal./deg.-mole\"."
+)
+_B592_ENTROPY_BASIS_REASON = (
     "kelley-king-1961-usbm-b592-p001-p040.md:793 prints all selected entropy "
     "values for a constant pressure of 1 atm at 298.15 K, in defined calories "
     "per degree per gram formula mass. "
     "kelley-king-1961-usbm-b592-p101-p120.md:263 heads table 6 "
-    "\"Heat capacities, cal./deg.-mole\" and "
     "\"Entropies at 298.15° K., cal./deg.-mole\"."
 )
 # Robie, R. A., and Hemingway, B. S., 1995, Thermodynamic properties of
@@ -12461,7 +12464,7 @@ def _b592_gas_basis(
     quantity: Quantity,
     temperatures_K: tuple[Decimal, ...],
 ) -> dict[str, State]:
-    """Table 6 heat capacity and entropy: mol-species at 1 atm, catalog rows only."""
+    """Table 6 mol-species. Entropy is at 1 atm. Cp has no printed pressure."""
 
     if quantity not in _B592_GAS_QUANTITIES:
         return {}
@@ -12472,10 +12475,12 @@ def _b592_gas_basis(
 
     if not vaporock_gas_has_one_coefficient_row(species_name, temperatures_K):
         return {}
-    return {
-        "per": _cited_state(PerBasis.MOL_SPECIES, _B592_GAS_BASIS_REASON),
-        "standard_pressure_Pa": _cited_state(atm_to_pa(1), _B592_GAS_BASIS_REASON),
-    }
+    if quantity is Quantity.S:
+        return {
+            "per": _cited_state(PerBasis.MOL_SPECIES, _B592_ENTROPY_BASIS_REASON),
+            "standard_pressure_Pa": _cited_state(atm_to_pa(1), _B592_ENTROPY_BASIS_REASON),
+        }
+    return {"per": _cited_state(PerBasis.MOL_SPECIES, _B592_CP_BASIS_REASON)}
 
 
 def _b2131_formation_basis(formula: str) -> dict[str, State]:

@@ -53,6 +53,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
+    ideal_gas_entropy_pressure_shift_J_per_mol_K,
     identity_equal,
     log10K_from_delta_fG_kJ_mol,
     quantity_token,
@@ -690,8 +691,9 @@ def _ellingham_attempt(
     # print another ideal-gas standard pressure. Its explicit formation
     # reaction supplies Δν_g, normalized below to the identity's declared
     # molar basis. Algebra: ΔfG°(p2)-ΔfG°(p1) = Δν_g R T ln(p2/p1).
-    # log10 Kf is recomputed from that shifted ΔfG. S°_gas(p2)-S°_gas(p1)
-    # = -R ln(p2/p1) (this attempt emits no entropy). Unit check: R·T is
+    # log10 Kf is recomputed from that shifted ΔfG. The one-mole entropy
+    # form of the same ln is ideal_gas_entropy_pressure_shift_J_per_mol_K;
+    # this attempt emits no entropy. Unit check: R·T is
     # J/mol, divided by 1000 gives kJ/mol; the log shift is dimensionless.
     # Sanity: CaO from Ca(s)+½O2(g)→CaO(cr) has Δν_g=-½, so at 1000 K
     # and 1 atm the ΔfG shift is -½·8.314·1000·ln(1.01325) ≈ -54.7 J/mol.
@@ -1143,6 +1145,40 @@ def _pure_phase_attempt(
     )
 
 
+def _janaf_catalog_standard_pressure_Pa() -> Decimal | None:
+    """Published JANAF p° from the generator that writes the catalog identity.
+
+    None when that constant cannot be read. Callers refuse rather than
+    substitute another 1 bar literal.
+    """
+
+    try:
+        from simulator.battery.generators.janaf import STANDARD_PRESSURE_PA
+    except Exception:  # noqa: BLE001 - catalog constant may be unimportable
+        return None
+    if isinstance(STANDARD_PRESSURE_PA, Decimal) and STANDARD_PRESSURE_PA > 0:
+        return STANDARD_PRESSURE_PA
+    return None
+
+
+def _printed_entropy_shift(identity: Identity) -> tuple[Decimal | None, str | None]:
+    """Catalog S moved onto the observation pressure, or a refusal detail."""
+
+    catalog_pressure = _janaf_catalog_standard_pressure_Pa()
+    if catalog_pressure is None:
+        return None, "janaf-catalog-standard-pressure-unknown"
+    printed = identity.standard_pressure_Pa
+    if not isinstance(printed, State) or not printed.is_value or printed.value is None:
+        return None, "standard-pressure-unknown"
+    printed_pressure = as_decimal(printed.value)
+    if printed_pressure <= 0:
+        return None, "standard-pressure-transform-pressure-nonpositive"
+    return (
+        ideal_gas_entropy_pressure_shift_J_per_mol_K(catalog_pressure, printed_pressure),
+        None,
+    )
+
+
 def _vaporock_gas_attempt(
     identity: Identity,
     quantity: Quantity,
@@ -1289,6 +1325,12 @@ def _vaporock_gas_attempt(
                 + row["E"] / t**2
             )
         elif quantity is Quantity.S:
+            # Catalog S is the JANAF 1 bar value. The shift to the
+            # observation's printed pressure is
+            # ideal_gas_entropy_pressure_shift_J_per_mol_K:
+            # dS = −R dln p at fixed T, so S°(p2) = S°(p1) − R ln(p2/p1),
+            # J/mol/K, with p2/p1 dimensionless. Cp and H−H298 are left on
+            # this raw value: for an ideal gas both depend only on T.
             raw = vapor._janaf_S(temperature, row)
         else:
             raw = vapor._janaf_dH(temperature, row) - row["H"]
@@ -1311,6 +1353,32 @@ def _vaporock_gas_attempt(
             extra={"engine": Engine.VAPOROCK.value},
             call_evidence=call_evidence,
         )
+    if quantity is Quantity.S:
+        shift, why = _printed_entropy_shift(identity)
+        if shift is None:
+            reason = (
+                RefusalReason.ATTEMPTED_UNAVAILABLE
+                if why == "janaf-catalog-standard-pressure-unknown"
+                else RefusalReason.IDENTITY_UNKNOWN
+            )
+            return _refuse(
+                reason,
+                why or "standard-pressure-unknown",
+                quantity=quantity,
+                origin=origin,
+                extra={"engine": Engine.VAPOROCK.value},
+                call_evidence=call_evidence,
+            )
+        value = value + shift
+        if not value.is_finite():
+            return _refuse(
+                RefusalReason.METRIC_DOMAIN,
+                "nonfinite-engine-value",
+                quantity=quantity,
+                origin=origin,
+                extra={"engine": Engine.VAPOROCK.value},
+                call_evidence=call_evidence,
+            )
     return ThermoAttempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],
