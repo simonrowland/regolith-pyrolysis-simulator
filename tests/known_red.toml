@@ -1,0 +1,153 @@
+[[test]]
+node = "tests/test_sso_r_r20_state.py::test_default_lunar_redox_runaway_acceptance"
+ticket = "t-1311"
+tier = "nightly"
+reason = "Lunar redox acceptance assertion fails on green."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/chemistry/test_builtin_condensation_route_provider.py::test_split_path_end_state_matches_pre_flip_account_balances[lunar_mare_low_ti-None]"
+ticket = "b-859"
+tier = "nightly"
+reason = "Full-run stage 0-to-1 wall Fe deposit disagrees with the pinned ledger."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_web_events_decision_pause.py::test_pause_resume_around_every_gate_is_ledger_identical"
+ticket = "b-1027"
+tier = "nightly"
+reason = "Pause-resume drive exits before simulation_complete."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_web_functional_qa.py::test_headless_full_run_ledgers_and_product_story_match_runner"
+ticket = "b-947"
+tier = "nightly"
+reason = "Headless full-run product ledger differs from the runner."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/chemistry/test_builtin_condensation_route_provider.py::test_split_path_end_state_matches_pre_flip_account_balances[mars_basalt-additives_kg1]"
+ticket = "b-859"
+tier = "nightly"
+reason = "Full-run stage 0-to-1 wall Fe deposit disagrees with the pinned ledger."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/chemistry/test_builtin_electrolysis_step_provider.py::test_full_run_mass_balance_holds_with_kernel_committed_electrolysis[lunar_mare_low_ti-None]"
+ticket = "b-163"
+tier = "nightly"
+reason = "MRE full-run fixture exceeds the 1800 second timeout."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/chemistry/test_builtin_electrolysis_step_provider.py::test_full_run_o2_yields_split_across_distinct_bins[lunar_mare_low_ti-None]"
+ticket = "b-163"
+tier = "nightly"
+reason = "MRE full-run fixture exceeds the 1800 second timeout."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/chemistry/test_builtin_condensation_route_provider.py::test_split_path_end_state_matches_pre_flip_account_balances[s_type_asteroid_silicate-None]"
+ticket = "b-859"
+tier = "nightly"
+reason = "Full-run stage 0-to-1 wall Fe deposit disagrees with the pinned ledger."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/chemistry/test_builtin_electrolysis_step_provider.py::test_full_run_mass_balance_holds_with_kernel_committed_electrolysis[mars_basalt-additives_kg1]"
+ticket = "b-163"
+tier = "nightly"
+reason = "MRE full-run fixture exceeds the 1800 second timeout."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/chemistry/test_builtin_electrolysis_step_provider.py::test_full_run_o2_yields_split_across_distinct_bins[mars_basalt-additives_kg1]"
+ticket = "b-163"
+tier = "nightly"
+reason = "MRE full-run fixture exceeds the 1800 second timeout."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_yield_root_cause.py::test_pyrolysis_track_c5_reduces_feo_without_additives"
+ticket = "b-872"
+tier = "nightly"
+reason = "C5 FeO reduction result differs from its pinned expectation."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/chemistry/test_sio_step_wall_deposit.py::test_hot_wall_sio_reactive_deposit_uses_product_psat_floor"
+ticket = "b-808"
+tier = "pr"
+reason = "Required hot-wall SiO saturation fit is unavailable."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_coating_rate.py::test_coating_diagnostic_default_output_is_byte_identical_to_golden"
+ticket = "b-807"
+tier = "pr"
+reason = "Host-dependent coating diagnostic digest differs from its golden."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_doc_anchors.py::test_doc_impl_anchors_resolve"
+ticket = "t-268"
+tier = "pr"
+reason = "Documented implementation anchor hints resolve to stale source lines."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_fail_loud_h2_h3.py::test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite"
+ticket = "b-813"
+tier = "pr"
+reason = "The commanded extreme-pO2 path no longer raises the pinned exception."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_rail_conformance.py::test_t3_na2o_activity_pin_remains_admitted"
+ticket = "t-1208"
+tier = "pr"
+reason = "The pinned Na2O activity row key was superseded."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_references_registry.py::test_build_references_check_passes"
+ticket = "t-268"
+tier = "pr"
+reason = "Reference registry warnings cause the integrity check to fail."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_stage0_harness.py::test_real_feedstock_stops_at_c0b_path_ab_pause"
+ticket = "b-1028"
+tier = "pr"
+reason = "Stage 0 pause reports dormant_by_epoch instead of the pinned refusal."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_staged_bakeout.py::test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture"
+ticket = "b-946"
+tier = "pr"
+reason = "C2A staged run captures species outside the pinned set."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_vr11_instrumentation.py::test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa"
+ticket = "b-808"
+tier = "pr"
+reason = "Na Antoine wall segment has no usable extrapolation fit."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_web_socket_trace.py::test_pre_refactor_socket_trace_matches_golden"
+ticket = "b-810"
+tier = "pr"
+reason = "Socket trace differs from the committed pre-refactor golden."
+since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_yield_disposition.py::test_session_multi_refusal_then_continue_matches_unattempted_hours"
+ticket = "b-810"
+tier = "pr"
+reason = "The test fixture omits the simulator condensation_model field."
+since = "7dd268c6f"
