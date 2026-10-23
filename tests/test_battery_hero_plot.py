@@ -2161,6 +2161,101 @@ def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
     ]
 
 
+def test_history_keeps_deck_rail_all_numeric_count() -> None:
+    """A deck-rail diagnostic copies the scorer's all-numeric summary.
+
+    The 10-16 SiO score is the summary this record is given: n=56, RMS 0.92.
+    A measured-tier row for the same key must not replace it. A summary rail
+    with no diagnostic is not added. A diagnostic with no summary stays at 0.
+    """
+
+    record = _history_record(
+        {
+            "store": {"revision": "sio"},
+            "records": [
+                {
+                    "tier": "all_numeric",
+                    "rail": "SiO_evolution",
+                    "engine": "openimcc",
+                    "n": 56,
+                    "rms_dex": "0.92",
+                    "median_abs_dex": "0.68",
+                },
+                {
+                    "tier": "measured",
+                    "rail": "SiO_evolution",
+                    "engine": "openimcc",
+                    "n": 3,
+                    "rms_dex": "0.10",
+                    "median_abs_dex": "0.05",
+                },
+                {
+                    "tier": "all_numeric",
+                    "rail": "residue_composition",
+                    "engine": "openimcc",
+                    "n": 12,
+                    "rms_dex": "0.2",
+                    "median_abs_dex": "0.1",
+                },
+                {
+                    "tier": "all_numeric",
+                    "rail": "redox",
+                    "engine": "internal-analytical",
+                    "n": 7,
+                    "rms_dex": "0.4",
+                    "median_abs_dex": "0.3",
+                },
+            ],
+        },
+        landing_sha="green-test",
+        commit_date="2026-10-18T10:27:53-04:00",
+        benchmarks={},
+        diagnostics={
+            ("SiO_evolution", "openimcc"): {
+                "refused_count": 133,
+                "not_observable_count": 0,
+                "refused_by_reason": {"effusion_regime_unverified": 36},
+                "open_predict_and_flag_notice_counts_by_kind": {
+                    "out_of_certified_band": 56
+                },
+            },
+            ("SiO_evolution", "vaporock"): {
+                "refused_count": 150,
+                "not_observable_count": 0,
+                "refused_by_reason": {"attempted_unavailable": 150},
+                "open_predict_and_flag_notice_counts_by_kind": {},
+            },
+        },
+    )
+
+    by_key = {
+        (item["rail"], item["engine"]): item for item in record["metrics"]
+    }
+    assert set(by_key) == {
+        ("SiO_evolution", "openimcc"),
+        ("SiO_evolution", "vaporock"),
+        ("redox", "internal-analytical"),
+    }
+    metric = by_key[("SiO_evolution", "openimcc")]
+    assert metric["n"] == 56
+    assert metric["numeric_count"] == 56
+    assert metric["rms_dex"] == "0.92"
+    assert metric["median_abs_dex"] == "0.68"
+    assert metric["refused_count"] == 133
+    assert metric["refused_by_reason"] == {"effusion_regime_unverified": 36}
+    assert metric["open_predict_and_flag_notice_counts_by_kind"] == {
+        "out_of_certified_band": 56
+    }
+    vaporock = by_key[("SiO_evolution", "vaporock")]
+    assert vaporock["n"] == 0
+    assert vaporock["numeric_count"] == 0
+    assert vaporock["rms_dex"] is None
+    redox = by_key[("redox", "internal-analytical")]
+    assert redox["n"] == 7
+    assert redox["numeric_count"] == 7
+    assert redox["rms_dex"] == "0.4"
+
+
 def test_cli_requires_explicit_history_path() -> None:
     with pytest.raises(SystemExit) as error:
         _parser().parse_args(

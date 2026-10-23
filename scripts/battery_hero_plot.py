@@ -1090,6 +1090,10 @@ def _history_record(
     records = summary.get("records")
     if not isinstance(records, Sequence) or isinstance(records, (str, bytes)):
         raise ValueError("score-summary.json has no records list")
+    # Hero chart rails always take their all-numeric summary. A deck rail is
+    # written only when this caller already diagnosed it, and then the summary
+    # n is the count. Dropping those rows is what zeroed SiO_evolution.
+    diagnostic_keys = {(str(rail), str(engine)) for rail, engine in diagnostics}
     metrics_by_key = {
         (str(record.get("rail")), str(record.get("engine"))): {
             "rail": record.get("rail"),
@@ -1101,7 +1105,11 @@ def _history_record(
         for record in records
         if isinstance(record, Mapping)
         and record.get("tier") == "all_numeric"
-        and record.get("rail") in HERO_RAILS
+        and (
+            record.get("rail") in HERO_RAILS
+            or (str(record.get("rail")), str(record.get("engine")))
+            in diagnostic_keys
+        )
     }
     for rail, engine in set(metrics_by_key) | set(diagnostics):
         metric = metrics_by_key.setdefault(
