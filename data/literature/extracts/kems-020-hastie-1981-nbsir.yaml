@@ -176,7 +176,8 @@ source_metadata:
   table1:
     class_tag: metadata
     locator:
-      page: 5
+      page: 11
+      published_page: 5
       table: '1'
       pdf_page_index: 10
     title: Typical Coal-Conversion and Combustion Systems
@@ -266,7 +267,8 @@ source_metadata:
   effusion_orifice:
     class_tag: metadata
     locator:
-      page: 53
+      page: 59
+      published_page: 53
       figure: '20'
       pdf_page_index: 58
     diameter_mm: 0.34
@@ -292,7 +294,8 @@ source_metadata:
       KCl = 5 x 10^-3 ATM
     attribution:
       locator:
-        page: 52
+        page: 58
+        published_page: 52
         figure: '15'
         pdf_page_index: 57
       quote: The indicated reference state partial pressures were obtained from JANAF (1971).
@@ -309,14 +312,16 @@ benches:
         tag: value
         value: Pt
       locator:
-        page: 53
+        page: 59
+        published_page: 53
         figure: '20'
         pdf_page_index: 58
         note: 'Figure 20 caption: “KMS data with Pt-cell orifice diameter of 0.34 mm.”'
   cell_material_and_liner:
     state: {tag: value, value: platinum KMS cell}
     locator:
-      page: 53
+      page: 59
+      published_page: 53
       figure: '20'
       pdf_page_index: 58
       note: 'Figure 20 caption: “KMS data with Pt-cell orifice diameter of 0.34 mm.”'
@@ -354,7 +359,8 @@ experiments:
           equation: '2'
           note: KMS pressure calibration method stated explicitly
   locator:
-    page: 53
+    page: 59
+    published_page: 53
     figure: '20'
     pdf_page_index: 58
     note: 'Figure 20 caption: "KMS data with Pt-cell orifice diameter of 0.34 mm."'
@@ -378,7 +384,7 @@ experiments:
   method: thermochemical_equilibrium_model
   locator:
     table: '3'
-    page: 43
+    page: 49
     published_page: 43
     pdf_page_index: 48
     note: Table 3 SOLGASMIX soda-lime-silica model glass; scoped so recipe does not lift into shared default sample
@@ -392,7 +398,7 @@ experiments:
           SiO2: 71
       locator:
         table: '3'
-        page: 43
+        page: 49
         published_page: 43
         pdf_page_index: 48
         note: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%); model recipe only'
@@ -405,7 +411,7 @@ experiments:
       (R2-1). Composition-only scope for mixed ledgers.
   locator:
     figure: '5'
-    page: 51
+    page: 57
     published_page: 51
     pdf_page_index: 56
     note: >-
@@ -421,7 +427,7 @@ experiments:
           CaO: 12
           SiO2: 71
       locator:
-        page: 18
+        page: 24
         published_page: 18
         pdf_page_index: 23
         note: >-
@@ -449,7 +455,7 @@ experiments:
   method: knudsen_effusion
   locator:
     figure: '5'
-    page: 51
+    page: 57
     published_page: 51
     pdf_page_index: 56
     note: >-
@@ -464,7 +470,7 @@ experiments:
           CaO: 12
           SiO2: 71
       locator:
-        page: 18
+        page: 24
         published_page: 18
         pdf_page_index: 23
         note: >-
@@ -475,7 +481,7 @@ experiments:
   method: transpiration
   locator:
     figure: '5'
-    page: 51
+    page: 57
     published_page: 51
     pdf_page_index: 56
     note: >-
@@ -491,7 +497,7 @@ experiments:
           CaO: 12
           SiO2: 71
       locator:
-        page: 18
+        page: 24
         published_page: 18
         pdf_page_index: 23
         note: >-
@@ -500,7 +506,7 @@ experiments:
 - experiment_id: hastie-1981-table2-quoted-fits
   method: transpiration
   locator:
-    page: 22
+    page: 28
     published_page: 22
     pdf_page_index: 27
     section: '10.1'
@@ -523,7 +529,7 @@ species:
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
         table: '2'
-        page: 23
+        page: 29
         published_page: 23
         pdf_page_index: 28
         note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
@@ -656,7 +662,7 @@ species:
           note: equation corresponds to [K2O] ~14; Illinois no. 6 / UTSI
           composition_role:
             value: initial_charge_only
-            locator: {page: 24, published_page: 24, pdf_page_index: 30, table: '2', note: 'body row 13; Comments column, with footnote a'}
+            locator: {page: 30, published_page: 24, pdf_page_index: 29, table: '2', table_caption_page: 29, note: 'body row 13; Comments column, with footnote a; data cell: 16650'}
             quote: 'Equation corresponds to [K2O] ~ 14.'
             note: 'Footnote a: the System column prints initial compositions. The fit is for K2O ~14 wt%, below the printed 19.5.'
         - system: synthetic Western channel slag
@@ -675,7 +681,7 @@ species:
           K2O_during_run_wt_pct_as_published: 18.9-17.6
           composition_role:
             value: initial_charge_only
-            locator: {page: 24, published_page: 24, pdf_page_index: 30, table: '2', note: 'body row 14; Comments column, with footnote a'}
+            locator: {page: 30, published_page: 24, pdf_page_index: 29, table: '2', table_caption_page: 29, note: 'body row 14; Comments column, with footnote a; data cell: 18472'}
             quote: '[K2O] 18.9-17.6.'
             note: 'Footnote a: the System column prints initial compositions. Run K2O 18.9-17.6 wt%, below the printed 22.7.'
         - system: synthetic Eastern channel slag
@@ -694,7 +700,7 @@ species:
           K2O_during_run_wt_pct_as_published: 23.3-22.1
           composition_role:
             value: initial_charge_only
-            locator: {page: 24, published_page: 24, pdf_page_index: 30, table: '2', note: 'body row 15; Comments column, with footnote a'}
+            locator: {page: 30, published_page: 24, pdf_page_index: 29, table: '2', table_caption_page: 29, note: 'body row 15; Comments column, with footnote a; data cell: 19056'}
             quote: '23.3-22.1 [K2O].'
             note: 'Footnote a: the System column prints initial compositions. Run K2O 23.3-22.1 wt%, below the printed 23.6.'
         - system: illite
@@ -725,7 +731,7 @@ species:
           note: 6[K2O]; initial P_O2 >= P_K, later fell to the level of K2O
           composition_role:
             value: initial_charge_only
-            locator: {page: 25, published_page: 25, pdf_page_index: 31, table: '2', note: 'body row 17; Comments column, with footnote a'}
+            locator: {page: 32, published_page: 25, pdf_page_index: 31, table: '2', note: 'body row 17; Comments column, with footnote a'}
             quote: '6[K2O].'
             note: 'Footnote a: the System column prints initial compositions. The fit is for K2O ~6 wt%, below the printed 8.7.'
         note: >-
@@ -742,7 +748,7 @@ species:
           value: "Table 2 potassium pressures are TMS measurements under neutral conditions (printed p. 22 / PDF 28); TMS usual operating range 0.2-1.0 atm binds via TMS experiment. KMS method limit ~1e-4 atm (section 6 / p. 9) stays with KMS runs."
           quote: "Table 2 potassium pressures are TMS measurements under neutral conditions (printed p. 22 / PDF 28); TMS usual operating range 0.2-1.0 atm binds via TMS experiment. KMS method limit ~1e-4 atm (section 6 / p. 9) stays with KMS runs."
           locator:
-            page: 22
+            page: 28
             published_page: 22
             pdf_page_index: 27
             paragraph: Table 2 potassium pressures as TMS under neutral conditions
@@ -750,7 +756,7 @@ species:
       type: psat_series
       locator:
         table: '2'
-        page: 23
+        page: 29
         published_page: 23
         pdf_page_index: 28
         note: rotated Table 2 ~17[K2O] row; report p. 23
@@ -884,7 +890,7 @@ species:
       type: psat_series
       class_tag: model
       locator:
-        page: 23
+        page: 29
         published_page: 23
         table: '2'
         pdf_page_index: 28
@@ -1255,7 +1261,7 @@ species:
       type: psat_series
       class_tag: model
       locator:
-        page: 23
+        page: 29
         published_page: 23
         table: '2'
         pdf_page_index: 28
@@ -1279,7 +1285,7 @@ species:
       type: psat_series
       class_tag: derived
       locator:
-        page: 53
+        page: 59
         published_page: 53
         figure: '20'
         pdf_page_index: 58
@@ -1299,7 +1305,7 @@ species:
       type: psat_series
       class_tag: figure_only
       locator:
-        page: 51
+        page: 57
         published_page: 51
         figure: '4'
         pdf_page_index: 56
@@ -1320,7 +1326,7 @@ species:
       type: psat_series
       class_tag: figure_only
       locator:
-        page: 53
+        page: 59
         published_page: 53
         figure: '21'
         pdf_page_index: 58
@@ -1344,7 +1350,7 @@ species:
       type: psat_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
-        page: 11
+        page: 17
         published_page: 11
         pdf_page_index: 16
         paragraph: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
@@ -1406,7 +1412,7 @@ species:
     - observation_id: hastie_1981_nacl_dimerization_second_law
       type: transition_point
       locator:
-        page: 11
+        page: 18
         published_page: 11
         pdf_page_index: 17
         paragraph: 2NaCl (g) = (NaCl)2 (g)
@@ -1444,7 +1450,7 @@ species:
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
         table: '3'
-        page: 43
+        page: 49
         published_page: 43
         pdf_page_index: 48
       T_range_K:
@@ -1488,7 +1494,7 @@ species:
       type: activity_coefficient
       locator:
         table: '3'
-        page: 43
+        page: 49
         published_page: 43
         pdf_page_index: 48
       T_range_K:
@@ -1569,7 +1575,7 @@ species:
       type: psat_series
       locator:
         figure: '5'
-        page: 59
+        page: 65
         published_page: 59
         pdf_page_index: 64
       T_K: 1493.7
@@ -1592,7 +1598,7 @@ species:
         glass_initial_wt_pct: {Na2O: 17, CaO: 12, SiO2: 71}
         composition_role:
           value: initial_charge_only
-          locator: {page: 18, published_page: 18, pdf_page_index: 23, note: initial glass composition}
+          locator: {page: 24, published_page: 18, pdf_page_index: 23, note: initial glass composition}
           quote: 'glass of initial composition (wt.%): Na2O(17), CaO(12), and SiO2(71)'
         Na2CO3_impurity_wt_pct: 0.45
       uncertainty:
@@ -1602,7 +1608,7 @@ species:
       type: psat_series
       locator:
         figure: '5'
-        page: 59
+        page: 65
         published_page: 59
         pdf_page_index: 64
       T_K: 1333.3
@@ -1624,7 +1630,7 @@ species:
         glass_initial_wt_pct: {Na2O: 17, CaO: 12, SiO2: 71}
         composition_role:
           value: initial_charge_only
-          locator: {page: 18, published_page: 18, pdf_page_index: 23, note: initial glass composition}
+          locator: {page: 24, published_page: 18, pdf_page_index: 23, note: initial glass composition}
           quote: 'glass of initial composition (wt.%): Na2O(17), CaO(12), and SiO2(71)'
         Na2CO3_impurity_wt_pct: 0.45
       uncertainty:
@@ -1634,7 +1640,7 @@ species:
       type: psat_series
       locator:
         figure: '5'
-        page: 59
+        page: 65
         published_page: 59
         pdf_page_index: 64
       T_K: 1333.3
@@ -1656,7 +1662,7 @@ species:
         glass_initial_wt_pct: {Na2O: 17, CaO: 12, SiO2: 71}
         composition_role:
           value: initial_charge_only
-          locator: {page: 18, published_page: 18, pdf_page_index: 23, note: initial glass composition}
+          locator: {page: 24, published_page: 18, pdf_page_index: 23, note: initial glass composition}
           quote: 'glass of initial composition (wt.%): Na2O(17), CaO(12), and SiO2(71)'
         Na2CO3_impurity_wt_pct: 0.45
       uncertainty:
@@ -1666,7 +1672,7 @@ species:
       type: psat_series
       locator:
         figure: '5'
-        page: 59
+        page: 65
         published_page: 59
         pdf_page_index: 64
       T_range_K:
@@ -1720,7 +1726,7 @@ species:
           SiO2: 71
         composition_role:
           value: initial_charge_only
-          locator: {page: 18, published_page: 18, pdf_page_index: 23, note: initial glass composition}
+          locator: {page: 24, published_page: 18, pdf_page_index: 23, note: initial glass composition}
           quote: 'glass of initial composition (wt.%): Na2O(17), CaO(12), and SiO2(71)'
         residue_Na2O_wt_pct_as_published:
           initial: 17.0
@@ -1770,7 +1776,8 @@ species:
       type: activity_coefficient
       locator:
         figure: '6'
-        page: 60
+        page: 66
+        published_page: 60
         pdf_page_index: 65
       T_range_K:
       - 1200.0
@@ -1795,7 +1802,7 @@ species:
       type: psat_series
       class_tag: model
       locator:
-        page: 11
+        page: 17
         published_page: 11
         pdf_page_index: 16
         section: '7.1'
@@ -1836,7 +1843,7 @@ species:
       type: gibbs_table
       class_tag: model
       locator:
-        page: 12
+        page: 18
         published_page: 12
         pdf_page_index: 17
         section: '7.1'
@@ -1874,7 +1881,7 @@ species:
       type: activity_coefficient
       class_tag: model
       locator:
-        page: 43
+        page: 49
         published_page: 43
         table: '3'
         pdf_page_index: 48
@@ -1984,7 +1991,7 @@ species:
       type: activity_coefficient
       class_tag: model
       locator:
-        page: 43
+        page: 49
         published_page: 43
         table: '3'
         pdf_page_index: 48
@@ -2094,7 +2101,7 @@ species:
       type: psat_series
       class_tag: figure_only
       locator:
-        page: 51
+        page: 57
         published_page: 51
         figure: '5'
         pdf_page_index: 56
@@ -2117,7 +2124,7 @@ species:
       type: psat_series
       class_tag: figure_only
       locator:
-        page: 51
+        page: 57
         published_page: 51
         figure: '5'
         pdf_page_index: 56
@@ -2141,7 +2148,7 @@ species:
       type: activity_coefficient
       class_tag: figure_only
       locator:
-        page: 51
+        page: 57
         published_page: 51
         figure: '6'
         pdf_page_index: 56
@@ -2162,7 +2169,7 @@ species:
     - observation_id: hastie_1981_na2so4_second_law_prose
       type: transition_point
       locator:
-        page: 12
+        page: 18
         published_page: 12
         pdf_page_index: 17
         paragraph: Na2SO4(l) = 2Na + SO2 + O2
@@ -2194,7 +2201,7 @@ species:
     - observation_id: hastie_1981_kohl1975_na2so4g_foreign_second_law
       type: transition_point
       locator:
-        page: 13
+        page: 19
         published_page: 13
         pdf_page_index: 18
         paragraph: Kohl et al. (1975), who give
@@ -2226,7 +2233,7 @@ species:
       type: gibbs_table
       class_tag: model
       locator:
-        page: 12
+        page: 18
         published_page: 12
         pdf_page_index: 17
         section: '7.1'
@@ -2261,7 +2268,7 @@ species:
       type: gibbs_table
       class_tag: model
       locator:
-        page: 13
+        page: 19
         published_page: 13
         pdf_page_index: 18
         section: '7.1'
@@ -2291,7 +2298,7 @@ species:
     - observation_id: hastie_1981_k2o_liquid_kp_janaf_derived
       type: activity_coefficient
       locator:
-        page: 22
+        page: 28
         published_page: 22
         pdf_page_index: 27
         equation: '6'
@@ -2322,7 +2329,7 @@ species:
       experiment: hastie-1981-k1-kms
       locator:
         figure: '11'
-        page: 61
+        page: 71
         published_page: 61
         pdf_page_index: 70
         note: report figure page after captions; PDF page 71
@@ -2360,7 +2367,7 @@ species:
           Na2O: 0.5
         composition_role:
           value: initial_charge_only
-          locator: {page: 29, published_page: 29, pdf_page_index: 34, section: '10.5'}
+          locator: {page: 35, published_page: 29, pdf_page_index: 34, section: '10.5'}
           quote: 'with initial composition as indicated in table 2'
         gamma_symbol_as_printed: y(K2O)
         x_K2O_note: printed mole-fraction labels on the figure (0.154 to 0.08)
@@ -2613,7 +2620,7 @@ species:
       experiment: hastie-1981-pt-tms
       locator:
         figure: '11'
-        page: 52
+        page: 58
         published_page: 52
         pdf_page_index: 57
         note: >-
@@ -2650,7 +2657,7 @@ species:
           Na2O: 0.5
         composition_role:
           value: initial_charge_only
-          locator: {page: 29, published_page: 29, pdf_page_index: 34, section: '10.5'}
+          locator: {page: 35, published_page: 29, pdf_page_index: 34, section: '10.5'}
           quote: 'with initial composition as indicated in table 2'
         gamma_symbol_as_printed: y(K2O)
         figure_digitized: true
@@ -2676,7 +2683,7 @@ species:
       type: activity_coefficient
       class_tag: model
       locator:
-        page: 22
+        page: 28
         published_page: 22
         paragraph: unnumbered log Kp expression below equation (6)
         pdf_page_index: 27
@@ -2697,7 +2704,7 @@ species:
       type: activity_coefficient
       class_tag: figure_only
       locator:
-        page: 52
+        page: 58
         published_page: 52
         figure: '11'
         pdf_page_index: 57
@@ -2722,7 +2729,7 @@ species:
       type: psat_series
       locator:
         figure: '4'
-        page: 58
+        page: 64
         published_page: 58
         pdf_page_index: 63
       T_range_K:
@@ -2743,7 +2750,7 @@ species:
           MgO: 2.1
         composition_role:
           value: initial_charge_only
-          locator: {page: 16, published_page: 16, pdf_page_index: 21, section: '8.2'}
+          locator: {page: 22, published_page: 16, pdf_page_index: 21, section: '8.2'}
           quote: "Beaver's Bend illite sample was used with the following composition for the major components, in wt.%"
         figure_digitized: true
         digitization_error_dex: 0.10
@@ -2970,7 +2977,7 @@ species:
       type: psat_series
       class_tag: figure_only
       locator:
-        page: 51
+        page: 57
         published_page: 51
         figure: '4'
         pdf_page_index: 56
@@ -2993,7 +3000,8 @@ species:
       type: activity_coefficient
       locator:
         figure: '15'
-        page: 63
+        page: 75
+        published_page: 63
         pdf_page_index: 74
         paragraph: report p. 35-36
       T_range_K:
@@ -3033,7 +3041,7 @@ species:
       type: activity_coefficient
       class_tag: measured
       locator:
-        page: 36
+        page: 42
         published_page: 36
         section: '10.8'
         figure: '15'
@@ -3071,7 +3079,8 @@ species:
       type: psat_series
       locator:
         figure: '15'
-        page: 63
+        page: 75
+        published_page: 63
         pdf_page_index: 74
       T_range_K:
       - 1074.0
@@ -3093,7 +3102,7 @@ species:
       type: psat_series
       class_tag: derived
       locator:
-        page: 52
+        page: 58
         published_page: 52
         figure: '15'
         pdf_page_index: 57

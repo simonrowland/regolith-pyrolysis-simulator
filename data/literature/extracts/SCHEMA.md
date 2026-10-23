@@ -449,6 +449,26 @@ folio printed on the page; it may be absent, Roman-numeral, or non-numeric.
 Example: a figure on the 12th PDF page with printed folio 7 has `page: 12`,
 `pdf_page_index: 11`, and `published_page: 7`.
 
+When the source PDF is absent from the corpus, a locator whose physical page
+could not be verified because no corpus PDF exists at either the extract's `source_id`
+or `source.corpus_source_id` may carry the typed verification field
+`page_verification: unverified_pdf_absent`. This is verification metadata, not a
+location key; the validator counts it as a notice and rejects it when either PDF exists.
+This typed reason is reported as a notice and exempts that locator from the
+`page == pdf_page_index + 1` check only while both corpus PDF paths are absent.
+
+For a table that continues from a captioned page onto a page containing cited
+data, set `table_caption_page` to the one-based physical page containing the
+caption/label. The locator's `page` and `pdf_page_index` identify the page
+containing the cited data, and `table_caption_page` must be an integer earlier
+than `page`. This verification metadata is not a location key. The label test
+checks the caption on `table_caption_page` and the cited data cell on `page`.
+
+For a continued table whose label appears on the immediately preceding
+physical page, set `table_continued: true`. The locator's `page` and
+`pdf_page_index` still identify the page containing the cited data; the label
+test checks the label on `page - 1` and the cited data cell on `page`.
+
 Every **observation** requires a `locator`.  
 Every **equipment-metadata field** that is present requires its **own** `locator`
 (often experimental-section prose or apparatus figures, not result tables).  

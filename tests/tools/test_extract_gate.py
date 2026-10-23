@@ -287,7 +287,7 @@ def test_locator_page_index_is_checked_against_corpus_pdf(tmp_path: Path, monkey
     )
 
 
-def test_locator_page_mismatch_is_soft_when_published_page_is_missing(tmp_path: Path):
+def test_locator_page_mismatch_is_hard_even_with_published_page(tmp_path: Path):
     doc = _document()
     locator = doc["species"]["Fe"]["observations"][0]["locator"]
     locator["page"] = 3711
@@ -296,11 +296,132 @@ def test_locator_page_mismatch_is_soft_when_published_page_is_missing(tmp_path: 
 
     assert "locator" not in _checks(report)
     assert "locator-page-offset" in _checks(report)
-    assert next(item for item in report.findings if item.check == "locator-page-offset").severity == "SOFT"
+    assert next(item for item in report.findings if item.check == "locator-page-offset").severity == "HARD"
 
     locator["published_page"] = 3711
     report = _run_gate(tmp_path, doc)
+    assert "locator-page-offset" in _checks(report)
+    assert next(item for item in report.findings if item.check == "locator-page-offset").severity == "HARD"
+
+
+def test_typed_missing_pdf_reason_skips_page_rule_with_counted_notice(tmp_path: Path):
+    doc = _document()
+    locator = doc["species"]["Fe"]["observations"][0]["locator"]
+    locator.update(page=3711, pdf_page_index=2, page_verification="unverified_pdf_absent")
+    report = _run_gate(tmp_path, doc)
+
     assert "locator-page-offset" not in _checks(report)
+    notice = next(item for item in report.findings if item.check == "locator-verification")
+    assert notice.severity == "SOFT"
+    assert "1 issue(s)" in notice.detail
+    locator["page_verification"] = "unverified"
+    report = _run_gate(tmp_path, doc)
+    assert next(item for item in report.findings if item.check == "locator").severity == "HARD"
+
+
+def test_typed_missing_pdf_reason_does_not_skip_when_corpus_pdf_exists(
+    tmp_path: Path, monkeypatch
+):
+    corpus = tmp_path / "corpus"
+    pdf = corpus / "raw" / "fixture-original" / "fixture-original.pdf"
+    pdf.parent.mkdir(parents=True)
+    pdf.write_bytes(b"fixture")
+    monkeypatch.setattr(
+        gate.subprocess,
+        "run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args[0], 0, stdout="Pages:          3\n", stderr=""
+        ),
+    )
+    doc = _document()
+    doc["source"]["corpus_source_id"] = "fixture-original"
+    locator = doc["species"]["Fe"]["observations"][0]["locator"]
+    locator.update(page=2, pdf_page_index=1, page_verification="unverified_pdf_absent")
+
+    report = _run_gate(tmp_path, doc, corpus=corpus)
+
+    finding = next(
+        item for item in report.findings if item.check == "locator-page-offset"
+    )
+    assert finding.severity == "HARD"
+    assert "page_verification is invalid" in finding.detail
+
+
+def test_locator_index_without_page_is_not_verified(tmp_path: Path):
+    doc = _document()
+    locator = doc["species"]["Fe"]["observations"][0]["locator"]
+    locator.pop("page")
+    report = _run_gate(tmp_path, doc)
+
+    finding = next(
+        item for item in report.findings if item.check == "locator-verification"
+    )
+    assert finding.severity == "SOFT"
+    assert ".page is missing or invalid; physical page is unverified" in finding.detail
+
+
+def test_page_verification_migrates_as_locator_field_not_note():
+    from simulator.battery.migrate import locator_from_mapping
+
+    locator = locator_from_mapping(
+        {
+            "page": 2,
+            "pdf_page_index": 1,
+            "page_verification": "unverified_pdf_absent",
+            "table": "I",
+        }
+    )
+
+    assert locator is not None
+    assert locator.page_verification == "unverified_pdf_absent"
+    assert locator.note is None
+    assert not validator._locator_ok(
+        {"page_verification": "unverified_pdf_absent"}
+    )
+
+
+def test_table_caption_page_migrates_as_locator_field_not_note():
+    from simulator.battery.migrate import locator_from_mapping
+
+    locator = locator_from_mapping(
+        {
+            "page": 4,
+            "pdf_page_index": 3,
+            "table": "877",
+            "table_caption_page": 3,
+            "record": "3300.000 64.806",
+        }
+    )
+
+    assert locator is not None
+    assert locator.table_caption_page == 3
+    assert locator.note is None
+
+
+def test_table_continued_migrates_as_locator_field_not_note():
+    from simulator.battery.migrate import locator_from_mapping
+
+    locator = locator_from_mapping(
+        {
+            "page": 4,
+            "pdf_page_index": 3,
+            "table": "877",
+            "table_continued": True,
+            "record": "3300.000 64.806",
+        }
+    )
+
+    assert locator is not None
+    assert locator.table_continued is True
+    assert locator.note is None
+
+
+def test_table_caption_page_must_precede_data_page():
+    import pytest
+    from simulator.battery.records import Locator
+
+    with pytest.raises(ValueError, match="earlier than the data page"):
+        Locator(page=3, table="877", table_caption_page=3)
 
 
 def test_absent_corpus_pdf_only_warns_about_page_count(tmp_path: Path):

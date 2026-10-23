@@ -368,7 +368,7 @@ experiments:
       locator: {page: 5, table: '2', note: Printed initial weights across runs}
     printed_composition:
       state: {tag: value, value: {SiO2: '50.34', Al2O3: '15.40', MgO: '10.80', CaO: '23.46'}}
-      locator: {pdf_page_index: 4, page: 4, section: '2.1 Sample preparation', note: 'lines 110-111; nominal composition SiO2=50.34, Al2O3=15.40, MgO=10.80, CaO=23.46 wt%; An-Di eutectic 42 wt% anorthite / 58 wt% diopside with run-varying Ga/In/Tl traces'}
+      locator: {pdf_page_index: 3, page: 4, section: '2.1 Sample preparation', note: 'lines 110-111; nominal composition SiO2=50.34, Al2O3=15.40, MgO=10.80, CaO=23.46 wt%; An-Di eutectic 42 wt% anorthite / 58 wt% diopside with run-varying Ga/In/Tl traces'}
     initial_composition:
       state:
         tag: value
@@ -380,7 +380,7 @@ experiments:
           - [Al2O3, '0.09016222059047146822155136996']
           - [MgO, '0.159959352914716545092785499']
           - [CaO, '0.2497337676677724287741937335']
-      locator: {pdf_page_index: 4, page: 4, section: '2.1 Sample preparation', note: 'lines 110-111; derived from nominal recipe wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j)'}
+      locator: {pdf_page_index: 3, page: 4, section: '2.1 Sample preparation', note: 'lines 110-111; derived from nominal recipe wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j)'}
       method_class: calculated
       inference:
         relation: wt_pct_to_mole_fraction

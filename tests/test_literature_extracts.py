@@ -205,7 +205,7 @@ def _assert_ohta_suito_1995_review_pins(extract: dict) -> None:
 
     table_iii_observation_id = "ohta_suito_1995_table3_interaction_parameters"
     expected_table_iii_locator = {
-        "page": 298, "published_page": 298, "pdf_page_index": 3, "table": "III"
+        "page": 4, "published_page": 298, "pdf_page_index": 3, "table": "III"
     }
     table_iii_locators = [
         row["locator"]
@@ -2892,7 +2892,7 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         assert values.get("formula") == formula
         assert values.get("condensed_phase") == condensed_phase
         assert row["T_range_K"] == [temperature, temperature]
-        assert row["locator"]["page"] == 826
+        assert row["locator"]["page"] == 6
         assert row["locator"]["published_page"] == 826
         assert row["locator"]["pdf_page_index"] == 5
         assert row["locator"]["figure"] == "7"
@@ -2913,7 +2913,7 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         assert row["T_range_K"] == [temperature, temperature]
         assert values["evidence_class"] == "figure_only"
         assert row["locator"] == {
-            "page": 826,
+            "page": 6,
             "published_page": 826,
             "pdf_page_index": 5,
             "figure": "7",
@@ -2939,26 +2939,27 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         (figure["figure"], figure["locator"])
         for figure in geometry["polythermal_pressure_figures"]
     ] == [
-        ("8", {"page": 827, "pdf_page_index": 6}),
-        ("9", {"page": 827, "pdf_page_index": 6}),
-        ("10", {"page": 827, "pdf_page_index": 6}),
-        ("11", {"page": 827, "pdf_page_index": 6}),
-        ("12", {"page": 828, "pdf_page_index": 7}),
-        ("13", {"page": 828, "pdf_page_index": 7}),
+        ("8", {"page": 7, "published_page": 827, "pdf_page_index": 6}),
+        ("9", {"page": 7, "published_page": 827, "pdf_page_index": 6}),
+        ("10", {"page": 7, "published_page": 827, "pdf_page_index": 6}),
+        ("11", {"page": 7, "published_page": 827, "pdf_page_index": 6}),
+        ("12", {"page": 8, "published_page": 828, "pdf_page_index": 7}),
+        ("13", {"page": 8, "published_page": 828, "pdf_page_index": 7}),
     ]
 
     cross_sections = next(
         row for row in doc["species"]["CaO"]["observations"]
         if row["observation_id"] == "halwax_2024_table_iii_ionization_cross_sections"
     )
-    assert cross_sections["locator"]["page"] == 826
+    assert cross_sections["locator"]["page"] == 6
+    assert cross_sections["locator"]["published_page"] == 826
     assert cross_sections["locator"]["pdf_page_index"] == 5
     cross_sections = cross_sections["values"]
     assert cross_sections["pressure_equation_locator"] == {
-        "page": 824, "pdf_page_index": 3, "equation": "1"
+        "page": 4, "published_page": 824, "pdf_page_index": 3, "equation": "1"
     }
     assert cross_sections["oxygen_molecular_cross_section_equation_locator"] == {
-        "page": 826, "pdf_page_index": 5, "equation": "12"
+        "page": 6, "published_page": 826, "pdf_page_index": 5, "equation": "12"
     }
     for species in ("CaO", "MgO"):
         table_i = next(
@@ -2967,20 +2968,20 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
                 "table_i_" + species.lower() + "_sample_masses"
             )
         )
-        assert table_i["locator"]["page"] == 825
+        assert table_i["locator"]["page"] == 5
         assert table_i["locator"]["pdf_page_index"] == 4
         assert all(
-            item["locator"] == {"page": 825, "table": "I", "pdf_page_index": 4}
+            item["locator"] == {"page": 5, "published_page": 825, "table": "I", "pdf_page_index": 4}
             for item in table_i["values"]["series"]
         )
     ni = next(
         row for row in doc["species"]["Ni"]["observations"]
         if row["observation_id"] == "halwax_2024_table_ii_ni_sublimation_this_study"
     )
-    assert ni["locator"]["page"] == 826
+    assert ni["locator"]["page"] == 6
     assert ni["locator"]["pdf_page_index"] == 5
     assert ni["uncertainty"]["locator"] == {
-        "page": 826, "pdf_page_index": 5, "table": "II"
+        "page": 6, "published_page": 826, "pdf_page_index": 5, "table": "II"
     }
     assert ni["values"]["pressure_calibration_factor"] == 7.6414e-9
     factor_pin = next(
@@ -2988,7 +2989,7 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         if sample.get("path", "").endswith("pressure_calibration_factor_as_printed")
     )
     assert factor_pin["value"] == "7.6414·10⁻⁹"
-    assert factor_pin["locator"]["page"] == 826
+    assert factor_pin["locator"]["page"] == 6
     assert factor_pin["locator"]["pdf_page_index"] == 5
 
 
