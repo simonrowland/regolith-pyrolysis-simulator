@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+from simulator.alpha_kinetics import (
+    _EVAPORATION_ALPHA_GROUPS,
+    _assert_runtime_alpha_source_not_vaporock,
+    _load_evaporation_alpha_specs,
+)
+
 import copy
 import math
 from collections import defaultdict
@@ -9,7 +15,6 @@ from collections.abc import Mapping
 from numbers import Real
 from typing import Any, NamedTuple
 
-from simulator.alpha_kinetics import parse_alpha_contract
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.chemistry.melt_activity import single_cation_mole_fractions
@@ -357,7 +362,6 @@ def refuse_viscous_p_bulk_out_of_domain(
 # NOTE: the evaporation alpha default lives at engines/builtin/evaporation_flux.py
 # (_DEFAULT_EVAPORATION_ALPHA), which is the authoritative flux path; the former
 # duplicate here was dead (unused, not imported) and was removed (SC-09 / BUG-051).
-_EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
 def _diagnostic_names_composition_projected(
     diagnostic: Mapping[str, Any] | None,
 ) -> bool:
@@ -487,95 +491,11 @@ _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE = (
 _KRESS91_FLOOR_OPEN_SIDE_C = 1.0e-6
 
 
-def _assert_runtime_alpha_source_not_vaporock(
-    species: str, alpha_data: Mapping[str, Any]
-) -> None:
-    """Production evaporation gate: refuse VapoRock-fit alpha provenance.
-
-    Complements catalog compile denial. Legacy compatibility views still load
-    alphas outside a re-compile; this path is the second SC-50 consumer so a
-    VapoRock source cannot reach HKL flux silently.
-    """
-
-    from simulator.vapour_rail.kinetics_anchors import (
-        KineticsAnchorError,
-        assert_alpha_source_not_vaporock,
-    )
-
-    sources: list[Any] = []
-    # source_note is a supported provenance shape (kinetics_anchors loader);
-    # omitting it lets VapoRock-fit alphas bypass the gate via
-    # {value, source_note} contracts.
-    for key in ("source", "provenance", "citation", "source_note"):
-        if key in alpha_data and alpha_data.get(key) is not None:
-            sources.append(alpha_data.get(key))
-    value = alpha_data.get("value")
-    if isinstance(value, Mapping):
-        for key in ("cite", "source", "provenance", "source_note"):
-            if key in value and value.get(key) is not None:
-                sources.append(value.get(key))
-    for source in sources:
-        try:
-            assert_alpha_source_not_vaporock(str(source))
-        except KineticsAnchorError as exc:
-            raise ValueError(
-                f"evaporation alpha for {species!r} refused VapoRock provenance: {exc}"
-            ) from exc
-
-
 def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, Any]:
-    """Load executable alpha specs, preserving dormant pressure-only carriers.
-
-    b-314: a row tagged ``broad_proxy_not_intrinsic`` (tier-2 proxy inherited
-    from another measurement family) is not an intrinsic melt alpha. It stays
-    in this map — the pressure-gating path
-    (``_legacy_evaporation_shadow_pressure_map``) and class diagnostics consume
-    it — but as a provenance-carrying mapping marked with
-    ``alpha_proxy_tag``, never a bare number indistinguishable from a
-    measured coefficient. The provider-facing measured view
-    (``_measured_alpha_control_view``) strips these rows so the SC-67
-    unmeasured-alpha refusal fires instead of a proxy satisfying the gate.
-    """
-
-    from simulator.evaporation_classes import (
-        BROAD_PROXY_NOT_INTRINSIC_TAG,
-        is_broad_proxy_not_intrinsic_row,
-    )
+    """Resolve catalog rows for the shared pure alpha loader."""
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
-    vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
-    alpha_by_species: dict[str, Any] = {}
-    for group_name in _EVAPORATION_ALPHA_GROUPS:
-        group = vapor_pressure_data.get(group_name, {}) or {}
-        for species, species_data in group.items():
-            if not isinstance(species_data, dict):
-                continue
-            if "evaporation_alpha" not in species_data:
-                continue
-            alpha_data = species_data.get("evaporation_alpha") or {}
-            if isinstance(alpha_data, Mapping):
-                _assert_runtime_alpha_source_not_vaporock(str(species), alpha_data)
-            value = parse_alpha_contract(alpha_data)
-            if value is None:
-                continue
-            if species_data.get("flux_dormant") is True:
-                alpha_by_species[species] = 0.0
-                continue
-            if is_broad_proxy_not_intrinsic_row(alpha_data):
-                payload = (
-                    dict(value)
-                    if isinstance(value, Mapping)
-                    else {"form": "scalar", "value": value}
-                )
-                payload["alpha_proxy_tag"] = BROAD_PROXY_NOT_INTRINSIC_TAG
-                if alpha_data.get("tier") is not None:
-                    payload["alpha_proxy_tier"] = alpha_data.get("tier")
-                if alpha_data.get("source"):
-                    payload["source"] = str(alpha_data.get("source"))
-                alpha_by_species[species] = payload
-                continue
-            alpha_by_species[species] = value
-    return alpha_by_species
+    return _load_evaporation_alpha_specs(vapor_pressure_legacy_view(vapor_pressure_data))
 
 
 def _measured_alpha_control_view(

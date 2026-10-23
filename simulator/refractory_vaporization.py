@@ -6,10 +6,12 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Mapping
 
-from scipy.optimize import brentq
 
 from simulator.accounting.formulas import parse_formula
-from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+from simulator.chemistry.langmuir_knudsen import (
+    hertz_knudsen_k_kg_s_m2_pa,
+    _solve_congruent_oxygen_balance,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -357,82 +359,21 @@ def solve_congruent_vaporization(
         formula_flux = cation_flux / condensed_metal_count
         return activities, pressures, fluxes, formula_flux
 
-    def oxygen_residual(oxygen_log: float) -> float:
-        _, _, fluxes, formula_flux = state(oxygen_log)
-        oxygen_from_condensed = condensed_oxygen_count * formula_flux
-        oxygen_in_cation_vapor = sum(
-            float(gas_formulas[name].elements.get("O", 0.0)) * fluxes[name]
-            for name in gas_names
-            if gas_formulas[name].elements.get(metal_element, 0.0) > 0.0
-        )
-        oxygen_excess = oxygen_from_condensed - oxygen_in_cation_vapor
-        oxygen_effusion = fluxes["O"] + 2.0 * fluxes["O2"]
-        scale = abs(oxygen_excess) + abs(oxygen_effusion) + 1.0e-300
-        return 2.0 * (oxygen_excess - oxygen_effusion) / scale
-
     if oxygen_mode == "self_buffered":
-        scan_points = [
-            _LOG10_ACTIVITY_MIN
-            + index * (_LOG10_ACTIVITY_MAX - _LOG10_ACTIVITY_MIN) / 720.0
-            for index in range(721)
-        ]
-        brackets: list[tuple[float, float]] = []
-        exact_roots: list[float] = []
-        previous_x: float | None = None
-        previous_value: float | None = None
-        for point in scan_points:
-            try:
-                value = oxygen_residual(point)
-            except CongruentVaporizationError:
-                previous_x = None
-                previous_value = None
-                continue
-            if not math.isfinite(value):
-                previous_x = None
-                previous_value = None
-                continue
-            if abs(value) <= 1.0e-14:
-                exact_roots.append(point)
-                previous_x = None
-                previous_value = None
-                continue
-            if previous_value is not None and value * previous_value < 0.0:
-                brackets.append((previous_x, point))
-            previous_x = point
-            previous_value = value
-        candidate_roots = list(exact_roots)
-        for bracket in brackets:
-            try:
-                candidate_roots.append(
-                    brentq(
-                        oxygen_residual,
-                        bracket[0],
-                        bracket[1],
-                        xtol=1.0e-12,
-                        rtol=1.0e-12,
-                        maxiter=200,
-                    )
-                )
-            except (RuntimeError, ValueError) as exc:
-                # Fail loud with typed refusal — never return a bracket mid-point
-                # or last residual evaluation (SC-109 completion-from-absence).
-                raise CongruentVaporizationError(
-                    f"congruent pO2 root solver failed for {material} at "
-                    f"{temperature:g} K (bracket={bracket[0]:.6g}..{bracket[1]:.6g}): "
-                    f"{exc}"
-                ) from exc
-        unique_roots: list[float] = []
-        for root in sorted(candidate_roots):
-            if not unique_roots or abs(root - unique_roots[-1]) > 1.0e-8:
-                unique_roots.append(root)
-        if len(unique_roots) != 1:
-            raise CongruentVaporizationError(
-                f"congruent solve found {len(unique_roots)} physical pO2 roots for "
-                f"{material} at {temperature:g} K"
-            )
-        oxygen_log = unique_roots[0]
-        self_buffered_root_count: int | None = len(unique_roots)
-        residual_norm = abs(oxygen_residual(oxygen_log))
+        oxygen_log, self_buffered_root_count, residual_norm = _solve_congruent_oxygen_balance(
+            lambda logp: state(logp)[2:],
+            gas_names=gas_names,
+            oxygen_atoms={name: float(formula.elements.get("O", 0.0))
+                          for name, formula in gas_formulas.items()},
+            cation_species=frozenset(
+                name for name, formula in gas_formulas.items()
+                if formula.elements.get(metal_element, 0.0) > 0.0
+            ),
+            condensed_oxygen_count=condensed_oxygen_count,
+            scan_min=_LOG10_ACTIVITY_MIN, scan_max=_LOG10_ACTIVITY_MAX,
+            material=material, temperature=temperature,
+            error_type=CongruentVaporizationError,
+        )
     else:
         assert fixed_log10_pO2_ratio is not None
         oxygen_log = fixed_log10_pO2_ratio

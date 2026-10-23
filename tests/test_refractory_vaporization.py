@@ -383,7 +383,7 @@ def test_brentq_nonconvergence_raises_typed_congruent_error(monkeypatch) -> None
         raise RuntimeError("Failed to converge after 200 iterations.")
 
     monkeypatch.setattr(
-        "simulator.refractory_vaporization.brentq",
+        "simulator.chemistry.langmuir_knudsen.brentq",
         _force_nonconvergence,
     )
     with pytest.raises(CongruentVaporizationError, match="root solver failed") as info:

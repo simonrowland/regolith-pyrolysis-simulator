@@ -32,6 +32,10 @@ from engines.builtin.evaporation_flux import (
 )
 from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
 from simulator.evaporation import _load_evaporation_alpha_by_species
+from simulator.alpha_kinetics import (
+    BROAD_PROXY_NOT_INTRINSIC_TAG,
+    is_broad_proxy_not_intrinsic_row,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -712,22 +716,6 @@ def grounding_evidence(class_id: str) -> tuple[EvidenceRow, ...]:
 # unmeasured-alpha refusal fires instead). The richer
 # :func:`gate_production_alpha_source` instrument (free-text refinement,
 # system-class fences) is still NOT wired into flux.
-
-BROAD_PROXY_NOT_INTRINSIC_TAG: Final[str] = "broad_proxy_not_intrinsic"
-
-
-def is_broad_proxy_not_intrinsic_row(alpha_data: Any) -> bool:
-    """True when an ``evaporation_alpha`` contract row is tagged as a tier-2
-    broad proxy — inherited from another measurement family, not an intrinsic
-    melt coefficient. Such a row is proxy evidence, never a measurement, and
-    must not satisfy the flux path's measured-alpha requirement."""
-
-    if not isinstance(alpha_data, Mapping):
-        return False
-    return (
-        str(alpha_data.get("tag") or "").strip().lower()
-        == BROAD_PROXY_NOT_INTRINSIC_TAG
-    )
 
 
 ProductionAlphaGate = Literal[
