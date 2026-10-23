@@ -5340,9 +5340,10 @@ def antoine_dew_temperature_diagnostic(
 ) -> dict[str, Any]:
     """Invert the existing Antoine wall-pressure surface for diagnostics.
 
-    The result carries no routing authority.  Certified-range refusals and
-    missing pressure/data return typed status records rather than fallback
-    temperatures.
+    The result carries no direct inventory-routing authority. The Fe result is
+    consumed by the stage_0_to_stage_1 wall schedule as a temperature floor;
+    when its wall relation is uncertified, that use remains visible in the
+    result reason rather than suppressing the predicted temperature.
     """
 
     try:
@@ -5384,7 +5385,36 @@ def antoine_dew_temperature_diagnostic(
                 continue
             if math.isfinite(low) and math.isfinite(high) and 0.0 < low < high:
                 candidate_ranges.append((low, high))
-    if not candidate_ranges:
+    certified_range: list[float] | None = None
+    uncertified_notice: str | None = None
+    search_ranges = sorted(set(candidate_ranges))
+    if not search_ranges:
+        support_range = (
+            block.get("construction_support_range_K")
+            if species == "Fe"
+            and block_name == "pure_component_antoine"
+            and isinstance(block, Mapping)
+            else None
+        )
+        if isinstance(support_range, (list, tuple)) and len(support_range) == 2:
+            try:
+                support_low, support_high = map(float, support_range)
+            except (TypeError, ValueError):
+                support_low = support_high = math.nan
+            if (
+                math.isfinite(support_low)
+                and math.isfinite(support_high)
+                and 0.0 < support_low < support_high
+            ):
+                # This is only a numeric starting bracket for the selected
+                # forward wall relation. It is not surfaced as certification.
+                search_ranges = [(support_low, support_high)]
+                relation_source = str(block.get("source") or "source unspecified")
+                uncertified_notice = (
+                    "Fe wall saturation relation uncertified (extrapolated); "
+                    f"source={relation_source}"
+                )
+    if not search_ranges:
         return {
             "status": "unavailable_no_certified_antoine_range",
             "temperature_K": None,
@@ -5393,12 +5423,46 @@ def antoine_dew_temperature_diagnostic(
             "routing_authority": False,
         }
 
-    certified_range = [min(item[0] for item in candidate_ranges), max(item[1] for item in candidate_ranges)]
+    if candidate_ranges:
+        certified_range = [
+            min(item[0] for item in candidate_ranges),
+            max(item[1] for item in candidate_ranges),
+        ]
     bracket_found = False
     try:
-        for low, high in sorted(set(candidate_ranges)):
+        for low, high in search_ranges:
             p_low = _antoine_psat_pa(species, low, vapor_pressure_data=vapor_pressure_data)
             p_high = _antoine_psat_pa(species, high, vapor_pressure_data=vapor_pressure_data)
+            if (
+                uncertified_notice is not None
+                and p_low is not None
+                and p_high is not None
+                and p_low < p_high
+            ):
+                # The Fe sidecar has no certified band. Expand its declared
+                # construction-support interval only as needed to bracket
+                # this pressure with the same forward wall relation.
+                for _ in range(80):
+                    if p_low <= target <= p_high:
+                        break
+                    if target < p_low:
+                        high, p_high = low, p_low
+                        low = max(low / 2.0, 1e-9)
+                        p_low = _antoine_psat_pa(
+                            species,
+                            low,
+                            vapor_pressure_data=vapor_pressure_data,
+                        )
+                    else:
+                        low, p_low = high, p_high
+                        high *= 2.0
+                        p_high = _antoine_psat_pa(
+                            species,
+                            high,
+                            vapor_pressure_data=vapor_pressure_data,
+                        )
+                    if p_low is None or p_high is None:
+                        break
             if p_low is not None and p_high is not None and min(p_low, p_high) <= target <= max(p_low, p_high):
                 bracket_found = True
                 break
@@ -5412,6 +5476,15 @@ def antoine_dew_temperature_diagnostic(
             "routing_authority": False,
         }
     if not bracket_found:
+        if uncertified_notice is not None:
+            return {
+                "status": "refused_outside_certified_surface",
+                "temperature_K": None,
+                "partial_pressure_Pa": target,
+                "reason": uncertified_notice,
+                "provenance": "existing_condensation_antoine_surface",
+                "routing_authority": False,
+            }
         return {
             "status": "refused_pressure_outside_certified_range",
             "temperature_K": None,
@@ -5439,9 +5512,11 @@ def antoine_dew_temperature_diagnostic(
     return {
         "status": "diagnostic_only",
         "temperature_K": temperature_K,
-        **({"reason": qualification} if qualification else {}),
+        **({"reason": uncertified_notice or qualification}
+           if uncertified_notice or qualification else {}),
         "partial_pressure_Pa": target,
-        "valid_range_K": certified_range,
+        **({"valid_range_K": certified_range}
+           if certified_range is not None else {}),
         "provenance": "existing_condensation_antoine_surface",
         "routing_authority": False,
     }
