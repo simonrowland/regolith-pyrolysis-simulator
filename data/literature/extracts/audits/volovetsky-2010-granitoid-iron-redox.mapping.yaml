@@ -1,0 +1,31 @@
+source_id: volovetsky-2010-granitoid-iron-redox
+source:
+  citation: Volovetsky et al. (2010), Study of oxygen fugacity influence on redox state of iron in granitoidic melts, Journal of Physics: Conference Series 217, 012050.
+extraction:
+  method: Born-digital pdftotext-layout table mapping; row/column binding checked against the 600 dpi PDF render.
+  date: '2026-10-20'
+  worker: fam25-1020
+review_status: draft
+tables:
+- page: 3
+  table_index: 1
+  type: equilibrium_phase_composition
+  quantity: equilibrium_phase_composition
+  unit: '% (basis not specified by the paper)'
+  evidence_class: measured_direct
+  phase: glass
+  values:
+  - {column: 3, species: SiO2, quantity: equilibrium_phase_composition, unit: '%'}
+  - {column: 4, species: TiO2, quantity: equilibrium_phase_composition, unit: '%'}
+  - {column: 5, species: Al2O3, quantity: equilibrium_phase_composition, unit: '%'}
+  - {column: 6, species: FeO, quantity: equilibrium_phase_composition, unit: '%'}
+  - {column: 7, species: MnO, quantity: equilibrium_phase_composition, unit: '%'}
+  - {column: 8, species: MgO, quantity: equilibrium_phase_composition, unit: '%'}
+  - {column: 9, species: CaO, quantity: equilibrium_phase_composition, unit: '%'}
+  - {column: 10, species: Na2O, quantity: equilibrium_phase_composition, unit: '%'}
+  - {column: 11, species: K2O, quantity: equilibrium_phase_composition, unit: '%'}
+  - {column: 12, species: Cl, quantity: equilibrium_phase_composition, unit: '%'}
+  - {column: 13, species: ZrO2, quantity: equilibrium_phase_composition, unit: '%'}
+  context_only:
+  - {column: 14, field: Total, reason: The total is not a species composition component.}
+  blanks: unknown

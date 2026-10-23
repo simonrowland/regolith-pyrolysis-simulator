@@ -3178,6 +3178,25 @@ def convert_volume_to_m3(
     return None, f"unmapped volume unit {units!r}"
 
 
+def convert_density_to_kg_per_m3(
+    value: Decimal, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """Normalize the printed density unit to the quantity token's SI unit."""
+    raw_unit = str(units or "").strip().lower()
+    if raw_unit in {"kg/m3", "kg/m^3", "kg/m³", "kg_per_m3"}:
+        return value, "as_published"
+    unit = (
+        raw_unit.replace(" ", "")
+        .replace("³", "3")
+        .replace("⁻", "-")
+        .replace("^", "")
+    )
+    if unit in {"g/cm3", "g/cm3asprinted", "gcm-3"}:
+        factor = _CONVERSION_META["g_per_cm3_to_kg_per_m3"][0]
+        return value * factor, "g_per_cm3_to_kg_per_m3"
+    return None, f"unmapped density unit {units!r}"
+
+
 # trail -> (factor, arithmetic, output_unit, original_unit)
 _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     "Pa_to_Pa": (Decimal("1"), "P_Pa = P_Pa", "Pa", "Pa"),
@@ -3222,6 +3241,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "m_kg_per_m2 = m_g_per_cm2 × 10",
         "kg_per_m2",
         "g_per_cm2",
+    ),
+    "g_per_cm3_to_kg_per_m3": (
+        Decimal("1000"),
+        "rho_kg_per_m3 = rho_g_per_cm3 × 1000",
+        "kg_per_m3",
+        "g_per_cm3",
     ),
     "mg_per_cm2_to_kg_per_m2": (
         Decimal("100"),
@@ -8761,6 +8786,11 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "delta_q_replicate_1",
         "delta_q_replicate_2",
     ),
+    Quantity.DENSITY: (
+        "density_g_cm3",
+        "density_kg_m3_also_printed",
+        "value",
+    ),
     Quantity.FUGACITY: (
         "fCl2_bar",
         "fugacity_bar",
@@ -9815,6 +9845,7 @@ def _selection_from_named_field(
     if q_token is Quantity.FE3_FE2_RATIO:
         return _fe3_fe2_ratio_selection(payload, condition_ranges)
     malformed_fraction_bound: SourceSelection | None = None
+    density_refusal: SourceSelection | None = None
     for key in QUANTITY_SOURCE_FIELDS.get(q_token, ()):
         if key not in payload:
             continue
@@ -9888,6 +9919,21 @@ def _selection_from_named_field(
             approximate_payload = {**payload, "approximate": True}
         if amount is None:
             continue
+        if q_token is Quantity.DENSITY:
+            density_units = _printed_unit_for_field(payload, key) or (
+                "kg/m3" if key == "density_kg_m3_also_printed" else units
+            )
+            amount, trail = convert_density_to_kg_per_m3(amount, density_units)
+            if amount is None:
+                density_refusal = _unavailable_selection(
+                    trail or "density has no supported printed unit",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+                continue
+            return _point_selection(amount, key, trail, payload, condition_ranges)
         if q_token is Quantity.MASS_LOSS_AREAL_DENSITY:
             amount, trail = convert_areal_mass_to_kg_per_m2(amount, units)
             if amount is None:
@@ -9946,6 +9992,20 @@ def _selection_from_named_field(
     if len(decorated) == 1:
         key, amount = decorated[0]
         assert amount is not None
+        if q_token is Quantity.DENSITY:
+            amount, trail = convert_density_to_kg_per_m3(
+                amount, _printed_unit_for_field(payload, key) or units
+            )
+            if amount is None:
+                density_refusal = _unavailable_selection(
+                    trail or "density has no supported printed unit",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+                return density_refusal
+            return _point_selection(amount, key, trail, payload, condition_ranges)
         if q_token is Quantity.MASS_LOSS_AREAL_DENSITY:
             amount, trail = convert_areal_mass_to_kg_per_m2(amount, units)
             if amount is None:
@@ -9985,6 +10045,8 @@ def _selection_from_named_field(
             amount /= Decimal("100")
             trail = "percent_to_fraction"
         return _point_selection(amount, key, trail, payload, condition_ranges)
+    if density_refusal is not None:
+        return density_refusal
     range_key = None
     raw_range = None
     if q_token is Quantity.EVAPORATION_COEFFICIENT_ALPHA and "alpha_range" in payload:
@@ -15637,6 +15699,7 @@ class Migrator:
         if (
             q_token in {
                 Quantity.MASS_LOSS_AREAL_DENSITY,
+                Quantity.DENSITY,
                 Quantity.FUGACITY,
                 Quantity.H_MINUS_H298,
                 Quantity.EVOLVED_GAS_YIELD,
@@ -17842,7 +17905,15 @@ class Migrator:
                 output_unit=(
                     converted.output_unit
                     if converted is not None
-                    else ("Pa" if str(trail).endswith("Pa") else (units or "as_published"))
+                    else (
+                        "kg_per_m3"
+                        if q_token_point is Quantity.DENSITY and trail == "as_published"
+                        else (
+                            "Pa"
+                            if str(trail).endswith("Pa")
+                            else (units or "as_published")
+                        )
+                    )
                 ),
             )
         else:
