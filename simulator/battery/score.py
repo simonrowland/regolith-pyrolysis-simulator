@@ -317,6 +317,11 @@ MIN_RESIDUAL_SUMMARY_N = 10
 # axes that predate those two; adding them misses every stored key.
 _ALIGNMENT_AXES = _AXIS_NAMES
 _ROLE_ALIGNMENT_AXES = frozenset({"phase_role", "counter_phase_role"})
+# Axes stored on Identity but omitted from group keys unless this profile
+# names them. normalising_element is element_fraction_remaining only.
+_PROFILE_GATED_ALIGNMENT_AXES = _ROLE_ALIGNMENT_AXES | frozenset(
+    {"normalising_element"}
+)
 _UNIT_DIMENSION: dict[str, str] = {
     "kJ_per_declared_mol_basis": "energy_per_mol",
     "J_per_declared_mol_basis_per_K": "energy_per_mol_per_K",
@@ -614,6 +619,23 @@ def match_reported_species(
     return None
 
 
+# Na/K/Fe/Mg fluxes are pyrolysis_yield. SiO is SiO_evolution. FeO stays FeO.
+_EVAPORATION_FLUX_PYROLYSIS_FORMULAS = frozenset({"Na", "K", "Fe", "Mg"})
+EVAPORATION_FLUX_SCORER_PENDING = (
+    "evaporation_flux scorer branch pending C11 surface-flow inputs"
+)
+
+
+def evaporation_flux_rail(species_formula: str) -> Rail | None:
+    """Headline rail an evaporation_flux row will use once C11 scores it."""
+
+    if species_formula in _EVAPORATION_FLUX_PYROLYSIS_FORMULAS:
+        return Rail.PYROLYSIS_YIELD
+    if species_formula == "SiO":
+        return Rail.SIO_EVOLUTION
+    return None
+
+
 def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -> Rail | None:
     """Headline rail, or None when the quantity is not on one.
 
@@ -626,6 +648,12 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
 
     if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
         return Rail.RESIDUE_COMPOSITION
+    if quantity is Quantity.ELEMENT_FRACTION_REMAINING:
+        return Rail.RESIDUE_COMPOSITION
+    if quantity is Quantity.EVAPORATION_FLUX:
+        return evaporation_flux_rail(species_formula)
+    if quantity is Quantity.CONDENSATION_COEFFICIENT:
+        return None
     if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION or quantity in PRINTED_CAPACITY_QUANTITIES:
         return Rail.MELT_ACTIVITY
     if quantity is Quantity.DISTRIBUTION_RATIO:
@@ -678,6 +706,10 @@ def no_headline_rail_reason(
 
     if quantity is None:
         return "quantity_unknown"
+    if quantity is Quantity.CONDENSATION_COEFFICIENT:
+        return "not_scored"
+    if quantity is Quantity.EVAPORATION_FLUX:
+        return "outside_supported_species"
     if quantity in _NOT_VAPOUR_QUANTITIES:
         return "not_a_vapour_quantity"
     if quantity in KINETIC_YIELD_QUANTITIES:
@@ -3108,7 +3140,7 @@ def _alignment_axes(profile: object) -> tuple[str, ...]:
     return tuple(
         name
         for name in _ALIGNMENT_AXES
-        if name not in _ROLE_ALIGNMENT_AXES or name in named
+        if name not in _PROFILE_GATED_ALIGNMENT_AXES or name in named
     )
 
 
@@ -3122,7 +3154,7 @@ def _axis_alignment_value(identity: Identity, name: str, profile: object) -> obj
         if not required and not permitted_na:
             return None
         return to_plain(state.value)
-    if state.is_not_applicable and permitted_na and not required:
+    if state.is_not_applicable and permitted_na:
         return {"state": "not_applicable"}
     return None
 
@@ -5681,6 +5713,263 @@ def _predict_phase_row(
     )
 
 
+_PREDICTED_RESIDUE_KEY = "predicted_residue_amount"
+ALPHA_EVIDENCE_QUANTITIES = frozenset(
+    {
+        Quantity.CONDENSATION_COEFFICIENT,
+        Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+    }
+)
+
+
+def alpha_evidence_record(observation: Observation) -> dict[str, object] | None:
+    """One alpha-catalog row. The two coefficients keep their own identities."""
+
+    identity = observation.identity
+    if not isinstance(identity, Identity):
+        return None
+    quantity = quantity_token(identity)
+    if quantity not in ALPHA_EVIDENCE_QUANTITIES:
+        return None
+    return {
+        "observation_id": observation.observation_id,
+        "quantity": quantity.value,
+        "identity": to_plain(identity),
+        "value": to_plain(observation.value),
+    }
+
+
+def alpha_evidence_catalog(
+    observations: Iterable[Observation],
+) -> tuple[dict[str, object], ...]:
+    records = []
+    for observation in observations:
+        record = alpha_evidence_record(observation)
+        if record is not None:
+            records.append(record)
+    return tuple(records)
+
+
+def _evaporation_flux_prediction(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+) -> EnginePrediction:
+    """Refuse. Do not call the legacy pipe-length flux."""
+
+    from simulator.battery.migrate import T1473_FLOW_AXES, flow_member_is_printed
+
+    provenance = observation.provenance if isinstance(observation.provenance, Mapping) else {}
+    flow = provenance.get("flow")
+    missing = [
+        axis
+        for axis in T1473_FLOW_AXES
+        if not isinstance(flow, Mapping) or not flow_member_is_printed(flow.get(axis))
+    ]
+    if missing:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={
+                "reason": "missing_input",
+                "missing": missing,
+                "quantity": Quantity.EVAPORATION_FLUX.value,
+            },
+            identity=identity,
+        )
+    formula = identity.species.formula
+    rail = evaporation_flux_rail(formula)
+    if rail is None:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            refusal_detail={
+                "reason": "outside_supported_species",
+                "quantity": Quantity.EVAPORATION_FLUX.value,
+                "species_formula": formula,
+            },
+            identity=identity,
+        )
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNSUPPORTED,
+        refusal_detail={
+            "reason": EVAPORATION_FLUX_SCORER_PENDING,
+            "quantity": Quantity.EVAPORATION_FLUX.value,
+            "species_formula": formula,
+            "rail": rail.value,
+        },
+        identity=identity,
+    )
+
+
+def _amount_from_residue_map(raw: object) -> Decimal | None:
+    if isinstance(raw, Mapping):
+        raw = raw.get("value")
+    if raw in (None, ""):
+        return None
+    try:
+        amount = as_decimal(raw)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not amount.is_finite():
+        return None
+    return amount
+
+
+def element_fraction_remaining_ratio(
+    *,
+    element: str,
+    normalising_element: str | None,
+    start_amounts: Mapping[str, object],
+    residue_amounts: Mapping[str, object],
+) -> tuple[Decimal | None, dict[str, object]]:
+    """Like-for-like remaining fraction from a predicted residue.
+
+    Premise: the scored quantity is the one the source printed. An absolute
+    row is n_X(t)/n_X(0). A normalised row is (n_X(t)/n_N(t)) / (n_X(0)/n_N(0)).
+    Algebra for the normalised form: f = n_X(t) * n_N(0) / (n_N(t) * n_X(0)).
+    The scorer does not replace n_N(t) with n_N(0).
+    Units: amount/amount, dimensionless on either path.
+    Sanity: every residue amount equal to its start amount gives f = 1.
+    """
+
+    def take(amounts: Mapping[str, object], name: str, role: str) -> tuple[Decimal | None, dict[str, object] | None]:
+        if name not in amounts:
+            reason = (
+                "element_not_in_starting_composition"
+                if role == "start"
+                else "element_not_in_residue"
+            )
+            return None, {"reason": reason, "element": name}
+        amount = _amount_from_residue_map(amounts[name])
+        if amount is None or amount <= 0:
+            return None, {"reason": "element_amount_not_positive", "element": name}
+        return amount, None
+
+    start_x, missing = take(start_amounts, element, "start")
+    if missing is not None or start_x is None:
+        return None, missing or {"reason": "element_not_in_starting_composition", "element": element}
+    residue_x, missing = take(residue_amounts, element, "residue")
+    if missing is not None or residue_x is None:
+        return None, missing or {"reason": "element_not_in_residue", "element": element}
+    if normalising_element is None:
+        return residue_x / start_x, {}
+    start_n, missing = take(start_amounts, normalising_element, "start")
+    if missing is not None or start_n is None:
+        return None, missing or {
+            "reason": "element_not_in_starting_composition",
+            "element": normalising_element,
+        }
+    residue_n, missing = take(residue_amounts, normalising_element, "residue")
+    if missing is not None or residue_n is None:
+        return None, missing or {
+            "reason": "element_not_in_residue",
+            "element": normalising_element,
+        }
+    return (residue_x * start_n) / (residue_n * start_x), {}
+
+
+def _element_fraction_remaining_prediction(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+) -> EnginePrediction:
+    composition = identity.composition
+    if composition is None or not composition.is_value or composition.value is None:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={"reason": "starting_composition_missing"},
+            identity=identity,
+        )
+    normaliser_state = identity.normalising_element
+    if normaliser_state is None or normaliser_state.is_unknown:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={"reason": "normalising_element_unknown"},
+            identity=identity,
+        )
+    normaliser = normaliser_state.value if normaliser_state.is_value else None
+    provenance = observation.provenance if isinstance(observation.provenance, Mapping) else {}
+    residue = provenance.get(_PREDICTED_RESIDUE_KEY)
+    if not isinstance(residue, Mapping):
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "residue_predictor_unavailable",
+                "quantity": Quantity.ELEMENT_FRACTION_REMAINING.value,
+            },
+            identity=identity,
+        )
+    value, detail = element_fraction_remaining_ratio(
+        element=identity.species.formula,
+        normalising_element=normaliser,
+        start_amounts=composition.value.as_map(),
+        residue_amounts=residue,
+    )
+    if value is None:
+        reason = RefusalReason.UNSUPPORTED
+        if detail.get("reason") == "element_not_in_starting_composition":
+            reason = RefusalReason.IDENTITY_INCOMPLETE
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=(
+                    ExecutionState.NOT_PROBED
+                    if reason is RefusalReason.IDENTITY_INCOMPLETE
+                    else ExecutionState.UNSUPPORTED
+                )
+            ),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=reason,
+            refusal_detail=detail,
+            identity=identity,
+        )
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=value,
+        unit="dimensionless",
+        coefficient_sources=sources,
+        lineage_complete=False,
+        identity=identity,
+    )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -5726,6 +6015,31 @@ def predict_with_engine(
             lineage_complete=False,
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "quantity_unknown"},
+        )
+    if quantity is Quantity.CONDENSATION_COEFFICIENT:
+        record = alpha_evidence_record(observation)
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "not_scored",
+                "outcome": "evidence_only",
+                "catalog": "alpha_evidence",
+                "record": record or {},
+            },
+            identity=identity,
+        )
+    if quantity is Quantity.EVAPORATION_FLUX:
+        return _evaporation_flux_prediction(
+            engine, observation, identity, channel, sources
+        )
+    if quantity is Quantity.ELEMENT_FRACTION_REMAINING:
+        return _element_fraction_remaining_prediction(
+            engine, observation, identity, channel, sources
         )
     if quantity is Quantity.FE3_FE2_RATIO:
         return _predict_fe_redox(engine, observation, identity, channel)

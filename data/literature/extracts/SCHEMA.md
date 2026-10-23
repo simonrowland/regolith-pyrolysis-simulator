@@ -237,6 +237,189 @@ Partial shapes are in scope (t-507 scope ruling): single-species P_sat series,
 derived γ without raw ion time series, single-species rate series, relative/
 uncalibrated series with bound-not-point semantics.
 
+## Quantity tokens (t-1473 schema diff)
+
+The closed observation-type list above does not grow. These three quantities
+use types that already exist. This section is the extract shape only. It does
+not route a row onto a rail and it does not authorize a migrator to retarget
+a row that does not print the quantity token.
+
+### `condensation_coefficient`
+
+Model input for the alpha catalog. Dimensionless. Not a scored prediction
+and not a `wall_deposition` observable. Stays on `type: alpha`.
+
+`values.quantity` is `condensation_coefficient`. The printed coefficient is
+`values.alpha` for a point, or `values.alpha_lower_bound` /
+`values.alpha_upper_bound` when `values.semantics` is `bound_not_point` or
+`bound_not_point_ordering`. An Arrhenius or polynomial condensation/growth
+coefficient keeps `values.alpha_form` verbatim (`expression`, and `A` / `B_K`
+only when the source prints them). `units` is `dimensionless`.
+
+Required printed identity, copied as printed:
+
+| Field | Meaning |
+|-------|---------|
+| `values.gas_species` | Condensing species |
+| `values.substrate` or `values.material` | Substrate |
+| `phase` | Substrate phase |
+| `T_K`, `T_range_K`, or `T_C` | Surface temperature. One of these is required |
+| `values.vapour_source_T_K` or `values.vapour_source_T_C` | Vapour or source temperature when the source prints one distinct from the surface. Omit when only one temperature is printed |
+| `values.technique` or `values.method` | Method |
+| `regime`, or a printed pressure (`values.vacuum`, `values.pressure`) | Pressure regime |
+
+Do not put this token on an evaporation coefficient. Liquid-potassium alpha
+(Neumann 1954, Tabelle 2) and the amorphous-SiO evaporation coefficient
+(Wetzel, Pucci and Gail 2012, eq 15 / Figure 7) stay
+`evaporation_coefficient_alpha`.
+
+```yaml
+type: alpha
+locator: {table: '3', page: 146}
+T_range_K: [2200.0, 2200.0]
+phase: solid_polycrystalline
+units: dimensionless
+values:
+  quantity: condensation_coefficient
+  alpha: 0.998
+  gas_species: W(g)
+  substrate: polycrystalline_W
+  technique: Mass spectrometry
+  vacuum: 1.0e-6 torr
+  method_class: review_compilation
+```
+
+Pound 1972 Table 3 (Chupka et al. 1963), tungsten row. The platinum and
+rhodium rows in the same table are lower bounds (`alpha_lower_bound`,
+`semantics: bound_not_point_ordering`), not points.
+
+### `evaporation_flux`
+
+Area-normalised flux from the evaporation law. `type: rate_series`.
+`values.quantity` is `evaporation_flux`. The number is
+`values.evaporation_flux`. Keep the printed unit. Allowed printed units are
+`mol m^-2 s^-1` and `kg m^-2 s^-1`. Do not convert at extraction. The
+canonical store unit is `subtype_defined` so both printed units survive; the
+scorer converts.
+
+Required printed identity:
+
+| Field | Meaning |
+|-------|---------|
+| `values.gas_species` | Evaporating species, as printed. Do not rewrite an oxide gas to the element |
+| `values.composition_as_printed` | Melt composition |
+| `T_C` or `T_K` | Temperature |
+| `values.P_total` with `values.P_total_unit` | Total pressure, as printed |
+| `values.atmosphere` or `values.carrier` | Atmosphere or carrier gas |
+| `values.flow` | Gas-flow conditions. The block is required even when the source omits a member |
+
+`values.flow` has four members: `flow_rate`, `velocity`, `geometry`,
+`crucible_or_sample_area`. A member the source prints is copied with its
+unit. A member the source omits is `{state: not_printed}` plus the locator
+of the place that was checked. Never write velocity 0, a still-gas flag, or
+an invented area.
+
+`mass_loss_rate` and `evaporation_rate` stay extensive rates (`kg s^-1`).
+A row that prints those tokens is not an evaporation flux.
+
+```yaml
+type: rate_series
+locator: {table: '1', page: 1}
+T_C: 1400
+units: mol m^-2 s^-1
+values:
+  quantity: evaporation_flux
+  evaporation_flux: 1.2e-5
+  gas_species: Na
+  composition_as_printed: 'printed melt analysis'
+  P_total: 1.0
+  P_total_unit: bar
+  atmosphere: air
+  flow:
+    flow_rate: {state: not_printed}
+    velocity: {state: not_printed}
+    geometry: {state: not_printed}
+    crucible_or_sample_area:
+      value: 1.5
+      unit: cm^2
+  method_class: measured_direct
+```
+
+Shape only. The numeric example is not a seated extract. No seated extract
+prints `quantity: evaporation_flux` at this diff.
+
+Na, K, Fe, and Mg fluxes are scored later on `pyrolysis_yield`. SiO is
+scored later on `SiO_evolution`. Any other species is stored and left
+unscored.
+
+### `element_fraction_remaining`
+
+Dimensionless fraction of one element remaining in an evaporation residue.
+`type: concentration_series`, one observation per element per time point.
+`values.quantity` is `element_fraction_remaining`. The printed number is
+`values.fraction_remaining`. `units` is `dimensionless`.
+
+Required printed identity:
+
+| Field | Meaning |
+|-------|---------|
+| `values.element` | Element, as printed |
+| `values.basis` | `atom` or `mass`, and only when the source states that basis |
+| `values.basis_as_printed` | The source's basis words, always, verbatim |
+| `values.normalising_element` | The element of a printed normalised ratio, such as Ca in `(K/Ca)/(K/Ca)_0`. Omit when the source prints an absolute fraction |
+| `T_C` or `T_K` | Temperature |
+| `values.duration` or `values.time_point` | Duration or time point, with its unit |
+| `values.atmosphere` or `values.pressure` | Atmosphere or pressure, as printed |
+| `values.starting_composition` | Starting composition, as printed |
+| `values.sample_mass` and `values.sample_geometry` | Sample mass and geometry. An omitted member is `{state: not_printed}` |
+
+Do not convert atom to mass or the reverse. Do not recompute `f` from a
+concentration and a mass loss. When the source derives `f` that way,
+`method_class` is `author_derived` and the derivation records the stated
+relation. `derived_from` names the parent rows when those rows are stored;
+otherwise `raw_inputs` is `not_printed` on that `measured_reduced`
+derivation. `author_derived` is a method-class string. It is not a new
+evidence-class token.
+
+A basis that is neither `atom` nor `mass` stays in `basis_as_printed` and
+`basis` is omitted. Do not coerce it. Neuman 2021 Table 2 prints
+`(K/Ca)/(K/Ca)0` (and the Cu and Zn analogues). Those rows stay
+`element_fraction_remaining`. `basis` is omitted, `basis_as_printed` keeps
+the source words, and `normalising_element` is Ca. Do not convert the ratio
+to an absolute fraction at extraction. When the source prints a retention
+assumption, copy it to `values.retention_assumption`. That note is not a
+scorer input. A row with a normaliser and a row without one are different
+identities and are not pooled.
+
+`mass_loss_fraction` is the fraction of sample mass lost. `yield_fraction`
+is a pyrolysis yield. `residue_component_composition` is a residue amount
+(oxide weight percent or element ppm), not a remaining fraction. None of
+those tokens is this one.
+
+```yaml
+type: concentration_series
+locator: {table: '1', page: 1}
+T_C: 1400
+units: dimensionless
+values:
+  quantity: element_fraction_remaining
+  element: Mg
+  fraction_remaining: 0.80
+  basis: mass
+  basis_as_printed: 'Mg/Mg initial by mass'
+  duration: {value: 60, unit: min}
+  atmosphere: 'H2/CO2'
+  starting_composition: 'printed starting analysis'
+  sample_mass: {value: 20, unit: mg}
+  sample_geometry: {state: not_printed}
+  method_class: measured_direct
+```
+
+Shape only. The numeric example is not a seated extract. No seated extract
+prints `quantity: element_fraction_remaining` at this diff. Rows that print
+`f_Mg` inside a custom `runs` map are not this token until a later extract
+uses the fields above.
+
 ## The `context` container (d-032 owner ruling, 2026-09-21)
 
 Different consumers get different containers. `observations` is the container

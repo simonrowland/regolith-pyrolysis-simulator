@@ -36,6 +36,8 @@ from simulator.battery.enums import (
     Phase,
     Polymorph,
     PolymorphRejectionKind,
+    KINETIC_YIELD_QUANTITIES,
+    QUANTITY_UNITS,
     Quantity,
     Rail,
     ResidualStatus,
@@ -9815,16 +9817,41 @@ def test_l05g1a_table_qualifier_leaves_reference_state_unknown(tmp_path: Path) -
 
 
 def test_l05g1a_does_not_cross_condensation_or_log_pressure() -> None:
+    """condensation_coefficient is its own token. A co-located activity field does not retarget it."""
+
     state, reason = map_quantity(
         None, {"quantity": "condensation_coefficient", "activity": 0.2}
     )
-    assert not state.is_value
+    assert state.is_value
+    assert state.value is Quantity.CONDENSATION_COEFFICIENT
+    assert state.value is not Quantity.ACTIVITY
+    assert reason is None
     state, reason = map_quantity(
         None,
         {"quantity": "log10_Psat_over_P0", "table_kJ_mol": 316.034, "activity": 1},
     )
     assert not state.is_value
     assert "unsupported" in (reason or "")
+
+
+def test_t1473_quantity_tokens_match_schema_and_stay_out_of_kinetic_yield() -> None:
+    """The t-1473 schema diff names three tokens. None joins the kinetic-yield set."""
+
+    expected = {
+        Quantity.CONDENSATION_COEFFICIENT: "dimensionless",
+        Quantity.EVAPORATION_FLUX: "subtype_defined",
+        Quantity.ELEMENT_FRACTION_REMAINING: "dimensionless",
+    }
+    schema = (REPO_ROOT / "data" / "literature" / "extracts" / "SCHEMA.md").read_text(
+        encoding="utf-8"
+    )
+    for quantity, unit in expected.items():
+        assert quantity.value in schema
+        assert QUANTITY_UNITS[quantity] == unit
+        assert quantity not in KINETIC_YIELD_QUANTITIES
+        state, reason = map_quantity(None, {"quantity": quantity.value})
+        assert state.is_value and state.value is quantity and reason is None
+    assert set(QUANTITY_UNITS) == set(Quantity)
 
 
 def test_l02_value_k_lifts_transition_temperature(tmp_path: Path) -> None:
