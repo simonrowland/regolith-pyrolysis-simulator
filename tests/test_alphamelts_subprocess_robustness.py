@@ -331,3 +331,352 @@ def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance(
     assert balance['dominant_metal_carriers'] == fresh_balance[
         'dominant_metal_carriers'
     ]
+
+
+# t-1469 crash families. Reason strings are the adapter constants' values.
+# getattr falls back to that value until the constant exists, so this module
+# still collects; the launch assertion is what fails while the guard is absent.
+_CAO_SIO2_BINARY_CRASH = 'subprocess_cao_sio2_binary_crash'
+_FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH = (
+    'subprocess_fe_free_silicate_absolute_fo2_crash'
+)
+
+
+def _crash_reason(constant_name: str, value: str) -> str:
+    import simulator.melt_backend.alphamelts as alphamelts
+
+    published = getattr(alphamelts, constant_name, value)
+    assert published == value
+    return str(published)
+
+
+def _marker_backend(tmp_path: Path):
+    marker = tmp_path / 'invoked'
+    stub = tmp_path / 'alphamelts'
+    stub.write_text(f'#!/bin/sh\nprintf invoked > "{marker}"\n')
+    stub.chmod(0o755)
+    return _backend(stub, timeout_s=1.0), marker
+
+
+def _melt(moles: dict[str, float]) -> dict[str, dict[str, float]]:
+    return {'process.cleaned_melt': dict(moles)}
+
+
+def test_cao_sio2_binary_refuses_before_launch_with_imposed_fo2(tmp_path):
+    """Ledger family CaO+SiO2 (76 rows). SIGABRT with absolute fO2 imposed.
+
+    Reproduction composition is the lunar row kems-053-stolyarova-1991 at
+    1993 K, mole CaO 0.51 / SiO2 0.49 (ledger line 4013276).
+    """
+    backend, marker = _marker_backend(tmp_path)
+    composition = _melt({'CaO': 0.51, 'SiO2': 0.49})
+
+    result = _run(backend, composition)
+
+    assert not marker.exists()
+    assert result.status == 'not_converged'
+    reason = _crash_reason(
+        'ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH',
+        _CAO_SIO2_BINARY_CRASH,
+    )
+    assert result.diagnostics['backend_status_reason'] == reason
+    assert result.diagnostics['backend_status_reason'] != (
+        ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH
+    )
+    assert result.diagnostics['backend_failure_category'] == 'engine_crash'
+    guard = result.diagnostics['subprocess_input_guard']
+    assert guard['predicate'] == 'two_component_cao_sio2'
+    assert guard['matching_scope'] == 'cao_sio2_binary'
+    assert guard['independent_of_imposed_fo2'] is True
+    assert guard['measured_signal'] == 'SIGABRT'
+    assert guard['active_components'] == ['CaO', 'SiO2']
+    assert 'CaO-SiO2' in result.warnings[0]
+
+
+def test_cao_sio2_binary_refuses_before_launch_without_imposed_fo2(tmp_path):
+    """Same binary SIGABRTs when absolute fO2 is omitted."""
+    from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
+
+    backend, marker = _marker_backend(tmp_path)
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=None,
+        composition_mol={'CaO': 0.51, 'SiO2': 0.49},
+        redox_mode=REDOX_MODE_NOT_AN_INPUT,
+        subprocess_run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+    )
+
+    assert not marker.exists()
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status_reason'] == _crash_reason(
+        'ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH',
+        _CAO_SIO2_BINARY_CRASH,
+    )
+    assert result.diagnostics['backend_failure_category'] == 'engine_crash'
+    assert result.diagnostics['subprocess_input_guard']['active_components'] == [
+        'CaO',
+        'SiO2',
+    ]
+
+
+@pytest.mark.parametrize(
+    ('label', 'moles'),
+    (
+        ('mullite', {'Al2O3': 0.6, 'SiO2': 0.4}),
+        (
+            'cas',
+            {
+                'Al2O3': 0.125891472868,
+                'CaO': 0.434108527132,
+                'SiO2': 0.44,
+            },
+        ),
+        (
+            'hastie',
+            {
+                'Na2O': 0.1642467099008939,
+                'CaO': 0.12814024887559882,
+                'SiO2': 0.7076130412235073,
+            },
+        ),
+    ),
+)
+def test_measured_fe_free_silicate_absolute_fo2_refuses_before_launch(
+    tmp_path,
+    label: str,
+    moles: dict[str, float],
+):
+    """SIGSEGV only when absolute fO2 is imposed. Not the alkali reason.
+
+    mullite: shornikov-1994 / shults-1994, 34 rows.
+    cas: stolyarova-1996, 142 rows.
+    hastie: kems-020, 3 rows, inside the certified T and SiO2 band.
+    """
+    del label
+    backend, marker = _marker_backend(tmp_path)
+
+    result = _run(backend, _melt(moles))
+
+    assert not marker.exists()
+    assert result.status == 'not_converged'
+    reason = _crash_reason(
+        'ALPHAMELTS_REASON_FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH',
+        _FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH,
+    )
+    assert result.diagnostics['backend_status_reason'] == reason
+    assert result.diagnostics['backend_status_reason'] != (
+        ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH
+    )
+    assert result.diagnostics['backend_failure_category'] == 'engine_crash'
+    guard = result.diagnostics['subprocess_input_guard']
+    assert guard['predicate'] == 'fe_free_silicate_and_imposed_absolute_fo2'
+    assert guard['measured_signal'] == 'SIGSEGV'
+    assert guard['not_the_predicate'] == 'no_Fe'
+    assert guard['active_components'] == sorted(moles)
+    assert sorted(moles) in guard['component_sets']
+    assert 'imposed' in result.warnings[0]
+
+
+def test_mgo_sio2_absolute_fo2_is_outside_the_new_matching_scope(tmp_path):
+    """Same SIGSEGV trigger, not one of the measured 414 sets, so it still launches."""
+    backend, marker = _marker_backend(tmp_path)
+
+    _run(backend, _melt({'MgO': 0.5, 'SiO2': 0.5}))
+
+    assert marker.exists()
+
+
+def test_fe_bearing_control_with_imposed_fo2_still_launches(tmp_path):
+    backend, marker = _marker_backend(tmp_path)
+
+    _run(backend)
+
+    assert marker.exists()
+
+
+def test_fe_free_silicate_without_imposed_fo2_still_launches(tmp_path):
+    """CAS computes when absolute fO2 is omitted. The guard must not fire."""
+    from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
+
+    backend, marker = _marker_backend(tmp_path)
+
+    backend.equilibrate(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=None,
+        composition_mol={
+            'Al2O3': 0.125891472868,
+            'CaO': 0.434108527132,
+            'SiO2': 0.44,
+        },
+        redox_mode=REDOX_MODE_NOT_AN_INPUT,
+        subprocess_run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+    )
+
+    assert marker.exists()
+
+
+def _qualification_handle(tmp_path: Path):
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    backend, marker = _marker_backend(tmp_path)
+    handle = EngineHandle(
+        name='alphamelts',
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    return handle, marker
+
+
+def test_qualification_cao_sio2_crash_stays_engine_crash(tmp_path):
+    """Lunar T makes the battery set qualification. The crash category must stay."""
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        REFUSAL_ENGINE_CRASH,
+        BinaryPot,
+        Po2Request,
+        equilibrate_cell,
+    )
+
+    handle, marker = _qualification_handle(tmp_path)
+    pot = BinaryPot(
+        pot_id='stolyarova-1991-1993k',
+        kato_1993_table4_system=None,
+        why='lunar CaO-SiO2 oxygen-closure start cell',
+        composition_wt_pct={'CaO': 49.2752, 'SiO2': 50.7248},
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1993.0,
+        po2=Po2Request(mode='commanded', po2_bar=1.0e-6),
+        qualification=True,
+        isolated=False,
+    )
+
+    assert not marker.exists()
+    assert cell.status == 'refusal'
+    assert cell.refusal_reason == REFUSAL_ENGINE_CRASH
+    assert cell.engine_reason == _crash_reason(
+        'ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH',
+        _CAO_SIO2_BINARY_CRASH,
+    )
+    assert cell.exit_code is None
+    assert cell.exit_signal is None
+
+
+@pytest.mark.parametrize(
+    ('pot_id', 'composition_wt_pct'),
+    (
+        ('cao-tio2', {'CaO': 53.4883, 'TiO2': 46.5117}),
+        ('alumina-cao', {'Al2O3': 50.0, 'CaO': 50.0}),
+        ('spinel', {'Al2O3': 71.8, 'MgO': 28.2}),
+        ('alumina', {'Al2O3': 100.0}),
+        ('lime', {'CaO': 100.0}),
+    ),
+)
+def test_qualification_does_not_launch_sio2_free_melt(
+    tmp_path,
+    pot_id: str,
+    composition_wt_pct: dict[str, float],
+):
+    """SiO2=0 is the basis gate. Qualification must not replace that gate."""
+    from engines.domain_reason import OutOfDomainReason
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        REFUSAL_GATE_REFUSED_IN_ADAPTER,
+        BinaryPot,
+        Po2Request,
+        equilibrate_cell,
+    )
+
+    handle, marker = _qualification_handle(tmp_path)
+    pot = BinaryPot(
+        pot_id=pot_id,
+        kato_1993_table4_system=None,
+        why='SiO2-free oxygen-closure start cell',
+        composition_wt_pct=composition_wt_pct,
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=2278.0,
+        po2=Po2Request(mode='commanded', po2_bar=1.0e-6),
+        qualification=True,
+        isolated=False,
+    )
+
+    assert not marker.exists()
+    assert cell.status == 'refusal'
+    assert cell.refusal_reason == REFUSAL_GATE_REFUSED_IN_ADAPTER
+    assert cell.engine_reason == OutOfDomainReason.SILICATE_WINDOW.value
+    notice = next(
+        item for item in cell.notices if item.get('kind') == 'melts_domain_gate'
+    )
+    assert 'AlphaMELTSBackend._domain_gate' not in ' '.join(
+        notice['bypassable_from_harness']
+    )
+    assert '_domain_gate' in ' '.join(notice['not_bypassable_from_harness'])
+
+
+def test_qualification_worker_does_not_launch_sio2_free_melt(tmp_path):
+    import io
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        run_isolated_cell_worker,
+    )
+
+    handle, marker = _qualification_handle(tmp_path)
+    protocol = io.StringIO()
+    run_isolated_cell_worker(
+        {
+            'pot_id': 'cao-tio2-worker',
+            'composition_wt_pct': {'CaO': 53.4883, 'TiO2': 46.5117},
+            'why': 'isolated qualification must keep the basis gate',
+            'po2': {'mode': 'commanded', 'po2_bar': 1.0e-6},
+            'engine': 'alphamelts',
+            'qualification': True,
+            'temperature_K': 2278.0,
+            'timeout_s': 5.0,
+            'arm': 'qualification',
+        },
+        handles={'alphamelts': handle},
+        protocol_stdout=protocol,
+    )
+
+    assert not marker.exists()
+    assert 'silicate_window' in protocol.getvalue()
+    assert 'subprocess_died' not in protocol.getvalue()
+
+
+def test_qualification_band_miss_with_iron_still_launches(tmp_path):
+    """SiO2 outside [30, 80] is notice+run. Removing the bypass must not refuse it."""
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        BinaryPot,
+        Po2Request,
+        equilibrate_cell,
+    )
+
+    handle, marker = _qualification_handle(tmp_path)
+    pot = BinaryPot(
+        pot_id='qual-sio2-20',
+        kato_1993_table4_system=None,
+        why='band miss that the domain gate admits',
+        composition_wt_pct={'SiO2': 20.0, 'FeO': 48.0, 'MgO': 32.0},
+    )
+
+    equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1700.0,
+        po2=Po2Request(mode='commanded', po2_bar=1.0e-6),
+        qualification=True,
+        isolated=False,
+    )
+
+    assert marker.exists()
