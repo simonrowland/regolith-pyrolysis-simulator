@@ -1015,6 +1015,111 @@ def test_antoine_fallback_mbar_is_not_scaled_as_bar() -> None:
     )
 
 
+def test_literature_antoine_refuses_missing_C_for_three_parameter_form() -> None:
+    from simulator.diagnostic_helpers.extract_reproduction import (
+        _literature_pressure_points,
+    )
+
+    obs = AdoptedObservation(
+        species_id="X",
+        source_id="fixture",
+        observation_id="missing_C_antoine",
+        obs_type="psat_series",
+        review_status=None,
+        phase=None,
+        regime=None,
+        standard_state=None,
+        T_range_K=(1000.0, 1000.0),
+        units="Pa",
+        uncertainty=None,
+        locator={},
+        values={
+            "runtime_form": "log10(P_Pa) = A - B/(T_K + C)",
+            "runtime_coefficients": {"A": 5.0, "B": 1000.0},
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption=geometry_assumption_text(),
+    )
+
+    points, skip, _drops = _literature_pressure_points(obs)
+
+    assert points is None
+    assert skip == "missing_antoine_C"
+
+
+def test_literature_antoine_accepts_missing_C_for_two_parameter_form() -> None:
+    from simulator.diagnostic_helpers.extract_reproduction import (
+        _literature_pressure_points,
+    )
+
+    obs = AdoptedObservation(
+        species_id="X",
+        source_id="fixture",
+        observation_id="two_parameter_antoine",
+        obs_type="psat_series",
+        review_status=None,
+        phase=None,
+        regime=None,
+        standard_state=None,
+        T_range_K=(1000.0, 1000.0),
+        units="Pa",
+        uncertainty=None,
+        locator={},
+        values={
+            "runtime_form": "log10(P_Pa) = A - B/T_K",
+            "runtime_coefficients": {"A": 5.0, "B": 1000.0},
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption=geometry_assumption_text(),
+    )
+
+    points, skip, _drops = _literature_pressure_points(obs)
+
+    assert skip is None
+    assert points is not None and len(points) == 1
+    assert points[0]["P_Pa"] == pytest.approx(10_000.0)
+
+
+def test_antoine_inversion_refuses_missing_C_for_three_parameter_form() -> None:
+    from simulator.diagnostic_helpers.extract_reproduction import (
+        _invert_antoine_temperature_K,
+    )
+
+    temperature_K, reason = _invert_antoine_temperature_K(
+        {
+            "runtime_form": "log10(P_Pa) = A - B/(T_K + C)",
+            "A": 5.0,
+            "B": 1000.0,
+        },
+        10_000.0,
+    )
+
+    assert temperature_K is None
+    assert reason == "missing_antoine_C"
+
+
+def test_antoine_inversion_accepts_missing_C_for_two_parameter_form() -> None:
+    from simulator.diagnostic_helpers.extract_reproduction import (
+        _invert_antoine_temperature_K,
+    )
+
+    temperature_K, reason = _invert_antoine_temperature_K(
+        {
+            "runtime_form": "log10(P_Pa) = A - B/T_K",
+            "A": 5.0,
+            "B": 1000.0,
+        },
+        10_000.0,
+    )
+
+    assert reason is None
+    assert temperature_K == pytest.approx(1000.0)
+
+
 def test_point_level_drops_emit_gap_records_not_silent() -> None:
     """P3: mixed series with rate-only rows must not vanish without a record."""
 
