@@ -283,6 +283,11 @@ implicit. For gas-phase ratios, state numerator and denominator species in the
 printed basis and retain coexisting phases in `point_conditions`. Until an engine predicts this quantity, scoring retains the row and
 returns the typed `quantity_not_predicted` refusal.
 
+For `equilibrium_phase_composition` component amounts printed in mass ppm,
+store the value unchanged with subtype `element_ppm_by_mass`. Phase-assemblage
+engines report wt%; scoring converts the reference transiently using
+`wt_percent = ppm / 10^4` (1 ppm = 1e-6 mass fraction = 1e-4 wt%).
+
 **Verbatim only.** Extracts store published numbers (and arithmetic that merely
 converts units with the conversion shown). No Antoine/refit coefficients invented
 by the migrator, no averaging across sources, no model-derived fill-in.

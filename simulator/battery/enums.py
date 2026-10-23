@@ -640,7 +640,7 @@ PHASE_ROW_QUANTITIES = PHASE_COMPOSITION_QUANTITIES | PRINTED_CAPACITY_QUANTITIE
 # Closed subtype tokens on a printed phase-composition row. Equilibrium
 # ratios (Darken–Gurry r, pCO2/pCO) reuse EQUILIBRIUM_PHASE_COMPOSITION
 # with a free-text basis and are not in this set.
-PHASE_BASIS_TOKENS = frozenset({"wt_percent", "mole_fraction"})
+PHASE_BASIS_TOKENS = frozenset({"wt_percent", "mole_fraction", "element_ppm_by_mass"})
 KINETIC_YIELD_QUANTITIES = frozenset(
     {
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,

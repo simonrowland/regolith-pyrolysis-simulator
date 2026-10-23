@@ -1011,6 +1011,25 @@ def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
     return metric_operation(quantity)
 
 
+def _phase_component_reference_wt_percent(
+    identity: Identity, reference: Decimal
+) -> Decimal:
+    """Convert a printed mass-ppm phase amount for comparison with wt% engines."""
+    quantity = quantity_token(identity)
+    subtype = (
+        identity.subtype.value
+        if identity.subtype is not None and identity.subtype.is_value
+        else None
+    )
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and subtype == "element_ppm_by_mass"
+    ):
+        # 1 ppm = 1e-6 mass fraction = 1e-4 wt%; 250 ppm = 0.025 wt%.
+        return reference / Decimal("10000")
+    return reference
+
+
 def _residual_metric_operation(
     quantity: Quantity | None, observation: object | None
 ) -> MetricOperation | None:
@@ -6990,17 +7009,20 @@ def _predict_phase_row(
         )
     subtype = identity.subtype.value if identity.subtype is not None and identity.subtype.is_value else None
     if solute is None:
-        if subtype in PHASE_BASIS_TOKENS and subtype != "wt_percent":
+        if subtype in PHASE_BASIS_TOKENS and subtype not in {
+            "wt_percent",
+            "element_ppm_by_mass",
+        }:
             return refused(
                 RefusalReason.COEFFICIENT_BASIS_MISMATCH,
                 {
                     "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
                     "basis": subtype,
                     "engine_basis": "wt_percent",
-                    "detail": "engine phase maps are wt%; mole_fraction rows are not converted",
+                    "detail": "engine phase maps are wt%; this phase basis is not converted",
                 },
             )
-        if subtype != "wt_percent":
+        if subtype not in {"wt_percent", "element_ppm_by_mass"}:
             return refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {"reason": "missing_input", "input": "basis"},
@@ -10235,6 +10257,7 @@ def compile_residual(
 
     ref_point = point_magnitude(reference.value)
     assert ref_point is not None
+    ref_point = _phase_component_reference_wt_percent(identity, ref_point)
     printed = _PrintedBandResolution()
     fusion_band_refusal: Mapping[str, object] | None = None
     if implied_alpha:
