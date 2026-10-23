@@ -69,7 +69,8 @@ def _n2_lab_schedule() -> dict:
 @pytest.mark.parametrize(
     ("campaign", "pO2_mbar", "p_total_mbar", "atmosphere"),
     [
-        (CampaignPhase.C0, 0.0, 0.0, Atmosphere.HARD_VACUUM),
+        # Owner d-252 selected the dry 1 mbar Ar cover for computed C0 exit.
+        (CampaignPhase.C0, 0.0, 1.0, Atmosphere.ARGON_FLOW),
         (CampaignPhase.C0B, 9.0, 9.0, Atmosphere.CONTROLLED_O2_FLOW),
         (CampaignPhase.C2A, 0.0, 10.0, Atmosphere.PN2_SWEEP),
         (CampaignPhase.C2A_STAGED, 0.0, 10.0, Atmosphere.PN2_SWEEP),

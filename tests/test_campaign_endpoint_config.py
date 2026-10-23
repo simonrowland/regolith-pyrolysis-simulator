@@ -366,6 +366,24 @@ def test_c0_computed_exit_uses_temperature_and_evacuation_bound():
     )
 
 
+def test_c0_exit_forecast_does_not_raise_for_scalar_temperature_range():
+    sim = SimpleNamespace(
+        campaign_mgr=SimpleNamespace(
+            _campaign_config=lambda _campaign: {
+                "alkali_retention_budget_fraction": 1.0e-3,
+                "temp_range_C": 900.0,
+            }
+        )
+    )
+
+    prediction = PyrolysisSimulator._predict_c0_exit(sim)
+
+    assert prediction["T_exit_C"] is None
+    assert prediction["prediction_status"] == (
+        "unavailable_invalid_temperature_range"
+    )
+
+
 def test_c0_first_melt_backstop_beats_the_maximum_hold():
     manager = CampaignManager(_setpoints())
     manager.c0_first_melt_backstop = True
