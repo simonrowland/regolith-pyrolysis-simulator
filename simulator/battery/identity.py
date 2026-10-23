@@ -1773,6 +1773,7 @@ def _identity_equal(
     *,
     allow_unknown_species_phase: bool = False,
     allow_unknown_species_polymorph: bool = False,
+    knudsen_residue_extent: bool = False,
 ) -> IdentityEqualOutcome:
     """Compare identities, optionally allowing an unknown phase or polymorph."""
 
@@ -1812,6 +1813,19 @@ def _identity_equal(
         return species_outcome
 
     profile = _comparison_profile(left, right)
+    if knudsen_residue_extent and left_q is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        # Same-row extent predictions validate measured xi and its printed
+        # temperature path in the residue owner. Absolute time, mass and
+        # chamber pressure do not enter molecular-effusion composition ratios.
+        # Printed oxygen still distinguishes two actually different commands;
+        # a model-selected cell oxygen is provenance, not a printed identity.
+        omitted = {"exposure", "sample_mass_kg", "total_pressure_Pa", "fO2_Pa"}
+        if any(i.fO2_Pa is not None and i.fO2_Pa.is_value for i in (left, right)):
+            omitted.remove("fO2_Pa")
+        profile = QuantityProfile(
+            required=profile.required - omitted,
+            permitted_not_applicable=profile.permitted_not_applicable - omitted,
+        )
     mismatch: list[str] = []
     unknown: list[str] = []
     invalid: list[str] = []
@@ -1882,6 +1896,13 @@ def identity_equal(left: Identity, right: Identity) -> IdentityEqualOutcome:
     """Exact equality on the quantity-class compared axes."""
 
     return _identity_equal(left, right)
+
+
+def _same_row_knudsen_residue_identity_equal(
+    left: Identity, right: Identity,
+) -> IdentityEqualOutcome:
+    """Compare a validated same-row Knudsen extent request, not a timed run."""
+    return _identity_equal(left, right, knudsen_residue_extent=True)
 
 
 def _same_row_redox_identity_equal(

@@ -1813,7 +1813,70 @@ def test_equilibrate_cell_payload_shape_includes_activity_metadata() -> None:
         "exit_signal",
         "exit_code",
         "model_id",
+        "liquid_composition_wt_pct",
+        "fe_redox_split",
     }
+
+
+def test_equilibrate_cell_copies_liquid_composition_and_fe_redox_split() -> None:
+    # Recorded ThermoEngine split shape: FeO 9 wt% and Fe2O3 1 wt%, plus Fe3Fet_Liq.
+    class _Backend:
+        def equilibrate(self, **_kwargs):
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={},
+                vapor_pressures_Pa={},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={
+                    "SiO2": 50.0,
+                    "FeO": 9.0,
+                    "Fe2O3": 1.0,
+                    "bad": float("nan"),
+                },
+                fe_redox_split={
+                    "FeO_wt_pct": 9.0,
+                    "Fe2O3_wt_pct": 1.0,
+                    "Fe3Fet_Liq": 0.1,
+                },
+            )
+
+    handle = EngineHandle(
+        name="thermoengine",
+        backend=_Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="fe-split",
+        kato_1993_table4_system=None,
+        why="copy the engine ferric split onto the cell",
+        composition_wt_pct={"SiO2": 50.0, "FeO": 9.0, "Fe2O3": 1.0},
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1673.15,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        isolated=False,
+        qualification=False,
+    )
+    assert cell.status == "ok"
+    assert cell.liquid_composition_wt_pct == {"SiO2": 50.0, "FeO": 9.0, "Fe2O3": 1.0}
+    assert cell.fe_redox_split == {
+        "FeO_wt_pct": 9.0,
+        "Fe2O3_wt_pct": 1.0,
+        "Fe3Fet_Liq": 0.1,
+    }
+    rebuilt = EquilibrateCell.from_payload(cell.as_payload())
+    assert rebuilt.fe_redox_split == cell.fe_redox_split
+    assert rebuilt.liquid_composition_wt_pct == cell.liquid_composition_wt_pct
+    legacy = EquilibrateCell.from_payload({"pot_id": "legacy", "engine": "alphamelts"})
+    assert legacy.fe_redox_split == {}
+    assert legacy.liquid_composition_wt_pct == {}
 
 
 def test_openimcc_cell_round_trips_through_harness() -> None:

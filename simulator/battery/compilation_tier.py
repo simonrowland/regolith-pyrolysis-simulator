@@ -57,6 +57,7 @@ from simulator.battery.identity import (
     quantity_token,
     standard_pressure_delta_g_kJ_per_mol,
 )
+from simulator.battery.polymorph_dictionary import canonical_element_allotrope
 from simulator.battery.records import (
     DecisionBand,
     Notice,
@@ -100,6 +101,31 @@ _TE_FORMULA: dict[str, str] = {
     "And": "Al2SiO5",
     "Ky": "Al2SiO5",
     "Sil": "Al2SiO5",
+    # (a) rows. Formula is PurePhaseList.csv Formula. Berman
+    # FormulaOveride is empty, so the live call returns this string.
+    # Polymorph-confirmed first. Brc is omitted: Mg(OH)2 does not parse.
+    "Rt": "TiO2",
+    "Mag": "Fe3O4",
+    "An": "CaAl2Si2O8",
+    "Wo": "CaSiO3",
+    # Not an (a) row. Berman has two CaSiO3 crystals. Wo alone would be
+    # the unique candidate for unset CaSiO3, which is (c).
+    "pWo": "CaSiO3",
+    "Gh": "Ca2Al2SiO7",
+    "Grs": "Ca3Al2Si3O12",
+    "Hem": "Fe2O3",
+    "Spn": "CaTiSiO5",
+    "Kls": "KAlSiO4",
+    "Cal": "CaCO3",
+    "Ak": "Ca2MgSi2O7",
+    "CaTs": "CaAl2SiO6",
+    "Mgs": "MgCO3",
+    "Nph": "NaAlSiO4",
+    "Prp": "Mg3Al2Si3O12",
+    "Jd": "NaAlSi2O6",
+    "Chr": "FeCr2O4",
+    "Mtc": "CaMgSiO4",
+    "Prv": "CaTiO3",
 }
 
 _THERMO_QUANTITIES = (
@@ -130,9 +156,10 @@ def _engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
 class _Product:
     formula: str
     coeff: Fraction
-    phase: Phase
+    phase: Phase | None
     polymorph: str | None  # None = generic crystal or a fluid
     token: str
+    literature_note: bool = False  # citation text, not a phase
 
 
 @dataclass(frozen=True)
@@ -361,7 +388,7 @@ def _per_basis(identity: Identity) -> PerBasis | None:
 
 def _product_phase(token: str) -> tuple[Phase, str | None]:
     text = token.strip().lower()
-    if "liquid" in text or text == "l":
+    if text in {"liquid", "l"}:
         return Phase.L, None
     if text in {"g", "gas"}:
         return Phase.G, None
@@ -369,6 +396,12 @@ def _product_phase(token: str) -> tuple[Phase, str | None]:
     if specific in {"s", "cr", "c"}:
         return Phase.CR, None
     return Phase.CR, specific
+
+
+def _is_literature_phase_note(token: str) -> bool:
+    """``lit. liquid range`` cites a neighbour. It is not a phase token."""
+
+    return "lit." in token.strip().lower()
 
 
 def _parse_product(segment: EllinghamFitSegment) -> _Product | None:
@@ -381,11 +414,51 @@ def _parse_product(segment: EllinghamFitSegment) -> _Product | None:
         float(coeff) - float(segment.n_ox)
     ) > 1e-9:
         return None
+    if _is_literature_phase_note(token):
+        return _Product(
+            formula,
+            coeff,
+            None,
+            None,
+            token.strip(),
+            literature_note=True,
+        )
     phase, polymorph = _product_phase(token)
     return _Product(formula, coeff, phase, polymorph, token.strip())
 
 
+def _crystal_coefficient_donor(
+    metal: str, segment: EllinghamFitSegment
+) -> str | None:
+    """Phase basis of a crystal neighbour whose dH and dS this segment copies.
+
+    Equality is the stored floats. The only such pair is the MnO
+    ``lit. liquid range`` segment and the MnO(s) segment below it; any
+    later pair is the same refusal.
+    """
+
+    for other in ELLINGHAM_FIT_SEGMENTS.get(metal, ()):
+        if other is segment:
+            continue
+        if (
+            other.dH_f_kJ_per_mol_O2 != segment.dH_f_kJ_per_mol_O2
+            or other.dS_f_kJ_per_mol_K_per_mol_O2
+            != segment.dS_f_kJ_per_mol_K_per_mol_O2
+        ):
+            continue
+        parsed = _parse_product(other)
+        if (
+            parsed is not None
+            and not parsed.literature_note
+            and parsed.phase is Phase.CR
+        ):
+            return other.phase_basis
+    return None
+
+
 def _phase_compatible(product: _Product, identity: Identity) -> bool:
+    if product.literature_note or product.phase is None:
+        return False
     if phase_token(identity.species) is not product.phase:
         return False
     if product.phase is not Phase.CR:
@@ -397,6 +470,222 @@ def _phase_compatible(product: _Product, identity: Identity) -> bool:
     if identity_name is None:
         return False
     return identity_name == product.polymorph
+
+
+# These tokens do not name a crystal form. REFERENCE is resolved to the
+# standard state at T before comparison. CRYSTALLINE is not alpha or beta.
+_NONSPECIFIC_ELEMENT_ALLOTROPES = frozenset(
+    {Polymorph.REFERENCE.value, Polymorph.CRYSTALLINE.value}
+)
+
+
+def _element_basis_label(
+    formula: str, phase: Phase | None, allotrope: str | None
+) -> str:
+    if phase is None:
+        return formula
+    if allotrope:
+        return f"{formula}({phase.value},{allotrope})"
+    return f"{formula}({phase.value})"
+
+
+def _segment_element_bases(
+    segment: EllinghamFitSegment,
+) -> dict[str, tuple[Phase, str | None]]:
+    reactant_side = segment.phase_basis.split("->", 1)[0]
+    return {
+        formula: _product_phase(token)
+        for formula, token in _PHASED_SPECIES_RE.findall(reactant_side)
+        if formula != "O2"
+    }
+
+
+def _ellingham_call(metal: str, product: _Product, temperature_K: Decimal) -> str:
+    call = f"ellingham:{metal}:{product.token}:T={temperature_K}"
+    if product.polymorph is None and product.phase is Phase.CR:
+        call += ":generic-solid"
+    return call
+
+
+def _outside_segment_refusal(
+    segment: EllinghamFitSegment,
+    temperature_K: Decimal,
+    *,
+    quantity: Quantity,
+    origin: str,
+    call_evidence: str,
+) -> ThermoAttempt:
+    """A clamped neighbour is a different reaction, not an extrapolated ΔfG."""
+
+    return _refuse(
+        RefusalReason.UNSUPPORTED,
+        "ellingham-formation-outside-segment",
+        quantity=quantity,
+        origin=origin,
+        extra={
+            "segment_range_K": [segment.range_K[0], segment.range_K[1]],
+            "temperature_K": str(temperature_K),
+            "phase_basis": segment.phase_basis,
+        },
+        call_evidence=call_evidence,
+    )
+
+
+def _janaf_element_reference(
+    formula: str, temperature_K: Decimal
+) -> tuple[tuple[Phase, str | None] | None, str]:
+    """Phase and allotrope from the element's JANAF (ref) table.
+
+    The schedule owner is ``_element_reference_state``. ``None`` means that
+    table does not name a single state at this temperature.
+    """
+
+    from simulator.battery.generators.janaf import _element_reference_state
+
+    species_state, _count, _locator, note, _convention = _element_reference_state(
+        formula, temperature_K
+    )
+    if not species_state.is_value:
+        return None, species_state.reason or note
+    species = species_state.value
+    phase = phase_token(species)
+    if phase is None:
+        return None, note
+    poly = polymorph_token(species)
+    return (phase, None if poly is None else poly.value), note
+
+
+def _element_reference_refusal(
+    identity: Identity,
+    segment: EllinghamFitSegment,
+    *,
+    temperature_K: Decimal,
+    quantity: Quantity,
+    origin: str,
+    call_evidence: str,
+) -> tuple[ThermoAttempt | None, tuple[Notice, ...]]:
+    """Refuse a declared reactant whose phase or allotrope is not this segment.
+
+    Each known element reactant is compared on its own. An unknown phase on
+    one term, including O2 or the product, does not skip the others. A
+    missing reaction is not this refusal; the standard-pressure transform
+    still owns the phases it needs.
+
+    ``Polymorph.REFERENCE`` means the element's standard state at this
+    temperature, taken from its JANAF (ref) table. The B1452 crystal stamp
+    is not that state. An unresolved reference state is admissible and
+    noticed. An omitted observation allotrope is not a mismatch. A
+    nonspecific token, including crystalline, is not a declared name. A
+    declared named allotrope is compared with the allotrope that table
+    gives a generic segment solid; if the table names none, the segment
+    cannot support the declaration. CEA ``Zr(a)`` / ``Zr(b)`` and JANAF
+    alpha / beta are one allotrope.
+    """
+
+    reaction_state = identity.reaction
+    reaction = (
+        reaction_state.value
+        if isinstance(reaction_state, State) and reaction_state.is_value
+        else None
+    )
+    if reaction is None:
+        return None, ()
+    segment_bases = _segment_element_bases(segment)
+    notices: list[Notice] = []
+    for term in reaction.terms:
+        if term.coefficient >= 0 or term.species.formula == "O2":
+            continue
+        formula = term.species.formula
+        cell_phase = phase_token(term.species)
+        cell_poly = polymorph_token(term.species)
+        cell_allotrope = None if cell_poly is None else cell_poly.value
+        if cell_allotrope == Polymorph.REFERENCE.value:
+            resolved, detail = _janaf_element_reference(formula, temperature_K)
+            if resolved is None:
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.INPUT_OMITTED,
+                        affected_quantities=(quantity,),
+                        reason=(
+                            "element-reference-state-unresolved: "
+                            f"{formula} at {temperature_K} K; {detail}"
+                        ),
+                        origin=origin,
+                    )
+                )
+                continue
+            cell_phase, cell_allotrope = resolved
+        if cell_phase is None:
+            continue
+        found = segment_bases.get(formula)
+        if found is None:
+            segment_phase: Phase | None = None
+            segment_allotrope = None
+        else:
+            segment_phase, segment_allotrope = found
+        segment_allotrope_name = canonical_element_allotrope(formula, segment_allotrope)
+        if segment_phase is Phase.CR and segment_allotrope_name is None:
+            resolved_segment, _detail = _janaf_element_reference(formula, temperature_K)
+            if (
+                resolved_segment is not None
+                and resolved_segment[0] is Phase.CR
+                and resolved_segment[1] is not None
+            ):
+                segment_allotrope = resolved_segment[1]
+                segment_allotrope_name = canonical_element_allotrope(
+                    formula, segment_allotrope
+                )
+        cell_allotrope_name = canonical_element_allotrope(formula, cell_allotrope)
+        observation_basis = _element_basis_label(
+            formula, cell_phase, cell_allotrope_name
+        )
+        segment_basis = _element_basis_label(
+            formula, segment_phase, segment_allotrope_name
+        )
+        extra: dict[str, object] = {
+            "element": formula,
+            "cell_phase": cell_phase.value,
+            "segment_phase": None if segment_phase is None else segment_phase.value,
+            "observation_element_basis": observation_basis,
+            "segment_element_basis": segment_basis,
+        }
+
+        def refuse(detail: str, **more: object) -> tuple[ThermoAttempt, tuple[Notice, ...]]:
+            return (
+                _refuse(
+                    RefusalReason.IDENTITY_MISMATCH,
+                    detail,
+                    quantity=quantity,
+                    origin=origin,
+                    extra={**extra, **more},
+                    call_evidence=call_evidence,
+                ),
+                (),
+            )
+
+        if segment_phase is not cell_phase:
+            return refuse("identity-mismatch-element-reference-phase")
+        specific = (
+            cell_allotrope_name is not None
+            and cell_allotrope_name not in _NONSPECIFIC_ELEMENT_ALLOTROPES
+        )
+        if (
+            specific
+            and segment_allotrope_name
+            and cell_allotrope_name != segment_allotrope_name
+        ):
+            return refuse(
+                "identity-mismatch-element-reference-allotrope",
+                cell_allotrope=cell_allotrope_name,
+                segment_allotrope=segment_allotrope_name,
+            )
+        if specific and segment_allotrope_name is None:
+            return refuse(
+                "identity-mismatch-element-reference-allotrope",
+                cell_allotrope=cell_allotrope_name,
+                segment_allotrope=segment_allotrope_name,
+            )
+    return None, tuple(notices)
 
 
 def _vaporock_gas_provenance(equil_module) -> str:
@@ -485,6 +774,20 @@ def _ellingham_attempt(
     the segment's 0.442 kJ/mol O2 construction bound (0.221 kJ/mol oxide).
     log10 Kf from −3.7028 kJ/mol is 0.0879, 0.004 from the printed 0.092.
     K2O at 298.15 K is outside the 1100 K K(g) segment and is refused.
+
+    The segment's element basis is the reactant phase and allotrope printed
+    on ``phase_basis``. A generic solid's allotrope is the one the element's
+    JANAF reference table names at this temperature. ``Polymorph.REFERENCE``
+    is that standard state, not a separate allotrope. A declared reactant
+    that names a different phase, or a different named allotrope, is refused
+    before this value is returned, at every printed pressure including
+    exactly 1 bar and a missing pressure.
+    When the bases match and the printed pressure is some other positive
+    value, the 1 bar fit is still shifted by Δν_g R T ln(p2/p1).
+
+    A product token that is a literature note (``lit. liquid range``) is
+    not a phase. If that segment's dH and dS are copied from a crystal
+    neighbour, a liquid-product identity is refused instead of answered.
     """
 
     if quantity not in _ENGINE_ELLINGHAM_QUANTITIES:
@@ -516,6 +819,7 @@ def _ellingham_attempt(
         )
     temperature = float(temperature_K)
     matches: list[tuple[str, EllinghamFitSegment, _Product, bool]] = []
+    copied_liquid: list[tuple[str, EllinghamFitSegment, _Product, bool, str]] = []
     formula_hit = False
     for metal in ELLINGHAM_FIT_SEGMENTS:
         segment = ellingham_segment_for_temperature(metal, temperature)
@@ -525,11 +829,41 @@ def _ellingham_attempt(
         if parse_species_formula(product.formula) != target:
             continue
         formula_hit = True
-        if not _phase_compatible(product, identity):
-            continue
         low, high = segment.range_K
         extrapolated = not (low <= temperature <= high)
+        if phase_token(identity.species) is Phase.L and (
+            product.literature_note or product.phase is Phase.L
+        ):
+            donor = _crystal_coefficient_donor(metal, segment)
+            if donor is not None:
+                copied_liquid.append((metal, segment, product, extrapolated, donor))
+                continue
+        if not _phase_compatible(product, identity):
+            continue
         matches.append((metal, segment, product, extrapolated))
+    if not matches and len(copied_liquid) == 1:
+        metal, segment, product, extrapolated, donor = copied_liquid[0]
+        call = _ellingham_call(metal, product, temperature_K)
+        if extrapolated:
+            return _outside_segment_refusal(
+                segment,
+                temperature_K,
+                quantity=quantity,
+                origin=origin,
+                call_evidence=call + ":outside-segment",
+            )
+        return _refuse(
+            RefusalReason.IDENTITY_MISMATCH,
+            "ellingham-liquid-label-copies-crystal-coefficients",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "observation_product_basis": f"{product.formula}({Phase.L.value})",
+                "segment_phase_basis": segment.phase_basis,
+                "crystal_neighbour_phase_basis": donor,
+            },
+            call_evidence=call,
+        )
     if not matches:
         return _refuse(
             RefusalReason.UNSUPPORTED,
@@ -549,23 +883,26 @@ def _ellingham_attempt(
             extra={"formulas": [item[0] for item in matches]},
         )
     metal, segment, product, extrapolated = matches[0]
-    call = f"ellingham:{metal}:{product.token}:T={temperature_K}"
-    if product.polymorph is None and product.phase is Phase.CR:
-        call += ":generic-solid"
+    call = _ellingham_call(metal, product, temperature_K)
     if extrapolated:
-        # Neighbouring-segment reaction dG is a different reference state.
-        return _refuse(
-            RefusalReason.UNSUPPORTED,
-            "ellingham-formation-outside-segment",
+        return _outside_segment_refusal(
+            segment,
+            temperature_K,
             quantity=quantity,
             origin=origin,
-            extra={
-                "segment_range_K": [segment.range_K[0], segment.range_K[1]],
-                "temperature_K": str(temperature_K),
-                "phase_basis": segment.phase_basis,
-            },
             call_evidence=call + ":outside-segment",
         )
+
+    basis_refusal, basis_notices = _element_reference_refusal(
+        identity,
+        segment,
+        temperature_K=temperature_K,
+        quantity=quantity,
+        origin=origin,
+        call_evidence=call,
+    )
+    if basis_refusal is not None:
+        return basis_refusal
 
     # dG is kJ/mol O2. mol-species divides by n_ox (mol oxide per mol O2).
     dG = Decimal(str(segment.delta_g_kJ_per_mol_O2(temperature)))
@@ -607,34 +944,6 @@ def _ellingham_attempt(
                 if reaction is not None
                 else ()
             )
-            if reaction is not None and all(
-                phase is not None for phase in reaction_phases
-            ):
-                segment_reactant_phases = {
-                    formula: _product_phase(token)[0]
-                    for formula, token in _PHASED_SPECIES_RE.findall(
-                        segment.phase_basis.split("->", 1)[0]
-                    )
-                    if formula != "O2"
-                }
-                for term, cell_phase in zip(reaction.terms, reaction_phases):
-                    if term.coefficient >= 0 or term.species.formula == "O2":
-                        continue
-                    segment_phase = segment_reactant_phases.get(term.species.formula)
-                    if segment_phase is not cell_phase:
-                        return _refuse(
-                            RefusalReason.IDENTITY_MISMATCH,
-                            "identity-mismatch-element-reference-phase",
-                            quantity=quantity,
-                            origin=origin,
-                            extra={
-                                "element": term.species.formula,
-                                "cell_phase": cell_phase.value,
-                                "segment_phase": (
-                                    None if segment_phase is None else segment_phase.value
-                                ),
-                            },
-                        )
             if reaction is None:
                 return _refuse(
                     RefusalReason.IDENTITY_UNKNOWN,
@@ -698,7 +1007,7 @@ def _ellingham_attempt(
     else:
         value = gibbs
         unit = QUANTITY_UNITS[Quantity.DELTA_FG]
-    notices: list[Notice] = []
+    notices: list[Notice] = list(basis_notices)
     authority = Authority.CERTIFIED
     if segment.authority_status != "authoritative":
         authority = Authority.EXTRAPOLATED
@@ -1029,7 +1338,391 @@ def _pure_phase_attempt(
     )
 
 
+_JANAF_TABLE_NOTICE = (
+    "Shomate segment does not cover T; JANAF tabulated values used"
+)
+_VAPOROCK_GAS_NOT_ADMISSIBLE = "vaporock-gas-thermo-not-admissible"
+
+
+def _vaporock_cp_s_admissible(heat_capacity: Decimal, entropy: Decimal) -> bool:
+    """Cp > 0 and S > 0. Shared by the full gate and an unverified H row."""
+
+    return (
+        heat_capacity.is_finite()
+        and heat_capacity > 0
+        and entropy.is_finite()
+        and entropy > 0
+    )
+
+
+def _vaporock_gas_thermo_admissible(
+    heat_capacity: Decimal,
+    entropy: Decimal,
+    enthalpy: Decimal,
+) -> bool:
+    """Cp > 0, S > 0, and a finite H−H298.
+
+    One gate for a verified in-band Shomate row and the tabulated gas read.
+    A negative enthalpy increment below 298.15 K is finite and is kept.
+    An unverified Shomate H term never reaches this predicate: that H−H298
+    request refuses, and Cp and S are gated by `_vaporock_cp_s_admissible`.
+    """
+
+    return _vaporock_cp_s_admissible(heat_capacity, entropy) and enthalpy.is_finite()
+
+
+def _refuse_inadmissible_vaporock_gas(
+    quantity: Quantity,
+    *,
+    origin: str,
+    species_name: str,
+    call_evidence: str,
+) -> ThermoAttempt:
+    return _refuse(
+        RefusalReason.METRIC_DOMAIN,
+        _VAPOROCK_GAS_NOT_ADMISSIBLE,
+        quantity=quantity,
+        origin=origin,
+        extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+        call_evidence=call_evidence,
+    )
+
+
+def _locator_table_id(observation: Observation) -> str:
+    locator = observation.locator
+    if locator is None:
+        return ""
+    table = locator.table or locator.record
+    return "" if table is None else str(table).strip()
+
+
+def _declared_standard_pressure_Pa(observation: Observation) -> Decimal | None:
+    """The identity's standard_pressure_Pa when that axis is a value.
+
+    Same field the Ellingham shift reads. This path does not transform it.
+    """
+
+    identity = observation.identity
+    if not isinstance(identity, Identity):
+        return None
+    state = identity.standard_pressure_Pa
+    if not isinstance(state, State) or not state.is_value or state.value is None:
+        return None
+    return as_decimal(state.value)
+
+
+def _tabulated_gas_basis_matches(
+    observation: Observation, formula: str, table_id: str
+) -> bool:
+    """The gas table is this observation's own species, phase, and reference basis.
+
+    A JANAF row matches only its own table id. Mg-001 above the boiling
+    point is the gas on the condensed 298.15 K zero; Mg-005 is the ideal-gas
+    zero. A non-JANAF row matches only when that compilation's elemental
+    reference owner says the 298.15 K reference is this ideal gas. A
+    reference-state table that is crystal at 298.15 K does not, including
+    temperatures where the stable phase has become gas. H−H298 is the
+    only quantity that calls this. Cp and S do not.
+    """
+
+    if _is_janaf_compilation_observation(observation, None):
+        return _locator_table_id(observation) == table_id
+    source_id = observation.source_id or ""
+    from simulator.battery.generators.usgs_b1259 import (
+        SOURCE_ID as b1259_source,
+        reference_enthalpy_zero_is_ideal_gas as b1259_ideal_gas,
+    )
+    from simulator.battery.generators.usgs_b1452 import (
+        SOURCE_ID as b1452_source,
+        reference_enthalpy_zero_is_ideal_gas as b1452_ideal_gas,
+    )
+
+    if source_id == b1259_source:
+        return b1259_ideal_gas(formula)
+    if source_id == b1452_source:
+        return b1452_ideal_gas(formula)
+    return False
+
+
+# Printed H−H298 is kJ/mol. 1 kJ/mol is under the smallest stored |H| that
+# separates the two candidates on this catalog (CaO, 43.9 kJ/mol) and over
+# the worst residual of a row that is still that printed enthalpy (Ca(g)
+# at 6000 K, 0.994 kJ/mol).
+_SHOMATE_ENTHALPY_TOLERANCE_KJ = Decimal("1")
+_SHOMATE_H_UNVERIFIED = "shomate_enthalpy_normalisation_unverified"
+_SHOMATE_COEF_FIELDS = ("T_min", "T_max", "A", "B", "C", "D", "E", "F", "G", "H")
+
+
+def _vaporock_gas_basis_refusal(
+    observation: Observation,
+    formula: str,
+    table_id: str,
+    quantity: Quantity,
+    *,
+    origin: str,
+    species_name: str,
+    call_evidence: str,
+    coefficient_interval: str,
+) -> ThermoAttempt | None:
+    """One basis gate for the in-band row and the tabulated read.
+
+    Species, neutral charge, declared gas phase, and mol-species basis
+    are the caller's checks, before this function and before either
+    branch. The axes that remain depend on the quantity. None means
+    this quantity may be answered from the gas table. A pressure
+    mismatch refuses with both pressures and does not convert the value.
+    """
+
+    from simulator.battery.generators.janaf import (
+        STANDARD_PRESSURE_PA as janaf_standard_pressure,
+    )
+
+    # Cp = (dH/dT)p is independent of the H origin.
+    # S is the absolute third-law entropy with −R ln(p/p°).
+    # H−H298 carries the 298.15 K zero.
+    pressure_extra: dict[str, object] = {}
+    if quantity is Quantity.CP:
+        return None
+    if quantity is Quantity.S:
+        declared_pressure = _declared_standard_pressure_Pa(observation)
+        if declared_pressure == janaf_standard_pressure:
+            return None
+        pressure_extra = {
+            "observation_pressure_Pa": (
+                None
+                if declared_pressure is None
+                else _decimal_token(declared_pressure)
+            ),
+            "gas_pressure_Pa": _decimal_token(janaf_standard_pressure),
+        }
+    elif _tabulated_gas_basis_matches(observation, formula, table_id):
+        return None
+    declared = None
+    if isinstance(observation.identity, Identity):
+        declared = phase_token(observation.identity.species)
+    return _refuse(
+        RefusalReason.IDENTITY_MISMATCH,
+        "tabulated_table_basis_mismatch",
+        quantity=quantity,
+        origin=origin,
+        extra={
+            "engine": Engine.VAPOROCK.value,
+            "species": species_name,
+            "observation_table": _locator_table_id(observation),
+            "observation_phase": None if declared is None else declared.value,
+            "gas_table": table_id,
+            "gas_phase": Phase.G.value,
+            "coefficient_interval": coefficient_interval,
+            "branch": "shomate" if coefficient_interval == "inside" else "table",
+            **pressure_extra,
+        },
+        call_evidence=call_evidence,
+    )
+
+
+def _shomate_row_key(row) -> tuple[float, ...]:
+    return tuple(float(row[name]) for name in _SHOMATE_COEF_FIELDS)
+
+
+def _classify_shomate_enthalpy_form(vapor, row, table_id: str) -> str:
+    """``subtract_H``, ``through_F``, or ``unverified`` for one coefficient row.
+
+    NIST Shomate, t = T/1000, with Cp and S in J/(mol·K) and H−H298 in kJ/mol:
+    Cp = A + Bt + Ct² + Dt³ + E/t²,
+    S = A ln t + Bt + Ct²/2 + Dt³/3 − E/(2t²) + G,
+    H−H298 = At + Bt²/2 + Ct³/3 + Dt⁴/4 − E/t + F − H.
+    VapoRock ``_janaf_dH`` returns that polynomial through +F and does not
+    subtract the stored H. The rows do not share one meaning for H.
+
+    Each printed ``enthalpy_increment`` node with T_min < T <= T_max is
+    compared to both candidates after ``as_decimal(str(float(raw)))``.
+    That is the conversion a returned value uses, and both sides are
+    kJ/mol, so nothing is rescaled. ``subtract_H`` when the NIST form
+    stays within 1 kJ/mol at every such node, including when both
+    candidates do (the stored H does not move the value). ``through_F``
+    when only the polynomial through F does. Otherwise the row's H term
+    is unverified.
+
+    K(g) on (1039.54, 1800] at 1200 K: through F is 107.74615257813333
+    and minus H = 88.99996 is 18.746192578133332, against printed K-005
+    18.746. O2(g) on (700, 2000] at 800 K: through F is
+    15.835631675866665 against printed O-029 15.835; subtracting
+    H = −48.593 yields 64.42863167586667. Co(g), Mn(g), and Ni(g) store
+    H = 0 and miss the printed enthalpy by hundreds of kJ/mol.
+    """
+
+    from simulator.battery.generators.janaf import _cached_table_property_points
+
+    try:
+        points = _cached_table_property_points(table_id, "enthalpy_increment")[0]
+        t_min = float(row["T_min"])
+        t_max = float(row["T_max"])
+        h_coef = float(row["H"])
+    except (KeyError, TypeError, ValueError, ArithmeticError):
+        return "unverified"
+    subtract_ok = True
+    through_ok = True
+    saw = False
+    tolerance = _SHOMATE_ENTHALPY_TOLERANCE_KJ
+    for temperature, printed in points:
+        node = float(temperature)
+        if not (node > t_min and node <= t_max):
+            continue
+        saw = True
+        try:
+            raw = float(vapor._janaf_dH(node, row))
+            through = as_decimal(str(raw))
+            subtract = as_decimal(str(float(raw - h_coef)))
+        except (TypeError, ValueError, ArithmeticError, OverflowError):
+            return "unverified"
+        if (
+            not subtract.is_finite()
+            or abs(subtract - printed) > tolerance
+        ):
+            subtract_ok = False
+        if not through.is_finite() or abs(through - printed) > tolerance:
+            through_ok = False
+    if not saw or not (subtract_ok or through_ok):
+        return "unverified"
+    if subtract_ok:
+        return "subtract_H"
+    return "through_F"
+
+
+def _shomate_enthalpy_form(vapor, row, table_id: str) -> str:
+    """Cached row convention. The cache key is the coefficient row, not T."""
+
+    cache = getattr(_shomate_enthalpy_form, "_cache", None)
+    if cache is None:
+        cache = {}
+        setattr(_shomate_enthalpy_form, "_cache", cache)
+    try:
+        key = (table_id, _shomate_row_key(row))
+    except (KeyError, TypeError, ValueError, ArithmeticError):
+        return "unverified"
+    form = cache.get(key)
+    if form is None:
+        form = _classify_shomate_enthalpy_form(vapor, row, table_id)
+        cache[key] = form
+    return form
+
+
+def _vaporock_tabulated_gas_attempt(
+    formula: str,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    *,
+    observation: Observation,
+    origin: str,
+    species_name: str,
+    call_evidence: str,
+) -> ThermoAttempt:
+    """Outside every Shomate row, read the neutral gas JANAF table or refuse.
+
+    The table's in-grid value is BRIDGE, the same authority as an in-range
+    JANAF fusion read in this module. The table document has no separate
+    authority field. This is not an extrapolated Shomate continuation.
+    The gas may be a phase-g table or a reference-phase gas already marked
+    by `_FIXED_REFERENCE_PHASES` (O2 is O-029). The caller already applied
+    `_vaporock_gas_basis_refusal`: Cp uses neither the enthalpy zero nor
+    standard pressure, S uses standard pressure and not the enthalpy zero,
+    and H−H298 uses the enthalpy zero. This function does not apply that
+    gate again. `_vaporock_gas_thermo_admissible` is the same numeric gate
+    as a verified in-band row.
+    """
+
+    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
+
+    table_formula = formula[:-3] if formula.endswith("(g)") else formula
+    try:
+        sample = janaf_tabulated_gas_thermo(table_formula, temperature_K)
+    except ValueError as exc:
+        text = str(exc)
+        extra = {"engine": Engine.VAPOROCK.value, "species": species_name}
+        if text.startswith("ambiguous JANAF gas tables"):
+            return _refuse(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                "vaporock-janaf-gas-table-ambiguous",
+                quantity=quantity,
+                origin=origin,
+                extra=extra,
+                call_evidence=call_evidence,
+            )
+        if (
+            text.startswith("no JANAF gas table")
+            or "outside the JANAF table range" in text
+            or "fewer than two" in text
+        ):
+            # Same refusal the in-band selector used when no row contained T.
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "vaporock-temperature-outside-janaf-row",
+                quantity=quantity,
+                origin=origin,
+                extra=extra,
+                call_evidence=call_evidence,
+            )
+        if "missing grid node" in text or "duplicate temperature" in text:
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "vaporock-janaf-table-gap",
+                quantity=quantity,
+                origin=origin,
+                extra=extra,
+                call_evidence=call_evidence,
+            )
+        return _refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "vaporock-janaf-table-unreadable",
+            quantity=quantity,
+            origin=origin,
+            extra={**extra, "detail": text},
+            call_evidence=call_evidence,
+        )
+
+    heat_capacity = sample.heat_capacity
+    entropy = sample.entropy
+    enthalpy = sample.enthalpy_increment
+    if not _vaporock_gas_thermo_admissible(heat_capacity, entropy, enthalpy):
+        return _refuse_inadmissible_vaporock_gas(
+            quantity,
+            origin=origin,
+            species_name=species_name,
+            call_evidence=call_evidence,
+        )
+    value = {
+        Quantity.CP: heat_capacity,
+        Quantity.S: entropy,
+        Quantity.H_MINUS_H298: enthalpy,
+    }[quantity]
+    return ThermoAttempt(
+        value=value,
+        unit=QUANTITY_UNITS[quantity],
+        authority=Authority.BRIDGE,
+        notices=(
+            Notice(
+                kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                affected_quantities=(quantity,),
+                reason=f"{_JANAF_TABLE_NOTICE}; table_id={sample.table_id}",
+                origin=origin,
+                band=(
+                    f"[{_decimal_token(sample.low_K)}, "
+                    f"{_decimal_token(sample.high_K)}] K"
+                ),
+                authority=Authority.BRIDGE,
+            ),
+        ),
+        refusal_reason=None,
+        refusal_detail={},
+        call_evidence=(
+            f"{call_evidence}:branch=table:coefficient_interval=outside:"
+            f"janaf_table_id={sample.table_id}"
+        ),
+    )
+
+
 def _vaporock_gas_attempt(
+    observation: Observation,
     identity: Identity,
     quantity: Quantity,
     temperature_K: Decimal,
@@ -1137,13 +1830,66 @@ def _vaporock_gas_attempt(
         for row in table_rows
         if temperature > float(row["T_min"]) and temperature <= float(row["T_max"])
     )
-    if not matching_rows:
+    # Containing-row selection is not an answer. One basis gate runs before
+    # either branch returns a number, and its axes depend on the quantity.
+    # Do not continue a Shomate row: Cr(g)
+    # at 500 K on that polynomial is about −49 J/(mol·K); the gas table's
+    # own 500 K node is 20.786.
+    from simulator.battery.generators.janaf import _janaf_gas_table_ids
+
+    table_formula = formula[:-3] if formula.endswith("(g)") else formula
+    table_ids = _janaf_gas_table_ids().get(table_formula, ())
+    coefficient_interval = "inside" if matching_rows else "outside"
+    if len(table_ids) != 1:
+        # No Shomate number without the one gas table the basis gate names.
+        if not table_ids:
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "vaporock-temperature-outside-janaf-row",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "engine": Engine.VAPOROCK.value,
+                    "species": species_name,
+                    "coefficient_interval": coefficient_interval,
+                    "branch": "shomate" if matching_rows else "table",
+                },
+                call_evidence=call_evidence,
+            )
         return _refuse(
-            RefusalReason.UNSUPPORTED,
-            "vaporock-temperature-outside-janaf-row",
+            RefusalReason.IDENTITY_INCOMPLETE,
+            "vaporock-janaf-gas-table-ambiguous",
             quantity=quantity,
             origin=origin,
-            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            extra={
+                "engine": Engine.VAPOROCK.value,
+                "species": species_name,
+                "coefficient_interval": coefficient_interval,
+                "branch": "shomate" if matching_rows else "table",
+            },
+            call_evidence=call_evidence,
+        )
+    table_id = table_ids[0]
+    basis_refusal = _vaporock_gas_basis_refusal(
+        observation,
+        table_formula,
+        table_id,
+        quantity,
+        origin=origin,
+        species_name=species_name,
+        call_evidence=call_evidence,
+        coefficient_interval=coefficient_interval,
+    )
+    if basis_refusal is not None:
+        return basis_refusal
+    if not matching_rows:
+        return _vaporock_tabulated_gas_attempt(
+            formula,
+            quantity,
+            temperature_K,
+            observation=observation,
+            origin=origin,
+            species_name=species_name,
             call_evidence=call_evidence,
         )
     if len(matching_rows) != 1:
@@ -1152,35 +1898,40 @@ def _vaporock_gas_attempt(
             "vaporock-janaf-interval-ambiguous",
             quantity=quantity,
             origin=origin,
-            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            extra={
+                "engine": Engine.VAPOROCK.value,
+                "species": species_name,
+                "coefficient_interval": coefficient_interval,
+                "branch": "shomate",
+            },
             call_evidence=call_evidence,
         )
     row = matching_rows[0]
 
-    # Shomate forms use t=T/1000: Cp=A+Bt+Ct²+Dt³+E/t² and
-    # S=A ln(t)+Bt+Ct²/2+Dt³/3−E/(2t²)+G, both J/(mol·K);
-    # H−H298=At+Bt²/2+Ct³/3+Dt⁴/4−E/t+F−H, in kJ/mol. Cp uses
-    # the selected VapoRock row; its native evaluators supply S and
-    # _janaf_dH's apparent H(T) terms through +F, not H−H298. Subtract the
-    # selected row's H coefficient per the Shomate form. Unit check: kJ/mol
-    # remains kJ/mol.
-    # Sanity: K(g), 1200 K gives 18.7461926 kJ/mol vs printed JANAF
-    # K-005 H−H298 = 18.746 kJ/mol.
+    # Cp uses the selected row. S uses VapoRock's own evaluator, which is
+    # the 1 bar fit and has no pressure term. H−H298 uses the row's
+    # verified convention (`_classify_shomate_enthalpy_form`): subtract the
+    # stored H, or keep the polynomial through F. A returned value is
+    # as_decimal(str(float(raw))). When the convention is verified, Cp, S,
+    # and H are gated together. When it is not, H−H298 refuses and Cp and
+    # S are gated on their own.
     try:
         t = temperature / 1000.0
-        if quantity is Quantity.CP:
-            raw = (
-                row["A"]
-                + row["B"] * t
-                + row["C"] * t**2
-                + row["D"] * t**3
-                + row["E"] / t**2
-            )
-        elif quantity is Quantity.S:
-            raw = vapor._janaf_S(temperature, row)
-        else:
-            raw = vapor._janaf_dH(temperature, row) - row["H"]
-        value = as_decimal(str(float(raw)))
+        raw_cp = (
+            row["A"]
+            + row["B"] * t
+            + row["C"] * t**2
+            + row["D"] * t**3
+            + row["E"] / t**2
+        )
+        raw_s = vapor._janaf_S(temperature, row)
+        raw_through = vapor._janaf_dH(temperature, row)
+        raw_subtract = raw_through - row["H"]
+        heat_capacity = as_decimal(str(float(raw_cp)))
+        entropy = as_decimal(str(float(raw_s)))
+        enthalpy_through = as_decimal(str(float(raw_through)))
+        enthalpy_subtract = as_decimal(str(float(raw_subtract)))
+        form = _shomate_enthalpy_form(vapor, row, table_id)
     except Exception as exc:  # noqa: BLE001 - optional engine evaluator boundary
         return _refuse(
             RefusalReason.ATTEMPTED_UNAVAILABLE,
@@ -1190,14 +1941,61 @@ def _vaporock_gas_attempt(
             extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
             call_evidence=call_evidence,
         )
-    if not value.is_finite():
-        return _refuse(
-            RefusalReason.METRIC_DOMAIN,
-            "nonfinite-engine-value",
-            quantity=quantity,
-            origin=origin,
-            extra={"engine": Engine.VAPOROCK.value},
-            call_evidence=call_evidence,
+    if form == "subtract_H":
+        enthalpy = enthalpy_subtract
+    elif form == "through_F":
+        enthalpy = enthalpy_through
+    else:
+        enthalpy = None
+    if form == "unverified":
+        if not _vaporock_cp_s_admissible(heat_capacity, entropy):
+            return _refuse_inadmissible_vaporock_gas(
+                quantity,
+                origin=origin,
+                species_name=species_name,
+                call_evidence=call_evidence,
+            )
+        if quantity is Quantity.H_MINUS_H298:
+            extra = {
+                "engine": Engine.VAPOROCK.value,
+                "species": species_name,
+                "gas_table": table_id,
+                "coefficient_interval": "inside",
+                "branch": "shomate",
+                "enthalpy_form": "unverified",
+            }
+            if enthalpy_subtract.is_finite():
+                extra["green_subtract_H"] = _decimal_token(enthalpy_subtract)
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                _SHOMATE_H_UNVERIFIED,
+                quantity=quantity,
+                origin=origin,
+                extra=extra,
+                call_evidence=call_evidence,
+            )
+        value = {Quantity.CP: heat_capacity, Quantity.S: entropy}[quantity]
+    else:
+        assert enthalpy is not None
+        if not _vaporock_gas_thermo_admissible(heat_capacity, entropy, enthalpy):
+            return _refuse_inadmissible_vaporock_gas(
+                quantity,
+                origin=origin,
+                species_name=species_name,
+                call_evidence=call_evidence,
+            )
+        value = {
+            Quantity.CP: heat_capacity,
+            Quantity.S: entropy,
+            Quantity.H_MINUS_H298: enthalpy,
+        }[quantity]
+    evidence = (
+        f"{call_evidence}:branch=shomate:coefficient_interval=inside:"
+        f"enthalpy_form={form}:gas_table={table_id}"
+    )
+    if quantity is Quantity.H_MINUS_H298 and form == "through_F":
+        evidence = (
+            f"{evidence}:green_subtract_H={_decimal_token(enthalpy_subtract)}"
         )
     return ThermoAttempt(
         value=value,
@@ -1206,7 +2004,7 @@ def _vaporock_gas_attempt(
         notices=(),
         refusal_reason=None,
         refusal_detail={},
-        call_evidence=call_evidence,
+        call_evidence=evidence,
     )
 
 
@@ -1495,7 +2293,9 @@ def predict_thermo_attempt(
     if engine is Engine.INTERNAL_ANALYTICAL:
         return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)
     if engine is Engine.VAPOROCK:
-        return _vaporock_gas_attempt(identity, quantity, temperature_K, origin=origin)
+        return _vaporock_gas_attempt(
+            observation, identity, quantity, temperature_K, origin=origin
+        )
     if engine in {Engine.THERMOENGINE, Engine.MAGEMIN}:
         return _pure_phase_attempt(
             engine,

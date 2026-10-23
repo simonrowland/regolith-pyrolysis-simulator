@@ -789,6 +789,90 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
         polymorph='sillimanite',
         bulk_wt_pct={'SiO2': 37.0780, 'Al2O3': 62.9220},
     ),
+    # (a) rows the ig accessor can reach. wt% are the ds636 Comp vector
+    # (TC_endmembers.c arr_em_db_tc_ds636) times oxide_info molar masses
+    # (TC_init_database.c: SiO2 60.08, Al2O3 101.96, CaO 56.08, MgO 40.30,
+    # Na2O 61.98, TiO2 79.88), 4 d.p. half-up. Comp atom count equals the
+    # literature formula, so formula_divisor is 1. Hosts are igneous_db
+    # pure phases (TC_init_database.c) or a G_SS_ig_* EM_tmp symbol
+    # (tc_gss_function.c). A ds636 name that is neither is not entered.
+    # gr/py: half-up sums to 99.9999 / 100.0001; the 0.0001 wt% remainder
+    # is on the oxide with the largest |remainder| (CaO, MgO).
+    'an': _MAGEMinPurePhaseSpec(
+        host_phase='fsp',
+        endmember='an',
+        formula='CaAl2Si2O8',
+        formula_basis='per 1 mol CaAl2Si2O8 (ds636 Comp line 10283, atoms 13)',
+        formula_divisor=1.0,
+        polymorph='anorthite',
+        bulk_wt_pct={'SiO2': 43.1919, 'Al2O3': 36.6499, 'CaO': 20.1582},
+    ),
+    'ru': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='ru',
+        formula='TiO2',
+        formula_basis='per 1 mol TiO2 (ds636 Comp line 10539, atoms 3)',
+        formula_divisor=1.0,
+        # igneous_db lists ru and does not name it. Unset, so rutile and
+        # anatase stay unresolved.
+        polymorph='',
+        bulk_wt_pct={'SiO2': 1.0e-6, 'TiO2': 100.0},
+    ),
+    'sph': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='sph',
+        formula='CaTiSiO5',
+        formula_basis='per 1 mol CaTiSiO5 (ds636 Comp line 9603, atoms 8)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 30.6468, 'CaO': 28.6064, 'TiO2': 40.7468},
+    ),
+    'cats': _MAGEMinPurePhaseSpec(
+        host_phase='cpx',
+        endmember='cats',
+        formula='CaAl2SiO6',
+        formula_basis='per 1 mol CaAl2SiO6 (ds636 Comp line 9747, atoms 10)',
+        formula_divisor=1.0,
+        # Holland–Powell name on this endmember. Not ca_al_pyroxene.
+        polymorph='ca_tschermak_pyroxene',
+        bulk_wt_pct={'SiO2': 27.5445, 'Al2O3': 46.7449, 'CaO': 25.7106},
+    ),
+    'gr': _MAGEMinPurePhaseSpec(
+        host_phase='g',
+        endmember='gr',
+        formula='Ca3Al2Si3O12',
+        formula_basis='per 1 mol Ca3Al2Si3O12 (ds636 Comp line 9251, atoms 20)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 40.0142, 'Al2O3': 22.6356, 'CaO': 37.3502},
+    ),
+    'py': _MAGEMinPurePhaseSpec(
+        host_phase='g',
+        endmember='py',
+        formula='Mg3Al2Si3O12',
+        formula_basis='per 1 mol Mg3Al2Si3O12 (ds636 Comp line 9227, atoms 20)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 44.7135, 'Al2O3': 25.2940, 'MgO': 29.9925},
+    ),
+    'jd': _MAGEMinPurePhaseSpec(
+        host_phase='cpx',
+        endmember='jd',
+        formula='NaAlSi2O6',
+        formula_basis='per 1 mol NaAlSi2O6 (ds636 Comp line 9715, atoms 10)',
+        formula_divisor=1.0,
+        polymorph='jadeite',
+        bulk_wt_pct={'SiO2': 59.4469, 'Al2O3': 25.2214, 'Na2O': 15.3317},
+    ),
+    'mont': _MAGEMinPurePhaseSpec(
+        host_phase='ol',
+        endmember='mont',
+        formula='CaMgSiO4',
+        formula_basis='per 1 mol CaMgSiO4 (ds636 Comp line 9091, atoms 7)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 38.3996, 'CaO': 35.8430, 'MgO': 25.7574},
+    ),
 }
 
 _MAGEMIN_PP_GBASE_RE = re.compile(
@@ -3283,8 +3367,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         ``phase_id`` is an ig-database symbol: ``fo`` (olivine endmember),
         ``per`` (ferropericlase endmember), ``en`` (orthopyroxene endmember,
-        Mg2Si2O6 basis), or the pure phases ``q`` / ``crst`` / ``trd`` /
-        ``cor`` / ``and`` / ``ky`` / ``sill``. There is no plain spinel id.
+        Mg2Si2O6 basis), the pure phases ``q`` / ``crst`` / ``trd`` /
+        ``cor`` / ``and`` / ``ky`` / ``sill`` / ``ru`` / ``sph``, or the
+        solution endmembers ``an`` (fsp), ``cats`` / ``jd`` (cpx),
+        ``gr`` / ``py`` (g), and ``mont`` (ol). There is no plain spinel id.
         Cold subprocess: same binary and slot discipline as the production
         subprocess bridge; equilibrate() is untouched.
         """

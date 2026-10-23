@@ -22,6 +22,7 @@ Usage: scripts/check_store_freshness.py [--head REF]
 from __future__ import annotations
 
 import argparse
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -63,6 +64,55 @@ CODE_INPUTS = (
 # can exist to follow them, and they would read as STALE forever. Each entry
 # needs that receipt (regen run, no store diff). Short shas, 9 characters,
 # matching the keys stale_input_commits() emits.
+#   19f472447, 67678d3d4, 0c5b7486a: recovery 2/4 (d-242). 19f472447 moves
+#     the battery-handle cache and the Kress redox inputs to their owners
+#     (Fe-redox material and refusal records) in simulator/battery/score.py;
+#     67678d3d4 scores MELTS Fe3+/Fe2+ from the engine's reported split
+#     (score.py) and carries the liquid composition and the Fe redox split
+#     through the battery cell payload
+#     (simulator/diagnostic_helpers/binary_pot_battery.py); 0c5b7486a matches
+#     vapour species reported with the exact _gas suffix (score.py). Migration
+#     imports only parse_species_formula from score.py, which none of them
+#     changes, and does not import binary_pot_battery.py. A full regen at the line's merge with green
+#     2e651d553 (11711159b, studio-2) was a fixed point: no store file changed.
+#     This acknowledges STORE outputs only; the scoring moves (d-242) are
+#     covered by the commits' tests.
+#   f53dcec23, 826f5848e, bff436549, 25796706a, 8adec237c, 9196346ee: the
+#     VapoRock gas-basis line (d-236). They change the VapoRock gas-thermo
+#     predictor in compilation_tier.py, which answers at score time, and add
+#     read-only accessors that it calls: JANAFTabulatedGas and
+#     janaf_tabulated_gas_thermo in generators/janaf.py, and
+#     reference_enthalpy_zero_is_ideal_gas in generators/usgs_b1259.py and
+#     usgs_b1452.py. Migration imports those modules but calls none of the new
+#     functions. A full regen at the line's merge with green 2c7bcb1cc
+#     (c69d8aa09, studio-2) was a fixed point: no store file changed. This
+#     acknowledges STORE outputs only; the predictor's value moves (d-236) are
+#     covered by the commits' tests.
+#   e7dfdd4fe, 8a53c7629, fa97603c0, 085e5cbae, ff8650f45, b99e4c167, 2ad98d246,
+#     42d10d20d, d5aaf3e40, 081f50759, 4b5ec3f56: the Markova Knudsen residue line
+#     (t-1418, d-241) and its below-threshold omission provenance (t-1439). They
+#     change the residue predictors in simulator/battery/residue.py, the
+#     residue scoring hooks in score.py, the source-oxygen condition helper in
+#     source_oxygen.py, the omission record in engines/builtin/vapor_pressure.py,
+#     and an identity helper in identity.py. Migration imports identity.py and
+#     score.py (parse_species_formula), so the receipt is the regen, not the
+#     import graph: a full regen at the line's merge with train/b150r
+#     (d5bcc7d8c, studio-2) was a fixed point: no store file changed. 081f50759
+#     and 4b5ec3f56 touch only residue.py and score.py scoring code after that
+#     merge. This acknowledges STORE outputs only; the scoring changes are
+#     covered by the commits' tests.
+#   3d438ccc2, d75e341ee, 39792163d, ac3ad1a43, dbc4906f3, a6e51654a, 2a5cb1e76,
+#     c02b1c0a6: the SC-365 compilation-tier sweep (t-1437, no d-id; notice-only
+#     per physics). Most change Ellingham and Antoine scoring in
+#     compilation_tier.py, score.py and engines/builtin/vapor_pressure.py.
+#     Three also touch MIGRATION inputs: a6e51654a changes migrate.py (the
+#     partial-pressure melt label), and dbc4906f3 and 2a5cb1e76 change the
+#     B1452 generator (usgs_b1452.py) and polymorph_dictionary.py, which
+#     migration uses. So the receipt is the regen, not the file list: a full
+#     regen at the line's tip (c02b1c0a6) and again at its merge with
+#     train/b150r (e7c4a4d08, studio-2) were both fixed points, with no store
+#     file changed. This acknowledges STORE outputs only; the scoring changes
+#     are covered by the commits' tests.
 #   037f97ff6, 5d46c88e1: d-216, source-oxygen scoring. They score Knudsen
 #     vapour rows at typed source oxygen conditions and keep typed reasons for
 #     closure fallbacks, in simulator/battery/source_oxygen.py and score.py.
@@ -214,6 +264,10 @@ CODE_INPUTS = (
 #     observations 128946, queue 88695, hard issues 3278) left every store
 #     file byte-identical.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
+    "19f472447", "67678d3d4", "0c5b7486a",
+    "f53dcec23", "826f5848e", "bff436549", "25796706a", "8adec237c", "9196346ee",
+    "e7dfdd4fe", "8a53c7629", "fa97603c0", "085e5cbae", "ff8650f45", "b99e4c167", "2ad98d246", "42d10d20d", "d5aaf3e40", "081f50759", "4b5ec3f56",
+    "3d438ccc2", "d75e341ee", "39792163d", "ac3ad1a43", "dbc4906f3", "a6e51654a", "2a5cb1e76", "c02b1c0a6",
     "037f97ff6", "5d46c88e1",
     "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
     "80fad2bfa",
@@ -236,6 +290,39 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "2458a9f46",
     "3b4e68626",
 })
+
+
+def _store_neutral_ack_commits() -> set[str]:
+    """Resolve validated receipt files; separate files avoid shared-set conflicts."""
+    directory = ROOT / "scripts" / "store_neutral_acks"
+    if not directory.exists():
+        return set()
+
+    acknowledgements: set[str] = set()
+    for path in sorted(directory.iterdir()):
+        stem = path.stem
+        if (
+            path.suffix != ".txt"
+            or (not 7 <= len(stem) <= 12 and len(stem) != 40)
+            or any(char not in "0123456789abcdefABCDEF" for char in stem)
+            or not stat.S_ISREG(path.lstat().st_mode)
+        ):
+            raise ValueError(f"malformed store-neutral ack file: {path}")
+        reason_lines = [
+            line for line in path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        if len(reason_lines) != 1:
+            raise ValueError(f"store-neutral ack must contain one reason line: {path}")
+        commit = _git(
+            "rev-parse", "--verify", "--end-of-options", f"{stem}^{{commit}}"
+        ).strip().lower()
+        if commit[:9] in STORE_NEUTRAL_INPUT_COMMITS:
+            raise ValueError(f"duplicate store-neutral acknowledgement: {commit[:9]}")
+        if commit in acknowledgements:
+            raise ValueError(f"duplicate store-neutral acknowledgement: {commit}")
+        acknowledgements.add(commit)
+    return acknowledgements
 
 
 def _git(*args: str) -> str:
@@ -302,8 +389,9 @@ def _untraced_extracts(head: str) -> list[str]:
 
 def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
     """Migrate-input commits after the last store-output commit, keyed
-    "<sha9> <subject>", minus the acknowledged STORE_NEUTRAL_INPUT_COMMITS."""
+    "<sha9> <subject>", minus the acknowledged store-neutral commits."""
     stale: dict[str, list[str]] = {}
+    ack_shas = _store_neutral_ack_commits()
     log = _git(
         "log", "--format=%H%x00%s", "--name-only", f"{last_store}..{head}", "--",
         "data/literature", "simulator/battery", *CODE_INPUTS,
@@ -317,6 +405,7 @@ def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
             line.strip()
             and commit is not None
             and commit[:9] not in STORE_NEUTRAL_INPUT_COMMITS
+            and commit.lower() not in ack_shas
             and _is_input(line.strip())
         ):
             stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
