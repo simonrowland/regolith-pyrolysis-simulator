@@ -1,0 +1,707 @@
+schema_version: literature_extract.v1
+source_id: bouhifd-2007-basalt-thermochemistry
+source:
+  citation: >-
+    Bouhifd M.A., Besson P., Courtial P., Gérardin C., Navrotsky A., Richet P. (2007).
+    Thermochemistry and melting properties of basalt. Contributions to Mineralogy and
+    Petrology 153:689–698.
+  doi: 10.1007/s00410-006-0170-8
+  year: 2007
+  sha256: 179044f4a778bcedcc55665a7893288898166afb30cec528df811744f08371ae
+extraction:
+  method: >-
+    Manual transcription from the born-digital pdftotext layout. Table 6 endmember
+    heat-of-fusion values quoted from earlier literature are typed as attributed
+    observations. The SFB basalt's calorimetric tables and derived fit are retained
+    in context: the measured relative enthalpies use a 273 K reference, and the
+    derived basalt fusion enthalpy has no registered table input asset. Figures 1–7
+    are deferred for figure reading.
+  date: '2026-10-20'
+  worker: codex
+  provenance_path: text/bouhifd-2007-basalt-thermochemistry/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+  - path: species.NaAlSi3O8.observations[bouhifd_2007_table6_albite_heat_of_fusion].values.delta_H_fus_kJ_mol-1
+    value: '64.5'
+    note: Table 6 albite value at Tf; PDF p. 8, printed p. 696.
+    locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+  - path: species.CaAl2Si2O8.observations[bouhifd_2007_table6_anorthite_heat_of_fusion].values.delta_H_fus_kJ_mol-1
+    value: '133.0'
+    note: Table 6 anorthite value at Tf; PDF p. 8, printed p. 696.
+    locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+  - path: species.Mg2SiO4.observations[bouhifd_2007_table6_forsterite_heat_of_fusion].values.delta_H_fus_kJ_mol-1
+    value: '142.0'
+    note: Table 6 forsterite value at Tf; PDF p. 8, printed p. 696.
+    locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+species:
+  NaAlSi3O8:
+    observations:
+      - observation_id: bouhifd_2007_table6_albite_heat_of_fusion
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1393, 1393]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1393'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '64.5'
+          T_fus_K: '1393'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+      - observation_id: bouhifd_2007_table6_albite_heat_of_fusion_at_1430k
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1430, 1430]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1430'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '64.8'
+          original_Tf_as_printed: '1393 K'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+  KAlSi3O8:
+    observations:
+      - observation_id: bouhifd_2007_table6_orthoclase_heat_of_fusion
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1500, 1500]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1500'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '54.0'
+          T_fus_K: '1500'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+      - observation_id: bouhifd_2007_table6_orthoclase_heat_of_fusion_at_1430k
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1430, 1430]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1430'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '53.6'
+          original_Tf_as_printed: '1500 K'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+  CaAl2Si2O8:
+    observations:
+      - observation_id: bouhifd_2007_table6_anorthite_heat_of_fusion
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1830, 1830]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1830'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '133.0'
+          T_fus_K: '1830'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+      - observation_id: bouhifd_2007_table6_anorthite_heat_of_fusion_at_1430k
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1430, 1430]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1430'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '123.7'
+          original_Tf_as_printed: '1830 K'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+  CaMgSi2O6:
+    observations:
+      - observation_id: bouhifd_2007_table6_diopside_heat_of_fusion
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1670, 1670]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1670'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '82.5'
+          T_fus_K: '1670'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+      - observation_id: bouhifd_2007_table6_diopside_heat_of_fusion_at_1430k
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1430, 1430]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1430'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '78.4'
+          original_Tf_as_printed: '1670 K'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+  Mg2SiO4:
+    observations:
+      - observation_id: bouhifd_2007_table6_forsterite_heat_of_fusion
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [2174, 2174]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '2174'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '142.0'
+          T_fus_K: '2174'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+      - observation_id: bouhifd_2007_table6_forsterite_heat_of_fusion_at_1430k
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1430, 1430]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1430'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '128.3'
+          original_Tf_as_printed: '2174 K'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+  Fe2SiO4:
+    observations:
+      - observation_id: bouhifd_2007_table6_fayalite_heat_of_fusion
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1490, 1490]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1490'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '89.3'
+          T_fus_K: '1490'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+      - observation_id: bouhifd_2007_table6_fayalite_heat_of_fusion_at_1430k
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1430, 1430]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1430'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '88.8'
+          original_Tf_as_printed: '1490 K'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+  FeTiO3:
+    observations:
+      - observation_id: bouhifd_2007_table6_ilmenite_heat_of_fusion
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1640, 1640]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1640'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '21.7'
+          T_fus_K: '1640'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+      - observation_id: bouhifd_2007_table6_ilmenite_heat_of_fusion_at_1430k
+        type: heat_capacity_and_heat_content_series
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        T_range_K: [1430, 1430]
+        phase: cr
+        phase_notes: Polymorph is not specified in Table 6.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1430'}
+            locator: {pdf_page_index: 7, page: 8, published_page: 696, table: '6'}
+        units: kJ/mol
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          delta_H_fus_kJ_mol-1: '17.9'
+          original_Tf_as_printed: '1640 K'
+          attribution: >-
+            From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b),
+            Stebbins and Carmichael (1984), and Naylor and Cook (1946), Table 6.
+  unknown:
+    observations:
+      - observation_id: bouhifd_2007_sfb_liquidus_temperature_dta
+        type: transition_point
+        locator:
+          pdf_page_index: 3
+          page: 4
+          published_page: 692
+          section: Crystallized basalt
+        T_range_K: [1430, 1430]
+        phase: cr
+        units: K
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1430'}
+            locator:
+              pdf_page_index: 3
+              page: 4
+              published_page: 692
+              section: Crystallized basalt
+        values:
+          quantity: transition_temperature
+          method_class: measured_direct
+          property_kind: liquidus
+          T_K: '1430'
+          note: >-
+            Preliminary differential thermal analysis liquidus for bulk SFB
+            basalt; no numeric uncertainty is printed.
+      - observation_id: bouhifd_2007_sfb_spinel_first_liquidus_phase
+        type: transition_point
+        locator:
+          pdf_page_index: 1
+          page: 2
+          published_page: 690
+          section: Experimental methods, Basalt sample
+        T_range_K: [1570, 1570]
+        phase: cr
+        units: K
+        uncertainty:
+          value_K: 10
+          note: The source prints 1570 ± 10 K; confidence level is not stated.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1570'}
+            locator:
+              pdf_page_index: 1
+              page: 2
+              published_page: 690
+              section: Experimental methods, Basalt sample
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator:
+              pdf_page_index: 1
+              page: 2
+              published_page: 690
+              section: Experimental methods, Basalt sample
+        values:
+          quantity: transition_temperature
+          method_class: measured_direct
+          property_kind: liquidus
+          T_K: '1570'
+          T_K_as_printed: '1570 ± 10'
+          T_m_uncertainty_K: 10
+          note: >-
+            Spinel is stated to be the first liquidus phase. The same temperature
+            was observed crystallizing on heating and disappearing in cooling.
+    context:
+      - observation_id: bouhifd_2007_table1_bulk_compositions
+        type: measured_table_no_compatible_bulk_composition_token
+        locator: {pdf_page_index: 1, page: 2, published_page: 690, table: '1'}
+        candidate_tokens: [residue_component_composition, density, valence_ratio]
+        units: wt%; density g/cm3; Fe2+/total Fe dimensionless
+        values:
+          wt_percent_composition: Table 1 values listed in note
+          sfb_glass_density_g_cm3: '2.862'
+          sfb_glass_density_method: room-temperature Archimedean method using toluene
+          sfb_glass_Fe2_over_total_Fe: '0.43'
+          sfb_glass_Fe2_over_total_Fe_method: wet chemical analysis
+        note: >-
+          The table gives whole-sample bulk compositions of multiphase basalt and
+          comparator basalts, so these are context rather than phase compositions.
+          The closed observation-type enum also has no standalone scalar type for
+          the table's room-temperature glass density or wet-chemical Fe2+/ΣFe
+          assay; those printed values remain context despite candidate quantity
+          tokens density and valence_ratio.
+          Printed Table 1 values (wt%; SFB, Dresser Basalt, Olivine Basalt): SiO2
+          46.58, 48.42, 48.83; Al2O3 13.28, 15.23, 12.04; Na2O 5.60, 2.30,
+          2.42; K2O 1.38, 0.58, 1.93; FeO 6.38, 6.70, 2.51; Fe2O3 5.35, 6.60,
+          5.77; CaO 10.00, 8.35, 7.36; MgO 9.15, 6.14, 16.69; MnO 0.19, 0.18,
+          0.18; TiO2 2.45, 1.90, 1.19; P2O5 blank, 2.26 (loss on ignition at
+          1273 K), 0.54. Totals 100.36, 98.66, 99.46. Glass density is
+          2.862 g/cm3 by room-temperature Archimedean measurement; wet-chemical
+          Fe2+/ΣFe is 0.43 (total iron expressed as FeO).
+      - observation_id: bouhifd_2007_table2_crystallized_sfb_mineral_analyses
+        type: measured_mineral_phase_compositions_without_a_store_token
+        locator: {pdf_page_index: 2, page: 3, published_page: 691, table: '2'}
+        candidate_tokens: [residue_component_composition]
+        units: wt% oxide; volume percent
+        values:
+          phase_order: [plagioclase, alkali-feldspar, clinopyroxene, olivine, spinel]
+          printed_oxide_wt_percent:
+            SiO2: ['51.8', '65.9', '59.1', '41.3', unknown]
+            Al2O3: ['29.8', '19.3', '6.5', '0.7', '14.3']
+            Na2O: ['4.7', '4.3', '0.7', '0.7', unknown]
+            K2O: ['0.2', '10.0', '0.3', '0.1', unknown]
+            FeO: ['0.4', '0.1', '9.3', '22.2', '68.2']
+            CaO: ['13.0', '0.4', '15.2', '0.8', unknown]
+            MgO: [unknown, unknown, '6.3', '34.1', '9.4']
+            TiO2: ['0.1', '0.1', '2.7', '0.2', '8.0']
+          volume_percent: ['33', '25', '23', '14', '5']
+        note: >-
+          These are measured mineral-phase analyses in crystallized SFB basalt,
+          averaged from more than 20 analytical TEM analyses per phase. Candidate
+          token residue_component_composition does not apply: these are not a
+          pyrolysis residue composition. Blank cells are unreported, not zero.
+      - observation_id: bouhifd_2007_sfb_modal_composition_model
+        type: model_composition_used_for_calculation
+        locator: {pdf_page_index: 2, page: 3, published_page: 691, section: Mineral composition}
+        units: wt% mineral components
+        values:
+          modal_composition: '28 An60Ab40; 12 Or60Ab40; 7 Fo70Fa30; 43 Di60Wo40; 10 Hem80Ilm20'
+          alternative_model_composition: 'Di49.0An43.5Fo7.5; with Na-bearing plagioclase, Di28.5An33.5Fo4.5Ab33.5'
+        note: >-
+          The paper presents these modal and alternative formula compositions
+          for thermodynamic calculations; they are model inputs, not additional
+          measured phase compositions.
+      - observation_id: bouhifd_2007_table3_relative_enthalpy
+        type: measured_table_no_compatible_enthalpy_reference_token
+        locator: {pdf_page_index: 3, page: 4, published_page: 692, table: '3'}
+        candidate_tokens: [H_minus_H298, cp]
+        units: K and J/g
+        values: {relative_enthalpy_reference: 273.15 K, unit: J/g}
+        note: >-
+          Table 3 prints relative enthalpy HT−H273 in J/g, not H−H298. The measured
+          rows are retained as printed, with the exact column headings and values:
+          crystalline SFB (run, T K, HT−H273 J/g): FF.14 475.2 171.60; FF.16
+          684.4 381.36; FF.5 700.5 399.23; FF.4 798.4 504.38; FF.6 862.3 574.17;
+          FF.8 1070.4 812.35; FH.6 526.8 221.16; FH.4 613.5 307.56; FH.7 727.6
+          428.19; FH.2 910.5 628.44; FH.8 960.0 685.29; FH.9 1161.1 915.24.
+          SFB glass/liquid: EI.1-B 430.4 131.44; EI.2-B 494.7 192.69; EI.3-B
+          594.5 292.22; EI.4-B 689.9 392.38; EI.5-B 718.4 424.14; EI.6-B 767.0
+          475.91; EI.7-B 819.8 534.33; EI.18-B 851.6 569.40; EI.8-B 911.0
+          637.21; EI.9-B 962.7 695.97; EI.11-B 976.4 717.35; EI.21 986.2
+          730.31; EI.19 1049.9 822.82; EI.14 1105.8 910.27; EI.15 1139.6
+          963.00; EI.16 1202.2 1039.28 (partial crystallization before drop); EI.17
+          1658.9 1754.02; EI.20 1700.3 1818.29.
+      - observation_id: bouhifd_2007_table4_cp_fit
+        type: model_derived_table_no_direct_observation
+        locator: {pdf_page_index: 5, page: 6, published_page: 694, table: '4'}
+        candidate_tokens: [cp]
+        units: J/(g K); temperature K; AAD percent
+        values: {fit_coefficients: listed in note, temperature_ranges_K: [430–910, 963–1700, 475–1160]}
+        note: >-
+          The fitted coefficients define author models, not directly measured Cp
+          rows. Printed values are retained: glass (a 0.9576; 10^3 b 0.2321;
+          10^-5 c -0.2397; 10^-2 d 0; T 430–910 K; AAD 0.07%); liquid
+          (a 1.4426; 10^3 b 0.0594; 10^-5 c 0; 10^-2 d 0; R273 -720.49;
+          T 963–1700 K; AAD 0.08%). Footnote: constant liquid Cp 1.522 J/(g K)
+          gives AAD 0.13%; solid (a 2.3370; 10^3 b -0.2773;
+          10^-5 c 0.2202; 10^-2 d -0.2976; T 475–1160 K; AAD 0.09%).
+      - observation_id: bouhifd_2007_table5_vitrification_measurements
+        type: measured_table_no_compatible_vitrification_enthalpy_token
+        locator: {pdf_page_index: 6, page: 7, published_page: 695, table: '5'}
+        candidate_tokens: [heat_of_fusion, H_minus_H298]
+        units: J/g
+        values: {temperature_K: 973, liquid_J_g: [720, 717, 717, 720, 720], crystalline_J_g: [959, 962, 948, 943, 950], DH_l_minus_c_J_g: '233.6 ± 2.5'}
+        note: >-
+          The printed measurement is the enthalpy difference between liquid and
+          crystalline basalt at 973 K (DHl-c), not heat of fusion. Liquid drop
+          values 720, 717, 717, 720, 720 J/g (mean 718.8, r ±1.6, error 0.2%);
+          crystalline values 959, 962, 948, 943, 950 J/g (mean 952.4, r ±7.9,
+          error 0.8%); reported DHl-c = 233.6 ± 2.5 J/g.
+      - observation_id: bouhifd_2007_sfb_derived_fusion_enthalpy
+        type: model_derived_value_pending_table_asset
+        locator: {pdf_page_index: 6, page: 7, published_page: 695, section: Enthalpy of melting, equation: '9'}
+        candidate_tokens: [heat_of_fusion]
+        units: J/g and kJ/mol
+        values:
+          at_1000_K: '15.4 kJ/mol'
+          at_1430_K: '400.8 J/g; 25.6 kJ/mol'
+          at_1530_K: '506 J/g'
+          at_1800_K: '33.6 kJ/mol'
+        note: >-
+          These are derived from Tables 3–5 and the printed heat-capacity fits;
+          derivation pending a corpus table asset (controller, t-1382). Equation
+          (9) is DHf(T) = -118.48 + 0.36311 T(K) J/g. No corpus table asset is
+          registered in this run.
+      - observation_id: bouhifd_2007_sfb_glass_transition_temperature
+        type: model_derived_transition_temperature
+        locator: {pdf_page_index: 4, page: 5, published_page: 693, section: Basalt glass and liquid}
+        candidate_tokens: [transition_temperature]
+        units: K
+        values: {glass_transition_temperature: '960'}
+        note: >-
+          Tg = 960 K is the intersection of the fitted glass and liquid enthalpy
+          equations, an author-derived value. Its derivation inputs lack a
+          registered corpus table asset, so it remains context.
+      - observation_id: bouhifd_2007_sfb_formation_enthalpy_from_oxides
+        type: model_derived_enthalpy_from_oxide_components
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, section: Conclusions}
+        candidate_tokens: [delta_fH]
+        units: kJ/mol oxide components
+        values:
+          crystallized_phase: '-112.2'
+          glass_phase: '-98.5'
+          reference_temperature_K: '298'
+        note: >-
+          Authors calculate formation enthalpies from constituent oxides, not
+          delta_fH from elements. Keep these values in context rather than
+          placing them under delta_fH.
+      - observation_id: bouhifd_2007_figure_1_crystalline_basalt_heat_capacity
+        type: figure_only
+        locator: {pdf_page_index: 3, page: 4, published_page: 692, figure: '1'}
+        units: J/(g K); K
+        values:
+          method_class: figure_only
+          typed_quantity: cp
+          quantity_as_printed: mean heat capacities of crystallized basalts
+          species: SFB basalt and previously published basalt samples
+          phase: crystalline basalt
+          temperature_as_printed: approximately 300–1300 K (figure axis)
+          x_axis_as_printed: T (K)
+          y_axis_as_printed: Cm (J/g K)
+          caption_as_printed: >-
+            Fig. 1 Mean heat capacities reported for crystallized basalts: LK
+            Lindroth and Krawza (1971); R-AR Roberts-Austen and Rücker (1891);
+            B Barus (1893). The dashed line represents the fitted values as given
+            by the enthalpy equation of Table 3. The HT−H300 data of Lindroth and
+            Krawza (1971) have been converted to HT−H273 with the Cp model of
+            Berman and Brown (1985).
+          panel: single
+          series:
+            - {name: SFB this work, marker: filled square, marker_count: 12, method_class: measured_direct}
+            - {name: Lindroth and Krawza (1971), marker: open square, marker_count: 7, method_class: quoted_attributed}
+            - {name: Roberts-Austen and Rücker (1891), marker: open circle, marker_count: 5, method_class: quoted_attributed}
+            - {name: Barus (1893), marker: filled circle, marker_count: 6, method_class: quoted_attributed}
+            - {name: fitted Table 3 enthalpy equation, marker: dashed line, marker_count: 0, method_class: model_derived}
+          attribution: Bouhifd et al. (2007); cited datasets attributed in legend
+          digitisation: deferred to a figure pass
+      - observation_id: bouhifd_2007_figure_2_crystalline_sfb_heat_capacity
+        type: figure_only
+        locator: {pdf_page_index: 4, page: 5, published_page: 693, figure: '2'}
+        units: J/(g K); K
+        values:
+          method_class: figure_only
+          typed_quantity: cp
+          quantity_as_printed: heat capacity of crystallized SFB basalt
+          species: SFB basalt
+          phase: crystalline
+          temperature_as_printed: approximately 400–1200 K
+          x_axis_as_printed: T (K)
+          y_axis_as_printed: Cp (J/g K)
+          caption_as_printed: >-
+            Fig. 2 Heat capacity of crystallized SFB: experimental values of
+            this work and of Lindroth and Krawza (1971), values calculated with
+            the model of Berman and Brown (1985) and derived from Eq. (4) with
+            our model of mineralogical composition of basalt.
+          panel: single
+          series:
+            - {name: experimental data this work, marker: filled square, marker_count: 12, method_class: measured_direct}
+            - {name: Lindroth and Krawza (1971), marker: open circle, marker_count: 11, method_class: quoted_attributed}
+            - {name: Berman and Brown (1985), marker: dotted line, marker_count: 0, method_class: model_derived}
+            - {name: calculated Cpc from Eq. (4), marker: dashed line, marker_count: 0, method_class: model_derived}
+          attribution: Bouhifd et al. (2007); cited dataset attributed in legend
+          digitisation: deferred to a figure pass
+      - observation_id: bouhifd_2007_figure_3_glass_liquid_enthalpy_and_capacity
+        type: figure_only
+        locator: {pdf_page_index: 4, page: 5, published_page: 693, figure: '3'}
+        units: J/g; J/(g K); K
+        values:
+          method_class: figure_only
+          typed_quantity: cp
+          quantity_as_printed: glass and liquid SFB basalt relative enthalpy and mean heat capacity
+          species: SFB basalt
+          phase: glass and liquid
+          temperature_as_printed: approximately 400–1800 K
+          x_axis_as_printed: T (K)
+          y_axis_as_printed: panel a HT−H273 (J/g); panel b Cm (J/g K)
+          caption_as_printed: >-
+            Fig. 3 a Relative enthalpy, HT−H273, for glassy and molten SFB basalt.
+            The arrow indicates the glass transition temperature. b Mean heat
+            capacities reported for glassy and molten basalts: Bacon (1977);
+            R-AR Roberts-Austen and Rücker (1891); B Barus (1893). The arrow
+            indicates the glass transition, the solid lines the fitted values
+            as given by the enthalpy equations of Table 3. The HT−H300 data of
+            Bacon (1977) have been converted to HT−H273 with the Cp model of
+            Richet (1987).
+          panel: a–b
+          series:
+            - {name: SFB relative enthalpy this work, marker: filled square, marker_count: 18, method_class: measured_direct}
+            - {name: SFB mean heat capacity this work, marker: filled square, marker_count: 18, method_class: measured_reduced}
+            - {name: Bacon (1977), marker: point, marker_count: 1, method_class: quoted_attributed}
+            - {name: Roberts-Austen and Rücker (1891), marker: open circle, marker_count: 3, method_class: quoted_attributed}
+            - {name: Barus (1893), marker: diamond, marker_count: 8, method_class: quoted_attributed}
+            - {name: Table 3 fitted enthalpy equations, marker: solid line, marker_count: 0, method_class: model_derived}
+          attribution: Bouhifd et al. (2007); cited datasets attributed in caption
+          digitisation: deferred to a figure pass
+      - observation_id: bouhifd_2007_figure_4_glassy_and_liquid_basalt_heat_capacity
+        type: figure_only
+        locator: {pdf_page_index: 5, page: 6, published_page: 694, figure: '4'}
+        units: J/(g K); K
+        values:
+          method_class: figure_only
+          typed_quantity: cp
+          quantity_as_printed: measured heat capacities of glassy and liquid SFB basalt with model comparisons
+          species: SFB basalt
+          phase: glass and liquid
+          temperature_as_printed: approximately 400–1800 K
+          x_axis_as_printed: T (K)
+          y_axis_as_printed: Cp (J/g K)
+          caption_as_printed: >-
+            Fig. 4 a Measured capacities of glassy SFB basalt and values
+            calculated with the model of Richet (1987). b Measured heat
+            capacities of liquid SFB basalt (the reported errors are ±1%) and
+            values calculated with the models of Stebbins et al. (1984), Lange
+            and Navrotsky (1992), Courtial and Richet (1993), and the heat
+            capacities using our mineralogical composition of basalt.
+          panel: a–b
+          series:
+            - {name: glass SFB data this work, marker: filled square, marker_count: 9, method_class: measured_direct}
+            - {name: Richet (1987), marker: dashed line, marker_count: 0, method_class: model_derived}
+            - {name: liquid SFB data this work, marker: filled square, marker_count: 9, method_class: measured_direct}
+            - {name: literature and mineralogical models, marker: solid or dashed lines, marker_count: 0, method_class: model_derived}
+          attribution: Bouhifd et al. (2007); cited models attributed in caption
+          digitisation: deferred to a figure pass
+      - observation_id: bouhifd_2007_figure_5_crystalline_glass_liquid_mean_heat_capacity
+        type: figure_only
+        locator: {pdf_page_index: 5, page: 6, published_page: 694, figure: '5'}
+        units: J/(g K); K
+        values:
+          method_class: figure_only
+          typed_quantity: cp
+          quantity_as_printed: comparison between mean heat capacities of crystal and glass phases of SFB basalt
+          species: SFB basalt
+          phase: crystalline, glass and liquid
+          temperature_as_printed: approximately 300–1800 K
+          x_axis_as_printed: T (K)
+          y_axis_as_printed: Cm (J/g K)
+          caption_as_printed: >-
+            Fig. 5 Comparison between the mean heat capacities of the crystal
+            and glass phases of SFB basalt.
+          panel: single
+          series:
+            - {name: crystalline phase, marker: filled square, marker_count: 12, method_class: measured_reduced}
+            - {name: glass and liquid phases, marker: open square, marker_count: 18, method_class: measured_reduced}
+          attribution: Bouhifd et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: bouhifd_2007_figure_6_sfb_enthalpy_of_fusion
+        type: figure_only
+        locator: {pdf_page_index: 6, page: 7, published_page: 695, figure: '6'}
+        units: J/g; K
+        values:
+          method_class: figure_only
+          typed_quantity: heat_of_fusion
+          quantity_as_printed: enthalpy of melting of SFB basalt as a function of temperature
+          species: SFB basalt
+          phase: crystalline basalt to basalt liquid
+          temperature_as_printed: 1000–1800 K
+          x_axis_as_printed: T (K)
+          y_axis_as_printed: Delta Hf (J/g)
+          caption_as_printed: Fig. 6 Enthalpy of melting of SFB basalt as a function of temperature.
+          panel: single
+          series:
+            - {name: equation (9) calculated fit, marker: filled square, marker_count: 7, method_class: model_derived}
+            - {name: printed linear fit, marker: dashed line, marker_count: 0, method_class: model_derived}
+          attribution: Bouhifd et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: bouhifd_2007_figure_7_sfb_differential_scanning_calorimetry
+        type: figure_only
+        locator: {pdf_page_index: 7, page: 8, published_page: 696, figure: '7'}
+        units: voltage; K
+        values:
+          method_class: figure_only
+          typed_quantity: transition_temperature
+          quantity_as_printed: typical endothermic peak during melting
+          species: SFB basalt
+          phase: crystalline basalt melting to liquid
+          temperature_as_printed: labelled temperatures 1275 K, 1430 K and 1547 K; heating at 10 K/min
+          x_axis_as_printed: T (K)
+          y_axis_as_printed: Voltage (no numeric ticks)
+          caption_as_printed: >-
+            Fig. 7 Typical endothermic peak during melting observed in differential
+            scanning calorimetry (at 10 K/min) for SFB basalt. Also shown are the
+            liquidus and the temperature interval of the heat effect.
+          panel: single
+          series:
+            - {name: measured differential scanning calorimetry trace, marker: continuous line, marker_count: 0, method_class: measured_direct}
+          attribution: Bouhifd et al. (2007)
+          digitisation: deferred to a figure pass

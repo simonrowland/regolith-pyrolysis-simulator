@@ -1,0 +1,404 @@
+schema_version: literature_extract.v1
+source_id: yang-teng-seetharaman-2012-vanadium-evaporation
+source:
+  citation: >-
+    Yang Y., Teng L., Seetharaman S. (2012). Kinetic Studies on Evaporation of
+    Liquid Vanadium Oxide, VOx (Where x = 4 or 5). Metallurgical and Materials
+    Transactions B. DOI 10.1007/s11663-012-9742-3.
+  doi: 10.1007/s11663-012-9742-3
+  year: 2012
+extraction:
+  method: >-
+    Printed prose values transcribed from the born-digital pdftotext-layout;
+    Figures 1–13 are recorded for a later figure pass and were not digitised.
+    The numeric mass-loss summaries in the Results are retained as measured
+    reduced values. Fitted coefficients, enthalpies and curves remain context.
+  date: '2026-10-21'
+  worker: codex
+  provenance_path: text/yang-teng-seetharaman-2012-vanadium-evaporation/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+  - species: V2O5
+    observable: mass_loss
+    observation_id: yang_2012_results_oxygen_mass_loss_fraction
+    field: mass_loss_fraction
+    value: '1'
+    locator: {page: 3, pdf_page_index: 2, section: Results}
+  - species: V2O5
+    observable: mass_loss
+    observation_id: yang_2012_results_air_mass_loss_fraction
+    field: mass_loss_fraction
+    value: '0.9'
+    locator: {page: 3, pdf_page_index: 2, section: Results}
+species:
+  V2O5:
+    observations:
+      - observation_id: yang_2012_results_oxygen_mass_loss_fraction
+        type: mass_loss
+        locator:
+          page: 3
+          pdf_page_index: 2
+          section: Results
+          note: >-
+            The text reports total evaporation at 1873 K in about 6 hours; the
+            figure-based time series is deferred.
+        phase: l
+        units: fraction
+        values:
+          quantity: mass_loss_fraction
+          method_class: measured_direct
+          mass_loss_fraction: '1'
+          T_K: '1873'
+          approximate: true
+          duration_hours_as_printed: about 6
+          definition_as_printed: sigma = delta_w/w0, mass loss divided by initial sample mass
+          sample_as_printed: liquid vanadium oxide, initially V2O5
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 3, pdf_page_index: 2, section: Results}
+          atmosphere:
+            state: {tag: value, value: oxygen carrier gas}
+            locator: {page: 3, pdf_page_index: 2, section: Results}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: No total pressure is stated for the TGA run.}
+            locator: {page: 3, pdf_page_index: 2, section: Results}
+      - observation_id: yang_2012_results_air_mass_loss_fraction
+        type: mass_loss
+        locator:
+          page: 3
+          pdf_page_index: 2
+          section: Results
+          note: The text gives this corresponding mass-loss value after the about-six-hour oxygen result.
+        phase: l
+        units: fraction
+        values:
+          quantity: mass_loss_fraction
+          method_class: measured_direct
+          mass_loss_fraction: '0.9'
+          T_K: '1873'
+          duration_hours_as_printed: about 6 (corresponding value; duration not repeated)
+          definition_as_printed: sigma = delta_w/w0, mass loss divided by initial sample mass
+          sample_as_printed: liquid vanadium oxide, initially V2O5
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 3, pdf_page_index: 2, section: Results}
+          atmosphere:
+            state: {tag: value, value: air}
+            locator: {page: 3, pdf_page_index: 2, section: Results}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: No total pressure is stated for the TGA run.}
+            locator: {page: 3, pdf_page_index: 2, section: Results}
+      - observation_id: yang_2012_results_co2_mass_loss_fraction
+        type: mass_loss
+        locator:
+          page: 3
+          pdf_page_index: 2
+          section: Results
+          note: The text gives this corresponding mass-loss value after the about-six-hour oxygen result.
+        phase: l
+        units: fraction
+        values:
+          quantity: mass_loss_fraction
+          method_class: measured_direct
+          mass_loss_fraction: '0.35'
+          T_K: '1873'
+          duration_hours_as_printed: about 6 (corresponding value; duration not repeated)
+          definition_as_printed: sigma = delta_w/w0, mass loss divided by initial sample mass
+          sample_as_printed: liquid vanadium oxide, initially V2O5
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 3, pdf_page_index: 2, section: Results}
+          atmosphere:
+            state: {tag: value, value: CO2}
+            locator: {page: 3, pdf_page_index: 2, section: Results}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: No total pressure is stated for the TGA run.}
+            locator: {page: 3, pdf_page_index: 2, section: Results}
+    context:
+      - observation_id: yang_2012_experimental_conditions_context
+        type: experimental_conditions_context
+        locator: {page: 1, pdf_page_index: 0, section: Experimental}
+        units: printed units retained per field
+        values:
+          quantity: experimental_conditions_as_printed
+          method_class: measured_direct
+          phase: liquid vanadium oxide
+          initial_material: V2O5, purity 99.6 pct
+          sample_mass_mg_as_printed: approximately 100
+          experiment_temperature_range_K: '1723–1873'
+          atmosphere_series: oxygen, air, CO2
+          gas_flow_ml_min_as_printed: 400
+          isothermal_hold_hours_as_printed: 7
+          note: >-
+            The numerical run conditions are retained as printed context; the
+            paper does not state a total gas pressure or numeric oxygen partial
+            pressures for these atmospheres.
+      - observation_id: yang_2012_fitted_quantities_context
+        type: model_results_context
+        locator: {page: 4, pdf_page_index: 3, figure: '6', section: Discussion}
+        units: as printed
+        values:
+          quantity: fitted_evaporation_model_results
+          method_class: model_derived
+          schema_note: >-
+            Fitted kinetic constants, vaporization coefficients and apparent
+            evaporation enthalpies are retained as model outputs. Their figure
+            inputs are deferred and are not registered as table assets.
+          apparent_activation_energies_kJ_mol_as_printed:
+            linear_stage:
+              oxygen: '169.68'
+              air: '186.43'
+              CO2: '213.02'
+            parabolic_stage:
+              oxygen: '237.86'
+              air: '212.03'
+          vaporization_coefficients_dimensionless:
+            oxygen: '1.1511'
+            air: '0.6804'
+            CO2: '0.2562'
+          apparent_evaporation_enthalpies_kJ_as_printed:
+            oxygen: '177.14'
+            air: '188.29'
+            CO2: '236.88'
+          note: >-
+            Enthalpy values are printed in kJ without an explicit molar basis in
+            the displayed values; no vaporization-enthalpy token is asserted.
+      - observation_id: yang_2012_prior_v2o5_vapor_pressure_context
+        type: quoted_value_context
+        locator: {page: 5, pdf_page_index: 4, section: Estimation of Vaporization Coefficient}
+        units: log10 pressure equation as printed; pressure unit mmHg
+        values:
+          quantity: prior_vapor_pressure_equation
+          method_class: quoted_attributed
+          equation_as_printed: log P = -7100/T + 5.05 (mmHg)
+          attribution: Reference 1, Kubaschewski and Alcock, Metallurgical Thermochemistry, 5th ed. (1979)
+          note: This is prior literature, not measured in the present experiments.
+      - observation_id: yang_2012_figure1_deferred
+        type: figure_record
+        locator: {page: 2, pdf_page_index: 1, figure: '1'}
+        panel: whole_figure
+        attribution: FactSage 6.1 phase-stability diagram, as captioned.
+        units: temperature K and oxygen partial pressure as plotted
+        values:
+          quantity: phase_stability_diagram
+          species: [V2O5, VO2, VO]
+          phase: liquid oxide and gas/oxide stability fields as plotted
+          temperature_as_printed: 1400 °C boundary reference discussed in text; full axis range shown in diagram
+          axes_as_printed: {x: temperature, y: oxygen partial pressure (log scale)}
+          caption: Stability diagram of VOx by FactSage 6.1.
+          series: []
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure2_deferred
+        type: figure_record
+        locator: {page: 2, pdf_page_index: 1, figure: '2'}
+        panel: whole_figure
+        attribution: SETARAM TGA 92 apparatus schematic.
+        units: not_applicable
+        values:
+          quantity: experimental_apparatus_schematic
+          species: [V2O5]
+          phase: liquid sample in Pt crucible
+          temperature_as_printed: not shown in schematic
+          axes_as_printed: none
+          caption: A schematic diagram of the TGA setup (SETARAM TGA 92).
+          series: []
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure3_deferred
+        type: figure_record
+        locator: {page: 3, pdf_page_index: 2, figure: '3'}
+        panel: whole_figure
+        attribution: Present-work TGA data.
+        units: seconds and dimensionless mass loss
+        values:
+          quantity: mass_loss_fraction
+          species: V2O5
+          phase: liquid
+          temperature_as_printed: 1723 K, 1773 K, 1823 K and 1873 K
+          axes_as_printed: {x: Time/s, y: dimensionless mass loss}
+          caption: Dimensionless mass loss as a function of time in O2.
+          series:
+            - {name: 1723 K, marker_count: 0}
+            - {name: 1773 K, marker_count: 0}
+            - {name: 1823 K, marker_count: 0}
+            - {name: 1873 K, marker_count: 0}
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure4_deferred
+        type: figure_record
+        locator: {page: 3, pdf_page_index: 2, figure: '4'}
+        panel: whole_figure
+        attribution: Present-work TGA data.
+        units: seconds and dimensionless mass loss
+        values:
+          quantity: mass_loss_fraction
+          species: V2O5
+          phase: liquid
+          temperature_as_printed: 1773 K, 1823 K and 1873 K
+          axes_as_printed: {x: Time/s, y: dimensionless mass loss}
+          caption: Dimensionless mass loss as a function of time in air.
+          series:
+            - {name: 1773 K, marker_count: 0}
+            - {name: 1823 K, marker_count: 0}
+            - {name: 1873 K, marker_count: 0}
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure5_deferred
+        type: figure_record
+        locator: {page: 3, pdf_page_index: 2, figure: '5'}
+        panel: whole_figure
+        attribution: Present-work TGA data.
+        units: seconds and dimensionless mass loss
+        values:
+          quantity: mass_loss_fraction
+          species: V2O5
+          phase: liquid
+          temperature_as_printed: 1773 K, 1823 K and 1873 K; 1723 K excluded from results analysis
+          axes_as_printed: {x: Time/s, y: dimensionless mass loss}
+          caption: Dimensionless mass loss as a function of time in CO2.
+          series:
+            - {name: 1773 K, marker_count: 0}
+            - {name: 1823 K, marker_count: 0}
+            - {name: 1873 K, marker_count: 0}
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure6_deferred
+        type: figure_record
+        locator: {page: 4, pdf_page_index: 3, figure: '6'}
+        panel: panels a and b
+        attribution: Present-work experimental rate constants and linear fits.
+        units: ln(rate constant) and 10^4/T (K^-1)
+        values:
+          quantity: evaporation_rate_model_fit
+          species: V2O5
+          phase: liquid
+          temperature_as_printed: 1723 K, 1773 K, 1823 K and 1873 K (some atmospheres omit endpoints)
+          axes_as_printed: {x: 10^4/T (K^-1), y: ln(k)}
+          caption: The Arrhenius plot of evaporation rates for linear (a) and parabolic (b) stage in different atmospheres.
+          series:
+            - {name: panel a oxygen, marker: triangle, marker_count: 3}
+            - {name: panel a air, marker: square, marker_count: 3}
+            - {name: panel a CO2, marker: open circle, marker_count: 3}
+            - {name: panel b oxygen, marker: triangle, marker_count: 3}
+            - {name: panel b air, marker: square, marker_count: 3}
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure7_deferred
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, figure: '7'}
+        panel: whole_figure
+        attribution: Present-work experimental data and fitted line.
+        units: seconds and dimensionless mass loss
+        values:
+          quantity: mass_loss_fraction
+          species: V2O5
+          phase: liquid
+          temperature_as_printed: air, 1773 K, 1823 K and 1873 K; first 7500 s
+          axes_as_printed: {x: Time/s, y: dimensionless mass loss}
+          caption: "Linear fit for the first 7500 s evaporation in air (solid line: experimental data; symbol line: fitted line)."
+          series:
+            - {name: experimental, marker_count: 0}
+            - {name: fitted, marker_count: 0}
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure8_deferred
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, figure: '8'}
+        panel: whole_figure
+        attribution: Present-work experimental data and fitted line.
+        units: seconds and dimensionless mass loss
+        values:
+          quantity: mass_loss_fraction
+          species: V2O5
+          phase: liquid
+          temperature_as_printed: O2, 1773 K, 1823 K and 1873 K; first 7500 s
+          axes_as_printed: {x: Time/s, y: dimensionless mass loss}
+          caption: "Linear fit for the first 7500 s evaporation in O2 (solid line: experimental data; symbol line: fitted line)."
+          series:
+            - {name: experimental, marker: circle, marker_count: 9}
+            - {name: fitted, marker_count: 0}
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure9_deferred
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, figure: '9'}
+        panel: whole_figure
+        attribution: Present-work experimental data and fitted line.
+        units: seconds and dimensionless mass loss
+        values:
+          quantity: mass_loss_fraction
+          species: V2O5
+          phase: liquid
+          temperature_as_printed: CO2, 1773 K, 1823 K and 1873 K; whole evaporation
+          axes_as_printed: {x: Time/s, y: dimensionless mass loss}
+          caption: "Linear fit for the whole evaporation in CO2 (solid line: experimental data; symbol line: fitted line)."
+          series:
+            - {name: experimental, marker: triangle, marker_count: 36}
+            - {name: fitted, marker_count: 0}
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure10_deferred
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, figure: '10'}
+        panel: whole_figure
+        attribution: Present-work experimental data and parabolic fit.
+        units: seconds and dimensionless mass loss
+        values:
+          quantity: mass_loss_fraction
+          species: V2O5
+          phase: liquid
+          temperature_as_printed: air, 1773 K, 1823 K and 1873 K; parabolic stage shown from approximately 10000 s
+          axes_as_printed: {x: Time/s, y: dimensionless mass loss}
+          caption: "Comparison of experimental data with model predictions for evaporation in air (solid line: experimental data; symbol line: fitted data)."
+          series:
+            - {name: experimental, marker_count: 0}
+            - {name: fitted, marker_count: 0}
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure11_deferred
+        type: figure_record
+        locator: {page: 6, pdf_page_index: 5, figure: '11'}
+        panel: whole_figure
+        attribution: Present-work experimental data and parabolic fit.
+        units: seconds and dimensionless mass loss
+        values:
+          quantity: mass_loss_fraction
+          species: V2O5
+          phase: liquid
+          temperature_as_printed: oxygen, 1773 K, 1823 K and 1873 K; parabolic stage shown from approximately 10000 s
+          axes_as_printed: {x: Time/s, y: dimensionless mass loss}
+          caption: "Comparison of experimental data with model predictions for evaporation in oxygen (solid line: experimental data; symbol line: fitted data)."
+          series:
+            - {name: experimental, marker: triangle, marker_count: 18}
+            - {name: fitted, marker_count: 0}
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure12_deferred
+        type: figure_record
+        locator: {page: 6, pdf_page_index: 5, figure: '12'}
+        panel: whole_figure
+        attribution: Present-work data converted to vapor pressure under the stated assumptions.
+        units: vapor pressure and v, units as labeled in the plot
+        values:
+          quantity: vapor_pressure_model_data
+          species: V2O5
+          phase: liquid
+          temperature_as_printed: 1723 K to 1873 K
+          axes_as_printed: {x: v, y: P_vap}
+          caption: Vapor pressure vs v in the temperature range of 1723 K to 1873 K (1450 °C to 1600 °C).
+          series:
+            - {name: CO2, marker: open circle, marker_count: 3}
+            - {name: air, marker: square, marker_count: 3}
+            - {name: oxygen, marker: triangle, marker_count: 3}
+          digitisation: deferred to a figure pass
+      - observation_id: yang_2012_figure13_deferred
+        type: figure_record
+        locator: {page: 7, pdf_page_index: 6, figure: '13'}
+        panel: whole_figure
+        attribution: Present-work calculated values from Eq. 5.
+        units: ln(v) and 10^3/T (K^-1)
+        values:
+          quantity: evaporation_rate_model_fit
+          species: V2O5
+          phase: liquid
+          temperature_as_printed: 1723 K to 1873 K
+          axes_as_printed: {x: 10^3/T (K^-1), y: ln(v)}
+          caption: Calculated ln v (using Eq. 5) vs 10^3/T.
+          series:
+            - {name: oxygen, marker: triangle, marker_count: 3}
+            - {name: air, marker: square, marker_count: 3}
+            - {name: CO2, marker: open circle, marker_count: 3}
+          digitisation: deferred to a figure pass

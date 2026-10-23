@@ -1,0 +1,1012 @@
+schema_version: literature_extract.v1
+source_id: yokokawa-1984-alumina-carbon-volatilization
+source:
+  citation: Yokokawa H., Fujishige M., Ujiie S., Kameyama T., Dokiya M. and Fukuda K. (1984). Volatilization
+    of Aluminum Oxycarbides and of Alumina with Carbon in Reduction of Alumina. Transactions of the Japan
+    Institute of Metals 25(3):187–196.
+  doi: 10.2320/matertrans1960.25.187
+  year: 1984
+extraction:
+  method: mineru_table_draft emit; cell values checked against pdftotext-layout and table render
+  date: '2026-10-20'
+  worker: codex
+review_status: draft
+species:
+  unknown:
+    observations:
+    - observation_id: yokokawa_1984_alumina_carbon_volatilization_p005_t01_r03_c06
+      type: mass_loss
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        row_label: 1-a
+        column_header: ratio $(W_1 - W_f)/W_1$  ratio $(W_1 - W_f)/W_1$
+        published_page: 191
+      units: fraction
+      mineru_flags: []
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.711'
+        sample_as_printed: $Al_4O_4C$
+        holding_scheme_as_printed: '(b)'
+        initial_mass_mg_as_printed: '22.8'
+        final_mass_mg_as_printed: '6.6'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No row temperature is printed for series 1–3; thermal analysis traces are in deferred
+              figures 4–6.
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+    - observation_id: yokokawa_1984_alumina_carbon_volatilization_p005_t01_r04_c06
+      type: mass_loss
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        row_label: b
+        column_header: ratio $(W_1 - W_f)/W_1$  ratio $(W_1 - W_f)/W_1$
+        published_page: 191
+      units: fraction
+      mineru_flags: []
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.920'
+        sample_as_printed: $Al_2OC$
+        holding_scheme_as_printed: '(b)'
+        initial_mass_mg_as_printed: '33.6'
+        final_mass_mg_as_printed: '2.7'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No row temperature is printed for series 1–3; thermal analysis traces are in deferred
+              figures 4–6.
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+    - observation_id: yokokawa_1984_alumina_carbon_volatilization_p005_t01_r05_c06
+      type: mass_loss
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        row_label: 2-a
+        column_header: ratio $(W_1 - W_f)/W_1$  ratio $(W_1 - W_f)/W_1$
+        published_page: 191
+      units: fraction
+      mineru_flags: []
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.564'
+        sample_as_printed: $Al_2O_3 + 3C$
+        holding_scheme_as_printed: '(b)'
+        initial_mass_mg_as_printed: '36.9'
+        final_mass_mg_as_printed: '16.1'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No row temperature is printed for series 1–3; thermal analysis traces are in deferred
+              figures 4–6.
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+    - observation_id: yokokawa_1984_alumina_carbon_volatilization_p005_t01_r06_c06
+      type: mass_loss
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        row_label: b
+        column_header: ratio $(W_1 - W_f)/W_1$  ratio $(W_1 - W_f)/W_1$
+        published_page: 191
+      units: fraction
+      mineru_flags: []
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.694'
+        sample_as_printed: $(Al_2O_3 + 3C) + SiC\langle 5 mass \% \rangle$
+        holding_scheme_as_printed: '(b)'
+        initial_mass_mg_as_printed: '19.6'
+        final_mass_mg_as_printed: '6.0'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No row temperature is printed for series 1–3; thermal analysis traces are in deferred
+              figures 4–6.
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+    - observation_id: yokokawa_1984_alumina_carbon_volatilization_p005_t01_r07_c06
+      type: mass_loss
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        row_label: c
+        column_header: ratio $(W_1 - W_f)/W_1$  ratio $(W_1 - W_f)/W_1$
+        published_page: 191
+      units: fraction
+      mineru_flags: []
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.684'
+        sample_as_printed: $(Al_2O_3 + 3C) + Si_3N_4\langle 5 mass \% \rangle$
+        holding_scheme_as_printed: '(b)'
+        initial_mass_mg_as_printed: '23.4'
+        final_mass_mg_as_printed: '7.4'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No row temperature is printed for series 1–3; thermal analysis traces are in deferred
+              figures 4–6.
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+    - observation_id: yokokawa_1984_alumina_carbon_volatilization_p005_t01_r08_c06
+      type: mass_loss
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        row_label: d
+        column_header: ratio $(W_1 - W_f)/W_1$  ratio $(W_1 - W_f)/W_1$
+        published_page: 191
+      units: fraction
+      mineru_flags: []
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.756'
+        sample_as_printed: $(Al_2O_3 + 3C) + (Fe_2O_3 + 3C)\langle 5 mass \% \rangle$
+        holding_scheme_as_printed: '(b)'
+        initial_mass_mg_as_printed: '20.9'
+        final_mass_mg_as_printed: '5.1'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No row temperature is printed for series 1–3; thermal analysis traces are in deferred
+              figures 4–6.
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+    - observation_id: yokokawa_1984_alumina_carbon_volatilization_p005_t01_r09_c06
+      type: mass_loss
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        row_label: e
+        column_header: ratio $(W_1 - W_f)/W_1$  ratio $(W_1 - W_f)/W_1$
+        published_page: 191
+      units: fraction
+      mineru_flags: []
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.888'
+        sample_as_printed: $(Al_2O_3 + 3C) + (Fe_2O_3 + 3C)\langle 10 mass \% \rangle$
+        holding_scheme_as_printed: '(b)'
+        initial_mass_mg_as_printed: '19.7'
+        final_mass_mg_as_printed: '2.2'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No row temperature is printed for series 1–3; thermal analysis traces are in deferred
+              figures 4–6.
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+    - observation_id: yokokawa_1984_alumina_carbon_volatilization_p005_t01_r10_c06
+      type: mass_loss
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        row_label: f
+        column_header: ratio $(W_1 - W_f)/W_1$  ratio $(W_1 - W_f)/W_1$
+        published_page: 191
+      units: fraction
+      mineru_flags: []
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.896'
+        sample_as_printed: $(Al_2O_3 + 3C) + (Fe_2O_3 + 3C)\langle 20 mass \% \rangle$
+        holding_scheme_as_printed: '(b)'
+        initial_mass_mg_as_printed: '18.2'
+        final_mass_mg_as_printed: '1.9'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No row temperature is printed for series 1–3; thermal analysis traces are in deferred
+              figures 4–6.
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+    - observation_id: yokokawa_1984_alumina_carbon_volatilization_p005_t01_r11_c06
+      type: mass_loss
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        row_label: 3-a
+        column_header: ratio $(W_1 - W_f)/W_1$  ratio $(W_1 - W_f)/W_1$
+        published_page: 191
+      units: fraction
+      mineru_flags: []
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.989'
+        sample_as_printed: $Al_2O_3 + Al_4C_3$
+        holding_scheme_as_printed: '(b)'
+        initial_mass_mg_as_printed: '19.0'
+        final_mass_mg_as_printed: '0.2'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No row temperature is printed for series 1–3; thermal analysis traces are in deferred
+              figures 4–6.
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+    - observation_id: yokokawa_1984_alumina_carbon_volatilization_p005_t01_r12_c06
+      type: mass_loss
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        row_label: b
+        column_header: ratio $(W_1 - W_f)/W_1$  ratio $(W_1 - W_f)/W_1$
+        published_page: 191
+      units: fraction
+      mineru_flags: []
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.752'
+        sample_as_printed: $Al_2O_3 + SiC$
+        holding_scheme_as_printed: '(b)'
+        initial_mass_mg_as_printed: '22.2'
+        final_mass_mg_as_printed: '5.5'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No row temperature is printed for series 1–3; thermal analysis traces are in deferred
+              figures 4–6.
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+    - observation_id: yokokawa_1984_table1_series_a_event_mass_loss_fraction
+      type: mass_loss
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 191
+        table: '1'
+        row_label: 4-a
+        column_header: ratio (W1-Wf)/W1; parenthetical event value
+      units: fraction
+      phase: cr
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.86'
+        sample_id: 4-a
+        sample_as_printed: 2Al2O3 + 3SiO2 + 12C
+        temperature_as_printed: 1908 K
+        T_K: '1908'
+        initial_mass_mg_as_printed: '56.3'
+        final_mass_mg_as_printed: '-0.1'
+        final_ratio_as_printed: '1.002'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+        note: The ratio and temperature in parentheses are the in-progress values when the sample left
+          the crucible after an abrupt weight change; the final weight is negative due to crucible/sample
+          side reaction.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1908'
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+            row_label: 4-a
+    - observation_id: yokokawa_1984_table1_series_b_event_mass_loss_fraction
+      type: mass_loss
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 191
+        table: '1'
+        row_label: 4-b
+        column_header: ratio (W1-Wf)/W1; parenthetical event value
+      units: fraction
+      phase: cr
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.86'
+        sample_id: 4-b
+        sample_as_printed: 3Al2O3 - 2SiO2 + 13C (M*)
+        temperature_as_printed: 1908 K
+        T_K: '1908'
+        initial_mass_mg_as_printed: '61.5'
+        final_mass_mg_as_printed: '-5.5'
+        final_ratio_as_printed: '1.089'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+        note: The ratio and temperature in parentheses are the in-progress values when the sample left
+          the crucible after an abrupt weight change; the final weight is negative due to crucible/sample
+          side reaction.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1908'
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+            row_label: 4-b
+    - observation_id: yokokawa_1984_table1_series_c_event_mass_loss_fraction
+      type: mass_loss
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 191
+        table: '1'
+        row_label: 4-c
+        column_header: ratio (W1-Wf)/W1; parenthetical event value
+      units: fraction
+      phase: cr
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.85'
+        sample_id: 4-c
+        sample_as_printed: M + AF <5 mass %> **
+        temperature_as_printed: 1898 K
+        T_K: '1898'
+        initial_mass_mg_as_printed: '56.2'
+        final_mass_mg_as_printed: '-3.9'
+        final_ratio_as_printed: '1.069'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+        note: The ratio and temperature in parentheses are the in-progress values when the sample left
+          the crucible after an abrupt weight change; the final weight is negative due to crucible/sample
+          side reaction.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1898'
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+            row_label: 4-c
+    - observation_id: yokokawa_1984_table1_series_d_event_mass_loss_fraction
+      type: mass_loss
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 191
+        table: '1'
+        row_label: 4-d
+        column_header: ratio (W1-Wf)/W1; parenthetical event value
+      units: fraction
+      phase: cr
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.76'
+        sample_id: 4-d
+        sample_as_printed: M + AF <10 mass %> **
+        temperature_as_printed: 1853 K
+        T_K: '1853'
+        initial_mass_mg_as_printed: '46.3'
+        final_mass_mg_as_printed: '-2.9'
+        final_ratio_as_printed: '1.063'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+        note: The ratio and temperature in parentheses are the in-progress values when the sample left
+          the crucible after an abrupt weight change; the final weight is negative due to crucible/sample
+          side reaction.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1853'
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+            row_label: 4-d
+    - observation_id: yokokawa_1984_table1_series_e_event_mass_loss_fraction
+      type: mass_loss
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 191
+        table: '1'
+        row_label: 4-e
+        column_header: ratio (W1-Wf)/W1; parenthetical event value
+      units: fraction
+      phase: cr
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.67'
+        sample_id: 4-e
+        sample_as_printed: M + AF <20 mass %> **
+        temperature_as_printed: 1813 K
+        T_K: '1813'
+        initial_mass_mg_as_printed: '51.1'
+        final_mass_mg_as_printed: '-1.4'
+        final_ratio_as_printed: '1.027'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+        note: The ratio and temperature in parentheses are the in-progress values when the sample left
+          the crucible after an abrupt weight change; the final weight is negative due to crucible/sample
+          side reaction.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1813'
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+            row_label: 4-e
+    - observation_id: yokokawa_1984_table1_series_f_event_mass_loss_fraction
+      type: mass_loss
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 191
+        table: '1'
+        row_label: 4-f
+        column_header: ratio (W1-Wf)/W1; parenthetical event value
+      units: fraction
+      phase: cr
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        mass_loss_fraction: '0.97'
+        sample_id: 4-f
+        sample_as_printed: M + AF <50 mass %> **
+        temperature_as_printed: 1913 K
+        T_K: '1913'
+        initial_mass_mg_as_printed: '56.6'
+        final_mass_mg_as_printed: '-6.8'
+        final_ratio_as_printed: '1.120'
+        atmosphere_as_printed: vacuum (numeric pressure not reported for this table row)
+        note: The ratio and temperature in parentheses are the in-progress values when the sample left
+          the crucible after an abrupt weight change; the final weight is negative due to crucible/sample
+          side reaction.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1913'
+          locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 191
+            table: '1'
+            row_label: 4-f
+    context:
+    - observation_id: yokokawa_1984_figure_1_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 1
+        page: 2
+        published_page: 188
+        figure: '1'
+      units: as printed on axes
+      values:
+        typed_quantity: thermodynamic phase relation diagram
+        species: Al-O-C gas over condensed phases
+        phase: mixed vapor/condensed sample system
+        temperature_as_printed: 1800 K; 134 Pa
+        x_axis_as_printed: T (K)
+        y_axis_as_printed: P (Pa); species partial pressures
+        caption_as_printed: Al-O-C solid-gas phase relations
+        method_class: model_derived
+      caption_as_printed: Al-O-C solid-gas phase relations
+      panel: whole_figure
+      series:
+      - name: CO vapor pressure
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      - name: CO2 vapor pressure
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      - name: O2 vapor pressure
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      - name: Al vapor pressure
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      - name: Al2O vapor pressure
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      - name: SiO vapor pressure
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      attribution: Yokokawa et al. (1984)
+      digitisation: deferred to a figure pass
+    - observation_id: yokokawa_1984_figure_2_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 189
+        figure: '2'
+      units: as printed on axes
+      values:
+        typed_quantity: Gibbs energy versus composition
+        species: Al2OC, Al4O4C, alumina, carbide
+        phase: mixed vapor/condensed sample system
+        temperature_as_printed: 1800 K
+        x_axis_as_printed: composition / stability case
+        y_axis_as_printed: assumed Gibbs energy
+        caption_as_printed: Assumed Gibbs energy of formation of Al2OC from oxide and carbide at 1800
+          K
+        method_class: model_derived
+      caption_as_printed: Assumed Gibbs energy of formation of Al2OC from oxide and carbide at 1800 K
+      panel: whole_figure
+      series:
+      - name: stability case (i)
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      - name: stability case (iii)
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      - name: stability case (v)
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      attribution: Yokokawa et al. (1984)
+      digitisation: deferred to a figure pass
+    - observation_id: yokokawa_1984_figure_3_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 189
+        figure: '3'
+      units: as printed on axes
+      values:
+        typed_quantity: pressure-composition diagram
+        species: Al2O3-Al4C3 pseudobinary with Al2OC
+        phase: mixed vapor/condensed sample system
+        temperature_as_printed: 1800 K
+        x_axis_as_printed: m(Al2O3)/m(Al4C3)
+        y_axis_as_printed: pressure (Pa)
+        caption_as_printed: Pressure-composition diagram in the Al2O3-Al4C3 pseudobinary system at 1800
+          K
+        method_class: model_derived
+      caption_as_printed: Pressure-composition diagram in the Al2O3-Al4C3 pseudobinary system at 1800
+        K
+      panel: whole_figure
+      series:
+      - name: case (i), panel a
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      - name: case (iii), panel b
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      - name: case (v), panel c
+        marker: continuous curve
+        marker_count: 0
+        method_class: model_derived
+      attribution: Yokokawa et al. (1984)
+      digitisation: deferred to a figure pass
+    - observation_id: yokokawa_1984_figure_4_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 5
+        page: 6
+        published_page: 192
+        figure: '4'
+      units: as printed on axes
+      values:
+        typed_quantity: thermal analysis traces
+        species: Al4O4C and Al2OC samples
+        phase: mixed vapor/condensed sample system
+        temperature_as_printed: temperature-dependent
+        x_axis_as_printed: T (K)
+        y_axis_as_printed: TG, DTG, DTA, pressure
+        caption_as_printed: Results of thermal analysis on oxycarbides
+        method_class: measured_direct
+        axes_as_printed:
+          x: T / K
+          TG: 1 − ΔW/W0
+          DTG: −dW/dt (mg min−1)
+          DTA: EMF / mV
+          pressure: log(P / Pa)
+        candidate_tokens:
+        - mass_loss_fraction_vs_T
+        - mass_loss_rate
+        - partial_pressure
+        schema_gap: Differential thermal-analysis signal has no store quantity token; digitisation is
+          deferred for all curves.
+      caption_as_printed: Results of thermal analysis on oxycarbides
+      panel: a-b
+      series:
+      - name: 'panel a: TG'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel a: DTG'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel a: DTA'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel a: pressure P'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel b: TG'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel b: DTG'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel b: DTA'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel b: pressure P'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      attribution: Yokokawa et al. (1984)
+      digitisation: deferred to a figure pass
+    - observation_id: yokokawa_1984_figure_5_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 6
+        page: 7
+        published_page: 193
+        figure: '5'
+      units: as printed on axes
+      values:
+        typed_quantity: DTG and DTA traces
+        species: Al2O3 + 3C with SiC, Si3N4, Fe2O3 additions
+        phase: mixed vapor/condensed sample system
+        temperature_as_printed: temperature-dependent
+        x_axis_as_printed: T (K)
+        y_axis_as_printed: DTG; DTA
+        caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina
+          with carbon
+        method_class: measured_direct
+        axes_as_printed:
+          x: T / K
+          y_left: differential weight loss (DTG)
+          y_right: DTA
+        candidate_tokens:
+        - mass_loss_rate
+        - heat_capacity
+        schema_gap: The plotted differential weight-loss and thermal signals are curves with no point
+          data entered in this figure pass.
+      caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina
+        with carbon
+      panel: a-f
+      series:
+      - name: 'panel a: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel a: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel b: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel b: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel c: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel c: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel d: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel d: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel e: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel e: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel f: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel f: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      attribution: Yokokawa et al. (1984)
+      digitisation: deferred to a figure pass
+    - observation_id: yokokawa_1984_figure_6_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 7
+        page: 8
+        published_page: 194
+        figure: '6'
+      units: as printed on axes
+      values:
+        typed_quantity: DTG and DTA traces
+        species: Al2O3 + Al4C3; Al2O3 + SiC
+        phase: mixed vapor/condensed sample system
+        temperature_as_printed: temperature-dependent
+        x_axis_as_printed: T (K)
+        y_axis_as_printed: DTG; DTA
+        caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina
+          with carbides
+        method_class: measured_direct
+        axes_as_printed:
+          x: T / K
+          y_left: differential weight loss (DTG)
+          y_right: DTA
+        candidate_tokens:
+        - mass_loss_rate
+        - heat_capacity
+        schema_gap: The plotted differential weight-loss and thermal signals are curves with no point
+          data entered in this figure pass.
+      caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina
+        with carbides
+      panel: a-c
+      series:
+      - name: 'panel a: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel a: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel b: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel b: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel c: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel c: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      attribution: Yokokawa et al. (1984)
+      digitisation: deferred to a figure pass
+    - observation_id: yokokawa_1984_figure_7_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 8
+        page: 9
+        published_page: 195
+        figure: '7'
+      units: as printed on axes
+      values:
+        typed_quantity: DTG and DTA traces
+        species: Al2O3-SiO2-Fe2O3-C mixtures
+        phase: mixed vapor/condensed sample system
+        temperature_as_printed: temperature-dependent
+        x_axis_as_printed: T (K)
+        y_axis_as_printed: DTG; DTA
+        caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina,
+          silica and iron oxide with carbon
+        method_class: measured_direct
+        axes_as_printed:
+          x: T / K
+          y_left: differential weight loss (DTG)
+          y_right: DTA
+        candidate_tokens:
+        - mass_loss_rate
+        - heat_capacity
+        schema_gap: The plotted differential weight-loss and thermal signals are curves with no point
+          data entered in this figure pass.
+      caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina,
+        silica and iron oxide with carbon
+      panel: a-f
+      series:
+      - name: 'panel a: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel a: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel b: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel b: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel c: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel c: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel d: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel d: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel e: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel e: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel f: DTG solid line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      - name: 'panel f: DTA broken line'
+        marker: continuous curve
+        marker_count: 0
+        method_class: measured_direct
+      attribution: Yokokawa et al. (1984)
+      digitisation: deferred to a figure pass
+    - observation_id: yokokawa_1984_printed_remaining_mass_context
+      type: measured_value_without_matching_token
+      locator:
+        pdf_page_index: 5
+        page: 6
+        published_page: 192
+        section: Aluminum oxycarbides
+      units: mass %; K
+      values:
+        remaining_mass_as_printed: 29 mass %
+        temperature_as_printed: heated to 2000 K
+        candidate_tokens:
+        - mass_loss_fraction
+        - yield_fraction
+        schema_gap: This is printed as remaining-mass yield, not the mass-loss fraction; converting it
+          by subtraction would create an unprinted value.
+      note: For Al4O4C, significant evaporation is reported around 1570 K after beginning above 1300 K,
+        and it ceases at 1800 K; the residual is α-alumina.
+    - observation_id: yokokawa_1984_printed_al2oc_experimental_pressure_context
+      type: printed_condition_context
+      locator:
+        pdf_page_index: 5
+        page: 6
+        published_page: 192
+        section: Aluminum oxycarbides
+      units: Pa; K
+      values:
+        pressure_range_as_printed: 10−4 to 10−3 Pa
+        evaporation_temperature_range_as_printed: 1600 to 2000 K
+        candidate_tokens:
+        - total_pressure_Pa
+        - transition_temperature
+      note: Applies to the Al2OC discussion, not to all Table 1 rows.
+fidelity_samples:
+- path: species.unknown.observations[yokokawa_1984_alumina_carbon_volatilization_p005_t01_r03_c06].values.mass_loss_fraction
+  value: '0.711'
+  note: Table 1, series 1-a (Al4O4C), rendered PDF p. 5 / printed p. 191.
+  locator:
+    pdf_page_index: 4
+    page: 5
+    published_page: 191
+    table: '1'
+- path: species.unknown.observations[yokokawa_1984_table1_series_a_event_mass_loss_fraction].values.mass_loss_fraction
+  value: '0.86'
+  note: Table 1, series 4-a parenthetical in-progress ratio at 1908 K, rendered PDF p. 5 / printed p.
+    191.
+  locator:
+    pdf_page_index: 4
+    page: 5
+    published_page: 191
+    table: '1'
