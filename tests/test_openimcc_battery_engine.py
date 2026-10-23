@@ -634,6 +634,63 @@ def test_openimcc_battery_solves_plante_oxygen_balance_anchor() -> None:
     assert notice["dominant_metal_carriers"]
 
 
+def test_internal_analytical_oxygen_condition_preserves_source_domain_notices() -> None:
+    _require_oxygen_balance()
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _InternalAnalyticalBatteryBackend,
+        engine_flags_from_result,
+    )
+
+    # 2064476 raises the default SiO2(l) reference floor to 1200 K.
+    request = {
+        "temperature_C": 1063.0 - 273.15,
+        "composition_mol": {"Na2O": 0.4, "SiO2": 0.6},
+        "po2_request": Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION, po2_bar=None,
+        ),
+    }
+    backend = _InternalAnalyticalBatteryBackend()
+    result = backend.equilibrate(**request)
+    source = backend._oxygen_balance_backend.equilibrate(**request)
+    original = next(
+        row for row in source.diagnostics["imcc_notices"]
+        if row.get("kind") == "openimcc_gas_flag"
+        and row.get("species") == "SiO"
+        and "SiO2(l)" in row.get("reason", "")
+        and "[1200, 1500] K" in row["reason"]
+    )
+    assert original["authority"] == "extrapolated"
+    assert result.status == "ok"
+    assert result.vapor_pressures_Pa["Na"] > 0.0
+    provenance = result.diagnostics["internal_analytical_provenance"]
+    solved = next(
+        row for row in provenance["oxygen_balance"]
+        if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
+    )
+    assert solved["pO2_bar"] > 0.0
+    assert math.isclose(backend._core.melt.pO2_mbar * 1e-3, solved["pO2_bar"])
+    assert solved["oxygen_condition_source"] == "openimcc_oxygen_balance_condition_only"
+    assert solved["pressure_prediction_source"] == "internal-analytical core"
+    assert "BuiltinVaporPressureProvider" in provenance["code_path"]
+    assert provenance["vapor_pressures_source"] == result.vapor_pressures_source
+    assert all(
+        value.startswith("builtin_")
+        for value in result.vapor_pressures_source.values()
+    )
+    assert original in provenance["oxygen_balance"]
+    assert original in result.diagnostics["imcc_notices"]
+    returned_notices = engine_flags_from_result(result)[0]
+    assert original in returned_notices
+    for row in source.diagnostics["imcc_notices"]:
+        if row.get("kind") != "fo2_oxygen_balance_effusion_solved":
+            assert row in provenance["oxygen_balance"]
+            assert row in returned_notices
+    assert sum(
+        row.get("kind") == "fo2_oxygen_balance_effusion_solved"
+        for row in returned_notices
+    ) == 1
+
+
 def test_openimcc_hot_k_rich_melt_returns_molecular_flow_refusal() -> None:
     _require_oxygen_balance()
     hot_k_rich = BinaryPot(
