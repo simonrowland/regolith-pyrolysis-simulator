@@ -160,6 +160,10 @@ def test_constrained_max_profile_costs_coating_and_applies_hardware_caps() -> No
 
 def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
     feedstocks = yaml.safe_load((DEFAULT_DATA_DIR / "feedstocks.yaml").read_text())
+    setpoints = yaml.safe_load((DEFAULT_DATA_DIR / "setpoints.yaml").read_text())
+    staged_na_duration_h = setpoints["campaigns"]["C2A_staged"][
+        "na_shuttle_stage"
+    ]["duration_h"]
     blocked_feedstocks = {
         key for key, entry in feedstocks.items()
         if is_blocked_feedstock(entry)
@@ -172,6 +176,7 @@ def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
     assert set(profiles) | not_applicable == loadable_feedstocks
     assert not_applicable.isdisjoint(profiles)
     assert blocked_feedstocks.isdisjoint(profiles)
+    staged_na_duration_seeds = set()
     for feedstock, profile in profiles.items():
         assert profile["feedstock"] == feedstock
         for objective in profile["objectives"]:
@@ -180,6 +185,17 @@ def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
         assert set(profile["constraints"]["gates"]).issubset(set(GATE_ORDER))
         for seed in profile["seed_recipes"]:
             RecipePatch.from_nested(seed["patch"]).validated(RecipeSchema())
+            seed_campaigns = seed["patch"].get("campaigns", {})
+            na_stage = seed_campaigns.get("C2A_staged", {}).get(
+                "na_shuttle_stage", {}
+            )
+            if "duration_h" in na_stage:
+                staged_na_duration_seeds.add((feedstock, seed["id"]))
+                assert na_stage["duration_h"] == staged_na_duration_h
+
+    assert staged_na_duration_seeds == {
+        ("lunar_spa_kreep_influenced", "spa-kreep-staged-seed"),
+    }
 
 
 def test_optimizer_window_profiles_fit_caps_and_sequences_load_at_60_hours() -> None:

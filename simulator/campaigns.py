@@ -1685,7 +1685,7 @@ class CampaignManager:
         staged: bool = False,
     ) -> bool:
         if staged:
-            return int(campaign_hour) <= 3
+            return int(campaign_hour) < 3
         return int(campaign_hour) % 6 < 3
 
     def get_temp_target(self, campaign: CampaignPhase,

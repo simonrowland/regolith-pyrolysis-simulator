@@ -931,7 +931,7 @@ def test_campaign_endpoint_caps_and_classes_are_materialized():
         "default": 25,
     }
     assert campaigns["C3"]["max_hold_hr"]["C3_NA"] == {
-        "A_staged": 3,
+        "A_staged": 6,
         "A": 18,
         "default": 35,
     }

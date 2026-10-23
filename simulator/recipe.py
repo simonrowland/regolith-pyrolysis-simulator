@@ -928,10 +928,10 @@ class RecipeSchema:
             low=1,
             high=6,
             units="hr",
-            # Duration sweep around 3 h nominal covers under/over-hold Na shuttle cases.
+            # Duration search spans under-hold through the configured six-hour window.
             bounds_source=(
-                "engineering_envelope around setpoints.yaml nominal "
-                "campaigns.C2A_staged.na_shuttle_stage.duration_h=3"
+                "engineering_envelope through setpoints.yaml nominal "
+                "campaigns.C2A_staged.na_shuttle_stage.duration_h=6"
             ),
         ),
         _knob(

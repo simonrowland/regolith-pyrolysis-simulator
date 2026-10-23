@@ -60,13 +60,12 @@ def test_canonical_sequence_recovers_mg_before_final_boiloff_and_skips_mre() -> 
     assert manager.get_next_campaign(CampaignPhase.C2A_STAGED, record) == CampaignPhase.C3_NA
     c3_melt = MeltState(campaign=CampaignPhase.C3_NA)
     manager.configure_campaign(c3_melt, CampaignPhase.C3_NA)
-    assert manager.get_temp_target(CampaignPhase.C3_NA, 0, c3_melt) == (1150.0, 600.0)
 
-    # Baseline pin: the three configured cool-cleanup hours remain at 1150 C.
+    # Three ticks inject at 1150 C; tick 3 starts the configured bakeout.
     assert [
         manager.get_temp_target(CampaignPhase.C3_NA, hour, c3_melt)
-        for hour in (1, 2, 3)
-    ] == [(1150.0, 600.0)] * 3
+        for hour in range(4)
+    ] == [(1150.0, 600.0)] * 3 + [(1600.0, 600.0)]
     assert manager._campaign_overrides(CampaignPhase.C3_NA)[
         "staged_duration_h"
     ] == 6.0
