@@ -216,6 +216,25 @@ else
   JUNIT_DST="(missing: $JUNIT_SRC)"
 fi
 
+# Keep the quarantined reds' results beside the gating JUnit without changing
+# the full-tier result. The known-red log carries the terminal stale-node line
+# that JUnit cannot represent.
+KNOWN_RED_JOB="${JOB_NAME}-known-red"
+KNOWN_RED_LOG_DST="$RESULT_DIR/${DATE_UTC}-known-red.log"
+KNOWN_RED_JUNIT_SRC="/tmp/ci-${KNOWN_RED_JOB}.xml"
+KNOWN_RED_JUNIT_DST="$RESULT_DIR/${DATE_UTC}-known-red-junit.xml"
+set +e
+CI_WALL_CAP_S="$CI_WALL_CAP_S" CI_BASELINE_JUNIT= CI_BASELINE_SNAPSHOT= \
+  "$STUDIO_CI" "$NIGHTLY_WT" "$KNOWN_RED_JOB" full --known-red-only \
+  >"$KNOWN_RED_LOG_DST" 2>&1
+KNOWN_RED_RC=$?
+set -e
+if [ -f "$KNOWN_RED_JUNIT_SRC" ] && cp -f "$KNOWN_RED_JUNIT_SRC" "$KNOWN_RED_JUNIT_DST"; then
+  :
+else
+  KNOWN_RED_JUNIT_DST="(missing: $KNOWN_RED_JUNIT_SRC)"
+fi
+
 STATUS="FAIL"
 INFRA_REASON=""
 case "$RC" in
@@ -229,8 +248,8 @@ case "$RC" in
   94) STATUS="INFRA"; INFRA_REASON="sustained-rss-watchdog-kill" ;;
 esac
 # One-line result for the date file (scheduler-friendly greppable).
-# Format: DATE STATUS tip=<sha> job=<name> junit=<path> exit=<rc> wall_cap_s=<n> [reason=<infra reason>]
-ONE_LINE="${DATE_UTC} ${STATUS} tip=${TIP_SHA} job=${JOB_NAME} junit=${JUNIT_DST} exit=${RC} wall_cap_s=${CI_WALL_CAP_S}"
+# Format: DATE STATUS tip=<sha> job=<name> junit=<path> exit=<rc> known_red_exit=<rc> known_red_junit=<path> wall_cap_s=<n> [reason=<infra reason>]
+ONE_LINE="${DATE_UTC} ${STATUS} tip=${TIP_SHA} job=${JOB_NAME} junit=${JUNIT_DST} exit=${RC} known_red_exit=${KNOWN_RED_RC} known_red_junit=${KNOWN_RED_JUNIT_DST} wall_cap_s=${CI_WALL_CAP_S}"
 if [ -n "$INFRA_REASON" ]; then
   ONE_LINE="$ONE_LINE reason=$INFRA_REASON"
 fi
@@ -247,10 +266,14 @@ fi
   echo "- studio-ci exit: ${RC}"
   if [ -n "$INFRA_REASON" ]; then echo "- reason: ${INFRA_REASON}"; fi
   echo "- junit: \`${JUNIT_DST}\`"
+  echo "- known-red exit (non-gating): ${KNOWN_RED_RC}"
+  echo "- known-red junit: \`${KNOWN_RED_JUNIT_DST}\`"
+  echo "- known-red log: \`${KNOWN_RED_LOG_DST}\`"
 } > "$RESULT_MD"
 
 echo "nightly-gate: wrote $RESULT_MD"
 echo "$ONE_LINE"
+echo "nightly-gate: known-red log $KNOWN_RED_LOG_DST"
 # Clear trap's early-exit writer; we already wrote the durable result.
 # Release the concurrency lock explicitly (trap would also do this, but we
 # clear the trap so the early-exit FAIL writer does not re-fire).

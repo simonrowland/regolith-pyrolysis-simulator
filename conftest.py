@@ -55,7 +55,7 @@ from tests.e2e.playwright_support import (
 )
 
 
-pytest_plugins = ("_pytest_loadgroup_order",)
+pytest_plugins = ("_pytest_loadgroup_order", "_pytest_known_red")
 
 
 def _safe_worker_id(worker_id: str) -> str:
