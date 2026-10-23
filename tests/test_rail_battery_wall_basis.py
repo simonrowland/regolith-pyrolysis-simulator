@@ -26,6 +26,7 @@ from simulator.condensation import (
     _wall_deposition_driving_pressure_pa,
     cold_spot_diagnostic,
 )
+from simulator.wall_advisor import advise_wall_materials
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState, PipeSegment
 
 
@@ -142,6 +143,41 @@ def test_wall_below_sio_landing_temperature_still_has_cold_spot():
     assert diagnostic["findings"][0]["condensation_temperature_C"] == pytest.approx(
         1050.0
     )
+
+
+def test_hot_stage0_duct_flags_dense_alumina_service_limit():
+    dense_alumina = next(
+        item
+        for item in advise_wall_materials([], zone_temperature_C=1800.0)
+        if item.material_id == "dense_alumina"
+    )
+    assert dense_alumina.limiting_temperature_C is not None
+
+    diagnostic = cold_spot_diagnostic(
+        [
+            PipeSegment(
+                name="stage_0_to_stage_1",
+                upstream_stage="stage_0",
+                downstream_stage="stage_1",
+                wall_temperature_C=1800.0,
+                length_m=1.0,
+                inner_diameter_m=0.12,
+            )
+        ],
+        {},
+    )
+
+    assert diagnostic["has_material_service_violation"] is True
+    notice = diagnostic["material_service_findings"][0]
+    assert notice["material_id"] == "dense_alumina"
+    assert notice["service_temperature_C"] == (
+        dense_alumina.limiting_temperature_C
+    )
+    assert notice["reason"] == (
+        "duct wall above material service T (unqualified hardware)"
+    )
+    assert notice["output_status"] == "status_bearing"
+    assert notice["authority_level"] == "extrapolated"
 
 
 def test_sio_reactive_wall_saturation_backstop_unchanged():

@@ -153,6 +153,7 @@ from simulator.state import (
     PipeSegment,
     clamp_stir_factor,
 )
+from simulator.wall_advisor import advise_wall_materials
 
 
 # Single-sourced from the physical_constants leaf (SC-CONST pass-B); byte-identical
@@ -2159,6 +2160,9 @@ class CondensationModel:
             'upstream_hot_wall_warnings': [],
             'upstream_hot_wall_findings': [],
             'upstream_hot_wall_min_C': DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
+            'has_material_service_violation': False,
+            'material_service_warnings': [],
+            'material_service_findings': [],
         }
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.last_knudsen_pressure_adjustment: dict[str, Any] = {}
@@ -2462,6 +2466,45 @@ class CondensationModel:
                 segment.name: float(wall_temperature_C)
                 for segment in self.pipe_segments
             })
+        fe_partial_pressure_mbar = (
+            None
+            if species_partial_pressures_mbar is None
+            else self.species_partial_pressures_mbar.get('Fe')
+        )
+        if fe_partial_pressure_mbar is not None:
+            fe_dewpoint = antoine_dew_temperature_diagnostic(
+                'Fe',
+                float(fe_partial_pressure_mbar) * 100.0,
+                vapor_pressure_data=self.vapor_pressure_data,
+            )
+            if fe_dewpoint.get('status') == 'diagnostic_only':
+                try:
+                    fe_dewpoint_C = (
+                        float(fe_dewpoint['temperature_K'])
+                        - CELSIUS_TO_KELVIN_OFFSET
+                    )
+                except (KeyError, TypeError, ValueError):
+                    fe_dewpoint_C = math.nan
+                if math.isfinite(fe_dewpoint_C):
+                    # d-260 assigns the Fe dew-point floor to the existing
+                    # stage_0_to_stage_1 schedule. Stage 0 has no capture area,
+                    # so its configured flowing pFe is segment-local here.
+                    self.pipe_segments = [
+                        replace(
+                            segment,
+                            wall_temperature_C=max(
+                                segment.wall_temperature_C,
+                                fe_dewpoint_C,
+                            ),
+                        )
+                        if (
+                            segment.name == 'stage_0_to_stage_1'
+                            and segment.name
+                            not in self.wall_temperature_input_refusals
+                        )
+                        else segment
+                        for segment in self.pipe_segments
+                    ]
         self.last_knudsen_regime_diagnostic = copy.deepcopy(
             self._current_knudsen_diagnostic()
         )
@@ -3290,21 +3333,27 @@ class CondensationModel:
                     capture_budget_alpha_record
                 )
             capture_budget_kg = float(stage_route['capture_budget_kg'])
+            captured_kg = 0.0
             if hkl_sink_total_kg <= 1e-15:
                 capture_budget_kg = 0.0
             elif capture_budget_kg > 0.0:
                 used_capture_budget_regularizer = True
-                wall_deposit_kg = capture_budget_kg * (
-                    wall_hkl_kg / hkl_sink_total_kg
+                # Share the pressure-isolated removal ceiling across the same
+                # evaluated stage and wall capacities used by the fixed-point
+                # route. Any budget the sinks cannot accept remains overhead.
+                stage_deposits, segment_deposits = (
+                    _regularized_capture_allocations(
+                        capture_budget_kg,
+                        hkl_condensed_by_stage,
+                        wall_hkl_by_segment,
+                    )
                 )
+                wall_deposit_kg = sum(segment_deposits.values())
+                captured_kg = wall_deposit_kg + sum(stage_deposits.values())
                 if wall_deposit_kg > 1e-15:
                     wall_deposit_by_species[species] = (
                         wall_deposit_by_species.get(species, 0.0)
                         + wall_deposit_kg
-                    )
-                    segment_deposits = _allocate_total_by_weights(
-                        wall_deposit_kg,
-                        wall_hkl_by_segment,
                     )
                     for segment_name, segment_kg in segment_deposits.items():
                         if segment_kg <= 1e-15:
@@ -3315,8 +3364,8 @@ class CondensationModel:
                         segment_species[species] = (
                             segment_species.get(species, 0.0) + segment_kg)
                 wall_fraction = (
-                    wall_deposit_kg / capture_budget_kg
-                    if capture_budget_kg > 0.0 else 0.0
+                    wall_deposit_kg / captured_kg
+                    if captured_kg > 0.0 else 0.0
                 )
                 segment_fractions = _wall_segment_account_fractions(
                     wall_deposit_by_segment_species,
@@ -3328,26 +3377,23 @@ class CondensationModel:
                 wall_deposit_account_fractions_by_species[species] = dict(
                     segment_fractions)
 
-                baffle_budget_kg = max(0.0, capture_budget_kg - wall_deposit_kg)
-                if hkl_condensed_total_kg > 1e-15 and baffle_budget_kg > 0.0:
-                    scale = baffle_budget_kg / hkl_condensed_total_kg
-                    for stage_number, hkl_stage_kg in hkl_condensed_by_stage.items():
-                        condensed_kg = hkl_stage_kg * scale
-                        if condensed_kg <= 1e-15:
-                            continue
-                        stage_species = condensed_by_stage_species.setdefault(
-                            stage_number, {})
-                        stage_species[species] = (
-                            stage_species.get(species, 0.0) + condensed_kg)
-                        if not is_designated_for_stage(species, stage_number):
-                            stage_impurity = (
-                                impurity_by_stage_species.setdefault(
-                                    stage_number, {}))
-                            stage_impurity[species] = (
-                                stage_impurity.get(species, 0.0)
-                                + condensed_kg)
+                for raw_stage_number, condensed_kg in stage_deposits.items():
+                    stage_number = int(raw_stage_number)
+                    if condensed_kg <= 1e-15:
+                        continue
+                    stage_species = condensed_by_stage_species.setdefault(
+                        stage_number, {})
+                    stage_species[species] = (
+                        stage_species.get(species, 0.0) + condensed_kg)
+                    if not is_designated_for_stage(species, stage_number):
+                        stage_impurity = (
+                            impurity_by_stage_species.setdefault(
+                                stage_number, {}))
+                        stage_impurity[species] = (
+                            stage_impurity.get(species, 0.0)
+                            + condensed_kg)
             remaining_by_species[species] = max(
-                0.0, rate_kg_hr - capture_budget_kg)
+                0.0, rate_kg_hr - captured_kg)
 
         from simulator.diagnostics import (
             _status_bearing_alpha_record,
@@ -7704,6 +7750,22 @@ def _regularized_capture_allocations(
     budget_kg = max(0.0, float(capture_budget_kg))
     if budget_kg <= 0.0 or hkl_sink_kg <= 1.0e-15:
         return {}, {}
+    # The pressure-isolated budget is a total removal ceiling, not extra sink
+    # capacity. If it exceeds S + W, each stage and wall can accept only its
+    # own evaluated transport amount; the remainder stays in overhead gas.
+    if budget_kg >= hkl_sink_kg:
+        return (
+            {
+                str(stage): float(capacity)
+                for stage, capacity in stage_hkl_by_stage.items()
+                if float(capacity) > 0.0
+            },
+            {
+                str(segment): float(capacity)
+                for segment, capacity in wall_hkl_by_segment.items()
+                if float(capacity) > 0.0
+            },
+        )
     wall_deposit_kg = budget_kg * wall_hkl_kg / hkl_sink_kg
     stage_deposit_kg = max(0.0, budget_kg - wall_deposit_kg)
     return (
@@ -7757,11 +7819,14 @@ def cold_spot_diagnostic(
     check. Upstream hot-wall fouling additionally uses local partial
     pressure versus the existing wall Antoine P_sat when that pressure
     is supplied; the uniform 1400 C floor remains as a coarse minimum.
+    The stage_0_to_stage_1 duct also reports dense-alumina service-limit
+    exceedance independently of the vapor-flow checks.
     """
 
     margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
     findings: list[dict[str, Any]] = []
     upstream_hot_wall_findings: list[dict[str, Any]] = []
+    material_service_findings: list[dict[str, Any]] = []
     hot_wall_threshold_C = (
         None
         if upstream_hot_wall_min_C is None
@@ -7873,11 +7938,60 @@ def cold_spot_diagnostic(
                 ),
             })
 
+    stage0_duct = next(
+        (
+            segment
+            for segment in pipe_segments
+            if segment.name == 'stage_0_to_stage_1'
+        ),
+        None,
+    )
+    if stage0_duct is not None:
+        dense_alumina = next(
+            (
+                assessment
+                for assessment in advise_wall_materials(
+                    [], zone_temperature_C=float(stage0_duct.wall_temperature_C)
+                )
+                if assessment.material_id == 'dense_alumina'
+            ),
+            None,
+        )
+        service_temperature_C = (
+            None
+            if dense_alumina is None
+            else dense_alumina.limiting_temperature_C
+        )
+        wall_temperature_C = float(stage0_duct.wall_temperature_C)
+        if (
+            service_temperature_C is not None
+            and wall_temperature_C > service_temperature_C
+        ):
+            reason = 'duct wall above material service T (unqualified hardware)'
+            material_service_findings.append({
+                'segment': stage0_duct.name,
+                'material_id': dense_alumina.material_id,
+                'wall_temperature_C': wall_temperature_C,
+                'service_temperature_C': service_temperature_C,
+                'citations': list(dense_alumina.service_temp.citations),
+                'reason': reason,
+                'output_status': 'status_bearing',
+                'authority_level': 'extrapolated',
+                'warning': (
+                    f'{reason}: {wall_temperature_C:.1f} C exceeds '
+                    f'dense alumina limit {service_temperature_C:.1f} C'
+                ),
+            })
+
     warnings = [str(finding['warning']) for finding in findings]
     upstream_hot_wall_warnings = [
         str(finding['warning'])
         for finding in upstream_hot_wall_findings
     ]
+    material_service_warnings = [
+        str(finding['warning']) for finding in material_service_findings
+    ]
+    warnings.extend(material_service_warnings)
     return {
         'has_cold_spot': bool(findings),
         'margin_C': margin_C,
@@ -7887,6 +8001,9 @@ def cold_spot_diagnostic(
         'upstream_hot_wall_min_C': hot_wall_threshold_C,
         'upstream_hot_wall_warnings': upstream_hot_wall_warnings,
         'upstream_hot_wall_findings': upstream_hot_wall_findings,
+        'has_material_service_violation': bool(material_service_findings),
+        'material_service_warnings': material_service_warnings,
+        'material_service_findings': material_service_findings,
     }
 
 
