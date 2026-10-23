@@ -285,6 +285,7 @@ def test_operator_metadata_exports_snapshot_resistance_and_groups():
     assert exported['R_gas_fraction']>.9
     assert exported['surface_film']['Sh']==diagnostic['surface_film']['Sh']
     assert exported['surface_film']['still_gas_comparison']==diagnostic['surface_film']['still_gas_comparison']
+    assert 'momentum layer exceeds 10% of flow length' in exported['surface_film']['domain_flags']
     assert 'surface_transport_by_species' not in result
 
 
@@ -296,16 +297,17 @@ def test_subnormal_vapour_drive_does_not_divide_by_underflow(gas_enabled):
     assert 0<=result.alpha_effective<=result.alpha_intrinsic
 
 
-def test_d254_default_matches_declared_planar3_and_exports_still_comparison():
+def test_d257_default_matches_declared_planar30_and_exports_still_comparison():
     default=sample()
-    declared=sample(surface_flow=flow(3))
+    declared=sample(surface_flow=flow(30))
     assert default.flux_kg_s_m2==declared.flux_kg_s_m2
     still=sample(surface_flow=SurfaceFlow('stagnant_disk',0.,'explicit still gas','pool','stagnant'))
     f=default.surface_film
-    assert f['geometry']=='planar' and f['u_m_s']==3
+    assert f['geometry']=='planar' and f['u_m_s']==30
     assert f['length_m']==pytest.approx(DIAMETER)
     assert f['geometry_parameters']['coverage']==pytest.approx(1)
-    assert 'surface flow undeclared: default 3 m/s planar recirculation fan (assumed hardware)' in f['domain_flags']
+    assert 'surface flow undeclared: default 30 m/s planar recirculation fan (assumed hardware)' in f['domain_flags']
+    assert 'momentum layer exceeds 10% of flow length' in f['domain_flags']
     comparison=f['still_gas_comparison']
     assert comparison['k_g_m_s']==still.surface_film['k_g_m_s']
     assert comparison['flux_kg_s_m2']==still.flux_kg_s_m2
@@ -325,6 +327,6 @@ def test_default_fan_material_service_temperature_predicts_and_flags(surface_del
     assert result.surface_film['geometry_parameters']['impeller_service_T_C']==rating
     notice='default fan unqualified above material service T'
     assert (notice in result.surface_film['domain_flags']) is unqualified
-    declared=sample(T_surface_K=temperature+surface_delta,T_gas_K=temperature+gas_delta,surface_flow=flow(3))
+    declared=sample(T_surface_K=temperature+surface_delta,T_gas_K=temperature+gas_delta,surface_flow=flow(30))
     assert declared.flux_kg_s_m2==result.flux_kg_s_m2
     assert notice not in declared.surface_film['domain_flags']

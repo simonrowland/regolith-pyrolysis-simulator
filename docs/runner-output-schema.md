@@ -829,9 +829,9 @@ incident, stuck, re-evaporated, and net continuous flux and has
   `length_m`, `rho_kg_m3`, `mu_Pa_s`, `D_m2_s`, `Re`, `Sc`, `Pe`, `Sh`,
   `Kn_film`, `Kn_geometry`, `Mach`, provenance and `domain_flags` (Dg06).
   An undeclared surface field carries the literal notice
-  `surface flow undeclared: default 3 m/s planar recirculation fan (assumed hardware)`
-  (d-254). The assumed planar footprint has L equal to pool diameter and W=A/L,
-  with a uniform 3 m/s free stream independent of net sweep. Its material ID and
+  `surface flow undeclared: default 30 m/s planar recirculation fan (assumed hardware)`
+  (d-257, superseding d-254). The assumed planar footprint has L equal to pool diameter and W=A/L,
+  with a uniform 30 m/s free stream independent of net sweep. Its material ID and
   service rating are in `geometry_parameters.impeller_material_id` and
   `impeller_service_T_C`, sourced from `data/furnace_materials.yaml`
   (`dense_alumina_continuous`). If either melt or headspace temperature exceeds

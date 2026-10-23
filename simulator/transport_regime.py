@@ -1941,12 +1941,15 @@ def surface_gas_film(*, area_m2, flow, temperature_K, pressure_pa, carrier, diff
     assumed = flow is None
     if assumed:
         # A=pi*L^2/4 gives L=sqrt(4A/pi), and W=A/L covers the same
-        # actual pool area [m^2/m=m]. d-254 declares u=3 m/s independently
-        # of net sweep; no flow or area is inferred from an outlet pipe.
-        flow = SurfaceFlow('planar', 3.0, 'd-254 assumed recirculation hardware',
+        # actual pool area [m^2/m=m]. d-257 selects 30 m/s: the 24 h C2A
+        # sweep gives SiO 4.745x lunar / 6.599x Mars versus still gas,
+        # at ideal rho*u^3/2 loads 30.62 / 43.67 W per flow m^2. This
+        # owner hardware assumption is independent of net sweep; keep
+        # the thick-momentum-layer range flag visible at this speed.
+        flow = SurfaceFlow('planar', 30.0, 'd-257 assumed recirculation hardware',
                            'pool free stream', 'uniform_free_stream',
                            length_m=diameter, width_m=area / diameter)
-        flags.append('surface flow undeclared: default 3 m/s planar recirculation fan (assumed hardware)')
+        flags.append('surface flow undeclared: default 30 m/s planar recirculation fan (assumed hardware)')
         parameters.update(impeller_material_id='dense_alumina_continuous',
                           impeller_service_T_C=_default_fan_service_T_C())
     if not isinstance(flow, SurfaceFlow):
