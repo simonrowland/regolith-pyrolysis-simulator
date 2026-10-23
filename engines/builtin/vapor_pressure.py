@@ -367,6 +367,9 @@ VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG = (
 VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_STATUS = "reconstructed_limited"
 PSEUDO_VAPOROCK_CURVE_FIT_SOURCE = "vaporock_backsolved_curve_fit"
 ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
+# A computed partial pressure at or below this floor is left out of
+# vapor_pressures_Pa. The omission record is the proof; absence alone is not.
+VAPOR_PRESSURE_REPORTING_THRESHOLD_PA = 1e-15
 _BUILTIN_VAPOR_SOURCE_CLASSES = frozenset(
     {
         "builtin_authoritative",
@@ -378,6 +381,46 @@ _BUILTIN_VAPOR_SOURCE_CLASSES = frozenset(
 
 def _fit_target(row: Mapping[str, Any] | None) -> str:
     return str((row or {}).get("fit_target", "") or "").strip()
+
+
+def _publishes_vapor_pressure(
+    pressure_Pa: float, *, retain_subthreshold: bool
+) -> bool:
+    """True when this computed pressure is copied onto vapor_pressures_Pa."""
+
+    return pressure_Pa > 0.0 and (
+        retain_subthreshold
+        or pressure_Pa > VAPOR_PRESSURE_REPORTING_THRESHOLD_PA
+    )
+
+
+def _record_reporting_threshold_omission(
+    omissions: dict[str, dict[str, Any]],
+    species: str,
+    pressure_Pa: float,
+    *,
+    field: str,
+    pressure_rail: str,
+) -> None:
+    """Record a species evaluated on this call and found at or below the floor.
+
+    Negative pressure fails the positivity gate and is not this record.
+    A species skipped before a pressure exists gets no record.
+    """
+
+    if (
+        not math.isfinite(pressure_Pa)
+        or pressure_Pa < 0.0
+        or pressure_Pa > VAPOR_PRESSURE_REPORTING_THRESHOLD_PA
+    ):
+        return
+    omissions[str(species)] = {
+        "species": str(species),
+        "reporting_threshold_Pa": VAPOR_PRESSURE_REPORTING_THRESHOLD_PA,
+        "computed_pressure_Pa": float(pressure_Pa),
+        "field": field,
+        "pressure_rail": pressure_rail,
+    }
 
 
 def _gas_rail_standard_reaction_block(
@@ -1999,6 +2042,224 @@ def vapor_pressure_authority_diagnostic(
     }
 
 
+# Segment phase words that name the same reservoir phase. Any other
+# non-empty token, including condensed_liquid and ideal_gas, stays itself.
+# An empty phase is undeclared: callers must not invent one.
+_ANTOINE_PHASE_SYNONYMS = {
+    "crystal": "cr",
+    "cr": "cr",
+    "c": "cr",
+    "solid": "cr",
+    "s": "cr",
+    "crystalline": "cr",
+    "liquid": "l",
+    "l": "l",
+    "gas": "g",
+    "g": "g",
+}
+
+
+def declared_antoine_segment_phase(block: Mapping[str, Any] | None) -> str | None:
+    """Closed phase token declared by an Antoine segment, or None if absent."""
+
+    if not _is_mapping(block):
+        return None
+    raw = str(block.get("phase") or block.get("fit_source_phase") or "").strip().lower()
+    if not raw:
+        return None
+    return _ANTOINE_PHASE_SYNONYMS.get(raw, raw)
+
+
+def _phase_boundary_gap(
+    left: Mapping[str, Any], right: Mapping[str, Any]
+) -> dict[str, Any] | None:
+    """Marker when the gap between two segments crosses a declared phase."""
+
+    left_phase = declared_antoine_segment_phase(left)
+    right_phase = declared_antoine_segment_phase(right)
+    if not left_phase or not right_phase or left_phase == right_phase:
+        return None
+    return {
+        "selection_refusal": "antoine-gap-crosses-phase-boundary",
+        "left_segment": str(left.get("name") or ""),
+        "right_segment": str(right.get("name") or ""),
+        "left_phase": left_phase,
+        "right_phase": right_phase,
+    }
+
+
+def _segment_antoine_finite(
+    segment: Mapping[str, Any], temperature_K: float
+) -> bool:
+    """True when the flank's pressure at this temperature is finite and positive.
+
+    ``_pure_segment_usable`` only requires a finite log10 pressure at or
+    below 308. Exponentiating a large negative log underflows to 0.0,
+    and the wall evaluator refuses that. A flank that cannot produce a
+    positive pressure is not an available extension.
+    """
+
+    for key in ("A", "B", "C"):
+        if segment.get(key) is None:
+            return False
+        try:
+            value = float(segment[key])
+        except (TypeError, ValueError):
+            return False
+        if not math.isfinite(value):
+            return False
+    if not _pure_segment_usable(segment, temperature_K):
+        return False
+    try:
+        pressure = _pow10_pressure_or_raise(
+            _antoine_log10_pressure(
+                float(segment["A"]),
+                float(segment["B"]),
+                float(segment["C"]),
+                float(temperature_K),
+            ),
+            species=str(segment.get("name") or "antoine_segment"),
+            field="phase_gap_flank_Pa",
+        )
+    except (VaporPressureComputationError, VaporPressureNumericalOverflowError):
+        return False
+    return math.isfinite(pressure) and pressure > 0.0
+
+
+def _declared_join_temperature_K(
+    *segments: Mapping[str, Any],
+) -> float | None:
+    """Shared melting join, or None when the flanks do not agree."""
+
+    found: list[float] = []
+    for segment in segments:
+        if "join_anchor_K" not in segment:
+            continue
+        try:
+            value = float(segment["join_anchor_K"])
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            found.append(value)
+    if not found:
+        return None
+    if any(abs(value - found[0]) > 1e-9 for value in found[1:]):
+        return None
+    return found[0]
+
+
+def _phase_gap_extension(
+    left: Mapping[str, Any],
+    right: Mapping[str, Any],
+    *,
+    left_low: float,
+    left_high: float,
+    right_low: float,
+    right_high: float,
+    temperature_K: float,
+) -> dict[str, Any] | None:
+    """Extend one finite flank across a declared phase gap, and flag it.
+
+    Premise: a temperature between two certified Antoine segments of
+    different phases is out of domain, not a missing fit (CLAUDE.md
+    section 4). Predict from the segment on the physical side of a
+    declared transition and carry the original reason. Crystal is the
+    flank below the transition; liquid is the flank above it.
+
+    Si(cr) ``crystal_janaf`` is certified on [100, 1685] and declares
+    ``join_anchor_K`` 1685, the melting join. Si(l) ``liquid_janaf`` is
+    certified on [1700, 3500]. The open gap is (1685, 1700). 1688.3 K
+    and 1690 K are above 1685 K, so the extension is the liquid
+    segment. Limiting case: at 1700 K the request is inside that
+    segment, so the value is the segment's own Antoine value and this
+    helper does not run. At 1685 K the liquid formula equals the
+    crystal formula (``join_step_log10_dex`` is 0), so the extension
+    meets the crystal value at the boundary.
+
+    If the gap has no single declared join on its closure, use the
+    nearer certified edge and record that. An equal distance takes the
+    lower edge. A flank is finite only when its pressure at this
+    temperature is representable and positive. An exponent that
+    underflows to 0 is not finite: use the other flank and say so.
+    If neither flank is finite, return None and the caller keeps the
+    coefficient-free refusal.
+    """
+
+    gap = _phase_boundary_gap(left, right)
+    if gap is None:
+        return None
+    left_finite = _segment_antoine_finite(left, temperature_K)
+    right_finite = _segment_antoine_finite(right, temperature_K)
+    if not left_finite and not right_finite:
+        return None
+
+    def phase_segment(token: str) -> Mapping[str, Any] | None:
+        if gap["left_phase"] == token:
+            return left
+        if gap["right_phase"] == token:
+            return right
+        return None
+
+    transition = _declared_join_temperature_K(left, right)
+    on_gap = (
+        transition is not None
+        and left_high - 1e-9 <= transition <= right_low + 1e-9
+    )
+    crystal = phase_segment("cr")
+    liquid = phase_segment("l")
+    chosen: Mapping[str, Any] | None = None
+    choice = ""
+    if on_gap and crystal is not None and liquid is not None:
+        preferred = crystal if temperature_K <= transition else liquid
+        choice = (
+            "crystal_below_declared_transition"
+            if preferred is crystal
+            else "liquid_above_declared_transition"
+        )
+        preferred_finite = (
+            left_finite if preferred is left else right_finite
+        )
+        if preferred_finite:
+            chosen = preferred
+        elif left_finite or right_finite:
+            chosen = left if left_finite else right
+            choice = "only_finite_flank"
+    if chosen is None:
+        if left_finite and right_finite:
+            distance_left = temperature_K - left_high
+            distance_right = right_low - temperature_K
+            if distance_right < distance_left:
+                chosen = right
+                choice = "nearer_edge"
+            elif distance_left < distance_right:
+                chosen = left
+                choice = "nearer_edge"
+            else:
+                chosen = left
+                choice = "nearer_edge_tie_lower"
+        elif left_finite or right_finite:
+            chosen = left if left_finite else right
+            choice = "only_finite_flank"
+        else:
+            return None
+
+    chosen_low, chosen_high = (
+        (left_low, left_high) if chosen is left else (right_low, right_high)
+    )
+    extended = dict(chosen)
+    extended.update(gap)
+    extended["authority_level"] = "extrapolated"
+    extended["segment_used"] = str(chosen.get("name") or "")
+    extended["segment_choice"] = choice
+    extended["certified_band_K"] = (float(chosen_low), float(chosen_high))
+    extended["gap_band_K"] = (float(left_high), float(right_low))
+    extended["left_segment_band_K"] = (float(left_low), float(left_high))
+    extended["right_segment_band_K"] = (float(right_low), float(right_high))
+    if on_gap and transition is not None:
+        extended["transition_temperature_K"] = float(transition)
+    return extended
+
+
 def _selected_temperature_segment(
     block: Mapping[str, Any],
     temperature_K: float | None,
@@ -2035,6 +2296,27 @@ def _selected_temperature_segment(
     ranged.sort(key=lambda item: item[0])
     if temperature_K < ranged[0][0]:
         return ranged[0][2]
+    if temperature_K > ranged[-1][1]:
+        return ranged[-1][2]
+    previous = ranged[0]
+    for low, _high, segment in ranged[1:]:
+        if temperature_K < low:
+            gap = _phase_boundary_gap(previous[2], segment)
+            if gap is not None:
+                extension = _phase_gap_extension(
+                    previous[2],
+                    segment,
+                    left_low=previous[0],
+                    left_high=previous[1],
+                    right_low=low,
+                    right_high=_high,
+                    temperature_K=temperature_K,
+                )
+                return extension if extension is not None else gap
+            # Same declared phase, or a flank with no phase: today's
+            # choice is the last segment, not a nearer edge.
+            return ranged[-1][2]
+        previous = (low, _high, segment)
     return ranged[-1][2]
 
 
@@ -2115,6 +2397,10 @@ def vapor_pressure_antoine_coefficients(
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
+            # The selector owns a phase-boundary gap. Falling through to
+            # the legacy antoine block would reintroduce the other phase.
+            if selected.get("selection_refusal"):
+                return selected, COEFF_BLOCK_PURE_COMPONENT
             if not _pure_segment_usable(selected, temperature_K):
                 antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
                 if _is_mapping(antoine):
@@ -2181,6 +2467,11 @@ def wall_condensation_antoine_coefficients(
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
+            # Same guard as the runtime selector: do not replace the
+            # selector's phase-boundary result with an empty block or
+            # the other phase. An extension already carries its flank.
+            if selected.get("selection_refusal"):
+                return selected, COEFF_BLOCK_PURE_COMPONENT
             if _pure_segment_usable(selected, temperature_K):
                 return selected, COEFF_BLOCK_PURE_COMPONENT
             # A grounded pure-species wall answer exists but not at this
@@ -2696,7 +2987,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 intent=ChemistryIntent.VAPOR_PRESSURE,
                 status="ok",
                 control_audit=control_audit,
-                diagnostic={"vapor_pressures_Pa": {}, "activities": {}},
+                diagnostic={
+                    "vapor_pressures_Pa": {},
+                    "activities": {},
+                    # Below 400 K nothing is evaluated, so the omission map is empty.
+                    "below_reporting_threshold_omissions": {},
+                },
             )
 
         vacuum_floor_bar = resolve_request_vacuum_floor_bar(request)
@@ -2801,6 +3097,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         vapor_pressures: dict[str, float] = {}
         vapor_pressure_sources: dict[str, str] = {}
         vapor_pressure_provenance: dict[str, dict[str, Any]] = {}
+        below_reporting_threshold_omissions: dict[str, dict[str, Any]] = {}
         activities: dict[str, float] = {}
         metal_extrapolations: dict[str, dict[str, object]] = {}
         oxide_vapor_extrapolations: dict[str, dict[str, object]] = {}
@@ -3087,10 +3384,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"{T_K:.2f} K (regular-solution continuation "
                         "UNCERTIFIED)"
                     )
-                if P_eq_Pa > 0.0 and (
-                    retain_analytical_channel
-                    or P_eq_Pa > 1e-15
-                    or retain_high_t_openimcc_carriers
+                if _publishes_vapor_pressure(
+                    P_eq_Pa,
+                    retain_subthreshold=(
+                        retain_analytical_channel
+                        or retain_high_t_openimcc_carriers
+                    ),
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = vapor_pressure_source_label(
@@ -3137,6 +3436,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         vapor_pressure_provenance[species][
                             "gamma_domain_authority"
                         ] = gamma_auth
+                else:
+                    _record_reporting_threshold_omission(
+                        below_reporting_threshold_omissions,
+                        species,
+                        P_eq_Pa,
+                        field="P_eq_standard_reaction",
+                        pressure_rail="liquid_oxide_standard_reaction",
+                    )
                 continue
 
             # Al/Ti/Cr/Mn: liquid-oxide standard reaction for oxide-coupled P
@@ -3222,8 +3529,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_liquid_oxide_standard_reaction",
                 )
-                if P_eq_Pa > 0.0 and (
-                    P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+                if _publishes_vapor_pressure(
+                    P_eq_Pa,
+                    retain_subthreshold=retain_high_t_openimcc_carriers,
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = (
@@ -3256,6 +3564,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     }
                     vapor_pressure_provenance[species].update(
                         oxide_activity.provenance()
+                    )
+                else:
+                    _record_reporting_threshold_omission(
+                        below_reporting_threshold_omissions,
+                        species,
+                        P_eq_Pa,
+                        field="P_eq_liquid_oxide_standard_reaction",
+                        pressure_rail="liquid_oxide_standard_reaction",
                     )
                 continue
 
@@ -3367,8 +3683,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_gas_rail_standard_reaction",
                 )
-                if P_eq_Pa > 0.0 and (
-                    P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+                if _publishes_vapor_pressure(
+                    P_eq_Pa,
+                    retain_subthreshold=retain_high_t_openimcc_carriers,
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = (
@@ -3418,6 +3735,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         )
                     vapor_pressure_provenance[species].update(
                         oxide_activity.provenance()
+                    )
+                else:
+                    _record_reporting_threshold_omission(
+                        below_reporting_threshold_omissions,
+                        species,
+                        P_eq_Pa,
+                        field="P_eq_gas_rail_standard_reaction",
+                        pressure_rail="gas_rail_liquid_oxide_standard_reaction",
                     )
                 continue
 
@@ -3592,8 +3917,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="P_eq_Pa",
             )
-            if P_eq_Pa > 0.0 and (
-                P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+            if _publishes_vapor_pressure(
+                P_eq_Pa,
+                retain_subthreshold=retain_high_t_openimcc_carriers,
             ):
                 vapor_pressures[species] = P_eq_Pa
                 ellingham_limit = ellingham_extrapolations.get(species)
@@ -3704,6 +4030,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         self._pseudo_vapor_pressure_warning_seen,
                         stacklevel=2,
                     )
+            else:
+                _record_reporting_threshold_omission(
+                    below_reporting_threshold_omissions,
+                    species,
+                    P_eq_Pa,
+                    field="P_eq_Pa",
+                    pressure_rail=pressure_rail,
+                )
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
         from simulator.vapour_rail.catalog import CatalogCompileError
@@ -4014,10 +4348,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             retain_analytical_channel = compiled_evaluator is not None or bool(
                 data.get("retain_analytical_pressure_channel", False)
             )
-            if P_eq_Pa > 0.0 and (
-                retain_analytical_channel
-                or P_eq_Pa > 1e-15
-                or retain_high_t_openimcc_carriers
+            if _publishes_vapor_pressure(
+                P_eq_Pa,
+                retain_subthreshold=(
+                    retain_analytical_channel
+                    or retain_high_t_openimcc_carriers
+                ),
             ):
                 vapor_pressures[name] = P_eq_Pa
                 # Above-band predictions remain diagnostic-limited, including
@@ -4097,6 +4433,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     self._pseudo_vapor_pressure_warning_seen,
                     stacklevel=2,
                 )
+            else:
+                _record_reporting_threshold_omission(
+                    below_reporting_threshold_omissions,
+                    name,
+                    P_eq_Pa,
+                    field="P_eq_Pa",
+                    pressure_rail="oxide_vapor",
+                )
 
         # YAML authority/bracket labels (pressure-neutral; Bug B pattern).
         species_authority: dict[str, dict[str, Any]] = {}
@@ -4154,6 +4498,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "vapor_pressures_Pa": vapor_pressures,
             "vapor_pressures_source": vapor_pressure_sources,
             "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
+            "below_reporting_threshold_omissions": (
+                below_reporting_threshold_omissions
+            ),
             "activities": activities,
             "activities_provider": "BuiltinVaporPressureProvider",
             "activities_standard_state": {
