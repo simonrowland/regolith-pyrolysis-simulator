@@ -530,7 +530,7 @@ def _published_intrinsic_melt_fO2(
     if not math.isfinite(raw) or not math.isfinite(temperature) or temperature <= 0.0:
         raise Kress91InvalidControls('intrinsic publication requires finite fO2 and positive T_K')
     candidates = {}
-    for oxide, (metal, cations, _) in OXIDE_TO_METAL.items():
+    for oxide, (metal, _, _) in OXIDE_TO_METAL.items():
         # The Fe thermochemistry is Fe/FeO, never Fe/Fe2O3. In particular,
         # a Kress-implied ferrous fraction must not invent a missing ledger
         # FeO inventory when ferric_divergence says respeciation is pending.
@@ -565,7 +565,7 @@ def _published_intrinsic_melt_fO2(
             authority_limit = None
         else:
             bound = math.log10(dissociation_pO2_threshold(
-                metal, temperature, a_oxide=activity.activity ** cations,
+                metal, temperature, a_oxide=activity.thermodynamic_parent_activity(),
             ))
             authority = 'ellingham_metal_oxide_equilibrium'
             authority_limit = ellingham_authority_limit(

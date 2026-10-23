@@ -1299,3 +1299,128 @@ def harvest_era(document: Mapping[str, Any]) -> str:
     if extraction.get("source_sha256"):
         return "txt"
     return "unknown"
+
+
+_FUSION_TABLES = {
+    "CaO": ("Ca-027", "Ca-028"),
+    "Al2O3": ("Al-096", "Al-100"),
+    # Mg-009 is the MgO(l) Gibbs function; like Al-100 and Ca-028, its
+    # observation series is phase-unknown around JANAF's GLASS <--> LIQUID row.
+    "MgO": ("Mg-008", "Mg-009"),
+    # High cristobalite is the high-temperature solid branch immediately
+    # below the accepted SiO2 melting point; the quartz table is metastable.
+    "SiO2": ("O-035", "O-038"),
+}
+
+
+def _formation_gibbs_points(rows: Iterable[Mapping[str, Any]]) -> tuple[
+    tuple[tuple[Decimal, Decimal], ...], tuple[Decimal, ...]
+]:
+    points: list[tuple[Decimal, Decimal]] = []
+    temperatures: set[Decimal] = set()
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        temperature = row.get("temperature")
+        gibbs = row.get("formation_gibbs_energy")
+        if not isinstance(temperature, Mapping):
+            continue
+        t_value = temperature.get("value")
+        if t_value is None:
+            continue
+        t = Decimal(str(t_value))
+        temperatures.add(t)
+        g_value = gibbs.get("value") if isinstance(gibbs, Mapping) else None
+        if g_value is not None:
+            points.append((t, Decimal(str(g_value))))
+    points.sort()
+    return tuple(points), tuple(sorted(temperatures))
+
+
+def _interpolate_formation_gibbs(
+    points: tuple[tuple[Decimal, Decimal], ...], temperature_K: Decimal
+) -> Decimal:
+    if temperature_K < points[0][0] or temperature_K > points[-1][0]:
+        raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+    missing_node = _missing_node_for_interpolation(points, (), temperature_K)
+    if missing_node is not None:
+        raise ValueError(
+            f"JANAF formation Gibbs interpolation spans missing grid node "
+            f"{missing_node} K at {temperature_K} K"
+        )
+    return _interpolate_table_points(points, temperature_K)
+
+
+def _interpolate_table_points(
+    points: tuple[tuple[Decimal, Decimal], ...],
+    temperature_K: Decimal,
+    *,
+    extrapolate: bool = False,
+) -> Decimal:
+    if temperature_K < points[0][0]:
+        if not extrapolate:
+            raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+        left, right = points[0], points[1]
+    elif temperature_K > points[-1][0]:
+        if not extrapolate:
+            raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+        left, right = points[-2], points[-1]
+    else:
+        left, right = next(
+            (a, b)
+            for a, b in zip(points, points[1:])
+            if a[0] <= temperature_K <= b[0]
+        )
+    return left[1] + (right[1] - left[1]) * (temperature_K - left[0]) / (
+        right[0] - left[0]
+    )
+
+
+def _missing_node_for_interpolation(
+    points: tuple[tuple[Decimal, Decimal], ...],
+    missing_nodes: tuple[Decimal, ...],
+    temperature_K: Decimal,
+) -> Decimal | None:
+    if any(node_temperature == temperature_K for node_temperature, _ in points):
+        return None
+    temperatures = tuple(temperature for temperature, _ in points)
+    gaps = tuple(right - left for left, right in zip(temperatures, temperatures[1:]))
+    for gap_index, ((left, _), (right, _)) in enumerate(zip(points, points[1:])):
+        if left < temperature_K < right:
+            absent_grid_nodes = tuple(
+                Decimal(candidate)
+                for candidate in range(
+                    int(left // 100) * 100 + 100,
+                    int(right // 100) * 100 + 1,
+                    100,
+                )
+                if left < Decimal(candidate) < right
+            )
+            for node in sorted(
+                {node for node in missing_nodes if left < node < right}
+                | set(absent_grid_nodes)
+            ):
+                run_start = gap_index
+                run_end = gap_index + 1
+                while run_start > 0 and gaps[run_start - 1] in (
+                    Decimal("200"),
+                    Decimal("400"),
+                ):
+                    run_start -= 1
+                while run_end < len(gaps) and gaps[run_end] in (
+                    Decimal("200"),
+                    Decimal("400"),
+                ):
+                    run_end += 1
+                sparse_ladder = (
+                    left >= Decimal("3000")
+                    and right - left in (Decimal("200"), Decimal("400"))
+                    and run_end - run_start >= 2
+                )
+                reference_interval = (
+                    left == Decimal("298.15") and right == Decimal("500")
+                )
+                if not sparse_ladder and not reference_interval:
+                    return node
+            return None
+    return None
