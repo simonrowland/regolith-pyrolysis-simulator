@@ -825,6 +825,12 @@ def _collect_shadow_trace(
     operator_decisions: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = list(operator_decisions)
+    model = getattr(sim, '_condensation_model', None)
+    events.extend(
+        _json_safe(dict(record))
+        for record in getattr(model, 'cold_spot_history', ())
+        if record.get('event') == 'stage3_opening_refused'
+    )
     kernel = getattr(sim, "_chem_kernel", None)
     if kernel is None:
         return events

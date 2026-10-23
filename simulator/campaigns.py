@@ -1724,8 +1724,12 @@ class CampaignManager:
                     for field, value in purities.items()}
         if command not in STAGE3_ROUTES:
             raise ValueError('stage3_route must be divert or through')
+        refused = train.collection_route.get('opening_refused_hour')
+        isolation = ({'opening_refused_hour': refused}
+                     if refused == melt.hour else {})
         train.collection_route = {
-            'stage3_route': command,
+            'stage3_route': 'divert' if isolation else command,
+            **isolation,
             **purities,
             'campaign': campaign.name,
             'substage': substage,

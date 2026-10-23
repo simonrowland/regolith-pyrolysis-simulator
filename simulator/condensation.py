@@ -2077,6 +2077,7 @@ class CondensationModel:
         self.retained_vapor_mol: dict[str, float] = {}
         self.stage3_bypass: Mapping[str, Any] = {}
         self.last_stage3_route_diagnostic: dict[str, Any] = {}
+        self.hard_stage3_gate = False  # Explicit opt-in for terminal constraints.
 
         for label, value in (
             ('wall_surface_area_m2', wall_surface_area_m2),
@@ -2760,6 +2761,12 @@ class CondensationModel:
                     unknown.append({'species': species, 'source': source, 'detail': str(exc)})
         # _route proposes allocation only; the ledger owner commits after this
         # method returns. A refused proposal cannot deposit onto the cartridge.
+        # Its diagnostics do accumulate: preserve the prior run evidence so a
+        # rejected through proposal cannot masquerade as actual silica contact.
+        prior_sticking = copy.deepcopy(self.last_sticking_alpha_provenance_notice)
+        prior_cold_spots = len(self.cold_spot_history)
+        prior_operating = (copy.deepcopy(self.operating_history[-1])
+                           if self.operating_history else None)
         result = (self._route(evap_flux, melt)
                   if not unknown and evap_flux.species_kg_hr.get('SiO', 0.0) > 0.0
                   else None)
@@ -2780,8 +2787,24 @@ class CondensationModel:
                 'key': 'silica_exposed_to_alkali', 'type': 'silica_exposed_to_alkali'}
             diagnostic['findings'] = [finding]
             diagnostic['silica_exposed_to_alkali_findings'] = [finding]
+            if self.hard_stage3_gate or unknown:
+                self.cold_spot_history.append(copy.deepcopy(diagnostic))
+                raise Stage3SilicaExposureRefusal(diagnostic)
+            self.last_sticking_alpha_provenance_notice = prior_sticking
+            del self.cold_spot_history[prior_cold_spots:]
+            if prior_operating is not None:
+                self.operating_history[-1] = prior_operating
+            # Refuse contact, not the representable run. Keep the cartridge
+            # isolated for every remaining parcel in this hour; the campaign
+            # owner may request another opening on the next hour.
+            self.train.collection_route.update(
+                stage3_route='divert', opening_refused_hour=melt.hour)
+            diagnostic.update(
+                event='stage3_opening_refused', hour=melt.hour,
+                campaign_hour=melt.campaign_hour,
+                reason='alkali_purity_exceeded', resolved_stage3_route='divert')
             self.cold_spot_history.append(copy.deepcopy(diagnostic))
-            raise Stage3SilicaExposureRefusal(diagnostic)
+            return self._route(evap_flux, melt)
         return result if result is not None else self._route(evap_flux, melt)
 
     def _build_default_pipe_segments(
