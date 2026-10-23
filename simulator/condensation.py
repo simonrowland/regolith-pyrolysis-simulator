@@ -5978,6 +5978,10 @@ def _antoine_psat_pa(
         data,
         temperature_K=T_K,
     )
+    if coefficient_block == 'pure_component_antoine' and antoine:
+        # Surface certification follows the selected relation, not the
+        # independent melt-source band (crown chunk 1 precedent).
+        data = dict(data, pure_component_antoine=antoine)
     source_band = vapor_pressure_source_equation_range_K(
         data, coefficient_block, T_K,
     ) or vapor_pressure_valid_range_K(data, coefficient_block, T_K)

@@ -1178,8 +1178,8 @@ def test_pure_segment_selector_projection_pins(vapor_pressure_data, monkeypatch)
 
     monkeypatch.setattr(vapor_pressure_module.math, "isfinite", capture_isfinite)
 
-    # Wall selection uses Na's published pure-component sidecar immediately
-    # above its documented T + C pole.
+    # The JANAF surface segment now covers Na immediately above the old
+    # sidecar's pole; the source fit itself remains unchanged.
     na = vapor_pressure_data["metals"]["Na"]
     pole_adjacent_K = math.nextafter(416.372, math.inf)
     wall_coeff, wall_block = (
@@ -1187,9 +1187,9 @@ def test_pure_segment_selector_projection_pins(vapor_pressure_data, monkeypatch)
             na, temperature_K=pole_adjacent_K
         )
     )
-    assert wall_coeff is na["pure_component_antoine"]
+    assert wall_coeff["name"] == "janaf_na_400_450"
     assert wall_block == "pure_component_antoine"
-    assert projected[-1].hex() == "-0x1.d46e978d4fdf2p+54"
+    assert projected[-1].hex() == "-0x1.97c8e1a14db30p+1"
 
     # Runtime selection uses the source-tabulated Mg pure-component fit.
     mg = vapor_pressure_data["metals"]["Mg"]

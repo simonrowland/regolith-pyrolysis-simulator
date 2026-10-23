@@ -2034,6 +2034,13 @@ def _selected_temperature_segment(
         return candidates[-1]
     ranged.sort(key=lambda item: item[0])
     if temperature_K < ranged[0][0]:
+        if (
+            ranged[0][2].get("extrapolation_policy") == "refuse"
+            and block.get("A") is not None
+        ):
+            # Bounded surface evidence must not replace the original
+            # out-of-band prediction/refusal below its lower endpoint.
+            return block
         return ranged[0][2]
     return ranged[-1][2]
 
@@ -2188,6 +2195,58 @@ def wall_condensation_antoine_coefficients(
             # than extrapolate through a pole or substitute the melt term.
             return {}, COEFF_BLOCK_PURE_COMPONENT
     return {}, COEFF_BLOCK_PURE_COMPONENT
+
+
+def _liquid_reference_pressure_from_solid(
+    species: str, temperature_K: float, solid_pressure_pa: float,
+) -> tuple[float, str | None]:
+    """Convert a stable-solid pressure using a printed JANAF liquid row."""
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    table_id = {"Na": "Na-003"}.get(species)
+    if table_id is None:
+        return solid_pressure_pa, f"fusion term unavailable: no liquid table for {species}"
+    try:
+        table = load_table_document(TABLES_DIR / f"{table_id}.yaml")["table"]
+    except (OSError, ValueError) as exc:
+        return solid_pressure_pa, f"fusion term unavailable: {table_id}: {exc}"
+
+    # Interpolate the printed liquid formation log Kf in reciprocal T,
+    # the same coordinate as the pressure segments. Only bracketed numeric
+    # cells are usable; Na-003 has no liquid formation input below298.15 K.
+    points = [
+        (float(row["temperature"]["value"]),
+         float(row["log10_formation_equilibrium_constant"]["value"]))
+        for row in table.get("values", [])
+        if row.get("log10_formation_equilibrium_constant", {}).get("value") is not None
+    ]
+    # The coexistence annotation establishes mu_l=mu_s, hence logKf,l=0.
+    for annotation in table.get("parse_ambiguities", []):
+        fields = annotation.get("raw_line", "").split("\t")
+        if fields[-1] in {"CRYSTAL <--> LIQUID", "BETA <--> LIQUID"}:
+            points.append((float(fields[0]), 0.0))
+    points.sort()
+    for (t1, y1), (t2, y2) in zip(points, points[1:]):
+        if not t1 <= temperature_K <= t2:
+            continue
+        fraction = (1.0 / temperature_K - 1.0 / t1) / (1.0 / t2 - 1.0 / t1)
+        log_kf = y1 + fraction * (y2 - y1)
+        # mu_g+RT ln(P_s/p0)=mu_s; subtract the liquid relation:
+        # ln(P_l/P_s)=(mu_l-mu_s)/(RT)=DeltaG_fus/(RT).
+        # JANAF logKf,l=-DeltaG_fus/(RT ln10), so P_l=P_s*10**(-logKf,l).
+        # Units: (J/mol)/(J/mol/K*K) is dimensionless; at Tm logKf=0,
+        # hence P_l=P_s. No extrapolation over absent liquid cells.
+        try:
+            pressure = solid_pressure_pa * 10.0 ** (-log_kf)
+        except (ValueError, OverflowError):
+            break
+        if math.isfinite(pressure) and pressure > 0.0:
+            return pressure, None
+        break
+    return solid_pressure_pa, (
+        f"fusion term unavailable: {table_id} has no usable liquid log Kf row "
+        f"at {temperature_K:g} K"
+    )
 
 
 def vapor_pressure_valid_range_K(

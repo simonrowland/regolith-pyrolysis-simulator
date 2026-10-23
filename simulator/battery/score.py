@@ -6175,6 +6175,7 @@ def predict_with_engine(
             from engines.builtin.vapor_pressure import (
                 COEFF_BLOCK_PURE_COMPONENT,
                 VaporPressureComputationError,
+                _liquid_reference_pressure_from_solid,
                 _pow10_pressure_or_raise,
                 vapor_pressure_valid_range_K,
                 wall_condensation_antoine_coefficients,
@@ -6229,7 +6230,8 @@ def predict_with_engine(
                     identity=identity,
                 )
             source_range = vapor_pressure_valid_range_K(
-                row, coefficient_block, temperature_K=float(T)
+                dict(row, pure_component_antoine=coefficients),
+                coefficient_block, temperature_K=float(T)
             )
             certified_band = None
             notices: tuple[Notice, ...] = ()
@@ -6251,6 +6253,42 @@ def predict_with_engine(
                             authority=Authority.EXTRAPOLATED,
                         ),
                     )
+            # This intake certifies Na phase references only. Preserve the
+            # pre-existing treatment of other elements' sidecars.
+            source_phase = coefficients.get("phase") if formula == "Na" else None
+            solid_reference = source_phase in {"solid", "alpha_solid", "crystal", "crystalline"}
+            phase_mismatch = (
+                (solid_reference and reservoir[1] != Phase.CR.value)
+                or (source_phase == "liquid" and reservoir[1] == Phase.CR.value)
+            )
+            if solid_reference and phase_mismatch:
+                if reservoir[1] in {Phase.L.value, Phase.SUPERCOOLED_L.value}:
+                    pressure, fusion_unavailable = _liquid_reference_pressure_from_solid(
+                        formula, float(T), pressure,
+                    )
+                    if fusion_unavailable is not None:
+                        return _input_refusal(
+                            engine=engine, channel=channel, sources=sources,
+                            identity=identity, requested=None,
+                            reason=RefusalReason.IDENTITY_INCOMPLETE,
+                            detail={"reason": "solid_liquid_reference_conversion_missing_input",
+                                    "missing_input": fusion_unavailable},
+                        )
+                authority = Authority.EXTRAPOLATED
+            elif source_phase == "liquid" and reservoir[1] == Phase.CR.value:
+                authority = Authority.EXTRAPOLATED
+            if phase_mismatch:
+                notices += (
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(Quantity.P_SAT,),
+                        reason="pure_component_antoine_phase_mismatch",
+                        origin=observation.observation_id,
+                        source=source_phase, destination=reservoir[1],
+                        band=f"condensed_phase={source_phase}",
+                        authority=Authority.EXTRAPOLATED,
+                    ),
+                )
             sidecar_sources = expand_coefficient_sources(("antoine_sidecar",))
             return EnginePrediction(
                 engine=engine,

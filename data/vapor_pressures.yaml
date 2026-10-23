@@ -814,6 +814,153 @@ families:
             valid_range_K:
             - 924
             - 1118
+            # JANAF Na-005: Na(g) formation relative to stable Na(cr/l),
+            # p0=0.1 MPa=100000 Pa. At a_condensed=1, P=p0*Kf;
+            # hence log10(P/Pa)=5+log10(Kf). Linear interpolation in 1/T
+            # between printed cells has Antoine C=0: B=(y2-y1)/(1/T1-1/T2),
+            # A=5+y1+B/T1. A is dimensionless, B has units K; both endpoints
+            # recover their printed pressures. No melt-source term is changed.
+            # At Tm=370.98 K the Na-001 crystal row prints Hinc=2.152 kJ/mol,
+            # S=57.898 J/mol/K. Na-005 at350 prints Hf=106.873 kJ/mol,
+            # S=157.000 J/mol/K and ideal monatomic Cp=20.786 J/mol/K.
+            # Integrate gas Cp to Tm; subtract solid Hinc(Tm)-Hinc(350)=647 J/mol:
+            # Gf(Tm)=106873+Cp*(Tm-350)-647-Tm*(157+Cp*ln(Tm/350)-57.898).
+            # Then logK=-Gf/(R*Tm*ln10); J/mol divided by J/mol is dimensionless.
+            # Coexisting liquid has the same mu, so both segments meet at Tm.
+            # 0.10 dex is a conservative model allowance (not a JANAF quoted
+            # measurement error) for tabular interpolation/assessment and the
+            # unadjusted handover to REF-041 at924 K. See t1478 evidence.
+            default_segment: rodebush_walters_liquid
+            segments:
+            - name: rodebush_walters_liquid
+              phase: liquid
+              source: REF-041 NIST WebBook Rodebush and Walters 1930; original certified Antoine fit
+              source_certification: source_equation_fit
+              A: 7.46077
+              B: 1873.728
+              C: -416.372
+              valid_range_K: [924, 1118]
+            - name: janaf_na_250_298.15
+              extrapolation_policy: refuse
+              phase: solid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [250, 298.15]
+              valid_range_K: [250, 298.15]
+              uncertainty_dex: 0.10
+              A: 10.36658359293873
+              B: 5613.145898234682
+              C: 0.0
+            - name: janaf_na_298.15_300
+              phase: solid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [298.15, 300]
+              valid_range_K: [298.15, 300]
+              uncertainty_dex: 0.10
+              A: 10.35081081081089
+              B: 5608.443243243268
+              C: 0.0
+            - name: janaf_na_300_350
+              phase: solid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [300, 350]
+              valid_range_K: [300, 350]
+              uncertainty_dex: 0.10
+              A: 10.30399999999999
+              B: 5594.399999999997
+              C: 0.0
+            - name: janaf_na_350_370.98
+              phase: solid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [350, 370.98]
+              valid_range_K: [350, 370.98]
+              uncertainty_dex: 0.10
+              A: 10.26514099106784
+              B: 5580.799346873745
+              C: 0.0
+            - name: janaf_na_370.98_400
+              phase: liquid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [370.98, 400]
+              valid_range_K: [370.98, 400]
+              uncertainty_dex: 0.10
+              A: 9.849667195292779
+              B: 5426.666878117112
+              C: 0.0
+            - name: janaf_na_400_450
+              phase: liquid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [400, 450]
+              valid_range_K: [400, 450]
+              uncertainty_dex: 0.10
+              A: 9.792
+              B: 5403.6
+              C: 0.0
+            - name: janaf_na_450_500
+              phase: liquid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [450, 500]
+              valid_range_K: [450, 500]
+              uncertainty_dex: 0.10
+              A: 9.744000000000007
+              B: 5382.000000000004
+              C: 0.0
+            - name: janaf_na_500_600
+              phase: liquid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [500, 600]
+              valid_range_K: [500, 600]
+              uncertainty_dex: 0.10
+              A: 9.666
+              B: 5343
+              C: 0.0
+            - name: janaf_na_600_700
+              phase: liquid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [600, 700]
+              valid_range_K: [600, 700]
+              uncertainty_dex: 0.10
+              A: 9.580999999999992
+              B: 5291.999999999996
+              C: 0.0
+            - name: janaf_na_700_800
+              phase: liquid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [700, 800]
+              valid_range_K: [700, 800]
+              uncertainty_dex: 0.10
+              A: 9.525000000000002
+              B: 5252.800000000002
+              C: 0.0
+            - name: janaf_na_800_900
+              phase: liquid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [800, 900]
+              valid_range_K: [800, 900]
+              uncertainty_dex: 0.10
+              A: 9.465999999999998
+              B: 5205.599999999998
+              C: 0.0
+            - name: janaf_na_900_924
+              phase: liquid
+              source: REF-020 JANAF Na-005 log Kf; stable Na(cr/l), Na-001 Tm=370.98 K
+              source_certification: derived_from_evaluation
+              source_certified_range_K: [900, 924]
+              valid_range_K: [900, 924]
+              uncertainty_dex: 0.10
+              A: 9.422000000000002
+              B: 5166.000000000002
+              C: 0.0
           oxide_activity_exponent: 1.0
           # Premise: NaO0.5(l) -> Na(g) + 0.25 O2(g).
           # Algebra: K=(p_Na/Pstd)(fO2/Pstd)^0.25 / a_NaO0.5;

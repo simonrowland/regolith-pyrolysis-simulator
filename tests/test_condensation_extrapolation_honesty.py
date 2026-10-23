@@ -205,10 +205,10 @@ def test_predict_flag_wall_values_keep_source_fit_and_authority(temperature, pre
     assert diagnostic["wall_saturation_pressure_refused"] is False
 
 
-def test_predict_flag_cold_na_pole_is_unavailable_with_band():
+def test_predict_flag_na_below_janaf_band_keeps_original_refusal():
     diagnostic = {}
     condensation._wall_deposition_driving_pressure_pa(
-        "Na", 100.0, 298.15, diagnostic_out=diagnostic,
+        "Na", 100.0, 249.999, diagnostic_out=diagnostic,
     )
     assert diagnostic["wall_saturation_pressure_pa"] is None
     notice = diagnostic["wall_saturation_pressure_notice"]
@@ -312,11 +312,8 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         assert wall["authoritative_for_coating"] is False
         assert wall["wall_saturation_pressure_extrapolations_by_species"]["Mg"]
         refused = wall["wall_saturation_pressure_refusals_by_species"]
-        assert {"Na", "Al2"} <= refused.keys()
-        assert any(
-            "no extrapolation available" in record["reason"]
-            for record in refused["Na"].values()
-        )
+        assert "Na" not in refused  # JANAF now covers the 298.15 K cold surface.
+        assert "Al2" in refused
         # Al2 has no reactive-product backstop, so reactivity metadata is not
         # applicable.  Its real reversible wall route instead refuses because
         # the available reaction-term source is not a wall saturation curve.
@@ -498,7 +495,18 @@ def test_sio_wall_temperature_diagnostic_keeps_missing_value_unavailable(monkeyp
 
 
 @pytest.mark.parametrize(("species", "temperature"), [("Na", 417.0), ("Mg", 115.0)])
-def test_predict_flag_underflow_is_unavailable(species, temperature):
+def test_predict_flag_underflow_is_unavailable(species, temperature, monkeypatch):
+    import copy
+
+    original = condensation._species_vapor_data
+
+    def legacy_fit(species, **kwargs):
+        data = copy.deepcopy(original(species, **kwargs))
+        # Exercise numerical underflow even when a newer segment covers this T.
+        data["pure_component_antoine"].pop("segments", None)
+        return data
+
+    monkeypatch.setattr(condensation, "_species_vapor_data", legacy_fit)
     diagnostic = {}
     condensation._wall_deposition_driving_pressure_pa(species, 100.0, temperature, diagnostic_out=diagnostic)
     assert diagnostic["wall_saturation_pressure_pa"] is None
