@@ -5218,6 +5218,72 @@ experiments:
         note: Minutes converted to seconds
 species:
   Mg:
+    context:
+    - observation_id: richter_2007_mg_cai_langmuir_alpha_arrhenius_context
+      type: best_fit_model_context
+      locator:
+        source_path: raw/kems-010-richter-2007/kems-010-richter-2007.pdf
+        published_page: 5553
+        figure: '3'
+        note: Printed fit combines this work's 1600–1900 °C vacuum runs with cited 1500 °C finite-hydrogen-pressure data.
+      T_range_K: [1773.15, 2173.15]
+      applies_to_experiments: &richter_2007_alpha_experiments
+      - cai-r-11
+      - cai-r-13
+      - cai-r-14
+      - cai-r-15
+      - cai-r-16
+      - cai-r-17
+      - cai-r-18
+      - cai-r-2
+      - cai-r-3
+      - cai-r-4
+      - cai-r-6
+      - cai-r-7
+      - cai-r-8
+      - cai-r-9
+      - cai-r2-1
+      - cai-r2-10
+      - cai-r2-11
+      - cai-r2-12
+      - cai-r2-13
+      - cai-r2-14
+      - cai-r2-15
+      - cai-r2-16
+      - cai-r2-17
+      - cai-r2-18
+      - cai-r2-19
+      - cai-r2-2
+      - cai-r2-20
+      - cai-r2-21
+      - cai-r2-3
+      - cai-r2-4
+      - cai-r2-5
+      - cai-r2-7
+      - cai-r2-8
+      - cai-r2-9
+      - cai-r3-1
+      - cai-r3-10
+      - cai-r3-11
+      - cai-r3-12
+      - cai-r3-13
+      - cai-r3-14
+      - cai-r3-15
+      - cai-r3-18
+      - cai-r3-19
+      - cai-r3-2
+      - cai-r3-20
+      - cai-r3-21
+      - cai-r3-4
+      - cai-r3-5
+      - cai-r3-7
+      - cai-r3-8
+      - cai-r3-9
+      units: dimensionless
+      uncertainty_convention: 2_sigma
+      values:
+        gas_species: Mg(g)
+        alpha_form: {type: arrhenius, expression: gamma = gamma_o * exp(-E/(R*T)), gamma_o: 143.0, c0: 143.0, E_J_per_mol: 121000.0, E_uncertainty_J_per_mol: 53000.0, R_J_per_mol_K: 8.314}
     observations:
     - observation_id: richter_2007_mg_cai_langmuir_alpha_arrhenius
       experiment: type-b-cai-like-lab-melt
@@ -5715,7 +5781,7 @@ species:
       type: alpha
       class_tag: model
       locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        source_path: raw/kems-010-richter-2007/kems-010-richter-2007.pdf
         published_page: 5553
         figure: '3'
       quote: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0 = 25.3,
@@ -55452,6 +55518,21 @@ species:
         note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
           not these laboratory evaporation residues.
   SiO:
+    context:
+    - observation_id: richter_2007_sio_cai_langmuir_alpha_arrhenius_context
+      type: best_fit_model_context
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5553
+        figure: '3'
+        note: Printed fit combines this work's 1600–1900 °C vacuum runs with cited 1500 °C finite-hydrogen-pressure data.
+      T_range_K: [1773.15, 2173.15]
+      applies_to_experiments: *richter_2007_alpha_experiments
+      units: dimensionless
+      uncertainty_convention: 2_sigma
+      values:
+        gas_species: SiO(g)
+        alpha_form: {type: arrhenius, expression: gamma = gamma_o * exp(-E/(R*T)), gamma_o: 25.3, c0: 25.3, E_J_per_mol: 92000.0, E_uncertainty_J_per_mol: 37000.0, R_J_per_mol_K: 8.314}
     observations:
     - observation_id: richter_2007_sio_cai_langmuir_alpha_arrhenius
       experiment: type-b-cai-like-lab-melt
