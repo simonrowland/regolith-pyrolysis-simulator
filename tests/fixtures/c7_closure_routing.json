@@ -1,0 +1,2987 @@
+{
+  "consumers": {
+    "0.0": {
+      "raw": "0x0.0p+0",
+      "transport": "0x0.0p+0",
+      "dispatch": "0x1.12e0be826d695p-30",
+      "requests": [
+        {
+          "controls": {
+            "pO2_bar": "0x1.12e0be826d695p-30",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "vacuum_floor_bar": "0x1.12e0be826d695p-30",
+            "body": "mars",
+            "process_phase": "hot_train",
+            "ambient_pressure_bar": "0x1.89374bc6a7efap-8",
+            "high_t_melt_activity": "openimcc",
+            "high_t_melt_activity_previous_temperature_K": null,
+            "high_t_melt_activity_previous": {},
+            "simulation_hour": 1
+          },
+          "resolved": "0x1.12e0be826d695p-30"
+        }
+      ],
+      "legacy_pressures_Pa": [
+        {
+          "SiO": "0x1.3c669598f7997p+0",
+          "Na": "0x1.a5c80851f5ca9p+7",
+          "K": "0x1.b2cb498f69d44p+1",
+          "Fe": "0x1.4802959425504p+3",
+          "Mg": "0x1.77b3acd0aac37p-4"
+        }
+      ],
+      "vaporock_transport_audit": [
+        {
+          "requested": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30"
+          },
+          "applied": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30",
+            "transport_fO2_log": "-0x1.2000000000000p+3"
+          },
+          "notes": [
+            "VapoRock vapor pressure applies transport gas fO2 from transport_pO2_bar; intrinsic_fO2_log is retained as melt redox provenance."
+          ]
+        }
+      ],
+      "flux_oxygen": "0x1.12e0be826d695p-30",
+      "intrinsic": "-0x1.2000000000000p+3"
+    },
+    "1.3e-12": {
+      "raw": "0x1.6deadf4bbb049p-40",
+      "transport": "0x1.6deadf4bbb049p-40",
+      "dispatch": "0x1.12e0be826d695p-30",
+      "requests": [
+        {
+          "controls": {
+            "pO2_bar": "0x1.12e0be826d695p-30",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "vacuum_floor_bar": "0x1.12e0be826d695p-30",
+            "body": "mars",
+            "process_phase": "hot_train",
+            "ambient_pressure_bar": "0x1.89374bc6a7efap-8",
+            "high_t_melt_activity": "openimcc",
+            "high_t_melt_activity_previous_temperature_K": null,
+            "high_t_melt_activity_previous": {},
+            "simulation_hour": 1
+          },
+          "resolved": "0x1.12e0be826d695p-30"
+        }
+      ],
+      "legacy_pressures_Pa": [
+        {
+          "SiO": "0x1.123b0441ae7edp+5",
+          "Na": "0x1.a5c80851f5ca9p+7",
+          "K": "0x1.b2cb498f69d44p+1",
+          "Fe": "0x1.4802959425504p+3",
+          "Mg": "0x1.77b3acd0aac37p-4"
+        }
+      ],
+      "vaporock_transport_audit": [
+        {
+          "requested": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30"
+          },
+          "applied": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30",
+            "transport_fO2_log": "-0x1.2000000000000p+3"
+          },
+          "notes": [
+            "VapoRock vapor pressure applies transport gas fO2 from transport_pO2_bar; intrinsic_fO2_log is retained as melt redox provenance."
+          ]
+        }
+      ],
+      "flux_oxygen": "0x1.12e0be826d695p-30",
+      "intrinsic": "-0x1.2000000000000p+3"
+    },
+    "1e-09": {
+      "raw": "0x1.12e0be826d695p-30",
+      "transport": "0x1.12e0be826d695p-30",
+      "dispatch": "0x1.12e0be826d695p-30",
+      "requests": [
+        {
+          "controls": {
+            "pO2_bar": "0x1.12e0be826d695p-30",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "vacuum_floor_bar": "0x1.12e0be826d695p-30",
+            "body": "mars",
+            "process_phase": "hot_train",
+            "ambient_pressure_bar": "0x1.89374bc6a7efap-8",
+            "high_t_melt_activity": "openimcc",
+            "high_t_melt_activity_previous_temperature_K": null,
+            "high_t_melt_activity_previous": {},
+            "simulation_hour": 1
+          },
+          "resolved": "0x1.12e0be826d695p-30"
+        }
+      ],
+      "legacy_pressures_Pa": [
+        {
+          "SiO": "0x1.3c669598f7997p+0",
+          "Na": "0x1.a5c80851f5ca9p+7",
+          "K": "0x1.b2cb498f69d44p+1",
+          "Fe": "0x1.4802959425504p+3",
+          "Mg": "0x1.77b3acd0aac37p-4"
+        }
+      ],
+      "vaporock_transport_audit": [
+        {
+          "requested": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30"
+          },
+          "applied": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30",
+            "transport_fO2_log": "-0x1.2000000000000p+3"
+          },
+          "notes": [
+            "VapoRock vapor pressure applies transport gas fO2 from transport_pO2_bar; intrinsic_fO2_log is retained as melt redox provenance."
+          ]
+        }
+      ],
+      "flux_oxygen": "0x1.12e0be826d695p-30",
+      "intrinsic": "-0x1.2000000000000p+3"
+    },
+    "1e-06": {
+      "raw": "0x1.0c6f7a0b5ed8ep-20",
+      "transport": "0x1.0c6f7a0b5ed8ep-20",
+      "dispatch": "0x1.0c6f7a0b5ed8ep-20",
+      "requests": [
+        {
+          "controls": {
+            "pO2_bar": "0x1.0c6f7a0b5ed8ep-20",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "vacuum_floor_bar": "0x1.12e0be826d695p-30",
+            "body": "mars",
+            "process_phase": "hot_train",
+            "ambient_pressure_bar": "0x1.89374bc6a7efap-8",
+            "high_t_melt_activity": "openimcc",
+            "high_t_melt_activity_previous_temperature_K": null,
+            "high_t_melt_activity_previous": {},
+            "simulation_hour": 1
+          },
+          "resolved": "0x1.0c6f7a0b5ed8ep-20"
+        }
+      ],
+      "legacy_pressures_Pa": [
+        {
+          "SiO": "0x1.402ccdef20167p-5",
+          "Na": "0x1.a5c80851f5ca9p+7",
+          "K": "0x1.b2cb498f69d44p+1",
+          "Fe": "0x1.4bec41c44bd67p-2",
+          "Mg": "0x1.77b3acd0aac37p-4"
+        }
+      ],
+      "vaporock_transport_audit": [
+        {
+          "requested": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.0c6f7a0b5ed8ep-20"
+          },
+          "applied": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.8000000000000p+2",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.0c6f7a0b5ed8ep-20",
+            "transport_fO2_log": "-0x1.8000000000000p+2"
+          },
+          "notes": [
+            "VapoRock vapor pressure applies transport gas fO2 from transport_pO2_bar; intrinsic_fO2_log is retained as melt redox provenance."
+          ]
+        }
+      ],
+      "flux_oxygen": "0x1.0c6f7a0b5ed8ep-20",
+      "intrinsic": "-0x1.2000000000000p+3"
+    }
+  },
+  "trajectories": {
+    "C2A": [
+      {
+        "hour": 1,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.30fa360f8c0bcp-8",
+          "Na": "0x1.691cd00395fe1p-5",
+          "K": "0x1.e63a4c62f1502p-10",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.a2536633313c1p-13"
+        },
+        "oxygen_produced_kg": "0x1.d401b2550ab67p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.fd472b958d652p-2",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b06186922be6bp-5",
+          "redox_source:native_fe_saturation_split": "0x1.21d28e31f6010p-7"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.1d1e26cab5b74p+3",
+        "buffer_delta_mol": "0x1.e6dae8eea2f48p-2",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x0.0p+0",
+          "target_ferric_fraction": "0x1.4dcf449aa86f5p-6",
+          "current_feo_mol": "0x1.23337614ec1e0p+11",
+          "current_fe2o3_mol": "0x0.0p+0",
+          "target_feo_mol": "0x1.1d449f3feef62p+11",
+          "target_fe2o3_mol": "0x1.7bb5b53f49f8fp+4",
+          "delta_fe2o3_mol": "0x1.7bb5b53f49f8fp+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.fd472b958d652p-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.fd472b958d652p-1",
+          "applied_o2_mol": "0x1.fd472b958d652p-2",
+          "required_o2_mol": "0x1.7bb5b53f49f8fp+3",
+          "available_o2_mol": "0x1.fd472b958d652p-2",
+          "unfunded_o2_mol": "0x1.6bcb7be29d8dcp+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.fd472b958d652p-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.cb60000000000p+9",
+            "liquidus_T_C": "0x1.5694000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.4dcf449aa86f5p-6",
+            "ledger_ferric_fraction": "0x1.bfb721f29d9d7p-11",
+            "delta_abs": "0x1.3fd18b8b13826p-6",
+            "delta_signed": "0x1.3fd18b8b13826p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {
+          "Fe": "0x1.e6dae8eea2f46p-1",
+          "O2": "0x1.c76096c537eb3p+3"
+        },
+        "native_fe_vapor_mol": "0x1.e6dae8eea2f46p-1"
+      },
+      {
+        "hour": 2,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.6b333d29d5c4dp-14",
+          "Fe": "0x1.057b1b9fa5c9fp-5",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.d401b2550ab67p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.2535548272e4dp-2",
+          "redox_source:evaporative_oxygen_loss": "0x1.abf7f707c4dcep-35"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.1b5eeef16c282p+3",
+        "buffer_delta_mol": "-0x1.e6dae8eea2f47p-2",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.b5f775589cac3p-10",
+          "target_ferric_fraction": "0x1.55fbde410de19p-6",
+          "current_feo_mol": "0x1.22a4a78f6dce6p+11",
+          "current_fe2o3_mol": "0x1.f2110a41ad2edp+0",
+          "target_feo_mol": "0x1.1d0d855b6882cp+11",
+          "target_fe2o3_mol": "0x1.84e99da56dbc8p+4",
+          "delta_fe2o3_mol": "0x1.65c88d0152e99p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.2535548272e4dp-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.2535548272e4dp-1",
+          "applied_o2_mol": "0x1.2535548272e4dp-2",
+          "required_o2_mol": "0x1.65c88d0152e99p+3",
+          "available_o2_mol": "0x1.2535548272e4dp-2",
+          "unfunded_o2_mol": "0x1.5c9ee25d3f527p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.2535548272e4dp-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.04f0000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.55fbde410de19p-6",
+            "ledger_ferric_fraction": "0x1.1b70b72a952b2p-9",
+            "delta_abs": "0x1.328dc75bbb3c3p-6",
+            "delta_signed": "0x1.328dc75bbb3c3p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 3,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.31050a7b51c70p-8",
+          "Na": "0x1.4805c66b23bbfp-5",
+          "K": "0x1.9a216eddc787cp-10",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.62ea5e45d4201p-13"
+        },
+        "oxygen_produced_kg": "0x1.d5bc7d260dc88p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.cd5c4e079a27fp-2",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b070fb649acd0p-5"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.18fe156396ee3p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-53",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.1b70b72a952b2p-9",
+          "target_ferric_fraction": "0x1.61489d0355a3cp-6",
+          "current_feo_mol": "0x1.228000e4dd800p+11",
+          "current_fe2o3_mol": "0x1.4255da417350ap+1",
+          "target_feo_mol": "0x1.1cda1e8cbe24ap+11",
+          "target_fe2o3_mol": "0x1.91c3515005449p+4",
+          "delta_fe2o3_mol": "0x1.69789607d6da8p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.cd5c4e079a27fp-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.cd5c4e079a27fp-1",
+          "applied_o2_mol": "0x1.cd5c4e079a27fp-2",
+          "required_o2_mol": "0x1.69789607d6da8p+3",
+          "available_o2_mol": "0x1.cd5c4e079a27fp-2",
+          "unfunded_o2_mol": "0x1.5b0db3979a094p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.cd5c4e079a27fp-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.048c000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.61489d0355a3cp-6",
+            "ledger_ferric_fraction": "0x1.80dcdd2ce7b98p-9",
+            "delta_abs": "0x1.312d015db8ac9p-6",
+            "delta_signed": "0x1.312d015db8ac9p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 4,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.5f2a47c569800p-13",
+          "Fe": "0x1.05201cf39deefp-5",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.d5bc7d260dc88p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.255704f68f660p-2"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.1756b9df4c85ap+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.80f5040e7544fp-9",
+          "target_ferric_fraction": "0x1.697577b26c69fp-6",
+          "current_feo_mol": "0x1.2234117599809p+11",
+          "current_fe2o3_mol": "0x1.b5acedc359dabp+1",
+          "target_feo_mol": "0x1.1ca311a0ae24ap+11",
+          "target_fe2o3_mol": "0x1.9af592f342366p+4",
+          "delta_fe2o3_mol": "0x1.643ff53ad6fb1p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.255704f68f660p-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.255704f68f660p-1",
+          "applied_o2_mol": "0x1.255704f68f660p-2",
+          "required_o2_mol": "0x1.643ff53ad6fb1p+3",
+          "available_o2_mol": "0x1.255704f68f660p-2",
+          "unfunded_o2_mol": "0x1.5b153d13227fep+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.255704f68f660p-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.048c000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.697577b26c69fp-6",
+            "ledger_ferric_fraction": "0x1.c1757478093d4p-9",
+            "delta_abs": "0x1.3146c9236b424p-6",
+            "delta_signed": "0x1.3146c9236b424p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 5,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.310f0cab2b172p-8",
+          "Na": "0x1.2d308d937c3d1p-5",
+          "K": "0x1.57cf32f549239p-10",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.330859577a49dp-13"
+        },
+        "oxygen_produced_kg": "0x1.d777567bd90fap-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.a6766b99d4c41p-2",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b07f294a32c06p-5"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.154ceb01af3a1p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.c1757478093d4p-9",
+          "target_ferric_fraction": "0x1.73a6c8076fdf3p-6",
+          "current_feo_mol": "0x1.220f6694faaeap+11",
+          "current_fe2o3_mol": "0x1.ff02af00fdb42p+1",
+          "target_feo_mol": "0x1.1c74b707b25efp+11",
+          "target_fe2o3_mol": "0x1.a68c393233a52p+4",
+          "delta_fe2o3_mol": "0x1.66abe35213eeap+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.a6766b99d4c41p-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.a6766b99d4c41p-1",
+          "applied_o2_mol": "0x1.a6766b99d4c41p-2",
+          "required_o2_mol": "0x1.66abe35213eeap+3",
+          "available_o2_mol": "0x1.a6766b99d4c41p-2",
+          "unfunded_o2_mol": "0x1.59782ff545488p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.a6766b99d4c41p-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.048c000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.73a6c8076fdf3p-6",
+            "ledger_ferric_fraction": "0x1.0f2d2d93c365cp-8",
+            "delta_abs": "0x1.2fdb7ca27f05cp-6",
+            "delta_signed": "0x1.2fdb7ca27f05cp-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 6,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.0da4afbd9563fp-12",
+          "Fe": "0x1.04c97553be6d0p-5",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.d777567bd90fap-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.258c65bb7c252p-2"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.13b9a6f34d8cdp+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.0f3e2d7d07c8fp-8",
+          "target_ferric_fraction": "0x1.7bd4a0431c648p-6",
+          "current_feo_mol": "0x1.21c859f1b80c9p+11",
+          "current_fe2o3_mol": "0x1.345024f3b9729p+2",
+          "target_feo_mol": "0x1.1c3db319d14eep+11",
+          "target_fe2o3_mol": "0x1.afbdbf369dc8fp+4",
+          "delta_fe2o3_mol": "0x1.62a9b5f9af6c5p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.258c65bb7c252p-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.258c65bb7c252p-1",
+          "applied_o2_mol": "0x1.258c65bb7c252p-2",
+          "required_o2_mol": "0x1.62a9b5f9af6c5p+3",
+          "available_o2_mol": "0x1.258c65bb7c252p-2",
+          "unfunded_o2_mol": "0x1.597d52cbd38b2p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.258c65bb7c252p-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.048c000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.7bd4a0431c648p-6",
+            "ledger_ferric_fraction": "0x1.2f8649fcb5bbcp-8",
+            "delta_abs": "0x1.2ff30dc3eef59p-6",
+            "delta_signed": "0x1.2ff30dc3eef59p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 7,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.311864946bbc6p-8",
+          "Na": "0x1.16e10d8972c57p-5",
+          "K": "0x1.1713fbb6dc1f0p-10",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.0da30f37e0303p-13"
+        },
+        "oxygen_produced_kg": "0x1.d9323d5fd447cp-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.85ee0ee2f282ep-2",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b08c665b3db35p-5"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x1.f80abc3d160efp-57",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.11f44b3622f85p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.2f8649fcb5bbcp-8",
+          "target_ferric_fraction": "0x1.851a37bc3f248p-6",
+          "current_feo_mol": "0x1.21a3a865009d1p+11",
+          "current_fe2o3_mol": "0x1.5901b1ab28f73p+2",
+          "target_feo_mol": "0x1.1c138b28cbd94p+11",
+          "target_fe2o3_mol": "0x1.ba47bb77fb2ecp+4",
+          "delta_fe2o3_mol": "0x1.64074f0d30f0fp+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.85ee0ee2f282ep-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.85ee0ee2f282ep-1",
+          "applied_o2_mol": "0x1.85ee0ee2f282ep-2",
+          "required_o2_mol": "0x1.64074f0d30f0fp+3",
+          "available_o2_mol": "0x1.85ee0ee2f282ep-2",
+          "unfunded_o2_mol": "0x1.57d7de96195cep+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.85ee0ee2f282ep-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.048c000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.851a37bc3f248p-6",
+            "ledger_ferric_fraction": "0x1.5a67c6d0887f7p-8",
+            "delta_abs": "0x1.2e8046081d04ap-6",
+            "delta_signed": "0x1.2e8046081d04ap-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 8,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.890d7a1a06f5fp-12",
+          "Fe": "0x1.047667a753057p-5",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.d9323d5fd447cp-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.25f4b88117038p-2"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.107214ff43440p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.5a7d78761ab3fp-8",
+          "target_ferric_fraction": "0x1.8d4a96f9cae1bp-6",
+          "current_feo_mol": "0x1.2160b29c8b610p+11",
+          "current_fe2o3_mol": "0x1.89bf738787479p+2",
+          "target_feo_mol": "0x1.1bdc88b72e62bp+11",
+          "target_fe2o3_mol": "0x1.c37a563921637p+4",
+          "delta_fe2o3_mol": "0x1.610a79573f919p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.25f4b88117038p-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.25f4b88117038p-1",
+          "applied_o2_mol": "0x1.25f4b88117038p-2",
+          "required_o2_mol": "0x1.610a79573f919p+3",
+          "available_o2_mol": "0x1.25f4b88117038p-2",
+          "unfunded_o2_mol": "0x1.57dad39336d97p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.25f4b88117038p-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0428000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.8d4a96f9cae1bp-6",
+            "ledger_ferric_fraction": "0x1.7ad3142f2b26ap-8",
+            "delta_abs": "0x1.2e95d1ee00180p-6",
+            "delta_signed": "0x1.2e95d1ee00180p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 9,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.31212f16f9d31p-8",
+          "Na": "0x1.03f6de0045a8dp-5",
+          "K": "0x1.9d3432bb87ef4p-11",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.df506059e7e2cp-14"
+        },
+        "oxygen_produced_kg": "0x1.daed31052581fp-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.69f1858f6b2d6p-2",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b098db5c41e0ep-5"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.0ee43846e47f1p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.7ad3142f2b26ap-8",
+          "target_ferric_fraction": "0x1.95c65e080d721p-6",
+          "current_feo_mol": "0x1.213bf4057b3e2p+11",
+          "current_fe2o3_mol": "0x1.ae7e0a97aa281p+2",
+          "target_feo_mol": "0x1.1bb5f8c5875d0p+11",
+          "target_fe2o3_mol": "0x1.cd1e52a2e2d52p+4",
+          "delta_fe2o3_mol": "0x1.617ecffcf84b2p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.69f1858f6b2d6p-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.69f1858f6b2d6p-1",
+          "applied_o2_mol": "0x1.69f1858f6b2d6p-2",
+          "required_o2_mol": "0x1.617ecffcf84b2p+3",
+          "available_o2_mol": "0x1.69f1858f6b2d6p-2",
+          "unfunded_o2_mol": "0x1.562f43d07cf1bp+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.69f1858f6b2d6p-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0428000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.95c65e080d721p-6",
+            "ledger_ferric_fraction": "0x1.a2a32bcb934a6p-8",
+            "delta_abs": "0x1.2d1d9315289f8p-6",
+            "delta_signed": "0x1.2d1d9315289f8p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 10,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.2099dd53cbce0p-11",
+          "Fe": "0x1.04266998217b9p-5",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.daed31052581fp-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.26c190a19b629p-2"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.0d706a43bec40p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.a2bd5d115fc09p-8",
+          "target_ferric_fraction": "0x1.9dfc1e2a507e1p-6",
+          "current_feo_mol": "0x1.20fc83669709fp+11",
+          "current_fe2o3_mol": "0x1.dbbc3b49978dap+2",
+          "target_feo_mol": "0x1.1b7eea6aafcd0p+11",
+          "target_fe2o3_mol": "0x1.d6554dcc351fep+4",
+          "delta_fe2o3_mol": "0x1.5f663ef9cf3c8p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.26c190a19b629p-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.26c190a19b629p-1",
+          "applied_o2_mol": "0x1.26c190a19b629p-2",
+          "required_o2_mol": "0x1.5f663ef9cf3c8p+3",
+          "available_o2_mol": "0x1.26c190a19b629p-2",
+          "unfunded_o2_mol": "0x1.56303274c2617p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.26c190a19b629p-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0428000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.9dfc1e2a507e8p-6",
+            "ledger_ferric_fraction": "0x1.c32b8860db4d6p-8",
+            "delta_abs": "0x1.2d313c1219ab2p-6",
+            "delta_signed": "0x1.2d313c1219ab2p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 11,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.312981f29b39ep-8",
+          "Na": "0x1.e75a439c5c643p-6",
+          "K": "0x1.c44b01819f510p-12",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.ae3964520c4d8p-14"
+        },
+        "oxygen_produced_kg": "0x1.dca830be68d88p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.51174876dc815p-2",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b0a4a70702210p-5"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.0c10f02d785adp+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.c32b8860db4d6p-8",
+          "target_ferric_fraction": "0x1.a5c5779a7de8bp-6",
+          "current_feo_mol": "0x1.20d7ab3482d68p+11",
+          "current_fe2o3_mol": "0x1.004a36aee57d0p+3",
+          "target_feo_mol": "0x1.1b5b87be1fbecp+11",
+          "target_fe2o3_mol": "0x1.df2df8f038b1fp+4",
+          "delta_fe2o3_mol": "0x1.5f08dd98c5f37p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.51174876dc815p-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.51174876dc815p-1",
+          "applied_o2_mol": "0x1.51174876dc815p-2",
+          "required_o2_mol": "0x1.5f08dd98c5f37p+3",
+          "available_o2_mol": "0x1.51174876dc815p-2",
+          "unfunded_o2_mol": "0x1.548023550f0f6p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.51174876dc815p-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0428000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.a5c5779a7de8bp-6",
+            "ledger_ferric_fraction": "0x1.e8421d6017268p-8",
+            "delta_abs": "0x1.2bb4f042781f1p-6",
+            "delta_signed": "0x1.2bb4f042781f1p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 12,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.b5d3c309ba0f4p-11",
+          "Fe": "0x1.03d914ba22499p-5",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.dca830be68d88p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.28481aba00dcbp-2"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.0aa8f91801989p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.e860a295c7fcfp-8",
+          "target_ferric_fraction": "0x1.ae05bd46ee709p-6",
+          "current_feo_mol": "0x1.209b5b4602629p+11",
+          "current_fe2o3_mol": "0x1.155bab3653451p+3",
+          "target_feo_mol": "0x1.1b2455bbf757fp+11",
+          "target_fe2o3_mol": "0x1.e86f381dec4a1p+4",
+          "delta_fe2o3_mol": "0x1.5dc16282c2a78p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.28481aba00dcbp-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.28481aba00dcbp-1",
+          "applied_o2_mol": "0x1.28481aba00dcbp-2",
+          "required_o2_mol": "0x1.5dc16282c2a78p+3",
+          "available_o2_mol": "0x1.28481aba00dcbp-2",
+          "unfunded_o2_mol": "0x1.547f21acf2a0ap+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.28481aba00dcbp-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0428000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.ae05bd46ee709p-6",
+            "ledger_ferric_fraction": "0x1.047de7c813ecep-7",
+            "delta_abs": "0x1.2bc6c962e47a2p-6",
+            "delta_signed": "0x1.2bc6c962e47a2p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 13,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.31316e2aba54dp-8",
+          "Na": "0x1.caf00c5ac0659p-6",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.85553cdbd9d75p-14"
+        },
+        "oxygen_produced_kg": "0x1.de633bf6d9c9bp-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.3aa5100de66dcp-2",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b0afe167888dcp-5"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.097103ea5e6b2p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.047de7c813ecep-7",
+          "target_ferric_fraction": "0x1.b52e8a6dac844p-6",
+          "current_feo_mol": "0x1.20765242ab227p+11",
+          "current_fe2o3_mol": "0x1.27e02ce1f352ep+3",
+          "target_feo_mol": "0x1.1b03ceb210213p+11",
+          "target_fe2o3_mol": "0x1.f090fa97b9f7fp+4",
+          "delta_fe2o3_mol": "0x1.5ca0e426c04e8p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.3aa5100de66dcp-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.3aa5100de66dcp-1",
+          "applied_o2_mol": "0x1.3aa5100de66dcp-2",
+          "required_o2_mol": "0x1.5ca0e426c04e8p+3",
+          "available_o2_mol": "0x1.3aa5100de66dcp-2",
+          "unfunded_o2_mol": "0x1.52cbbba6511b1p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.3aa5100de66dcp-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0428000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.b52e8a6dac83dp-6",
+            "ledger_ferric_fraction": "0x1.15ce2a93fad6ap-7",
+            "delta_abs": "0x1.2a477523af188p-6",
+            "delta_signed": "0x1.2a477523af188p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 14,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.413b154f6bbeap-10",
+          "Fe": "0x1.038e0f4326fdcp-5",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.de633bf6d9c9bp-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.2a825f9031beep-2"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.0812c075a1325p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.15df842572726p-7",
+          "target_ferric_fraction": "0x1.bd7e4bebebbcbp-6",
+          "current_feo_mol": "0x1.203cd5da9a6a1p+11",
+          "current_fe2o3_mol": "0x1.3b8a7de2d1b9cp+3",
+          "target_feo_mol": "0x1.1acc622e74b10p+11",
+          "target_fe2o3_mol": "0x1.f9e229fad7219p+4",
+          "delta_fe2o3_mol": "0x1.5c1ceb096e44bp+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.2a825f9031beep-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.2a825f9031beep-1",
+          "applied_o2_mol": "0x1.2a825f9031beep-2",
+          "required_o2_mol": "0x1.5c1ceb096e44bp+3",
+          "available_o2_mol": "0x1.2a825f9031beep-2",
+          "unfunded_o2_mol": "0x1.52c8d80cecb6cp+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.2a825f9031beep-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0428000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.bd7e4bebebbcbp-6",
+            "ledger_ferric_fraction": "0x1.264d825faadcdp-7",
+            "delta_abs": "0x1.2a578abc164e4p-6",
+            "delta_signed": "0x1.2a578abc164e4p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 15,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.31390176ea0dep-8",
+          "Na": "0x1.b1e21020d222cp-6",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.62c5bdb9f7348p-14"
+        },
+        "oxygen_produced_kg": "0x1.e01e522d9007ep-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.295b751402a8fp-2",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b0ba9de32f8aap-5"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x1.f80abc3d160efp-57",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.06f94a9a3f510p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.264d825faadcdp-7",
+          "target_ferric_fraction": "0x1.c42b481774d3bp-6",
+          "current_feo_mol": "0x1.2017858ea863ep+11",
+          "current_fe2o3_mol": "0x1.4e32a3dbd4d5bp+3",
+          "target_feo_mol": "0x1.1aae0f937f4bap+11",
+          "target_fe2o3_mol": "0x1.00bb685c183d3p+5",
+          "delta_fe2o3_mol": "0x1.5a5d7eca460f8p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.295b751402a8fp-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.295b751402a8fp-1",
+          "applied_o2_mol": "0x1.295b751402a8fp-2",
+          "required_o2_mol": "0x1.5a5d7eca460f8p+3",
+          "available_o2_mol": "0x1.295b751402a8fp-2",
+          "unfunded_o2_mol": "0x1.5112a321a5fa4p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.295b751402a8fp-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0428000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.c42b481774d3bp-6",
+            "ledger_ferric_fraction": "0x1.36ab453ce0953p-7",
+            "delta_abs": "0x1.28d5a57904892p-6",
+            "delta_signed": "0x1.28d5a57904892p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 16,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.32e1077e60ec1p-10",
+          "Fe": "0x1.0344b761be936p-5",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.e01e522d9007ep-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.29d485c329787p-2"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.05a6feda244e0p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.36bea7f59c162p-7",
+          "target_ferric_fraction": "0x1.cc7656a0b7423p-6",
+          "current_feo_mol": "0x1.1fe0377b4d145p+11",
+          "current_fe2o3_mol": "0x1.60c85b2d15004p+3",
+          "target_feo_mol": "0x1.1a76c3ff16071p+11",
+          "target_fe2o3_mol": "0x1.0560865226e8dp+5",
+          "delta_fe2o3_mol": "0x1.5a5cdf0dc3518p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.29d485c329787p-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.29d485c329787p-1",
+          "applied_o2_mol": "0x1.29d485c329787p-2",
+          "required_o2_mol": "0x1.5a5cdf0dc3518p+3",
+          "available_o2_mol": "0x1.29d485c329787p-2",
+          "unfunded_o2_mol": "0x1.510e3adfaa05cp+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.29d485c329787p-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0428000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.cc7656a0b7423p-6",
+            "ledger_ferric_fraction": "0x1.47241a7c701ebp-7",
+            "delta_abs": "0x1.28e449627f32ep-6",
+            "delta_signed": "0x1.28e449627f32ep-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 17,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.314045c46abfdp-8",
+          "Na": "0x1.9b98a55bc02efp-6",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.4536b089b5c89p-14"
+        },
+        "oxygen_produced_kg": "0x1.e1d972f002c41p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.19fd8c08f945dp-2",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b0c4ea8372421p-5"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.04a79b5029230p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.47241a7c701ebp-7",
+          "target_ferric_fraction": "0x1.d2b58021733fdp-6",
+          "current_feo_mol": "0x1.1fbafcea94af2p+11",
+          "current_fe2o3_mol": "0x1.7365a3894797cp+3",
+          "target_feo_mol": "0x1.1a5a660098110p+11",
+          "target_fe2o3_mol": "0x1.08ec4621e5aabp+5",
+          "delta_fe2o3_mol": "0x1.5825ba7f27898p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.19fd8c08f945dp-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.19fd8c08f945dp-1",
+          "applied_o2_mol": "0x1.19fd8c08f945dp-2",
+          "required_o2_mol": "0x1.5825ba7f27898p+3",
+          "available_o2_mol": "0x1.19fd8c08f945dp-2",
+          "unfunded_o2_mol": "0x1.4f55ce1edfbf5p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.19fd8c08f945dp-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.03c4000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.d2b58021733fdp-6",
+            "ledger_ferric_fraction": "0x1.56aa5084222bbp-7",
+            "delta_abs": "0x1.276057df622a0p-6",
+            "delta_signed": "0x1.276057df622a0p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 18,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.25f83d364ae3ep-10",
+          "Fe": "0x1.ef4c8fc279f96p-6",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.e1d972f002c41p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.1c8114fb1d8ccp-2"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.036e256cec23dp+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.56bebe44a270dp-7",
+          "target_ferric_fraction": "0x1.daa0f248d0790p-6",
+          "current_feo_mol": "0x1.1f866aa2b29b0p+11",
+          "current_fe2o3_mol": "0x1.85057c49d72c2p+3",
+          "target_feo_mol": "0x1.1a259cff1d72fp+11",
+          "target_fe2o3_mol": "0x1.0d5b13851ace3p+5",
+          "delta_fe2o3_mol": "0x1.583368e54a065p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.1c8114fb1d8ccp-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.1c8114fb1d8ccp-1",
+          "applied_o2_mol": "0x1.1c8114fb1d8ccp-2",
+          "required_o2_mol": "0x1.583368e54a065p+3",
+          "available_o2_mol": "0x1.1c8114fb1d8ccp-2",
+          "unfunded_o2_mol": "0x1.4f4f603d7119fp+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.1c8114fb1d8ccp-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.03c4000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.daa0f248d0790p-6",
+            "ledger_ferric_fraction": "0x1.666950f40f81fp-7",
+            "delta_abs": "0x1.276c49cec8b80p-6",
+            "delta_signed": "0x1.276c49cec8b80p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 19,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.31472738928f9p-8",
+          "Na": "0x1.8800105e0c28bp-6",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.2c41b401148b8p-14"
+        },
+        "oxygen_produced_kg": "0x1.e3949daed3e15p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.0c7cf166eb3acp-2",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b0ceab1f8f261p-5"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.0284d0fdfa639p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.666950f40f81fp-7",
+          "target_ferric_fraction": "0x1.e07fc8cb56235p-6",
+          "current_feo_mol": "0x1.1f62da8013375p+11",
+          "current_fe2o3_mol": "0x1.96cd8d9989050p+3",
+          "target_feo_mol": "0x1.1a0af602f1c15p+11",
+          "target_fe2o3_mol": "0x1.10aff30a91025p+5",
+          "delta_fe2o3_mol": "0x1.55f91f485d822p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.0c7cf166eb3acp-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.0c7cf166eb3acp-1",
+          "applied_o2_mol": "0x1.0c7cf166eb3acp-2",
+          "required_o2_mol": "0x1.55f91f485d822p+3",
+          "available_o2_mol": "0x1.0c7cf166eb3acp-2",
+          "unfunded_o2_mol": "0x1.4d9537bd26285p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.0c7cf166eb3acp-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.03c4000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.e07fc8cb56235p-6",
+            "ledger_ferric_fraction": "0x1.75321d2d4799ep-7",
+            "delta_abs": "0x1.25e6ba34b2566p-6",
+            "delta_signed": "0x1.25e6ba34b2566p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 20,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.1a8bf43639212p-10",
+          "Fe": "0x1.d87eafc8becd8p-6",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.e3949daed3e15p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.0f7541d0232c1p-2"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.0161fd3ad6870p+3",
+        "buffer_delta_mol": "0x1.0000000000000p-54",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.754757daa2b43p-7",
+          "target_ferric_fraction": "0x1.e80dbe8ad57f9p-6",
+          "current_feo_mol": "0x1.1f30c47813775p+11",
+          "current_fe2o3_mol": "0x1.a7955caff7b8ap+3",
+          "target_feo_mol": "0x1.19d8a14ebbc5cp+11",
+          "target_fe2o3_mol": "0x1.14e9bc56f420dp+5",
+          "delta_fe2o3_mol": "0x1.5608ca55ec655p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.0f7541d0232c1p-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.0f7541d0232c1p-1",
+          "applied_o2_mol": "0x1.0f7541d0232c1p-2",
+          "required_o2_mol": "0x1.5608ca55ec655p+3",
+          "available_o2_mol": "0x1.0f7541d0232c1p-2",
+          "unfunded_o2_mol": "0x1.4d8d20476b4bfp+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.0f7541d0232c1p-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0360000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.e80dbe8ad5800p-6",
+            "ledger_ferric_fraction": "0x1.843adbaed4958p-7",
+            "delta_abs": "0x1.25f050b36b354p-6",
+            "delta_signed": "0x1.25f050b36b354p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 21,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.314daec770c6dp-8",
+          "Na": "0x1.76a2a526569b7p-6",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.16f5d75aa32e2p-14"
+        },
+        "oxygen_produced_kg": "0x1.e54fd1e79dcedp-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.0087ba3981ce9p-2",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b0d7ec627303cp-5"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.008b855ba6eb5p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.843adbaed4958p-7",
+          "target_ferric_fraction": "0x1.ed97681f0fb1ap-6",
+          "current_feo_mol": "0x1.1f0ed5cfd972fp+11",
+          "current_fe2o3_mol": "0x1.b88cb0ccf9eb6p+3",
+          "target_feo_mol": "0x1.19bf7e74753f4p+11",
+          "target_fe2o3_mol": "0x1.180e179fc4f08p+5",
+          "delta_fe2o3_mol": "0x1.53d5d6d90ceb5p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.0087ba3981ce9p-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.0087ba3981ce9p-1",
+          "applied_o2_mol": "0x1.0087ba3981ce9p-2",
+          "required_o2_mol": "0x1.53d5d6d90ceb5p+3",
+          "available_o2_mol": "0x1.0087ba3981ce9p-2",
+          "unfunded_o2_mol": "0x1.4bd1990740dcep+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.0087ba3981ce9p-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0360000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.ed97681f0fb1ap-6",
+            "ledger_ferric_fraction": "0x1.925be48dd5ea3p-7",
+            "delta_abs": "0x1.246975d824bc8p-6",
+            "delta_signed": "0x1.246975d824bc8p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 22,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.105f52e376f34p-10",
+          "Fe": "0x1.c3732da8763adp-6",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.e54fd1e79dcedp-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.036d6f38ed12dp-2"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.fef95610133f8p+2",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.9271c42233af4p-7",
+          "target_ferric_fraction": "0x1.f4cf43042eb37p-6",
+          "current_feo_mol": "0x1.1edefadb02e94p+11",
+          "current_fe2o3_mol": "0x1.c8952c7092086p+3",
+          "target_feo_mol": "0x1.198f6c7e65f1fp+11",
+          "target_fe2o3_mol": "0x1.1c1716afc36c2p+5",
+          "delta_fe2o3_mol": "0x1.53e397273dd41p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.036d6f38ed12dp-2",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.036d6f38ed12dp-1",
+          "applied_o2_mol": "0x1.036d6f38ed12dp-2",
+          "required_o2_mol": "0x1.53e397273dd41p+3",
+          "available_o2_mol": "0x1.036d6f38ed12dp-2",
+          "unfunded_o2_mol": "0x1.4bc82bad766b8p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.036d6f38ed12dp-2",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0360000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.f4cf43042eb37p-6",
+            "ledger_ferric_fraction": "0x1.a0bc6dcee7002p-7",
+            "delta_abs": "0x1.24710c1cbb336p-6",
+            "delta_signed": "0x1.24710c1cbb336p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 23,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C2A",
+        "source_kg_hr": {
+          "SiO": "0x1.3153e59fecd09p-8",
+          "Na": "0x1.671faacf39ce8p-6",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x1.0497849604d02p-14"
+        },
+        "oxygen_produced_kg": "0x1.e70b0f254a759p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.ebb5588d4fb17p-3",
+          "redox_source:evaporative_oxygen_loss": "-0x1.b0e0bb4bf017cp-5"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.fd6cfec18edf7p+2",
+        "buffer_delta_mol": "0x1.0000000000000p-55",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.a0bc6dcee7002p-7",
+          "target_ferric_fraction": "0x1.fa0cfabbf0a9fp-6",
+          "current_feo_mol": "0x1.1ebe8d2d1bcbap+11",
+          "current_fe2o3_mol": "0x1.d8cc036420d98p+3",
+          "target_feo_mol": "0x1.1977a3a6dfdb6p+11",
+          "target_fe2o3_mol": "0x1.1f1031a0863d6p+5",
+          "delta_fe2o3_mol": "0x1.51ba618efc0e0p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.ebb5588d4fb17p-3",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.ebb5588d4fb17p-2",
+          "applied_o2_mol": "0x1.ebb5588d4fb17p-3",
+          "required_o2_mol": "0x1.51ba618efc0e0p+3",
+          "available_o2_mol": "0x1.ebb5588d4fb17p-3",
+          "unfunded_o2_mol": "0x1.4a0b8c2cc6cf4p+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.ebb5588d4fb17p-3",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0360000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.fa0cfabbf0a9fp-6",
+            "ledger_ferric_fraction": "0x1.ae47ab7f1039ap-7",
+            "delta_abs": "0x1.22e924fc688d2p-6",
+            "delta_signed": "0x1.22e924fc688d2p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 24,
+        "temperature_C": "0x1.9000000000000p+10",
+        "campaign": "C3_K",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.073ea0dd4e680p-10",
+          "Fe": "0x1.aff107959e787p-6",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.e70b0f254a759p-2",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.f090d814010e4p-3"
+        },
+        "bulk_pO2_bar": "0x1.0624dd2f1a9fcp-10",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.fb72d07c84669p+2",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "partial",
+          "current_ferric_fraction": "0x1.ae5e0e0c7e872p-7",
+          "target_ferric_fraction": "0x1.007a934dc2fe2p-5",
+          "current_feo_mol": "0x1.1e90b68464079p+11",
+          "current_fe2o3_mol": "0x1.e829ae288b572p+3",
+          "target_feo_mol": "0x1.1949a9470a645p+11",
+          "target_fe2o3_mol": "0x1.22ec1335573e6p+5",
+          "delta_fe2o3_mol": "0x1.51c34f5668d13p+4",
+          "o2_account": "reservoir.fo2_buffer",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.f090d814010e4p-3",
+          "source": "scalar Kress91 fO2 ledger re-speciation",
+          "applied_delta_fe2o3_mol": "0x1.f090d814010e4p-2",
+          "applied_o2_mol": "0x1.f090d814010e4p-3",
+          "required_o2_mol": "0x1.51c34f5668d13p+3",
+          "available_o2_mol": "0x1.f090d814010e4p-3",
+          "unfunded_o2_mol": "0x1.4a010bf618ccfp+3",
+          "direction": "oxidizing",
+          "o2_debit_mol": "0x1.f090d814010e4p-3",
+          "o2_credit_mol": "0x0.0p+0",
+          "status": "ok",
+          "gate_authority": {
+            "kind": "real",
+            "fallback_status": "not_engaged",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": "0x1.0360000000000p+10",
+            "liquidus_T_C": "0x1.57c0000000000p+10"
+          },
+          "transition_name": "fe_redox_respeciation",
+          "residual_attribution": "evaporative_internal_o_unbacked",
+          "ferric_divergence_after": {
+            "status": "ok",
+            "implied_ferric_fraction": "0x1.007a934dc2fe2p-5",
+            "ledger_ferric_fraction": "0x1.bc0c4252d64dep-7",
+            "delta_abs": "0x1.22ef05721ad55p-6",
+            "delta_signed": "0x1.22ef05721ad55p-6",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": false,
+            "attribution": "evaporative_internal_o_unbacked",
+            "reason": "evaporative_internal_o_unbacked"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      }
+    ],
+    "C0": [
+      {
+        "hour": 1,
+        "temperature_C": "0x1.2c00000000000p+6",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x0.0p+0",
+        "redox_source_terms": {},
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": null,
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "overhead_gas",
+          "internal_o2_capacity_mol": "0x0.0p+0",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.ffffffffffde6p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.ffffffffffde6p-1",
+            "delta_signed": "0x1.ffffffffffde6p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 2,
+        "temperature_C": "0x1.f400000000000p+6",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x0.0p+0",
+        "redox_source_terms": {},
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": null,
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "overhead_gas",
+          "internal_o2_capacity_mol": "0x0.0p+0",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.ffffffffd7d80p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.ffffffffd7d80p-1",
+            "delta_signed": "0x1.ffffffffd7d80p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 3,
+        "temperature_C": "0x1.5e00000000000p+7",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x0.0p+0",
+        "redox_source_terms": {},
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "overhead_gas",
+          "internal_o2_capacity_mol": "0x0.0p+0",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.fffffff33fc1fp-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.fffffff33fc1fp-1",
+            "delta_signed": "0x1.fffffff33fc1fp-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 4,
+        "temperature_C": "0x1.c200000000000p+7",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x0.0p+0",
+        "redox_source_terms": {},
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "overhead_gas",
+          "internal_o2_capacity_mol": "0x0.0p+0",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.fffffe632b349p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.fffffe632b349p-1",
+            "delta_signed": "0x1.fffffe632b349p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 5,
+        "temperature_C": "0x1.1300000000000p+8",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x0.0p+0",
+        "redox_source_terms": {},
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "overhead_gas",
+          "internal_o2_capacity_mol": "0x0.0p+0",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.ffffe527a3f02p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.ffffe527a3f02p-1",
+            "delta_signed": "0x1.ffffe527a3f02p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 6,
+        "temperature_C": "0x1.4500000000000p+8",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x0.0p+0",
+        "redox_source_terms": {},
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "overhead_gas",
+          "internal_o2_capacity_mol": "0x0.0p+0",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.fffeefcfcfc39p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.fffeefcfcfc39p-1",
+            "delta_signed": "0x1.fffeefcfcfc39p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 7,
+        "temperature_C": "0x1.7700000000000p+8",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x0.0p+0",
+        "redox_source_terms": {},
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "overhead_gas",
+          "internal_o2_capacity_mol": "0x0.0p+0",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.fff89f0ac1d7bp-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.fff89f0ac1d7bp-1",
+            "delta_signed": "0x1.fff89f0ac1d7bp-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 8,
+        "temperature_C": "0x1.a900000000000p+8",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x0.0p+0",
+        "redox_source_terms": {},
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "overhead_gas",
+          "internal_o2_capacity_mol": "0x0.0p+0",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.ffd9ec215f988p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.ffd9ec215f988p-1",
+            "delta_signed": "0x1.ffd9ec215f988p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 9,
+        "temperature_C": "0x1.db00000000000p+8",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.07cf0694e30bdp-37",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.afcd2969dd10dp-40",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.a5b519c1aa9d8p-35"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.a5b519c1aa9d8p-35",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.ff64d492bd392p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.ff64d492bd392p-1",
+            "delta_signed": "0x1.ff64d492bd392p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          },
+          "excess_o2_to_headspace_mol": "0x1.a5b519c1aa9d8p-35",
+          "flags": [
+            "EXCESS_OXYGEN_TO_GAS"
+          ]
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 10,
+        "temperature_C": "0x1.0680000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x1.a4136bb24dee0p-36",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.5a504a67fba66p-37",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.1d812ec8aa682p-32"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.1d812ec8aa682p-32",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.fdf6321972b78p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.fdf6321972b78p-1",
+            "delta_signed": "0x1.fdf6321972b78p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          },
+          "excess_o2_to_headspace_mol": "0x1.1d812ec8aa683p-32",
+          "flags": [
+            "EXCESS_OXYGEN_TO_GAS"
+          ]
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 11,
+        "temperature_C": "0x1.1f80000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.31944714b310bp-30",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.04e86f1d3da28p-32",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.e87aa349ed46ep-28"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.e87aa349ed46ep-28",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.fa29576c8be0fp-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.fa29576c8be0fp-1",
+            "delta_signed": "0x1.fa29576c8be0fp-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          },
+          "excess_o2_to_headspace_mol": "0x1.e87aa349ed46ep-28",
+          "flags": [
+            "EXCESS_OXYGEN_TO_GAS"
+          ]
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 12,
+        "temperature_C": "0x1.3880000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x1.37c077a4c35edp-27",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.d28564606c3f6p-29",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.a7c3ac32f778ep-24"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.a7c3ac32f778ep-24",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.f1720321fdf06p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.f1720321fdf06p-1",
+            "delta_signed": "0x1.f1720321fdf06p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          },
+          "excess_o2_to_headspace_mol": "0x1.a7c3ac32f778ep-24",
+          "flags": [
+            "EXCESS_OXYGEN_TO_GAS"
+          ]
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 13,
+        "temperature_C": "0x1.5180000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.a20ed8dcb00f0p-25",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.cac4b67672c8ep-27",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.4e23e1d17d153p-22"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.4e23e1d17d153p-22",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.e005d7e0fc5ebp-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.e005d7e0fc5ebp-1",
+            "delta_signed": "0x1.e005d7e0fc5ebp-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          },
+          "excess_o2_to_headspace_mol": "0x1.4e23e1d17d153p-22",
+          "flags": [
+            "EXCESS_OXYGEN_TO_GAS"
+          ]
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 14,
+        "temperature_C": "0x1.6a80000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x1.ba36e5be6858ap-21",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.4214e4a8b8fffp-22",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.2c8d1589f5867p-17"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.2c8d1589f5867p-17",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.c1bd82cc8c822p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.c1bd82cc8c822p-1",
+            "delta_signed": "0x1.c1bd82cc8c822p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          },
+          "excess_o2_to_headspace_mol": "0x1.2c8d1589f5868p-17",
+          "flags": [
+            "EXCESS_OXYGEN_TO_GAS"
+          ]
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 15,
+        "temperature_C": "0x1.8380000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.f61248488fe4cp-21",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.07c3b3cbe57bap-21",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.914a136953142p-18"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.914a136953142p-18",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.94609afe632bbp-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.94609afe632bbp-1",
+            "delta_signed": "0x1.94609afe632bbp-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          },
+          "excess_o2_to_headspace_mol": "0x1.914a136953143p-18",
+          "flags": [
+            "EXCESS_OXYGEN_TO_GAS"
+          ]
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 16,
+        "temperature_C": "0x1.9c80000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x1.db01269f3c641p-16",
+          "K": "0x0.0p+0",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.5b0cb104aa07dp-17",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.42d63d5c3b977p-12"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.42d63d5c3b977p-12",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.5a4658f5f98c9p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.5a4658f5f98c9p-1",
+            "delta_signed": "0x1.5a4658f5f98c9p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          },
+          "excess_o2_to_headspace_mol": "0x1.42d63d5c3b977p-12",
+          "flags": [
+            "EXCESS_OXYGEN_TO_GAS"
+          ]
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 17,
+        "temperature_C": "0x1.b580000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.084440779c272p-17",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.911e556e2f2f9p-17",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.a6707d9bb8a3ap-15",
+          "redox_source:evaporative_oxygen_loss": "-0x1.92ce430b01d4fp-35"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000000000p+3",
+        "buffer_delta_mol": "0x0.0p+0",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.a6707d9bb8a3ap-15",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.1a82be2b51fc5p-1",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.1a82be2b51fc5p-1",
+            "delta_signed": "0x1.1a82be2b51fc5p-1",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          },
+          "excess_o2_to_headspace_mol": "0x1.a6707d9bb8a3bp-15",
+          "flags": [
+            "EXCESS_OXYGEN_TO_GAS"
+          ]
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 18,
+        "temperature_C": "0x1.ce80000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x1.ebcfba4377ed2p-13",
+          "K": "0x0.0p+0",
+          "Fe": "0x1.2f8d4e7b4188dp-36",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.911e6b5497ddap-17",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.4e427de4281aep-9",
+          "redox_source:evaporative_oxygen_loss": "-0x1.56359d5065e9fp-32"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.200000002f4dfp+3",
+        "buffer_delta_mol": "0x1.4e427de4281afp-9",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.4e427de4281aep-9",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.bb10c724ccabbp-2",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.bb10c724ccabbp-2",
+            "delta_signed": "0x1.bb10c724ccabbp-2",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 19,
+        "temperature_C": "0x1.db00000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.a08c30e964335p-16",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.911ea10783314p-17",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.4ceed72a3e2e8p-13",
+          "redox_source:evaporative_oxygen_loss": "-0x1.a38c84f6524c2p-31"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000018315p+3",
+        "buffer_delta_mol": "0x1.4ceed72a3e2f0p-13",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.4ceed72a3e2e8p-13",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.842cdc2ca441dp-2",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.842cdc2ca441dp-2",
+            "delta_signed": "0x1.842cdc2ca441dp-2",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 20,
+        "temperature_C": "0x1.db00000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x1.44f7e0bb69504p-12",
+          "K": "0x0.0p+0",
+          "Fe": "0x1.1b74f9074a02cp-34",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.911ed6ba6ea57p-17",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.b9bac34c631a1p-9",
+          "redox_source:evaporative_oxygen_loss": "-0x1.a38c85f48da4cp-31"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x1.492283b834171p-83",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000018315p+3",
+        "buffer_delta_mol": "0x1.b9bac34c631a2p-9",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.b9bac34c631a1p-9",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.842cb4e32787cp-2",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.842cb4e32787cp-2",
+            "delta_signed": "0x1.842cb4e32787cp-2",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 21,
+        "temperature_C": "0x1.db00000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.84b03a76b0906p-16",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.911f0c6d5cd21p-17",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.36aa7e9d86d2ep-13",
+          "redox_source:evaporative_oxygen_loss": "-0x1.a38c9b35fe1f6p-31"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000018315p+3",
+        "buffer_delta_mol": "0x1.36aa7e9d86d20p-13",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.36aa7e9d86d2ep-13",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.842cb30d462f4p-2",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.842cb30d462f4p-2",
+            "delta_signed": "0x1.842cb30d462f4p-2",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 22,
+        "temperature_C": "0x1.db00000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x1.4c728e9087aa7p-12",
+          "K": "0x0.0p+0",
+          "Fe": "0x1.1bbb8fd359c95p-34",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.911f42204b1d3p-17",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.c3e562fc6b50ep-9",
+          "redox_source:evaporative_oxygen_loss": "-0x1.a38c9c23c212ap-31"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000018315p+3",
+        "buffer_delta_mol": "0x1.c3e562fc6b50ep-9",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.c3e562fc6b50ep-9",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.842c8adc798e2p-2",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.842c8adc798e2p-2",
+            "delta_signed": "0x1.842c8adc798e2p-2",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 23,
+        "temperature_C": "0x1.db00000000000p+9",
+        "campaign": "C0",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x0.0p+0",
+          "K": "0x1.8283963707531p-16",
+          "Fe": "0x0.0p+0",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.911f77d33c30cp-17",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.34ed96ccb4dd1p-13",
+          "redox_source:evaporative_oxygen_loss": "-0x1.a38cb1e27a02bp-31"
+        },
+        "bulk_pO2_bar": "0x1.12e0be826d695p-30",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000018315p+3",
+        "buffer_delta_mol": "0x1.34ed96ccb4dc0p-13",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.34ed96ccb4dd1p-13",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.842c89093363ep-2",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.842c89093363ep-2",
+            "delta_signed": "0x1.842c89093363ep-2",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      },
+      {
+        "hour": 24,
+        "temperature_C": "0x1.db00000000000p+9",
+        "campaign": "C0B",
+        "source_kg_hr": {
+          "SiO": "0x0.0p+0",
+          "Na": "0x1.4d067e78b9a64p-12",
+          "K": "0x0.0p+0",
+          "Fe": "0x1.1bc147447084bp-34",
+          "Mg": "0x0.0p+0"
+        },
+        "oxygen_produced_kg": "0x1.911fad862d629p-17",
+        "redox_source_terms": {
+          "redox_source:evaporative_metal_loss": "0x1.c4ae7a47cf4d6p-9",
+          "redox_source:evaporative_oxygen_loss": "-0x1.a38cb2cee76ddp-31"
+        },
+        "bulk_pO2_bar": "0x1.26e978d4fdf3bp-7",
+        "ledger_pO2_bar": "0x0.0p+0",
+        "request_pO2_bar": "0x1.12e0be826d695p-30",
+        "intrinsic_log_fO2": "-0x1.2000000018315p+3",
+        "buffer_delta_mol": "0x1.c4ae7a47cf4d4p-9",
+        "ferric": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": "0x1.c4ae7a47cf4d6p-9",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": "0x1.842c60c68779bp-2",
+            "ledger_ferric_fraction": "0x0.0p+0",
+            "delta_abs": "0x1.842c60c68779bp-2",
+            "delta_signed": "0x1.842c60c68779bp-2",
+            "warning_threshold_abs": "0x1.999999999999ap-5",
+            "warning_threshold_ferric_fraction_abs": "0x1.999999999999ap-5",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "native_source_mol": {},
+        "native_fe_vapor_mol": "0x0.0p+0"
+      }
+    ]
+  }
+}

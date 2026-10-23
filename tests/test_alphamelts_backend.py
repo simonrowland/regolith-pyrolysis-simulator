@@ -10339,8 +10339,11 @@ def test_battery_melts_invalid_observation_refuses_before_native(
 
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 @pytest.mark.parametrize('route', ['direct', 'kernel'])
-def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeypatch):
-    from simulator.environment import vacuum_floor_bar_for_environment
+@pytest.mark.parametrize('raw_oxygen,expected', [
+    # Production routing at f2ee412fa, before the C7 value flip.
+    (0.0, 1.3e-12), (1.3e-12, 1.3e-12), (1e-9, 1e-9), (1e-6, 1e-6),
+])
+def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, raw_oxygen, expected, monkeypatch):
     from simulator.state import Atmosphere
 
     backend = backend_cls()
@@ -10354,17 +10357,17 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
     sim.melt = types.SimpleNamespace(
         body='moon', ambient_pressure_mbar=0.0,
         atmosphere=Atmosphere.HARD_VACUUM,
+        sweep_mol_per_s=None,
         temperature_C=1600.0, p_total_mbar=1000.0,
         oxygen_reservoir=types.SimpleNamespace(
             headspace_transport_pO2_bar=0.0, melt_intrinsic_fO2_log=-12.0,
         ),
     )
-    floor = vacuum_floor_bar_for_environment(body=sim.melt.body)
     sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = (
-        sim._headspace_transport_pO2_bar_from_ledger(0.0, head_o2_mol=0.0)
+        sim._headspace_transport_pO2_bar_from_ledger(raw_oxygen)
     )
     live = sim._vapor_pressure_dispatch_pO2_bar()
-    assert live == floor
+    assert live == expected
     assert sim._backend_accepts_kwarg('vapor_transport_pO2_bar')
     assert sim._backend_accepts_kwarg('vapor_transport_floor_bar')
 
@@ -10424,7 +10427,7 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
     if route == 'kernel':
         # Diagnostic MELTS vapour is discarded before the builtin refresh.
         assert result.vapor_pressures_Pa == {}
-    assert helper.calls[-1]['fO2_log'] == pytest.approx(math.log10(floor))
+    assert helper.calls[-1]['fO2_log'] == pytest.approx(math.log10(expected))
     backend.equilibrate(
         temperature_C=1600.0,
         composition_kg={'SiO2': 49.0, 'Al2O3': 15.0, 'FeO': 10.0,

@@ -186,6 +186,9 @@ def test_passive_exchange_respeciation_settles_same_buffer_once(absorbing) -> No
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) == pytest.approx(after_exchange_gas + gas_credit)
     assert after_exchange_gas - before_gas == pytest.approx(exchange.exchange_o2_mol, abs=1e-12)
     buffer_delta = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0) - before_buffer
+    # Oxidizing Fe consumes the finite stored parcel; reduction replenishes it.
+    # The amount is owned by the committed transition, not an activity change.
+    assert buffer_delta < 0.0 if absorbing else buffer_delta >= 0.0
     assert buffer_delta == pytest.approx(
         diagnostic.get("buffer_o2_credit_mol", 0.0) - diagnostic.get("o2_debit_mol", 0.0), abs=1e-12,
     )
@@ -1390,7 +1393,8 @@ def test_redox_source_bounds_finite_absurd_candidate_fo2(
     assert reservoir.redox_source_refusal_context == {}
 
 
-def test_redox_source_valid_candidate_fo2_still_applies_exact_delta() -> None:
+@pytest.mark.parametrize("sign", [-1.0, 1.0])
+def test_redox_source_valid_candidate_fo2_still_applies_exact_delta(sign) -> None:
     sim = _make_sim()
     sim.melt.p_total_mbar = 10.0  # Keep the small increment below the gas ceiling.
     sim.melt.temperature_C = 1600.0
@@ -1404,11 +1408,11 @@ def test_redox_source_valid_candidate_fo2_still_applies_exact_delta() -> None:
     )
 
     reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
-        {"redox_source:test_valid": capacity * math.log(10.0) * 0.25},
+        {"redox_source:test_valid": sign * capacity * math.log(10.0) * 0.25},
         temperature_K=temperature_K,
     )
 
-    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(-8.75)
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(-9.0 + sign * 0.25)
     assert reservoir.redox_source_terms_applied is True
     assert reservoir.redox_source_skip_reason == ""
     assert reservoir.redox_source_refusal_context == {}
