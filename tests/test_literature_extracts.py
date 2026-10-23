@@ -14,7 +14,9 @@ from __future__ import annotations
 import copy
 import hashlib
 import importlib.util
+import json
 import math
+import os
 import sys
 from collections import Counter
 from decimal import Decimal
@@ -3543,6 +3545,51 @@ def test_pilot_extract_count_exact_and_merge_smoke():
     report = em.build_consistency_report(extracts)
     assert report["kind"] == "cross_source_consistency"
     assert "conflicts" in report
+
+    # Golden pin the current merged output while allowing the live corpus to
+    # grow with post-policy extracts. Update this snapshot when the 347-source
+    # corpus changes intentionally.
+    if len(files) == 347:
+        merged_payload = json.dumps(
+            {"by_species": view, "coverage": cov, "consistency": report},
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+            default=lambda value: {
+                "type": type(value).__qualname__, "value": str(value)
+            },
+        ).encode("utf-8")
+        assert len(extracts) == 347
+        assert len(view["species"]) == 1842
+        assert sum(
+            len(species.get("observations") or [])
+            for species in view["species"].values()
+        ) == 8881
+        assert cov["source_count"] == 347
+        assert cov["cells_found"] == 2875
+        assert len(report["conflicts"]) == 10
+        assert hashlib.sha256(merged_payload).hexdigest() == (
+            "569b1af9d179b8009dc5626531be9ef7c87e29528779aa18c2cc2b64fcd6d76a"
+        )
+
+
+def test_extract_yaml_cache_copies_and_reloads_stat_changes(tmp_path: Path):
+    path = tmp_path / "extract.yaml"
+    path.write_text("value: 1\n", encoding="utf-8")
+
+    misses_before = vle._load_extract_yaml_cached.cache_info().misses
+    parsed = vle.load_extract_yaml(path)
+    parsed["value"] = 9
+    assert vle.load_extract_yaml(path) == {"value": 1}
+    assert vle._load_extract_yaml_cached.cache_info().misses == misses_before + 1
+
+    metadata = path.stat()
+    path.write_text("value: 2\n", encoding="utf-8")
+    os.utime(path, ns=(metadata.st_atime_ns, metadata.st_mtime_ns + 1_000_000))
+    assert path.stat().st_size == metadata.st_size
+    assert vle.load_extract_yaml(path) == {"value": 2}
+    assert vle._load_extract_yaml_cached.cache_info().misses == misses_before + 2
 
 
 # ---------------------------------------------------------------------------
