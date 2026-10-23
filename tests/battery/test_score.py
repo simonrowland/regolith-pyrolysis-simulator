@@ -3686,6 +3686,30 @@ def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures(
         f"free-molecular in-cell pressure sum <= {pressure_limit} Pa"
     )
 
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    assert headline_rows(
+        (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+    )[0]["n"] == 0
+    assert [
+        (row["stratum"], row["n"])
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    ] == [(FLAGGED_STRATUM_UNVERIFIED_APPARATUS, 1)]
+    payload = residual_to_plain(residual)
+    for tier in ("measured", "compilation"):
+        assert headline_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,), tier=tier
+        )[0]["n"] == 0
+    assert flagged_stratum_payloads(
+        (payload,), (Engine.INTERNAL_ANALYTICAL,)
+    )[0]["n"] == 1
+
     missing = replace(
         reference,
         value=Value(kind=ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
