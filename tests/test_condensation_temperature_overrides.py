@@ -339,6 +339,43 @@ def test_stage0_hot_wall_diagnostic_is_sibling_and_route_neutral():
     )
 
 
+def test_stage0_to_stage1_wall_schedule_tracks_flowing_fe_dewpoint():
+    model = CondensationModel(CondensationTrain.create_default())
+    fe_partial_pressure_pa = 154.6
+    dewpoint = condensation_module.antoine_dew_temperature_diagnostic(
+        "Fe",
+        fe_partial_pressure_pa,
+        vapor_pressure_data=model.vapor_pressure_data,
+    )
+    assert dewpoint["status"] == "diagnostic_only"
+    fe_dewpoint_C = float(dewpoint["temperature_K"]) - 273.15
+    assert fe_dewpoint_C > 1650.0
+
+    scheduled_temperatures_C = {
+        segment.name: 1500.0 for segment in model.pipe_segments
+    }
+    scheduled_temperatures_C["stage_0_to_stage_1"] = 1650.0
+    model.configure_operating_conditions(
+        wall_temperature_C=1500.0,
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={
+            "Fe": fe_partial_pressure_pa / 100.0,
+        },
+        pipe_segment_temperatures_C=scheduled_temperatures_C,
+        campaign_name="C2A_continuous",
+        campaign_hour=20.0,
+    )
+
+    applied_temperatures_C = {
+        segment.name: segment.wall_temperature_C
+        for segment in model.pipe_segments
+    }
+    assert applied_temperatures_C["stage_0_to_stage_1"] == pytest.approx(
+        max(1650.0, fe_dewpoint_C)
+    )
+    assert applied_temperatures_C["stage_1_to_stage_2"] == 1500.0
+
+
 def test_operating_conditions_preserve_valid_subzero_wall_temperature():
     model = CondensationModel(CondensationTrain.create_default())
     names = {segment.name for segment in model.pipe_segments}
