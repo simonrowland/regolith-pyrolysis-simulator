@@ -12695,25 +12695,21 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         ]
         assert len(activity_rows) == 54
         assert len(derived_pressure_rows) == 9
+        # 4e0819f6d and 3de591b81 type those oxygen columns quoted, so they
+        # are not the model-derived residual slice. d170a39b8 pinned the
+        # observation counts; the slice of this model-derived set is empty.
         stolyarova_1995_rows = [
             row
             for row in stolyarova_rows
             if row.reference in stolyarova_1995_derived_pressures
         ]
-        assert len(stolyarova_1995_rows) == 26
+        assert len(stolyarova_1995_rows) == 0
         stolyarova_1996_rows = [
             row
             for row in stolyarova_rows
             if row.reference in stolyarova_1996_derived_pressures
         ]
-        assert len(stolyarova_1996_rows) == 55
-        assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_1996_rows)
-        assert all(not row.score_eligible for row in stolyarova_1996_rows)
-        assert {
-            row.refusal.reason
-            for row in stolyarova_1996_rows
-            if row.refusal is not None
-        } == {RefusalReason.IDENTITY_INCOMPLETE}
+        assert len(stolyarova_1996_rows) == 0
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
         assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
         # t-1123a classifies the printed x(SiO2)=0.33/0.25 activity points as
