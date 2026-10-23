@@ -795,8 +795,8 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
             assert "extrapolated_beyond_source" in label
 
     # t-383: Na joins K on standard_reaction_term for the runtime selector.
-    # NIST Rodebush pure-component sidecar stays wall-only (wall_condensation
-    # / pure_component_antoine point tests); runtime coefficient block is antoine.
+    # The wall selects the JANAF pure-component surface; the runtime melt
+    # coefficient block remains antoine.
     na_metal = data["metals"]["Na"]
     _, na_block = vapor_pressure_antoine_coefficients(na_metal, 1429.0)
     assert na_block == "antoine"
@@ -809,7 +809,8 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         )
         == "builtin_fallback:standard_reaction_term"
     )
-    # Pure-component provenance tier still honest when the sidecar is selected.
+    # At1118 K the selected JANAF segment is derived from an evaluation,
+    # distinct from the retained REF-041 source-fit comparator.
     from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
 
     _, na_pure_block = wall_condensation_antoine_coefficients(na_metal, 1118.0)
@@ -820,7 +821,7 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         coefficient_block=na_pure_block,
         temperature_K=1118.0,
     )
-    assert "pure_component_source_equation_fit" in na_pure_label
+    assert na_pure_label == "builtin_fallback:pure_component_derived_from_evaluation"
 
     k_metal = data["metals"]["K"]
     _, k_block = vapor_pressure_antoine_coefficients(k_metal, 1429.0)
@@ -852,12 +853,14 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         assert "pure_component_unspecified" not in label
         assert "pure_component_first_principles" not in label
 
-    # t-383: runtime selector returns standard_reaction antoine for Na; force the
-    # pure-component sidecar block to exercise the unspecified-tier path.
+    # Remove tier annotations from the selected wall segment, preserving the
+    # independent retained-source container and the unspecified-tier guard.
     unannotated = copy.deepcopy(data["metals"]["Na"])
-    unannotated["pure_component_antoine"].pop("provenance_class", None)
-    unannotated["pure_component_antoine"].pop("source_certification", None)
-    unannotated_block = "pure_component_antoine"
+    unannotated_segment, unannotated_block = wall_condensation_antoine_coefficients(
+        unannotated, 1118.0,
+    )
+    unannotated_segment.pop("provenance_class", None)
+    unannotated_segment.pop("source_certification", None)
     unannotated_label = vapor_pressure_source_label(
         "builtin_fallback",
         unannotated,
