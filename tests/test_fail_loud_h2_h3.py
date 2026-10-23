@@ -21,8 +21,10 @@ from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.runner import (
     EngineBugAbort,
     _latest_mass_balance_pct,
+    _sio_tsweep_table,
     _sio_tsweep_row,
     _sio_wall_sweep_row,
+    _unavailable_report_from_upstream,
 )
 
 
@@ -99,6 +101,85 @@ def test_sio_sweep_rows_require_diagnostic_mass_balance_key() -> None:
             report=_minimal_sio_report(),
             diagnostics={},
         )
+
+
+def _silica_fume_unavailable() -> dict[str, str]:
+    return {
+        "status": "unavailable",
+        "section": "sio_yield_report.sio_to_silica_fume_kg",
+        "exception_type": "LookupError",
+        "reason": "silica fume stage unavailable",
+    }
+
+
+def test_sio_sweep_rows_propagate_unavailable_silica_fume() -> None:
+    report = _minimal_sio_report()
+    upstream = _silica_fume_unavailable()
+    report["sio_to_silica_fume_kg"] = upstream
+    diagnostics = {"mass_balance_error_pct": 0.0}
+
+    tsweep_row = _sio_tsweep_row(
+        cell_id="cell",
+        t_low_c=1100.0,
+        t_hold_c=1400.0,
+        ramp_c_per_hr=5.0,
+        report=report,
+        diagnostics=diagnostics,
+        mass_kg=1000.0,
+    )
+    wall_sweep_row = _sio_wall_sweep_row(
+        cell_id="cell",
+        feedstock_id="lunar_mare_low_ti",
+        pO2_mode="no_suppress",
+        pO2_mbar=None,
+        liner_temperature_c=1500.0,
+        report=report,
+        diagnostics=diagnostics,
+    )
+
+    assert tsweep_row["stage3_silica_kg"] == _unavailable_report_from_upstream(
+        upstream,
+        section="sio_tsweep.stage3_silica_kg",
+    )
+    assert tsweep_row["terminal_offgas_escape_pct"] == (
+        _unavailable_report_from_upstream(
+            upstream,
+            section="sio_tsweep.terminal_offgas_escape_pct",
+        )
+    )
+    assert wall_sweep_row["stage3_silica_kg"] == (
+        _unavailable_report_from_upstream(
+            upstream,
+            section="sio_wall_sweep.stage3_silica_kg",
+        )
+    )
+
+
+def test_sio_tsweep_table_renders_unavailable_silica_metrics() -> None:
+    upstream = _silica_fume_unavailable()
+    row = {
+        "cell_id": "cell",
+        "T_low_C": 1100.0,
+        "T_hold_C": 1400.0,
+        "ramp_C_per_hr": 5.0,
+        "sio_yield_pct_of_feedstock": 1.25,
+        "terminal_offgas_escape_pct": _unavailable_report_from_upstream(
+            upstream,
+            section="sio_tsweep.terminal_offgas_escape_pct",
+        ),
+        "stage3_silica_kg": _unavailable_report_from_upstream(
+            upstream,
+            section="sio_tsweep.stage3_silica_kg",
+        ),
+        "mass_balance_err_pct": 0.0,
+    }
+
+    try:
+        rendered = _sio_tsweep_table([row])
+    except (TypeError, ValueError) as exc:
+        pytest.fail(f"typed unavailable metrics must render: {exc}")
+
+    assert "| unavailable | unavailable |" in rendered
 
 
 def test_ledger_reads_project_and_assert_balanced_reject_nonfinite_balances() -> None:
