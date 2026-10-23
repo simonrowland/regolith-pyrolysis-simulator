@@ -12353,6 +12353,7 @@ def discover_extracts(directory: Path | None = None) -> list[Path]:
 
 _B677_SOURCE_ID = "pankratz-1984-usbm-b677"
 _B592_SOURCE_ID = "kelley-king-1961-usbm-b592"
+_B2131_SOURCE_ID = "robie-hemingway-1995-usgs-b2131"
 _B677_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S, Quantity.H_MINUS_H298})
 _B592_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S})
 _H_MINUS_H298_ANCHOR = "H(T)-H(298.15 K)"
@@ -12386,6 +12387,19 @@ _B592_GAS_BASIS_REASON = (
     "kelley-king-1961-usbm-b592-p101-p120.md:263 heads table 6 "
     "\"Heat capacities, cal./deg.-mole\" and "
     "\"Entropies at 298.15° K., cal./deg.-mole\"."
+)
+# Robie, R. A., and Hemingway, B. S., 1995, Thermodynamic properties of
+# minerals and related substances, USGS Bulletin 2131. pdftotext-layout.txt.
+_B2131_FORMATION_BASIS_REASON = (
+    "robie-hemingway-1995-usgs-b2131 pdftotext-layout.txt:167-170 prints mol "
+    "as identical with the gram formula weight, and \"One bar = 1OS Pascals\" "
+    "beside \"The standard atmosphere is equal to 101325 Pascals.\" "
+    ":187-188 the Gibbs energy of formation from the elements in their "
+    "reference states is in J per mol, and Kr is the equilibrium constant of "
+    "formation. :313-315 and :332 the reference states for ΔfG and log Kr, and "
+    "the reference pressure adopted for these tables, are the elements in "
+    "their standard states at 1 bar. The extracted phase is prose and the "
+    "table prints no element reaction, so reaction stays unmapped."
 )
 
 
@@ -12464,6 +12478,19 @@ def _b592_gas_basis(
     }
 
 
+def _b2131_formation_basis(formula: str) -> dict[str, State]:
+    """log10 Kf per mole of an Ellingham oxide product, referenced to 1 bar."""
+
+    from simulator.battery.compilation_tier import formula_is_ellingham_oxide_product
+
+    if not formula_is_ellingham_oxide_product(formula):
+        return {}
+    return {
+        "per": _cited_state(PerBasis.MOL_SPECIES, _B2131_FORMATION_BASIS_REASON),
+        "standard_pressure_Pa": _cited_state(bar_to_pa(1), _B2131_FORMATION_BASIS_REASON),
+    }
+
+
 def _b677_formation_basis(formula: str) -> dict[str, State]:
     """Mol-species at 1 atm for an Ellingham oxide product. No invented reaction."""
 
@@ -12495,6 +12522,8 @@ def compilation_source_basis(
         return _b677_formation_basis(formula)
     if source_id == _B592_SOURCE_ID and quantity in _B592_GAS_QUANTITIES:
         return _b592_gas_basis(formula, phase, quantity, temperatures)
+    if source_id == _B2131_SOURCE_ID and quantity is Quantity.LOG10_KF:
+        return _b2131_formation_basis(formula)
     return {}
 
 

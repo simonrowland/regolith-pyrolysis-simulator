@@ -16,7 +16,7 @@ from simulator.battery.compilation_tier import (
     predict_thermo_attempt,
 )
 from simulator.battery.enums import Engine, PerBasis, Quantity, RefusalReason, ValueKind
-from simulator.battery.identity import atm_to_pa, quantity_token
+from simulator.battery.identity import atm_to_pa, bar_to_pa, quantity_token
 from simulator.battery.migrate import (
     REPO_ROOT,
     _identity_from_plain,
@@ -249,14 +249,33 @@ def test_b592_alo_uses_printed_table6_basis(tmp_path: Path) -> None:
     assert admitted.value is not None
 
 
-def test_b2131_cao_logkf_refuses_missing_per_basis(tmp_path: Path) -> None:
+def _b2131_printed_raw(document: dict, temperature: str, column: str) -> str:
+    for row in document["rows"]:
+        cells = row.get("cells")
+        if not isinstance(cells, dict):
+            continue
+        if str(cells.get("temperature", {}).get("raw")) == temperature:
+            return str(cells[column]["raw"])
+    raise AssertionError(temperature)
+
+
+def test_b2131_cao_logkf_maps_mol_species_at_one_bar(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B2131, "high-temperature-p182.json")
     log_kf = _observation(result, B2131, "high-temperature-p182", Quantity.LOG10_KF)
-    assert _per_is_unknown(log_kf)
-    cell = _cell_at(log_kf, "298.15")
-    attempt = _attempt(Engine.INTERNAL_ANALYTICAL, cell)
-    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
-    assert attempt.refusal_detail["reason"] == _MISSING_PER
+    assert log_kf.identity.per.value is PerBasis.MOL_SPECIES
+    assert "pdftotext-layout.txt:167" in log_kf.identity.per.reason
+    assert ":313-315" in log_kf.identity.per.reason
+    assert "1 bar" in log_kf.identity.per.reason
+    assert log_kf.identity.standard_pressure_Pa.value == bar_to_pa(1)
+    assert log_kf.identity.reaction.is_unknown
+    document = _record_doc(B2131, "high-temperature-p182.json")
+    assert _b2131_printed_raw(document, "298.15", "log_kf") == "105.66"
+    assert _cell_at(log_kf, "298.15").value.point == _reader_magnitude(
+        document, Quantity.LOG10_KF, "298.15"
+    )
+    attempt = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(log_kf, "298.15"))
+    assert attempt.value is None
+    assert attempt.refusal_detail["reason"] == "ellingham-phase-or-polymorph-not-in-fit"
 
 
 def test_b689_ags_gas_stays_missing_mol_basis(tmp_path: Path) -> None:
