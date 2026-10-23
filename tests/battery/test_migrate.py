@@ -6796,7 +6796,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "transition_temperature": 58
     }
     # The reviewed residue-composition rail adds 516 Sossi ppm and 648 Hashimoto
-    # oxide cells. t-1152 adds 110 printed Markova 1984 Table 2 residue cells.
+    # oxide cells. The refreshed Gibson 1971 extract adds 15 printed after-1400 °C
+    # residue cells matching its numeric source rows. t-1152 adds 110 printed
+    # Markova 1984 Table 2 residue cells.
     # The independent source census validates each typed component against its
     # own printed field; the seven all-null Hashimoto rows stay absent.
     # t-1122 adds four 14163 1050°C residue-ppm cells each for K and Na from
@@ -6808,9 +6810,12 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # because the data was added, not because a check was relaxed; mismatches
     # stays 0.
     # kems-010 adds 51 rows × 4 residue cells = 204; every cell matches.
-    assert census.get("residue_component_composition") == 1518
+    assert census.get("residue_component_composition") == 1533
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
+    assert per_source.get("gibson-1971-lunar-gas-release") == {
+        "residue_component_composition": 15
+    }
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
         "residue_component_composition": 8
     }
@@ -6835,17 +6840,18 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     }
     # Fresh regeneration restores 33 missing extract siblings (+132); this fix
     # checks all 433 existing converted cells, moving 2681->3114 with no exceptions.
-    # Sossi 2020 adds 22 isotope_delta rows under the field shared with the
-    # migrator's Quantity.ISOTOPE_DELTA source map. The census falls back to
-    # QUANTITY_SOURCE_FIELDS for quantities without a unit-conversion case.
-    # Measured on the b146r2 merge regen: isotope_delta 0->22 and n_numeric
-    # 3114->3136. mismatches stays 0; the count moved because those rows
-    # became visible, not because a check was relaxed.
-    assert census.get("isotope_delta") == 22
+    # Sossi 2020 contributes 22 isotope_delta rows and Neuman 2021 contributes
+    # 50. The census falls back to QUANTITY_SOURCE_FIELDS for quantities without
+    # a unit-conversion case. Scratch regen: isotope_delta 22->72 and n_numeric
+    # 3136->3201 (Gibson 1971 +15; Neuman 2021 +50); counts follow the store.
+    assert census.get("isotope_delta") == 72
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
-    assert n_numeric == 3136, (n_numeric, census, n_unavailable)
+    assert per_source.get("neuman-2021-k-cu-evaporation-isotope-fractionation") == {
+        "isotope_delta": 50
+    }
+    assert n_numeric == 3201, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
