@@ -40,14 +40,20 @@ species:
     observations:
       - observation_id: baud_2003_norton_al_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = 0.989 − 8009/T; at T = 1500 K, β = 0.0129."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0129
           gas_species: Al(g)
           substrate: SiC (Nor.) + Al2O3 powder bed
@@ -55,14 +61,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_carborundum_al_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = 1.633 − 9341/T; at T = 1500 K, β = 0.0101."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0101
           gas_species: Al(g)
           substrate: SiC (Car.) + Al2O3 powder bed
@@ -70,14 +82,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_norton_carbon_al_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = 1.915 − 9416/T; at T = 1500 K, β = 0.0127."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0127
           gas_species: Al(g)
           substrate: SiC (Nor.) + Al2O3 + C powder bed
@@ -85,14 +103,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_norton_silicon_al_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = −7.601 + 6042/T; at T = 1500 K, β = 0.0281."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0281
           gas_species: Al(g)
           substrate: SiC (Nor.) + Al2O3 + Si powder bed
@@ -102,14 +126,20 @@ species:
     observations:
       - observation_id: baud_2003_norton_al2o_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = 5.663 − 17 027/T; at T = 1500 K, β = 0.0034."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0034
           gas_species: Al2O(g)
           substrate: SiC (Nor.) + Al2O3 powder bed
@@ -117,14 +147,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_carborundum_al2o_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = 3.375 − 13656/T; at T = 1500 K, β = 0.0033."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0033
           gas_species: Al2O(g)
           substrate: SiC (Car.) + Al2O3 powder bed
@@ -132,14 +168,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_norton_carbon_al2o_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = 7.412 − 19 403/T; at T = 1500 K, β = 0.004."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.004
           gas_species: Al2O(g)
           substrate: SiC (Nor.) + Al2O3 + C powder bed
@@ -147,14 +189,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_norton_silicon_al2o_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = −10.414 + 9888/T; at T = 1500 K, β = 0.0219."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0219
           gas_species: Al2O(g)
           substrate: SiC (Nor.) + Al2O3 + Si powder bed
@@ -164,14 +212,20 @@ species:
     observations:
       - observation_id: baud_2003_norton_sio_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = −4.733 + 274/T; at T = 1500 K, β = 0.0106."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0106
           gas_species: SiO(g)
           substrate: SiC (Nor.) + Al2O3 powder bed
@@ -179,14 +233,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_carborundum_sio_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = 1.631 − 7095/T; at T = 1500 K, β = 0.0451."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0451
           gas_species: SiO(g)
           substrate: SiC (Car.) + Al2O3 powder bed
@@ -194,14 +254,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_norton_carbon_sio_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = −13.122 + 13961/T; at T = 1500 K, β = 0.022."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.022
           gas_species: SiO(g)
           substrate: SiC (Nor.) + Al2O3 + C powder bed
@@ -209,14 +275,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_norton_silicon_sio_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         units: dimensionless
         regime: knudsen_effusion
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = −21.64 + 26 039/T; at T = 1500 K, β = 0.0138."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0138
           gas_species: SiO(g)
           substrate: SiC (Nor.) + Al2O3 + Si powder bed
@@ -226,14 +298,20 @@ species:
     observations:
       - observation_id: baud_2003_norton_co_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = −6.032 + 3844/T; at T = 1500 K, β = 0.0311."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0311
           gas_species: CO(g)
           substrate: SiC (Nor.) + Al2O3 powder bed
@@ -241,14 +319,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_carborundum_co_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = −16.118 + 18 635/T; at T = 1500 K, β = 0.0249."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0249
           gas_species: CO(g)
           substrate: SiC (Car.) + Al2O3 powder bed
@@ -256,14 +340,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_norton_carbon_co_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = −7.824 + 5949/T; at T = 1500 K, β = 0.0211."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.0211
           gas_species: CO(g)
           substrate: SiC (Nor.) + Al2O3 + C powder bed
@@ -271,14 +361,20 @@ species:
           method: multiple cell method; β at 1500 K
       - observation_id: baud_2003_norton_silicon_co_beta_1500k
         type: alpha
-        locator: {table: '5', page: 6, published_page: 24}
+        locator: {table: '5', page: 6, published_page: 24, section: '3.3'}
         T_K: 1500
         phase: condensed_solid
         regime: knudsen_effusion
         units: dimensionless
         values:
           quantity: condensation_coefficient
-          method_class: measured_direct
+          method_class: measured_reduced
+          derivation:
+            relation: "ln β (fit) = −8.112 + 8900/T; at T = 1500 K, β = 0.113."
+            output_unit: dimensionless
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 6, published_page: 24, table: '5', section: '3.3'}
           alpha: 0.113
           gas_species: CO(g)
           substrate: SiC (Nor.) + Al2O3 + Si powder bed
