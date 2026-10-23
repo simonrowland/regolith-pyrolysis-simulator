@@ -14,6 +14,7 @@ from simulator.core import (
 from simulator.campaigns import c0_exit_run_notice
 from simulator.accounting.ledger import snapshot_atom_ledger
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.reduced_real_determinism import PT0DeterminismStore
 from simulator.runner import build_per_hour_summary
 
 
@@ -299,6 +300,20 @@ def test_c0_forecast_digest_is_unchanged_by_forecast():
     prediction = sim._predict_c0_exit()
 
     assert prediction["prediction_status"] == "ok"
+    assert _forecast_owned_state_digest(sim, per_hour_summaries) == before
+
+
+def test_c0_forecast_digest_preserves_production_pt0_replay_state():
+    feedstocks = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "feedstocks.yaml").read_text()
+    )
+    sim, _phase_context, per_hour_summaries = _short_c0_trajectory(feedstocks)
+    sim.configure_pt0_determinism_store(PT0DeterminismStore("replay"))
+    before = _forecast_owned_state_digest(sim, per_hour_summaries)
+
+    prediction = sim._predict_c0_exit()
+
+    assert prediction["prediction_status"].startswith("unavailable")
     assert _forecast_owned_state_digest(sim, per_hour_summaries) == before
 
 
