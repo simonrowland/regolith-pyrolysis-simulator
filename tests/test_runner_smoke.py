@@ -688,6 +688,7 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "stage_3_capture",
     "redox_source_breakdown",
     "oxygen_reservoir",
+    "high_t_melt_activity",
     "mass_balance_error_category",
     "reduced_real_cache_state",
     "c2a_staged_gas",

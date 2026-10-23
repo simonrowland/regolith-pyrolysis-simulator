@@ -841,8 +841,11 @@ incident, stuck, re-evaporated, and net continuous flux and has
   appears only when its backing source is populated. Most require a staged /
   diagnostic / real-backend run, but that is **not** a rule you can rely on:
   `fe_redox_split`, `stage_3_capture`, and `condensation_refusals_by_species`
-  are all present on a plain `internal-analytical` C0 run. Consumers must test
-  for presence, not infer it from the backend. Each is whitelisted in
+  are all present on a plain `internal-analytical` C0 run. The
+  `high_t_melt_activity` diagnostic can also appear on an internal-analytical
+  run when a per-hour vapor-pressure dispatch crosses the VapoRock temperature
+  cap. Consumers must test for presence, not infer it from the backend. Each is
+  whitelisted in
   `tests/test_runner_smoke.py::PER_HOUR_OPTIONAL_KEYS`:
   * `p_carrier_bar` / `carrier_identity` -- emitted as a pair when the
     overhead composition carries a finite positive partial pressure for the
@@ -951,6 +954,12 @@ incident, stuck, re-evaporated, and net continuous flux and has
     `_oxygen_reservoir_exchange_observables` when the snapshot reports a
     clamped exchange; carries the ledger-committed O2 amount, unbacked O2
     remainder, direction, and clamp status from `HourSnapshot.oxygen_reservoir`.
+  * `high_t_melt_activity` -- emitted when the per-hour vapor-pressure
+    dispatch populates the high-temperature activity authority diagnostic.
+    This JSON-safe `high_t_melt_activity.v1` value is copied from
+    `sim._last_high_t_melt_activity`; it describes that hour's provider,
+    authority, and notices. It is separate from the run-level
+    `high_t_melt_activity_fallback_notice`.
   * `mass_balance_error_category` -- added inline by `build_per_hour_summary`
     when `HourSnapshot.mass_balance_error_category` is a non-empty string; the
     categorical mass-balance-error label for that hour.
