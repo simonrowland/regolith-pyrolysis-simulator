@@ -2036,3 +2036,98 @@ def test_argon_flow_uses_inert_sweep_transport_po2():
         0.0,
         head_o2_mol=0.0,
     ) == pytest.approx(0.0015)
+
+
+# Keep b151 parent expectations visible while owner-ruled value moves are classified.
+def test_cro2_condenses_to_terminal_chromium_oxide_account_b151():
+    sim = _cro2_train_sim()
+    sim.atom_ledger.load_external(
+        "process.overhead_gas", {"O2": 1.0}, source="test pO2 buffer",
+        material_origin="feedstock",
+    )
+    flux = EvaporationFlux(species_kg_hr={"CrO2": 1.0}, total_kg_hr=1.0)
+
+    sim._route_to_condensation(flux)
+    sim._update_melt_composition(flux)
+
+    chromium = sim.atom_ledger.kg_by_account(
+        "terminal.chromium_condensed_oxide_stored"
+    )
+    train = sim.atom_ledger.kg_by_account("process.condensation_train")
+    stage_totals = sim.train.total_by_species()
+
+    wall_cro2_by_account_kg = {}
+    for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS:
+        cro2_kg = sim.atom_ledger.kg_by_account(account).get("CrO2", 0.0)
+        if cro2_kg > 0.0:
+            wall_cro2_by_account_kg[account] = cro2_kg
+    # 2026-07-30 7d42b4f rebaseline: real flowing CrO2 partial pressure is
+    # supersaturated on the first two walls; segment-local depletion then
+    # leaves 0.913341865141524 kg for terminal conversion.
+    assert wall_cro2_by_account_kg == pytest.approx(
+        {
+            "process.wall_deposit_segment_stage_0_to_stage_1": (
+                0.04078029875692986
+            ),
+            "process.wall_deposit_segment_stage_1_to_stage_2": (
+                0.045877836101546096
+            ),
+        },
+        rel=1e-12,
+        abs=0.0,
+    )
+    remaining_cro2_kg = flux.species_kg_hr["CrO2"] - sum(
+        wall_cro2_by_account_kg.values()
+    )
+    # The terminal account receives only that segment-locally depleted
+    # remainder, converted by the fixture's exact CrO2 -> Cr2O3 stoichiometry.
+    expected_cr2o3_kg = (
+        remaining_cro2_kg
+        * 0.5
+        * MOLAR_MASS["Cr2O3"]
+        / MOLAR_MASS["CrO2"]
+    )
+    assert chromium["Cr2O3"] == pytest.approx(
+        expected_cr2o3_kg, rel=1e-12, abs=0.0
+    )
+    assert "Cr2O3" not in train
+    assert stage_totals["Cr2O3"] == pytest.approx(chromium["Cr2O3"])
+    assert stage_totals.get("O2", 0.0) == pytest.approx(0.0)
+
+
+def test_transport_saturation_uses_full_inlet_when_residual_is_nearly_captured_b151():
+    sim = _gas_train_sim()
+    residual_flux = EvaporationFlux(
+        total_kg_hr=1.0e-12,
+        species_kg_hr={"Fe": 1.0e-12},
+    )
+    residual_transport = sim.overhead_model.estimate_transport_state(
+        residual_flux, sim.melt
+    )
+    pipe_capacity_kg_hr = residual_transport["pipe_conductance_kg_hr"]
+    inlet_flux = EvaporationFlux(
+        total_kg_hr=1.5 * pipe_capacity_kg_hr,
+        species_kg_hr={"Fe": 1.5 * pipe_capacity_kg_hr},
+    )
+
+    gas = sim.overhead_model.update(
+        residual_flux,
+        sim.melt,
+        sim.train,
+        transport_inlet_kg_hr=inlet_flux.total_kg_hr,
+    )
+
+    assert gas.transport_saturation_pct == pytest.approx(150.0)
+    assert gas.evap_exceeds_transport is True
+    assert gas.composition == pytest.approx({
+        "Fe": residual_transport["vapor_pressure_mbar"],
+    })
+
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.campaign_hour = 0.0
+    sim.overhead = gas
+    sim.campaign_mgr.get_temp_target = lambda *_args: (1600.0, 100.0)
+    sim._update_temperature()
+
+    assert sim._last_actual_ramp == pytest.approx(50.0)
+    assert "pipe saturated" in sim._last_throttle_reason

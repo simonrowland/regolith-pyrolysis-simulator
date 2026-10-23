@@ -4059,3 +4059,57 @@ def test_recipe_patch_max_hold_cannot_elevate_catalog_validated_cap() -> None:
             profile,
             RecipeSchema(),
         )
+
+
+# Keep b151 parent expectations visible while owner-ruled value moves are classified.
+@pytest.mark.parametrize("campaign", ("C2B", "C3", "C4", "C6"))
+@pytest.mark.parametrize(
+    "rate,metadata_active",
+    ((1.0, False), (0.0, True)),
+)
+def test_t155_bubbler_context_must_match_resolved_patch_b151(
+    campaign: str, rate: float, metadata_active: bool
+) -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch(
+        {("campaigns", campaign, "o2_bubbler_kg_per_hr"): rate}
+    )
+    context = conditional_execution_context(
+        schema,
+        states={O2_BUBBLER_GUARD.canonicalizer_id: metadata_active},
+    )
+
+    with pytest.raises(
+        EvaluationInputError, match="conditional_mask does not match resolved patch"
+    ):
+        _build_eval_inputs(
+            patch,
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            _mre_cap_profile(),
+            schema,
+            conditional_context=context,
+        )
+
+
+def test_recipe_without_local_max_hold_does_not_borrow_other_seed_cap_b151() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 29)
+    profile["seed_recipes"].append({
+        "id": "other-seed",
+        "source_campaign": "C2A_continuous",
+        "patch": {
+            "campaigns": {"C2A_continuous": {"max_hold_hr": 160}}
+        },
+    })
+
+    with pytest.raises(
+        ProfileValidationError,
+        match=r"thermal_window_campaign_max_hold_hr refusal.*31 h.*30 h",
+    ):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile,
+            RecipeSchema(),
+        )

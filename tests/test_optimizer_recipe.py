@@ -2511,3 +2511,537 @@ def test_feedstock_context_preserves_custom_search_schema_and_binds_admission(mo
     with pytest.raises(RecipeValidationError, match="physical pressure floor"):
         RecipePatch({STAGE_SIO_PTOTAL: floor / 2}).validated(contextual)
     assert custom.vacuum_floor_bar == base.vacuum_floor_bar
+
+
+# Keep b151 parent expectations visible while owner-ruled value moves are classified.
+def test_c2a_staged_stage_gas_knobs_validate_and_render_b151() -> None:
+    schema = RecipeSchema()
+    search_paths = {spec.path for spec in schema.search_allowlist}
+
+    assert {
+        STAGE_SIO_PO2,
+        STAGE_SIO_PTOTAL,
+        STAGE_SIO_GAS_MODE,
+    } <= search_paths
+    po2_spec = schema.spec_for(STAGE_SIO_PO2)
+    total_spec = schema.spec_for(STAGE_SIO_PTOTAL)
+    mode_spec = schema.spec_for(STAGE_SIO_GAS_MODE)
+    assert po2_spec.low == pytest.approx(0.0)
+    assert po2_spec.high == pytest.approx(15.0)
+    assert total_spec.low == pytest.approx(5.0)
+    assert total_spec.high == pytest.approx(15.0)
+    assert mode_spec.choices == ("pn2_sweep", "po2_hold")
+
+    patch = RecipePatch(
+        {
+            STAGE_SIO_PO2: 2.5,
+            STAGE_SIO_PTOTAL: 12.0,
+            STAGE_SIO_GAS_MODE: "po2_hold",
+        }
+    ).validated(schema)
+    nested = schema.to_setpoints_patch(patch)
+    loaded_patch = RecipePatch.from_nested(nested).validated(schema)
+    sio_stage = _stage_by_name(nested["campaigns"]["C2A_staged"]["stages"], "sio_window")
+
+    assert loaded_patch.values[STAGE_SIO_PO2] == pytest.approx(2.5)
+    assert loaded_patch.values[STAGE_SIO_PTOTAL] == pytest.approx(12.0)
+    assert loaded_patch.values[STAGE_SIO_GAS_MODE] == "po2_hold"
+    assert sio_stage["pO2_mbar"] == pytest.approx(2.5)
+    assert sio_stage["p_total_mbar"] == pytest.approx(12.0)
+    assert sio_stage["gas_cover_mode"] == "po2_hold"
+
+
+def test_c2a_staged_stage_gas_knobs_fail_loudly_b151() -> None:
+    schema = RecipeSchema()
+
+    with pytest.raises(
+        RecipeValidationError,
+        match=r"campaigns\.C2A_staged\.stages\.sio_window\.gas_cover_mode",
+    ):
+        RecipePatch({STAGE_SIO_GAS_MODE: "argon_blanket"}).validated(schema)
+    with pytest.raises(
+        RecipeValidationError,
+        match=r"campaigns\.C2A_staged\.stages\.sio_window\.p_total_mbar",
+    ):
+        RecipePatch({STAGE_SIO_PTOTAL: 4.9}).validated(schema)
+    with pytest.raises(
+        RecipeValidationError,
+        match=r"campaigns\.C2A_staged\.stages\.sio_window\.pN2_mbar",
+    ):
+        RecipePatch.from_nested(
+            {
+                "campaigns": {
+                    "C2A_staged": {
+                        "stages": [{"name": "sio_window", "pN2_mbar": 10.0}]
+                    }
+                }
+            }
+        ).validated(schema)
+    with pytest.raises(
+        RecipeValidationError,
+        match="recipe_pressure_partial_exceeds_total",
+    ):
+        RecipePatch({STAGE_SIO_PO2: 12.0}).validated(schema)
+
+
+def test_recipe_schema_setpoint_bounds_match_golden_pin_b151() -> None:
+    expected = {
+        "campaigns.C0.temp_range_C": (20, 950),
+        "campaigns.C0b_p_cleanup.temp_range_C": (1180, 1320),
+        "campaigns.C0b_p_cleanup.pO2_mbar": (3.0, 15.0),
+        "campaigns.C0b_p_cleanup.pO2_mbar_default": (3.0, 15.0),
+        "campaigns.C0b_p_cleanup.p_total_mbar_default": (3.0, 15.0),
+        "campaigns.C0b_p_cleanup.duration_hr": (0.5, 2.5),
+        "campaigns.C2A_continuous.temp_range_C": (1050, 1843),
+        "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C": (10, 20),
+        "campaigns.C2A_continuous.p_total_mbar": (5, 15),
+        "campaigns.C2A_continuous.p_total_mbar_default": (5, 15),
+        "campaigns.C2A_staged.temp_range_C": (1250, 1750),
+        "campaigns.C2A_staged.default_hold_T_C": (1250, 1750),
+        "campaigns.C2A_staged.p_total_mbar": (5, 15),
+        "campaigns.C2A_staged.p_total_mbar_default": (5, 15),
+        "campaigns.C2A_staged.stages.alkali_early_fe.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2A_staged.stages.sio_window.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2A_staged.stages.fe_hot_hold.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2B.temp_range_C": (1320, 1480),
+        "campaigns.C2B.pO2_mbar": (0.8, 2.3),
+        "campaigns.C2B.pO2_mbar_default": (0.8, 2.3),
+        "campaigns.C2B.p_total_mbar_default": (0.8, 2.3),
+        "campaigns.C3.pO2_mbar_default": (0.5, 1.5),
+        "campaigns.C3.p_total_mbar_default": (0.5, 1.5),
+        "campaigns.C3.K_phase.pO2_bakeout_mbar": (0.5, 1.5),
+        "campaigns.C3.Na_phase.pO2_bakeout_mbar": (0.5, 1.5),
+        "campaigns.C3.duration_after_pathA_hr": (10, 18),
+        "campaigns.C3.duration_after_pathB_hr_per_phase": (20, 35),
+        "campaigns.C4.temp_range_C": (1580, 1670),
+        "campaigns.C4.default_hold_T_C": (1580, 1670),
+        "campaigns.C4.pO2_mbar": (0.08, 0.35),
+        "campaigns.C4.pO2_mbar_default": (0.08, 0.35),
+        "campaigns.C4.p_total_mbar_default": (0.08, 0.35),
+        "campaigns.C4.optional_Ca_harvest.pO2_mbar": (0.03, 0.12),
+        "campaigns.C5.temp_range_C": (1500, 1650),
+        "campaigns.C5.pO2_bar": (0.01, 0.1),
+        "campaigns.C5.pO2_mbar_default": (10, 100),
+        "campaigns.C5.p_total_mbar_default": (10, 100),
+        "campaigns.C6.temp_range_C": (1380, 1450),
+        "campaigns.C6.default_hold_T_C": (1380, 1450),
+        "campaigns.C6.pO2_mbar": (0.08, 0.35),
+        "campaigns.C6.pO2_mbar_default": (0.08, 0.35),
+        "campaigns.C6.p_total_mbar_default": (0.08, 0.35),
+    }
+    schema = RecipeSchema()
+    actual = {
+        ".".join(spec.path): (
+            type(spec.low),
+            spec.low,
+            type(spec.high),
+            spec.high,
+        )
+        for spec in schema.allowlist
+        if spec.bounds_source.startswith("setpoints:")
+        or spec.bounds_source.startswith(
+            "engineering_envelope converted from setpoints.yaml range "
+        )
+    }
+
+    assert len(actual) == 43
+    assert actual == {
+        path: (type(low), low, type(high), high)
+        for path, (low, high) in expected.items()
+    }
+
+
+def test_knob_bounds_source_provenance_is_honest_b151() -> None:
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    range_sourced = 0
+    converted_setpoint_ranges = 0
+    engineering_envelopes = 0
+    grounded_sources = 0
+
+    for spec in RecipeSchema().allowlist:
+        if spec.bounds_source.startswith("setpoints:"):
+            yaml_path = spec.bounds_source.removeprefix("setpoints:")
+            yaml_value = _lookup_setpoint(setpoints, yaml_path)
+            assert isinstance(yaml_value, list), (
+                f"{'.'.join(spec.path)} cites scalar YAML as bounds_source; "
+                "scalar nominal knobs must use engineering_envelope"
+            )
+            assert len(yaml_value) == 2
+            assert spec.low is not None
+            assert spec.high is not None
+            assert (spec.low, spec.high) == tuple(yaml_value)
+            range_sourced += 1
+        elif spec.bounds_source.startswith(
+            "engineering_envelope converted from setpoints.yaml range "
+        ):
+            yaml_value = _lookup_setpoint(setpoints, "campaigns.C5.pO2_bar")
+            assert (spec.low, spec.high) == tuple(
+                value * 1000 for value in yaml_value
+            )
+            mbar_target = (
+                "mbar default"
+                if spec.path[-1] == "pO2_mbar_default"
+                else "total mbar default"
+            )
+            assert spec.bounds_source == (
+                "engineering_envelope converted from setpoints.yaml range "
+                f"campaigns.C5.pO2_bar=[{yaml_value[0]!r}, {yaml_value[1]!r}] "
+                f"bar to {mbar_target}"
+            )
+            converted_setpoint_ranges += 1
+        elif spec.bounds_source.startswith(
+            ("hot_wall_invariant:", "condensation_train ")
+        ):
+            assert spec.low is not None
+            assert spec.high is not None
+            assert spec.low <= spec.high
+            grounded_sources += 1
+        else:
+            assert spec.bounds_source.startswith("engineering_envelope"), (
+                f"{'.'.join(spec.path)} bounds_source must be setpoints: range "
+                "or named grounded source"
+            )
+            engineering_envelopes += 1
+
+    assert (
+        range_sourced
+        + converted_setpoint_ranges
+        + engineering_envelopes
+        + grounded_sources
+        == len(RecipeSchema().allowlist)
+    )
+    assert range_sourced == 41
+    assert converted_setpoint_ranges == 2
+    assert engineering_envelopes > 0
+    assert grounded_sources > 0
+
+
+def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves_b151() -> None:
+    schema = RecipeSchema()
+    empty = RecipePatch({})
+    assert empty.canonical_json().encode() == b"[]"
+    assert canonical_json_dumps(schema.to_setpoints_patch(empty)).encode() == b"{}"
+    resolved = canonical_json_dumps(
+        normalize_canonical_value(
+            PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch={})
+            ._session_config()
+            .setpoints
+        )
+    ).encode()
+    # Recomputed after phosphorus batch 7e6bebc: its C0b-P controls changed
+    # data/setpoints.yaml, the sole batch input serialized by this resolved
+    # setpoints digest. Empty recipe/setpoints patch bytes remain neutral.
+    # Recomputed 2026-08-07 (b-147 Mg TE-μ0 demotion): the derived
+    # Mg_threshold_grounding roots in data/setpoints.yaml moved with the
+    # Pref_GF retarget (moon 1978.564→1892.647 C; asteroid 1840.802→1768.703 C)
+    # plus the phase_basis provenance string — the digest tracks the file
+    # content by design. Empty patch bytes remain neutral (identity holds).
+    # Recomputed 2026-08-29 (b-329 furnace-ceiling inheritance). The move was
+    # verified by diffing the resolved setpoints structure before/after rather
+    # than accepted on faith; it is EXACTLY two entries, both deliberate:
+    #   -  "max_service_T_C": 1750   (the stale Doloma-REE duct literal, removed:
+    #                                 nothing in simulator/ reads it, and it sat
+    #                                 450 C below the inherited furnace ceiling)
+    #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
+    #                                 null meaning "inherit from furnace_material")
+    # No other key changed. The digest tracks file content by design.
+    # Recomputed 2026-10-22 (t-1441 stirring labels): 4 description strings
+    # changed, no values. Paths: campaigns.C2A_continuous.adaptive_control.
+    # induction_stirring; endpoint_criteria.control.surface_renewal;
+    # endpoint_criteria.general; furnace.induction_stirring.note.
+    assert hashlib.sha256(resolved).hexdigest() == (
+        "6e96c06bd07493a6db66db50de75fc9599b8a0353c5d08ae37d68f09ec90ccb6"
+    )
+    # C2's loader-scalar pressure pairs add coupled constraints to the sampling
+    # domain, which the bounds digest tracks without an allowlist_version bump.
+    assert schema.bounds_digest == (
+        "21c0c4905a878d30051332ef69cc25cbd395a52ed5fd0f9a68484280efa7e0dc"
+    )
+    assert schema.bounds_digest != (
+        "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
+    )
+    # Moves with bounds_digest above -- that is the POINT of this test's name
+    # ("identity moves"): the empty patch's own bytes stay neutral while identity
+    # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
+    assert empty.recipe_id(schema) == (
+        "be70d44b9d30688788e535c9e84b42d51111956487b2b7e962deb1a70790d95e"
+    )
+    assert empty.recipe_id(schema) != (
+        "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
+    )
+    identity = study_module._search_space_identity(
+        schema, profile_pinned_paths=(), cli_pinned_paths=()
+    )
+    identity_digest = hashlib.sha256(
+        canonical_json_dumps(dict(identity)).encode()
+    ).hexdigest()
+    # Pin the live search identity directly; retired list-shaped paths stay out.
+    assert identity_digest == (
+        "0cfae3821a514712c36151ca997fd5d9381191deeccca66ceb807628e179b160"
+    )
+    subspace_digests = [
+        c5_sampler_context(schema, active=active).conditional_subspace_digest
+        for active in (False, True)
+    ]
+    assert subspace_digests == [
+        "7dfe16aff3f3ce553483953257b9fd3a18280b57b3f4af306342663a78e3a075",
+        "ba10851113c96b4bcc0e52feecb66a80e640ddda38d4a6a21fd5f6fdbfc8bdc3",
+    ]
+    assert subspace_digests == identity["conditional_subspace_digests"]
+
+
+def test_pinned_c2a_temperature_targets_leave_other_knobs_searchable_b151() -> None:
+    target_paths = (
+        ("campaigns", "C2A_staged", "stages", "alkali_early_fe", "target_C"),
+        ("campaigns", "C2A_staged", "stages", "sio_window", "target_C"),
+        ("campaigns", "C2A_staged", "stages", "cool_for_na_shuttle", "target_C"),
+    )
+    schema = RecipeSchema(
+        pinned_paths=[
+            "C2A_staged.stages.alkali_early_fe.target_C",
+            "C2A_staged.stages.sio_window.target_C",
+            "C2A_staged.stages.cool_for_na_shuttle.target_C",
+        ]
+    )
+    search_paths = {spec.path for spec in schema.search_allowlist}
+
+    for path in target_paths:
+        assert path not in search_paths
+        spec = schema.spec_for(path)
+        assert spec.search_enabled is False
+        assert spec.runtime_enabled is True
+    assert ("campaigns", "C2A_staged", "p_total_mbar") in search_paths
+    assert (
+        "campaigns",
+        "C2A_staged",
+        "stages",
+        "alkali_early_fe",
+        "ramp_rate_C_per_hr",
+    ) in search_paths
+    assert (
+        "campaigns",
+        "C2A_staged",
+        "stages",
+        "sio_window",
+        "duration_hr",
+    ) in search_paths
+    assert ("campaigns", "C2B", "pO2_mbar") in search_paths
+    assert (
+        "campaigns",
+        "C2A_staged",
+        "stages",
+        "fe_hot_hold",
+        "target_C",
+    ) not in {spec.path for spec in schema.allowlist}
+
+
+def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash_b151() -> None:
+    profile = {
+        "profile_id": "pin-golden-neutral-test",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": FEEDSTOCK,
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            },
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "internal-analytical",
+        },
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical", "hours": 1}},
+        "seed_recipes": [
+            {
+                "id": "seed",
+                "source_campaign": "C0",
+                "patch": {"campaigns": {"C0": {"temp_range_C": [900, 950]}}},
+            },
+        ],
+    }
+    schema = RecipeSchema()
+    unpinned = schema.with_pinned_paths(())
+    paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
+    assert unpinned is schema
+    assert len(paths) == 65
+    assert (
+        hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
+        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
+    )
+    spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        FEEDSTOCK,
+        "internal-analytical",
+        profile,
+        unpinned,
+    )
+    # b-042: optimizer identity contains resolved values only.
+    assert spec.recipe_id == "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
+    # moves when the live searchable allowlist identity changes.
+    # 2026-06-29: moved when the Mg pseudo vapor-pressure row was removed,
+    # AlphaMELTS activity-times-Antoine adopted the shared coefficient selector,
+    # and SiO alpha_s became a cited temperature-dependent YAML spec.
+    # Later 2026-06-29: moved again when redox v3 Step B added
+    # diagnostic-only a_FeO_calphad metadata to the builtin vapor-pressure
+    # provider. This is still source-fingerprint invalidation, not an
+    # authoritative vapor/yield/ledger move.
+    # 2026-06-30: moved when per-stage materials.yaml alpha_s overrides gained
+    # explicit certification/status stamping; source-fingerprint only.
+    # 2026-07-01: moved when C4b added FeSi to species_catalog and the
+    # grounded wall_reactivity_matrix source surface.
+    # 2026-07-03: moved when S2b routed the C3 Na/K dose through the credit
+    # line (core/extraction/runner/state source edits). recipe_id + the search
+    # search allowlist above are UNCHANGED, so this is source-fingerprint
+    # invalidation only, not a recipe/schema/allowlist or authoritative
+    # vapor/yield/ledger move.
+    # 2026-07-03 (SSO-2 c1): allowlist-v10 — 12 new C2A_staged per-stage gas
+    # knobs (pO2/p_total/gas_cover_mode x 4 stages) enter the SEARCHABLE
+    # allowlist, so recipe_id + allowlist hash + cache_key move BY DESIGN
+    # (allowlist-identity move, not source-fingerprint).
+    # 2026-07-03 (later): moved again for SIO-PATH0 (map/core diagnostics +
+    # fO2 non-finite fail-loud guard, source-fingerprint) AND the
+    # PHYSICS_GATE_VERSION v3 bump — the latter is the INTENDED semantic
+    # invalidation: pre-S2c cached feasibility verdicts must not be served
+    # under the new provenance-completeness gate (milestone-3 L2-P2).
+    # 2026-07-04 (CF-1 env-vacuum-floor): source-fingerprint move — new
+    # simulator/environment.py (body->vacuum-floor) + env-set floor in
+    # vapor_pressure/equilibrium/fe_redox/core. Behaviorally neutral (unknown
+    # body defaults to the old 1e-9; all reduced-real output goldens byte-
+    # identical); only the source-module digest moves. Provenance rebaseline.
+    # 2026-07-04 (#89): functional-YAML production digest (setpoints/vapor_pressures
+    # parsed-content, not raw bytes) shifts the evalspec cache_key; golden-neutral.
+    # 2026-07-04 (CF-2-lite): Ellingham source-fingerprint move from code-only
+    # mbar-species fit segmentation and authority flags; production YAML digest
+    # remains stable because data/setpoints.yaml and data/vapor_pressures.yaml
+    # are untouched.
+    # 2026-07-05 (structural-activity reference): source-fingerprint move from the new
+    # simulator/chemistry/structural_activity.py plus its diagnostic-only exposure in
+    # engines/builtin/vapor_pressure.py (diagnostic['structural_activity_reference']).
+    # recipe_id + the searchable allowlist above are UNCHANGED and golden surfaces are
+    # byte-identical; diagnostic-only, not an authoritative vapor/yield/ledger move.
+    # 2026-07-06 (bug-hunt fix wave): source-fingerprint + allowlist-semantics move
+    # from the validated-catch fixes: NaN/Overflow guards (evaluate/_common/condensation),
+    # SC-35 zero-level canonicalization (C3 dosing deadband at 1% of high; C2A depletion
+    # disabled band [0, 0.01) snapping to the fixed-schedule 0.0), per-species vapor
+    # source labels (vapor_pressure/core), and the authority re-derive paths. Physics
+    # values unchanged; two runner fixtures moved on label strings only (verified
+    # zero numeric diffs before regen).
+    # 2026-07-06 (CF-3 landing): source-fingerprint move from the corrected
+    # single-cation alkali activity (simulator/chemistry/melt_activity.py new,
+    # engines/builtin/vapor_pressure.py gamma*X wiring). A REAL physics move
+    # (linear-in-gamma alkali suppression); runner/sio_yield/sso_r goldens
+    # regenerated in the same batch. Value recomputed controller-side and
+    # cross-checked against the independent completion-worker observation.
+    # 2026-07-06 (SSO-4): allowlist-v11 adds three searched per-stage
+    # depletion_log_slope_epsilon_per_hr knobs and removes the legacy global
+    # depletion_flux_decay_fraction from search. Search-list hash moves by
+    # design; recipe_id/cache_key remain pinned here because this no-O2 patch
+    # resolves through the O2-neutral allowlist epoch.
+    # 2026-07-07 (t-141 epoch): K standard term moves to the Lamoreaux-
+    # Hildenbrand 1984 liquid-KO0.5 basis (data/vapor_pressures.yaml K row +
+    # engines/builtin/vapor_pressure.py fit_target plumbing). cache_key moves
+    # through the data-digest facet; recipe_id stays pinned (no allowlist or
+    # bounds change). Recomputed controller-side on the production venv after
+    # the wall-selector pole-guard follow-up (914a2a3 + scope fix) finalized
+    # the resolution fingerprint.
+    # 2026-07-09 (JANAF-4th multiphase re-ground + Mn in-range authority fix):
+    # cache_key moves because the canonical payload differs from 3a0e64c only
+    # in data_digests.setpoints plus vapor_pressure_provider_code_fingerprint;
+    # substituting those two old fields reproduces f448556f..., proving no
+    # schema/allowlist drift.
+    # 2026-07-11 0.6.0 E-MOVE: version/source/data fingerprint invalidation;
+    # recipe_id and searchable allowlist hash above are unchanged.
+    # This key is a golden-neutrality tripwire: it moves whenever ANY EvalSpec
+    # identity input legitimately changes (source fingerprint, hashed defaults,
+    # bounds/setpoints). Rebaseline ONLY by executable recompute with the mover
+    # named. Movers to date (2026-07-12): C6 1400 C window + t-005; wave-11
+    # request-shape fingerprint + wave-12 cost-params hashing; runtp
+    # vapor_pressure.py fingerprint; t-190 relocated the oxide-wt%-basis helper
+    # into fingerprinted accounting code (simulator/accounting/ledger_api.py);
+    # 2026-07-13 the em-dash->ASCII '--' fix in data/feedstocks.yaml (latin1
+    # guard, push-regression cluster C) moved the feedstock data digest.
+    # t-259 hygiene: 6b1388b7 above pins the 84-path search allowlist hash;
+    # it is not a cache_key value. The key is pure (pristine == full-suite)
+    # for byte-identical canonical EvalSpec inputs.
+    # 2026-07-14 t-194 Cr/Mn grounding: the functional vapor-pressure digest
+    # moved with data/vapor_pressures.yaml; merge-time (2026-07-15) empirical
+    # recompute in the integrated tree (t-259 purity fix + t-194 digest move).
+    # 2026-07-17: t-097 (110f03c/a217ce8) owns the Ellingham source-fingerprint
+    # move; W-A5a/t-227 adds the composed reviewed electricity/solar defaults.
+    # Recomputed from this tree.
+    # 2026-07-31 VR-3 (be07c4d5): optimizer identity drops data/provider
+    # fingerprints; corpus_version is the sole version lever and bumps to
+    # analytical-corpus-2026-07-31-vapour-rail-key-v2. The old 332e86… key
+    # hashed the pre-VR-3 payload (fingerprints present, June corpus). That
+    # payload is unreachable: current canonical_evalspec_json does not
+    # serialize those fingerprints, and the June corpus is not interoperable.
+    # Pin recomputed from this tree's executable cache_key(spec).
+    # 2026-09-30 C7d removed the physics-gate version and class from this digest.
+    # 2026-10-20 b-585 d-045: the default physics_constraints digest now includes
+    # coating_max_upstream_wall_deposit_fraction_per_campaign = 5e-4. Removing
+    # that one threshold from the default constraint payload restores
+    # f6d1c88b.... recipe_id is unchanged. The key carries no run result.
+    assert cache_key(spec) == "368ca7f8131d3652aea965f3106bad89afeab89a35478a660eeb0c61fd8fc6d4"
+
+
+def test_nested_yaml_round_trip_and_setpoints_patch_smoke_b151() -> None:
+    patch = RecipePatch(
+        {
+            PO2_DEFAULT: 10.0,
+            PTOTAL_DEFAULT: 10.0,
+            ("campaigns", "C2A_continuous", "duration_h"): [20, 24],
+        }
+    )
+
+    schema = RecipeSchema()
+    nested = schema.to_setpoints_patch(patch)
+    loaded = yaml.safe_load(yaml.safe_dump(nested, sort_keys=True))
+    loaded_patch = RecipePatch.from_nested(loaded)
+    assert loaded_patch.values[PO2_DEFAULT] == pytest.approx(10.0)
+    assert loaded_patch.values[PTOTAL_DEFAULT] == pytest.approx(10.0)
+    assert loaded_patch.values[
+        ("campaigns", "C2A_continuous", "duration_hr")
+    ] == [20, 24]
+
+    run = PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch=nested)
+    config = run._session_config()
+    assert config.setpoints["campaigns"]["C0b_p_cleanup"]["pO2_mbar_default"] == 10.0
+    assert config.setpoints["campaigns"]["C0b_p_cleanup"]["p_total_mbar_default"] == 10.0
+    assert config.setpoints["campaigns"]["C2A_continuous"]["duration_h"] == [
+        20,
+        24,
+    ]
+
+
+def test_recipe_id_is_stable_and_schema_versioned_b151() -> None:
+    first = RecipePatch({PO2_DEFAULT: 9.0}).validated()
+    second = RecipePatch.from_nested(
+        {"campaigns": {"C0b_p_cleanup": {"pO2_mbar_default": 9.0}}}
+    ).validated()
+
+    assert first.recipe_id() == second.recipe_id()
+    # Recomputed after the catalog-grounded C2A full-yield envelope expansion.
+    # 2026-07-21 B1: recomputed again after the hot-wall offset window
+    # re-derivation (OVERHEAD_HEADSPACE_OFFSET_MIN_K -200 -> -443 for the
+    # 1843 C melt ceiling) moved the schema bounds digest.
+    # 2026-08-29 b-329: recomputed again for the same reason, one layer out --
+    # the hot-wall ceiling stopped being a literal (1750, Doloma-REE) and now
+    # inherits the furnace-material envelope, taking offset_min -443 -> -800 with
+    # it. Note the -443 above was itself a re-derivation of this same pin: a
+    # difference between two moving numbers, written down as a constant, goes
+    # stale every time either moves. It is now evaluated, not pinned. Recomputed
+    # 2026-09-29 for C2 loader-scalar pressure coupling.
+    assert (
+        first.recipe_id()
+                == "cb77c9b93e43903f3820c491df51dce7a7a3d4f8784d9b55121f64906bca7b6d"
+    )
+    assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
+    assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

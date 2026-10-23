@@ -3537,3 +3537,54 @@ def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> N
         "missing-species-state-dependent-melt-transfer-inputs"
     )
     assert series_v.get("ledger_yields_authorized") is not False
+
+
+# Keep b151 parent expectations visible while owner-ruled value moves are classified.
+@pytest.mark.parametrize("absorbing", [True, False])
+def test_passive_exchange_respeciation_settles_same_buffer_once_b151(absorbing) -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 0.2
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas", {"O2": 1000.0},
+        source="test funded initial redox split", material_origin="feedstock",
+    )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0 if absorbing else -3.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1873.15
+    sim._sync_oxygen_reservoir_mirror()
+    sim._apply_fe_redox_respeciation()
+    if not absorbing:
+        # Isolate release into a dilute headspace without inventing a second
+        # chemistry path: move the initially funded gas to the existing buffer.
+        gas = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+        sim._dispatch_and_commit(
+            ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
+            control_inputs={"dn_to_headspace_mol": -gas},
+        )
+    before_gas = sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0)
+    before_o = math.fsum(
+        sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
+        for account in sim.atom_ledger.mol_by_account()
+    )
+    exchange = sim._apply_oxygen_reservoir_exchange()
+    assert (exchange.exchange_o2_mol < 0.0) == absorbing
+    assert abs(exchange.exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
+    after_exchange_gas = sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0)
+    before_buffer = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0)
+    diagnostic = sim._apply_fe_redox_respeciation()
+    assert diagnostic["o2_account"] == "reservoir.fo2_buffer"
+    assert diagnostic["direction"] == ("oxidizing" if absorbing else "reducing")
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) == after_exchange_gas
+    assert after_exchange_gas - before_gas == pytest.approx(exchange.exchange_o2_mol, abs=1e-12)
+    buffer_delta = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0) - before_buffer
+    assert buffer_delta == pytest.approx(
+        diagnostic.get("o2_credit_mol", 0.0) - diagnostic.get("o2_debit_mol", 0.0), abs=1e-12,
+    )
+    if absorbing:
+        assert diagnostic["applied_o2_mol"] == pytest.approx(-exchange.exchange_o2_mol)
+        assert diagnostic["unfunded_o2_mol"] > 0.0  # Differential step != finite split.
+    after_o = math.fsum(
+        sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
+        for account in sim.atom_ledger.mol_by_account()
+    )
+    assert after_o == pytest.approx(before_o, rel=0.0, abs=2 * math.ulp(before_o))

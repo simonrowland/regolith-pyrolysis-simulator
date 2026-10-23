@@ -1769,7 +1769,15 @@ def test_current_hour_source_cannot_bypass_capacity_or_vessel_refusal(
 @pytest.mark.parametrize("downstream_pressure_Pa", [500.0, 2000.0])
 def test_pipe_saturation_uses_executable_pressure_ratio_capacity(
     downstream_pressure_Pa,
+    monkeypatch,
 ):
+    resolved_inputs = []
+
+    def observe_capacity(*args):
+        resolved_inputs.append(args)
+        return pipe_pressure_capacity_fraction(*args)
+
+    monkeypatch.setattr(capacity_coupling, "pipe_pressure_capacity_fraction", observe_capacity)
     conductance = 1.0e-8
     result = solve_capacity_shadow(
         pre_holdup_mol={},
@@ -1796,6 +1804,10 @@ def test_pipe_saturation_uses_executable_pressure_ratio_capacity(
         0.12, 1.0, M_N2, gas_dynamic_viscosity_Pa_s(T_FOR_1000_PA_PER_MOL),
         T_FOR_1000_PA_PER_MOL, total_pressure_Pa, downstream_pressure_Pa,
     )
+    assert (
+        0.12, 1.0, M_N2, gas_dynamic_viscosity_Pa_s(T_FOR_1000_PA_PER_MOL),
+        T_FOR_1000_PA_PER_MOL, total_pressure_Pa, downstream_pressure_Pa,
+    ) in resolved_inputs
     executable_capacity = conductance * fraction * 3600.0
     expected = (
         M_N2 / executable_capacity if executable_capacity > 0.0 else math.inf

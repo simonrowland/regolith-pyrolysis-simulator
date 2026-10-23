@@ -65,6 +65,20 @@ def test_high_pressure_recovers_poiseuille_component(pressure_pa, tolerance):
     assert actual == pytest.approx(viscous, rel=tolerance)
 
 
+def test_capacity_fraction_recovers_viscous_pressure_square_limit():
+    # Poiseuille F is proportional to P1²-P2². Dividing by the same
+    # pipe's vacuum flow cancels the dimensional coefficient, leaving a
+    # dimensionless ratio: at P2/P1=.6 the fraction is 1-.6²=.64. Equal
+    # pressures give zero; a vacuum outlet gives one. The bridge term is below 1e-6
+    # relative at this deep-viscous pressure, as for the mass-flow limit above.
+    temperature_K = 1773.15
+    fraction = tr.pipe_pressure_capacity_fraction(
+        0.12, 1.0, 0.040, tr.gas_dynamic_viscosity_Pa_s(temperature_K),
+        temperature_K, 1e7, 6e6,
+    )
+    assert fraction == pytest.approx(0.64, rel=1e-6)
+
+
 def test_published_knudsen_transition_factor_at_unit_parameter():
     # Odnoralov (2005), Eqs. 4-5: at x=1 the molecular multiplier is
     # 3.507/4.095 = 0.8564102564102564. Independent 50-digit Decimal arithmetic
