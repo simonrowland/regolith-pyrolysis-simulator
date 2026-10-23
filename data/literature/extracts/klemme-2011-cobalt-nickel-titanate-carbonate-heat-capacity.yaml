@@ -1,0 +1,4430 @@
+schema_version: literature_extract.v1
+source_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+source:
+  citation: Klemme, S., Hermes, W., Eul, M., Wijbrans, C. H., Rohrbach, A., and Pöttgen, R. (2011). New thermodynamic data
+    for CoTiO3, NiTiO3 and CoCO3 based on low-temperature calorimetric measurements. Chemistry Central Journal, 5, 54.
+  doi: 10.1186/1752-153X-5-54
+  year: 2011
+  corpus_asset: raw/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity.pdf
+  corpus_sha256: de63741dd94f4f557cfb66a5b3f8a7f323ce93dc25b0caec4f67063c3d8959de
+extraction:
+  method: Machine transcription from the authoritative born-digital pdftotext-layout file, with table column assignment checked
+    against 600 dpi renders of the corpus PDF asset. The table tool could not draft because this source has no MinerU
+    content-list JSON. Tables 1-3 are measured Cp points; Tables 4-6 S(T) values are author-calculated from those
+    measurements using a T^3 extrapolation. Figures 1-4 are records only, with digitisation deferred.
+  date: '2026-10-20'
+  worker: fam24-1020
+review_status: draft
+fidelity_samples:
+- path: species.NiTiO3.observations[klemme_2011_nitio3_table1_series1_cp].values.series[0].cp
+  value: 0.02
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+- path: species.NiTiO3.observations[klemme_2011_nitio3_table1_series1_cp].values.series[20].cp
+  value: 9.76
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+- path: species.NiTiO3.observations[klemme_2011_nitio3_table1_series2_cp].values.series[0].cp
+  value: 0.01
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+- path: species.CoTiO3.observations[klemme_2011_cotio3_table2_series1_cp].values.series[209].cp
+  value: 90.15
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '2'
+- path: species.CoTiO3.observations[klemme_2011_cotio3_table2_series2_cp].values.series[0].cp
+  value: 0.0018
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '2'
+- path: species.CoCO3.observations[klemme_2011_coco3_table3_series1_cp].values.series[0].cp
+  value: 0.02
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '3'
+- path: species.CoCO3.observations[klemme_2011_coco3_table3_series1_cp].values.series[169].cp
+  value: 86.19
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '3'
+- path: species.NiTiO3.observations[klemme_2011_nitio3_standard_entropy_298_15k].values.entropy
+  value: 90.9
+  locator:
+    page: 8
+    published_page: 8
+    pdf_page_index: 7
+    table: '4'
+- path: species.CoTiO3.observations[klemme_2011_cotio3_standard_entropy_298_15k].values.entropy
+  value: 94.4
+  locator:
+    page: 9
+    published_page: 9
+    pdf_page_index: 8
+    table: '5'
+- path: species.CoCO3.observations[klemme_2011_coco3_standard_entropy_298_15k].values.entropy
+  value: 88.9
+  locator:
+    page: 10
+    published_page: 10
+    pdf_page_index: 9
+    table: '6'
+species:
+  NiTiO3:
+    observations:
+    - observation_id: klemme_2011_nitio3_table1_series1_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table continues on physical page 4.
+      phase: cr
+      phase_as_published: synthetic polycrystalline sample
+      T_range_K:
+      - 2.7
+      - 303.1
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      values:
+        quantity: cp
+        method_class: measured_direct
+        measurement_series: first scan
+        molar_basis_as_published: per mole of formula unit
+        series:
+        - T_K: 2.7
+          cp: 0.02
+          T_as_printed: '2.70'
+          cp_as_printed: '0.02'
+        - T_K: 3.24
+          cp: 0.05
+          T_as_printed: '3.24'
+          cp_as_printed: '0.05'
+        - T_K: 3.78
+          cp: 0.09
+          T_as_printed: '3.78'
+          cp_as_printed: '0.09'
+        - T_K: 4.32
+          cp: 0.18
+          T_as_printed: '4.32'
+          cp_as_printed: '0.18'
+        - T_K: 4.84
+          cp: 0.29
+          T_as_printed: '4.84'
+          cp_as_printed: '0.29'
+        - T_K: 5.37
+          cp: 0.45
+          T_as_printed: '5.37'
+          cp_as_printed: '0.45'
+        - T_K: 5.9
+          cp: 0.65
+          T_as_printed: '5.90'
+          cp_as_printed: '0.65'
+        - T_K: 6.43
+          cp: 0.88
+          T_as_printed: '6.43'
+          cp_as_printed: '0.88'
+        - T_K: 6.95
+          cp: 1.15
+          T_as_printed: '6.95'
+          cp_as_printed: '1.15'
+        - T_K: 7.45
+          cp: 1.44
+          T_as_printed: '7.45'
+          cp_as_printed: '1.44'
+        - T_K: 7.98
+          cp: 1.77
+          T_as_printed: '7.98'
+          cp_as_printed: '1.77'
+        - T_K: 8.2
+          cp: 1.91
+          T_as_printed: '8.20'
+          cp_as_printed: '1.91'
+        - T_K: 9.2
+          cp: 2.6
+          T_as_printed: '9.20'
+          cp_as_printed: '2.60'
+        - T_K: 10.2
+          cp: 3.35
+          T_as_printed: '10.2'
+          cp_as_printed: '3.35'
+        - T_K: 11.2
+          cp: 4.14
+          T_as_printed: '11.2'
+          cp_as_printed: '4.14'
+        - T_K: 12.2
+          cp: 4.97
+          T_as_printed: '12.2'
+          cp_as_printed: '4.97'
+        - T_K: 13.2
+          cp: 5.84
+          T_as_printed: '13.2'
+          cp_as_printed: '5.84'
+        - T_K: 14.2
+          cp: 6.72
+          T_as_printed: '14.2'
+          cp_as_printed: '6.72'
+        - T_K: 15.2
+          cp: 7.72
+          T_as_printed: '15.2'
+          cp_as_printed: '7.72'
+        - T_K: 16.2
+          cp: 8.7
+          T_as_printed: '16.2'
+          cp_as_printed: '8.70'
+        - T_K: 17.2
+          cp: 9.76
+          T_as_printed: '17.2'
+          cp_as_printed: '9.76'
+        - T_K: 18.2
+          cp: 10.91
+          T_as_printed: '18.2'
+          cp_as_printed: '10.91'
+        - T_K: 19.2
+          cp: 12.17
+          T_as_printed: '19.2'
+          cp_as_printed: '12.17'
+        - T_K: 20.2
+          cp: 13.69
+          T_as_printed: '20.2'
+          cp_as_printed: '13.69'
+        - T_K: 21.2
+          cp: 15.61
+          T_as_printed: '21.2'
+          cp_as_printed: '15.61'
+        - T_K: 22.1
+          cp: 19
+          T_as_printed: '22.1'
+          cp_as_printed: '19.00'
+        - T_K: 23.1
+          cp: 5.92
+          T_as_printed: '23.1'
+          cp_as_printed: '5.92'
+        - T_K: 24.1
+          cp: 4.04
+          T_as_printed: '24.1'
+          cp_as_printed: '4.04'
+        - T_K: 25.1
+          cp: 3.25
+          T_as_printed: '25.1'
+          cp_as_printed: '3.25'
+        - T_K: 26.1
+          cp: 2.84
+          T_as_printed: '26.1'
+          cp_as_printed: '2.84'
+        - T_K: 27.1
+          cp: 2.62
+          T_as_printed: '27.1'
+          cp_as_printed: '2.62'
+        - T_K: 28.1
+          cp: 2.5
+          T_as_printed: '28.1'
+          cp_as_printed: '2.50'
+        - T_K: 29.1
+          cp: 2.46
+          T_as_printed: '29.1'
+          cp_as_printed: '2.46'
+        - T_K: 30.1
+          cp: 2.48
+          T_as_printed: '30.1'
+          cp_as_printed: '2.48'
+        - T_K: 31.1
+          cp: 2.53
+          T_as_printed: '31.1'
+          cp_as_printed: '2.53'
+        - T_K: 32.1
+          cp: 2.62
+          T_as_printed: '32.1'
+          cp_as_printed: '2.62'
+        - T_K: 33.1
+          cp: 2.74
+          T_as_printed: '33.1'
+          cp_as_printed: '2.74'
+        - T_K: 34
+          cp: 2.87
+          T_as_printed: '34.0'
+          cp_as_printed: '2.87'
+        - T_K: 35
+          cp: 3.03
+          T_as_printed: '35.0'
+          cp_as_printed: '3.03'
+        - T_K: 36
+          cp: 3.21
+          T_as_printed: '36.0'
+          cp_as_printed: '3.21'
+        - T_K: 37
+          cp: 3.4
+          T_as_printed: '37.0'
+          cp_as_printed: '3.40'
+        - T_K: 38
+          cp: 3.61
+          T_as_printed: '38.0'
+          cp_as_printed: '3.61'
+        - T_K: 39
+          cp: 3.83
+          T_as_printed: '39.0'
+          cp_as_printed: '3.83'
+        - T_K: 40
+          cp: 4.05
+          T_as_printed: '40.0'
+          cp_as_printed: '4.05'
+        - T_K: 41
+          cp: 4.3
+          T_as_printed: '41.0'
+          cp_as_printed: '4.30'
+        - T_K: 42
+          cp: 4.56
+          T_as_printed: '42.0'
+          cp_as_printed: '4.56'
+        - T_K: 43
+          cp: 4.85
+          T_as_printed: '43.0'
+          cp_as_printed: '4.85'
+        - T_K: 44
+          cp: 5.15
+          T_as_printed: '44.0'
+          cp_as_printed: '5.15'
+        - T_K: 45
+          cp: 5.46
+          T_as_printed: '45.0'
+          cp_as_printed: '5.46'
+        - T_K: 46
+          cp: 5.77
+          T_as_printed: '46.0'
+          cp_as_printed: '5.77'
+        - T_K: 47
+          cp: 6.09
+          T_as_printed: '47.0'
+          cp_as_printed: '6.09'
+        - T_K: 48
+          cp: 6.41
+          T_as_printed: '48.0'
+          cp_as_printed: '6.41'
+        - T_K: 49
+          cp: 6.74
+          T_as_printed: '49.0'
+          cp_as_printed: '6.74'
+        - T_K: 49.9
+          cp: 7.08
+          T_as_printed: '49.9'
+          cp_as_printed: '7.08'
+        - T_K: 50.9
+          cp: 7.47
+          T_as_printed: '50.9'
+          cp_as_printed: '7.47'
+        - T_K: 51
+          cp: 7.45
+          T_as_printed: '51.0'
+          cp_as_printed: '7.45'
+        - T_K: 53
+          cp: 8.21
+          T_as_printed: '53.0'
+          cp_as_printed: '8.21'
+        - T_K: 55
+          cp: 9.01
+          T_as_printed: '55.0'
+          cp_as_printed: '9.01'
+        - T_K: 57.1
+          cp: 9.81
+          T_as_printed: '57.1'
+          cp_as_printed: '9.81'
+        - T_K: 59.1
+          cp: 10.6
+          T_as_printed: '59.1'
+          cp_as_printed: '10.6'
+        - T_K: 61.2
+          cp: 11.5
+          T_as_printed: '61.2'
+          cp_as_printed: '11.5'
+        - T_K: 63.2
+          cp: 12.3
+          T_as_printed: '63.2'
+          cp_as_printed: '12.3'
+        - T_K: 65.3
+          cp: 13.2
+          T_as_printed: '65.3'
+          cp_as_printed: '13.2'
+        - T_K: 67.3
+          cp: 14.2
+          T_as_printed: '67.3'
+          cp_as_printed: '14.2'
+        - T_K: 69.4
+          cp: 15.1
+          T_as_printed: '69.4'
+          cp_as_printed: '15.1'
+        - T_K: 71.4
+          cp: 16.1
+          T_as_printed: '71.4'
+          cp_as_printed: '16.1'
+        - T_K: 73.4
+          cp: 17.1
+          T_as_printed: '73.4'
+          cp_as_printed: '17.1'
+        - T_K: 75.5
+          cp: 18.2
+          T_as_printed: '75.5'
+          cp_as_printed: '18.2'
+        - T_K: 77.5
+          cp: 19.2
+          T_as_printed: '77.5'
+          cp_as_printed: '19.2'
+        - T_K: 79.6
+          cp: 20.3
+          T_as_printed: '79.6'
+          cp_as_printed: '20.3'
+        - T_K: 81.6
+          cp: 21.4
+          T_as_printed: '81.6'
+          cp_as_printed: '21.4'
+        - T_K: 83.6
+          cp: 22.5
+          T_as_printed: '83.6'
+          cp_as_printed: '22.5'
+        - T_K: 85.7
+          cp: 23.6
+          T_as_printed: '85.7'
+          cp_as_printed: '23.6'
+        - T_K: 87.7
+          cp: 24.7
+          T_as_printed: '87.7'
+          cp_as_printed: '24.7'
+        - T_K: 89.8
+          cp: 25.7
+          T_as_printed: '89.8'
+          cp_as_printed: '25.7'
+        - T_K: 91.8
+          cp: 26.8
+          T_as_printed: '91.8'
+          cp_as_printed: '26.8'
+        - T_K: 93.8
+          cp: 27.9
+          T_as_printed: '93.8'
+          cp_as_printed: '27.9'
+        - T_K: 95.9
+          cp: 29
+          T_as_printed: '95.9'
+          cp_as_printed: '29.0'
+        - T_K: 97.9
+          cp: 30
+          T_as_printed: '97.9'
+          cp_as_printed: '30.0'
+        - T_K: 100
+          cp: 31
+          T_as_printed: '100.0'
+          cp_as_printed: '31.0'
+        - T_K: 102
+          cp: 32
+          T_as_printed: '102.0'
+          cp_as_printed: '32.0'
+        - T_K: 104
+          cp: 33
+          T_as_printed: '104.0'
+          cp_as_printed: '33.0'
+        - T_K: 106.1
+          cp: 33.9
+          T_as_printed: '106.1'
+          cp_as_printed: '33.9'
+        - T_K: 108.1
+          cp: 34.9
+          T_as_printed: '108.1'
+          cp_as_printed: '34.9'
+        - T_K: 110.1
+          cp: 35.9
+          T_as_printed: '110.1'
+          cp_as_printed: '35.9'
+        - T_K: 112.2
+          cp: 36.8
+          T_as_printed: '112.2'
+          cp_as_printed: '36.8'
+        - T_K: 114.2
+          cp: 37.7
+          T_as_printed: '114.2'
+          cp_as_printed: '37.7'
+        - T_K: 116.3
+          cp: 38.6
+          T_as_printed: '116.3'
+          cp_as_printed: '38.6'
+        - T_K: 118.3
+          cp: 39.5
+          T_as_printed: '118.3'
+          cp_as_printed: '39.5'
+        - T_K: 120.3
+          cp: 40.5
+          T_as_printed: '120.3'
+          cp_as_printed: '40.5'
+        - T_K: 122.4
+          cp: 41.4
+          T_as_printed: '122.4'
+          cp_as_printed: '41.4'
+        - T_K: 124.4
+          cp: 42.4
+          T_as_printed: '124.4'
+          cp_as_printed: '42.4'
+        - T_K: 126.5
+          cp: 43.4
+          T_as_printed: '126.5'
+          cp_as_printed: '43.4'
+        - T_K: 128.5
+          cp: 44.3
+          T_as_printed: '128.5'
+          cp_as_printed: '44.3'
+        - T_K: 130.5
+          cp: 45.3
+          T_as_printed: '130.5'
+          cp_as_printed: '45.3'
+        - T_K: 132.6
+          cp: 46.1
+          T_as_printed: '132.6'
+          cp_as_printed: '46.1'
+        - T_K: 134.6
+          cp: 47.1
+          T_as_printed: '134.6'
+          cp_as_printed: '47.1'
+        - T_K: 136.6
+          cp: 48
+          T_as_printed: '136.6'
+          cp_as_printed: '48.0'
+        - T_K: 138.7
+          cp: 48.9
+          T_as_printed: '138.7'
+          cp_as_printed: '48.9'
+        - T_K: 140.7
+          cp: 49.8
+          T_as_printed: '140.7'
+          cp_as_printed: '49.8'
+        - T_K: 142.7
+          cp: 50.7
+          T_as_printed: '142.7'
+          cp_as_printed: '50.7'
+        - T_K: 144.8
+          cp: 51.6
+          T_as_printed: '144.8'
+          cp_as_printed: '51.6'
+        - T_K: 146.8
+          cp: 52.4
+          T_as_printed: '146.8'
+          cp_as_printed: '52.4'
+        - T_K: 148.8
+          cp: 53.3
+          T_as_printed: '148.8'
+          cp_as_printed: '53.3'
+        - T_K: 150.9
+          cp: 54.2
+          T_as_printed: '150.9'
+          cp_as_printed: '54.2'
+        - T_K: 152.9
+          cp: 55
+          T_as_printed: '152.9'
+          cp_as_printed: '55.0'
+        - T_K: 155
+          cp: 55.9
+          T_as_printed: '155.0'
+          cp_as_printed: '55.9'
+        - T_K: 157
+          cp: 56.7
+          T_as_printed: '157.0'
+          cp_as_printed: '56.7'
+        - T_K: 159
+          cp: 57.5
+          T_as_printed: '159.0'
+          cp_as_printed: '57.5'
+        - T_K: 161.1
+          cp: 58.3
+          T_as_printed: '161.1'
+          cp_as_printed: '58.3'
+        - T_K: 163.1
+          cp: 59.1
+          T_as_printed: '163.1'
+          cp_as_printed: '59.1'
+        - T_K: 165.1
+          cp: 59.9
+          T_as_printed: '165.1'
+          cp_as_printed: '59.9'
+        - T_K: 167.2
+          cp: 60.6
+          T_as_printed: '167.2'
+          cp_as_printed: '60.6'
+        - T_K: 169.2
+          cp: 61.3
+          T_as_printed: '169.2'
+          cp_as_printed: '61.3'
+        - T_K: 171.2
+          cp: 62
+          T_as_printed: '171.2'
+          cp_as_printed: '62.0'
+        - T_K: 173.3
+          cp: 62.8
+          T_as_printed: '173.3'
+          cp_as_printed: '62.8'
+        - T_K: 175.3
+          cp: 63.5
+          T_as_printed: '175.3'
+          cp_as_printed: '63.5'
+        - T_K: 177.3
+          cp: 64.3
+          T_as_printed: '177.3'
+          cp_as_printed: '64.3'
+        - T_K: 179.3
+          cp: 64.9
+          T_as_printed: '179.3'
+          cp_as_printed: '64.9'
+        - T_K: 181.4
+          cp: 65.6
+          T_as_printed: '181.4'
+          cp_as_printed: '65.6'
+        - T_K: 183.4
+          cp: 66.3
+          T_as_printed: '183.4'
+          cp_as_printed: '66.3'
+        - T_K: 185.4
+          cp: 66.9
+          T_as_printed: '185.4'
+          cp_as_printed: '66.9'
+        - T_K: 187.4
+          cp: 67.7
+          T_as_printed: '187.4'
+          cp_as_printed: '67.7'
+        - T_K: 189.5
+          cp: 68.3
+          T_as_printed: '189.5'
+          cp_as_printed: '68.3'
+        - T_K: 191.5
+          cp: 69
+          T_as_printed: '191.5'
+          cp_as_printed: '69.0'
+        - T_K: 193.5
+          cp: 69.6
+          T_as_printed: '193.5'
+          cp_as_printed: '69.6'
+        - T_K: 195.6
+          cp: 70.3
+          T_as_printed: '195.6'
+          cp_as_printed: '70.3'
+        - T_K: 197.6
+          cp: 70.9
+          T_as_printed: '197.6'
+          cp_as_printed: '70.9'
+        - T_K: 199.6
+          cp: 71.6
+          T_as_printed: '199.6'
+          cp_as_printed: '71.6'
+        - T_K: 201.7
+          cp: 72.2
+          T_as_printed: '201.7'
+          cp_as_printed: '72.2'
+        - T_K: 203.7
+          cp: 72.8
+          T_as_printed: '203.7'
+          cp_as_printed: '72.8'
+        - T_K: 205.7
+          cp: 73.3
+          T_as_printed: '205.7'
+          cp_as_printed: '73.3'
+        - T_K: 207.8
+          cp: 73.9
+          T_as_printed: '207.8'
+          cp_as_printed: '73.9'
+        - T_K: 209.8
+          cp: 74.5
+          T_as_printed: '209.8'
+          cp_as_printed: '74.5'
+        - T_K: 211.8
+          cp: 75.1
+          T_as_printed: '211.8'
+          cp_as_printed: '75.1'
+        - T_K: 213.9
+          cp: 75.7
+          T_as_printed: '213.9'
+          cp_as_printed: '75.7'
+        - T_K: 215.9
+          cp: 76.3
+          T_as_printed: '215.9'
+          cp_as_printed: '76.3'
+        - T_K: 217.9
+          cp: 76.8
+          T_as_printed: '217.9'
+          cp_as_printed: '76.8'
+        - T_K: 219.9
+          cp: 77.4
+          T_as_printed: '219.9'
+          cp_as_printed: '77.4'
+        - T_K: 222
+          cp: 77.9
+          T_as_printed: '222.0'
+          cp_as_printed: '77.9'
+        - T_K: 224
+          cp: 78.4
+          T_as_printed: '224.0'
+          cp_as_printed: '78.4'
+        - T_K: 226
+          cp: 78.9
+          T_as_printed: '226.0'
+          cp_as_printed: '78.9'
+        - T_K: 228
+          cp: 79.4
+          T_as_printed: '228.0'
+          cp_as_printed: '79.4'
+        - T_K: 230.1
+          cp: 79.9
+          T_as_printed: '230.1'
+          cp_as_printed: '79.9'
+        - T_K: 232.1
+          cp: 80.3
+          T_as_printed: '232.1'
+          cp_as_printed: '80.3'
+        - T_K: 234.1
+          cp: 80.8
+          T_as_printed: '234.1'
+          cp_as_printed: '80.8'
+        - T_K: 236.2
+          cp: 81.3
+          T_as_printed: '236.2'
+          cp_as_printed: '81.3'
+        - T_K: 238.2
+          cp: 81.8
+          T_as_printed: '238.2'
+          cp_as_printed: '81.8'
+        - T_K: 240.2
+          cp: 82.3
+          T_as_printed: '240.2'
+          cp_as_printed: '82.3'
+        - T_K: 242.3
+          cp: 82.8
+          T_as_printed: '242.3'
+          cp_as_printed: '82.8'
+        - T_K: 244.3
+          cp: 83.2
+          T_as_printed: '244.3'
+          cp_as_printed: '83.2'
+        - T_K: 246.3
+          cp: 83.6
+          T_as_printed: '246.3'
+          cp_as_printed: '83.6'
+        - T_K: 248.4
+          cp: 84
+          T_as_printed: '248.4'
+          cp_as_printed: '84.0'
+        - T_K: 250.4
+          cp: 84.4
+          T_as_printed: '250.4'
+          cp_as_printed: '84.4'
+        - T_K: 252.4
+          cp: 84.8
+          T_as_printed: '252.4'
+          cp_as_printed: '84.8'
+        - T_K: 254.4
+          cp: 85.2
+          T_as_printed: '254.4'
+          cp_as_printed: '85.2'
+        - T_K: 256.5
+          cp: 85.6
+          T_as_printed: '256.5'
+          cp_as_printed: '85.6'
+        - T_K: 258.5
+          cp: 85.9
+          T_as_printed: '258.5'
+          cp_as_printed: '85.9'
+        - T_K: 260.5
+          cp: 86.3
+          T_as_printed: '260.5'
+          cp_as_printed: '86.3'
+        - T_K: 262.6
+          cp: 86.7
+          T_as_printed: '262.6'
+          cp_as_printed: '86.7'
+        - T_K: 264.6
+          cp: 87
+          T_as_printed: '264.6'
+          cp_as_printed: '87.0'
+        - T_K: 266.6
+          cp: 87.4
+          T_as_printed: '266.6'
+          cp_as_printed: '87.4'
+        - T_K: 268.6
+          cp: 87.7
+          T_as_printed: '268.6'
+          cp_as_printed: '87.7'
+        - T_K: 270.6
+          cp: 88
+          T_as_printed: '270.6'
+          cp_as_printed: '88.0'
+        - T_K: 272.6
+          cp: 88.4
+          T_as_printed: '272.6'
+          cp_as_printed: '88.4'
+        - T_K: 274.7
+          cp: 88.7
+          T_as_printed: '274.7'
+          cp_as_printed: '88.7'
+        - T_K: 276.7
+          cp: 89.1
+          T_as_printed: '276.7'
+          cp_as_printed: '89.1'
+        - T_K: 278.7
+          cp: 89.4
+          T_as_printed: '278.7'
+          cp_as_printed: '89.4'
+        - T_K: 280.7
+          cp: 89.8
+          T_as_printed: '280.7'
+          cp_as_printed: '89.8'
+        - T_K: 282.7
+          cp: 90
+          T_as_printed: '282.7'
+          cp_as_printed: '90.0'
+        - T_K: 284.8
+          cp: 90.3
+          T_as_printed: '284.8'
+          cp_as_printed: '90.3'
+        - T_K: 286.8
+          cp: 90.6
+          T_as_printed: '286.8'
+          cp_as_printed: '90.6'
+        - T_K: 288.8
+          cp: 91
+          T_as_printed: '288.8'
+          cp_as_printed: '91.0'
+        - T_K: 290.9
+          cp: 91.3
+          T_as_printed: '290.9'
+          cp_as_printed: '91.3'
+        - T_K: 292.9
+          cp: 91.6
+          T_as_printed: '292.9'
+          cp_as_printed: '91.6'
+        - T_K: 294.9
+          cp: 91.9
+          T_as_printed: '294.9'
+          cp_as_printed: '91.9'
+        - T_K: 296.9
+          cp: 92.1
+          T_as_printed: '296.9'
+          cp_as_printed: '92.1'
+        - T_K: 299
+          cp: 92.4
+          T_as_printed: '299.0'
+          cp_as_printed: '92.4'
+        - T_K: 301
+          cp: 92.5
+          T_as_printed: '301.0'
+          cp_as_printed: '92.5'
+        - T_K: 303.1
+          cp: 92.7
+          T_as_printed: '303.1'
+          cp_as_printed: '92.7'
+      uncertainty:
+        reported_status: not_reported_individually
+        note: The paper does not print an uncertainty for each tabulated Cp point.
+    - observation_id: klemme_2011_nitio3_table1_series2_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+      phase: cr
+      phase_as_published: synthetic polycrystalline sample
+      T_range_K:
+      - 2.17
+      - 40.8
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      values:
+        quantity: cp
+        method_class: measured_direct
+        measurement_series: second scan
+        molar_basis_as_published: per mole of formula unit
+        series:
+        - T_K: 2.17
+          cp: 0.01
+          T_as_printed: '2.17'
+          cp_as_printed: '0.010'
+        - T_K: 2.7
+          cp: 0.023
+          T_as_printed: '2.70'
+          cp_as_printed: '0.023'
+        - T_K: 3.24
+          cp: 0.048
+          T_as_printed: '3.24'
+          cp_as_printed: '0.048'
+        - T_K: 3.78
+          cp: 0.094
+          T_as_printed: '3.78'
+          cp_as_printed: '0.094'
+        - T_K: 4.32
+          cp: 0.18
+          T_as_printed: '4.32'
+          cp_as_printed: '0.18'
+        - T_K: 4.84
+          cp: 0.29
+          T_as_printed: '4.84'
+          cp_as_printed: '0.29'
+        - T_K: 5.37
+          cp: 0.45
+          T_as_printed: '5.37'
+          cp_as_printed: '0.45'
+        - T_K: 5.9
+          cp: 0.65
+          T_as_printed: '5.90'
+          cp_as_printed: '0.65'
+        - T_K: 6.43
+          cp: 0.88
+          T_as_printed: '6.43'
+          cp_as_printed: '0.88'
+        - T_K: 7
+          cp: 1.2
+          T_as_printed: '7.0'
+          cp_as_printed: '1.2'
+        - T_K: 7.5
+          cp: 1.4
+          T_as_printed: '7.5'
+          cp_as_printed: '1.4'
+        - T_K: 8
+          cp: 1.8
+          T_as_printed: '8.0'
+          cp_as_printed: '1.8'
+        - T_K: 8.5
+          cp: 2.1
+          T_as_printed: '8.5'
+          cp_as_printed: '2.1'
+        - T_K: 9
+          cp: 2.5
+          T_as_printed: '9.0'
+          cp_as_printed: '2.5'
+        - T_K: 9.5
+          cp: 2.9
+          T_as_printed: '9.5'
+          cp_as_printed: '2.9'
+        - T_K: 10.1
+          cp: 3.3
+          T_as_printed: '10.1'
+          cp_as_printed: '3.3'
+        - T_K: 10.6
+          cp: 3.6
+          T_as_printed: '10.6'
+          cp_as_printed: '3.6'
+        - T_K: 11.1
+          cp: 4.1
+          T_as_printed: '11.1'
+          cp_as_printed: '4.1'
+        - T_K: 11.6
+          cp: 4.5
+          T_as_printed: '11.6'
+          cp_as_printed: '4.5'
+        - T_K: 12.2
+          cp: 5
+          T_as_printed: '12.2'
+          cp_as_printed: '5.0'
+        - T_K: 12.7
+          cp: 5.4
+          T_as_printed: '12.7'
+          cp_as_printed: '5.4'
+        - T_K: 13.2
+          cp: 5.9
+          T_as_printed: '13.2'
+          cp_as_printed: '5.9'
+        - T_K: 13.7
+          cp: 6.3
+          T_as_printed: '13.7'
+          cp_as_printed: '6.3'
+        - T_K: 14.3
+          cp: 6.8
+          T_as_printed: '14.3'
+          cp_as_printed: '6.8'
+        - T_K: 14.8
+          cp: 7.3
+          T_as_printed: '14.8'
+          cp_as_printed: '7.3'
+        - T_K: 15.3
+          cp: 7.8
+          T_as_printed: '15.3'
+          cp_as_printed: '7.8'
+        - T_K: 15.8
+          cp: 8.3
+          T_as_printed: '15.8'
+          cp_as_printed: '8.3'
+        - T_K: 16.3
+          cp: 8.9
+          T_as_printed: '16.3'
+          cp_as_printed: '8.9'
+        - T_K: 16.9
+          cp: 9.4
+          T_as_printed: '16.9'
+          cp_as_printed: '9.4'
+        - T_K: 17.4
+          cp: 10
+          T_as_printed: '17.4'
+          cp_as_printed: '10.0'
+        - T_K: 17.9
+          cp: 10.6
+          T_as_printed: '17.9'
+          cp_as_printed: '10.6'
+        - T_K: 18.4
+          cp: 11.2
+          T_as_printed: '18.4'
+          cp_as_printed: '11.2'
+        - T_K: 18.9
+          cp: 11.8
+          T_as_printed: '18.9'
+          cp_as_printed: '11.8'
+        - T_K: 19.5
+          cp: 12.6
+          T_as_printed: '19.5'
+          cp_as_printed: '12.6'
+        - T_K: 20
+          cp: 13.3
+          T_as_printed: '20.0'
+          cp_as_printed: '13.3'
+        - T_K: 20.5
+          cp: 14.2
+          T_as_printed: '20.5'
+          cp_as_printed: '14.2'
+        - T_K: 21
+          cp: 15.2
+          T_as_printed: '21.0'
+          cp_as_printed: '15.2'
+        - T_K: 21.6
+          cp: 16.6
+          T_as_printed: '21.6'
+          cp_as_printed: '16.6'
+        - T_K: 22.1
+          cp: 18.6
+          T_as_printed: '22.1'
+          cp_as_printed: '18.6'
+        - T_K: 22.6
+          cp: 13.9
+          T_as_printed: '22.6'
+          cp_as_printed: '13.9'
+        - T_K: 23
+          cp: 6.4
+          T_as_printed: '23.0'
+          cp_as_printed: '6.4'
+        - T_K: 23.6
+          cp: 4.8
+          T_as_printed: '23.6'
+          cp_as_printed: '4.8'
+        - T_K: 24.1
+          cp: 4
+          T_as_printed: '24.1'
+          cp_as_printed: '4.0'
+        - T_K: 24.6
+          cp: 3.5
+          T_as_printed: '24.6'
+          cp_as_printed: '3.5'
+        - T_K: 25.2
+          cp: 3.2
+          T_as_printed: '25.2'
+          cp_as_printed: '3.2'
+        - T_K: 25.7
+          cp: 3
+          T_as_printed: '25.7'
+          cp_as_printed: '3.0'
+        - T_K: 26.2
+          cp: 2.8
+          T_as_printed: '26.2'
+          cp_as_printed: '2.8'
+        - T_K: 26.7
+          cp: 2.7
+          T_as_printed: '26.7'
+          cp_as_printed: '2.7'
+        - T_K: 27.3
+          cp: 2.6
+          T_as_printed: '27.3'
+          cp_as_printed: '2.6'
+        - T_K: 27.8
+          cp: 2.5
+          T_as_printed: '27.8'
+          cp_as_printed: '2.5'
+        - T_K: 28.3
+          cp: 2.5
+          T_as_printed: '28.3'
+          cp_as_printed: '2.5'
+        - T_K: 28.8
+          cp: 2.5
+          T_as_printed: '28.8'
+          cp_as_printed: '2.5'
+        - T_K: 29.3
+          cp: 2.5
+          T_as_printed: '29.3'
+          cp_as_printed: '2.5'
+        - T_K: 29.9
+          cp: 2.5
+          T_as_printed: '29.9'
+          cp_as_printed: '2.5'
+        - T_K: 30.4
+          cp: 2.5
+          T_as_printed: '30.4'
+          cp_as_printed: '2.5'
+        - T_K: 30.9
+          cp: 2.5
+          T_as_printed: '30.9'
+          cp_as_printed: '2.5'
+        - T_K: 31.4
+          cp: 2.6
+          T_as_printed: '31.4'
+          cp_as_printed: '2.6'
+        - T_K: 32
+          cp: 2.6
+          T_as_printed: '32.0'
+          cp_as_printed: '2.6'
+        - T_K: 32.5
+          cp: 2.7
+          T_as_printed: '32.5'
+          cp_as_printed: '2.7'
+        - T_K: 33
+          cp: 2.7
+          T_as_printed: '33.0'
+          cp_as_printed: '2.7'
+        - T_K: 33.5
+          cp: 2.8
+          T_as_printed: '33.5'
+          cp_as_printed: '2.8'
+        - T_K: 34
+          cp: 2.9
+          T_as_printed: '34.0'
+          cp_as_printed: '2.9'
+        - T_K: 34.5
+          cp: 3
+          T_as_printed: '34.5'
+          cp_as_printed: '3.0'
+        - T_K: 35.1
+          cp: 3
+          T_as_printed: '35.1'
+          cp_as_printed: '3.0'
+        - T_K: 35.6
+          cp: 3.1
+          T_as_printed: '35.6'
+          cp_as_printed: '3.1'
+        - T_K: 36.1
+          cp: 3.2
+          T_as_printed: '36.1'
+          cp_as_printed: '3.2'
+        - T_K: 36.6
+          cp: 3.3
+          T_as_printed: '36.6'
+          cp_as_printed: '3.3'
+        - T_K: 37.1
+          cp: 3.4
+          T_as_printed: '37.1'
+          cp_as_printed: '3.4'
+        - T_K: 37.7
+          cp: 3.5
+          T_as_printed: '37.7'
+          cp_as_printed: '3.5'
+        - T_K: 38.2
+          cp: 3.7
+          T_as_printed: '38.2'
+          cp_as_printed: '3.7'
+        - T_K: 38.7
+          cp: 3.8
+          T_as_printed: '38.7'
+          cp_as_printed: '3.8'
+        - T_K: 39.2
+          cp: 3.9
+          T_as_printed: '39.2'
+          cp_as_printed: '3.9'
+        - T_K: 39.7
+          cp: 4
+          T_as_printed: '39.7'
+          cp_as_printed: '4.0'
+        - T_K: 40.3
+          cp: 4.1
+          T_as_printed: '40.3'
+          cp_as_printed: '4.1'
+        - T_K: 40.8
+          cp: 4.2
+          T_as_printed: '40.8'
+          cp_as_printed: '4.2'
+      uncertainty:
+        reported_status: not_reported_individually
+        note: The paper does not print an uncertainty for each tabulated Cp point.
+    - observation_id: klemme_2011_nitio3_table4_entropy_series
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 8
+        published_page: 8
+        pdf_page_index: 7
+        table: '4'
+        note: The table continues on physical page 9.
+      phase: cr
+      phase_as_published: synthetic polycrystalline sample
+      T_range_K:
+      - 5
+      - 300
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      derived_from: &id001
+      - klemme_2011_nitio3_table1_series1_cp
+      - klemme_2011_nitio3_table1_series2_cp
+      derivation:
+        relation: The authors calculate thermodynamic functions from the measured Cp data; S(T) uses a T^3 extrapolation to
+          0 K.
+        inputs: *id001
+        output_unit: J/mol K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        molar_basis_as_published: per mole of formula unit
+        series:
+        - T_K: 300
+          entropy: 91.5
+          T_as_printed: '300'
+          entropy_as_printed: '91.5'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 290
+          entropy: 88.4
+          T_as_printed: '290'
+          entropy_as_printed: '88.4'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 280
+          entropy: 85.2
+          T_as_printed: '280'
+          entropy_as_printed: '85.2'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 270
+          entropy: 82
+          T_as_printed: '270'
+          entropy_as_printed: '82.0'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 260
+          entropy: 78.7
+          T_as_printed: '260'
+          entropy_as_printed: '78.7'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 250
+          entropy: 75.3
+          T_as_printed: '250'
+          entropy_as_printed: '75.3'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 240
+          entropy: 71.9
+          T_as_printed: '240'
+          entropy_as_printed: '71.9'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 230
+          entropy: 68.5
+          T_as_printed: '230'
+          entropy_as_printed: '68.5'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 220
+          entropy: 65
+          T_as_printed: '220'
+          entropy_as_printed: '65.0'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 210
+          entropy: 61.4
+          T_as_printed: '210'
+          entropy_as_printed: '61.4'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 200
+          entropy: 57.9
+          T_as_printed: '200'
+          entropy_as_printed: '57.9'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 190
+          entropy: 54.3
+          T_as_printed: '190'
+          entropy_as_printed: '54.3'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 180
+          entropy: 50.7
+          T_as_printed: '180'
+          entropy_as_printed: '50.7'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 170
+          entropy: 47.1
+          T_as_printed: '170'
+          entropy_as_printed: '47.1'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 160
+          entropy: 43.4
+          T_as_printed: '160'
+          entropy_as_printed: '43.4'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 150
+          entropy: 39.8
+          T_as_printed: '150'
+          entropy_as_printed: '39.8'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 140
+          entropy: 36.3
+          T_as_printed: '140'
+          entropy_as_printed: '36.3'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 130
+          entropy: 32.8
+          T_as_printed: '130'
+          entropy_as_printed: '32.8'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 120
+          entropy: 29.3
+          T_as_printed: '120'
+          entropy_as_printed: '29.3'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 110
+          entropy: 26
+          T_as_printed: '110'
+          entropy_as_printed: '26.0'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 100
+          entropy: 22.9
+          T_as_printed: '100'
+          entropy_as_printed: '22.9'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 90
+          entropy: 19.9
+          T_as_printed: '90'
+          entropy_as_printed: '19.9'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 80
+          entropy: 17.1
+          T_as_printed: '80'
+          entropy_as_printed: '17.1'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 70
+          entropy: 14.8
+          T_as_printed: '70'
+          entropy_as_printed: '14.8'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 60
+          entropy: 12.7
+          T_as_printed: '60'
+          entropy_as_printed: '12.7'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 50
+          entropy: 11.1
+          T_as_printed: '50'
+          entropy_as_printed: '11.1'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 40
+          entropy: 9.89
+          T_as_printed: '40'
+          entropy_as_printed: '9.89'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 30
+          entropy: 9.01
+          T_as_printed: '30'
+          entropy_as_printed: '9.01'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 20
+          entropy: 6.03
+          T_as_printed: '20'
+          entropy_as_printed: '6.03'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 15
+          entropy: 3.13
+          T_as_printed: '15'
+          entropy_as_printed: '3.13'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 10
+          entropy: 1.05
+          T_as_printed: '10'
+          entropy_as_printed: '1.05'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 5
+          entropy: 0.08
+          T_as_printed: '5'
+          entropy_as_printed: '0.080'
+          point_uncertainty_status: not_reported_individually
+      uncertainty:
+        reported_status: not_reported_individually
+        note: Individual S(T) uncertainties are not printed; the separately reported S(298.15 K) uncertainties are stored
+          on their own observations.
+    - observation_id: klemme_2011_nitio3_standard_entropy_298_15k
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 8
+        published_page: 8
+        pdf_page_index: 7
+        table: '4'
+        note: The same result is also in the abstract on physical page 1 and Table 7 on physical page 11; one observation
+          only.
+      phase: cr
+      phase_as_published: synthetic polycrystalline sample
+      T_range_K:
+      - 298.15
+      - 298.15
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      derived_from: *id001
+      derivation:
+        relation: The authors calculate the standard molar entropy from their measured Cp data, using a T^3 extrapolation
+          to 0 K.
+        inputs: *id001
+        output_unit: J/mol K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        molar_basis_as_published: per mole of formula unit
+        T_K: 298.15
+        T_as_printed: '298.15'
+        entropy: 90.9
+        entropy_as_printed: '90.9'
+      uncertainty:
+        reported_status: printed
+        value_J_per_mol_K: 0.7
+        uncertainty_as_printed: ± 0.7 J mol-1 K-1 in the abstract; parentheses in Table 7
+    - observation_id: klemme_2011_nitio3_s298_quote_38
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 11
+        published_page: 11
+        pdf_page_index: 10
+        table: '7'
+        row: NiTiO3, [38]
+      phase: cr
+      T_range_K:
+      - 298.15
+      - 298.15
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        attribution: '[38]'
+        molar_basis_as_published: per mole of formula unit
+        series:
+        - T_K: 298.15
+          T_as_printed: '298.15'
+          entropy: 80.1
+          entropy_as_printed: '80.1'
+          value_as_printed: 80.1(3.7)
+      uncertainty:
+        reported_status: printed
+        value_J_per_mol_K: 3.7
+        uncertainty_as_printed: '3.7'
+    context:
+    - observation_id: klemme_2011_nitio3_table4_calculated_cp_and_cp_over_t_context
+      type: table_record
+      locator:
+        page: 8
+        published_page: 8
+        pdf_page_index: 7
+        table: '4'
+        note: The table continues on physical page 9.
+      units: T in K; Cp in J/mol K; Cp/T in J mol-1 K-2
+      values:
+        quantity_as_printed: Cp, Cp/T and S(T) at selected temperatures
+        candidate_store_tokens:
+        - cp
+        - S
+        method_class: model_derived
+        disposition: The S(T) values are typed as measured_reduced in klemme_2011_nitio3_table4_entropy_series (with S(298.15
+          K) split out for its printed uncertainty). The selected-temperature Cp values are not stored as a second measured
+          series because the paper does not identify them as independent measurements; the Cp/T column has no quantity token.
+          The printed Cp and Cp/T cells are retained here.
+        rows:
+        - T_as_printed: '300'
+          Cp_as_printed: '92.4'
+          Cp_over_T_as_printed: '0.308'
+        - T_as_printed: '298.15'
+          Cp_as_printed: '92.3'
+          Cp_over_T_as_printed: '0.309'
+        - T_as_printed: '290'
+          Cp_as_printed: '91.2'
+          Cp_over_T_as_printed: '0.314'
+        - T_as_printed: '280'
+          Cp_as_printed: '89.7'
+          Cp_over_T_as_printed: '0.320'
+        - T_as_printed: '270'
+          Cp_as_printed: '87.9'
+          Cp_over_T_as_printed: '0.326'
+        - T_as_printed: '260'
+          Cp_as_printed: '86.2'
+          Cp_over_T_as_printed: '0.332'
+        - T_as_printed: '250'
+          Cp_as_printed: '84.3'
+          Cp_over_T_as_printed: '0.337'
+        - T_as_printed: '240'
+          Cp_as_printed: '82.2'
+          Cp_over_T_as_printed: '0.343'
+        - T_as_printed: '230'
+          Cp_as_printed: '79.9'
+          Cp_over_T_as_printed: '0.347'
+        - T_as_printed: '220'
+          Cp_as_printed: '77.4'
+          Cp_over_T_as_printed: '0.352'
+        - T_as_printed: '210'
+          Cp_as_printed: '74.5'
+          Cp_over_T_as_printed: '0.355'
+        - T_as_printed: '200'
+          Cp_as_printed: '71.7'
+          Cp_over_T_as_printed: '0.358'
+        - T_as_printed: '190'
+          Cp_as_printed: '68.5'
+          Cp_over_T_as_printed: '0.360'
+        - T_as_printed: '180'
+          Cp_as_printed: '65.1'
+          Cp_over_T_as_printed: '0.362'
+        - T_as_printed: '170'
+          Cp_as_printed: '61.6'
+          Cp_over_T_as_printed: '0.362'
+        - T_as_printed: '160'
+          Cp_as_printed: '57.9'
+          Cp_over_T_as_printed: '0.362'
+        - T_as_printed: '150'
+          Cp_as_printed: '53.8'
+          Cp_over_T_as_printed: '0.359'
+        - T_as_printed: '140'
+          Cp_as_printed: '49.5'
+          Cp_over_T_as_printed: '0.354'
+        - T_as_printed: '130'
+          Cp_as_printed: '45.0'
+          Cp_over_T_as_printed: '0.346'
+        - T_as_printed: '120'
+          Cp_as_printed: '40.3'
+          Cp_over_T_as_printed: '0.336'
+        - T_as_printed: '110'
+          Cp_as_printed: '35.8'
+          Cp_over_T_as_printed: '0.325'
+        - T_as_printed: '100'
+          Cp_as_printed: '31.0'
+          Cp_over_T_as_printed: '0.310'
+        - T_as_printed: '90'
+          Cp_as_printed: '25.9'
+          Cp_over_T_as_printed: '0.287'
+        - T_as_printed: '80'
+          Cp_as_printed: '20.5'
+          Cp_over_T_as_printed: '0.257'
+        - T_as_printed: '70'
+          Cp_as_printed: '15.4'
+          Cp_over_T_as_printed: '0.220'
+        - T_as_printed: '60'
+          Cp_as_printed: '11.0'
+          Cp_over_T_as_printed: '0.183'
+        - T_as_printed: '50'
+          Cp_as_printed: '7.11'
+          Cp_over_T_as_printed: '0.142'
+        - T_as_printed: '40'
+          Cp_as_printed: '4.05'
+          Cp_over_T_as_printed: '0.101'
+        - T_as_printed: '30'
+          Cp_as_printed: '2.48'
+          Cp_over_T_as_printed: '0.083'
+        - T_as_printed: '20'
+          Cp_as_printed: '13.4'
+          Cp_over_T_as_printed: '0.672'
+        - T_as_printed: '15'
+          Cp_as_printed: '7.53'
+          Cp_over_T_as_printed: '0.502'
+        - T_as_printed: '10'
+          Cp_as_printed: '3.20'
+          Cp_over_T_as_printed: '0.320'
+        - T_as_printed: '5'
+          Cp_as_printed: '4.15'
+          Cp_over_T_as_printed: '0.830'
+    - observation_id: klemme_2011_figure2_nitio3_cp
+      type: figure_record
+      locator:
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        figure: '2'
+      phase: cr
+      units: T in K; Cp in J/mol K
+      values:
+        quantity: cp
+        method_class: figure_only
+        species: NiTiO3
+        temperature_as_published: main axis 0-350 K; inset 0-60 K
+        axes_as_printed:
+          x: Temperature / K
+          y: Cp / J mol-1 K-1
+        caption_as_published: Low-temperature heat capacity data for NiTiO3. The insert shows results from two scans done
+          at low temperatures.
+        panel: main panel with low-temperature inset
+        series:
+        - label: first scan
+          marker: filled circle
+          marker_count: 180
+        - label: second scan
+          marker: open diamond
+          marker_count: 75
+        attribution: This work.
+        digitisation: deferred to a figure pass
+        numeric_points: none
+    - observation_id: klemme_2011_nitio3_heat_capacity_anomaly_peak_text
+      type: thermochemical_values
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Abstract
+      units: K
+      values:
+        quantity_as_printed: low-temperature heat-capacity anomaly peak temperature
+        quantity_token: unavailable
+        candidate_store_tokens:
+        - transition_temperature
+        - cp
+        schema_gap: No quantity token represents a heat-capacity anomaly peak temperature without recasting the reported peak
+          as a phase-transition temperature.
+        method_class: measured_reduced
+        species: NiTiO3
+        phase: crystalline solid
+        temperature_as_printed: '26'
+        temperature_K: 26
+        approximate: false
+        interpretation: For NiTiO3 and CoTiO3 the authors say the Cp anomaly coincides with antiferromagnetic ordering; for
+          CoCO3 they say it may be caused by the transition.
+  CoTiO3:
+    observations:
+    - observation_id: klemme_2011_cotio3_table2_series1_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: Table continues on physical page 5.
+      phase: cr
+      phase_as_published: synthetic polycrystalline sample
+      T_range_K:
+      - 2.17
+      - 304.3
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      values:
+        quantity: cp
+        method_class: measured_direct
+        measurement_series: first scan
+        molar_basis_as_published: per mole of formula unit
+        series:
+        - T_K: 2.17
+          cp: 0.002
+          T_as_printed: '2.17'
+          cp_as_printed: '0.002'
+        - T_K: 3.92
+          cp: 0.006
+          T_as_printed: '3.92'
+          cp_as_printed: '0.006'
+        - T_K: 5.65
+          cp: 0.022
+          T_as_printed: '5.65'
+          cp_as_printed: '0.022'
+        - T_K: 7.34
+          cp: 0.065
+          T_as_printed: '7.34'
+          cp_as_printed: '0.065'
+        - T_K: 9.04
+          cp: 0.131
+          T_as_printed: '9.04'
+          cp_as_printed: '0.131'
+        - T_K: 10.8
+          cp: 0.286
+          T_as_printed: '10.8'
+          cp_as_printed: '0.286'
+        - T_K: 12.4
+          cp: 0.491
+          T_as_printed: '12.4'
+          cp_as_printed: '0.491'
+        - T_K: 14.2
+          cp: 0.774
+          T_as_printed: '14.2'
+          cp_as_printed: '0.774'
+        - T_K: 15.8
+          cp: 1.14
+          T_as_printed: '15.8'
+          cp_as_printed: '1.14'
+        - T_K: 17.5
+          cp: 1.59
+          T_as_printed: '17.5'
+          cp_as_printed: '1.59'
+        - T_K: 19.2
+          cp: 2.11
+          T_as_printed: '19.2'
+          cp_as_printed: '2.11'
+        - T_K: 20.9
+          cp: 2.73
+          T_as_printed: '20.9'
+          cp_as_printed: '2.73'
+        - T_K: 22.6
+          cp: 3.44
+          T_as_printed: '22.6'
+          cp_as_printed: '3.44'
+        - T_K: 24.3
+          cp: 4.23
+          T_as_printed: '24.3'
+          cp_as_printed: '4.23'
+        - T_K: 26
+          cp: 5.11
+          T_as_printed: '26.0'
+          cp_as_printed: '5.11'
+        - T_K: 27.7
+          cp: 6.11
+          T_as_printed: '27.7'
+          cp_as_printed: '6.11'
+        - T_K: 29.3
+          cp: 7.18
+          T_as_printed: '29.3'
+          cp_as_printed: '7.18'
+        - T_K: 31
+          cp: 8.38
+          T_as_printed: '31.0'
+          cp_as_printed: '8.38'
+        - T_K: 32.7
+          cp: 9.77
+          T_as_printed: '32.7'
+          cp_as_printed: '9.77'
+        - T_K: 34.4
+          cp: 11.32
+          T_as_printed: '34.4'
+          cp_as_printed: '11.32'
+        - T_K: 36.1
+          cp: 13.2
+          T_as_printed: '36.1'
+          cp_as_printed: '13.20'
+        - T_K: 37.6
+          cp: 14.08
+          T_as_printed: '37.6'
+          cp_as_printed: '14.08'
+        - T_K: 39.4
+          cp: 10.69
+          T_as_printed: '39.4'
+          cp_as_printed: '10.69'
+        - T_K: 41.1
+          cp: 9.24
+          T_as_printed: '41.1'
+          cp_as_printed: '9.24'
+        - T_K: 42.8
+          cp: 8.97
+          T_as_printed: '42.8'
+          cp_as_printed: '8.97'
+        - T_K: 44.5
+          cp: 9.13
+          T_as_printed: '44.5'
+          cp_as_printed: '9.13'
+        - T_K: 46.2
+          cp: 9.51
+          T_as_printed: '46.2'
+          cp_as_printed: '9.51'
+        - T_K: 47.9
+          cp: 10.02
+          T_as_printed: '47.9'
+          cp_as_printed: '10.02'
+        - T_K: 49.6
+          cp: 10.64
+          T_as_printed: '49.6'
+          cp_as_printed: '10.64'
+        - T_K: 51.3
+          cp: 11.31
+          T_as_printed: '51.3'
+          cp_as_printed: '11.31'
+        - T_K: 52.9
+          cp: 12.05
+          T_as_printed: '52.9'
+          cp_as_printed: '12.05'
+        - T_K: 54.6
+          cp: 12.84
+          T_as_printed: '54.6'
+          cp_as_printed: '12.84'
+        - T_K: 56.3
+          cp: 13.62
+          T_as_printed: '56.3'
+          cp_as_printed: '13.62'
+        - T_K: 58
+          cp: 14.43
+          T_as_printed: '58.0'
+          cp_as_printed: '14.43'
+        - T_K: 59.7
+          cp: 15.21
+          T_as_printed: '59.7'
+          cp_as_printed: '15.21'
+        - T_K: 61.4
+          cp: 16.04
+          T_as_printed: '61.4'
+          cp_as_printed: '16.04'
+        - T_K: 63
+          cp: 16.88
+          T_as_printed: '63.0'
+          cp_as_printed: '16.88'
+        - T_K: 64.7
+          cp: 17.75
+          T_as_printed: '64.7'
+          cp_as_printed: '17.75'
+        - T_K: 66.4
+          cp: 18.62
+          T_as_printed: '66.4'
+          cp_as_printed: '18.62'
+        - T_K: 68.1
+          cp: 19.51
+          T_as_printed: '68.1'
+          cp_as_printed: '19.51'
+        - T_K: 69.8
+          cp: 20.41
+          T_as_printed: '69.8'
+          cp_as_printed: '20.41'
+        - T_K: 71.5
+          cp: 21.33
+          T_as_printed: '71.5'
+          cp_as_printed: '21.33'
+        - T_K: 73.1
+          cp: 22.33
+          T_as_printed: '73.1'
+          cp_as_printed: '22.33'
+        - T_K: 74.8
+          cp: 23.3
+          T_as_printed: '74.8'
+          cp_as_printed: '23.30'
+        - T_K: 76.5
+          cp: 24.26
+          T_as_printed: '76.5'
+          cp_as_printed: '24.26'
+        - T_K: 78.2
+          cp: 25.27
+          T_as_printed: '78.2'
+          cp_as_printed: '25.27'
+        - T_K: 79.9
+          cp: 26.29
+          T_as_printed: '79.9'
+          cp_as_printed: '26.29'
+        - T_K: 81.5
+          cp: 27.25
+          T_as_printed: '81.5'
+          cp_as_printed: '27.25'
+        - T_K: 83.2
+          cp: 28.24
+          T_as_printed: '83.2'
+          cp_as_printed: '28.24'
+        - T_K: 84.9
+          cp: 29.21
+          T_as_printed: '84.9'
+          cp_as_printed: '29.21'
+        - T_K: 86.6
+          cp: 30.21
+          T_as_printed: '86.6'
+          cp_as_printed: '30.21'
+        - T_K: 88.3
+          cp: 31.13
+          T_as_printed: '88.3'
+          cp_as_printed: '31.13'
+        - T_K: 89.9
+          cp: 32.06
+          T_as_printed: '89.9'
+          cp_as_printed: '32.06'
+        - T_K: 91.6
+          cp: 33.05
+          T_as_printed: '91.6'
+          cp_as_printed: '33.05'
+        - T_K: 93.3
+          cp: 33.99
+          T_as_printed: '93.3'
+          cp_as_printed: '33.99'
+        - T_K: 95
+          cp: 34.89
+          T_as_printed: '95.0'
+          cp_as_printed: '34.89'
+        - T_K: 96.7
+          cp: 35.78
+          T_as_printed: '96.7'
+          cp_as_printed: '35.78'
+        - T_K: 98.3
+          cp: 36.62
+          T_as_printed: '98.3'
+          cp_as_printed: '36.62'
+        - T_K: 100
+          cp: 37.42
+          T_as_printed: '100.0'
+          cp_as_printed: '37.42'
+        - T_K: 101.6
+          cp: 38
+          T_as_printed: '101.6'
+          cp_as_printed: '38.00'
+        - T_K: 101.7
+          cp: 38.25
+          T_as_printed: '101.7'
+          cp_as_printed: '38.25'
+        - T_K: 102.2
+          cp: 38.49
+          T_as_printed: '102.2'
+          cp_as_printed: '38.49'
+        - T_K: 102.7
+          cp: 38.73
+          T_as_printed: '102.7'
+          cp_as_printed: '38.73'
+        - T_K: 103.2
+          cp: 39.01
+          T_as_printed: '103.2'
+          cp_as_printed: '39.01'
+        - T_K: 103.7
+          cp: 39.22
+          T_as_printed: '103.7'
+          cp_as_printed: '39.22'
+        - T_K: 104.2
+          cp: 39.47
+          T_as_printed: '104.2'
+          cp_as_printed: '39.47'
+        - T_K: 104.8
+          cp: 39.73
+          T_as_printed: '104.8'
+          cp_as_printed: '39.73'
+        - T_K: 105.3
+          cp: 39.95
+          T_as_printed: '105.3'
+          cp_as_printed: '39.95'
+        - T_K: 105.8
+          cp: 40.18
+          T_as_printed: '105.8'
+          cp_as_printed: '40.18'
+        - T_K: 106.3
+          cp: 40.45
+          T_as_printed: '106.3'
+          cp_as_printed: '40.45'
+        - T_K: 106.8
+          cp: 40.69
+          T_as_printed: '106.8'
+          cp_as_printed: '40.69'
+        - T_K: 107.3
+          cp: 40.91
+          T_as_printed: '107.3'
+          cp_as_printed: '40.91'
+        - T_K: 107.8
+          cp: 41.17
+          T_as_printed: '107.8'
+          cp_as_printed: '41.17'
+        - T_K: 108.3
+          cp: 41.38
+          T_as_printed: '108.3'
+          cp_as_printed: '41.38'
+        - T_K: 108.8
+          cp: 41.63
+          T_as_printed: '108.8'
+          cp_as_printed: '41.63'
+        - T_K: 109.3
+          cp: 41.86
+          T_as_printed: '109.3'
+          cp_as_printed: '41.86'
+        - T_K: 109.9
+          cp: 42.07
+          T_as_printed: '109.9'
+          cp_as_printed: '42.07'
+        - T_K: 110.4
+          cp: 42.32
+          T_as_printed: '110.4'
+          cp_as_printed: '42.32'
+        - T_K: 110.9
+          cp: 42.52
+          T_as_printed: '110.9'
+          cp_as_printed: '42.52'
+        - T_K: 111.4
+          cp: 42.75
+          T_as_printed: '111.4'
+          cp_as_printed: '42.75'
+        - T_K: 111.9
+          cp: 42.96
+          T_as_printed: '111.9'
+          cp_as_printed: '42.96'
+        - T_K: 112.4
+          cp: 43.16
+          T_as_printed: '112.4'
+          cp_as_printed: '43.16'
+        - T_K: 112.9
+          cp: 43.41
+          T_as_printed: '112.9'
+          cp_as_printed: '43.41'
+        - T_K: 113.4
+          cp: 43.58
+          T_as_printed: '113.4'
+          cp_as_printed: '43.58'
+        - T_K: 113.9
+          cp: 43.77
+          T_as_printed: '113.9'
+          cp_as_printed: '43.77'
+        - T_K: 114.5
+          cp: 43.99
+          T_as_printed: '114.5'
+          cp_as_printed: '43.99'
+        - T_K: 115
+          cp: 44.2
+          T_as_printed: '115.0'
+          cp_as_printed: '44.20'
+        - T_K: 115.5
+          cp: 44.44
+          T_as_printed: '115.5'
+          cp_as_printed: '44.44'
+        - T_K: 116
+          cp: 44.67
+          T_as_printed: '116.0'
+          cp_as_printed: '44.67'
+        - T_K: 116.5
+          cp: 44.89
+          T_as_printed: '116.5'
+          cp_as_printed: '44.89'
+        - T_K: 117
+          cp: 45.14
+          T_as_printed: '117.0'
+          cp_as_printed: '45.14'
+        - T_K: 117.5
+          cp: 45.35
+          T_as_printed: '117.5'
+          cp_as_printed: '45.35'
+        - T_K: 118
+          cp: 45.59
+          T_as_printed: '118.0'
+          cp_as_printed: '45.59'
+        - T_K: 118.5
+          cp: 45.79
+          T_as_printed: '118.5'
+          cp_as_printed: '45.79'
+        - T_K: 119.1
+          cp: 46.06
+          T_as_printed: '119.1'
+          cp_as_printed: '46.06'
+        - T_K: 119.6
+          cp: 46.26
+          T_as_printed: '119.6'
+          cp_as_printed: '46.26'
+        - T_K: 120.1
+          cp: 46.49
+          T_as_printed: '120.1'
+          cp_as_printed: '46.49'
+        - T_K: 120.6
+          cp: 46.74
+          T_as_printed: '120.6'
+          cp_as_printed: '46.74'
+        - T_K: 121.1
+          cp: 46.99
+          T_as_printed: '121.1'
+          cp_as_printed: '46.99'
+        - T_K: 121.6
+          cp: 47.21
+          T_as_printed: '121.6'
+          cp_as_printed: '47.21'
+        - T_K: 122.1
+          cp: 47.45
+          T_as_printed: '122.1'
+          cp_as_printed: '47.45'
+        - T_K: 122.6
+          cp: 47.7
+          T_as_printed: '122.6'
+          cp_as_printed: '47.70'
+        - T_K: 123.1
+          cp: 47.93
+          T_as_printed: '123.1'
+          cp_as_printed: '47.93'
+        - T_K: 123.6
+          cp: 48.14
+          T_as_printed: '123.6'
+          cp_as_printed: '48.14'
+        - T_K: 124.2
+          cp: 48.41
+          T_as_printed: '124.2'
+          cp_as_printed: '48.41'
+        - T_K: 124.7
+          cp: 48.62
+          T_as_printed: '124.7'
+          cp_as_printed: '48.62'
+        - T_K: 125.2
+          cp: 48.88
+          T_as_printed: '125.2'
+          cp_as_printed: '48.88'
+        - T_K: 125.7
+          cp: 49.07
+          T_as_printed: '125.7'
+          cp_as_printed: '49.07'
+        - T_K: 126.2
+          cp: 49.3
+          T_as_printed: '126.2'
+          cp_as_printed: '49.30'
+        - T_K: 126.7
+          cp: 49.49
+          T_as_printed: '126.7'
+          cp_as_printed: '49.49'
+        - T_K: 127.2
+          cp: 49.74
+          T_as_printed: '127.2'
+          cp_as_printed: '49.74'
+        - T_K: 127.7
+          cp: 49.95
+          T_as_printed: '127.7'
+          cp_as_printed: '49.95'
+        - T_K: 128.2
+          cp: 50.17
+          T_as_printed: '128.2'
+          cp_as_printed: '50.17'
+        - T_K: 128.7
+          cp: 50.37
+          T_as_printed: '128.7'
+          cp_as_printed: '50.37'
+        - T_K: 129.3
+          cp: 50.62
+          T_as_printed: '129.3'
+          cp_as_printed: '50.62'
+        - T_K: 129.8
+          cp: 50.85
+          T_as_printed: '129.8'
+          cp_as_printed: '50.85'
+        - T_K: 130.3
+          cp: 51.07
+          T_as_printed: '130.3'
+          cp_as_printed: '51.07'
+        - T_K: 130.8
+          cp: 51.24
+          T_as_printed: '130.8'
+          cp_as_printed: '51.24'
+        - T_K: 131.3
+          cp: 51.46
+          T_as_printed: '131.3'
+          cp_as_printed: '51.46'
+        - T_K: 131.8
+          cp: 51.7
+          T_as_printed: '131.8'
+          cp_as_printed: '51.70'
+        - T_K: 132.3
+          cp: 51.89
+          T_as_printed: '132.3'
+          cp_as_printed: '51.89'
+        - T_K: 132.8
+          cp: 52.12
+          T_as_printed: '132.8'
+          cp_as_printed: '52.12'
+        - T_K: 133.3
+          cp: 52.35
+          T_as_printed: '133.3'
+          cp_as_printed: '52.35'
+        - T_K: 133.8
+          cp: 52.58
+          T_as_printed: '133.8'
+          cp_as_printed: '52.58'
+        - T_K: 134.3
+          cp: 52.8
+          T_as_printed: '134.3'
+          cp_as_printed: '52.80'
+        - T_K: 134.9
+          cp: 52.96
+          T_as_printed: '134.9'
+          cp_as_printed: '52.96'
+        - T_K: 135.4
+          cp: 53.19
+          T_as_printed: '135.4'
+          cp_as_printed: '53.19'
+        - T_K: 135.9
+          cp: 53.42
+          T_as_printed: '135.9'
+          cp_as_printed: '53.42'
+        - T_K: 136.4
+          cp: 53.61
+          T_as_printed: '136.4'
+          cp_as_printed: '53.61'
+        - T_K: 136.9
+          cp: 53.83
+          T_as_printed: '136.9'
+          cp_as_printed: '53.83'
+        - T_K: 137.4
+          cp: 54.11
+          T_as_printed: '137.4'
+          cp_as_printed: '54.11'
+        - T_K: 137.9
+          cp: 54.3
+          T_as_printed: '137.9'
+          cp_as_printed: '54.30'
+        - T_K: 138.4
+          cp: 54.48
+          T_as_printed: '138.4'
+          cp_as_printed: '54.48'
+        - T_K: 138.9
+          cp: 54.73
+          T_as_printed: '138.9'
+          cp_as_printed: '54.73'
+        - T_K: 139.5
+          cp: 54.88
+          T_as_printed: '139.5'
+          cp_as_printed: '54.88'
+        - T_K: 140
+          cp: 55.1
+          T_as_printed: '140.0'
+          cp_as_printed: '55.10'
+        - T_K: 140.5
+          cp: 55.34
+          T_as_printed: '140.5'
+          cp_as_printed: '55.34'
+        - T_K: 141
+          cp: 55.54
+          T_as_printed: '141.0'
+          cp_as_printed: '55.54'
+        - T_K: 141.5
+          cp: 55.76
+          T_as_printed: '141.5'
+          cp_as_printed: '55.76'
+        - T_K: 142
+          cp: 55.97
+          T_as_printed: '142.0'
+          cp_as_printed: '55.97'
+        - T_K: 142.5
+          cp: 56.16
+          T_as_printed: '142.5'
+          cp_as_printed: '56.16'
+        - T_K: 143
+          cp: 56.35
+          T_as_printed: '143.0'
+          cp_as_printed: '56.35'
+        - T_K: 143.5
+          cp: 56.51
+          T_as_printed: '143.5'
+          cp_as_printed: '56.51'
+        - T_K: 144
+          cp: 56.73
+          T_as_printed: '144.0'
+          cp_as_printed: '56.73'
+        - T_K: 144.6
+          cp: 56.95
+          T_as_printed: '144.6'
+          cp_as_printed: '56.95'
+        - T_K: 145.1
+          cp: 57.15
+          T_as_printed: '145.1'
+          cp_as_printed: '57.15'
+        - T_K: 145.6
+          cp: 57.36
+          T_as_printed: '145.6'
+          cp_as_printed: '57.36'
+        - T_K: 146.1
+          cp: 57.55
+          T_as_printed: '146.1'
+          cp_as_printed: '57.55'
+        - T_K: 146.6
+          cp: 57.71
+          T_as_printed: '146.6'
+          cp_as_printed: '57.71'
+        - T_K: 147.1
+          cp: 57.93
+          T_as_printed: '147.1'
+          cp_as_printed: '57.93'
+        - T_K: 147.6
+          cp: 58.11
+          T_as_printed: '147.6'
+          cp_as_printed: '58.11'
+        - T_K: 148.1
+          cp: 58.31
+          T_as_printed: '148.1'
+          cp_as_printed: '58.31'
+        - T_K: 148.6
+          cp: 58.52
+          T_as_printed: '148.6'
+          cp_as_printed: '58.52'
+        - T_K: 149.2
+          cp: 58.75
+          T_as_printed: '149.2'
+          cp_as_printed: '58.75'
+        - T_K: 149.7
+          cp: 58.92
+          T_as_printed: '149.7'
+          cp_as_printed: '58.92'
+        - T_K: 150.2
+          cp: 59.13
+          T_as_printed: '150.2'
+          cp_as_printed: '59.13'
+        - T_K: 150.7
+          cp: 59.31
+          T_as_printed: '150.7'
+          cp_as_printed: '59.31'
+        - T_K: 151.2
+          cp: 59.51
+          T_as_printed: '151.2'
+          cp_as_printed: '59.51'
+        - T_K: 151.7
+          cp: 59.69
+          T_as_printed: '151.7'
+          cp_as_printed: '59.69'
+        - T_K: 152.2
+          cp: 59.88
+          T_as_printed: '152.2'
+          cp_as_printed: '59.88'
+        - T_K: 152.7
+          cp: 60.06
+          T_as_printed: '152.7'
+          cp_as_printed: '60.06'
+        - T_K: 153.2
+          cp: 60.24
+          T_as_printed: '153.2'
+          cp_as_printed: '60.24'
+        - T_K: 153.7
+          cp: 60.44
+          T_as_printed: '153.7'
+          cp_as_printed: '60.44'
+        - T_K: 154.3
+          cp: 60.65
+          T_as_printed: '154.3'
+          cp_as_printed: '60.65'
+        - T_K: 154.8
+          cp: 60.86
+          T_as_printed: '154.8'
+          cp_as_printed: '60.86'
+        - T_K: 155.3
+          cp: 61.01
+          T_as_printed: '155.3'
+          cp_as_printed: '61.01'
+        - T_K: 155.8
+          cp: 61.22
+          T_as_printed: '155.8'
+          cp_as_printed: '61.22'
+        - T_K: 156.3
+          cp: 61.4
+          T_as_printed: '156.3'
+          cp_as_printed: '61.40'
+        - T_K: 156.8
+          cp: 61.56
+          T_as_printed: '156.8'
+          cp_as_printed: '61.56'
+        - T_K: 157.3
+          cp: 61.79
+          T_as_printed: '157.3'
+          cp_as_printed: '61.79'
+        - T_K: 157.8
+          cp: 61.92
+          T_as_printed: '157.8'
+          cp_as_printed: '61.92'
+        - T_K: 158.3
+          cp: 62.13
+          T_as_printed: '158.3'
+          cp_as_printed: '62.13'
+        - T_K: 158.9
+          cp: 62.31
+          T_as_printed: '158.9'
+          cp_as_printed: '62.31'
+        - T_K: 159.4
+          cp: 62.47
+          T_as_printed: '159.4'
+          cp_as_printed: '62.47'
+        - T_K: 159.9
+          cp: 62.67
+          T_as_printed: '159.9'
+          cp_as_printed: '62.67'
+        - T_K: 160.4
+          cp: 62.85
+          T_as_printed: '160.4'
+          cp_as_printed: '62.85'
+        - T_K: 160.9
+          cp: 63.01
+          T_as_printed: '160.9'
+          cp_as_printed: '63.01'
+        - T_K: 161.4
+          cp: 63.2
+          T_as_printed: '161.4'
+          cp_as_printed: '63.20'
+        - T_K: 161.9
+          cp: 63.33
+          T_as_printed: '161.9'
+          cp_as_printed: '63.33'
+        - T_K: 162.4
+          cp: 63.34
+          T_as_printed: '162.4'
+          cp_as_printed: '63.34'
+        - T_K: 162.4
+          cp: 63.46
+          T_as_printed: '162.4'
+          cp_as_printed: '63.46'
+        - T_K: 167.3
+          cp: 65.01
+          T_as_printed: '167.3'
+          cp_as_printed: '65.01'
+        - T_K: 172.2
+          cp: 66.53
+          T_as_printed: '172.2'
+          cp_as_printed: '66.53'
+        - T_K: 177
+          cp: 68.01
+          T_as_printed: '177.0'
+          cp_as_printed: '68.01'
+        - T_K: 181.9
+          cp: 69.38
+          T_as_printed: '181.9'
+          cp_as_printed: '69.38'
+        - T_K: 186.8
+          cp: 70.68
+          T_as_printed: '186.8'
+          cp_as_printed: '70.68'
+        - T_K: 191.6
+          cp: 72
+          T_as_printed: '191.6'
+          cp_as_printed: '72.00'
+        - T_K: 196.5
+          cp: 73.31
+          T_as_printed: '196.5'
+          cp_as_printed: '73.31'
+        - T_K: 201.4
+          cp: 74.4
+          T_as_printed: '201.4'
+          cp_as_printed: '74.40'
+        - T_K: 206.2
+          cp: 75.52
+          T_as_printed: '206.2'
+          cp_as_printed: '75.52'
+        - T_K: 211.1
+          cp: 76.59
+          T_as_printed: '211.1'
+          cp_as_printed: '76.59'
+        - T_K: 216
+          cp: 77.77
+          T_as_printed: '216.0'
+          cp_as_printed: '77.77'
+        - T_K: 220.8
+          cp: 78.73
+          T_as_printed: '220.8'
+          cp_as_printed: '78.73'
+        - T_K: 225.7
+          cp: 79.58
+          T_as_printed: '225.7'
+          cp_as_printed: '79.58'
+        - T_K: 230.5
+          cp: 80.34
+          T_as_printed: '230.5'
+          cp_as_printed: '80.34'
+        - T_K: 235.4
+          cp: 81.07
+          T_as_printed: '235.4'
+          cp_as_printed: '81.07'
+        - T_K: 240.3
+          cp: 81.96
+          T_as_printed: '240.3'
+          cp_as_printed: '81.96'
+        - T_K: 245.2
+          cp: 82.62
+          T_as_printed: '245.2'
+          cp_as_printed: '82.62'
+        - T_K: 250
+          cp: 83.15
+          T_as_printed: '250.0'
+          cp_as_printed: '83.15'
+        - T_K: 254.9
+          cp: 83.7
+          T_as_printed: '254.9'
+          cp_as_printed: '83.70'
+        - T_K: 259.8
+          cp: 84.11
+          T_as_printed: '259.8'
+          cp_as_printed: '84.11'
+        - T_K: 264.6
+          cp: 84.53
+          T_as_printed: '264.6'
+          cp_as_printed: '84.53'
+        - T_K: 269.4
+          cp: 85.05
+          T_as_printed: '269.4'
+          cp_as_printed: '85.05'
+        - T_K: 274.3
+          cp: 85.48
+          T_as_printed: '274.3'
+          cp_as_printed: '85.48'
+        - T_K: 279.1
+          cp: 85.82
+          T_as_printed: '279.1'
+          cp_as_printed: '85.82'
+        - T_K: 284
+          cp: 86.18
+          T_as_printed: '284.0'
+          cp_as_printed: '86.18'
+        - T_K: 288.8
+          cp: 86.29
+          T_as_printed: '288.8'
+          cp_as_printed: '86.29'
+        - T_K: 293.7
+          cp: 86.52
+          T_as_printed: '293.7'
+          cp_as_printed: '86.52'
+        - T_K: 298.6
+          cp: 86.8
+          T_as_printed: '298.6'
+          cp_as_printed: '86.80'
+        - T_K: 304.3
+          cp: 90.15
+          T_as_printed: '304.3'
+          cp_as_printed: '90.15'
+      uncertainty:
+        reported_status: not_reported_individually
+        note: The paper does not print an uncertainty for each tabulated Cp point.
+    - observation_id: klemme_2011_cotio3_table2_series2_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: The second scan is printed across physical pages 4 and 5.
+      phase: cr
+      phase_as_published: synthetic polycrystalline sample
+      T_range_K:
+      - 2.24
+      - 61.2
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      values:
+        quantity: cp
+        method_class: measured_direct
+        measurement_series: second scan
+        molar_basis_as_published: per mole of formula unit
+        series:
+        - T_K: 2.24
+          cp: 0.0018
+          T_as_printed: '2.24'
+          cp_as_printed: '0.0018'
+        - T_K: 3.19
+          cp: 0.0034
+          T_as_printed: '3.19'
+          cp_as_printed: '0.0034'
+        - T_K: 4.2
+          cp: 0.0085
+          T_as_printed: '4.20'
+          cp_as_printed: '0.0085'
+        - T_K: 5.2
+          cp: 0.0164
+          T_as_printed: '5.20'
+          cp_as_printed: '0.0164'
+        - T_K: 6.19
+          cp: 0.0285
+          T_as_printed: '6.19'
+          cp_as_printed: '0.0285'
+        - T_K: 7.21
+          cp: 0.0572
+          T_as_printed: '7.21'
+          cp_as_printed: '0.0572'
+        - T_K: 8.15
+          cp: 0.093
+          T_as_printed: '8.15'
+          cp_as_printed: '0.093'
+        - T_K: 9.14
+          cp: 0.15
+          T_as_printed: '9.14'
+          cp_as_printed: '0.15'
+        - T_K: 10.12
+          cp: 0.22
+          T_as_printed: '10.12'
+          cp_as_printed: '0.22'
+        - T_K: 11.1
+          cp: 0.31
+          T_as_printed: '11.1'
+          cp_as_printed: '0.31'
+        - T_K: 12.1
+          cp: 0.43
+          T_as_printed: '12.1'
+          cp_as_printed: '0.43'
+        - T_K: 13.1
+          cp: 0.58
+          T_as_printed: '13.1'
+          cp_as_printed: '0.58'
+        - T_K: 14.1
+          cp: 0.75
+          T_as_printed: '14.1'
+          cp_as_printed: '0.75'
+        - T_K: 15.1
+          cp: 0.95
+          T_as_printed: '15.1'
+          cp_as_printed: '0.95'
+        - T_K: 16
+          cp: 1.17
+          T_as_printed: '16.0'
+          cp_as_printed: '1.17'
+        - T_K: 17
+          cp: 1.42
+          T_as_printed: '17.0'
+          cp_as_printed: '1.42'
+        - T_K: 18
+          cp: 1.7
+          T_as_printed: '18.0'
+          cp_as_printed: '1.70'
+        - T_K: 19
+          cp: 2.01
+          T_as_printed: '19.0'
+          cp_as_printed: '2.01'
+        - T_K: 20
+          cp: 2.35
+          T_as_printed: '20.0'
+          cp_as_printed: '2.35'
+        - T_K: 20.9
+          cp: 2.71
+          T_as_printed: '20.9'
+          cp_as_printed: '2.71'
+        - T_K: 21.9
+          cp: 3.11
+          T_as_printed: '21.9'
+          cp_as_printed: '3.11'
+        - T_K: 22.9
+          cp: 3.55
+          T_as_printed: '22.9'
+          cp_as_printed: '3.55'
+        - T_K: 23.9
+          cp: 4.02
+          T_as_printed: '23.9'
+          cp_as_printed: '4.02'
+        - T_K: 24.9
+          cp: 4.49
+          T_as_printed: '24.9'
+          cp_as_printed: '4.49'
+        - T_K: 25.8
+          cp: 5
+          T_as_printed: '25.8'
+          cp_as_printed: '5.00'
+        - T_K: 26.8
+          cp: 5.54
+          T_as_printed: '26.8'
+          cp_as_printed: '5.54'
+        - T_K: 27.8
+          cp: 6.11
+          T_as_printed: '27.8'
+          cp_as_printed: '6.11'
+        - T_K: 28.8
+          cp: 6.77
+          T_as_printed: '28.8'
+          cp_as_printed: '6.77'
+        - T_K: 29.7
+          cp: 7.38
+          T_as_printed: '29.7'
+          cp_as_printed: '7.38'
+        - T_K: 30.6
+          cp: 7.82
+          T_as_printed: '30.6'
+          cp_as_printed: '7.82'
+        - T_K: 30.7
+          cp: 8.12
+          T_as_printed: '30.7'
+          cp_as_printed: '8.12'
+        - T_K: 31.2
+          cp: 8.5
+          T_as_printed: '31.2'
+          cp_as_printed: '8.50'
+        - T_K: 31.8
+          cp: 8.91
+          T_as_printed: '31.8'
+          cp_as_printed: '8.91'
+        - T_K: 32.3
+          cp: 9.33
+          T_as_printed: '32.3'
+          cp_as_printed: '9.33'
+        - T_K: 32.8
+          cp: 9.75
+          T_as_printed: '32.8'
+          cp_as_printed: '9.75'
+        - T_K: 33.3
+          cp: 10.2
+          T_as_printed: '33.3'
+          cp_as_printed: '10.2'
+        - T_K: 33.8
+          cp: 10.7
+          T_as_printed: '33.8'
+          cp_as_printed: '10.7'
+        - T_K: 34.3
+          cp: 11.2
+          T_as_printed: '34.3'
+          cp_as_printed: '11.2'
+        - T_K: 34.8
+          cp: 11.7
+          T_as_printed: '34.8'
+          cp_as_printed: '11.7'
+        - T_K: 35.4
+          cp: 12.3
+          T_as_printed: '35.4'
+          cp_as_printed: '12.3'
+        - T_K: 35.9
+          cp: 13
+          T_as_printed: '35.9'
+          cp_as_printed: '13.0'
+        - T_K: 36.4
+          cp: 13.8
+          T_as_printed: '36.4'
+          cp_as_printed: '13.8'
+        - T_K: 36.9
+          cp: 14.5
+          T_as_printed: '36.9'
+          cp_as_printed: '14.5'
+        - T_K: 37.4
+          cp: 14.6
+          T_as_printed: '37.4'
+          cp_as_printed: '14.6'
+        - T_K: 37.9
+          cp: 13.8
+          T_as_printed: '37.9'
+          cp_as_printed: '13.8'
+        - T_K: 38.4
+          cp: 12.6
+          T_as_printed: '38.4'
+          cp_as_printed: '12.6'
+        - T_K: 38.9
+          cp: 11.5
+          T_as_printed: '38.9'
+          cp_as_printed: '11.5'
+        - T_K: 39.4
+          cp: 10.7
+          T_as_printed: '39.4'
+          cp_as_printed: '10.7'
+        - T_K: 40
+          cp: 10
+          T_as_printed: '40.0'
+          cp_as_printed: '10.0'
+        - T_K: 40.5
+          cp: 9.6
+          T_as_printed: '40.5'
+          cp_as_printed: '9.6'
+        - T_K: 41
+          cp: 9.3
+          T_as_printed: '41.0'
+          cp_as_printed: '9.3'
+        - T_K: 41.5
+          cp: 9.1
+          T_as_printed: '41.5'
+          cp_as_printed: '9.1'
+        - T_K: 42.1
+          cp: 9
+          T_as_printed: '42.1'
+          cp_as_printed: '9.0'
+        - T_K: 42.6
+          cp: 9
+          T_as_printed: '42.6'
+          cp_as_printed: '9.0'
+        - T_K: 43.1
+          cp: 9
+          T_as_printed: '43.1'
+          cp_as_printed: '9.0'
+        - T_K: 43.6
+          cp: 9
+          T_as_printed: '43.6'
+          cp_as_printed: '9.0'
+        - T_K: 44.1
+          cp: 9.1
+          T_as_printed: '44.1'
+          cp_as_printed: '9.1'
+        - T_K: 44.7
+          cp: 9.2
+          T_as_printed: '44.7'
+          cp_as_printed: '9.2'
+        - T_K: 45.2
+          cp: 9.3
+          T_as_printed: '45.2'
+          cp_as_printed: '9.3'
+        - T_K: 45.7
+          cp: 9.4
+          T_as_printed: '45.7'
+          cp_as_printed: '9.4'
+        - T_K: 46.2
+          cp: 9.5
+          T_as_printed: '46.2'
+          cp_as_printed: '9.5'
+        - T_K: 46.7
+          cp: 9.6
+          T_as_printed: '46.7'
+          cp_as_printed: '9.6'
+        - T_K: 47.2
+          cp: 9.8
+          T_as_printed: '47.2'
+          cp_as_printed: '9.8'
+        - T_K: 47.8
+          cp: 10
+          T_as_printed: '47.8'
+          cp_as_printed: '10.0'
+        - T_K: 48.3
+          cp: 10.1
+          T_as_printed: '48.3'
+          cp_as_printed: '10.1'
+        - T_K: 48.8
+          cp: 10.3
+          T_as_printed: '48.8'
+          cp_as_printed: '10.3'
+        - T_K: 49.3
+          cp: 10.5
+          T_as_printed: '49.3'
+          cp_as_printed: '10.5'
+        - T_K: 49.8
+          cp: 10.7
+          T_as_printed: '49.8'
+          cp_as_printed: '10.7'
+        - T_K: 50.3
+          cp: 10.9
+          T_as_printed: '50.3'
+          cp_as_printed: '10.9'
+        - T_K: 50.9
+          cp: 11.1
+          T_as_printed: '50.9'
+          cp_as_printed: '11.1'
+        - T_K: 51.4
+          cp: 11.4
+          T_as_printed: '51.4'
+          cp_as_printed: '11.4'
+        - T_K: 51.9
+          cp: 11.6
+          T_as_printed: '51.9'
+          cp_as_printed: '11.6'
+        - T_K: 52.4
+          cp: 11.8
+          T_as_printed: '52.4'
+          cp_as_printed: '11.8'
+        - T_K: 52.9
+          cp: 12
+          T_as_printed: '52.9'
+          cp_as_printed: '12.0'
+        - T_K: 53.4
+          cp: 12.3
+          T_as_printed: '53.4'
+          cp_as_printed: '12.3'
+        - T_K: 53.9
+          cp: 12.5
+          T_as_printed: '53.9'
+          cp_as_printed: '12.5'
+        - T_K: 54.5
+          cp: 12.7
+          T_as_printed: '54.5'
+          cp_as_printed: '12.7'
+        - T_K: 55
+          cp: 13
+          T_as_printed: '55.0'
+          cp_as_printed: '13.0'
+        - T_K: 55.5
+          cp: 13.2
+          T_as_printed: '55.5'
+          cp_as_printed: '13.2'
+        - T_K: 56
+          cp: 13.5
+          T_as_printed: '56.0'
+          cp_as_printed: '13.5'
+        - T_K: 56.5
+          cp: 13.7
+          T_as_printed: '56.5'
+          cp_as_printed: '13.7'
+        - T_K: 57
+          cp: 14
+          T_as_printed: '57.0'
+          cp_as_printed: '14.0'
+        - T_K: 57.6
+          cp: 14.2
+          T_as_printed: '57.6'
+          cp_as_printed: '14.2'
+        - T_K: 58.1
+          cp: 14.5
+          T_as_printed: '58.1'
+          cp_as_printed: '14.5'
+        - T_K: 58.6
+          cp: 14.7
+          T_as_printed: '58.6'
+          cp_as_printed: '14.7'
+        - T_K: 59.1
+          cp: 14.9
+          T_as_printed: '59.1'
+          cp_as_printed: '14.9'
+        - T_K: 59.6
+          cp: 15.2
+          T_as_printed: '59.6'
+          cp_as_printed: '15.2'
+        - T_K: 60.1
+          cp: 15.4
+          T_as_printed: '60.1'
+          cp_as_printed: '15.4'
+        - T_K: 60.6
+          cp: 15.7
+          T_as_printed: '60.6'
+          cp_as_printed: '15.7'
+        - T_K: 61.2
+          cp: 15.9
+          T_as_printed: '61.2'
+          cp_as_printed: '15.9'
+      uncertainty:
+        reported_status: not_reported_individually
+        note: The paper does not print an uncertainty for each tabulated Cp point.
+    - observation_id: klemme_2011_cotio3_table5_entropy_series
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 9
+        published_page: 9
+        pdf_page_index: 8
+        table: '5'
+        note: The table continues on physical page 10.
+      phase: cr
+      phase_as_published: synthetic polycrystalline sample
+      T_range_K:
+      - 5
+      - 300
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      derived_from: &id002
+      - klemme_2011_cotio3_table2_series1_cp
+      - klemme_2011_cotio3_table2_series2_cp
+      derivation:
+        relation: The authors calculate thermodynamic functions from the measured Cp data; S(T) uses a T^3 extrapolation to
+          0 K.
+        inputs: *id002
+        output_unit: J/mol K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        molar_basis_as_published: per mole of formula unit
+        series:
+        - T_K: 300
+          entropy: 95
+          T_as_printed: '300'
+          entropy_as_printed: '95.0'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 290
+          entropy: 92
+          T_as_printed: '290'
+          entropy_as_printed: '92.0'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 280
+          entropy: 89
+          T_as_printed: '280'
+          entropy_as_printed: '89.0'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 270
+          entropy: 85.9
+          T_as_printed: '270'
+          entropy_as_printed: '85.9'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 260
+          entropy: 82.7
+          T_as_printed: '260'
+          entropy_as_printed: '82.7'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 250
+          entropy: 79.4
+          T_as_printed: '250'
+          entropy_as_printed: '79.4'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 240
+          entropy: 76.1
+          T_as_printed: '240'
+          entropy_as_printed: '76.1'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 230
+          entropy: 72.6
+          T_as_printed: '230'
+          entropy_as_printed: '72.6'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 220
+          entropy: 69.1
+          T_as_printed: '220'
+          entropy_as_printed: '69.1'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 210
+          entropy: 65.5
+          T_as_printed: '210'
+          entropy_as_printed: '65.5'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 200
+          entropy: 61.8
+          T_as_printed: '200'
+          entropy_as_printed: '61.8'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 190
+          entropy: 58.1
+          T_as_printed: '190'
+          entropy_as_printed: '58.1'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 180
+          entropy: 54.3
+          T_as_printed: '180'
+          entropy_as_printed: '54.3'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 170
+          entropy: 50.4
+          T_as_printed: '170'
+          entropy_as_printed: '50.4'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 160
+          entropy: 46.5
+          T_as_printed: '160'
+          entropy_as_printed: '46.5'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 150
+          entropy: 42.6
+          T_as_printed: '150'
+          entropy_as_printed: '42.6'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 140
+          entropy: 38.7
+          T_as_printed: '140'
+          entropy_as_printed: '38.7'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 130
+          entropy: 34.7
+          T_as_printed: '130'
+          entropy_as_printed: '34.7'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 120
+          entropy: 30.8
+          T_as_printed: '120'
+          entropy_as_printed: '30.8'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 110
+          entropy: 27
+          T_as_printed: '110'
+          entropy_as_printed: '27.0'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 100
+          entropy: 23.2
+          T_as_printed: '100'
+          entropy_as_printed: '23.2'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 90
+          entropy: 19.5
+          T_as_printed: '90'
+          entropy_as_printed: '19.5'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 80
+          entropy: 16.1
+          T_as_printed: '80'
+          entropy_as_printed: '16.1'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 70
+          entropy: 13
+          T_as_printed: '70'
+          entropy_as_printed: '13.0'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 60
+          entropy: 10.2
+          T_as_printed: '60'
+          entropy_as_printed: '10.2'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 50
+          entropy: 7.86
+          T_as_printed: '50'
+          entropy_as_printed: '7.86'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 40
+          entropy: 5.71
+          T_as_printed: '40'
+          entropy_as_printed: '5.71'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 30
+          entropy: 2.56
+          T_as_printed: '30'
+          entropy_as_printed: '2.56'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 20
+          entropy: 0.72
+          T_as_printed: '20'
+          entropy_as_printed: '0.72'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 15
+          entropy: 0.26
+          T_as_printed: '15'
+          entropy_as_printed: '0.26'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 10
+          entropy: 0.058
+          T_as_printed: '10'
+          entropy_as_printed: '0.058'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 5
+          entropy: 0.006
+          T_as_printed: '5'
+          entropy_as_printed: '0.006'
+          point_uncertainty_status: not_reported_individually
+      uncertainty:
+        reported_status: not_reported_individually
+        note: Individual S(T) uncertainties are not printed; the separately reported S(298.15 K) uncertainties are stored
+          on their own observations.
+    - observation_id: klemme_2011_cotio3_standard_entropy_298_15k
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 9
+        published_page: 9
+        pdf_page_index: 8
+        table: '5'
+        note: The same result is also in the abstract on physical page 1 and Table 7 on physical page 11; one observation
+          only.
+      phase: cr
+      phase_as_published: synthetic polycrystalline sample
+      T_range_K:
+      - 298.15
+      - 298.15
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      derived_from: *id002
+      derivation:
+        relation: The authors calculate the standard molar entropy from their measured Cp data, using a T^3 extrapolation
+          to 0 K.
+        inputs: *id002
+        output_unit: J/mol K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        molar_basis_as_published: per mole of formula unit
+        T_K: 298.15
+        T_as_printed: '298.15'
+        entropy: 94.4
+        entropy_as_printed: '94.4'
+      uncertainty:
+        reported_status: printed
+        value_J_per_mol_K: 0.8
+        uncertainty_as_printed: ± 0.8 J mol-1 K-1 in the abstract; parentheses in Table 7
+    - observation_id: klemme_2011_cotio3_s298_quote_38
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 11
+        published_page: 11
+        pdf_page_index: 10
+        table: '7'
+        row: CoTiO3, [38]
+      phase: cr
+      T_range_K:
+      - 298.15
+      - 298.15
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        attribution: '[38]'
+        molar_basis_as_published: per mole of formula unit
+        series:
+        - T_K: 298.15
+          T_as_printed: '298.15'
+          entropy: 96.9
+          entropy_as_printed: '96.9'
+          value_as_printed: 96.9*
+      uncertainty:
+        reported_status: not_reported
+        note: Table 7 marks 96.9 with an asterisk and explicitly says reference [38] did not report an uncertainty.
+    context:
+    - observation_id: klemme_2011_cotio3_table5_calculated_cp_and_cp_over_t_context
+      type: table_record
+      locator:
+        page: 9
+        published_page: 9
+        pdf_page_index: 8
+        table: '5'
+        note: The table continues on physical page 10.
+      units: T in K; Cp in J/mol K; Cp/T in J mol-1 K-2
+      values:
+        quantity_as_printed: Cp, Cp/T and S(T) at selected temperatures
+        candidate_store_tokens:
+        - cp
+        - S
+        method_class: model_derived
+        disposition: The S(T) values are typed as measured_reduced in klemme_2011_cotio3_table5_entropy_series (with S(298.15
+          K) split out for its printed uncertainty). The selected-temperature Cp values are not stored as a second measured
+          series because the paper does not identify them as independent measurements; the Cp/T column has no quantity token.
+          The printed Cp and Cp/T cells are retained here.
+        rows:
+        - T_as_printed: '300'
+          Cp_as_printed: '87.6'
+          Cp_over_T_as_printed: '0.292'
+        - T_as_printed: '298.15'
+          Cp_as_printed: '86.8'
+          Cp_over_T_as_printed: '0.291'
+        - T_as_printed: '290'
+          Cp_as_printed: '86.3'
+          Cp_over_T_as_printed: '0.298'
+        - T_as_printed: '280'
+          Cp_as_printed: '85.9'
+          Cp_over_T_as_printed: '0.307'
+        - T_as_printed: '270'
+          Cp_as_printed: '85.1'
+          Cp_over_T_as_printed: '0.315'
+        - T_as_printed: '260'
+          Cp_as_printed: '84.1'
+          Cp_over_T_as_printed: '0.324'
+        - T_as_printed: '250'
+          Cp_as_printed: '83.1'
+          Cp_over_T_as_printed: '0.333'
+        - T_as_printed: '240'
+          Cp_as_printed: '81.9'
+          Cp_over_T_as_printed: '0.341'
+        - T_as_printed: '230'
+          Cp_as_printed: '80.3'
+          Cp_over_T_as_printed: '0.349'
+        - T_as_printed: '220'
+          Cp_as_printed: '78.6'
+          Cp_over_T_as_printed: '0.357'
+        - T_as_printed: '210'
+          Cp_as_printed: '76.3'
+          Cp_over_T_as_printed: '0.364'
+        - T_as_printed: '200'
+          Cp_as_printed: '74.1'
+          Cp_over_T_as_printed: '0.370'
+        - T_as_printed: '190'
+          Cp_as_printed: '71.6'
+          Cp_over_T_as_printed: '0.377'
+        - T_as_printed: '180'
+          Cp_as_printed: '68.9'
+          Cp_over_T_as_printed: '0.383'
+        - T_as_printed: '170'
+          Cp_as_printed: '65.9'
+          Cp_over_T_as_printed: '0.387'
+        - T_as_printed: '160'
+          Cp_as_printed: '62.7'
+          Cp_over_T_as_printed: '0.392'
+        - T_as_printed: '150'
+          Cp_as_printed: '59.1'
+          Cp_over_T_as_printed: '0.394'
+        - T_as_printed: '140'
+          Cp_as_printed: '55.1'
+          Cp_over_T_as_printed: '0.394'
+        - T_as_printed: '130'
+          Cp_as_printed: '51.0'
+          Cp_over_T_as_printed: '0.392'
+        - T_as_printed: '120'
+          Cp_as_printed: '46.5'
+          Cp_over_T_as_printed: '0.387'
+        - T_as_printed: '110'
+          Cp_as_printed: '42.1'
+          Cp_over_T_as_printed: '0.383'
+        - T_as_printed: '100'
+          Cp_as_printed: '37.4'
+          Cp_over_T_as_printed: '0.374'
+        - T_as_printed: '90'
+          Cp_as_printed: '32.1'
+          Cp_over_T_as_printed: '0.357'
+        - T_as_printed: '80'
+          Cp_as_printed: '26.4'
+          Cp_over_T_as_printed: '0.330'
+        - T_as_printed: '70'
+          Cp_as_printed: '20.5'
+          Cp_over_T_as_printed: '0.293'
+        - T_as_printed: '60'
+          Cp_as_printed: '15.4'
+          Cp_over_T_as_printed: '0.256'
+        - T_as_printed: '50'
+          Cp_as_printed: '10.8'
+          Cp_over_T_as_printed: '0.216'
+        - T_as_printed: '40'
+          Cp_as_printed: '10.2'
+          Cp_over_T_as_printed: '0.254'
+        - T_as_printed: '30'
+          Cp_as_printed: '7.65'
+          Cp_over_T_as_printed: '0.255'
+        - T_as_printed: '20'
+          Cp_as_printed: '2.39'
+          Cp_over_T_as_printed: '0.120'
+        - T_as_printed: '15'
+          Cp_as_printed: '0.96'
+          Cp_over_T_as_printed: '0.064'
+        - T_as_printed: '10'
+          Cp_as_printed: '0.22'
+          Cp_over_T_as_printed: '0.022'
+        - T_as_printed: '5'
+          Cp_as_printed: '0.02'
+          Cp_over_T_as_printed: '0.003'
+    - observation_id: klemme_2011_figure3_cotio3_cp
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        figure: '3'
+      phase: cr
+      units: T in K; Cp in J/mol K
+      values:
+        quantity: cp
+        method_class: figure_only
+        species: CoTiO3
+        temperature_as_published: main axis 0-300 K; inset 0-80 K
+        axes_as_printed:
+          x: Temperature / K
+          y: Cp / J mol-1 K-1
+        caption_as_published: Low-temperature heat capacity data for CoTiO3. The insert shows results from two scans done
+          at low temperatures.
+        panel: main panel with low-temperature inset
+        series:
+        - label: first scan
+          marker: open square
+          marker_count: 210
+        - label: second scan
+          marker: filled square
+          marker_count: 90
+        attribution: This work.
+        digitisation: deferred to a figure pass
+        numeric_points: none
+    - observation_id: klemme_2011_cotio3_heat_capacity_anomaly_peak_text
+      type: thermochemical_values
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Abstract
+      units: K
+      values:
+        quantity_as_printed: low-temperature heat-capacity anomaly peak temperature
+        quantity_token: unavailable
+        candidate_store_tokens:
+        - transition_temperature
+        - cp
+        schema_gap: No quantity token represents a heat-capacity anomaly peak temperature without recasting the reported peak
+          as a phase-transition temperature.
+        method_class: measured_reduced
+        species: CoTiO3
+        phase: crystalline solid
+        temperature_as_printed: '37'
+        temperature_K: 37
+        approximate: false
+        interpretation: For NiTiO3 and CoTiO3 the authors say the Cp anomaly coincides with antiferromagnetic ordering; for
+          CoCO3 they say it may be caused by the transition.
+  CoCO3:
+    observations:
+    - observation_id: klemme_2011_coco3_table3_series1_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '3'
+        note: Table continues on physical page 6.
+      phase: cr
+      phase_as_published: crystalline CoCO3 sample
+      T_range_K:
+      - 2.21
+      - 304
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      values:
+        quantity: cp
+        method_class: measured_direct
+        measurement_series: first scan
+        molar_basis_as_published: per mole of formula unit
+        series:
+        - T_K: 2.21
+          cp: 0.02
+          T_as_printed: '2.21'
+          cp_as_printed: '0.02'
+        - T_K: 2.6
+          cp: 0.03
+          T_as_printed: '2.60'
+          cp_as_printed: '0.03'
+        - T_K: 3.01
+          cp: 0.04
+          T_as_printed: '3.01'
+          cp_as_printed: '0.04'
+        - T_K: 3.43
+          cp: 0.06
+          T_as_printed: '3.43'
+          cp_as_printed: '0.06'
+        - T_K: 3.86
+          cp: 0.08
+          T_as_printed: '3.86'
+          cp_as_printed: '0.08'
+        - T_K: 4.27
+          cp: 0.11
+          T_as_printed: '4.27'
+          cp_as_printed: '0.11'
+        - T_K: 4.68
+          cp: 0.15
+          T_as_printed: '4.68'
+          cp_as_printed: '0.15'
+        - T_K: 5.1
+          cp: 0.19
+          T_as_printed: '5.10'
+          cp_as_printed: '0.19'
+        - T_K: 5.51
+          cp: 0.24
+          T_as_printed: '5.51'
+          cp_as_printed: '0.24'
+        - T_K: 5.92
+          cp: 0.33
+          T_as_printed: '5.92'
+          cp_as_printed: '0.33'
+        - T_K: 6.34
+          cp: 0.39
+          T_as_printed: '6.34'
+          cp_as_printed: '0.39'
+        - T_K: 6.75
+          cp: 0.45
+          T_as_printed: '6.75'
+          cp_as_printed: '0.45'
+        - T_K: 7.18
+          cp: 0.52
+          T_as_printed: '7.18'
+          cp_as_printed: '0.52'
+        - T_K: 7.54
+          cp: 0.58
+          T_as_printed: '7.54'
+          cp_as_printed: '0.58'
+        - T_K: 7.95
+          cp: 0.73
+          T_as_printed: '7.95'
+          cp_as_printed: '0.73'
+        - T_K: 8.35
+          cp: 0.81
+          T_as_printed: '8.35'
+          cp_as_printed: '0.81'
+        - T_K: 8.76
+          cp: 0.9
+          T_as_printed: '8.76'
+          cp_as_printed: '0.90'
+        - T_K: 9.17
+          cp: 0.99
+          T_as_printed: '9.17'
+          cp_as_printed: '0.99'
+        - T_K: 9.58
+          cp: 1.08
+          T_as_printed: '9.58'
+          cp_as_printed: '1.08'
+        - T_K: 9.99
+          cp: 1.3
+          T_as_printed: '9.99'
+          cp_as_printed: '1.30'
+        - T_K: 10.4
+          cp: 1.41
+          T_as_printed: '10.4'
+          cp_as_printed: '1.41'
+        - T_K: 10.8
+          cp: 1.53
+          T_as_printed: '10.8'
+          cp_as_printed: '1.53'
+        - T_K: 11.2
+          cp: 1.64
+          T_as_printed: '11.2'
+          cp_as_printed: '1.64'
+        - T_K: 11.6
+          cp: 1.9
+          T_as_printed: '11.6'
+          cp_as_printed: '1.90'
+        - T_K: 12
+          cp: 2.06
+          T_as_printed: '12.0'
+          cp_as_printed: '2.06'
+        - T_K: 12.5
+          cp: 2.2
+          T_as_printed: '12.5'
+          cp_as_printed: '2.20'
+        - T_K: 12.9
+          cp: 2.5
+          T_as_printed: '12.9'
+          cp_as_printed: '2.50'
+        - T_K: 13.3
+          cp: 2.66
+          T_as_printed: '13.3'
+          cp_as_printed: '2.66'
+        - T_K: 13.7
+          cp: 2.83
+          T_as_printed: '13.7'
+          cp_as_printed: '2.83'
+        - T_K: 14.1
+          cp: 3.15
+          T_as_printed: '14.1'
+          cp_as_printed: '3.15'
+        - T_K: 14.5
+          cp: 3.26
+          T_as_printed: '14.5'
+          cp_as_printed: '3.26'
+        - T_K: 14.9
+          cp: 3.22
+          T_as_printed: '14.9'
+          cp_as_printed: '3.22'
+        - T_K: 15.3
+          cp: 3.05
+          T_as_printed: '15.3'
+          cp_as_printed: '3.05'
+        - T_K: 15.7
+          cp: 2.91
+          T_as_printed: '15.7'
+          cp_as_printed: '2.91'
+        - T_K: 16.1
+          cp: 2.82
+          T_as_printed: '16.1'
+          cp_as_printed: '2.82'
+        - T_K: 16.6
+          cp: 2.76
+          T_as_printed: '16.6'
+          cp_as_printed: '2.76'
+        - T_K: 17
+          cp: 2.71
+          T_as_printed: '17.0'
+          cp_as_printed: '2.71'
+        - T_K: 17.4
+          cp: 2.69
+          T_as_printed: '17.4'
+          cp_as_printed: '2.69'
+        - T_K: 17.8
+          cp: 2.67
+          T_as_printed: '17.8'
+          cp_as_printed: '2.67'
+        - T_K: 18.2
+          cp: 2.66
+          T_as_printed: '18.2'
+          cp_as_printed: '2.66'
+        - T_K: 18.6
+          cp: 2.66
+          T_as_printed: '18.6'
+          cp_as_printed: '2.66'
+        - T_K: 19
+          cp: 2.67
+          T_as_printed: '19.0'
+          cp_as_printed: '2.67'
+        - T_K: 19.4
+          cp: 2.67
+          T_as_printed: '19.4'
+          cp_as_printed: '2.67'
+        - T_K: 19.8
+          cp: 2.69
+          T_as_printed: '19.8'
+          cp_as_printed: '2.69'
+        - T_K: 20.3
+          cp: 2.77
+          T_as_printed: '20.3'
+          cp_as_printed: '2.77'
+        - T_K: 20.7
+          cp: 2.8
+          T_as_printed: '20.7'
+          cp_as_printed: '2.80'
+        - T_K: 21.1
+          cp: 2.82
+          T_as_printed: '21.1'
+          cp_as_printed: '2.82'
+        - T_K: 21.5
+          cp: 2.85
+          T_as_printed: '21.5'
+          cp_as_printed: '2.85'
+        - T_K: 21.9
+          cp: 2.88
+          T_as_printed: '21.9'
+          cp_as_printed: '2.88'
+        - T_K: 22.3
+          cp: 2.91
+          T_as_printed: '22.3'
+          cp_as_printed: '2.91'
+        - T_K: 22.7
+          cp: 2.96
+          T_as_printed: '22.7'
+          cp_as_printed: '2.96'
+        - T_K: 23.1
+          cp: 3
+          T_as_printed: '23.1'
+          cp_as_printed: '3.00'
+        - T_K: 23.5
+          cp: 3.03
+          T_as_printed: '23.5'
+          cp_as_printed: '3.03'
+        - T_K: 24
+          cp: 3.09
+          T_as_printed: '24.0'
+          cp_as_printed: '3.09'
+        - T_K: 24.4
+          cp: 3.18
+          T_as_printed: '24.4'
+          cp_as_printed: '3.18'
+        - T_K: 24.8
+          cp: 3.23
+          T_as_printed: '24.8'
+          cp_as_printed: '3.23'
+        - T_K: 25.2
+          cp: 3.28
+          T_as_printed: '25.2'
+          cp_as_printed: '3.28'
+        - T_K: 25.6
+          cp: 3.34
+          T_as_printed: '25.6'
+          cp_as_printed: '3.34'
+        - T_K: 26
+          cp: 3.39
+          T_as_printed: '26.0'
+          cp_as_printed: '3.39'
+        - T_K: 26.4
+          cp: 3.45
+          T_as_printed: '26.4'
+          cp_as_printed: '3.45'
+        - T_K: 26.8
+          cp: 3.52
+          T_as_printed: '26.8'
+          cp_as_printed: '3.52'
+        - T_K: 27.2
+          cp: 3.58
+          T_as_printed: '27.2'
+          cp_as_printed: '3.58'
+        - T_K: 27.7
+          cp: 3.68
+          T_as_printed: '27.7'
+          cp_as_printed: '3.68'
+        - T_K: 28.1
+          cp: 3.77
+          T_as_printed: '28.1'
+          cp_as_printed: '3.77'
+        - T_K: 28.5
+          cp: 3.84
+          T_as_printed: '28.5'
+          cp_as_printed: '3.84'
+        - T_K: 28.9
+          cp: 3.92
+          T_as_printed: '28.9'
+          cp_as_printed: '3.92'
+        - T_K: 29.3
+          cp: 4
+          T_as_printed: '29.3'
+          cp_as_printed: '4.00'
+        - T_K: 29.7
+          cp: 4.09
+          T_as_printed: '29.7'
+          cp_as_printed: '4.09'
+        - T_K: 30.1
+          cp: 4.2
+          T_as_printed: '30.1'
+          cp_as_printed: '4.20'
+        - T_K: 30.5
+          cp: 4.31
+          T_as_printed: '30.5'
+          cp_as_printed: '4.31'
+        - T_K: 30.9
+          cp: 4.39
+          T_as_printed: '30.9'
+          cp_as_printed: '4.39'
+        - T_K: 31.3
+          cp: 4.48
+          T_as_printed: '31.3'
+          cp_as_printed: '4.48'
+        - T_K: 31.8
+          cp: 4.57
+          T_as_printed: '31.8'
+          cp_as_printed: '4.57'
+        - T_K: 32.2
+          cp: 4.68
+          T_as_printed: '32.2'
+          cp_as_printed: '4.68'
+        - T_K: 32.6
+          cp: 4.8
+          T_as_printed: '32.6'
+          cp_as_printed: '4.80'
+        - T_K: 33
+          cp: 4.92
+          T_as_printed: '33.0'
+          cp_as_printed: '4.92'
+        - T_K: 33.4
+          cp: 5.01
+          T_as_printed: '33.4'
+          cp_as_printed: '5.01'
+        - T_K: 33.8
+          cp: 5.14
+          T_as_printed: '33.8'
+          cp_as_printed: '5.14'
+        - T_K: 34.2
+          cp: 5.26
+          T_as_printed: '34.2'
+          cp_as_printed: '5.26'
+        - T_K: 34.6
+          cp: 5.4
+          T_as_printed: '34.6'
+          cp_as_printed: '5.40'
+        - T_K: 35
+          cp: 5.5
+          T_as_printed: '35.0'
+          cp_as_printed: '5.50'
+        - T_K: 35.4
+          cp: 5.59
+          T_as_printed: '35.4'
+          cp_as_printed: '5.59'
+        - T_K: 35.8
+          cp: 5.71
+          T_as_printed: '35.8'
+          cp_as_printed: '5.71'
+        - T_K: 36.2
+          cp: 5.83
+          T_as_printed: '36.2'
+          cp_as_printed: '5.83'
+        - T_K: 36.7
+          cp: 6
+          T_as_printed: '36.7'
+          cp_as_printed: '6.00'
+        - T_K: 37
+          cp: 6.13
+          T_as_printed: '37.0'
+          cp_as_printed: '6.13'
+        - T_K: 37.5
+          cp: 6.25
+          T_as_printed: '37.5'
+          cp_as_printed: '6.25'
+        - T_K: 37.9
+          cp: 6.4
+          T_as_printed: '37.9'
+          cp_as_printed: '6.40'
+        - T_K: 38.3
+          cp: 6.57
+          T_as_printed: '38.3'
+          cp_as_printed: '6.57'
+        - T_K: 38.7
+          cp: 6.68
+          T_as_printed: '38.7'
+          cp_as_printed: '6.68'
+        - T_K: 39.1
+          cp: 6.79
+          T_as_printed: '39.1'
+          cp_as_printed: '6.79'
+        - T_K: 39.5
+          cp: 6.94
+          T_as_printed: '39.5'
+          cp_as_printed: '6.94'
+        - T_K: 39.9
+          cp: 7.11
+          T_as_printed: '39.9'
+          cp_as_printed: '7.11'
+        - T_K: 40.3
+          cp: 7.25
+          T_as_printed: '40.3'
+          cp_as_printed: '7.25'
+        - T_K: 40.7
+          cp: 7.39
+          T_as_printed: '40.7'
+          cp_as_printed: '7.39'
+        - T_K: 41.1
+          cp: 7.55
+          T_as_printed: '41.1'
+          cp_as_printed: '7.55'
+        - T_K: 41.5
+          cp: 7.72
+          T_as_printed: '41.5'
+          cp_as_printed: '7.72'
+        - T_K: 42
+          cp: 7.88
+          T_as_printed: '42.0'
+          cp_as_printed: '7.88'
+        - T_K: 42.4
+          cp: 8.05
+          T_as_printed: '42.4'
+          cp_as_printed: '8.05'
+        - T_K: 42.8
+          cp: 8.23
+          T_as_printed: '42.8'
+          cp_as_printed: '8.23'
+        - T_K: 43.2
+          cp: 8.4
+          T_as_printed: '43.2'
+          cp_as_printed: '8.40'
+        - T_K: 43.6
+          cp: 8.57
+          T_as_printed: '43.6'
+          cp_as_printed: '8.57'
+        - T_K: 44
+          cp: 8.74
+          T_as_printed: '44.0'
+          cp_as_printed: '8.74'
+        - T_K: 44.4
+          cp: 8.9
+          T_as_printed: '44.4'
+          cp_as_printed: '8.90'
+        - T_K: 44.8
+          cp: 9.1
+          T_as_printed: '44.8'
+          cp_as_printed: '9.10'
+        - T_K: 45.2
+          cp: 9.26
+          T_as_printed: '45.2'
+          cp_as_printed: '9.26'
+        - T_K: 45.6
+          cp: 9.42
+          T_as_printed: '45.6'
+          cp_as_printed: '9.42'
+        - T_K: 46.1
+          cp: 9.62
+          T_as_printed: '46.1'
+          cp_as_printed: '9.62'
+        - T_K: 46.5
+          cp: 9.8
+          T_as_printed: '46.5'
+          cp_as_printed: '9.80'
+        - T_K: 46.9
+          cp: 9.98
+          T_as_printed: '46.9'
+          cp_as_printed: '9.98'
+        - T_K: 47.3
+          cp: 10.17
+          T_as_printed: '47.3'
+          cp_as_printed: '10.17'
+        - T_K: 47.7
+          cp: 10.35
+          T_as_printed: '47.7'
+          cp_as_printed: '10.35'
+        - T_K: 48.1
+          cp: 10.54
+          T_as_printed: '48.1'
+          cp_as_printed: '10.54'
+        - T_K: 48.5
+          cp: 10.72
+          T_as_printed: '48.5'
+          cp_as_printed: '10.72'
+        - T_K: 48.9
+          cp: 10.9
+          T_as_printed: '48.9'
+          cp_as_printed: '10.90'
+        - T_K: 49.3
+          cp: 11.08
+          T_as_printed: '49.3'
+          cp_as_printed: '11.08'
+        - T_K: 49.7
+          cp: 11.29
+          T_as_printed: '49.7'
+          cp_as_printed: '11.29'
+        - T_K: 50.1
+          cp: 11.47
+          T_as_printed: '50.1'
+          cp_as_printed: '11.47'
+        - T_K: 50.5
+          cp: 11.66
+          T_as_printed: '50.5'
+          cp_as_printed: '11.66'
+        - T_K: 50.8
+          cp: 11.67
+          T_as_printed: '50.8'
+          cp_as_printed: '11.67'
+        - T_K: 51
+          cp: 11.93
+          T_as_printed: '51.0'
+          cp_as_printed: '11.93'
+        - T_K: 56.1
+          cp: 14.51
+          T_as_printed: '56.1'
+          cp_as_printed: '14.51'
+        - T_K: 61.3
+          cp: 17.03
+          T_as_printed: '61.3'
+          cp_as_printed: '17.03'
+        - T_K: 66.5
+          cp: 19.66
+          T_as_printed: '66.5'
+          cp_as_printed: '19.66'
+        - T_K: 71.7
+          cp: 22.3
+          T_as_printed: '71.7'
+          cp_as_printed: '22.30'
+        - T_K: 76.8
+          cp: 25.28
+          T_as_printed: '76.8'
+          cp_as_printed: '25.28'
+        - T_K: 82
+          cp: 28.12
+          T_as_printed: '82.0'
+          cp_as_printed: '28.12'
+        - T_K: 87.2
+          cp: 30.85
+          T_as_printed: '87.2'
+          cp_as_printed: '30.85'
+        - T_K: 92.3
+          cp: 33.4
+          T_as_printed: '92.3'
+          cp_as_printed: '33.40'
+        - T_K: 97.5
+          cp: 35.82
+          T_as_printed: '97.5'
+          cp_as_printed: '35.82'
+        - T_K: 102.7
+          cp: 37.95
+          T_as_printed: '102.7'
+          cp_as_printed: '37.95'
+        - T_K: 107.8
+          cp: 39.99
+          T_as_printed: '107.8'
+          cp_as_printed: '39.99'
+        - T_K: 113
+          cp: 41.75
+          T_as_printed: '113.0'
+          cp_as_printed: '41.75'
+        - T_K: 118.2
+          cp: 43.56
+          T_as_printed: '118.2'
+          cp_as_printed: '43.56'
+        - T_K: 123.3
+          cp: 45.43
+          T_as_printed: '123.3'
+          cp_as_printed: '45.43'
+        - T_K: 128.5
+          cp: 47.2
+          T_as_printed: '128.5'
+          cp_as_printed: '47.20'
+        - T_K: 133.6
+          cp: 48.95
+          T_as_printed: '133.6'
+          cp_as_printed: '48.95'
+        - T_K: 138.8
+          cp: 50.65
+          T_as_printed: '138.8'
+          cp_as_printed: '50.65'
+        - T_K: 144
+          cp: 52.24
+          T_as_printed: '144.0'
+          cp_as_printed: '52.24'
+        - T_K: 149.1
+          cp: 53.85
+          T_as_printed: '149.1'
+          cp_as_printed: '53.85'
+        - T_K: 154.3
+          cp: 55.46
+          T_as_printed: '154.3'
+          cp_as_printed: '55.46'
+        - T_K: 159.5
+          cp: 56.93
+          T_as_printed: '159.5'
+          cp_as_printed: '56.93'
+        - T_K: 164.6
+          cp: 58.27
+          T_as_printed: '164.6'
+          cp_as_printed: '58.27'
+        - T_K: 169.8
+          cp: 59.6
+          T_as_printed: '169.8'
+          cp_as_printed: '59.60'
+        - T_K: 174.9
+          cp: 60.84
+          T_as_printed: '174.9'
+          cp_as_printed: '60.84'
+        - T_K: 180.1
+          cp: 62.22
+          T_as_printed: '180.1'
+          cp_as_printed: '62.22'
+        - T_K: 185.2
+          cp: 63.43
+          T_as_printed: '185.2'
+          cp_as_printed: '63.43'
+        - T_K: 190.3
+          cp: 64.64
+          T_as_printed: '190.3'
+          cp_as_printed: '64.64'
+        - T_K: 195.5
+          cp: 65.84
+          T_as_printed: '195.5'
+          cp_as_printed: '65.84'
+        - T_K: 200.6
+          cp: 66.91
+          T_as_printed: '200.6'
+          cp_as_printed: '66.91'
+        - T_K: 205.8
+          cp: 68.13
+          T_as_printed: '205.8'
+          cp_as_printed: '68.13'
+        - T_K: 210.9
+          cp: 69.25
+          T_as_printed: '210.9'
+          cp_as_printed: '69.25'
+        - T_K: 216.1
+          cp: 70.36
+          T_as_printed: '216.1'
+          cp_as_printed: '70.36'
+        - T_K: 221.2
+          cp: 71.34
+          T_as_printed: '221.2'
+          cp_as_printed: '71.34'
+        - T_K: 226.4
+          cp: 72.16
+          T_as_printed: '226.4'
+          cp_as_printed: '72.16'
+        - T_K: 231.5
+          cp: 73.25
+          T_as_printed: '231.5'
+          cp_as_printed: '73.25'
+        - T_K: 236.6
+          cp: 74.31
+          T_as_printed: '236.6'
+          cp_as_printed: '74.31'
+        - T_K: 241.8
+          cp: 75.37
+          T_as_printed: '241.8'
+          cp_as_printed: '75.37'
+        - T_K: 247
+          cp: 76.42
+          T_as_printed: '247.0'
+          cp_as_printed: '76.42'
+        - T_K: 252.1
+          cp: 77.36
+          T_as_printed: '252.1'
+          cp_as_printed: '77.36'
+        - T_K: 257.2
+          cp: 78.22
+          T_as_printed: '257.2'
+          cp_as_printed: '78.22'
+        - T_K: 262.4
+          cp: 79.16
+          T_as_printed: '262.4'
+          cp_as_printed: '79.16'
+        - T_K: 267.5
+          cp: 80.16
+          T_as_printed: '267.5'
+          cp_as_printed: '80.16'
+        - T_K: 272.6
+          cp: 81.02
+          T_as_printed: '272.6'
+          cp_as_printed: '81.02'
+        - T_K: 277.7
+          cp: 81.9
+          T_as_printed: '277.7'
+          cp_as_printed: '81.90'
+        - T_K: 282.8
+          cp: 82.56
+          T_as_printed: '282.8'
+          cp_as_printed: '82.56'
+        - T_K: 287.9
+          cp: 83.26
+          T_as_printed: '287.9'
+          cp_as_printed: '83.26'
+        - T_K: 293
+          cp: 83.84
+          T_as_printed: '293.0'
+          cp_as_printed: '83.84'
+        - T_K: 298.1
+          cp: 84.79
+          T_as_printed: '298.1'
+          cp_as_printed: '84.79'
+        - T_K: 304
+          cp: 86.19
+          T_as_printed: '304.0'
+          cp_as_printed: '86.19'
+      uncertainty:
+        reported_status: not_reported_individually
+        note: The paper does not print an uncertainty for each tabulated Cp point.
+    - observation_id: klemme_2011_coco3_table6_entropy_series
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 10
+        published_page: 10
+        pdf_page_index: 9
+        table: '6'
+      phase: cr
+      phase_as_published: crystalline CoCO3 sample
+      T_range_K:
+      - 5
+      - 300
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      derived_from: &id003
+      - klemme_2011_coco3_table3_series1_cp
+      derivation:
+        relation: The authors calculate thermodynamic functions from the measured Cp data; S(T) uses a T^3 extrapolation to
+          0 K.
+        inputs: *id003
+        output_unit: J/mol K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        molar_basis_as_published: per mole of formula unit
+        series:
+        - T_K: 300
+          entropy: 89.4
+          T_as_printed: '300'
+          entropy_as_printed: '89.4'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 290
+          entropy: 86.6
+          T_as_printed: '290'
+          entropy_as_printed: '86.6'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 280
+          entropy: 83.7
+          T_as_printed: '280'
+          entropy_as_printed: '83.7'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 270
+          entropy: 80.7
+          T_as_printed: '270'
+          entropy_as_printed: '80.7'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 260
+          entropy: 77.7
+          T_as_printed: '260'
+          entropy_as_printed: '77.7'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 250
+          entropy: 74.7
+          T_as_printed: '250'
+          entropy_as_printed: '74.7'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 240
+          entropy: 71.6
+          T_as_printed: '240'
+          entropy_as_printed: '71.6'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 230
+          entropy: 68.4
+          T_as_printed: '230'
+          entropy_as_printed: '68.4'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 220
+          entropy: 65.2
+          T_as_printed: '220'
+          entropy_as_printed: '65.2'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 210
+          entropy: 61.9
+          T_as_printed: '210'
+          entropy_as_printed: '61.9'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 200
+          entropy: 58.6
+          T_as_printed: '200'
+          entropy_as_printed: '58.6'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 190
+          entropy: 55.3
+          T_as_printed: '190'
+          entropy_as_printed: '55.3'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 180
+          entropy: 51.8
+          T_as_printed: '180'
+          entropy_as_printed: '51.8'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 170
+          entropy: 48.4
+          T_as_printed: '170'
+          entropy_as_printed: '48.4'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 160
+          entropy: 44.8
+          T_as_printed: '160'
+          entropy_as_printed: '44.8'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 150
+          entropy: 41.2
+          T_as_printed: '150'
+          entropy_as_printed: '41.2'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 140
+          entropy: 37.6
+          T_as_printed: '140'
+          entropy_as_printed: '37.6'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 130
+          entropy: 33.9
+          T_as_printed: '130'
+          entropy_as_printed: '33.9'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 120
+          entropy: 30.3
+          T_as_printed: '120'
+          entropy_as_printed: '30.3'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 110
+          entropy: 26.6
+          T_as_printed: '110'
+          entropy_as_printed: '26.6'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 100
+          entropy: 22.9
+          T_as_printed: '100'
+          entropy_as_printed: '22.9'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 90
+          entropy: 19.2
+          T_as_printed: '90'
+          entropy_as_printed: '19.2'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 80
+          entropy: 15.7
+          T_as_printed: '80'
+          entropy_as_printed: '15.7'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 70
+          entropy: 12.5
+          T_as_printed: '70'
+          entropy_as_printed: '12.5'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 60
+          entropy: 9.62
+          T_as_printed: '60'
+          entropy_as_printed: '9.62'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 50
+          entropy: 7.09
+          T_as_printed: '50'
+          entropy_as_printed: '7.09'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 40
+          entropy: 5.06
+          T_as_printed: '40'
+          entropy_as_printed: '5.06'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 30
+          entropy: 3.49
+          T_as_printed: '30'
+          entropy_as_printed: '3.49'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 20
+          entropy: 2.16
+          T_as_printed: '20'
+          entropy_as_printed: '2.16'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 15
+          entropy: 1.37
+          T_as_printed: '15'
+          entropy_as_printed: '1.37'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 10
+          entropy: 0.46
+          T_as_printed: '10'
+          entropy_as_printed: '0.46'
+          point_uncertainty_status: not_reported_individually
+        - T_K: 5
+          entropy: 0.062
+          T_as_printed: '5'
+          entropy_as_printed: '0.062'
+          point_uncertainty_status: not_reported_individually
+      uncertainty:
+        reported_status: not_reported_individually
+        note: Individual S(T) uncertainties are not printed; the separately reported S(298.15 K) uncertainties are stored
+          on their own observations.
+    - observation_id: klemme_2011_coco3_standard_entropy_298_15k
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 10
+        published_page: 10
+        pdf_page_index: 9
+        table: '6'
+        note: The same result is also in the abstract on physical page 1 and Table 7 on physical page 11; one observation
+          only.
+      phase: cr
+      phase_as_published: crystalline CoCO3 sample
+      T_range_K:
+      - 298.15
+      - 298.15
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      derived_from: *id003
+      derivation:
+        relation: The authors calculate the standard molar entropy from their measured Cp data, using a T^3 extrapolation
+          to 0 K.
+        inputs: *id003
+        output_unit: J/mol K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        molar_basis_as_published: per mole of formula unit
+        T_K: 298.15
+        T_as_printed: '298.15'
+        entropy: 88.9
+        entropy_as_printed: '88.9'
+      uncertainty:
+        reported_status: printed
+        value_J_per_mol_K: 0.7
+        uncertainty_as_printed: ± 0.7 J mol-1 K-1 in the abstract; parentheses in Table 7
+    - observation_id: klemme_2011_coco3_s298_quote_37
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 11
+        published_page: 11
+        pdf_page_index: 10
+        table: '7'
+        row: CoCO3, [37]
+      phase: cr
+      T_range_K:
+      - 298.15
+      - 298.15
+      units: J/mol K
+      published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        attribution: '[37]'
+        molar_basis_as_published: per mole of formula unit
+        series:
+        - T_K: 298.15
+          T_as_printed: '298.15'
+          entropy: 88.7
+          entropy_as_printed: '88.7'
+          value_as_printed: 88.7(1.7)
+      uncertainty:
+        reported_status: printed
+        value_J_per_mol_K: 1.7
+        uncertainty_as_printed: '1.7'
+    context:
+    - observation_id: klemme_2011_coco3_table6_calculated_cp_and_cp_over_t_context
+      type: table_record
+      locator:
+        page: 10
+        published_page: 10
+        pdf_page_index: 9
+        table: '6'
+      units: T in K; Cp in J/mol K; Cp/T in J mol-1 K-2
+      values:
+        quantity_as_printed: Cp, Cp/T and S(T) at selected temperatures
+        candidate_store_tokens:
+        - cp
+        - S
+        method_class: model_derived
+        disposition: The S(T) values are typed as measured_reduced in klemme_2011_coco3_table6_entropy_series (with S(298.15
+          K) split out for its printed uncertainty). The selected-temperature Cp values are not stored as a second measured
+          series because the paper does not identify them as independent measurements; the Cp/T column has no quantity token.
+          The printed Cp and Cp/T cells are retained here.
+        rows:
+        - T_as_printed: '300'
+          Cp_as_printed: '85.2'
+          Cp_over_T_as_printed: '0.284'
+        - T_as_printed: '298.15'
+          Cp_as_printed: '84.8'
+          Cp_over_T_as_printed: '0.284'
+        - T_as_printed: '290'
+          Cp_as_printed: '83.5'
+          Cp_over_T_as_printed: '0.288'
+        - T_as_printed: '280'
+          Cp_as_printed: '82.2'
+          Cp_over_T_as_printed: '0.294'
+        - T_as_printed: '270'
+          Cp_as_printed: '80.6'
+          Cp_over_T_as_printed: '0.298'
+        - T_as_printed: '260'
+          Cp_as_printed: '78.7'
+          Cp_over_T_as_printed: '0.303'
+        - T_as_printed: '250'
+          Cp_as_printed: '77.0'
+          Cp_over_T_as_printed: '0.308'
+        - T_as_printed: '240'
+          Cp_as_printed: '75.0'
+          Cp_over_T_as_printed: '0.312'
+        - T_as_printed: '230'
+          Cp_as_printed: '72.9'
+          Cp_over_T_as_printed: '0.317'
+        - T_as_printed: '220'
+          Cp_as_printed: '71.1'
+          Cp_over_T_as_printed: '0.323'
+        - T_as_printed: '210'
+          Cp_as_printed: '69.0'
+          Cp_over_T_as_printed: '0.329'
+        - T_as_printed: '200'
+          Cp_as_printed: '66.8'
+          Cp_over_T_as_printed: '0.334'
+        - T_as_printed: '190'
+          Cp_as_printed: '64.6'
+          Cp_over_T_as_printed: '0.340'
+        - T_as_printed: '180'
+          Cp_as_printed: '62.2'
+          Cp_over_T_as_printed: '0.346'
+        - T_as_printed: '170'
+          Cp_as_printed: '59.7'
+          Cp_over_T_as_printed: '0.351'
+        - T_as_printed: '160'
+          Cp_as_printed: '57.1'
+          Cp_over_T_as_printed: '0.357'
+        - T_as_printed: '150'
+          Cp_as_printed: '54.1'
+          Cp_over_T_as_printed: '0.361'
+        - T_as_printed: '140'
+          Cp_as_printed: '51.0'
+          Cp_over_T_as_printed: '0.364'
+        - T_as_printed: '130'
+          Cp_as_printed: '47.7'
+          Cp_over_T_as_printed: '0.367'
+        - T_as_printed: '120'
+          Cp_as_printed: '44.2'
+          Cp_over_T_as_printed: '0.369'
+        - T_as_printed: '110'
+          Cp_as_printed: '40.7'
+          Cp_over_T_as_printed: '0.370'
+        - T_as_printed: '100'
+          Cp_as_printed: '36.9'
+          Cp_over_T_as_printed: '0.369'
+        - T_as_printed: '90'
+          Cp_as_printed: '32.2'
+          Cp_over_T_as_printed: '0.358'
+        - T_as_printed: '80'
+          Cp_as_printed: '27.0'
+          Cp_over_T_as_printed: '0.338'
+        - T_as_printed: '70'
+          Cp_as_printed: '21.4'
+          Cp_over_T_as_printed: '0.306'
+        - T_as_printed: '60'
+          Cp_as_printed: '16.4'
+          Cp_over_T_as_printed: '0.273'
+        - T_as_printed: '50'
+          Cp_as_printed: '11.4'
+          Cp_over_T_as_printed: '0.228'
+        - T_as_printed: '40'
+          Cp_as_printed: '7.14'
+          Cp_over_T_as_printed: '0.178'
+        - T_as_printed: '30'
+          Cp_as_printed: '4.17'
+          Cp_over_T_as_printed: '0.139'
+        - T_as_printed: '20'
+          Cp_as_printed: '2.72'
+          Cp_over_T_as_printed: '0.136'
+        - T_as_printed: '15'
+          Cp_as_printed: '3.18'
+          Cp_over_T_as_printed: '0.212'
+        - T_as_printed: '10'
+          Cp_as_printed: '1.31'
+          Cp_over_T_as_printed: '0.131'
+        - T_as_printed: '5'
+          Cp_as_printed: '0.18'
+          Cp_over_T_as_printed: '0.036'
+    - observation_id: klemme_2011_figure4_coco3_cp
+      type: figure_record
+      locator:
+        page: 8
+        published_page: 8
+        pdf_page_index: 7
+        figure: '4'
+      phase: cr
+      units: T in K; Cp in J/mol K
+      values:
+        quantity: cp
+        method_class: figure_only
+        species: CoCO3
+        temperature_as_published: main axis 0-300 K; inset 0-40 K
+        axes_as_printed:
+          x: Temperature / K
+          y: Cp / J mol-1 K-1
+        caption_as_published: Low-temperature heat capacity data for CoCO3.
+        panel: main panel with low-temperature inset
+        series:
+        - label: single scan
+          marker: filled triangle in the main panel; open diamond in the inset
+          marker_count: 170
+        attribution: This work.
+        digitisation: deferred to a figure pass
+        numeric_points: none
+    - observation_id: klemme_2011_coco3_heat_capacity_anomaly_peak_text
+      type: thermochemical_values
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Abstract
+      units: K
+      values:
+        quantity_as_printed: low-temperature heat-capacity anomaly peak temperature
+        quantity_token: unavailable
+        candidate_store_tokens:
+        - transition_temperature
+        - cp
+        schema_gap: No quantity token represents a heat-capacity anomaly peak temperature without recasting the reported peak
+          as a phase-transition temperature.
+        method_class: measured_reduced
+        species: CoCO3
+        phase: crystalline solid
+        temperature_as_printed: about 31
+        temperature_K: 31
+        approximate: true
+        interpretation: For NiTiO3 and CoTiO3 the authors say the Cp anomaly coincides with antiferromagnetic ordering; for
+          CoCO3 they say it may be caused by the transition.
+  Al2O3:
+    observations: []
+    context:
+    - observation_id: klemme_2011_figure1_al2o3_calorimeter_check
+      type: figure_record
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        figure: '1'
+      phase: cr
+      units: T in K; Cp in J/mol K
+      values:
+        quantity: cp
+        method_class: figure_only
+        species: Al2O3
+        temperature_as_published: main axis 0-350 K
+        axes_as_printed:
+          x: T / K
+          y: Cp / J mol-1 K-1
+        caption_as_published: Comparison of published heat capacities of NIST SRM-720 (Ditmars et al. 1982) with PPMS measurements
+          done at Münster University.
+        panel: single panel
+        series:
+        - label: Münster PPMS
+          marker: black diamond
+          marker_count: not separable; dense overlapping markers
+        - label: NIST-SRM 720
+          marker: red square
+          marker_count: 32
+        attribution: Münster PPMS measurements; NIST-SRM 720 values attributed to Ditmars et al. (1982) [35].
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        marker_count_note: The black PPMS symbols overlap into a continuous band at 600 dpi; count is not separately resolvable.
+          NIST red squares are countable in the render.
+        calibration_summary_as_published: SRM-720 Cp was reproduced within 0.8%; average Cp difference 0.4% above 90 K and
+          around 4% below 90 K.
