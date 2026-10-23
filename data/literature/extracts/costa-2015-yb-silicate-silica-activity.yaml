@@ -1,0 +1,186 @@
+schema_version: literature_extract.v1
+source_id: costa-2015-yb-silicate-silica-activity
+source:
+  citation: 'Costa, G. C. C. & Jacobson, N. S. (2015). Mass spectrometric measurements of the silica activity in the Yb2O3-SiO2 system and implications to assess the degradation of silicate-based coatings in combustion environments. Journal of the European Ceramic Society, 35(15), 4259–4267.'
+  doi: 10.1016/j.jeurceramsoc.2015.07.019
+  year: 2015
+  corpus_asset: raw/costa-2015-yb-silicate-silica-activity/costa-2015-yb-silicate-silica-activity.pdf
+extraction:
+  method: >-
+    Born-digital pdftotext-layout was checked against 600 dpi renders of the paper's tables, figures and relevant prose. Figures are metadata-only, deferred records. The 2018 published corrigendum was checked against its 600 dpi render and is retained with the erroneous original Table 2 as context; the cycle-derived elemental formation enthalpy is not scored because its inputs have no registered table asset.
+  date: '2026-10-21'
+  worker: fam33b-1020
+review_status: draft
+fidelity_samples:
+  - path: species.Yb2SiO5.observations[costa_2015_literature_delta_fH_yb2sio5].values.value
+    value: -2774.75
+    locator: {page: 7, pdf_page_index: 6, published_page: 4265, note: 'Formation enthalpy quoted from Liang and Navrotsky [10].'}
+species:
+  Yb2SiO5:
+    observations:
+      - observation_id: costa_2015_literature_delta_fH_yb2sio5
+        type: gibbs_table
+        locator: {page: 7, pdf_page_index: 6, published_page: 4265, paragraph: 'discussion following Fig. 8'}
+        phase: cr
+        units: kJ/mol
+        standard_state: Standard enthalpy of formation from elements at 298 K, as attributed to Liang and Navrotsky [10].
+        values:
+          quantity: delta_fH
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liang and Navrotsky [10], as cited by Costa and Jacobson.
+          T_K: '298'
+          value_as_printed: '-2774.75'
+          value: -2774.75
+          sigma: '8.21'
+        uncertainty: '±8.21 kJ/mol'
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '298'}}
+            locator: {page: 7, pdf_page_index: 6, published_page: 4265}
+    context:
+      - observation_id: costa_2015_table_1_whole_sample_xrd
+        type: measured_bulk_sample_analysis
+        locator: {page: 6, pdf_page_index: 5, published_page: 4264, table: '1'}
+        units: wt%
+        values:
+          method_class: measured_direct
+          candidate_tokens: [equilibrium_phase_composition, phase_fraction]
+          schema_gap: >-
+            XRD values are whole multiphase powder batch fractions, not composition of a single phase; the store has no token for whole-sample phase fractions.
+          rows:
+            - {sample: 'Ta + Yb2O3 + Yb2SiO5', Yb2SiO5: '23±2', Yb2O3: '68±1', Ta: '7.0±0.2', Ta2Si: '1.8±0.4', other_reported: 'not reported'}
+            - {sample: 'Mo + Yb2Si2O7 + Yb2SiO5', Yb2SiO5: '55.3±0.3', Yb2Si2O7: '36.8±0.2', Mo: '8.0±0.1', other_reported: 'not reported'}
+            - {sample: 'Mo + SiO2', SiO2: '80.7±0.4', Mo: '19.3±0.1', other_reported: 'not reported'}
+      - observation_id: costa_2015_table_2_original_and_corrected_cycle
+        type: thermochemical_cycle_context
+        locator: {page: 8, pdf_page_index: 7, published_page: 4266, table: '2'}
+        units: kJ/mol
+        values:
+          method_class: measured_direct
+          candidate_tokens: [delta_fH]
+          schema_gap: >-
+            Table 2 is a reaction enthalpy cycle. Reactions 1–6 are formation/heating steps, not standard enthalpy of formation; reaction 7 is derived from the cycle and its inputs are not registered corpus table assets. Corrected cycle and inputs are in .agent-scratch/costa-2015-yb-silicate-silica-activity/table-2-corrected-cycle.csv; derivation pending a corpus table asset (controller, t-1382).
+          original_table_2_as_published: 'Row 2 prints Y2SiO5 in the product; original values include reaction 1 −27±2, reaction 2 +283±3, reaction 3 +165.2±0.5, reaction 4 +87.9±0.5, reaction 5 +1809±10, reaction 6 +908±2, and row 7 −2714±11.'
+          corrigendum: 'Costa and Jacobson (2018), DOI 10.1016/j.jeurceramsoc.2018.03.007, corrects the product to Yb2SiO5 and the reaction signs; corrected row 7 is −2774±11 kJ/mol. The 2015 prose omits the minus sign in its 2774±11 statement; the corrigendum table gives −2774±11.'
+      - observation_id: costa_2015_table_3_optical_basicity_model
+        type: model_table
+        locator: {page: 8, pdf_page_index: 7, published_page: 4266, table: '3'}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          candidate_tokens: [activity]
+          schema_gap: 'Optical basicity is not oxide activity and has no matching token.'
+          rows: [{phase: Y2SiO5, optical_basicity: '0.792'}, {phase: Yb2SiO5, optical_basicity: '0.728'}, {phase: Y2Si2O7, optical_basicity: '0.703'}, {phase: Yb2Si2O7, optical_basicity: '0.657'}]
+      - observation_id: costa_2015_table_4_flux_model_inputs
+        type: model_table
+        locator: {page: 8, pdf_page_index: 7, published_page: 4266, table: '4'}
+        units: as printed per parameter
+        values:
+          method_class: model_derived
+          candidate_tokens: [evaporation_rate, p_partial]
+          schema_gap: 'These are inputs to the gas-side flux model, not observed material properties or partial-pressure measurements.'
+          T_K: '1773'
+          total_pressure_atm: '1.013'
+          H2O_partial_pressure_atm: '0.3'
+          characteristic_dimension_cm: '1.4'
+          gas_velocity_cm_s: '13'
+          viscosity_g_cm_s: '5.75e-4'
+          free_stream_density_kg_m3: '1.16e-3'
+          density_at_T_kg_m3: '1.95e-4'
+          SiOH4_diffusivity_cm2_s: '2.23'
+          logKp_relation: 'log Kp = 2851.2 T−1 − 3.5249'
+          reaction: 'SiO2(s) + 2 H2O(g) = Si(OH)4(g)'
+          gas_constant_cm3_atm_K_mol: '8.21e1'
+      - observation_id: costa_2015_table_5_area_specific_flux
+        type: measured_and_model_flux_table
+        locator: {page: 8, pdf_page_index: 7, published_page: 4266, table: '5'}
+        units: mg cm−2 h−1 at 1773 K
+        values:
+          method_class: mixed_model_and_quoted_measurement
+          candidate_tokens: [evaporation_rate]
+          schema_gap: 'Area-specific evaporation_rate flux is retained here; scoring requires confirming that the converter accepts mg cm−2 h−1 and establishing the needed apparatus inputs.'
+          T_K: '1773'
+          calculated: [{assemblage: SiO2, flux: '1.1e-2'}, {assemblage: Y2SiO5 + Y2O3, flux: '1.5e-5'}, {assemblage: Yb2SiO5 + Yb2O3, flux: '3.8e-5'}, {assemblage: Y2SiO5 + Y2Si2O7, flux: '3.1e-3'}, {assemblage: Yb2SiO5 + Yb2Si2O7, flux: '4.0e-3'}]
+          cited_measurements: [{assemblage: 'Y2Si2O7 + <1% Y2SiO5', flux: '1.9e-3', attribution: '[a]'}, {assemblage: 'Yb2Si2O7 + <1% Yb2SiO5', flux: '2.0e-3', attribution: '[b]'}, {assemblage: 'Yb2Si2O7 + traces Yb2SiO5', flux: '2.3e-3', attribution: '[c]'}, {assemblage: Yb2Si2O7, flux: '0.75', attribution: '[d]'}]
+      - observation_id: costa_2015_figure_1_deferred
+        type: figure_record
+        locator: {page: 2, pdf_page_index: 1, published_page: 4260, figure: '1'}
+        panel: whole_figure
+        attribution: 'Phase diagram reproduced from reference [7].'
+        units: temperature and composition axes as printed
+        values: {quantity: phase_diagram, species: [Yb2O3, SiO2], phase: solid and liquid fields, temperature_as_printed: phase diagram, axes_as_printed: {x: composition Yb2O3-SiO2, y: temperature}, caption: 'Yb2O3-SiO2 phase diagram.', series: [{name: phase boundaries, marker: lines, marker_count: not_applicable, evidence_class: quoted_attributed}], digitisation: deferred to a figure pass, numeric_points: none}
+      - observation_id: costa_2015_figure_2_deferred
+        type: figure_record
+        locator: {page: 3, pdf_page_index: 2, published_page: 4261, figure: '2'}
+        panel: whole_figure
+        attribution: 'Structural diagrams as presented by Costa and Jacobson.'
+        units: schematic
+        values: {quantity: crystal_structure_schematic, species: [Yb2Si2O7, Yb2SiO5], phase: solid, temperature_as_printed: not specified, axes_as_printed: none, caption: 'Pyrosilicate and orthosilicate structures; caption labels Y2Si2O7/Y2SiO5 while the surrounding text discusses Yb compounds.', series: [{name: pyrosilicate, marker: schematic, marker_count: 0}, {name: orthosilicate, marker: schematic, marker_count: 0}], digitisation: deferred to a figure pass, numeric_points: none}
+      - observation_id: costa_2015_figure_3_deferred
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, published_page: 4263, figure: '3'}
+        panel: three panels
+        attribution: 'Present study XRD patterns.'
+        units: intensity as plotted
+        values: {quantity: XRD_pattern, species: [Yb2SiO5, Yb2O3, Yb2Si2O7], phase: solids, temperature_as_printed: not specified, axes_as_printed: {x: diffraction angle, y: intensity}, caption: 'XRD patterns for the prepared samples.', series: [{name: measured patterns, marker: measured scatter and fit lines, marker_count: not_counted, evidence_class: measured_direct}], digitisation: deferred to a figure pass, numeric_points: none}
+      - observation_id: costa_2015_figure_4_deferred
+        type: figure_record
+        locator: {page: 6, pdf_page_index: 5, published_page: 4264, figure: '4'}
+        panel: A-C
+        attribution: 'Present study KEMS measurements.'
+        units: counts s−1 vs time
+        values: {quantity: ion_intensity, species: [SiO, MoO3], phase: gas, temperature_as_printed: A 1564 K; B-C 1695 K, axes_as_printed: {x: time, y: ion intensity}, caption: 'Ion intensity as a function of time for the indicated samples.', series: [{name: SiO, marker: circles, marker_count: not_counted, evidence_class: measured_direct}, {name: MoO3, marker: triangles, marker_count: not_counted, evidence_class: measured_direct}], text_quoted_values: ['3Ta + Yb2O3 + Yb2SiO5: intensity decreased from 68 × 10^3 cps to approximately 40 × 10^3 cps after 16 h.', 'SiO in 3Mo + SiO2: intensity increased from 7.5 × 10^3 cps to 13.5 × 10^3 cps after 31 h.', 'MoO3: intensity decreased from 8.5 × 10^3 cps to approximately 200 cps after 23 h.'], digitisation: deferred to a figure pass, numeric_points: none}
+      - observation_id: costa_2015_figure_5_deferred
+        type: figure_record
+        locator: {page: 6, pdf_page_index: 5, published_page: 4264, figure: '5'}
+        panel: whole_figure
+        attribution: 'Present study measurements; repeated runs noted by the authors.'
+        units: ln(IT) vs K−1
+        values: {quantity: ion_intensity, species: [SiO, Au], phase: gas, temperature_as_printed: 1562 K mean with range 1239–1597 °C, axes_as_printed: {x: inverse temperature, y: ln(IT)}, caption: 'KEMS calibration plot for SiO and Au.', series: [{name: SiO, marker: closed circles, marker_count: not_counted, evidence_class: measured_direct}, {name: Au, marker: open triangles, marker_count: not_counted, evidence_class: measured_direct}], in_plot_fits: ['Au: y=44.22±0.02−(41432±37)x, R2=0.99987', 'SiO: y=47.0±0.2−(49994±297)x, R2=0.99771'], digitisation: deferred to a figure pass, numeric_points: none}
+      - observation_id: costa_2015_figure_6_deferred
+        type: figure_record
+        locator: {page: 7, pdf_page_index: 6, published_page: 4265, figure: '6'}
+        panel: whole_figure
+        attribution: 'FactSage model curves.'
+        units: temperatures K and printed intercepts
+        values: {quantity: p_partial, species: SiO, phase: gas over SiO2, temperature_as_printed: '1512.13–1656.27 K', axes_as_printed: {x: SiO2 activity, y: SiO pressure}, caption: 'Calculated calibration curves for SiO pressure against silica activity.', series: [{name: '11 numbered model curves', marker: lines, marker_count: 11, evidence_class: model_derived}], in_plot_values: ['1: 1512.13 K, 4.71', '2: 1526.44 K, 4.58', '3: 1543.16 K, 4.45', '4: 1557.04 K, 4.32', '5: 1573.45 K, 4.19', '6: 1588.45 K, 4.06', '7: 1603.77 K, 3.94', '8: 1616.94 K, 3.84', '9: 1631.1 K, 3.73', '10: 1644.94 K, 3.62', '11: 1656.27 K, 3.54'], digitisation: deferred to a figure pass, numeric_points: none}
+      - observation_id: costa_2015_figure_7_deferred
+        type: figure_record
+        locator: {page: 7, pdf_page_index: 6, published_page: 4265, figure: '7'}
+        panel: whole_figure
+        attribution: 'Present study KEMS data and fitted relation.'
+        units: log activity; inverse temperature ×10^4 K−1
+        values:
+          quantity: activity
+          species: SiO2
+          phase: solid assemblage Yb2O3 + Yb2SiO5
+          temperature_as_printed: approximately 1500–1650 K
+          standard_state:
+            state: inferred
+            phase: tridymite
+            basis: 'pure SiO2 phase stable over this T interval; transition near 1743 K (Richet et al. 1982/JANAF)'
+          notice: high-T extent is within about 100 K of the tridymite to cristobalite transition
+          axes_as_printed: {x: inverse temperature ×10^4 K−1, y: log a(SiO2)}
+          caption: 'Silica activity for the Yb2O3 + Yb2SiO5 solid field.'
+          series:
+            - {name: measured activity, marker: open triangles, marker_count: 11, evidence_class: measured_reduced}
+            - {name: linear fit, marker: line, marker_count: 0, evidence_class: model_derived}
+          in_plot_fit: 'y=−1413±128 (1/T) −1.67±0.08'
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: costa_2015_figure_8_deferred
+        type: figure_record
+        locator: {page: 7, pdf_page_index: 6, published_page: 4265, figure: '8'}
+        panel: whole_figure
+        attribution: 'Present study KEMS measurements; fit parameters printed in plot.'
+        units: ln(IT) and K−1
+        values: {quantity: ion_intensity, species: [SiO, MoO3], phase: gas, temperature_as_printed: 1724–1866 K, axes_as_printed: {x: inverse temperature, y: ln(IT)}, caption: 'Initial KEMS measurements for indicated samples.', series: [{name: SiO, marker: circles, marker_count: 12, evidence_class: measured_direct}, {name: MoO3, marker: triangles, marker_count: 12, evidence_class: measured_direct}], in_plot_fits: ['1: 55.0(3), −65635(488)', '2: 55.1(2), −66793(393)', '3: 57.6(3), −77561(473)', '4: 63.1(3), −89626(491)'], digitisation: deferred to a figure pass, numeric_points: none}
+      - observation_id: costa_2015_figure_9_deferred
+        type: figure_record
+        locator: {page: 8, pdf_page_index: 7, published_page: 4266, figure: '9'}
+        panel: whole_figure
+        attribution: 'Present study KEMS data and fitted relation.'
+        units: log activity; inverse temperature ×10^4 K−1
+        values: {quantity: activity, species: SiO2, phase: solid assemblage Yb2SiO5 + Yb2Si2O7, temperature_as_printed: 1724–1866 K, standard_state: {state: unknown, reason: 'Pure SiO2 reference interval crosses the tridymite to cristobalite transition near 1743 K (Richet et al. 1982/JANAF).'}, axes_as_printed: {x: inverse temperature ×10^4 K−1, y: log a(SiO2)}, caption: 'Silica activity for the Yb2SiO5 + Yb2Si2O7 solid field.', series: [{name: measured activity, marker: black circles, marker_count: 7, evidence_class: measured_reduced}], digitisation: deferred to a figure pass, numeric_points: none}

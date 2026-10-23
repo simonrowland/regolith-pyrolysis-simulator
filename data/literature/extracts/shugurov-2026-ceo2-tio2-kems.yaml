@@ -1,0 +1,3460 @@
+schema_version: literature_extract.v1
+source_id: shugurov-2026-ceo2-tio2-kems
+source:
+  citation: Shugurov, S. M., Zhinkina, O. A., Repin, D. A., Balabanova, E. A. & Lopatin, S. I. (2026). Vaporization
+    and Thermodynamic Properties of the CeO2–TiO2 System by Knudsen Effusion Mass Spectrometry. Russian Journal
+    of Inorganic Chemistry, 71(1), 1–7.
+  doi: 10.1134/S0036023625602727
+  year: 2026
+  version: English journal original
+extraction:
+  method: Table 2 from MinerU machine table draft; Table 3 transcribed from born-digital pdftotext-layout and reconciled
+    to the printed table; Table 1 quantitative XRD phase fractions retained in context because no phase-fraction
+    token fits.
+  date: '2026-10-20'
+  worker: codex-fam33-1020
+review_status: draft
+experiments:
+- experiment_id: shugurov-2026-ceo2-tio2-kems_kems_2150k
+  method: knudsen_effusion
+  method_as_printed: high-temperature differential mass spectrometry using an MS-1301 mass spectrometer and tungsten
+    twin Knudsen effusion cell
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Experimental Section
+  conditions:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental Section
+fidelity_samples:
+- path: species.CeO2.observations[0].values.points[0].activity
+  value: '0.006'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    table: '3'
+    row: x(CeO2)=0.1
+- path: species.TiO2.observations[shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p7].values.points[0].activity
+  value: '0.072'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    table: '3'
+    row: x(CeO2)=0.7
+- path: species.unknown.observations[shugurov-2026-ceo2-tio2-kems_table2_sample3_onset].values.T_C
+  value: '1763'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    row: '3'
+    column: Onset of melting
+species:
+  CeO2:
+    observations:
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p1
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.1
+        column: activity(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: &id001
+          page: 5
+          pdf_page_index: 4
+          table: '3'
+          row: x(CeO2)=0.1
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.1
+          x_CeO2_as_printed: '0.1'
+          x_TiO2_as_printed: '0.9'
+          activity: '0.006'
+          activity_as_printed: '0.006'
+          sigma: '0.005'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.1'
+            TiO2: '0.9'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value: &id002
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CeO2
+                    - '0.1'
+                  - - TiO2
+                    - '0.9'
+              locator: *id001
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id001
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p1
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.1
+        column: gamma(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id001
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p1
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.1
+          x_CeO2_as_printed: '0.1'
+          x_TiO2_as_printed: '0.9'
+          gamma: '0.062'
+          gamma_as_printed: '0.062'
+          sigma: '0.05'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.1'
+            TiO2: '0.9'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value: *id002
+              locator: *id001
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id001
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p1
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p2
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.2
+        column: activity(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: &id003
+          page: 5
+          pdf_page_index: 4
+          table: '3'
+          row: x(CeO2)=0.2
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.2
+          x_CeO2_as_printed: '0.2'
+          x_TiO2_as_printed: '0.8'
+          activity: '0.033'
+          activity_as_printed: '0.033'
+          sigma: '0.007'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.2'
+            TiO2: '0.8'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id003
+            composition:
+              state:
+                tag: value
+                value: &id004
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CeO2
+                    - '0.2'
+                  - - TiO2
+                    - '0.8'
+              locator: *id003
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id003
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p2
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.2
+        column: gamma(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id003
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p2
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.2
+          x_CeO2_as_printed: '0.2'
+          x_TiO2_as_printed: '0.8'
+          gamma: '0.163'
+          gamma_as_printed: '0.163'
+          sigma: '0.035'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.2'
+            TiO2: '0.8'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id003
+            composition:
+              state:
+                tag: value
+                value: *id004
+              locator: *id003
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id003
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p2
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p3
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.3
+        column: activity(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: &id005
+          page: 5
+          pdf_page_index: 4
+          table: '3'
+          row: x(CeO2)=0.3
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.3
+          x_CeO2_as_printed: '0.3'
+          x_TiO2_as_printed: '0.7'
+          activity: '0.083'
+          activity_as_printed: '0.083'
+          sigma: '0.007'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.3'
+            TiO2: '0.7'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id005
+            composition:
+              state:
+                tag: value
+                value: &id006
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CeO2
+                    - '0.3'
+                  - - TiO2
+                    - '0.7'
+              locator: *id005
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id005
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p3
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.3
+        column: gamma(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id005
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p3
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.3
+          x_CeO2_as_printed: '0.3'
+          x_TiO2_as_printed: '0.7'
+          gamma: '0.278'
+          gamma_as_printed: '0.278'
+          sigma: '0.023'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.3'
+            TiO2: '0.7'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id005
+            composition:
+              state:
+                tag: value
+                value: *id006
+              locator: *id005
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id005
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p3
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p4
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.4
+        column: activity(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: &id007
+          page: 5
+          pdf_page_index: 4
+          table: '3'
+          row: x(CeO2)=0.4
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.4
+          x_CeO2_as_printed: '0.4'
+          x_TiO2_as_printed: '0.6'
+          activity: '0.159'
+          activity_as_printed: '0.159'
+          sigma: '0.011'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.4'
+            TiO2: '0.6'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id007
+            composition:
+              state:
+                tag: value
+                value: &id008
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CeO2
+                    - '0.4'
+                  - - TiO2
+                    - '0.6'
+              locator: *id007
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id007
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p4
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.4
+        column: gamma(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id007
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p4
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.4
+          x_CeO2_as_printed: '0.4'
+          x_TiO2_as_printed: '0.6'
+          gamma: '0.397'
+          gamma_as_printed: '0.397'
+          sigma: '0.028'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.4'
+            TiO2: '0.6'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id007
+            composition:
+              state:
+                tag: value
+                value: *id008
+              locator: *id007
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id007
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p4
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p5
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.5
+        column: activity(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: &id009
+          page: 5
+          pdf_page_index: 4
+          table: '3'
+          row: x(CeO2)=0.5
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.5
+          x_CeO2_as_printed: '0.5'
+          x_TiO2_as_printed: '0.5'
+          activity: '0.257'
+          activity_as_printed: '0.257'
+          sigma: '0.025'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.5'
+            TiO2: '0.5'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id009
+            composition:
+              state:
+                tag: value
+                value: &id010
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CeO2
+                    - '0.5'
+                  - - TiO2
+                    - '0.5'
+              locator: *id009
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id009
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p5
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.5
+        column: gamma(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id009
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p5
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.5
+          x_CeO2_as_printed: '0.5'
+          x_TiO2_as_printed: '0.5'
+          gamma: '0.51'
+          gamma_as_printed: '0.51'
+          sigma: '0.05'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.5'
+            TiO2: '0.5'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id009
+            composition:
+              state:
+                tag: value
+                value: *id010
+              locator: *id009
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id009
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p5
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p6
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.6
+        column: activity(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: &id011
+          page: 5
+          pdf_page_index: 4
+          table: '3'
+          row: x(CeO2)=0.6
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.6
+          x_CeO2_as_printed: '0.6'
+          x_TiO2_as_printed: '0.4'
+          activity: '0.38'
+          activity_as_printed: '0.38'
+          sigma: '0.04'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.6'
+            TiO2: '0.4'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id011
+            composition:
+              state:
+                tag: value
+                value: &id012
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CeO2
+                    - '0.6'
+                  - - TiO2
+                    - '0.4'
+              locator: *id011
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id011
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p6
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.6
+        column: gamma(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id011
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p6
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.6
+          x_CeO2_as_printed: '0.6'
+          x_TiO2_as_printed: '0.4'
+          gamma: '0.63'
+          gamma_as_printed: '0.63'
+          sigma: '0.07'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.6'
+            TiO2: '0.4'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id011
+            composition:
+              state:
+                tag: value
+                value: *id012
+              locator: *id011
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id011
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p6
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p7
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.7
+        column: activity(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: &id013
+          page: 5
+          pdf_page_index: 4
+          table: '3'
+          row: x(CeO2)=0.7
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.7
+          x_CeO2_as_printed: '0.7'
+          x_TiO2_as_printed: '0.3'
+          activity: '0.515'
+          activity_as_printed: '0.515'
+          sigma: '0.027'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.7'
+            TiO2: '0.3'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id013
+            composition:
+              state:
+                tag: value
+                value: &id014
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CeO2
+                    - '0.7'
+                  - - TiO2
+                    - '0.3'
+              locator: *id013
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id013
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p7
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.7
+        column: gamma(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id013
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p7
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.7
+          x_CeO2_as_printed: '0.7'
+          x_TiO2_as_printed: '0.3'
+          gamma: '0.74'
+          gamma_as_printed: '0.74'
+          sigma: '0.04'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.7'
+            TiO2: '0.3'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id013
+            composition:
+              state:
+                tag: value
+                value: *id014
+              locator: *id013
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id013
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p7
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p8
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.8
+        column: activity(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: &id015
+          page: 5
+          pdf_page_index: 4
+          table: '3'
+          row: x(CeO2)=0.8
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.8
+          x_CeO2_as_printed: '0.8'
+          x_TiO2_as_printed: '0.2'
+          activity: '1.00'
+          activity_as_printed: '1.00'
+          sigma: null
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.8'
+            TiO2: '0.2'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id015
+            composition:
+              state:
+                tag: value
+                value: &id016
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CeO2
+                    - '0.8'
+                  - - TiO2
+                    - '0.2'
+              locator: *id015
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id015
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p8
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.8
+        column: gamma(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id015
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p8
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.8
+          x_CeO2_as_printed: '0.8'
+          x_TiO2_as_printed: '0.2'
+          gamma: '1.00'
+          gamma_as_printed: '1.00'
+          sigma: null
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.8'
+            TiO2: '0.2'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id015
+            composition:
+              state:
+                tag: value
+                value: *id016
+              locator: *id015
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id015
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p8
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p9
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.9
+        column: activity(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: &id017
+          page: 5
+          pdf_page_index: 4
+          table: '3'
+          row: x(CeO2)=0.9
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.9
+          x_CeO2_as_printed: '0.9'
+          x_TiO2_as_printed: '0.1'
+          activity: '1.00'
+          activity_as_printed: '1.00'
+          sigma: null
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.9'
+            TiO2: '0.1'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id017
+            composition:
+              state:
+                tag: value
+                value: &id018
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CeO2
+                    - '0.9'
+                  - - TiO2
+                    - '0.1'
+              locator: *id017
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id017
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p9
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.9
+        column: gamma(CeO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: The paper gives the component reference material but does not specify its condensed polymorph
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id017
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: CeO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p9
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.9
+          x_CeO2_as_printed: '0.9'
+          x_TiO2_as_printed: '0.1'
+          gamma: '1.00'
+          gamma_as_printed: '1.00'
+          sigma: null
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.9'
+            TiO2: '0.1'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id017
+            composition:
+              state:
+                tag: value
+                value: *id018
+              locator: *id017
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id017
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p9
+    context:
+    - observation_id: shugurov-2026-ceo2-tio2-kems_figure1_activity_curves
+      type: figure_record
+      units: dimensionless activity
+      locator:
+        page: 5
+        pdf_page_index: 4
+        figure: '1'
+      phase: unknown
+      values:
+        quantity_as_printed: component activity
+        caption: Dependence of the activities of the components in the CeO2–TiO2 system on composition at 2150 K.
+        species_as_printed:
+        - CeO2
+        - TiO2
+        temperature_K: '2150'
+        panel: whole figure
+        attribution: authors’ measured/reduced values
+        axes_as_printed:
+          x: molar fraction CeO2 (top axis TiO2)
+          y: activity ai
+        series:
+        - CeO2
+        - TiO2
+        marker_count_per_series:
+          CeO2: 7
+          TiO2: 7
+        digitisation: deferred to a figure pass
+  TiO2:
+    observations:
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p1
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.1
+        column: activity(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id001
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.1
+          x_CeO2_as_printed: '0.1'
+          x_TiO2_as_printed: '0.9'
+          activity: '0.81'
+          activity_as_printed: '0.81'
+          sigma: '0.07'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.1'
+            TiO2: '0.9'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value: *id002
+              locator: *id001
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id001
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p1
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.1
+        column: gamma(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id001
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p1
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.1
+          x_CeO2_as_printed: '0.1'
+          x_TiO2_as_printed: '0.9'
+          gamma: '0.90'
+          gamma_as_printed: '0.90'
+          sigma: '0.08'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.1'
+            TiO2: '0.9'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value: *id002
+              locator: *id001
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id001
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p1
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p2
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.2
+        column: activity(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id003
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.2
+          x_CeO2_as_printed: '0.2'
+          x_TiO2_as_printed: '0.8'
+          activity: '0.61'
+          activity_as_printed: '0.61'
+          sigma: '0.03'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.2'
+            TiO2: '0.8'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id003
+            composition:
+              state:
+                tag: value
+                value: *id004
+              locator: *id003
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id003
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p2
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.2
+        column: gamma(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id003
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p2
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.2
+          x_CeO2_as_printed: '0.2'
+          x_TiO2_as_printed: '0.8'
+          gamma: '0.76'
+          gamma_as_printed: '0.76'
+          sigma: '0.04'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.2'
+            TiO2: '0.8'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id003
+            composition:
+              state:
+                tag: value
+                value: *id004
+              locator: *id003
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id003
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p2
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p3
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.3
+        column: activity(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id005
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.3
+          x_CeO2_as_printed: '0.3'
+          x_TiO2_as_printed: '0.7'
+          activity: '0.44'
+          activity_as_printed: '0.44'
+          sigma: '0.16'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.3'
+            TiO2: '0.7'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id005
+            composition:
+              state:
+                tag: value
+                value: *id006
+              locator: *id005
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id005
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p3
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.3
+        column: gamma(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id005
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p3
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.3
+          x_CeO2_as_printed: '0.3'
+          x_TiO2_as_printed: '0.7'
+          gamma: '0.63'
+          gamma_as_printed: '0.63'
+          sigma: '0.022'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.3'
+            TiO2: '0.7'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id005
+            composition:
+              state:
+                tag: value
+                value: *id006
+              locator: *id005
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id005
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p3
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p4
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.4
+        column: activity(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id007
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.4
+          x_CeO2_as_printed: '0.4'
+          x_TiO2_as_printed: '0.6'
+          activity: '0.312'
+          activity_as_printed: '0.312'
+          sigma: '0.014'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.4'
+            TiO2: '0.6'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id007
+            composition:
+              state:
+                tag: value
+                value: *id008
+              locator: *id007
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id007
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p4
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.4
+        column: gamma(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id007
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p4
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.4
+          x_CeO2_as_printed: '0.4'
+          x_TiO2_as_printed: '0.6'
+          gamma: '0.52'
+          gamma_as_printed: '0.52'
+          sigma: '0.024'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.4'
+            TiO2: '0.6'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id007
+            composition:
+              state:
+                tag: value
+                value: *id008
+              locator: *id007
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id007
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p4
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p5
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.5
+        column: activity(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id009
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.5
+          x_CeO2_as_printed: '0.5'
+          x_TiO2_as_printed: '0.5'
+          activity: '0.209'
+          activity_as_printed: '0.209'
+          sigma: '0.020'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.5'
+            TiO2: '0.5'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id009
+            composition:
+              state:
+                tag: value
+                value: *id010
+              locator: *id009
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id009
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p5
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.5
+        column: gamma(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id009
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p5
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.5
+          x_CeO2_as_printed: '0.5'
+          x_TiO2_as_printed: '0.5'
+          gamma: '0.42'
+          gamma_as_printed: '0.42'
+          sigma: '0.04'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.5'
+            TiO2: '0.5'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id009
+            composition:
+              state:
+                tag: value
+                value: *id010
+              locator: *id009
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id009
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p5
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p6
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.6
+        column: activity(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id011
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.6
+          x_CeO2_as_printed: '0.6'
+          x_TiO2_as_printed: '0.4'
+          activity: '0.131'
+          activity_as_printed: '0.131'
+          sigma: '0.021'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.6'
+            TiO2: '0.4'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id011
+            composition:
+              state:
+                tag: value
+                value: *id012
+              locator: *id011
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id011
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p6
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.6
+        column: gamma(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id011
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p6
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.6
+          x_CeO2_as_printed: '0.6'
+          x_TiO2_as_printed: '0.4'
+          gamma: '0.33'
+          gamma_as_printed: '0.33'
+          sigma: '0.05'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.6'
+            TiO2: '0.4'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id011
+            composition:
+              state:
+                tag: value
+                value: *id012
+              locator: *id011
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id011
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p6
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p7
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.7
+        column: activity(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id013
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: Activity/activity-coefficient values are reported from differential mass spectrometry and the
+            equations stated by the authors; the raw ion-current/pressure values are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Experimental Section
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.7
+          x_CeO2_as_printed: '0.7'
+          x_TiO2_as_printed: '0.3'
+          activity: '0.072'
+          activity_as_printed: '0.072'
+          sigma: '0.009'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.7'
+            TiO2: '0.3'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id013
+            composition:
+              state:
+                tag: value
+                value: *id014
+              locator: *id013
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id013
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p7
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.7
+        column: gamma(TiO2)
+      phase: unknown
+      standard_state:
+        state:
+          tag: unknown
+          reason: Ti3O5 is the printed compound reference for TiO2; it is unknown because the reference is a compound, not pure TiO2.
+        inferred: false
+        note: CeO2 activity is referenced to individual CeO2; the paper states Ti3O5 was chosen as the reference
+          compound for TiO2 because pure TiO2 is thermally unstable. The paper gives ai = pi/p0i but does not identify
+          the condensed polymorph in Table 3.
+        locator: *id013
+      units: dimensionless
+      experiment: shugurov-2026-ceo2-tio2-kems_kems_2150k
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        composition_component: TiO2
+        derivation:
+          relation: gamma_i = a_i / x_i (Eq. 9), computed from unrounded activity data. Table 3 prints rounded activities,
+            so the displayed activity cell does not always reproduce the reported gamma exactly.
+          inputs:
+          - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p7
+          output_unit: dimensionless
+        reference_state_as_printed: 'CeO2: individual CeO2; TiO2: Ti3O5 reference compound, as stated in the discussion'
+        method_as_printed: Differential mass spectrometry; TiO2 activity for samples 1–2 determined by Eq. (6),
+          and samples 1–7 obtained by Gibbs–Duhem integration as described in the paper.
+        points:
+        - row_as_printed: x(CeO2)=0.7
+          x_CeO2_as_printed: '0.7'
+          x_TiO2_as_printed: '0.3'
+          gamma: '0.24'
+          gamma_as_printed: '0.24'
+          sigma: '0.03'
+          T_K: '2150'
+          composition_mol:
+            CeO2: '0.7'
+            TiO2: '0.3'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id013
+            composition:
+              state:
+                tag: value
+                value: *id014
+              locator: *id013
+            phase_assemblage:
+              state:
+                tag: unknown
+                reason: The table does not label the phase for this individual composition; the discussion identifies
+                  only samples 2–5 as homogeneous melt and samples 8–9 as containing individual CeO2 at 2150 K.
+              locator: *id013
+        derived_from:
+        - shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p7
+    context: []
+  unknown:
+    observations:
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample1_onset
+      type: transition_point
+      locator: &id019
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '1'
+        column: Onset of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '2133'
+        formula: unknown
+        sample_id: '1'
+        composition_as_published: 10CeO2–90TiO2
+        column_as_published: Onset of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: &id020
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - CeO2
+                - '0.1'
+              - - TiO2
+                - '0.9'
+          locator: *id019
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample1_completion
+      type: transition_point
+      locator: &id021
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '1'
+        column: Completion of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '2193'
+        formula: unknown
+        sample_id: '1'
+        composition_as_published: 10CeO2–90TiO2
+        column_as_published: Completion of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: *id020
+          locator: *id021
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample2_onset
+      type: transition_point
+      locator: &id022
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '2'
+        column: Onset of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '1853'
+        formula: unknown
+        sample_id: '2'
+        composition_as_published: 20CeO2–80TiO2
+        column_as_published: Onset of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: &id023
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - CeO2
+                - '0.2'
+              - - TiO2
+                - '0.8'
+          locator: *id022
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample2_completion
+      type: transition_point
+      locator: &id024
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '2'
+        column: Completion of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '1958'
+        formula: unknown
+        sample_id: '2'
+        composition_as_published: 20CeO2–80TiO2
+        column_as_published: Completion of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: *id023
+          locator: *id024
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample3_onset
+      type: transition_point
+      locator: &id025
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '3'
+        column: Onset of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '1763'
+        formula: unknown
+        sample_id: '3'
+        composition_as_published: 30CeO2–70TiO2
+        column_as_published: Onset of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: &id026
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - CeO2
+                - '0.3'
+              - - TiO2
+                - '0.7'
+          locator: *id025
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample3_completion
+      type: transition_point
+      locator: &id027
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '3'
+        column: Completion of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '1763'
+        formula: unknown
+        sample_id: '3'
+        composition_as_published: 30CeO2–70TiO2
+        column_as_published: Completion of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: *id026
+          locator: *id027
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample4_onset
+      type: transition_point
+      locator: &id028
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '4'
+        column: Onset of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '1833'
+        formula: unknown
+        sample_id: '4'
+        composition_as_published: 40CeO2–60TiO2
+        column_as_published: Onset of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: &id029
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - CeO2
+                - '0.4'
+              - - TiO2
+                - '0.6'
+          locator: *id028
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample4_completion
+      type: transition_point
+      locator: &id030
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '4'
+        column: Completion of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '1853'
+        formula: unknown
+        sample_id: '4'
+        composition_as_published: 40CeO2–60TiO2
+        column_as_published: Completion of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: *id029
+          locator: *id030
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample5_onset
+      type: transition_point
+      locator: &id031
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '5'
+        column: Onset of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '1723'
+        formula: unknown
+        sample_id: '5'
+        composition_as_published: 50CeO2–50TiO2
+        column_as_published: Onset of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: &id032
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - CeO2
+                - '0.5'
+              - - TiO2
+                - '0.5'
+          locator: *id031
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample5_completion
+      type: transition_point
+      locator: &id033
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '5'
+        column: Completion of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '1853'
+        formula: unknown
+        sample_id: '5'
+        composition_as_published: 50CeO2–50TiO2
+        column_as_published: Completion of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: *id032
+          locator: *id033
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample6_onset
+      type: transition_point
+      locator: &id034
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '6'
+        column: Onset of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '1763'
+        formula: unknown
+        sample_id: '6'
+        composition_as_published: 60CeO2–40TiO2
+        column_as_published: Onset of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: &id035
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - CeO2
+                - '0.6'
+              - - TiO2
+                - '0.4'
+          locator: *id034
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample6_completion
+      type: transition_point
+      locator: &id036
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '6'
+        column: Completion of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '1813'
+        formula: unknown
+        sample_id: '6'
+        composition_as_published: 60CeO2–40TiO2
+        column_as_published: Completion of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: *id035
+          locator: *id036
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample7_onset
+      type: transition_point
+      locator: &id037
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '7'
+        column: Onset of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '2143'
+        formula: unknown
+        sample_id: '7'
+        composition_as_published: 70CeO2–30TiO2
+        column_as_published: Onset of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: &id038
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - CeO2
+                - '0.7'
+              - - TiO2
+                - '0.3'
+          locator: *id037
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample7_completion
+      type: transition_point
+      locator: &id039
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '7'
+        column: Completion of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '2213'
+        formula: unknown
+        sample_id: '7'
+        composition_as_published: 70CeO2–30TiO2
+        column_as_published: Completion of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: *id038
+          locator: *id039
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample8_onset
+      type: transition_point
+      locator: &id040
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '8'
+        column: Onset of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '2413'
+        formula: unknown
+        sample_id: '8'
+        composition_as_published: 80CeO2–20TiO2
+        column_as_published: Onset of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: &id041
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - CeO2
+                - '0.8'
+              - - TiO2
+                - '0.2'
+          locator: *id040
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample8_completion
+      type: transition_point
+      locator: &id042
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '8'
+        column: Completion of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '2423'
+        formula: unknown
+        sample_id: '8'
+        composition_as_published: 80CeO2–20TiO2
+        column_as_published: Completion of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: *id041
+          locator: *id042
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample9_onset
+      type: transition_point
+      locator: &id043
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '9'
+        column: Onset of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '2493'
+        formula: unknown
+        sample_id: '9'
+        composition_as_published: 90CeO2–10TiO2
+        column_as_published: Onset of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: &id044
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - CeO2
+                - '0.9'
+              - - TiO2
+                - '0.1'
+          locator: *id043
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table2_sample9_completion
+      type: transition_point
+      locator: &id045
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: '9'
+        column: Completion of melting
+      units: °C
+      phase: unknown
+      uncertainty:
+        note: The table reports onset/completion temperatures without numeric uncertainty.
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '2493'
+        formula: unknown
+        sample_id: '9'
+        composition_as_published: 90CeO2–10TiO2
+        column_as_published: Completion of melting
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value: *id044
+          locator: *id045
+    context:
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_Gm_x0p1
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.1
+        column: delta_Gm
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGm
+        value_as_published: '12.4'
+        uncertainty_as_published: '2.0'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.1'
+          TiO2: '0.9'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_G_excess_x0p1
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.1
+        column: delta_G_excess
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGE
+        value_as_published: '6.6'
+        uncertainty_as_published: '2.0'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.1'
+          TiO2: '0.9'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_Gm_x0p2
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.2
+        column: delta_Gm
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGm
+        value_as_published: '19.4'
+        uncertainty_as_published: '1.1'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.2'
+          TiO2: '0.8'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_G_excess_x0p2
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.2
+        column: delta_G_excess
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGE
+        value_as_published: '10.5'
+        uncertainty_as_published: '1.1'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.2'
+          TiO2: '0.8'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_Gm_x0p3
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.3
+        column: delta_Gm
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGm
+        value_as_published: '23.5'
+        uncertainty_as_published: '0.6'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.3'
+          TiO2: '0.7'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_G_excess_x0p3
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.3
+        column: delta_G_excess
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGE
+        value_as_published: '12.6'
+        uncertainty_as_published: '0.6'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.3'
+          TiO2: '0.7'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_Gm_x0p4
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.4
+        column: delta_Gm
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGm
+        value_as_published: '25.7'
+        uncertainty_as_published: '0.7'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.4'
+          TiO2: '0.6'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_G_excess_x0p4
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.4
+        column: delta_G_excess
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGE
+        value_as_published: '13.6'
+        uncertainty_as_published: '0.7'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.4'
+          TiO2: '0.6'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_Gm_x0p5
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.5
+        column: delta_Gm
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGm
+        value_as_published: '26.1'
+        uncertainty_as_published: '1.2'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.5'
+          TiO2: '0.5'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_G_excess_x0p5
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.5
+        column: delta_G_excess
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGE
+        value_as_published: '13.7'
+        uncertainty_as_published: '1.2'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.5'
+          TiO2: '0.5'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_Gm_x0p6
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.6
+        column: delta_Gm
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGm
+        value_as_published: '25.0'
+        uncertainty_as_published: '1.6'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.6'
+          TiO2: '0.4'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_G_excess_x0p6
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.6
+        column: delta_G_excess
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGE
+        value_as_published: '13.0'
+        uncertainty_as_published: '1.6'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.6'
+          TiO2: '0.4'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_Gm_x0p7
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.7
+        column: delta_Gm
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGm
+        value_as_published: '22.4'
+        uncertainty_as_published: '0.9'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.7'
+          TiO2: '0.3'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_delta_G_excess_x0p7
+      type: thermodynamic_context
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.7
+        column: delta_G_excess
+      phase: unknown
+      values:
+        method_class: model_derived
+        quantity_as_printed: −ΔGE
+        value_as_published: '11.5'
+        uncertainty_as_published: '0.9'
+        units: kJ/mol
+        temperature_K_as_printed: '2150'
+        composition_as_published:
+          CeO2: '0.7'
+          TiO2: '0.3'
+        reason_no_token: The store has no token for molar Gibbs energy of mixing or excess Gibbs energy.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_endmember_x0p0
+      type: source_context
+      units: dimensionless activity and activity coefficient; kJ/mol for Gibbs energy columns
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=0.0
+      values:
+        method_class: author_estimate
+        quantities_as_printed:
+          a(CeO2): '0'
+          a(TiO2): '1'
+          gamma(CeO2): '0'
+          gamma(TiO2): '1'
+          −ΔGm: '0'
+          −ΔGE: '0'
+        composition_as_published:
+          CeO2: '0.0'
+          TiO2: '1.0'
+        reason: Table 3 endmember limit/reference row, retained in context rather than scored as a mixture measurement.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table3_endmember_x1p0
+      type: source_context
+      units: dimensionless activity and activity coefficient; kJ/mol for Gibbs energy columns
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: x(CeO2)=1.0
+      values:
+        method_class: author_estimate
+        quantities_as_printed:
+          a(CeO2): '1'
+          a(TiO2): '0'
+          gamma(CeO2): '1'
+          gamma(TiO2): '0'
+          −ΔGm: '0'
+          −ΔGE: '0'
+        composition_as_published:
+          CeO2: '1.0'
+          TiO2: '0.0'
+        reason: Table 3 endmember limit/reference row, retained in context rather than scored as a mixture measurement.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_appearance_energies
+      type: source_context
+      units: eV
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: Results and Discussion
+      values:
+        method_class: measured_direct
+        appearance_energies_eV_as_published:
+          CeO+: '5.0'
+          CeO2+: '9.5'
+          TiO+: '6.8'
+          TiO2+: '9.6'
+        method_as_published: Vanishing ion current method; the paper states these values are consistent with reference
+          ionization energies.
+        reason_no_token: No ionization energy quantity token exists in the store.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table1_sample1_quantitative_xrd
+      type: source_context
+      units: percent phase fraction; mole fraction as printed
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: '1'
+      values:
+        method_class: measured_direct
+        sample_id: '1'
+        anneal: 1400°C in air for 22.5 h, then furnace-cooled
+        phase_measurement_temperature_as_printed: room temperature
+        synthesis_mole_fractions:
+          CeO2: '0.1'
+          TiO2: '0.9'
+        quantitative_phase_analysis_percent:
+          CeTi2O6: '19'
+          CeO2: '3'
+          TiO2: '78'
+        reason_no_token: Quantitative phase fractions in the whole multiphase ceramic are not a single-phase composition;
+          equilibrium_phase_composition is scalar-only.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table1_sample2_quantitative_xrd
+      type: source_context
+      units: percent phase fraction; mole fraction as printed
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: '2'
+      values:
+        method_class: measured_direct
+        sample_id: '2'
+        anneal: 1400°C in air for 22.5 h, then furnace-cooled
+        phase_measurement_temperature_as_printed: room temperature
+        synthesis_mole_fractions:
+          CeO2: '0.2'
+          TiO2: '0.8'
+        quantitative_phase_analysis_percent:
+          CeTi2O6: '44'
+          CeO2: '4'
+          TiO2: '52'
+        reason_no_token: Quantitative phase fractions in the whole multiphase ceramic are not a single-phase composition;
+          equilibrium_phase_composition is scalar-only.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table1_sample3_quantitative_xrd
+      type: source_context
+      units: percent phase fraction; mole fraction as printed
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: '3'
+      values:
+        method_class: measured_direct
+        sample_id: '3'
+        anneal: 1400°C in air for 22.5 h, then furnace-cooled
+        phase_measurement_temperature_as_printed: room temperature
+        synthesis_mole_fractions:
+          CeO2: '0.3'
+          TiO2: '0.7'
+        quantitative_phase_analysis_percent:
+          CeTi2O6: '67'
+          CeO2: '10'
+          TiO2: '23'
+        reason_no_token: Quantitative phase fractions in the whole multiphase ceramic are not a single-phase composition;
+          equilibrium_phase_composition is scalar-only.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table1_sample4_quantitative_xrd
+      type: source_context
+      units: percent phase fraction; mole fraction as printed
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: '4'
+      values:
+        method_class: measured_direct
+        sample_id: '4'
+        anneal: 1400°C in air for 22.5 h, then furnace-cooled
+        phase_measurement_temperature_as_printed: room temperature
+        synthesis_mole_fractions:
+          CeO2: '0.4'
+          TiO2: '0.6'
+        quantitative_phase_analysis_percent:
+          CeTi2O6: '75'
+          CeO2: '23'
+          TiO2: '2'
+        reason_no_token: Quantitative phase fractions in the whole multiphase ceramic are not a single-phase composition;
+          equilibrium_phase_composition is scalar-only.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table1_sample5_quantitative_xrd
+      type: source_context
+      units: percent phase fraction; mole fraction as printed
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: '5'
+      values:
+        method_class: measured_direct
+        sample_id: '5'
+        anneal: 1400°C in air for 22.5 h, then furnace-cooled
+        phase_measurement_temperature_as_printed: room temperature
+        synthesis_mole_fractions:
+          CeO2: '0.5'
+          TiO2: '0.5'
+        quantitative_phase_analysis_percent:
+          CeTi2O6: '55'
+          CeO2: '42'
+          TiO2: '3'
+        reason_no_token: Quantitative phase fractions in the whole multiphase ceramic are not a single-phase composition;
+          equilibrium_phase_composition is scalar-only.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table1_sample6_quantitative_xrd
+      type: source_context
+      units: percent phase fraction; mole fraction as printed
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: '6'
+      values:
+        method_class: measured_direct
+        sample_id: '6'
+        anneal: 1400°C in air for 22.5 h, then furnace-cooled
+        phase_measurement_temperature_as_printed: room temperature
+        synthesis_mole_fractions:
+          CeO2: '0.6'
+          TiO2: '0.4'
+        quantitative_phase_analysis_percent:
+          CeTi2O6: '43'
+          CeO2: '57'
+        reason_no_token: Quantitative phase fractions in the whole multiphase ceramic are not a single-phase composition;
+          equilibrium_phase_composition is scalar-only.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table1_sample7_quantitative_xrd
+      type: source_context
+      units: percent phase fraction; mole fraction as printed
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: '7'
+      values:
+        method_class: measured_direct
+        sample_id: '7'
+        anneal: 1400°C in air for 22.5 h, then furnace-cooled
+        phase_measurement_temperature_as_printed: room temperature
+        synthesis_mole_fractions:
+          CeO2: '0.7'
+          TiO2: '0.3'
+        quantitative_phase_analysis_percent:
+          CeTi2O6: '32'
+          CeO2: '68'
+        reason_no_token: Quantitative phase fractions in the whole multiphase ceramic are not a single-phase composition;
+          equilibrium_phase_composition is scalar-only.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table1_sample8_quantitative_xrd
+      type: source_context
+      units: percent phase fraction; mole fraction as printed
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: '8'
+      values:
+        method_class: measured_direct
+        sample_id: '8'
+        anneal: 1400°C in air for 22.5 h, then furnace-cooled
+        phase_measurement_temperature_as_printed: room temperature
+        synthesis_mole_fractions:
+          CeO2: '0.8'
+          TiO2: '0.2'
+        quantitative_phase_analysis_percent:
+          CeTi2O6: '20'
+          CeO2: '80'
+        reason_no_token: Quantitative phase fractions in the whole multiphase ceramic are not a single-phase composition;
+          equilibrium_phase_composition is scalar-only.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_table1_sample9_quantitative_xrd
+      type: source_context
+      units: percent phase fraction; mole fraction as printed
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: '9'
+      values:
+        method_class: measured_direct
+        sample_id: '9'
+        anneal: 1400°C in air for 22.5 h, then furnace-cooled
+        phase_measurement_temperature_as_printed: room temperature
+        synthesis_mole_fractions:
+          CeO2: '0.9'
+          TiO2: '0.1'
+        quantitative_phase_analysis_percent:
+          CeTi2O6: '9'
+          CeO2: '91'
+        reason_no_token: Quantitative phase fractions in the whole multiphase ceramic are not a single-phase composition;
+          equilibrium_phase_composition is scalar-only.
+    - observation_id: shugurov-2026-ceo2-tio2-kems_figure2_gibbs_curves
+      type: figure_record
+      units: kJ/mol
+      locator:
+        page: 6
+        pdf_page_index: 5
+        figure: '2'
+      values:
+        quantity_as_printed: molar Gibbs energy of mixing and excess Gibbs energy
+        caption: Dependence of molar Gibbs energy of mixing (ΔGm) and excess Gibbs energy (ΔGE) on composition for
+          CeO2–TiO2 at 2150 K.
+        species_as_printed:
+        - CeO2
+        - TiO2
+        temperature_K: '2150'
+        panel: whole figure
+        attribution: authors’ calculated values from Table 3
+        axes_as_printed:
+          x: molar fraction CeO2 (top axis TiO2)
+          y: ΔGm and ΔGE, kJ/mol
+        series:
+        - ΔGm
+        - ΔGE
+        marker_count_per_series:
+          ΔGm: 7
+          ΔGE: 7
+        digitisation: deferred to a figure pass
