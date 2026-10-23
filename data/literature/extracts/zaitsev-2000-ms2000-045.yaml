@@ -1668,27 +1668,6 @@ experiments:
 species:
   MnO:
     observations:
-    - observation_id: zaitsev_2000_table1_measured_ion_signals
-      type: gas_speciation
-      experiment: mnosi2-table1-1773k
-      locator:
-        published_page: 5
-        section: Experimental realisation and assignment of mass spectra
-        pdf_page_index: 4
-      units: ion signals; individual intensities not tabulated
-      values:
-        quantity: Table 1 activity-calculation input signals
-        method_class: measured_direct
-        ions_measured:
-        - Mn+
-        - SiO+
-        - NbO+
-        - NbO2+
-        - MoO+
-        - MoO2+
-        - MoO3+
-        note: Mn+ and SiO+ currents were measured over all samples; complete or partial reductant-oxide currents
-          were used in Eqn. (5). Numerical input currents are not reported.
     - observation_id: zaitsev_2000_table1_mno_activities_eqn5
       type: activity_coefficient
       experiment: mnosi2-table1-1773k
@@ -1711,10 +1690,13 @@ species:
         composition_basis: binary mole fraction; printed x(SiO2), MnO is binary complement
         derivation:
           relation: "Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents unpublished. Full printed relation in equations_page_4 context."
-          inputs:
-          - zaitsev_2000_table1_measured_ion_signals
-        derived_from:
-        - zaitsev_2000_table1_measured_ion_signals
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 5
+              section: Experimental realisation and assignment of mass spectra
+              pdf_page_index: 4
+              note: Numerical input currents are not reported.
         points:
         - x_SiO2_as_printed: '0.515'
           activity: '0.137'
@@ -1882,10 +1864,13 @@ species:
         composition_basis: binary mole fraction; printed x(SiO2), MnO is binary complement
         derivation:
           relation: "Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories unpublished."
-          inputs:
-          - zaitsev_2000_table1_measured_ion_signals
-        derived_from:
-        - zaitsev_2000_table1_measured_ion_signals
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 5
+              section: Experimental realisation and assignment of mass spectra
+              pdf_page_index: 4
+              note: Numerical input currents are not reported.
         points:
         - x_SiO2_as_printed: '0.515'
           activity: '0.138'
@@ -2032,6 +2017,25 @@ species:
             SiO2: '0.273'
             MnO: '0.727'
     context:
+    - observation_id: zaitsev_2000_table1_measured_ion_signals
+      type: measured_ion_signals_context
+      experiment: mnosi2-table1-1773k
+      locator:
+        published_page: 5
+        section: Experimental realisation and assignment of mass spectra
+        pdf_page_index: 4
+      units: ion signals; individual intensities not tabulated
+      values:
+        method_class: measured_direct
+        ions_measured:
+        - Mn+
+        - SiO+
+        - NbO+
+        - NbO2+
+        - MoO+
+        - MoO2+
+        - MoO3+
+        note: Mn+ and SiO+ currents were measured over all samples; complete or partial reductant-oxide currents were used in Eqn. (5). Numerical input currents are not reported.
     - observation_id: zaitsev_2000_qualifying_statements
       type: thermodynamic_example
       locator:
@@ -2368,10 +2372,13 @@ species:
         composition_basis: binary mole fraction; printed x(SiO2), MnO is binary complement
         derivation:
           relation: "Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents unpublished. Full printed relation in equations_page_4 context."
-          inputs:
-          - zaitsev_2000_table1_measured_ion_signals
-        derived_from:
-        - zaitsev_2000_table1_measured_ion_signals
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 5
+              section: Experimental realisation and assignment of mass spectra
+              pdf_page_index: 4
+              note: Numerical input currents are not reported.
         points:
         - x_SiO2_as_printed: '0.515'
           activity: '0.983'
@@ -2553,10 +2560,13 @@ species:
         composition_basis: binary mole fraction; printed x(SiO2), MnO is binary complement
         derivation:
           relation: "Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories unpublished."
-          inputs:
-          - zaitsev_2000_table1_measured_ion_signals
-        derived_from:
-        - zaitsev_2000_table1_measured_ion_signals
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 5
+              section: Experimental realisation and assignment of mass spectra
+              pdf_page_index: 4
+              note: Numerical input currents are not reported.
         points:
         - x_SiO2_as_printed: '0.515'
           activity: '0.992'

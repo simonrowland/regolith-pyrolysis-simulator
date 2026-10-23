@@ -1,4 +1,5 @@
 from pathlib import Path
+from decimal import Decimal
 
 import yaml
 
@@ -23,7 +24,7 @@ def test_zaitsev_2000_table_1_activities_migrate_and_pin_printed_values():
     assert migrator.result.validation is not None
     assert migrator.result.validation.ok
     assert migrator.result.validation.hard_issues == ()
-    assert len(migrator.result.observations) == 33
+    assert len(migrator.result.observations) == 32
     row = next(
         row for row in document["species"]["MnO"]["observations"]
         if row["observation_id"] == "zaitsev_2000_table1_mno_activities_eqn5"
@@ -31,6 +32,13 @@ def test_zaitsev_2000_table_1_activities_migrate_and_pin_printed_values():
     points = row["values"]["points"]
     assert (points[0]["x_SiO2_as_printed"], points[0]["activity_eqn5_as_printed"]) == ("0.515", "0.137")
     assert (points[3]["x_SiO2_as_printed"], points[3]["activity_eqn5_as_printed"]) == ("0.405", "0.254")
+    eqn5_migrated = {
+        row.value.point
+        for row in migrator.result.observations.values()
+        if "::zaitsev_2000_table1_mno_activities_eqn5::" in row.observation_id
+    }
+    assert {Decimal("0.137"), Decimal("0.165"), Decimal("0.254")} <= eqn5_migrated
+    assert len(migrator.result.queue) == 0
     condensed_liquid_series = (
         "zaitsev_2000_table1_mno_activities_eqn5",
         "zaitsev_2000_table1_mno_activities_eqn11",

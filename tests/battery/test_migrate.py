@@ -1119,6 +1119,7 @@ def test_production_migration_keeps_located_unprinted_raw_input_declaration(
     assert observation.derivation.raw_inputs.state.value.value == "not_printed"
     assert observation.derivation.raw_inputs.locator is not None
     assert result.validation.hard_issues == ()
+    assert result.queue == []
 
     reloaded = observation_from_plain(
         yaml.safe_load(yaml.safe_dump(to_plain(observation)))
@@ -1158,6 +1159,149 @@ def test_production_migration_rejects_unlocated_unprinted_raw_input_declaration(
         and issue.detail == "derived observation requires derived_from"
         for issue in result.validation.hard_issues
     )
+
+
+def test_plante_1992_table2_activities_migrate_with_table1_ancestry(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-021-plante-1992-feo.yaml", write=False
+    )
+    activities = {
+        str(observation.identity.composition.value.components[0][1]): observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-021-plante-1992-feo"
+        and observation.identity.quantity.value is Quantity.ACTIVITY
+    }
+
+    # Table 2, p. 1278: these three printed a(FeO) values provide independent
+    # pins against the source page; each was obtained by integrating Eq. (4)
+    # from the measured Table 1 ion-intensity ratios.
+    expected = {"0.1": "0.404", "0.2": "0.604", "0.3": "0.699"}
+    for x_feo, activity in expected.items():
+        observation = activities[x_feo]
+        assert observation.value.point == Decimal(activity)
+        assert observation.identity.temperature_K.value == Decimal("1973")
+        assert observation.identity.species.phase.value is Phase.L
+        assert len(observation.derived_from or ()) == 14
+        assert observation.derivation is not None
+        assert "analytical integration" in observation.derivation.relation
+        assert all(parent in result.observations for parent in observation.derived_from)
+
+    scored = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-021-plante-1992-feo"
+        and observation.value.kind is ValueKind.POINT
+    ]
+    assert len(scored) == 23
+    for observation in scored:
+        temperature = observation.point_conditions["temperature_K"]
+        assert temperature.state.value == Decimal("1973")
+        assert temperature.locator.page == 1278
+    ratios = [
+        observation
+        for observation in scored
+        if observation.identity.quantity.value is Quantity.ION_INTENSITY_RATIO
+    ]
+    assert len(ratios) == 14
+    assert all(observation.identity.species.phase.value is Phase.L for observation in ratios)
+
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
+
+def test_guo_2021_unregistered_reduction_inputs_stay_in_context(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "guo-2021-mgo-activity-cmas-slag.yaml",
+        write=False,
+        use_repository_index_row=True,
+    )
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if "guo_2021_table5_mgo_activities_1873k" in observation.observation_id
+    ]
+    assert len(observations) == 8
+    assert all(observation.identity.species.phase.value is Phase.L for observation in observations)
+    assert all(
+        result.experiments[observation.experiment_id].method.value
+        is MethodToken.QUENCH_EQUILIBRATION
+        for observation in observations
+    )
+    assert all(
+        observation.derived_from == ("tables:guo-2021-mgo-activity-cmas-slag",)
+        for observation in observations
+    )
+    contexts = [
+        context
+        for rows in result.context_by_work.values()
+        for context in rows
+        if context.get("source_id") == "guo-2021-mgo-activity-cmas-slag"
+    ]
+    table6 = next(
+        context for context in contexts
+        if context["observation_id"] == "guo_2021_table6_mg_activity_coefficients_1873k"
+    )
+    assert table6["type"] == "model_output"
+    assert table6["values"]["points"][0]["gamma"] == "3.1713"
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
+
+def test_shornikov_2021_model_results_are_context_not_observations(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "shornikov-2021-mgo-feo-silicate.yaml", write=False
+    )
+    assert result.observations == {}
+    contexts = [
+        context
+        for rows in result.context_by_work.values()
+        for context in rows
+        if context.get("source_id") == "shornikov-2021-mgo-feo-silicate"
+    ]
+    study = next(
+        context for context in contexts
+        if context["observation_id"] == "shornikov_2021_study_aim_and_temperature"
+    )
+    assert study["values"]["study_kind_as_reported"] == "theoretical calculations"
+    assert study["values"]["model_as_reported"] == "semi-empirical model (Shornikov, 2019)"
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
+
+def test_stolyarova_1992_untyped_bulk_thermodynamics_stays_in_context(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-016-stolyarova-1992.yaml", write=False
+    )
+    assert result.observations == {}
+    contexts = {
+        context["observation_id"]: context
+        for rows in result.context_by_work.values()
+        for context in rows
+        if context.get("source_id") == "kems-016-stolyarova-1992"
+    }
+    table1 = contexts["stolyarova_1992_gibbs_cas_and_fcm_table1"]["values"]["points"]
+    table3 = contexts["stolyarova_1992_na2o_k2o_sio2_gibbs_table3"]["values"]["points"]
+    table4 = contexts["stolyarova_1992_na2o_chemical_potential_nbs_table4"]["values"]["points"]
+
+    # Physical PDF p. 2 (Table 1) and p. 3 (Tables 3-4). These are printed
+    # bulk Gibbs energies and a component chemical potential, for which this
+    # schema has no matching quantity token; keep the numbers in context.
+    assert table1[0]["minus_delta_G_exp_kcal_mol"] == 8.3
+    assert table1[0]["minus_delta_G_kohler"] == 8.4
+    assert table1[0]["minus_delta_G_wilson"] == 7.4
+    assert table3[0]["minus_delta_G_exp_kcal_mol"] == 8.4
+    assert table4[0]["mu_Na2O_exp_kcal_mol"] == 56.0
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
 
 
 @pytest.mark.parametrize(
