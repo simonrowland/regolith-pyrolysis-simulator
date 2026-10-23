@@ -8,9 +8,10 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import IdentityEqualKind, Quantity
+from simulator.battery.enums import IdentityEqualKind, Quantity, UncertaintyKind
 from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import REPO_ROOT, convert_duration_to_s
+from simulator.battery.records import Uncertainty
 from simulator.battery.score import _printed_uncertainty_band
 from tests.battery.test_migrate import _migrate_real_extract
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
@@ -262,3 +263,78 @@ def test_neuman_fraction_remaining_mutation_reaches_the_typed_value(tmp_path: Pa
         if f'::neuman_2021_table2_k_fraction_remaining_8b13a' in obs.observation_id
     )
     assert point.value.point == Decimal('0.958')
+
+
+def test_neuman_fraction_remaining_rows_migrate_relative_rsd(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, f'{SOURCE}.yaml')
+    doc = yaml.safe_load(EXTRACT.read_text(encoding='utf-8'))
+    expected_rsd = {
+        f"{SOURCE}::{row['observation_id']}": row['values'][
+            'RSD_percent_as_printed'
+        ]
+        for element in ('K', 'Cu', 'Zn')
+        for row in doc['species'][element]['observations']
+        if row['values'].get('quantity') == 'element_fraction_remaining'
+    }
+    migrated = {
+        key: observation
+        for key, observation in result.observations.items()
+        if key in expected_rsd
+    }
+
+    assert len(expected_rsd) == len(migrated) == 60
+    for observation_id, relative_sd in expected_rsd.items():
+        uncertainty = migrated[observation_id].uncertainty
+        assert uncertainty.kind is UncertaintyKind.PRINTED
+        assert uncertainty.basis == 'relative_sd'
+        assert uncertainty.verbatim['RSD_percent_as_printed'] == relative_sd
+        assert uncertainty.verbatim['confidence_level'] == 'not_stated'
+
+    assert migrated[
+        f'{SOURCE}::neuman_2021_table2_k_fraction_remaining_8b13a'
+    ].uncertainty.value == Decimal('0.0103')
+
+
+def test_neuman_relative_rsd_reaches_score_band(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, f'{SOURCE}.yaml')
+    observation = result.observations[
+        f'{SOURCE}::neuman_2021_table2_k_fraction_remaining_8b13a'
+    ]
+    absolute_sigma = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={
+            "value": "0.0098777",
+            "unit": "dimensionless",
+            "confidence_level": "not_stated",
+        },
+    )
+
+    resolution = _printed_uncertainty_band(
+        Quantity.ELEMENT_FRACTION_REMAINING,
+        observation.uncertainty,
+        abs(observation.value.point),
+        source_observation=observation,
+    )
+    absolute_resolution = _printed_uncertainty_band(
+        Quantity.ELEMENT_FRACTION_REMAINING,
+        absolute_sigma,
+        abs(observation.value.point),
+        source_observation=observation,
+    )
+
+    assert observation.value.point == Decimal('0.959')
+    assert observation.uncertainty.basis == 'relative_sd'
+    assert observation.uncertainty.verbatim['confidence_level'] == 'not_stated'
+    assert resolution.refusal is None
+    assert resolution.band is not None
+    assert absolute_resolution.refusal is None
+    assert absolute_resolution.band is not None
+    assert resolution.band.value == Decimal('0.0098777')
+    assert resolution.band.value == absolute_resolution.band.value
+    assert resolution.band.unit == 'dimensionless'
+    assert resolution.band.rule.startswith('printed_unstated:')
+    assert absolute_resolution.band.rule.startswith('printed_unstated:')
+    assert resolution.notice is not None
+    assert absolute_resolution.notice is not None
+    assert resolution.notice.reason == 'confidence_level_not_stated'
+    assert resolution.notice.reason == absolute_resolution.notice.reason
