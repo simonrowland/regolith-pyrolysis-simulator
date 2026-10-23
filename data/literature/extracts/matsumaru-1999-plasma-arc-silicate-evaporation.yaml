@@ -1,0 +1,693 @@
+schema_version: literature_extract.v1
+source_id: matsumaru-1999-plasma-arc-silicate-evaporation
+source:
+  citation: >-
+    Matsumaru, K., Fukuyama, H., Susa, M., and Nagata, K. (1999), "Plasma Arc
+    Evaporation from Molten Silicate Glasses", Journal of the Japan Institute
+    of Metals, 63(1), 21–27.
+  year: 1999
+  doi: 10.2320/jinstmet1952.63.1_21
+extraction:
+  method: >-
+    Born-digital pdftotext-layout and the MinerU table draft were compared.
+    Tables 1–3 are retained in context because their ion-pair model inputs,
+    bulk-system mass-loss rates, and quoted incinerator-ash compositions do not
+    map to a row-level species observation without changing their meaning.
+    Every numeric table cell was checked against 600-dpi PDF renders on physical
+    pages 5–6; Table 2's two calculated Fe-Glass cases share one printed cell.
+    The text's explicit 75 mol% Fe2+ value at 450 s is typed as one measured
+    valence-ratio point. Figures 3–10 are metadata only; no plotted coordinates
+    were digitized.
+  date: '2026-10-19'
+  worker: fam18-1019
+review_status: draft
+fidelity_samples:
+  - species: Fe
+    observation_id: matsumaru_1999_text_fe2_fraction_450s
+    field: value
+    value: '0.75'
+    locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 23
+      section: Results
+      figure: '3'
+      note: The text states that 75 mol% of the initial Fe3+ had changed to Fe2+ by 450 s.
+species:
+  Fe:
+    observations:
+      - observation_id: matsumaru_1999_text_fe2_fraction_450s
+        type: concentration_series
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 23
+          section: Results
+          figure: '3'
+          note: The prose gives 75 mol% at 450 s; no plotted figure values were digitized.
+        phase: glass
+        units: fraction
+        values:
+          quantity: valence_ratio
+          valence_basis:
+            numerator_oxidation_states:
+              - 2
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_direct
+          method_as_printed: Mössbauer spectroscopy
+          method_schema_gap: >-
+            Mössbauer spectroscopy is printed as the measurement method, but the
+            closed method-token enum has no Mössbauer token; no generic method
+            token is substituted.
+          value: '0.75'
+          value_as_published: '75 mol% Fe3+ converted to Fe2+'
+        quench_statement:
+          text: >-
+            The paper states that iron valence was measured by Mössbauer
+            spectroscopy after melting; it does not state a quench or cooling
+            procedure.
+          quench_direction: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 22
+            section: Experimental method
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: >-
+                The source gives a radial surface-temperature profile, not one
+                temperature for the 450 s valence measurement.
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 24
+              figure: '6'
+          oxygen_partial_pressure:
+            state:
+              tag: unknown
+              reason: >-
+                The source plots a changing Fe-Glass oxygen partial pressure in
+                Figure 4 but gives no numeric value at 450 s; figure reads are
+                deferred.
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 23
+              figure: '4'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The chamber total pressure is not stated.
+            locator:
+              page: 2
+              pdf_page_index: 1
+              published_page: 22
+              section: Experimental method
+          composition:
+            state:
+              tag: value
+              value:
+                amount_basis: mass_percent
+                components:
+                  SiO2: '36'
+                  CaO: '36'
+                  Al2O3: '18'
+                  Fe2O3: '10'
+            locator:
+              page: 2
+              pdf_page_index: 1
+              published_page: 22
+              section: Experimental method
+              note: The paper reports the Fe-Glass composition and says both melt compositions stayed constant through 900 s.
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              page: 2
+              pdf_page_index: 1
+              published_page: 22
+              section: Experimental method
+              note: No quench or cooling procedure for the Mössbauer analysis is stated.
+          time_s:
+            state:
+              tag: value
+              value: '450'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 23
+              section: Results
+              note: The text states that 450 s had elapsed during plasma melting.
+    context:
+      - observation_id: matsumaru_1999_figure3_metadata
+        type: figure_record
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 23
+          figure: '3'
+        units: Fe2+/total Fe as molar fraction; time in s
+        values:
+          quantity_as_printed: Fe2+/total Fe valence ratio
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: Fe in Fe-Glass
+            phase: glass measured after plasma melting
+            temperature: spatially variable melt surface; no single value on this figure
+          axes_as_printed: Fe2+/Fetotal versus t (s)
+          caption: Molar ratio of Fe2+ to total Fe in Fe-Glass as a function of time.
+          panels:
+            - panel: single
+              series:
+                - name: Fe-Glass Mössbauer ratio markers
+                  marker_count: 4
+                  evidence_class: measured_direct
+                - name: drawn trend curve
+                  marker_count: 0
+                  evidence_class: measured_reduced
+          attribution: Authors' Mössbauer measurements; markers read only for count.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: matsumaru_1999_iron_composition_and_redox_summary
+        type: measured_text_context
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 23
+          section: Results
+        units: mass%; mol%; s
+        values:
+          quantity: iron_valence_and_composition_changes
+          method_class: measured_direct
+          method_as_printed: Electron-probe microanalysis and Mössbauer spectroscopy
+          composition_stability_as_printed: Both samples' compositions remained constant through 900 s of melting.
+          composition_change_as_printed: The 1800 s sample showed a maximum increase of 1 mass% in total iron concentration.
+          valence_at_1800_s_as_printed: All iron ions were Fe2+ after 1800 s; no numeric ratio is substituted for this wording.
+      - observation_id: matsumaru_1999_text_oxygen_partial_pressure
+        type: measured_text_context
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 23
+          figure: '4'
+          section: Results
+        units: Pa
+        values:
+          quantity: oxygen_partial_pressure_condition
+          method_class: measured_direct
+          method_as_printed: Quadrupole mass spectrometer, calibrated against a zirconia oxygen sensor.
+          glass_as_printed: 40 Pa before plasma ignition and approximately constant during melting.
+          fe_glass_as_printed: Rose to 140 Pa after melting began, then gradually decreased.
+          schema_gap: >-
+            Oxygen partial pressure is retained as a condition. The time-series
+            curve has no tabulated values and is not digitized.
+      - observation_id: matsumaru_1999_figure4_metadata
+        type: figure_record
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 23
+          figure: '4'
+        units: Pa; s
+        values:
+          quantity_as_printed: oxygen partial pressure used as a condition
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: O2 in the chamber over Glass and Fe-Glass
+            phase: gas
+            temperature: melt surface temperature is spatially variable
+          axes_as_printed: pO2 (Pa) versus t (s)
+          caption: Change in partial pressure of oxygen during melting Glass and Fe-Glass.
+          panels:
+            - panel: single
+              series:
+                - name: Glass measured pO2
+                  marker_count: 0
+                  evidence_class: measured_direct
+                - name: Fe-Glass measured pO2
+                  marker_count: 0
+                  evidence_class: measured_direct
+                - name: calculated oxygen partial pressure by Eq. (6)
+                  marker_count: 0
+                  evidence_class: model_derived
+          attribution: Authors' mass-spectrometer measurements and calculation.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: matsumaru_1999_figure5_metadata
+        type: figure_record
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 23
+          figure: '5'
+        units: 10^-4 kg; s
+        values:
+          quantity_as_printed: whole-specimen mass change
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: Glass and Fe-Glass samples with an iron ignition rod
+            phase: molten samples during plasma melting
+            temperature: spatially variable melt-surface profile
+          measurement_basis_as_printed: >-
+            The figure caption defines the whole sample as glass plus iron rod;
+            the experimental method says the mass-change measurement includes
+            the alumina crucible.
+          axes_as_printed: ΔW / 10^-4 kg versus t (s)
+          caption: Mass change of the whole sample (glass+iron rod) as a function of time.
+          panels:
+            - panel: single
+              series:
+                - name: Glass measured mass-change markers
+                  marker_count: 6
+                  evidence_class: measured_direct
+                - name: Fe-Glass measured mass-change markers
+                  marker_count: 5
+                  evidence_class: measured_direct
+                - name: Glass least-squares line
+                  marker_count: 0
+                  evidence_class: measured_reduced
+                - name: Fe-Glass least-squares line
+                  marker_count: 0
+                  evidence_class: measured_reduced
+          attribution: Authors' balance measurements and least-squares rate fits.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+  O2:
+    observations: []
+    context:
+      - observation_id: matsumaru_1999_figure8_metadata
+        type: figure_record
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 25
+          figure: '8'
+        units: log(P/Pa)
+        values:
+          quantity_as_printed: equilibrium partial pressures of SiO(g) and SiO2(g)
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: SiO, SiO2, and O2 over Glass and Fe-Glass
+            phase: gas above liquid silicate glass
+            temperature: 2000 K
+          axes_as_printed: log(P / Pa) versus log(pO2 / Pa)
+          caption: >-
+            Partial pressure of gaseous species vaporized from Glass and Fe-Glass
+            as a function of oxygen partial pressure at 2000 K.
+          panels:
+            - panel: single
+              series:
+                - name: Glass SiO(g)
+                  marker_count: 1
+                  evidence_class: model_derived
+                - name: Glass SiO2(g)
+                  marker_count: 1
+                  evidence_class: model_derived
+                - name: Fe-Glass containing Fe2O3 SiO(g)
+                  marker_count: 0
+                  evidence_class: model_derived
+                - name: Fe-Glass containing Fe2O3 SiO2(g)
+                  marker_count: 0
+                  evidence_class: model_derived
+                - name: Fe-Glass containing FeO SiO(g)
+                  marker_count: 0
+                  evidence_class: model_derived
+                - name: Fe-Glass containing FeO SiO2(g)
+                  marker_count: 0
+                  evidence_class: model_derived
+          attribution: Authors' equilibrium vapor-pressure calculations; no values digitized.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+  SiO2:
+    observations: []
+    context:
+      - observation_id: matsumaru_1999_table1_regular_solution_interaction_energies
+        type: thermodynamic_context
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 25
+          table: '1'
+        units: J
+        values:
+          quantity: regular_solution_ion_pair_interaction_energy
+          method_class: quoted_attributed
+          attribution: S. Banya (1992), reference 14, as cited by Matsumaru et al.
+          model_use: Regular-solution calculation of silicate melt activities.
+          candidate_store_tokens:
+            - interaction_parameter
+          schema_gap: >-
+            These cation-pair energies are inputs to this paper's
+            regular-solution model and are attributed to Banya (1992); they are
+            quoted model parameters, not measured activity observations.
+          rows:
+            - ion_pair: Al3+-Ca2+
+              interaction_energy_J_as_printed: '-154810'
+            - ion_pair: Al3+-Si4+
+              interaction_energy_J_as_printed: '-127610'
+            - ion_pair: Ca2+-Si4+
+              interaction_energy_J_as_printed: '-133890'
+            - ion_pair: Al3+-Fe2+
+              interaction_energy_J_as_printed: '-41000'
+            - ion_pair: Al3+-Fe3+
+              interaction_energy_J_as_printed: '-161080'
+            - ion_pair: Ca4+-Fe2+
+              interaction_energy_J_as_printed: '-31380'
+            - ion_pair: Ca4+-Fe3+
+              interaction_energy_J_as_printed: '-95810'
+            - ion_pair: Si2+-Fe2+
+              interaction_energy_J_as_printed: '-41840'
+            - ion_pair: Si2+-Fe3+
+              interaction_energy_J_as_printed: '+32640'
+      - observation_id: matsumaru_1999_table2_measured_bulk_mass_loss_rates
+        type: measured_table_context
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 26
+          table: '2'
+        units: kg/s
+        values:
+          quantity: total_mass_loss_rate_of_sample_assembly
+          method_class: measured_reduced
+          candidate_store_tokens:
+            - mass_loss_rate
+            - evaporation_rate
+          schema_gap: >-
+            The printed rate is for the complete sample, iron rod, and alumina crucible
+            assembly, not one species. The rates also integrate a spatially varying
+            temperature, and the Fe-Glass oxygen pressure changes during the
+            run; assigning them to one species and one point identity would
+            change the reported quantity.
+          rows:
+            - sample_id: Glass
+              composition_as_printed: 40 mass% SiO2, 40 mass% CaO, 20 mass% Al2O3
+              measured_rate_kg_per_s_as_printed: 3.8×10^-7
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 26
+                table: '2'
+                row: Glass
+                column: Measured
+            - sample_id: Fe-Glass
+              composition_as_printed: 36 mass% SiO2, 36 mass% CaO, 18 mass% Al2O3, 10 mass% Fe2O3
+              measured_rate_kg_per_s_as_printed: 2.0×10^-7
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 26
+                table: '2'
+                row: Fe-Glass
+                column: Measured
+          duplicate_value_note: The two measured rates also appear in the abstract and conclusion; Table 2 is the single retained record of each rate.
+          duplicate_locators:
+            - page: 1
+              pdf_page_index: 0
+              published_page: 21
+              section: Abstract
+            - page: 6
+              pdf_page_index: 5
+              published_page: 26
+              section: Conclusion
+      - observation_id: matsumaru_1999_table2_model_calculated_rates
+        type: thermodynamic_context
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 26
+          table: '2'
+        units: kg/s
+        values:
+          quantity: total_mass_loss_rate_of_sample_assembly
+          method_class: model_derived
+          generator: Hertz-Knudsen calculation using regular-solution activities and vapor pressures.
+          calculation_conditions_as_printed:
+            Glass: pO2 = 40 Pa; aSiO2(l) = 0.21.
+            Fe-Glass with Fe2O3: pO2 = 200 Pa; aSiO2(l) = 0.23.
+            Fe-Glass with FeO: pO2 = 200 Pa; aSiO2(l) = 0.14.
+            temperature: The radial surface-temperature profile from Figure 6, averaged over 1 mm annuli.
+          rows:
+            - sample_id: Glass
+              calculated_rate_kg_per_s_as_printed: 3.6×10^-7
+            - sample_id: Fe-Glass
+              calculated_rate_kg_per_s_as_printed: 1.8×10^-7
+              assumption: all iron oxide is Fe2O3
+            - sample_id: Fe-Glass
+              calculated_rate_kg_per_s_as_printed: 1.7×10^-7
+              assumption: all iron oxide is FeO
+      - observation_id: matsumaru_1999_table3_quoted_incinerator_ash_compositions
+        type: quoted_table_context
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 26
+          table: '3'
+        units: mass% as printed; T-S*, T-Cl*, and T-Cr* are total amounts.
+        values:
+          quantity: incinerator_ash_composition
+          method_class: quoted_attributed
+          attribution: >-
+            The Japan Society for the Promotion of Science, Thermal Plasma
+            Processing Research Committee (1996), p. 307, reference 15.
+          candidate_store_tokens:
+            - equilibrium_phase_composition
+            - residue_component_composition
+          schema_gap: >-
+            The rows are quoted bulk-ash compositions, not equilibrium-phase
+            compositions or evaporation-residue compositions from this study.
+          ash_samples:
+            - sample_id: Ash A
+              values_as_printed:
+                SiO2: '20.65'
+                CaO: '27.33'
+                Al2O3: '17.6'
+                Fe2O3: '4.43'
+                K2O: '3.02'
+                Na2O: '3.42'
+                P2O5: '1.98'
+                MgO: '2.7'
+                TiO2: '1.57'
+                T-S*: '0.32'
+                T-Cl*: '5.47'
+                Pb: '0.34'
+                T-Cr*: '0.035'
+                Mn: '0.18'
+                Cu: '0.531'
+                Zn: '0.71'
+                Ni: '0.021'
+            - sample_id: Ash B
+              values_as_printed:
+                SiO2: '38.73'
+                CaO: '20.72'
+                Al2O3: '12.74'
+                Fe2O3: '3.71'
+                K2O: '2.5'
+                Na2O: '5.63'
+                P2O5: '1.36'
+                MgO: '2.06'
+                TiO2: '1.01'
+                T-S*: '0.19'
+                T-Cl*: '3.33'
+                Pb: '0.22'
+                T-Cr*: '0.026'
+                Mn: '0.125'
+                Cu: '0.847'
+                Zn: '0.73'
+                Ni: '0.022'
+            - sample_id: Ash C
+              values_as_printed:
+                SiO2: '44.95'
+                CaO: '17.67'
+                Al2O3: '12.47'
+                Fe2O3: '3.66'
+                K2O: '2.23'
+                Na2O: '3.93'
+                P2O5: '2.32'
+                MgO: '2.68'
+                TiO2: '1.35'
+                T-S*: 'N.D.'
+                T-Cl*: '0.4'
+                Pb: '0.1'
+                T-Cr*: '0.041'
+                Mn: '0.132'
+                Cu: '0.136'
+                Zn: '0.25'
+                Ni: '0.03'
+          row_count: 17
+          printed_sample_definitions:
+            Ash A: Fluidized-bed incinerator fly ash from the dust collector.
+            Ash B: Mixture of fluidized-bed fly ash and incinerator bottom ash at a 7:3 ratio.
+            Ash C: Magnetic-separation-treated stoker-furnace incinerator ash.
+      - observation_id: matsumaru_1999_figure6_metadata
+        type: figure_record
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 24
+          figure: '6'
+        units: K; mm
+        values:
+          quantity_as_printed: melt-surface temperature profile
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: Glass and Fe-Glass melt surfaces
+            phase: liquid
+            temperature: plotted radial profile; 2200 K at the molten iron/sample interface
+          axes_as_printed: T / K versus r / mm
+          caption: Temperature distribution on the surface of Glass and Fe-Glass.
+          panels:
+            - panel: single
+              series:
+                - name: Glass temperature markers
+                  marker_count: 2
+                  evidence_class: measured_direct
+                - name: Fe-Glass temperature markers
+                  marker_count: 3
+                  evidence_class: measured_direct
+                - name: thermocouple point T.C.
+                  marker_count: 1
+                  evidence_class: measured_direct
+                - name: temperature-profile curve
+                  marker_count: 0
+                  evidence_class: measured_reduced
+          attribution: Authors' surface-temperature measurement and thermocouple point.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: matsumaru_1999_figure7_metadata
+        type: figure_record
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 25
+          figure: '7'
+        units: ln(activity); 10^-4 K^-1
+        values:
+          quantity_as_printed: SiO2 activity
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: SiO2
+            phase: l
+            temperature: variable, plotted as reciprocal temperature
+          axes_as_printed: ln(aSiO2(l)) versus T^-1 / 10^-4 K^-1
+          standard_state: Pure liquid SiO2, as stated for aSiO2(l) in equation (10).
+          caption: Activity of SiO2(l) in Glass and Fe-Glass as a function of temperature.
+          panels:
+            - panel: single
+              series:
+                - name: Rein and Chipman literature data
+                  marker_count: 2
+                  evidence_class: quoted_attributed
+                - name: Glass regular-solution calculation
+                  marker_count: 0
+                  evidence_class: model_derived
+                - name: Fe-Glass containing Fe2O3 calculation
+                  marker_count: 0
+                  evidence_class: model_derived
+                - name: Fe-Glass containing FeO calculation
+                  marker_count: 0
+                  evidence_class: model_derived
+          attribution: >-
+            Model curves are this work; the two circles are attributed to Rein
+            and Chipman in the legend.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: matsumaru_1999_figure9_metadata
+        type: figure_record
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 26
+          figure: '9'
+        units: log(P/Pa); K
+        values:
+          quantity_as_printed: equilibrium partial pressures of SiO(g) and SiO2(g)
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: SiO(g) and SiO2(g)
+            phase: gas above liquid silicate glass
+            temperature: 1800–2200 K as shown on the axis
+          axes_as_printed: log(P / Pa) versus T / K
+          caption: Partial pressure of gaseous species vaporized from Glass and Fe-Glass as a function of temperature.
+          series_conditions_as_printed:
+            Glass: pO2 = 40 Pa; aSiO2(l) = 0.21.
+            Fe-Glass containing Fe2O3: pO2 = 200 Pa; aSiO2(l) = 0.23.
+            Fe-Glass containing FeO: pO2 = 200 Pa; aSiO2(l) = 0.14.
+          activity_standard_state_as_printed: Pure liquid SiO2 for all series, as stated for aSiO2(l) in equation (10).
+          panels:
+            - panel: single
+              series:
+                - name: Glass SiO(g)
+                  marker_count: 0
+                  evidence_class: model_derived
+                - name: Glass SiO2(g)
+                  marker_count: 0
+                  evidence_class: model_derived
+                - name: Fe-Glass containing Fe2O3 SiO(g)
+                  marker_count: 0
+                  evidence_class: model_derived
+                - name: Fe-Glass containing Fe2O3 SiO2(g)
+                  marker_count: 0
+                  evidence_class: model_derived
+                - name: Fe-Glass containing FeO SiO(g)
+                  marker_count: 0
+                  evidence_class: model_derived
+                - name: Fe-Glass containing FeO SiO2(g)
+                  marker_count: 0
+                  evidence_class: model_derived
+          attribution: Authors' equilibrium vapor-pressure calculations.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: matsumaru_1999_figure10_metadata
+        type: figure_record
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 27
+          figure: '10'
+        units: log(P/Pa); log(pO2/Pa)
+        values:
+          quantity_as_printed: equilibrium partial pressures of Pb(g), PbO(g), Zn(g), ZnO(g), Cr(g), and CrO2(g)
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: Pb, Zn, and Cr gaseous oxides and elemental vapor species
+            phase: gas above silicate melt
+            temperature: 2000 K
+          axes_as_printed: log(P / Pa) versus log(pO2 / Pa)
+          caption: Partial pressure of gaseous species as a function of oxygen partial pressure at 2000 K.
+          panel: whole_figure
+          series:
+            - name: Pb(g)
+              marker_count: 0
+              evidence_class: model_derived
+            - name: PbO(g)
+              marker_count: 0
+              evidence_class: model_derived
+            - name: Zn(g)
+              marker_count: 0
+              evidence_class: model_derived
+            - name: ZnO(g)
+              marker_count: 0
+              evidence_class: model_derived
+            - name: Cr(g)
+              marker_count: 0
+              evidence_class: model_derived
+            - name: CrO2(g)
+              marker_count: 0
+              evidence_class: model_derived
+          attribution: Authors' equilibrium vapor-pressure calculations; condensed-phase activities are set to 1.
+          digitisation: deferred to a figure pass
+          numeric_points: none

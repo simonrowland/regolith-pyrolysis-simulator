@@ -1,0 +1,86 @@
+schema_version: literature_extract_mapping_audit.v1
+source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+source_text: text/borisov-2004-tio2-pd-ni-fe-solubilities/pdftotext-layout.txt
+table_tool_status: No MinerU markdown/table draft exists for this source; the converter accepts MinerU tables and cannot emit
+  from the pdftotext-only layout file.
+tables:
+- table: '1'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 565
+    table: '1'
+  printed_data_rows: 24
+  columns_as_printed:
+  - No.
+  - Sample
+  - −log fO2
+  - T °C
+  - h†
+  - SiO2 wt%
+  - TiO2 wt%
+  - Al2O3 wt%
+  - MgO wt%
+  - CaO wt%
+  - Total
+  - Pd_ICP ppm
+  - s.d.
+  - Pd_EMP ppm
+  - s.d.
+  mapped_fields:
+  - sample_id
+  - point_conditions.fO2_log
+  - values.T_C
+  - point_conditions.duration_h
+  - values.composition_wt_pct
+  - values.composition_total_wt_pct_as_published
+  - values.value
+  - uncertainty.as_published
+  assay_methods:
+    Pd_ICP: LA ICP-MS
+    Pd_EMP: electron microprobe; first six air rows only
+  explicit_unmeasured_cells: Pd_EMP and s.d. printed as dashes in rows 7–24; not imputed or represented as numeric measurements.
+  same_run_dittos: Expanded only from the table footnote; conditions carry the same fO2, T, and duration for the row group.
+  row_binding: Every typed cell carries the sample printed in its row and its exact printed glass composition.
+- table: '2'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 565
+    table: '2'
+  printed_data_rows: 12
+  columns_as_printed:
+  - No.
+  - SiO2 wt%
+  - TiO2 wt%
+  - Al2O3 wt%
+  - MgO wt%
+  - CaO wt%
+  - MeO wt%
+  - s.d.
+  - Total
+  - XTiO2
+  - XMeO
+  - γMeO
+  mapped_fields:
+  - sample_id
+  - values.composition_wt_pct
+  - values.value
+  - uncertainty.as_published
+  - values.X_TiO2_as_published
+  - values.X_MeO_as_published
+  - values.gamma
+  series_conditions:
+    Ni-loop: 1301 °C, fO2 = 10^-8.40 atm, 50 h, calculated from known CO/CO2 gas ratios; liquid NiO standard state.
+    Fe-loop: 1301 °C, fO2 = 10^-12.65 atm, 44 h, calculated; liquid FeO standard state.
+  row_binding: Rows 1–6 are Ni-loop, rows 7–12 Fe-loop; every composition, MeO concentration, printed mole fraction, and gamma
+    value is bound to its printed row.
+render_check:
+  dpi: 600
+  physical_pdf_page: 2
+  rendered_cells_checked: 504
+  table1_rows: 24
+  table2_rows: 12
+  numeric_cells_emitted: 444
+  explicit_dash_cells_checked: 36
+  hand_corrections: 0

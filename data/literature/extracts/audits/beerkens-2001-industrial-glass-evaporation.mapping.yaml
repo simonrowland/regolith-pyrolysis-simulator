@@ -1,0 +1,96 @@
+source_id: beerkens-2001-industrial-glass-evaporation
+source:
+  doi: 10.34657/13064
+  year: 2001
+drafts:
+  - file: p003-t01.csv
+    page: 3
+    table_index: 1
+    printed_table: '1'
+    candidate_tokens: [condensate_composition, residue_component_composition, mass_loss_rate, mass_loss_areal_density]
+    disposition: context_only
+    reason: >-
+      This is a generalized typical-range table without one identified sampled
+      furnace or source attribution. Filter-dust wt% is not a row-level melt
+      condensate or study residue composition; specific particulate emission
+      in kg/t glass has no time denominator, and dust concentration in mg/m3
+      has no store token. The 600-dpi page-3 render confirms the 0.17 footnote
+      marker, the blank B2O3 cell shown as a dash, and both residue cells printed
+      as 10.
+  - file: p009-t02.csv
+    page: 9
+    table_index: 2
+    printed_table: '2'
+    candidate_tokens: [partial_pressure, mass_loss_rate, residue_component_composition]
+    disposition: context_model
+    reason: >-
+      The table is titled estimated values and is described as model scenarios.
+      NaOH pressures and Na2SO4 dust emissions are preserved in context; no
+      measured row is claimed. The five process conditions and two furnace
+      columns were checked against the 600-dpi page-9 render.
+  - file: p010-t03.csv
+    page: 10
+    table_index: 3
+    printed_table: '3'
+    candidate_tokens: [partial_pressure, mass_loss_rate, mass_loss_fraction]
+    disposition: partial
+    reason: >-
+      Four measured CO pressure cells are typed as species CO partial_pressure
+      observations with their furnace number, printed T_C, pO2, water-vapor
+      pressure and incomplete-composition state. The fifth CO cell remains a
+      strict upper bound in context. Dust and Na2O emissions in kg/t glass have
+      no time denominator or melt-mass fraction; NaOH concentration is
+      model-derived. The complete five-column, thirteen-row value grid was
+      transcribed independently from the 600-dpi render and compared cell by
+      cell with the table context and typed CO observations.
+  - file: text and figure records
+    pages: [1, 4, 6, 7, 10, 11, 12]
+    table_index: 0
+    printed_table: none
+    candidate_tokens: [mass_loss_fraction, mass_loss_rate, partial_pressure]
+    disposition: partial
+    reason: >-
+      The approximate quoted fraction of extra NaCl evaporated is typed as
+      mass_loss_fraction. The reported 3.5–4 g/(m2 h) Na2O flux, surface
+      depletion percentages, and kg-per-glass-throughput estimates have no
+      matching store token. Model curves and figure-only measurements are
+      deferred without numeric points.
+  - file: prose on PDF page 8
+    page: 8
+    table_index: 0
+    printed_table: none
+    candidate_tokens: [mass_loss_fraction, residue_component_composition]
+    disposition: quoted_context_no_token
+    reason: >-
+      The quoted >50% PbO depletion is a lead-glass surface-concentration
+      change after 8 h at 1300 °C, not whole-sample mass loss or a final
+      residue composition; the printed initial composition is retained.
+  - file: prose on PDF page 9
+    page: 9
+    table_index: 0
+    printed_table: none
+    candidate_tokens: [mass_loss_rate, residue_component_composition, mass_loss_fraction]
+    disposition: context_no_token
+    reason: >-
+      The about-30 mg/m3 sodium-sulfate-dust effect is particulate concentration
+      per flue-gas volume, and the prose does not state whether it is measured
+      or model-derived. Figure 8's about-50% gas-velocity change has no matching
+      quantity token and remains a figure record without numeric points.
+  - file: prose on PDF page 11
+    page: 11
+    table_index: 0
+    printed_table: none
+    candidate_tokens: [mass_loss_fraction, residue_component_composition]
+    disposition: context_no_token
+    reason: >-
+      Boron depletion of a 0.5–3 mm surface layer by more than 50% is a local
+      concentration change rather than a whole-sample mass fraction or a final
+      residue composition. The temperature threshold is retained as printed.
+table_tool_emit:
+  disposition: not_run
+  reason: >-
+    Tables 1 and 2 had no measured row-level mapping that preserved their
+    meaning. Table 3's 10^5 Pa factor is printed in a row stub rather than a
+    column header, so table emission cannot apply the factor safely; its four
+    numeric CO pressures and per-furnace conditions were transcribed by hand
+    from the render. The fifth pressure is bounded and was not emitted.
