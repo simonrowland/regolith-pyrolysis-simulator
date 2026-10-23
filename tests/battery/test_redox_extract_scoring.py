@@ -365,8 +365,12 @@ def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     ``b1a7c34db`` ``predict_with_engine(OPENIMCC, row4)`` returns this
     Decimal from ``openimcc.evaluate_redox`` on the printed mole-fraction
     composition. The row is not a mass-percent stand-in. OpenIMCC must
-    not open or equilibrate a cell.
+    not open or equilibrate a cell. The pack digest is the digest on the
+    result the scorer just stamped, not a host-specific literal.
     """
+
+    pytest.importorskip("openimcc")
+    import openimcc
 
     row4 = _borisov_row4()
 
@@ -381,6 +385,15 @@ def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
         "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
         _boom,
     )
+    redox_results = []
+    original_evaluate_redox = openimcc.evaluate_redox
+
+    def capture_redox_result(*args, **kwargs):
+        result = original_evaluate_redox(*args, **kwargs)
+        redox_results.append(result)
+        return result
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_result)
     prediction = predict_with_engine(Engine.OPENIMCC, row4)
 
     assert prediction.refusal_reason is None
@@ -389,9 +402,11 @@ def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     assert prediction.authority is Authority.BRIDGE
     assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
     assert prediction.version == "openimcc-redox"
+    assert len(redox_results) == 1
+    digest = redox_results[0].redox_pack_digest
+    assert len(digest) == 64 and all(char in "0123456789abcdef" for char in digest)
     assert prediction.coefficient_sources == (
-        "openimcc-redox-pack:sha256:"
-        "cae887f4e7cc537d330396767911a817f68503219ff723af2162829031819cec",
+        f"openimcc-redox-pack:sha256:{digest}",
     )
 
 
