@@ -1,0 +1,53 @@
+schema_version: literature_extract.v1
+source_id: lee-1976-chromium-oxide-vaporization
+source:
+  citation: Lee, H.-L., Sasamoto, T. & Sata, T. (1976), "Effects of Porosity on Vacuum-Vaporization of Chromium Oxide and Thermodynamic Treatments", Yogyo-Kyokai-Shi 84(11), 579-586.
+  year: 1976
+extraction:
+  method: MinerU table transcription checked against rendered PDF page
+  date: '2026-10-22'
+  worker: wave52-F64
+review_status: draft
+species:
+  Cr2O3:
+    observations:
+    - observation_id: lee1976_table3_porosity_0_018
+      type: rate_series
+      locator: {table: '3', page: 3, published_page: 64, row: '0.018'}
+      units: μg cm^-2 s^-1
+      T_C: [1745, 1635, 1575, 1457]
+      values:
+        printed_porosity: '0.018'
+        printed_rates: ['39.9', '5.62', '1.62', '0.114']
+        status: typed_refusal
+        reason: Schema token evaporation_flux excludes the printed unit μg cm^-2 s^-1 and requires a gas_species not stated by the table.
+    - observation_id: lee1976_table3_porosity_0_250
+      type: rate_series
+      locator: {table: '3', page: 3, published_page: 64, row: '0.250'}
+      units: μg cm^-2 s^-1
+      T_C: [1745, 1635, 1575, 1457]
+      values:
+        printed_porosity: '0.250'
+        printed_rates: ['42.3', '6.66', '1.84', '0.141']
+        status: typed_refusal
+        reason: Schema token evaporation_flux excludes the printed unit μg cm^-2 s^-1 and requires a gas_species not stated by the table.
+    - observation_id: lee1976_table3_porosity_0_300
+      type: rate_series
+      locator: {table: '3', page: 3, published_page: 64, row: '0.300'}
+      units: μg cm^-2 s^-1
+      T_C: [1745, 1635, 1575, 1457]
+      values:
+        printed_porosity: '0.300'
+        printed_rates: ['45.1', '6.89', '2.19', '0.186']
+        status: typed_refusal
+        reason: Schema token evaporation_flux excludes the printed unit μg cm^-2 s^-1 and requires a gas_species not stated by the table.
+    - observation_id: lee1976_table3_porosity_0_380
+      type: rate_series
+      locator: {table: '3', page: 3, published_page: 64, row: '0.380'}
+      units: μg cm^-2 s^-1
+      T_C: [1745, 1635, 1575, 1457]
+      values:
+        printed_porosity: '0.380'
+        printed_rates: ['47.6', '7.27', '2.47', '0.322']
+        status: typed_refusal
+        reason: Schema token evaporation_flux excludes the printed unit μg cm^-2 s^-1 and requires a gas_species not stated by the table.
