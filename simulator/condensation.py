@@ -3290,21 +3290,27 @@ class CondensationModel:
                     capture_budget_alpha_record
                 )
             capture_budget_kg = float(stage_route['capture_budget_kg'])
+            captured_kg = 0.0
             if hkl_sink_total_kg <= 1e-15:
                 capture_budget_kg = 0.0
             elif capture_budget_kg > 0.0:
                 used_capture_budget_regularizer = True
-                wall_deposit_kg = capture_budget_kg * (
-                    wall_hkl_kg / hkl_sink_total_kg
+                # Share the pressure-isolated removal ceiling across the same
+                # evaluated stage and wall capacities used by the fixed-point
+                # route. Any budget the sinks cannot accept remains overhead.
+                stage_deposits, segment_deposits = (
+                    _regularized_capture_allocations(
+                        capture_budget_kg,
+                        hkl_condensed_by_stage,
+                        wall_hkl_by_segment,
+                    )
                 )
+                wall_deposit_kg = sum(segment_deposits.values())
+                captured_kg = wall_deposit_kg + sum(stage_deposits.values())
                 if wall_deposit_kg > 1e-15:
                     wall_deposit_by_species[species] = (
                         wall_deposit_by_species.get(species, 0.0)
                         + wall_deposit_kg
-                    )
-                    segment_deposits = _allocate_total_by_weights(
-                        wall_deposit_kg,
-                        wall_hkl_by_segment,
                     )
                     for segment_name, segment_kg in segment_deposits.items():
                         if segment_kg <= 1e-15:
@@ -3315,8 +3321,8 @@ class CondensationModel:
                         segment_species[species] = (
                             segment_species.get(species, 0.0) + segment_kg)
                 wall_fraction = (
-                    wall_deposit_kg / capture_budget_kg
-                    if capture_budget_kg > 0.0 else 0.0
+                    wall_deposit_kg / captured_kg
+                    if captured_kg > 0.0 else 0.0
                 )
                 segment_fractions = _wall_segment_account_fractions(
                     wall_deposit_by_segment_species,
@@ -3328,26 +3334,23 @@ class CondensationModel:
                 wall_deposit_account_fractions_by_species[species] = dict(
                     segment_fractions)
 
-                baffle_budget_kg = max(0.0, capture_budget_kg - wall_deposit_kg)
-                if hkl_condensed_total_kg > 1e-15 and baffle_budget_kg > 0.0:
-                    scale = baffle_budget_kg / hkl_condensed_total_kg
-                    for stage_number, hkl_stage_kg in hkl_condensed_by_stage.items():
-                        condensed_kg = hkl_stage_kg * scale
-                        if condensed_kg <= 1e-15:
-                            continue
-                        stage_species = condensed_by_stage_species.setdefault(
-                            stage_number, {})
-                        stage_species[species] = (
-                            stage_species.get(species, 0.0) + condensed_kg)
-                        if not is_designated_for_stage(species, stage_number):
-                            stage_impurity = (
-                                impurity_by_stage_species.setdefault(
-                                    stage_number, {}))
-                            stage_impurity[species] = (
-                                stage_impurity.get(species, 0.0)
-                                + condensed_kg)
+                for raw_stage_number, condensed_kg in stage_deposits.items():
+                    stage_number = int(raw_stage_number)
+                    if condensed_kg <= 1e-15:
+                        continue
+                    stage_species = condensed_by_stage_species.setdefault(
+                        stage_number, {})
+                    stage_species[species] = (
+                        stage_species.get(species, 0.0) + condensed_kg)
+                    if not is_designated_for_stage(species, stage_number):
+                        stage_impurity = (
+                            impurity_by_stage_species.setdefault(
+                                stage_number, {}))
+                        stage_impurity[species] = (
+                            stage_impurity.get(species, 0.0)
+                            + condensed_kg)
             remaining_by_species[species] = max(
-                0.0, rate_kg_hr - capture_budget_kg)
+                0.0, rate_kg_hr - captured_kg)
 
         from simulator.diagnostics import (
             _status_bearing_alpha_record,
@@ -7704,6 +7707,22 @@ def _regularized_capture_allocations(
     budget_kg = max(0.0, float(capture_budget_kg))
     if budget_kg <= 0.0 or hkl_sink_kg <= 1.0e-15:
         return {}, {}
+    # The pressure-isolated budget is a total removal ceiling, not extra sink
+    # capacity. If it exceeds S + W, each stage and wall can accept only its
+    # own evaluated transport amount; the remainder stays in overhead gas.
+    if budget_kg >= hkl_sink_kg:
+        return (
+            {
+                str(stage): float(capacity)
+                for stage, capacity in stage_hkl_by_stage.items()
+                if float(capacity) > 0.0
+            },
+            {
+                str(segment): float(capacity)
+                for segment, capacity in wall_hkl_by_segment.items()
+                if float(capacity) > 0.0
+            },
+        )
     wall_deposit_kg = budget_kg * wall_hkl_kg / hkl_sink_kg
     stage_deposit_kg = max(0.0, budget_kg - wall_deposit_kg)
     return (
