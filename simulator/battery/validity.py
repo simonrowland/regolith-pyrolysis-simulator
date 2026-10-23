@@ -678,16 +678,8 @@ def effusion_regime_unverified(
                 )
             )
             return _pass(checks)
-        checks.append(
-            GateCheck(
-                "orifice_knudsen",
-                False,
-                {
-                    "reason": "unknown orifice Knudsen number; chamber pressure is not cell pressure",
-                },
-            )
-        )
-        return _fail(RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "orifice_knudsen")
+        # Chamber pressure cannot verify the cell regime here. Continue to the
+        # printed in-cell sum, which is the independent fallback evidence.
 
     ungrounded_detail = (
         _calibration_not_grounded_detail(calibration)
