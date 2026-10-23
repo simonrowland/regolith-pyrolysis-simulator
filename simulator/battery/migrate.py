@@ -12371,8 +12371,10 @@ def _rejected_log_fO2_reason(facts: PrintedOxygenFacts) -> str | None:
 def _log_fO2_to_pa(
     log10_fO2: Decimal, reference_pressure_pa: Decimal = _BAR_PA
 ) -> Decimal:
+    # log10(fO2/bar) -> Pa is × 1e5 Pa/bar:
     # fO2_Pa = 10^L × P_ref, where P_ref is 1e5 Pa (bar) or 101325 Pa (atm).
     # Unit check: 10^L is dimensionless, so multiplying by P_ref leaves Pa.
+    # Sanity: log10(fO2/bar) = -8 -> 10^-8 × 1e5 Pa/bar = 1e-3 Pa.
     return reference_pressure_pa * (Decimal(10) ** log10_fO2)
 
 
