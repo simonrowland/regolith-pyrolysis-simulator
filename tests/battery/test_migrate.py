@@ -6507,13 +6507,17 @@ def _series_census(
     n_numeric = 0
     n_unavailable = 0
     for src_path in sorted(extracts.glob("*.yaml")):
-        source = yaml.safe_load(src_path.read_text(encoding="utf-8"))
+        source = yaml.load(
+            src_path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
+        )
         if not isinstance(source, dict):
             continue
         store_path = extracts_v2 / src_path.name
         if not store_path.is_file():
             continue
-        stored = yaml.safe_load(store_path.read_text(encoding="utf-8"))
+        stored = yaml.load(
+            store_path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
+        )
         stored_observations = [
             o
             for o in (stored.get("observations") or [])
