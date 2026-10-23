@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:park-min-2004-carbide-capacity-fluoride-soda-slags
+      role: pdf
+      path: raw/park-min-2004-carbide-capacity-fluoride-soda-slags/park-min-2004-carbide-capacity-fluoride-soda-slags.pdf
+      sha256:
+        tag: value
+        value: 7d78be8ca0e8cff995a572e42ec549957e9d852bb4e43516bfd3f26ea9b96936
+    - asset_id: pdftotext:park-min-2004-carbide-capacity-fluoride-soda-slags
+      role: pdftotext
+      path: text/park-min-2004-carbide-capacity-fluoride-soda-slags
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:park-min-2004-carbide-capacity-fluoride-soda-slags
       role: pdftotext
       path: unknown

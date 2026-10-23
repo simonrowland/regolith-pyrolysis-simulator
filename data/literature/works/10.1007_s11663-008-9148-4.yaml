@@ -9,8 +9,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:basu-2008-feo-steelmaking
+      role: pdf
+      path: raw/basu-2008-feo-steelmaking/basu-2008-feo-steelmaking.pdf
+      sha256:
+        tag: value
+        value: 6d54fb8e12375d83976b9a3cb7850684d45cb090fd4a8e4c0b600bb532252434
+    - asset_id: pdftotext:basu-2008-feo-steelmaking
+      role: pdftotext
+      path: text/basu-2008-feo-steelmaking
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:basu-2008-feo-steelmaking
+      role: table_csv
+      path: tables/basu-2008-feo-steelmaking
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:basu-2008-feo-steelmaking
       role: pdftotext
       path: unknown

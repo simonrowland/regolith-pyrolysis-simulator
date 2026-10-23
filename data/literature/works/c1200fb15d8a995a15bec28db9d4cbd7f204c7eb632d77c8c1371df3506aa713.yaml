@@ -7,9 +7,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:abdul-2023-clinker-thesis
+      role: pdf
+      path: raw/abdul-2023-clinker-thesis/abdul-2023-clinker-thesis.pdf
+      sha256:
+        tag: value
+        value: 05837adcca1da0b334f9607a48941609636eb3bcf6382cd6d983d62925333b27
+    - asset_id: pdftotext:abdul-2023-clinker-thesis
+      role: pdftotext
+      path: text/abdul-2023-clinker-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:abdul-2023-clinker-thesis
       role: pdftotext
       path: unknown

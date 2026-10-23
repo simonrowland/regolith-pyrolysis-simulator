@@ -10,8 +10,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:gaillard-2003-hydrous-silicic-melt-activity
+      role: pdf
+      path: raw/gaillard-2003-hydrous-silicic-melt-activity/gaillard-2003-hydrous-silicic-melt-activity.pdf
+      sha256:
+        tag: value
+        value: 24f82320c06715c2bc367e293dab62f0a471f82e68ff4a874016814ac0bdc951
+    - asset_id: pdftotext:gaillard-2003-hydrous-silicic-melt-activity
+      role: pdftotext
+      path: text/gaillard-2003-hydrous-silicic-melt-activity
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:gaillard-2003-hydrous-silicic-melt-activity
+      role: table_csv
+      path: tables/gaillard-2003-hydrous-silicic-melt-activity
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:gaillard-2003-hydrous-silicic-melt-activity
       role: pdftotext
       path: unknown

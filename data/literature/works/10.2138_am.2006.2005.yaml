@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:dachs-geiger-2006-pyrope-grossular
+      role: pdf
+      path: raw/dachs-geiger-2006-pyrope-grossular/dachs-geiger-2006-pyrope-grossular.pdf
+      sha256:
+        tag: value
+        value: ca38d534d3c3cf71f5299c47aef2155e291b802011d6ecbc3da8e47c7948d4b5
+    - asset_id: pdftotext:dachs-geiger-2006-pyrope-grossular
+      role: pdftotext
+      path: text/dachs-geiger-2006-pyrope-grossular
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:dachs-geiger-2006-pyrope-grossular
       role: pdftotext
       path: unknown

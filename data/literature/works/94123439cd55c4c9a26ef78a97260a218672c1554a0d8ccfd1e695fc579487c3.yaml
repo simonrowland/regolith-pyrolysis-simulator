@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
     - asset_id: pdf:mendybaev-2018-cmas-evaporation
       role: pdf
@@ -17,6 +17,12 @@ work:
       sha256:
         tag: value
         value: 01fad2e988ee1fbe9c0fcf055badf2b7320dde1b4f13fed234fff6dc2cf20b5f
+    - asset_id: pdftotext:mendybaev-2018-cmas-evaporation
+      role: pdftotext
+      path: text/mendybaev-2018-cmas-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:mendybaev-2018-cmas-evaporation
       role: pdftotext
       path: unknown

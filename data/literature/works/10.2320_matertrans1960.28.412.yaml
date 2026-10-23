@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:qi-1987-fe-c-v-interaction
+      role: pdf
+      path: raw/qi-1987-fe-c-v-interaction/qi-1987-fe-c-v-interaction.pdf
+      sha256:
+        tag: value
+        value: 17fa7965823d521a223b8fdfdde6d2fde025b2fc3a56b68cfa3dfd94ff62894c
+    - asset_id: pdftotext:qi-1987-fe-c-v-interaction
+      role: pdftotext
+      path: text/qi-1987-fe-c-v-interaction
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:qi-1987-fe-c-v-interaction
       role: pdftotext
       path: unknown

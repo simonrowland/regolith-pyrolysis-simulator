@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:badjukov-petrova-1993-shock-vaporization
+      role: pdf
+      path: raw/badjukov-petrova-1993-shock-vaporization/badjukov-petrova-1993-shock-vaporization.pdf
+      sha256:
+        tag: value
+        value: 5e6b17505e81aaa3bffc3ee30791418dad0ecc99f4b725c7e478fa994305ce3a
+    - asset_id: pdftotext:badjukov-petrova-1993-shock-vaporization
+      role: pdftotext
+      path: text/badjukov-petrova-1993-shock-vaporization
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:badjukov-petrova-1993-shock-vaporization
       role: pdftotext
       path: unknown

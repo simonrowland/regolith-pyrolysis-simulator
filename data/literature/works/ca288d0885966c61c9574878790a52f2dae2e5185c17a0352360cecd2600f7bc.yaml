@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
     - asset_id: pdf:shornikov-2002-spinel-mgal2o4
       role: pdf
@@ -17,6 +17,18 @@ work:
       sha256:
         tag: value
         value: d786534c1e88bd47987aa1727e0091c6a96844c7af41d683753de5b97ec1496c
+    - asset_id: pdftotext:shornikov-2002-spinel-mgal2o4
+      role: pdftotext
+      path: text/shornikov-2002-spinel-mgal2o4
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shornikov-2002-spinel-mgal2o4
+      role: table_csv
+      path: tables/shornikov-2002-spinel-mgal2o4
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:shornikov-2002-spinel-mgal2o4
       role: pdftotext
       path: unknown

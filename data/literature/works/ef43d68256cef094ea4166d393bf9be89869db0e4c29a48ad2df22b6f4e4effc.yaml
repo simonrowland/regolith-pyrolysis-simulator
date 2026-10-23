@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:panda-2019-ten-oxide-thermodynamics
+      role: pdf
+      path: raw/panda-2019-ten-oxide-thermodynamics/panda-2019-ten-oxide-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: 3532197fb6490ff3e08a94d305c1b0517dedf1f9253aba4f23a72625d7db66d1
+    - asset_id: pdftotext:panda-2019-ten-oxide-thermodynamics
+      role: pdftotext
+      path: text/panda-2019-ten-oxide-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:panda-2019-ten-oxide-thermodynamics
       role: pdftotext
       path: unknown

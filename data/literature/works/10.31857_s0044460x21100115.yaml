@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:stolyarova-2021-ti-al-kems-ru
+      role: pdf
+      path: raw/stolyarova-2021-ti-al-kems-ru/stolyarova-2021-ti-al-kems-ru.pdf
+      sha256:
+        tag: value
+        value: 02760c0be9287389d89756ce01d579e01d87187f624fb774a7375becc2420ac0
+    - asset_id: pdftotext:stolyarova-2021-ti-al-kems-ru
+      role: pdftotext
+      path: text/stolyarova-2021-ti-al-kems-ru
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:stolyarova-2021-ti-al-kems-ru
       role: pdftotext
       path: unknown

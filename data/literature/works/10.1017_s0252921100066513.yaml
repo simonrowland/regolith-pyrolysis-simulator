@@ -9,8 +9,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:shimaoka-nakamura-1991-iau-colloq126-79
+      role: pdf
+      path: raw/shimaoka-nakamura-1991-iau-colloq126-79/shimaoka-nakamura-1991-iau-colloq126-79.pdf
+      sha256:
+        tag: value
+        value: 83dce9c72e72bc6a49e71ddf7584049c774002e6725900870a47aed79c2fccac
+    - asset_id: pdftotext:shimaoka-nakamura-1991-iau-colloq126-79
+      role: pdftotext
+      path: text/shimaoka-nakamura-1991-iau-colloq126-79
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shimaoka-nakamura-1991-iau-colloq126-79
+      role: table_csv
+      path: tables/shimaoka-nakamura-1991-iau-colloq126-79
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:shimaoka-nakamura-1991-iau-colloq126-79
       role: pdftotext
       path: unknown

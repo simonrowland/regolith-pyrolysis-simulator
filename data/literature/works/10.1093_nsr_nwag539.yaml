@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:xu-2026-excess-oxygen-magma
+      role: pdf
+      path: raw/xu-2026-excess-oxygen-magma/xu-2026-excess-oxygen-magma.pdf
+      sha256:
+        tag: value
+        value: 2faf2bfa4eb3e1a167463c6dbb2f7e331749295408a4ac335ddf17bd80ce53e3
+    - asset_id: pdftotext:xu-2026-excess-oxygen-magma
+      role: pdftotext
+      path: text/xu-2026-excess-oxygen-magma
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:xu-2026-excess-oxygen-magma
       role: pdftotext
       path: unknown

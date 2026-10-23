@@ -8,8 +8,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:tomioka-1991-nitride-capacity-cao-al2o3
+      role: pdf
+      path: raw/tomioka-1991-nitride-capacity-cao-al2o3/tomioka-1991-nitride-capacity-cao-al2o3.pdf
+      sha256:
+        tag: value
+        value: 698a4d5e76a918fae7d4374dd78e42456c585e4d72b53a3b7c55050ef5ce60b5
+    - asset_id: pdftotext:tomioka-1991-nitride-capacity-cao-al2o3
+      role: pdftotext
+      path: text/tomioka-1991-nitride-capacity-cao-al2o3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:tomioka-1991-nitride-capacity-cao-al2o3
       role: pdftotext
       path: unknown

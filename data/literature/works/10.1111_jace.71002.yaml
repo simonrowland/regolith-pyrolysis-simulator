@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:babaian-2026-fe-mg-si-reassessment
+      role: pdf
+      path: raw/babaian-2026-fe-mg-si-reassessment/babaian-2026-fe-mg-si-reassessment.pdf
+      sha256:
+        tag: value
+        value: 92aa3ad29fe84ade31b8b165b3d630d72d26d031f2cf6a980f47d2c610823636
+    - asset_id: pdftotext:babaian-2026-fe-mg-si-reassessment
+      role: pdftotext
+      path: text/babaian-2026-fe-mg-si-reassessment
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:babaian-2026-fe-mg-si-reassessment
       role: pdftotext
       path: unknown

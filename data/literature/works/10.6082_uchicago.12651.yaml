@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:zhang-2024-alkali-evaporation-ti-thesis
+      role: pdf
+      path: raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+      sha256:
+        tag: value
+        value: c77267dd6edf95ef61591d3f74b70379646935cee939de3bd6eba07fae5e5c54
+    - asset_id: pdftotext:zhang-2024-alkali-evaporation-ti-thesis
+      role: pdftotext
+      path: text/zhang-2024-alkali-evaporation-ti-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:zhang-2024-alkali-evaporation-ti-thesis
       role: pdftotext
       path: unknown
@@ -1699,7 +1711,6 @@ context:
     - 2         1400℃   -710289c         -235083       -391541                                       22176      2.03E-01                         8.98E-06     0.17
     - 3         1400℃   -710289          -235116       -391537                                       22144      2.04E-01                         8.41E-06     0.18
     derivation_pending: derivation pending a corpus table asset (controller, t-1382)
-    inputs_csv: .agent-scratch/f39-tables/zhang-2024-alkali-evaporation-ti-thesis/table_2_2.csv
   context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_2_derived_values
   work_id: 10.6082/uchicago.12651
   source_id: zhang-2024-alkali-evaporation-ti-thesis
@@ -1731,7 +1742,6 @@ context:
     - K            1200        0.15      >0.99         3.0×10-7   >1.2×10-6   <0.0375
     - Rb           1200        0.15      >0.98         4.5×10-7   >6.0×10-7   <0.1125
     derivation_pending: derivation pending a corpus table asset (controller, t-1382)
-    inputs_csv: .agent-scratch/f39-tables/zhang-2024-alkali-evaporation-ti-thesis/table_2_3.csv
   context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_3_derived_values
   work_id: 10.6082/uchicago.12651
   source_id: zhang-2024-alkali-evaporation-ti-thesis
@@ -1767,7 +1777,6 @@ context:
     - FCMAS      1500   1                                                                                                               4.83E-6    6,1*
     - FCMAS      1550   1                                                                                                               6.95E-6    6,1*
     derivation_pending: derivation pending a corpus table asset (controller, t-1382)
-    inputs_csv: .agent-scratch/f39-tables/zhang-2024-alkali-evaporation-ti-thesis/table_2_4.csv
   context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_4_derived_values
   work_id: 10.6082/uchicago.12651
   source_id: zhang-2024-alkali-evaporation-ti-thesis
@@ -4038,7 +4047,6 @@ context:
     - Fe-free Andesite      1400     Rb         0.1           8.0E-07       8.0E-08
     - Fe-free Andesite      1400     Cs         0.1           1.5E-06       1.5E-07
     derivation_pending: derivation pending a corpus table asset (controller, t-1382)
-    inputs_csv: .agent-scratch/f39-tables/zhang-2024-alkali-evaporation-ti-thesis/table_3_7.csv
   context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_7_derived_values
   work_id: 10.6082/uchicago.12651
   source_id: zhang-2024-alkali-evaporation-ti-thesis

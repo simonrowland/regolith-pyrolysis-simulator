@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:vickerfalt-2020-mgo-v2o3
+      role: pdf
+      path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+      sha256:
+        tag: value
+        value: 78b40e5942ac8fd7907a2ef44f28be62d8424d6b1e32c0e7b83cad083019522f
+    - asset_id: pdftotext:vickerfalt-2020-mgo-v2o3
+      role: pdftotext
+      path: text/vickerfalt-2020-mgo-v2o3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:vickerfalt-2020-mgo-v2o3
       role: pdftotext
       path: unknown

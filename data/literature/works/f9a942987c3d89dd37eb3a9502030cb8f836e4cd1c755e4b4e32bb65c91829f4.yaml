@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:su-2024-lunar-volatiles-thesis
+      role: pdf
+      path: raw/su-2024-lunar-volatiles-thesis/su-2024-lunar-volatiles-thesis.pdf
+      sha256:
+        tag: value
+        value: 471f14fd7cf2c51aacb54d7104b94b893512c9bda1936b519e6fb03675eaa401
+    - asset_id: pdftotext:su-2024-lunar-volatiles-thesis
+      role: pdftotext
+      path: text/su-2024-lunar-volatiles-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:su-2024-lunar-volatiles-thesis
       role: pdftotext
       path: unknown

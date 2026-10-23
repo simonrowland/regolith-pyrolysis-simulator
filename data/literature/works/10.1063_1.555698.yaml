@@ -9,8 +9,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:pedley-marshall-1983-gaseous-monoxides
+      role: pdf
+      path: raw/pedley-marshall-1983-gaseous-monoxides/pedley-marshall-1983-gaseous-monoxides.pdf
+      sha256:
+        tag: value
+        value: ff94c550a358c5255a90ed3f7a23d3f42daf8937c9bdfc2ce29df79ee8f3825a
+    - asset_id: pdftotext:pedley-marshall-1983-gaseous-monoxides
+      role: pdftotext
+      path: text/pedley-marshall-1983-gaseous-monoxides
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pedley-marshall-1983-gaseous-monoxides
+      role: table_csv
+      path: tables/pedley-marshall-1983-gaseous-monoxides
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:pedley-marshall-1983-gaseous-monoxides
       role: pdftotext
       path: unknown

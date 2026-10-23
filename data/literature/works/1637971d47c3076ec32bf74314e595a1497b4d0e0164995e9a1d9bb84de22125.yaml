@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:albertsson-2013-cr-slag-thesis
+      role: pdf
+      path: raw/albertsson-2013-cr-slag-thesis/albertsson-2013-cr-slag-thesis.pdf
+      sha256:
+        tag: value
+        value: a19510cfe8233ba3bec0bbd12aabd0c70b453335df82afa694ae95f74820afc1
+    - asset_id: pdftotext:albertsson-2013-cr-slag-thesis
+      role: pdftotext
+      path: text/albertsson-2013-cr-slag-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:albertsson-2013-cr-slag-thesis
       role: pdftotext
       path: unknown

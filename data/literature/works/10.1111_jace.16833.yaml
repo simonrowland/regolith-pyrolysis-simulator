@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
+      role: pdf
+      path: raw/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy.pdf
+      sha256:
+        tag: value
+        value: 46887fadf6ed3b265f23d2a12bfd37208f6578e4f7c4e313c46ca7729725bb40
+    - asset_id: pdftotext:yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
+      role: pdftotext
+      path: text/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
       role: pdftotext
       path: unknown

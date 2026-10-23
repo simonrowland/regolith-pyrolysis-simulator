@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate
+      role: pdf
+      path: raw/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate.pdf
+      sha256:
+        tag: value
+        value: 981786fa314fbbad3a5d96a5e16c9d4111b6b7818cbe60704b038cc0ce9072b7
+    - asset_id: pdftotext:khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate
+      role: pdftotext
+      path: text/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate
       role: pdftotext
       path: unknown

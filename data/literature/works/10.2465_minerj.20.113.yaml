@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
     - asset_id: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
       role: pdf
@@ -23,6 +23,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
+    - asset_id: tables:tsuchiyama-1998-forsterite-mg2sio4-h2
+      role: table_csv
+      path: tables/tsuchiyama-1998-forsterite-mg2sio4-h2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:tsuchiyama-1998-forsterite-mg2sio4-h2
       role: pdftotext
       path: unknown

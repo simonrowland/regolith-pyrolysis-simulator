@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
     - asset_id: pdf:itoh-hino-banya-1997-mg-deoxidation
       role: pdf
@@ -17,6 +17,12 @@ work:
       sha256:
         tag: value
         value: 814f29d3f50f15c44ad5f2c0624777895af430fb6cae05103d7ed697c4314ec7
+    - asset_id: pdftotext:itoh-hino-banya-1997-mg-deoxidation
+      role: pdftotext
+      path: text/itoh-hino-banya-1997-mg-deoxidation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:itoh-hino-banya-1997-mg-deoxidation
       role: pdftotext
       path: unknown

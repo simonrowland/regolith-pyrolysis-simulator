@@ -9,8 +9,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:cho-suito-1994-cas-slag-activities
+      role: pdf
+      path: raw/cho-suito-1994-cas-slag-activities/cho-suito-1994-cas-slag-activities.pdf
+      sha256:
+        tag: value
+        value: 4444502c1a0f22709ae809fefd818c94ac22d2046b9ee86187aa4132ef598484
+    - asset_id: pdftotext:cho-suito-1994-cas-slag-activities
+      role: pdftotext
+      path: text/cho-suito-1994-cas-slag-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:cho-suito-1994-cas-slag-activities
+      role: table_csv
+      path: tables/cho-suito-1994-cas-slag-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:cho-suito-1994-cas-slag-activities
       role: pdftotext
       path: unknown

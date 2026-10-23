@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:kirschen-1999-si-ti-al-miscibility
+      role: pdf
+      path: raw/kirschen-1999-si-ti-al-miscibility/kirschen-1999-si-ti-al-miscibility.pdf
+      sha256:
+        tag: value
+        value: 714867fedcdc30b14d4be52a07da85c826c0424d388806dfb1adf9587773190a
+    - asset_id: pdftotext:kirschen-1999-si-ti-al-miscibility
+      role: pdftotext
+      path: text/kirschen-1999-si-ti-al-miscibility
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:kirschen-1999-si-ti-al-miscibility
       role: pdftotext
       path: unknown

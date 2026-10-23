@@ -9,9 +9,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+      role: pdf
+      path: raw/bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite/bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite.pdf
+      sha256:
+        tag: value
+        value: f761fb56c4bd21080edfe14531769ca3c86465e60e5b20453529c6dc9001797d
+    - asset_id: pdftotext:bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+      role: pdftotext
+      path: text/bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
       role: pdftotext
       path: unknown

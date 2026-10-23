@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:borisov-borisovskiy-2024-ti-zircon
+      role: pdf
+      path: raw/borisov-borisovskiy-2024-ti-zircon/borisov-borisovskiy-2024-ti-zircon.pdf
+      sha256:
+        tag: value
+        value: dc1a232b026b35ea7373fe881b46ac0d6d152324138d4b8cd6b84d287a6daa43
+    - asset_id: pdftotext:borisov-borisovskiy-2024-ti-zircon
+      role: pdftotext
+      path: text/borisov-borisovskiy-2024-ti-zircon
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:borisov-borisovskiy-2024-ti-zircon
       role: pdftotext
       path: unknown

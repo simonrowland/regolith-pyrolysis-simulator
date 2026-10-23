@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:farah-1998-vanadium-silicate-melts-thesis
+      role: pdf
+      path: raw/farah-1998-vanadium-silicate-melts-thesis/farah-1998-vanadium-silicate-melts-thesis.pdf
+      sha256:
+        tag: value
+        value: 881342e19d855f6ab649c24713c5c75fe05cdd43ae4b3f6c6851f86ea97f8ae7
+    - asset_id: pdftotext:farah-1998-vanadium-silicate-melts-thesis
+      role: pdftotext
+      path: text/farah-1998-vanadium-silicate-melts-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:farah-1998-vanadium-silicate-melts-thesis
       role: pdftotext
       path: unknown

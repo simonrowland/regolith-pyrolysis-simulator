@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:kor-1967-thesis-sulphur-oxides-slags
+      role: pdf
+      path: raw/kor-1967-thesis-sulphur-oxides-slags/kor-1967-thesis-sulphur-oxides-slags.pdf
+      sha256:
+        tag: value
+        value: f780c62b10a5f704fd577538cf26d3635787fa34d702aa75996b63fdb4901681
+    - asset_id: pdftotext:kor-1967-thesis-sulphur-oxides-slags
+      role: pdftotext
+      path: text/kor-1967-thesis-sulphur-oxides-slags
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:kor-1967-thesis-sulphur-oxides-slags
       role: pdftotext
       path: unknown

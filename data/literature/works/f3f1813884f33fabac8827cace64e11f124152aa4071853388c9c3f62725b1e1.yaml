@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
     - asset_id: pdf:ivanova-2018-spinel-rich-cai-evaporation
       role: pdf
@@ -18,6 +18,18 @@ work:
       sha256:
         tag: value
         value: 8a0f1ed3c4073a5d4e28813a4abf40136be29cba7a8dc6c7fe5e7d2ad763ca4f
+    - asset_id: pdftotext:ivanova-2018-spinel-rich-cai-evaporation
+      role: pdftotext
+      path: text/ivanova-2018-spinel-rich-cai-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ivanova-2018-spinel-rich-cai-evaporation
+      role: table_csv
+      path: tables/ivanova-2018-spinel-rich-cai-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:ivanova-2018-spinel-rich-cai-evaporation
       role: pdftotext
       path: unknown

@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:sossi-2020-magma-ocean-redox
+      role: pdf
+      path: raw/sossi-2020-magma-ocean-redox/sossi-2020-magma-ocean-redox.pdf
+      sha256:
+        tag: value
+        value: 829723d5d77a9a8a0c921ba68c19a9d3bde45fdc5f01e9a10e6b5039700ec65e
+    - asset_id: pdftotext:sossi-2020-magma-ocean-redox
+      role: pdftotext
+      path: text/sossi-2020-magma-ocean-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:sossi-2020-magma-ocean-redox
       role: pdftotext
       path: unknown

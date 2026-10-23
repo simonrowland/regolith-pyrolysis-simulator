@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:shilov-2026-sro-la2o3-kems
+      role: pdf
+      path: raw/shilov-2026-sro-la2o3-kems/shilov-2026-sro-la2o3-kems.pdf
+      sha256:
+        tag: value
+        value: 6d25b0144526958cd762713929bf7e13436af8fcf95dd0b603395f3de44196b8
+    - asset_id: pdftotext:shilov-2026-sro-la2o3-kems
+      role: pdftotext
+      path: text/shilov-2026-sro-la2o3-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:shilov-2026-sro-la2o3-kems
       role: pdftotext
       path: unknown

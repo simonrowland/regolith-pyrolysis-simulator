@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:georges-2000-potassium-evaporation-thesis
+      role: pdf
+      path: raw/georges-2000-potassium-evaporation-thesis/georges-2000-potassium-evaporation-thesis.pdf
+      sha256:
+        tag: value
+        value: edd9d5c9a507f6113f166ee00e80b9838930f443438c627de9834f6ff6651462
+    - asset_id: pdftotext:georges-2000-potassium-evaporation-thesis
+      role: pdftotext
+      path: text/georges-2000-potassium-evaporation-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:georges-2000-potassium-evaporation-thesis
       role: pdftotext
       path: unknown

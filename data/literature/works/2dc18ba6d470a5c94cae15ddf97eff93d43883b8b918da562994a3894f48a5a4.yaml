@@ -10,8 +10,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:green-1971-apollo12-basalt-petrology
+      role: pdf
+      path: raw/green-1971-apollo12-basalt-petrology/green-1971-apollo12-basalt-petrology.pdf
+      sha256:
+        tag: value
+        value: 9a8e44f55b1c7731ff73adb94a60fd2dd4784793079522a97f89998a8e3f463d
+    - asset_id: pdftotext:green-1971-apollo12-basalt-petrology
+      role: pdftotext
+      path: text/green-1971-apollo12-basalt-petrology
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:green-1971-apollo12-basalt-petrology
+      role: table_csv
+      path: tables/green-1971-apollo12-basalt-petrology
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:green-1971-apollo12-basalt-petrology
       role: pdftotext
       path: unknown

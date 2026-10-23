@@ -9,9 +9,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:leister-ehrt-2000-polyvalent-redox
+      role: pdf
+      path: raw/leister-ehrt-2000-polyvalent-redox/leister-ehrt-2000-polyvalent-redox.pdf
+      sha256:
+        tag: value
+        value: 071b33f4c18e0d166b5fa7ac0d302584d5533e4f9e26899543ed9196f3660800
+    - asset_id: pdftotext:leister-ehrt-2000-polyvalent-redox
+      role: pdftotext
+      path: text/leister-ehrt-2000-polyvalent-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:leister-ehrt-2000-polyvalent-redox
       role: pdftotext
       path: unknown

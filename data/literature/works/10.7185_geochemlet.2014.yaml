@@ -9,9 +9,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:day-2020-trinitite-volatility
+      role: pdf
+      path: raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+      sha256:
+        tag: value
+        value: 2d5b0645c8fe011a58f3add21a0e3e50f433055c9e4f87f33906842afeff6bb5
+    - asset_id: pdftotext:day-2020-trinitite-volatility
+      role: pdftotext
+      path: text/day-2020-trinitite-volatility
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:day-2020-trinitite-volatility
       role: pdftotext
       path: unknown

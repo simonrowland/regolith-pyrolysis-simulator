@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:vickerfalt-2024-autogenous-slag-thesis
+      role: pdf
+      path: raw/vickerfalt-2024-autogenous-slag-thesis/vickerfalt-2024-autogenous-slag-thesis.pdf
+      sha256:
+        tag: value
+        value: d40167d5b6cadadabad3d861b7c44465c4e8e29260c569b0c1f8752c6aff11ed
+    - asset_id: pdftotext:vickerfalt-2024-autogenous-slag-thesis
+      role: pdftotext
+      path: text/vickerfalt-2024-autogenous-slag-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:vickerfalt-2024-autogenous-slag-thesis
       role: pdftotext
       path: unknown

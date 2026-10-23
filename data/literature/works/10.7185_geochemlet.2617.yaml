@@ -9,8 +9,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+      role: pdf
+      path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+      sha256:
+        tag: value
+        value: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
+    - asset_id: pdftotext:aithala-2026-magmatic-iron-redox-to-2100c
+      role: pdftotext
+      path: text/aithala-2026-magmatic-iron-redox-to-2100c
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:aithala-2026-magmatic-iron-redox-to-2100c
+      role: table_csv
+      path: tables/aithala-2026-magmatic-iron-redox-to-2100c
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:aithala-2026-magmatic-iron-redox-to-2100c
       role: pdftotext
       path: unknown

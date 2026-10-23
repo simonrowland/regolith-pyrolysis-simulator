@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:banya-watanabe-1977-feto-p2o5-solid-iron
+      role: pdf
+      path: raw/banya-watanabe-1977-feto-p2o5-solid-iron/banya-watanabe-1977-feto-p2o5-solid-iron.pdf
+      sha256:
+        tag: value
+        value: fa3583dbec4678d8716a1dd4a9c3929b1b7adfcb1e377405ffab823af2a91afe
+    - asset_id: pdftotext:banya-watanabe-1977-feto-p2o5-solid-iron
+      role: pdftotext
+      path: text/banya-watanabe-1977-feto-p2o5-solid-iron
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:banya-watanabe-1977-feto-p2o5-solid-iron
       role: pdftotext
       path: unknown

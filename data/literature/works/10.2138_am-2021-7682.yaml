@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:matzen-2022-martian-basalt-redox
+      role: pdf
+      path: raw/matzen-2022-martian-basalt-redox/matzen-2022-martian-basalt-redox.pdf
+      sha256:
+        tag: value
+        value: 25811172003e82a4a3dafd40e8d757c6df93f30b5329d68b314fcfb1c3ed0d16
+    - asset_id: pdftotext:matzen-2022-martian-basalt-redox
+      role: pdftotext
+      path: text/matzen-2022-martian-basalt-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:matzen-2022-martian-basalt-redox
       role: pdftotext
       path: unknown

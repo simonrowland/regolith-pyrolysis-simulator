@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:yu-2003-k-na-evaporation-chondrule-melts
+      role: pdf
+      path: raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      sha256:
+        tag: value
+        value: 8bded4d751935f90adcc645766217ec15e77a7f9d58e8ad4c5c88f6aece0c38c
+    - asset_id: pdftotext:yu-2003-k-na-evaporation-chondrule-melts
+      role: pdftotext
+      path: text/yu-2003-k-na-evaporation-chondrule-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:yu-2003-k-na-evaporation-chondrule-melts
       role: pdftotext
       path: unknown

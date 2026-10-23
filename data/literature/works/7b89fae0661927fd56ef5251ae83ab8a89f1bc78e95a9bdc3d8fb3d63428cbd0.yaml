@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:xiao-reuter-holappa-2000-chromium-slag-oxidation-review
+      role: pdf
+      path: raw/xiao-reuter-holappa-2000-chromium-slag-oxidation-review/xiao-reuter-holappa-2000-chromium-slag-oxidation-review.pdf
+      sha256:
+        tag: value
+        value: 09d6972bcd1ee0d2eb638db60cf815d9cbb7595bff6eafe477637780efff0396
+    - asset_id: pdftotext:xiao-reuter-holappa-2000-chromium-slag-oxidation-review
+      role: pdftotext
+      path: text/xiao-reuter-holappa-2000-chromium-slag-oxidation-review
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:xiao-reuter-holappa-2000-chromium-slag-oxidation-review
       role: pdftotext
       path: unknown

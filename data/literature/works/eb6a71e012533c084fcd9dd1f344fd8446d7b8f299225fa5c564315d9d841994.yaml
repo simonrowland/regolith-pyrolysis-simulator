@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
     - asset_id: pdf:shilov-1998-sno-zno-p2o5-vaporization
       role: pdf
@@ -18,6 +18,12 @@ work:
       sha256:
         tag: value
         value: f5ae5493b9f41a8819b0f520b4eb0a5ce8f9e382451c3511033ac967b1f99c5c
+    - asset_id: pdftotext:shilov-1998-sno-zno-p2o5-vaporization
+      role: pdftotext
+      path: text/shilov-1998-sno-zno-p2o5-vaporization
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:shilov-1998-sno-zno-p2o5-vaporization
       role: pdftotext
       path: unknown

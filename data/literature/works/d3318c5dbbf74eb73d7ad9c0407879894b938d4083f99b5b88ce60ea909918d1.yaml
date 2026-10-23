@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:kropf-2009-alkalis-chondrules-thesis
+      role: pdf
+      path: raw/kropf-2009-alkalis-chondrules-thesis/kropf-2009-alkalis-chondrules-thesis.pdf
+      sha256:
+        tag: value
+        value: 8eaa359bcca64e2359537ae2ed1199a0ccfb55b0769de6050fc1e4d9fe7822c2
+    - asset_id: pdftotext:kropf-2009-alkalis-chondrules-thesis
+      role: pdftotext
+      path: text/kropf-2009-alkalis-chondrules-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:kropf-2009-alkalis-chondrules-thesis
       role: pdftotext
       path: unknown

@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:kim-2014-carbon-fe-v-mo-ni
+      role: pdf
+      path: raw/kim-2014-carbon-fe-v-mo-ni/kim-2014-carbon-fe-v-mo-ni.pdf
+      sha256:
+        tag: value
+        value: dfd7bb0ebba5bce34a75400c1ec82b4e5f4575148f92b9ba5da41bf31037b0cc
+    - asset_id: pdftotext:kim-2014-carbon-fe-v-mo-ni
+      role: pdftotext
+      path: text/kim-2014-carbon-fe-v-mo-ni
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:kim-2014-carbon-fe-v-mo-ni
       role: pdftotext
       path: unknown

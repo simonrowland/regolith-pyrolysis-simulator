@@ -9,9 +9,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:dohmen-2003-coupled-kinetics
+      role: pdf
+      path: raw/dohmen-2003-coupled-kinetics/dohmen-2003-coupled-kinetics.pdf
+      sha256:
+        tag: value
+        value: 8a559094a8ea54256375ee4108f36b85c9c23bd74a5423b53330b39943eb937b
+    - asset_id: pdftotext:dohmen-2003-coupled-kinetics
+      role: pdftotext
+      path: text/dohmen-2003-coupled-kinetics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:dohmen-2003-coupled-kinetics
       role: pdftotext
       path: unknown

@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:beckett-2002-silicate-melt-activities
+      role: pdf
+      path: raw/beckett-2002-silicate-melt-activities/beckett-2002-silicate-melt-activities.pdf
+      sha256:
+        tag: value
+        value: 0f3b3ac1f985bbb80b027b59799753243a9df13e0cc08128e8c88742329189de
+    - asset_id: pdftotext:beckett-2002-silicate-melt-activities
+      role: pdftotext
+      path: text/beckett-2002-silicate-melt-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:beckett-2002-silicate-melt-activities
       role: pdftotext
       path: unknown

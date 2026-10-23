@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:wadhwa-2008-redox-small-bodies
+      role: pdf
+      path: raw/wadhwa-2008-redox-small-bodies/wadhwa-2008-redox-small-bodies.pdf
+      sha256:
+        tag: value
+        value: 65e45d04d8f174461a0853bb8e451ca2e3295ccf1294ac5ce0b4fea67d7e9dff
+    - asset_id: pdftotext:wadhwa-2008-redox-small-bodies
+      role: pdftotext
+      path: text/wadhwa-2008-redox-small-bodies
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:wadhwa-2008-redox-small-bodies
       role: pdftotext
       path: unknown

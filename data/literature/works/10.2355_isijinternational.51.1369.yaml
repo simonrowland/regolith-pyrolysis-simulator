@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+      role: pdf
+      path: raw/seki-2011-ca-o-solubility-fe-cao-al2o3/seki-2011-ca-o-solubility-fe-cao-al2o3.pdf
+      sha256:
+        tag: value
+        value: a3e15c6ca6f3f644c04faddddebc6387c965309768725d5586200ca1e6132ee9
+    - asset_id: pdftotext:seki-2011-ca-o-solubility-fe-cao-al2o3
+      role: pdftotext
+      path: text/seki-2011-ca-o-solubility-fe-cao-al2o3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:seki-2011-ca-o-solubility-fe-cao-al2o3
       role: pdftotext
       path: unknown

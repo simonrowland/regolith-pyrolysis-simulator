@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
     - asset_id: pdf:shults-1995-calcium-aluminate-thermodynamics
       role: pdf
@@ -17,6 +17,18 @@ work:
       sha256:
         tag: value
         value: 74f9c7b642f693865729998d5f91a73907e4bf311174401d6ef261c39c0058e5
+    - asset_id: pdftotext:shults-1995-calcium-aluminate-thermodynamics
+      role: pdftotext
+      path: text/shults-1995-calcium-aluminate-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shults-1995-calcium-aluminate-thermodynamics
+      role: table_csv
+      path: tables/shults-1995-calcium-aluminate-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:shults-1995-calcium-aluminate-thermodynamics
       role: pdftotext
       path: unknown

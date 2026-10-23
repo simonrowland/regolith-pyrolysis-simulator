@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:cacciatore-zajacz-2026-v-sc-oxybarometer
+      role: pdf
+      path: raw/cacciatore-zajacz-2026-v-sc-oxybarometer/cacciatore-zajacz-2026-v-sc-oxybarometer.pdf
+      sha256:
+        tag: value
+        value: d5e291a5b16cc213e3546d560be4c382bf274450feb2625aa211996d8024eafb
+    - asset_id: pdftotext:cacciatore-zajacz-2026-v-sc-oxybarometer
+      role: pdftotext
+      path: text/cacciatore-zajacz-2026-v-sc-oxybarometer
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:cacciatore-zajacz-2026-v-sc-oxybarometer
       role: pdftotext
       path: unknown

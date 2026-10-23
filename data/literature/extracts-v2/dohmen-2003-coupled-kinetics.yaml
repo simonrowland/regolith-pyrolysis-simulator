@@ -97,7 +97,7 @@ observations:
     figure: '6'
     section: 3.2 Gas Phase Composition
     note: The text gives the approximate Fe pressure and points to Figure 6, whose caption identifies the SC6 time series.
-  read_from: unknown:dohmen-2003-coupled-kinetics
+  read_from: pdf:dohmen-2003-coupled-kinetics
   point_conditions:
     temperature_K:
       state:
@@ -144,7 +144,7 @@ observations:
   derivation:
     relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - unknown:dohmen-2003-coupled-kinetics
+    - pdf:dohmen-2003-coupled-kinetics
     parameters: []
     output_unit: Pa
 - observation_id: dohmen-2003-coupled-kinetics::dohmen_2003_text_psio_approximate
@@ -244,7 +244,7 @@ observations:
     section: 3.2 Gas Phase Composition
     note: The text states SiO becomes unambiguous after about 10 hours and gives its approximate pressure; the source sentence
       does not name a specific run.
-  read_from: unknown:dohmen-2003-coupled-kinetics
+  read_from: pdf:dohmen-2003-coupled-kinetics
   point_conditions:
     temperature_K:
       state:
@@ -292,6 +292,6 @@ observations:
   derivation:
     relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - unknown:dohmen-2003-coupled-kinetics
+    - pdf:dohmen-2003-coupled-kinetics
     parameters: []
     output_unit: Pa

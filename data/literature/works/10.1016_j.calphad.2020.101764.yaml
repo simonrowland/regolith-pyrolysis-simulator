@@ -9,8 +9,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:deffrennes-2020-ca-o-calphad
+      role: pdf
+      path: raw/deffrennes-2020-ca-o-calphad/deffrennes-2020-ca-o-calphad.pdf
+      sha256:
+        tag: value
+        value: 8b5c40c419d3bdcc1c7966613bb8a8adf6a6379231ff24a82d2435889ea24be7
+    - asset_id: pdftotext:deffrennes-2020-ca-o-calphad
+      role: pdftotext
+      path: text/deffrennes-2020-ca-o-calphad
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:deffrennes-2020-ca-o-calphad
+      role: table_csv
+      path: tables/deffrennes-2020-ca-o-calphad
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:deffrennes-2020-ca-o-calphad
       role: pdftotext
       path: unknown

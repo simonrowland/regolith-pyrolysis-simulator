@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:park-2021-vanadium-thermodynamics-thesis
+      role: pdf
+      path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+      sha256:
+        tag: value
+        value: fd1130b780b6b7c068dba1f7a9d4575cd82426269254aed7ca548dfd134fd2ba
+    - asset_id: pdftotext:park-2021-vanadium-thermodynamics-thesis
+      role: pdftotext
+      path: text/park-2021-vanadium-thermodynamics-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:park-2021-vanadium-thermodynamics-thesis
       role: pdftotext
       path: unknown

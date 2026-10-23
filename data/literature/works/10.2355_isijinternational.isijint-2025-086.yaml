@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:feng-2025-fe-si-ca-v-ti-phase-diagrams
+      role: pdf
+      path: raw/feng-2025-fe-si-ca-v-ti-phase-diagrams/feng-2025-fe-si-ca-v-ti-phase-diagrams.pdf
+      sha256:
+        tag: value
+        value: ce863d5587564fa9ea0f9f0cdacaa8014b8ab0a43fb4eba3bc760e413efcb88c
+    - asset_id: pdftotext:feng-2025-fe-si-ca-v-ti-phase-diagrams
+      role: pdftotext
+      path: text/feng-2025-fe-si-ca-v-ti-phase-diagrams
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:feng-2025-fe-si-ca-v-ti-phase-diagrams
       role: pdftotext
       path: unknown

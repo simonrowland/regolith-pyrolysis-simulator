@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:oneill-2005-alkali-oxide-activities
+      role: pdf
+      path: raw/oneill-2005-alkali-oxide-activities/oneill-2005-alkali-oxide-activities.pdf
+      sha256:
+        tag: value
+        value: b62b8619c2802d9e7a71383a27793959a50b577d3212ef04ed05805bc9ff6e2e
+    - asset_id: pdftotext:oneill-2005-alkali-oxide-activities
+      role: pdftotext
+      path: text/oneill-2005-alkali-oxide-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:oneill-2005-alkali-oxide-activities
       role: pdftotext
       path: unknown

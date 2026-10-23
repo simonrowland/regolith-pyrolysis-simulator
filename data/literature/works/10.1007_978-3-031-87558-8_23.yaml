@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
     - asset_id: pdf:shornikov-2025-saratov-alkali-evaporation
       role: pdf
@@ -17,6 +17,12 @@ work:
       sha256:
         tag: value
         value: 60790b61f867e2fbee22478d375c2f754c54cead52210bac84ec1152cc62b768
+    - asset_id: pdftotext:shornikov-2025-saratov-alkali-evaporation
+      role: pdftotext
+      path: text/shornikov-2025-saratov-alkali-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:shornikov-2025-saratov-alkali-evaporation
       role: pdftotext
       path: unknown

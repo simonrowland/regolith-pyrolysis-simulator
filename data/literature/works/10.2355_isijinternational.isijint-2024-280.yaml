@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:babaian-2024-fe-mg-si-air-equilibria
+      role: pdf
+      path: raw/babaian-2024-fe-mg-si-air-equilibria/babaian-2024-fe-mg-si-air-equilibria.pdf
+      sha256:
+        tag: value
+        value: 97746795fed7add2db1a00569d239a86a9ad3f25bf71670666ff076c0b9a6c68
+    - asset_id: pdftotext:babaian-2024-fe-mg-si-air-equilibria
+      role: pdftotext
+      path: text/babaian-2024-fe-mg-si-air-equilibria
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:babaian-2024-fe-mg-si-air-equilibria
       role: pdftotext
       path: unknown

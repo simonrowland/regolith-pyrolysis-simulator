@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:sugawara-akaogi-2003-ni-co-fusion
+      role: pdf
+      path: raw/sugawara-akaogi-2003-ni-co-fusion/sugawara-akaogi-2003-ni-co-fusion.pdf
+      sha256:
+        tag: value
+        value: 8ec87754658d594a0ccd480a58c0a2b8505af6a92c7cc6772413806bd81a93af
+    - asset_id: pdftotext:sugawara-akaogi-2003-ni-co-fusion
+      role: pdftotext
+      path: text/sugawara-akaogi-2003-ni-co-fusion
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:sugawara-akaogi-2003-ni-co-fusion
       role: pdftotext
       path: unknown

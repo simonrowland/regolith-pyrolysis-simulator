@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:bennour-1996-ternary-cs-na-silicate
+      role: pdf
+      path: raw/bennour-1996-ternary-cs-na-silicate/bennour-1996-ternary-cs-na-silicate.pdf
+      sha256:
+        tag: value
+        value: dc927ff7b7175da5094652aa08738549c25ca9b4d6faa3eae756d965fe065ab1
+    - asset_id: pdftotext:bennour-1996-ternary-cs-na-silicate
+      role: pdftotext
+      path: text/bennour-1996-ternary-cs-na-silicate
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:bennour-1996-ternary-cs-na-silicate
       role: pdftotext
       path: unknown

@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:brillo-2025-al-ti-thermophysical
+      role: pdf
+      path: raw/brillo-2025-al-ti-thermophysical/brillo-2025-al-ti-thermophysical.pdf
+      sha256:
+        tag: value
+        value: 4b1b39aa6c565222ed2da8a93538e65dc20ca33436ecacbdee4f9f5b08ccc839
+    - asset_id: pdftotext:brillo-2025-al-ti-thermophysical
+      role: pdftotext
+      path: text/brillo-2025-al-ti-thermophysical
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:brillo-2025-al-ti-thermophysical
       role: pdftotext
       path: unknown

@@ -9,9 +9,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+      role: pdf
+      path: raw/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report.pdf
+      sha256:
+        tag: value
+        value: 3e08aaa379a026003d0c0891b061c33ded3dc70b15fd1d59e7e414556961fa8d
+    - asset_id: pdftotext:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+      role: pdftotext
+      path: text/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
       role: pdftotext
       path: unknown

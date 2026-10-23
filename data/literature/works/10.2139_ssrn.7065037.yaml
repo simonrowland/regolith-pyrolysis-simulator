@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:terashima-2026-sro-slag-activity-preprint
+      role: pdf
+      path: raw/terashima-2026-sro-slag-activity-preprint/terashima-2026-sro-slag-activity-preprint.pdf
+      sha256:
+        tag: value
+        value: 746aec3a1d3e1a10fe99117ca83e10d2da56fe92cba56d275f2a91f8c0f15eb4
+    - asset_id: pdftotext:terashima-2026-sro-slag-activity-preprint
+      role: pdftotext
+      path: text/terashima-2026-sro-slag-activity-preprint
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:terashima-2026-sro-slag-activity-preprint
       role: pdftotext
       path: unknown

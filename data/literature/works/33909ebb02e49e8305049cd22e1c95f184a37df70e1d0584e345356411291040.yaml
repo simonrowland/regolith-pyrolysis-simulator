@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
     - asset_id: pdf:shornikov-2023-calcium-phosphate
       role: pdf
@@ -17,6 +17,12 @@ work:
       sha256:
         tag: value
         value: 7d8732eaa4d7946d1d9bd99d8619626a4d015be8f5ce7d38a6132dc583112234
+    - asset_id: pdftotext:shornikov-2023-calcium-phosphate
+      role: pdftotext
+      path: text/shornikov-2023-calcium-phosphate
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:shornikov-2023-calcium-phosphate
       role: pdftotext
       path: unknown

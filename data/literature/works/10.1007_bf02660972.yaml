@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:ohta-suito-1995-mno-activity-slags
+      role: pdf
+      path: raw/ohta-suito-1995-mno-activity-slags/ohta-suito-1995-mno-activity-slags.pdf
+      sha256:
+        tag: value
+        value: b6c19829b95ad1aa38c169d9ca236c54f897a232f6a2bdc2002e7d3be7677067
+    - asset_id: pdftotext:ohta-suito-1995-mno-activity-slags
+      role: pdftotext
+      path: text/ohta-suito-1995-mno-activity-slags
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:ohta-suito-1995-mno-activity-slags
       role: pdftotext
       path: unknown

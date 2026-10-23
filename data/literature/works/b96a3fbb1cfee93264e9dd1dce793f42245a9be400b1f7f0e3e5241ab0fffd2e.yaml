@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
     - asset_id: pdf:nasa-cea-thermo
       role: pdf
@@ -17,6 +17,12 @@ work:
       sha256:
         tag: value
         value: 0ab4154b0fdeac29581f8d047a4cb6836c138c0b41da8f28990ef7d3e2756765
+    - asset_id: pdftotext:nasa-cea-thermo
+      role: pdftotext
+      path: text/nasa-cea-thermo
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:nasa-cea-thermo
       role: pdftotext
       path: unknown

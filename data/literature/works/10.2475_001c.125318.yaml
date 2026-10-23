@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:woermann-1969-mg-fe-ti-oxides
+      role: pdf
+      path: raw/woermann-1969-mg-fe-ti-oxides/woermann-1969-mg-fe-ti-oxides.pdf
+      sha256:
+        tag: value
+        value: 7f66bd6dae19a3ee951c63927e3877fac601ae13094c79b0281c5f63dbfc328a
+    - asset_id: pdftotext:woermann-1969-mg-fe-ti-oxides
+      role: pdftotext
+      path: text/woermann-1969-mg-fe-ti-oxides
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:woermann-1969-mg-fe-ti-oxides
       role: pdftotext
       path: unknown

@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:barcza-1979-mn-slag-metal-equilibrium
+      role: pdf
+      path: raw/barcza-1979-mn-slag-metal-equilibrium/barcza-1979-mn-slag-metal-equilibrium.pdf
+      sha256:
+        tag: value
+        value: f5eb7f2629166bc1145f468dd50167a8d2d02ad7b7ffcc48f9832d42831e17ce
+    - asset_id: pdftotext:barcza-1979-mn-slag-metal-equilibrium
+      role: pdftotext
+      path: text/barcza-1979-mn-slag-metal-equilibrium
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:barcza-1979-mn-slag-metal-equilibrium
       role: pdftotext
       path: unknown

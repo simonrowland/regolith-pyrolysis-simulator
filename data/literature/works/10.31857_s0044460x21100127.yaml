@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 15c9c151dd49edfc0011891bb28619e30f0872bf
     files:
+    - asset_id: pdf:lopatin-2021-ce-ti-zr-kems-ru
+      role: pdf
+      path: raw/lopatin-2021-ce-ti-zr-kems-ru/lopatin-2021-ce-ti-zr-kems-ru.pdf
+      sha256:
+        tag: value
+        value: ac77871fa308772c9f7d7903b42019e3eef48a04a06ecb3bc636e21d71b82a0d
+    - asset_id: pdftotext:lopatin-2021-ce-ti-zr-kems-ru
+      role: pdftotext
+      path: text/lopatin-2021-ce-ti-zr-kems-ru
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:lopatin-2021-ce-ti-zr-kems-ru
       role: pdftotext
       path: unknown
