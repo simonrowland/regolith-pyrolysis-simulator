@@ -1724,6 +1724,9 @@ def test_condensation_residual_ignores_prior_holdup_drain_credit(monkeypatch):
 
 def test_step_overhead_composition_uses_real_condensation_residual():
     sim = _gas_train_sim()
+    # t-1396 finite-capacity contract: declare the pressure ceiling whose
+    # inlet/residual load and saturation this fixture tests.
+    sim.melt.p_total_mbar = 0.001
     evolved_kg = 1.0
     flux = EvaporationFlux(
         total_kg_hr=evolved_kg,
@@ -2097,6 +2100,9 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account_b151():
 
 def test_transport_saturation_uses_full_inlet_when_residual_is_nearly_captured_b151():
     sim = _gas_train_sim()
+    # t-1396 finite-capacity contract: declare the pressure ceiling whose
+    # inlet/residual load and saturation this fixture tests.
+    sim.melt.p_total_mbar = 0.001
     residual_flux = EvaporationFlux(
         total_kg_hr=1.0e-12,
         species_kg_hr={"Fe": 1.0e-12},
