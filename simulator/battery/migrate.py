@@ -6008,10 +6008,12 @@ def _named_fraction_bound_selection(
         bound /= Decimal("100")
         trail = "percent_to_fraction"
     return SourceSelection(
-        value=Value(
-            ValueKind.BOUND,
-            bound_operator=operator,
-            bound_value=bound,
+        value=_value_from_plain(
+            {
+                "kind": ValueKind.BOUND.value,
+                "bound_operator": operator,
+                "bound_value": bound,
+            }
         ),
         field_name=key,
         unit_trail=trail,
@@ -9438,10 +9440,12 @@ def _printed_scalar_selection(
         )
     return replace(
         selection,
-        value=Value(
-            ValueKind.POINT,
-            point=linear,
-            approximate=selection.value.approximate,
+        value=_value_from_plain(
+            {
+                "kind": ValueKind.POINT.value,
+                "point": linear,
+                "approximate": selection.value.approximate,
+            }
         ),
         amount=linear,
         unit_trail=f"printed_{printed_form.value}_to_linear",
