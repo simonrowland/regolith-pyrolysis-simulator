@@ -433,7 +433,7 @@ MASS_SPEC_OBSERVATION_TYPES = frozenset({"psat_series", "rate_series", "alpha"})
 RESIDUAL_BASELINES_PATH = (
     ROOT / "tests" / "chemistry" / "extract_store_reproduction_residual_baselines.yaml"
 )
-NA2O_ACTIVITY_PIN_KEY = "ms2000_044_na2o_activity_xsio2_0709_t1673:activity"
+NA2O_ACTIVITY_PIN_KEY = "ms2000_044_na2o_activity_xsio2_0709_t1673_class_quote_r2:activity"
 
 
 @lru_cache(maxsize=1)
