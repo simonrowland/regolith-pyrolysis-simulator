@@ -5305,11 +5305,23 @@ def antoine_dew_temperature_diagnostic(
         }
 
     data = _species_vapor_data(species, vapor_pressure_data=vapor_pressure_data)
-    from engines.builtin.vapor_pressure import vapor_pressure_valid_range_K
+    from engines.builtin.vapor_pressure import (
+        vapor_pressure_valid_range_K,
+        wall_condensation_antoine_coefficients,
+    )
 
+    _, block_name = wall_condensation_antoine_coefficients(data)
+    block = data.get(block_name, {})
+    segments = block.get("segments") if isinstance(block, Mapping) else None
+    # Enumerate the wall relation's own bands. The independent melt-source
+    # range cannot certify an inverse of the pure-surface curve.
+    coefficient_rows = (
+        [dict(data, **{block_name: segment}) for segment in segments if isinstance(segment, Mapping)]
+        if isinstance(segments, list) else [data]
+    )
     candidate_ranges: list[tuple[float, float]] = []
-    for block_name in (None, "pure_component_antoine", "antoine"):
-        valid = vapor_pressure_valid_range_K(data, block_name)
+    for row in coefficient_rows:
+        valid = vapor_pressure_valid_range_K(row, block_name)
         if isinstance(valid, (list, tuple)) and len(valid) == 2:
             try:
                 low, high = float(valid[0]), float(valid[1])
@@ -5326,11 +5338,15 @@ def antoine_dew_temperature_diagnostic(
             "routing_authority": False,
         }
 
-    low = min(item[0] for item in candidate_ranges)
-    high = max(item[1] for item in candidate_ranges)
+    certified_range = [min(item[0] for item in candidate_ranges), max(item[1] for item in candidate_ranges)]
+    bracket_found = False
     try:
-        p_low = _antoine_psat_pa(species, low, vapor_pressure_data=vapor_pressure_data)
-        p_high = _antoine_psat_pa(species, high, vapor_pressure_data=vapor_pressure_data)
+        for low, high in sorted(set(candidate_ranges)):
+            p_low = _antoine_psat_pa(species, low, vapor_pressure_data=vapor_pressure_data)
+            p_high = _antoine_psat_pa(species, high, vapor_pressure_data=vapor_pressure_data)
+            if p_low is not None and p_high is not None and min(p_low, p_high) <= target <= max(p_low, p_high):
+                bracket_found = True
+                break
     except (KeyError, ValueError) as exc:
         return {
             "status": "refused_outside_certified_surface",
@@ -5340,12 +5356,12 @@ def antoine_dew_temperature_diagnostic(
             "provenance": "existing_condensation_antoine_surface",
             "routing_authority": False,
         }
-    if p_low is None or p_high is None or not min(p_low, p_high) <= target <= max(p_low, p_high):
+    if not bracket_found:
         return {
             "status": "refused_pressure_outside_certified_range",
             "temperature_K": None,
             "partial_pressure_Pa": target,
-            "valid_range_K": [low, high],
+            "valid_range_K": certified_range,
             "provenance": "existing_condensation_antoine_surface",
             "routing_authority": False,
         }
@@ -5367,7 +5383,7 @@ def antoine_dew_temperature_diagnostic(
         "status": "diagnostic_only",
         "temperature_K": (low + high) / 2.0,
         "partial_pressure_Pa": target,
-        "valid_range_K": [min(item[0] for item in candidate_ranges), max(item[1] for item in candidate_ranges)],
+        "valid_range_K": certified_range,
         "provenance": "existing_condensation_antoine_surface",
         "routing_authority": False,
     }

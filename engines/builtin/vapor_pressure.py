@@ -2200,7 +2200,11 @@ def wall_condensation_antoine_coefficients(
 def _liquid_reference_pressure_from_solid(
     species: str, temperature_K: float, solid_pressure_pa: float,
 ) -> tuple[float, str | None]:
-    """Convert a stable-solid pressure using a printed JANAF liquid row."""
+    """Return (liquid pressure in Pa, missing-input reason or None).
+
+    Only bracketed JANAF liquid cells are usable. On missing input the
+    returned pressure is unchanged; callers must refuse the liquid request.
+    """
     from simulator.reference_data.janaf import TABLES_DIR, load_table_document
 
     table_id = {"Na": "Na-003"}.get(species)

@@ -12,9 +12,9 @@ invariant 7 — not on the simulator's own output:
   (Clausius-Clapeyron, dH_vap > 0), so any wall above the normal boiling
   point has P_sat > 1 atm >= p_i for ANY admissible p_i <= P_total. This
   argument alone settles the sign; the Antoine sidecar only has to be sane.
-- The Antoine coefficients themselves come from the literature sidecar
-  data/vapor_pressures.yaml::pure_component_antoine (NIST SRD 69 fits),
-  evaluated here by hand, independent of the simulator's code path.
+- The adopted coefficients come from the literature sidecar
+  data/vapor_pressures.yaml::pure_component_antoine (JANAF Na surface and
+  NIST SRD 69 K fit), with arithmetic evaluated here by hand.
 
 Dew-point derivation (premise -> Antoine inversion -> units -> sanity):
 
@@ -31,11 +31,9 @@ Dew-point derivation (premise -> Antoine inversion -> units -> sanity):
              sidecar (the NIST bar fits were converted by A += 5, per the
              sidecar source strings), so p enters in Pa and T_dew comes out
              in K; C carries the Kelvin offset of the shifted Antoine form.
-  Sanity:    inverting at p = 101325 Pa must reproduce the external normal
-             boiling points (Na 883 C, K 759 C) — checked below. At
-             p = 1000 Pa the inversion gives Na 836.4 K = 563.3 C and
-             K 702.4 K = 429.2 C, both far below the 1500-1650 C wall band
-             (and consistent with the commit's "~651 C / ~429 C" wording).
+  Sanity:    inverting at p = 101325 Pa must agree with the external normal
+             boiling points (Na 883 C, K 759 C) within the tolerance below.
+             At p = 1000 Pa both inverses are far below the1500-1650 C walls.
 
 Mirrored pattern: tests/test_coating_rate.py:364-370 asserts mol_s == 0.0
 AND p_i <= P_total AND supersaturated is False — a mechanism assertion, not
@@ -92,8 +90,13 @@ def _antoine_coefficients(species: str) -> dict:
 
 
 def _antoine_psat_pa(coeff: dict, temperature_K: float) -> float:
-    # Hand evaluation of the sidecar fit — deliberately NOT the simulator's
-    # code path (invariant 7: ground truth, not self-parity).
+    # Select the adopted surface, then check its Pa/K arithmetic by hand.
+    # External boiling-point anchors above remain independent of selection.
+    from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
+
+    coeff, _ = wall_condensation_antoine_coefficients(
+        {"pure_component_antoine": coeff}, temperature_K,
+    )
     return 10.0 ** (
         float(coeff["A"])
         - float(coeff["B"]) / (float(temperature_K) + float(coeff.get("C", 0.0)))
@@ -102,9 +105,36 @@ def _antoine_psat_pa(coeff: dict, temperature_K: float) -> float:
 
 def _antoine_dew_point_K(coeff: dict, pressure_pa: float) -> float:
     # Inversion of log10(P/Pa) = A - B/(T_K + C): T_K = B/(A - log10(P/Pa)) - C.
-    return float(coeff["B"]) / (
-        float(coeff["A"]) - math.log10(float(pressure_pa))
-    ) - float(coeff.get("C", 0.0))
+    # Independent analytic check of the production diagnostic's bisection.
+    for segment in coeff.get("segments", [coeff]):
+        temperature = float(segment["B"]) / (
+            float(segment["A"]) - math.log10(float(pressure_pa))
+        ) - float(segment.get("C", 0.0))
+        low, high = segment["valid_range_K"]
+        if low <= temperature <= high:
+            return temperature
+    raise ValueError("pressure outside the tabulated surface bands")
+
+
+@pytest.mark.parametrize("temperature_K", [250., 328.453, 370.98, 500., 900., 1100., 1600.])
+def test_na_dew_diagnostic_inverts_each_certified_surface_band(temperature_K):
+    from simulator.condensation import _antoine_psat_pa, antoine_dew_temperature_diagnostic
+
+    pressure = _antoine_psat_pa("Na", temperature_K)
+    result = antoine_dew_temperature_diagnostic("Na", pressure)
+    assert result["status"] == "diagnostic_only"
+    assert result["temperature_K"] == pytest.approx(temperature_K, abs=1e-9)
+    assert result["valid_range_K"] == [250., 1600.]
+    assert result["routing_authority"] is False
+
+
+def test_na_dew_diagnostic_refuses_above_certified_surface():
+    from simulator.condensation import _antoine_psat_pa, antoine_dew_temperature_diagnostic
+
+    result = antoine_dew_temperature_diagnostic("Na", _antoine_psat_pa("Na", 1700.))
+    assert result["status"] == "refused_pressure_outside_certified_range"
+    assert result["temperature_K"] is None
+    assert result["valid_range_K"] == [250., 1600.]
 
 
 @pytest.mark.parametrize("species", ["Na", "K"])
@@ -113,9 +143,9 @@ def test_antoine_sidecar_recovers_external_normal_boiling_point(
 ) -> None:
     # Grounding for everything else in this file: the sidecar coefficients,
     # inverted at 1 atm, must land on the externally known normal boiling
-    # point (Na 883 C, K 759 C). 5% in K covers the short extrapolation of
-    # the Na NIST fit (certified 924-1118 K; its boiling point is 1156 K)
-    # and the in-range K fit (certified 679.4-1033 K; boiling 1032 K).
+    # point (Na 883 C, K 759 C). 5% in K allows the difference between the
+    # independent Na boiling-point assessment and the adopted JANAF surface,
+    # plus the K fit residual (certified 679.4-1033 K; boiling1032 K).
     coeff = _antoine_coefficients(species)
     external_boiling_K = (
         ALKALI_EXTERNAL_ANCHORS[species]["normal_boiling_point_C"]
@@ -137,12 +167,12 @@ def test_dew_point_at_max_admissible_partial_pressure_is_below_wall_band(
 
     # Highest admissible dew point: p_i = P_total = 10 mbar = 1000 Pa.
     # Inversion: T_dew = B/(A - log10(1000 Pa)) - C  (Pa in, K out).
-    #   Na: 1873.728/(7.460770 - 3) + 416.372 = 836.4 K = 563.3 C
+    #   Na: JANAF800–900 K segment, analytic inverse within its own band.
     #   K:  4691.58/(9.457180 - 3) - 24.195   = 702.4 K = 429.2 C
     t_dew_K = _antoine_dew_point_K(coeff, TOTAL_PRESSURE_PA)
 
     # Mechanism, not the number: the dew point sits hundreds of K below the
-    # coolest wall in the band (actual margins: Na 937 K, K 1071 K).
+    # coolest wall in the band.
     assert t_dew_K < WALL_BAND_MIN_K - 500.0
     # External cross-check needing no Antoine extrapolation at all: the wall
     # band lies above the normal boiling point, so P_sat(T_wall) > 1 atm
@@ -199,8 +229,7 @@ def test_wall_driving_force_is_zero_via_dewpoint_relation(
     # (d) so the only remaining branch is max(0.0, p_i - P_sat_pa), and it is
     #     zero exactly because p_i < P_sat at the WALL temperature. The
     #     undersaturation is verified against the hand-evaluated sidecar fit,
-    #     and the simulator's P_sat is that same published fit, not a
-    #     substitute surface.
+    #     and the simulator's P_sat is that same adopted surface.
     assert _antoine_psat_pa(coeff, wall_temperature_K) > p_i_pa
     assert p_sat_pa == pytest.approx(
         _antoine_psat_pa(coeff, wall_temperature_K),
