@@ -7,9 +7,9 @@ source:
   corpus_asset: raw/saini-2023-sulfur-vanadium-borosilicate-structure/saini-2023-sulfur-vanadium-borosilicate-structure.pdf
 extraction:
   method: >-
-    Born-digital journal article; pdftotext-layout is primary and MinerU table draft found no table blocks. Tables 1, 2, and 3 on PDF pages 3, 7, and 8 were rendered at 600 dpi and transcribed from the render. The ten figures were reviewed at 600 dpi and are deferred without numeric points. The paper reports qualitative V redox inferences and XPS binding-energy shifts, but no numeric V valence fractions or ratios. Glass-composition vectors, room-temperature structural descriptors, and binding energies are retained in context because no matching quantity token describes them.
+    Born-digital journal article; pdftotext-layout is primary and MinerU table draft found no table blocks. Tables 1, 2, and 3 on PDF pages 3, 7, and 8 were rendered at 600 dpi and transcribed from the render. The ten figures were reviewed at 600 dpi and are deferred without numeric points. The paper reports qualitative V redox inferences and XPS binding-energy shifts, but no numeric V valence fractions or ratios. Measured parenthesized oxide cells in Table 1 are typed as equilibrium_phase_composition; batch figures and unreported sulfur-free SO3 cells remain context. Tables 2-3 structural descriptors and binding energies remain context.
   table_dispositions:
-    table_1: context-only; measured whole-glass composition vectors and SO3 solubility have no matching battery quantity token
+    table_1: typed; measured parenthesized oxide cells are equilibrium_phase_composition observations; batch formulations and unreported sulfur-free SO3 cells remain context
     table_2: context-only; room-temperature Al coordination and NMR parameters have no matching quantity token
     table_3: context-only; room-temperature B coordination and NMR parameters have no matching quantity token
     redox: no numeric measured V valence fraction or ratio is printed; XPS binding-energy values and qualitative interpretation are context
@@ -17,6 +17,10 @@ extraction:
   date: '2026-10-20'
   worker: fam31-1020
 review_status: draft
+fidelity_samples:
+- path: species.Na2O.observations[saini_2023_1_na2o_composition].values.points[0].value
+  value: '28.95'
+  locator: {page: 3, published_page: 3, pdf_page_index: 2, table: '1', row: 0V, column: Na2O}
 species:
   V:
     observations: []

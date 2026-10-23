@@ -7,10 +7,10 @@ source:
   corpus_asset: raw/jin-2022-cl-cr-sulfur-glass-solubility/jin-2022-cl-cr-sulfur-glass-solubility.pdf
 extraction:
   method: >-
-    PDF is born-digital; pdftotext-layout is the primary read. MinerU produced no table blocks, so Tables 1-4 were transcribed from the text layer; Tables 1, 2, and 4 were checked against 600 dpi renders (PDF pages 14-16). The controller ruled that this base has no composition-vector quantity: the full Table 2 glass analyses are context, not split into species concentration observations. The salt-saturated glasses were melted at 1150 °C for one hour and water-quenched; Table 4's measured Cr(VI)/Cr(total) values are typed as fractions from the printed percentages. No figures were digitised.
+    PDF is born-digital; pdftotext-layout is the primary read. MinerU produced no table blocks, so Tables 1-4 were transcribed from the text layer; Tables 1, 2, and 4 were checked against 600 dpi renders (PDF pages 14-16). Table 2 measured mass% cells are typed as equilibrium_phase_composition; the separate anion mol% columns remain context. Table 4 composition is retained as a shared identity condition for its Cr(VI)/Cr(total) measurements. The salt-saturated glasses were melted at 1150 °C for one hour and water-quenched; Table 4's measured Cr(VI)/Cr(total) values are typed as fractions from the printed percentages. No figures were digitised.
   table_dispositions:
     table_1: context-quoted; target glass compositions, not measurements in this work
-    table_2: context-no-token; candidate equilibrium_phase_composition and liquidus_composition; schema gap for glass composition vectors
+    table_2: typed; measured mass% cells are equilibrium_phase_composition observations; separate anion mol% columns remain context
     table_3: context-no-token; aqueous wash-solution analyses, not an equilibrium glass composition
     table_4: typed; measured Cr(VI)/Cr(total) fractions
   date: '2026-10-20'
@@ -20,6 +20,9 @@ fidelity_samples:
 - path: species.Cr.observations[jin_2022_table4_cr_vi_fraction].values.points[0].value
   value: 0.577
   locator: {page: 16, pdf_page_index: 15, table: '4', row: 'S75-Cr25(R5)'}
+- path: species.Al2O3.observations[jin_2022_2_al2o3_composition].values.points[0].value
+  value: '9.83'
+  locator: {page: 15, published_page: not_printed, pdf_page_index: 14, table: '2', row: BL, column: Al2O3}
 species:
   Cr:
     observations:
