@@ -573,6 +573,36 @@ def test_campaign_transition_zero_po2_override_leaves_atmosphere_at_default():
     assert sim.melt.atmosphere == Atmosphere.PN2_SWEEP
 
 
+def test_c0_forecast_reacts_to_web_ordered_ramp_override():
+    configured_before_start = SimSession().start(
+        _config(runtime_campaign_overrides={"C0": {"ramp_rate": 2000.0}})
+    )
+    started_before_adjustment = SimSession().start(_config())
+    started_before_adjustment.adjust(
+        "campaign_override",
+        2000.0,
+        campaign="C0",
+        field="ramp_rate",
+    )
+
+    def ledger_after_c0(session):
+        sim = session.simulator
+        steps = 0
+        while sim.melt.campaign == CampaignPhase.C0 and steps < 10:
+            sim.step()
+            steps += 1
+        assert sim.melt.campaign != CampaignPhase.C0
+        return json.dumps(
+            sim.atom_ledger.mol_by_account(),
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+
+    assert ledger_after_c0(configured_before_start) == ledger_after_c0(
+        started_before_adjustment
+    )
+
+
 def test_session_adjust_stir_state_writes_canonical_2_axis_state():
     """0.5.3 Phase B: ``session.adjust("stir_state", {axial, radial})``
     is the canonical 2-axis writer. Drives both axes through
