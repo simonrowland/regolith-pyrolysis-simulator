@@ -284,7 +284,7 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
                 and record.point_conditions["temperature_K"].locator.page == 4
                 for record in migrated
             )
-            assert all(record.point_conditions["total_pressure_Pa"].state.is_unknown for record in migrated)
+            assert all(record.identity.total_pressure_Pa.is_not_applicable for record in migrated)
 
         if "quench_statement" in observation:
             assert observation["quench_statement"]["preservation"] == "not_stated"
@@ -308,6 +308,11 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         source = rows_by_id[observation_id]
         assert source["values"]["Fe2O3_wt_pct"] == fe2o3
         assert source["values"]["FeO_wt_pct"] == feo
+        if observation_id.startswith("kc91_fe3_t4_"):
+            run = observation_id.removeprefix("kc91_fe3_t4_")
+            for oxide, printed in (("Fe2O3", fe2o3), ("FeO", feo)):
+                direct = rows_by_id[f"kc91_t4_{run}_{oxide}"]
+                assert direct["values"]["value_as_published"] == printed
         record = next(item for item in reduced if observation_id in item.observation_id)
         expected_ratio = fe3_fe2_ratio_from_oxide_wt_pct(
             Decimal(fe2o3), Decimal(feo)
@@ -350,6 +355,23 @@ def test_context_provenance_and_deferred_figures_are_explicit() -> None:
         for body in document["species"].values()
         for item in body.get("context", [])
     ]
+    equation7 = next(
+        item for item in context
+        if item["observation_id"] == "kress_1991_equation7_fit_scope"
+    )
+    assert equation7["locator"]["page"] == 6
+    assert equation7["locator"]["published_page"] == 87
+    assert equation7["values"]["fit_data_scope"]["data_count"] == 228
+    assert equation7["values"]["fit_data_scope"]["equation"] == 7
+    fit_scope = equation7["values"]["fit_data_scope"]
+    assert fit_scope["regression"] == "weighted stepwise-linear"
+    assert "weighted stepwise-linear regression" in equation7["values"]["source_wording"]
+    assert len(fit_scope["sources"]) == 7
+    assert all(
+        source["fit_locator"]["published_page"] == 87
+        for source in fit_scope["sources"]
+    )
+
     table7_e = next(item for item in context if item["observation_id"] == "kc91_t7_e")
     assert table7_e["values"]["evidence_class"] == "quoted_attributed"
     assert table7_e["values"]["attribution"] == "Stebbins et al. (1984)"
