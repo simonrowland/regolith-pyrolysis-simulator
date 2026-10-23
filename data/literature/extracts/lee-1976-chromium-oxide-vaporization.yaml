@@ -1,53 +1,669 @@
 schema_version: literature_extract.v1
 source_id: lee-1976-chromium-oxide-vaporization
 source:
-  citation: Lee, H.-L., Sasamoto, T. & Sata, T. (1976), "Effects of Porosity on Vacuum-Vaporization of Chromium Oxide and Thermodynamic Treatments", Yogyo-Kyokai-Shi 84(11), 579-586.
+  citation: Lee, H.-L., Sasamoto, T. & Sata, T. (1976), "Effects of Porosity on Vacuum-Vaporization of
+    Chromium Oxide and Thermodynamic Treatments", Yogyo-Kyokai-Shi 84(11), 579-586.
   year: 1976
 extraction:
-  method: MinerU table transcription checked against rendered PDF page
+  method: MinerU table transcription; every Table 3 cell row/column assignment checked against rendered
+    PDF page
   date: '2026-10-22'
-  worker: wave52-F64
+  worker: codex-resume-76953-1792725097
+  provenance_path: data/literature/extracts/lee-1976-chromium-oxide-vaporization-audit.md
 review_status: draft
+fidelity_samples:
+- species: Cr2O3
+  observation_id: lee1976_table3_porosity_0_018_T1745C
+  field: evaporation_flux
+  value: '39.9'
+  locator:
+    page: 3
+    table: '3'
+- species: Cr2O3
+  observation_id: lee1976_table3_porosity_0_250_T1635C
+  field: evaporation_flux
+  value: '6.66'
+  locator:
+    page: 3
+    table: '3'
+- species: Cr2O3
+  observation_id: lee1976_table3_porosity_0_300_T1575C
+  field: evaporation_flux
+  value: '2.19'
+  locator:
+    page: 3
+    table: '3'
+- species: Cr2O3
+  observation_id: lee1976_table3_porosity_0_380_T1457C
+  field: evaporation_flux
+  value: '0.322'
+  locator:
+    page: 3
+    table: '3'
 species:
   Cr2O3:
     observations:
-    - observation_id: lee1976_table3_porosity_0_018
+    - observation_id: lee1976_table3_porosity_0_018_T1745C
       type: rate_series
-      locator: {table: '3', page: 3, published_page: 64, row: '0.018'}
-      units: μg cm^-2 s^-1
-      T_C: [1745, 1635, 1575, 1457]
+      locator: &id001
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.018'
+        column: 1745°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1745
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1745
+          locator: *id001
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.018'
+          locator: *id001
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
       values:
-        printed_porosity: '0.018'
-        printed_rates: ['39.9', '5.62', '1.62', '0.114']
-        status: typed_refusal
-        reason: Schema token evaporation_flux excludes the printed unit μg cm^-2 s^-1 and requires a gas_species not stated by the table.
-    - observation_id: lee1976_table3_porosity_0_250
+        quantity: evaporation_flux
+        evaporation_flux: '39.9'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_018_T1635C
       type: rate_series
-      locator: {table: '3', page: 3, published_page: 64, row: '0.250'}
-      units: μg cm^-2 s^-1
-      T_C: [1745, 1635, 1575, 1457]
+      locator: &id002
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.018'
+        column: 1635°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1635
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1635
+          locator: *id002
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.018'
+          locator: *id002
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
       values:
-        printed_porosity: '0.250'
-        printed_rates: ['42.3', '6.66', '1.84', '0.141']
-        status: typed_refusal
-        reason: Schema token evaporation_flux excludes the printed unit μg cm^-2 s^-1 and requires a gas_species not stated by the table.
-    - observation_id: lee1976_table3_porosity_0_300
+        quantity: evaporation_flux
+        evaporation_flux: '5.62'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_018_T1575C
       type: rate_series
-      locator: {table: '3', page: 3, published_page: 64, row: '0.300'}
-      units: μg cm^-2 s^-1
-      T_C: [1745, 1635, 1575, 1457]
+      locator: &id003
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.018'
+        column: 1575°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1575
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1575
+          locator: *id003
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.018'
+          locator: *id003
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
       values:
-        printed_porosity: '0.300'
-        printed_rates: ['45.1', '6.89', '2.19', '0.186']
-        status: typed_refusal
-        reason: Schema token evaporation_flux excludes the printed unit μg cm^-2 s^-1 and requires a gas_species not stated by the table.
-    - observation_id: lee1976_table3_porosity_0_380
+        quantity: evaporation_flux
+        evaporation_flux: '1.62'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_018_T1457C
       type: rate_series
-      locator: {table: '3', page: 3, published_page: 64, row: '0.380'}
-      units: μg cm^-2 s^-1
-      T_C: [1745, 1635, 1575, 1457]
+      locator: &id004
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.018'
+        column: 1457°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1457
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1457
+          locator: *id004
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.018'
+          locator: *id004
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
       values:
-        printed_porosity: '0.380'
-        printed_rates: ['47.6', '7.27', '2.47', '0.322']
-        status: typed_refusal
-        reason: Schema token evaporation_flux excludes the printed unit μg cm^-2 s^-1 and requires a gas_species not stated by the table.
+        quantity: evaporation_flux
+        evaporation_flux: '0.114'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_250_T1745C
+      type: rate_series
+      locator: &id005
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.250'
+        column: 1745°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1745
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1745
+          locator: *id005
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.250'
+          locator: *id005
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '42.3'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_250_T1635C
+      type: rate_series
+      locator: &id006
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.250'
+        column: 1635°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1635
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1635
+          locator: *id006
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.250'
+          locator: *id006
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '6.66'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_250_T1575C
+      type: rate_series
+      locator: &id007
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.250'
+        column: 1575°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1575
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1575
+          locator: *id007
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.250'
+          locator: *id007
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '1.84'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_250_T1457C
+      type: rate_series
+      locator: &id008
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.250'
+        column: 1457°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1457
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1457
+          locator: *id008
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.250'
+          locator: *id008
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.141'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_300_T1745C
+      type: rate_series
+      locator: &id009
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.300'
+        column: 1745°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1745
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1745
+          locator: *id009
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.300'
+          locator: *id009
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '45.1'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_300_T1635C
+      type: rate_series
+      locator: &id010
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.300'
+        column: 1635°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1635
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1635
+          locator: *id010
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.300'
+          locator: *id010
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '6.89'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_300_T1575C
+      type: rate_series
+      locator: &id011
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.300'
+        column: 1575°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1575
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1575
+          locator: *id011
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.300'
+          locator: *id011
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '2.19'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_300_T1457C
+      type: rate_series
+      locator: &id012
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.300'
+        column: 1457°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1457
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1457
+          locator: *id012
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.300'
+          locator: *id012
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.186'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_380_T1745C
+      type: rate_series
+      locator: &id013
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.380'
+        column: 1745°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1745
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1745
+          locator: *id013
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.380'
+          locator: *id013
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '47.6'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_380_T1635C
+      type: rate_series
+      locator: &id014
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.380'
+        column: 1635°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1635
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1635
+          locator: *id014
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.380'
+          locator: *id014
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '7.27'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_380_T1575C
+      type: rate_series
+      locator: &id015
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.380'
+        column: 1575°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1575
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1575
+          locator: *id015
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.380'
+          locator: *id015
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '2.47'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1
+    - observation_id: lee1976_table3_porosity_0_380_T1457C
+      type: rate_series
+      locator: &id016
+        table: '3'
+        page: 3
+        published_page: 64
+        row: '0.380'
+        column: 1457°C
+      phase: condensed_solid
+      regime: langmuir_free_evaporation
+      units: μg·cm^-2·sec^-1
+      T_C: 1457
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1457
+          locator: *id016
+        apparent_porosity:
+          state:
+            tag: value
+            value: '0.380'
+          locator: *id016
+        pO2_atm:
+          state:
+            tag: value
+            value: 1e-9
+          locator:
+            page: 5
+            published_page: 66
+            section: 3.2 Langmuir- and Knudsen-vapor pressures and thermodynamic treatments
+            note: The authors state Langmuir vaporization in this investigation was carried out at about
+              pO2 ≈ 10^-9 atm.
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.322'
+        material_as_printed: Cr2O3
+        method_class: measured_direct
+        units_as_printed: μg·cm^-2·sec^-1

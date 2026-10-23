@@ -641,6 +641,65 @@ def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
         )
 
 
+def test_lee_1976_table3_cells_match_render_and_unprinted_conditions_stay_unknown(
+    tmp_path: Path,
+) -> None:
+    """Table 3's full 4x4 print is pinned to the page-3 render and migration."""
+    from simulator.battery.enums import Quantity
+
+    source = EXTRACTS / "lee-1976-chromium-oxide-vaporization.yaml"
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    rows = extract["species"]["Cr2O3"]["observations"]
+    assert len(rows) == 16
+    rendered = {
+        "lee1976_table3_porosity_0_018_T1745C": Decimal("39.9"),
+        "lee1976_table3_porosity_0_250_T1635C": Decimal("6.66"),
+        "lee1976_table3_porosity_0_300_T1575C": Decimal("2.19"),
+        "lee1976_table3_porosity_0_380_T1457C": Decimal("0.322"),
+    }
+    source_rows = {row["observation_id"]: row for row in rows}
+    for observation_id, expected in rendered.items():
+        row = source_rows[observation_id]
+        assert row["locator"]["page"] == 3
+        assert Decimal(row["values"]["evaporation_flux"]) == expected
+
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrator.finalize()
+    result = migrator.result
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+    assert len(result.observations) == 16
+    for observation_id, row in source_rows.items():
+        observation = result.observations[
+            f"lee-1976-chromium-oxide-vaporization::{observation_id}"
+        ]
+        printed = Decimal(row["values"]["evaporation_flux"])
+        assert observation.identity.quantity.value is Quantity.EVAPORATION_FLUX
+        assert observation.value.point == printed * Decimal("0.00001")
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.is_value
+        assert observation.identity.temperature_K.value == (
+            Decimal(str(row["T_C"])) + Decimal("273.15")
+        )
+        assert observation.identity.total_pressure_Pa.is_unknown
+        assert not observation.identity.fO2_Pa.is_value
+        assert observation.identity.species.formula == "Cr2O3"
+        assert "gas_species" not in row["values"]
+        assert "P_total" not in row["values"]
+        assert "flow" not in row["values"]
+        assert row["values"]["material_as_printed"] == "Cr2O3"
+        assert observation.point_conditions is not None
+        assert observation.point_conditions["pO2_atm"].state.is_value
+        assert observation.point_conditions["pO2_atm"].state.value == Decimal("1e-9")
+        assert observation.provenance["printed_unit"] == "μg·cm^-2·sec^-1"
+        assert observation.provenance["flow"] == {
+            "flow_rate": {"state": "not_printed"},
+            "velocity": {"state": "not_printed"},
+            "geometry": {"state": "not_printed"},
+            "crucible_or_sample_area": {"state": "not_printed"},
+        }
+
+
 def test_sato_1976_migrates_all_numeric_table_cells() -> None:
     """Every printed numeric cell in the three tables becomes a numeric observation."""
     source = EXTRACTS / "sato-1976-lunar-fo2-apollo-17.yaml"
