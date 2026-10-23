@@ -6837,7 +6837,16 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
-    assert n_numeric == 3136, (n_numeric, census, n_unavailable)
+    # Family car (F39-F50): Bonnand, Bruand, Matzen et al. (2020) adds 14 printed
+    # Fe3+/Fe2+ ratio series. Measured with _series_census on a regenerated store
+    # of the family car re-merge: fe3_fe2_ratio 38->52 and n_numeric 3136->3150,
+    # no other category or source moved, mismatches stays 0. The count moved
+    # because the data became visible, not because a check was relaxed.
+    assert per_source.get(
+        "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
+    ) == {"fe3_fe2_ratio": 14}
+    assert census.get("fe3_fe2_ratio") == 52
+    assert n_numeric == 3150, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
