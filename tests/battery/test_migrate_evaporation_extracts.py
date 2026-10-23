@@ -166,7 +166,11 @@ def _assert_sossi_pins(result) -> None:
 
 
 def test_sossi_fitted_outputs_are_context_and_run_measurements_keep_conditions(tmp_path: Path) -> None:
-    result = _migrate_real_extract(tmp_path, EXTRACT)
+    # Table 3–6 fits name tables:kems-012-sossi-2019. That asset id is registered
+    # on the repository index row; a stub index cannot resolve it.
+    result = _migrate_real_extract(
+        tmp_path, EXTRACT, use_repository_index_row=True
+    )
     _assert_sossi_pins(result)
 
 
