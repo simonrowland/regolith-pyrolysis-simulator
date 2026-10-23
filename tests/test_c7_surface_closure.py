@@ -181,6 +181,17 @@ def test_non_evaporating_step_uses_published_intrinsic_oxygen(campaign):
             sim.setpoints['campaigns']['C7'].update(_c7_patch()['campaigns']['C7'])
         sim.start_campaign(CampaignPhase[campaign])
         sim.melt.temperature_C = 1400.0 if campaign == 'C6' else 1600.0
+        # A direct query after changing campaign must not consume the previous
+        # interval's accepted coordinate or source-free carrier admission.
+        sim._reaction_pO2_bar = 0.0 if campaign == 'C6' else 1e-12
+        sim._frozen_evaporation_carriers = frozenset()
+        sim._last_surface_oxygen_diagnostic = {'completed_interval': True}
+        sim._get_equilibrium()
+        query = sim._last_vapor_pressure_diagnostic
+        assert query['pO2_bar'] == 10.0 ** query['intrinsic_fO2_publication']['published_intrinsic_fO2_log']
+        assert sim._reaction_pO2_bar is None
+        assert sim._frozen_evaporation_carriers is None
+        assert sim._last_surface_oxygen_diagnostic == {'completed_interval': True}
         sim.step()
         diagnostic = sim._last_vapor_pressure_diagnostic
         published = diagnostic['intrinsic_fO2_publication']['published_intrinsic_fO2_log']

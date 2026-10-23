@@ -9842,6 +9842,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         surfaces existing state at the consumption point; it does not
         introduce a new control-flow branch.
         """
+        if not self._evaporation_campaign_active():
+            # An accepted coordinate/admission belongs to its evaporation
+            # interval. Direct queries after a campaign change use the melt's
+            # publication; retain the completed interval's diagnostic receipt.
+            self._reaction_pO2_bar = None
+            self._frozen_evaporation_carriers = None
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'replay_enabled', False):
             return store.replay_equilibrium(self)
