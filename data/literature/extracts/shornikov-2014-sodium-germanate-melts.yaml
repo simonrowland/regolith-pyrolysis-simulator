@@ -1,0 +1,1722 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2014-sodium-germanate-melts
+source:
+  citation: Shornikov, S. I. (2014), “Thermodynamic properties of the Na2O–GeO2 melts,” Experimental Geochemistry
+    2(1).
+  year: 2014
+  corpus_asset: raw/shornikov-2014-sodium-germanate-melts/shornikov-2014-sodium-germanate-melts.pdf
+extraction:
+  method: 'MinerU tables were converted and compared with the text layer. The 600 dpi render of PDF page
+    2 confirmed every stored digit. The liquid GeO2 cell was hand-corrected. MinerU printed a leading
+    superscript 0, which is the standard-state mark, value -292.357. The liquid cell prints Na4Ge9O2.
+    That printed label is kept, and Na4Ge9O20 is an inferred correction. Five Table 1 entropy dashes
+    were not stored. Table 1 enthalpies are stored per mol_species. The header prints kJ/mole.'
+  date: '2026-10-20'
+  worker: t1372-w2-w8-t1
+review_status: draft
+skipped_empty_or_dash:
+  total: 5
+  tables:
+  - page: 2
+    table: '1'
+    count: 5
+    note: ΔS_T dashes at 1400 K for Na4GeO4, Na6Ge2O7, Na2GeO3, Na2Ge4O9 and Na4Ge9O20.
+fidelity_samples:
+- species: Na4GeO4
+  observable: gibbs_table
+  observation_id: na_2014_t1_Na4GeO4_1400_dfH
+  field: value
+  value: '-134.35'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '1'
+- species: Na4Ge9O20
+  observable: gibbs_table
+  observation_id: na_2014_t2_l_Na4Ge9O20
+  field: value
+  value: '-3625.145'
+  locator: &id001
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '2'
+- species: GeO2
+  observable: gibbs_table
+  observation_id: na_2014_t2_l_GeO2
+  field: value
+  value: '-292.357'
+  locator: *id001
+- species: O2
+  observable: gibbs_table
+  observation_id: na_2014_t2_g_O2
+  field: value
+  value: '0.000'
+  locator: *id001
+species:
+  Na4GeO4:
+    observations:
+    - observation_id: na_2014_t1_Na4GeO4_1400_dfH
+      type: gibbs_table
+      locator: &id002
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na4GeO4
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-134.35'
+        value_as_printed: -134.35±5.00
+        T_K: '1400'
+        attribution: Fan et al. (1993)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '5.00'
+        verbatim: -134.35±5.00
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id002
+    - observation_id: na_2014_t2_cr_Na4GeO4
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na4GeO4
+        column_header: ΔfG°1500, cr
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-1067.082'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  Na6Ge2O7:
+    observations:
+    - observation_id: na_2014_t1_Na6Ge2O7_1300_dfH
+      type: gibbs_table
+      locator: &id003
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na6Ge2O7
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-137.30'
+        value_as_printed: -137.30±1.70
+        T_K: '1300'
+        attribution: Kozhina and Shultz (2000)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.70'
+        verbatim: -137.30±1.70
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id003
+    - observation_id: na_2014_t1_Na6Ge2O7_1400_dfH
+      type: gibbs_table
+      locator: &id004
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na6Ge2O7
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-131.47'
+        value_as_printed: -131.47±4.00
+        T_K: '1400'
+        attribution: Fan et al. (1993)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '4.00'
+        verbatim: -131.47±4.00
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id004
+    - observation_id: na_2014_t1_Na6Ge2O7_1450_dfH
+      type: gibbs_table
+      locator: &id005
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na6Ge2O7
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-130.53'
+        value_as_printed: -130.53±4.18
+        T_K: '1450'
+        attribution: Kozhina and Shultz (1995)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '4.18'
+        verbatim: -130.53±4.18
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1450'
+          locator: *id005
+    - observation_id: na_2014_t2_cr_Na6Ge2O7
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na6Ge2O7
+        column_header: ΔfG°1500, cr
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-1823.673'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+    context:
+    - observation_id: na_2014_t1_Na6Ge2O7_1300_dfS
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na6Ge2O7
+        column_header: ΔS_T, J/(mole K)
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: -7.31±1.31
+        T_K: '1300'
+        attribution: Kozhina and Shultz (2000)
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+        reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+    - observation_id: na_2014_t1_Na6Ge2O7_1450_dfS
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na6Ge2O7
+        column_header: ΔS_T, J/(mole K)
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: -6.24±2.72
+        T_K: '1450'
+        attribution: Kozhina and Shultz (1995)
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+        reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  Na2GeO3:
+    observations:
+    - observation_id: na_2014_t1_Na2GeO3_1300_dfH
+      type: gibbs_table
+      locator: &id006
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2GeO3
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-129.80'
+        value_as_printed: -129.80±1.70
+        T_K: '1300'
+        attribution: Kozhina and Shultz (2000)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.70'
+        verbatim: -129.80±1.70
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id006
+    - observation_id: na_2014_t1_Na2GeO3_1400_dfH
+      type: gibbs_table
+      locator: &id007
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2GeO3
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-118.36'
+        value_as_printed: -118.36±5.00
+        T_K: '1400'
+        attribution: Fan et al. (1993)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '5.00'
+        verbatim: -118.36±5.00
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id007
+    - observation_id: na_2014_t1_Na2GeO3_1450_dfH
+      type: gibbs_table
+      locator: &id008
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2GeO3
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-117.82'
+        value_as_printed: -117.82±5.43
+        T_K: '1450'
+        attribution: Kohsaka et al. (1978)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '5.43'
+        verbatim: -117.82±5.43
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1450'
+          locator: *id008
+    - observation_id: na_2014_t1_Na2GeO3_1450b_dfH
+      type: gibbs_table
+      locator: &id009
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2GeO3
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-124.68'
+        value_as_printed: -124.68±4.18
+        T_K: '1450'
+        attribution: Kozhina and Shultz (1995)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '4.18'
+        verbatim: -124.68±4.18
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1450'
+          locator: *id009
+    - observation_id: na_2014_t2_cr_Na2GeO3
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na2GeO3
+        column_header: ΔfG°1500, cr
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-736.673'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+    - observation_id: na_2014_t2_l_Na2GeO3
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na2GeO3
+        column_header: ΔfG°1500, l
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-743.176'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+    context:
+    - observation_id: na_2014_t1_Na2GeO3_1300_dfS
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2GeO3
+        column_header: ΔS_T, J/(mole K)
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: -7.00±1.31
+        T_K: '1300'
+        attribution: Kozhina and Shultz (2000)
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+        reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+    - observation_id: na_2014_t1_Na2GeO3_1450_dfS
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2GeO3
+        column_header: ΔS_T, J/(mole K)
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: -9.00±4.18
+        T_K: '1450'
+        attribution: Kohsaka et al. (1978)
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+        reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+    - observation_id: na_2014_t1_Na2GeO3_1450b_dfS
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2GeO3
+        column_header: ΔS_T, J/(mole K)
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: -6.69±2.72
+        T_K: '1450'
+        attribution: Kozhina and Shultz (1995)
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+        reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  Na2Ge4O9:
+    observations:
+    - observation_id: na_2014_t1_Na2Ge4O9_1300_dfH
+      type: gibbs_table
+      locator: &id010
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2Ge4O9
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-55.70'
+        value_as_printed: -55.70±1.70
+        T_K: '1300'
+        attribution: Kozhina and Shultz (2000)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.70'
+        verbatim: -55.70±1.70
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id010
+    - observation_id: na_2014_t1_Na2Ge4O9_1400_dfH
+      type: gibbs_table
+      locator: &id011
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2Ge4O9
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-56.57'
+        value_as_printed: -56.57±3.00
+        T_K: '1400'
+        attribution: Fan et al. (1993)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '3.00'
+        verbatim: -56.57±3.00
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id011
+    - observation_id: na_2014_t1_Na2Ge4O9_1450_dfH
+      type: gibbs_table
+      locator: &id012
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2Ge4O9
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-55.23'
+        value_as_printed: -55.23±4.18
+        T_K: '1450'
+        attribution: Kozhina and Shultz (1995)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '4.18'
+        verbatim: -55.23±4.18
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1450'
+          locator: *id012
+    - observation_id: na_2014_t2_cr_Na2Ge4O9
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na2Ge4O9
+        column_header: ΔfG°1500, cr
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-1680.422'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+    context:
+    - observation_id: na_2014_t1_Na2Ge4O9_1300_dfS
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2Ge4O9
+        column_header: ΔS_T, J/(mole K)
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 4.69±1.31
+        T_K: '1300'
+        attribution: Kozhina and Shultz (2000)
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+        reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+    - observation_id: na_2014_t1_Na2Ge4O9_1450_dfS
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na2Ge4O9
+        column_header: ΔS_T, J/(mole K)
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 5.02±2.72
+        T_K: '1450'
+        attribution: Kozhina and Shultz (1995)
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+        reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  Na4Ge9O20:
+    observations:
+    - observation_id: na_2014_t1_Na4Ge9O20_1300_dfH
+      type: gibbs_table
+      locator: &id013
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na4Ge9O20
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-49.97'
+        value_as_printed: -49.97±1.70
+        T_K: '1300'
+        attribution: Kozhina and Shultz (2000)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.70'
+        verbatim: -49.97±1.70
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id013
+    - observation_id: na_2014_t1_Na4Ge9O20_1400_dfH
+      type: gibbs_table
+      locator: &id014
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na4Ge9O20
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-51.49'
+        value_as_printed: -51.49±3.00
+        T_K: '1400'
+        attribution: Fan et al. (1993)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '3.00'
+        verbatim: -51.49±3.00
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id014
+    - observation_id: na_2014_t1_Na4Ge9O20_1450_dfH
+      type: gibbs_table
+      locator: &id015
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na4Ge9O20
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-51.81'
+        value_as_printed: -51.81±5.43
+        T_K: '1450'
+        attribution: Kohsaka et al. (1978)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '5.43'
+        verbatim: -51.81±5.43
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1450'
+          locator: *id015
+    - observation_id: na_2014_t1_Na4Ge9O20_1450b_dfH
+      type: gibbs_table
+      locator: &id016
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na4Ge9O20
+        column_header: ΔH_T, kJ/mole
+        note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit
+          was hand-corrected.
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-50.66'
+        value_as_printed: -50.66±4.18
+        T_K: '1450'
+        attribution: Kozhina and Shultz (1995)
+        reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '4.18'
+        verbatim: -50.66±4.18
+        confidence_level: not_stated
+        basis: Printed ± on the enthalpy cell. Confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1450'
+          locator: *id016
+    - observation_id: na_2014_t2_cr_Na4Ge9O20
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na4Ge9O20
+        column_header: ΔfG°1500, cr
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-3611.465'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+    - observation_id: na_2014_t2_l_Na4Ge9O20
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na4Ge9O2
+        column_header: ΔfG°1500, l
+        note: 'The liquid cell prints Na4Ge9O2 next to -3625.145. The text layer of PDF page 2 and the
+          600 dpi page agree on that label. The solid cell on the same row prints Na4Ge9O20, and every
+          Table 1 row for this compound prints Na4Ge9O20. Na4Ge9O20 is an inferred correction of a dropped
+          final 0. The page is not claimed to print Na4Ge9O20 in the liquid cell. The value -3625.145
+          is the printed cell.'
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-3625.145'
+        formula_as_printed: Na4Ge9O2
+        formula_inferred: Na4Ge9O20
+        formula_inference: 'The liquid label drops the final 0 of Na4Ge9O20. The solid cell on the same row and every Table 1 row print Na4Ge9O20.'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+    context:
+    - observation_id: na_2014_t1_Na4Ge9O20_1300_dfS
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na4Ge9O20
+        column_header: ΔS_T, J/(mole K)
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 5.35±1.31
+        T_K: '1300'
+        attribution: Kozhina and Shultz (2000)
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+        reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+    - observation_id: na_2014_t1_Na4Ge9O20_1450_dfS
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na4Ge9O20
+        column_header: ΔS_T, J/(mole K)
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 3.85±4.18
+        T_K: '1450'
+        attribution: Kohsaka et al. (1978)
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+        reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+    - observation_id: na_2014_t1_Na4Ge9O20_1450b_dfS
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '1'
+        row_label: Na4Ge9O20
+        column_header: ΔS_T, J/(mole K)
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 4.14±2.72
+        T_K: '1450'
+        attribution: Kozhina and Shultz (1995)
+        standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
+          formation from the simple oxides. The paper does not state whether each simple oxide is the
+          pure solid or the pure liquid.'
+        reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  Na2O:
+    observations:
+    - observation_id: na_2014_t2_cr_Na2O
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na2O
+        column_header: ΔfG°1500, cr
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-211.201'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+    - observation_id: na_2014_t2_l_Na2O
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na2O
+        column_header: ΔfG°1500, l
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-213.636'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+    - observation_id: na_2014_t2_g_Na2O
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na2O
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-79.739'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+    context:
+    - observation_id: na_2014_activity_reference_unstated
+      type: activity_reference_unstated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        paragraph: oxide activities
+      units: as reported
+      values:
+        standard_state: The text says the oxide activities a(i) were obtained by Gibbs-energy minimization
+          and are plotted in Fig. 2. It does not state whether a(Na2O) and a(GeO2) are referred to the
+          pure solid or the pure liquid. Fig. 2 lines are the present-study calculation. The markers are
+          literature EMF and KEMS points. No present-study marker was read.
+        expected_migration_phase: unknown
+  Na:
+    observations:
+    - observation_id: na_2014_t2_g_Na
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-26.838'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  Na2:
+    observations:
+    - observation_id: na_2014_t2_g_Na2
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na2
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-7.696'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  NaO:
+    observations:
+    - observation_id: na_2014_t2_g_NaO
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: NaO
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '13.897'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  Na2O2:
+    observations:
+    - observation_id: na_2014_t2_g_Na2O2
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Na2O2
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-59.967'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  Ge:
+    observations:
+    - observation_id: na_2014_t2_g_Ge
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Ge
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '170.658'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  GeO2:
+    observations:
+    - observation_id: na_2014_t2_cr_GeO2
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: GeO2
+        column_header: ΔfG°1500, cr
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-290.807'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+    - observation_id: na_2014_t2_l_GeO2
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: GeO2
+        column_header: ΔfG°1500, l
+        note: MinerU read a leading superscript 0 on the liquid GeO2 label. The 600 dpi page shows that
+          mark on GeO2(l) only. It is read as the standard-state mark, not as a different formula. Value
+          −292.357.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-292.357'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+    - observation_id: na_2014_t2_g_GeO2
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: GeO2
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-101.526'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  Ge2:
+    observations:
+    - observation_id: na_2014_t2_g_Ge2
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Ge2
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '221.010'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  GeO:
+    observations:
+    - observation_id: na_2014_t2_g_GeO
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: GeO
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-155.217'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  Ge2O2:
+    observations:
+    - observation_id: na_2014_t2_g_Ge2O2
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Ge2O2
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-295.507'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  Ge3O3:
+    observations:
+    - observation_id: na_2014_t2_g_Ge3O3
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: Ge3O3
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '-378.763'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  O:
+    observations:
+    - observation_id: na_2014_t2_g_O
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: O
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '154.920'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  O2:
+    observations:
+    - observation_id: na_2014_t2_g_O2
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: O2
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '0.000'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+  O3:
+    observations:
+    - observation_id: na_2014_t2_g_O3
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 52
+        table: '2'
+        row_label: O3
+        column_header: ΔfG°1500, g
+        note: 600 dpi render confirms the value. Calculated in the present study. Parents are not printed.
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        value: '243.150'
+        T_K: '1500'
+        attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
+          Kozhina and Shultz (1995, 2000).
+        standard_state: 'Table 2 caption, published page 52: Gibbs energy of formation from elements of
+          condensed phases and vapor species at 1500 K, calculated in the present study. The reference
+          is the elements, not a pure-oxide activity reference.'
+        parents_not_printed: The caption names the sources. It does not print the input numbers. No derived_from
+          link is invented.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500'
+          locator: *id001
+experiments:
+- experiment_id: shornikov-2014-ideal-associated-solution
+  kind: thermodynamic_model
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+  method: Ideal associated solution, Gibbs-energy minimization, 900–1600 K. Table 2 is the 1500 K formation
+    set used as input. The input numbers from the cited sources are not printed.

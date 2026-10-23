@@ -1,0 +1,488 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2024-sodium-phosphate-melts
+source:
+  citation: >-
+    Shornikov, S. I. (2024). Thermodynamic properties of the Na2O–P4O10 melts.
+    Experiment in Geosciences, 30(1), 67–70.
+  year: 2024
+  venue: Experiment in Geosciences
+  corpus_asset: raw/shornikov-2024-sodium-phosphate-melts/shornikov-2024-sodium-phosphate-melts.pdf
+  corpus_sha256: 5e089f5f49a8f86b08f46f6cbed53a7a2be0c02072a4d91217a9c9a4689ff995
+extraction:
+  method: >-
+    No numerical table is printed. MinerU content list for this PDF has text,
+    images, one chart and no table blocks, so mineru_table_draft emit was not run.
+    Figures 1–3 were read on 600 dpi renders of PDF pages 3 and 4. This-study
+    series are continuous calculated strokes with no marker centre. Literature
+    symbols stay in the audit sidecar and are not re-extracted.
+  date: '2026-10-20'
+  worker: t1372-w2-w7-t1
+review_status: draft
+fidelity_samples:
+  - species: Na2O
+    observable: activity_coefficient
+    observation_id: shornikov_2024_na2o_p4o10_fig2a_series8
+    field: admission_status
+    value: typed_refusal
+    locator:
+      page: 3
+      published_page: 68
+      pdf_page_index: 2
+      figure: '2'
+      panel: A
+      note: Series 8 is the calculated Na2O activity stroke at 1073 K. No marker centre.
+  - species: PO
+    observable: partial_pressure
+    observation_id: shornikov_2024_na2o_p4o10_fig3a_po
+    field: admission_status
+    value: typed_refusal
+    locator:
+      page: 4
+      published_page: 69
+      pdf_page_index: 3
+      figure: '3'
+      panel: A
+      note: Series 15 is the calculated PO pressure stroke over NaPO3. No marker centre.
+experiments:
+  - experiment_id: shornikov_2024_na2o_p4o10_model
+    method: engine_evaluation
+    locator:
+      page: 2
+      published_page: 67
+      pdf_page_index: 1
+      section: Abstract
+      note: Semi-empirical model calculations for 600–1900 K. This paper reports no new Knudsen cell.
+    conditions:
+      temperature_K:
+        state:
+          tag: unknown
+          reason: range_only_not_a_single_temperature
+        locator:
+          page: 2
+          published_page: 67
+          pdf_page_index: 1
+          section: Abstract
+          note: The model covers 600–1900 K.
+species:
+  Na2O:
+    observations:
+      - observation_id: shornikov_2024_na2o_p4o10_fig2a_series8
+        type: activity_coefficient
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 3
+          published_page: 68
+          pdf_page_index: 2
+          figure: '2'
+          panel: A
+          note: >-
+            Caption series 8, calculated in the present study at 1073 K.
+            600 dpi render of PDF page 3: continuous stroke on panel A, no marker centre.
+        phase: condensed
+        units: dimensionless activity as plotted, log10
+        T_range_K: [1073, 1073]
+        standard_state: >-
+          Published page 69 (PDF page 4): the initial values of the standard Gibbs
+          energies of formation of Na2O and P4O10 are taken in the crystalline and
+          liquid state (Glushko et al., 1978–1982). The paper does not state which
+          of those phases is the reference of the plotted Na2O activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 8
+          temperature_K: 1073
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+      - observation_id: shornikov_2024_na2o_p4o10_fig2a_series9
+        type: activity_coefficient
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 3
+          published_page: 68
+          pdf_page_index: 2
+          figure: '2'
+          panel: A
+          note: Caption series 9, this study at 1173 K. Continuous stroke on panel A.
+        phase: condensed
+        units: dimensionless activity as plotted, log10
+        T_range_K: [1173, 1173]
+        standard_state: >-
+          Published page 69 (PDF page 4): the initial values of the standard Gibbs
+          energies of formation of Na2O and P4O10 are taken in the crystalline and
+          liquid state (Glushko et al., 1978–1982). The paper does not state which
+          of those phases is the reference of the plotted Na2O activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 9
+          temperature_K: 1173
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+      - observation_id: shornikov_2024_na2o_p4o10_fig2a_series10
+        type: activity_coefficient
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 3
+          published_page: 68
+          pdf_page_index: 2
+          figure: '2'
+          panel: A
+          note: Caption series 10, this study at 1673 K. Continuous stroke on panel A.
+        phase: condensed
+        units: dimensionless activity as plotted, log10
+        T_range_K: [1673, 1673]
+        standard_state: >-
+          Published page 69 (PDF page 4): the initial values of the standard Gibbs
+          energies of formation of Na2O and P4O10 are taken in the crystalline and
+          liquid state (Glushko et al., 1978–1982). The paper does not state which
+          of those phases is the reference of the plotted Na2O activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 10
+          temperature_K: 1673
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+      - observation_id: shornikov_2024_na2o_p4o10_fig2a_series11
+        type: activity_coefficient
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 3
+          published_page: 68
+          pdf_page_index: 2
+          figure: '2'
+          panel: A
+          note: Caption series 11, this study at 1873 K. Continuous stroke on panel A.
+        phase: condensed
+        units: dimensionless activity as plotted, log10
+        T_range_K: [1873, 1873]
+        standard_state: >-
+          Published page 69 (PDF page 4): the initial values of the standard Gibbs
+          energies of formation of Na2O and P4O10 are taken in the crystalline and
+          liquid state (Glushko et al., 1978–1982). The paper does not state which
+          of those phases is the reference of the plotted Na2O activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 11
+          temperature_K: 1873
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+    context:
+      - observation_id: shornikov_2024_na2o_p4o10_model_scope
+        type: model_scope
+        locator:
+          page: 4
+          published_page: 69
+          pdf_page_index: 3
+          section: body
+        units: as reported
+        values:
+          quantity: model scope
+          method_class: model_derived
+          temperature_range_K: [600, 1900]
+          model: Semi-empirical model (Shornikov, 2019).
+          model_inputs: >-
+            Standard Gibbs energies of Na2O and P4O10 in the crystalline and liquid
+            state, and of NaPO3, Na4P2O7, Na3PO4 and Na5P3O10. Gas species from
+            Glushko et al. (1978–1982), Alikhanyan et al. (1975) and Rudny et al. (1986).
+          gas_species_considered:
+            [Na, Na2, NaO, Na2O, Na2O2, P, P2, P3, P4, PO, PO2, P2O3, P2O4, P2O5, P3O6, P4O6, P4O7, P4O8, P4O9, P4O10, NaPO, NaPO2, NaPO3, Na2P2O6, O, O2, O3, O4]
+          condensed_compounds_as_printed:
+            - {formula: NaPO3, oxide_equivalent: 2Na2O · P4O10, congruent_melting_K: 901}
+            - {formula: Na4P2O7, oxide_equivalent: 4Na2O · P4O10, congruent_melting_K: 1252}
+            - {formula: Na3PO4, oxide_equivalent: 6Na2O · P4O10, congruent_melting_K: 1852}
+            - {formula: Na5P3O10, oxide_equivalent: 10Na2O · 3P4O10, dissociates_K: 903}
+          po_po2_pressure_bound: >-
+            The partial pressures of PO and PO2 over NaPO3 at 1100–1400 K do not
+            exceed 10^-8 atm. The sentence is split: published page 69 ends at
+            10^-8 and published page 70 opens with atm. The 600 dpi render of PDF
+            page 4 prints the exponent as a superscript minus. pdftotext prints an
+            en dash. This is a bound, not a point.
+          mixing_energy_minimum: >-
+            The minimum mixing energy is in the concentration range close to the
+            eutectic between NaPO3 and Na4P2O7. No numeric minimum is printed.
+          cited_comparison_not_this_study: >-
+            The paper says the P4O10 activities of Malheiros et al. (1993) and
+            Yamaguchi and Goto (1984) at 1673 K differ by more than 10 orders, and
+            that the mixing-energy discrepancy exceeds 130 kJ/mol. Those figures
+            compare other work. They are not values calculated in this study.
+          electron_energy_is_cited_work: >-
+            The 45–70 eV electron energy is stated as the cause of fragmentation
+            in the cited mass-spectrometric studies, not as a condition of a new
+            experiment in this paper.
+      - observation_id: shornikov_2024_na2o_p4o10_fig1_phase_diagram
+        type: phase_diagram
+        locator:
+          page: 3
+          published_page: 68
+          pdf_page_index: 2
+          figure: '1'
+        units: figure-only
+        values:
+          quantity: Na2O–P4O10 phase diagram
+          method_class: figure_only
+          attribution: Xie et al. (2020), as printed in the caption.
+          reason: Region diagram. Boundaries were not digitized.
+  P4O10:
+    observations:
+      - observation_id: shornikov_2024_na2o_p4o10_fig2b_series8
+        type: activity_coefficient
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 3
+          published_page: 68
+          pdf_page_index: 2
+          figure: '2'
+          panel: B
+          note: >-
+            Caption series 8 at 1073 K. 600 dpi render: continuous stroke labelled
+            8 on panel B. Series 9 is not labelled on panel B.
+        phase: condensed
+        units: dimensionless activity as plotted, log10
+        T_range_K: [1073, 1073]
+        standard_state: >-
+          Published page 69 (PDF page 4): the initial values of the standard Gibbs
+          energies of formation of Na2O and P4O10 are taken in the crystalline and
+          liquid state (Glushko et al., 1978–1982). The paper does not state which
+          of those phases is the reference of the plotted P4O10 activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 8
+          temperature_K: 1073
+          reason: Continuous calculated stroke. No marker centre.
+      - observation_id: shornikov_2024_na2o_p4o10_fig2b_series10
+        type: activity_coefficient
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 3
+          published_page: 68
+          pdf_page_index: 2
+          figure: '2'
+          panel: B
+          note: Caption series 10 at 1673 K. Continuous stroke on panel B.
+        phase: condensed
+        units: dimensionless activity as plotted, log10
+        T_range_K: [1673, 1673]
+        standard_state: >-
+          Published page 69 (PDF page 4): the initial values of the standard Gibbs
+          energies of formation of Na2O and P4O10 are taken in the crystalline and
+          liquid state (Glushko et al., 1978–1982). The paper does not state which
+          of those phases is the reference of the plotted P4O10 activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 10
+          temperature_K: 1673
+          reason: Continuous calculated stroke. No marker centre.
+      - observation_id: shornikov_2024_na2o_p4o10_fig2b_series11
+        type: activity_coefficient
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 3
+          published_page: 68
+          pdf_page_index: 2
+          figure: '2'
+          panel: B
+          note: Caption series 11 at 1873 K. Continuous stroke on panel B.
+        phase: condensed
+        units: dimensionless activity as plotted, log10
+        T_range_K: [1873, 1873]
+        standard_state: >-
+          Published page 69 (PDF page 4): the initial values of the standard Gibbs
+          energies of formation of Na2O and P4O10 are taken in the crystalline and
+          liquid state (Glushko et al., 1978–1982). The paper does not state which
+          of those phases is the reference of the plotted P4O10 activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 11
+          temperature_K: 1873
+          reason: Continuous calculated stroke. No marker centre.
+  NaPO3:
+    observations:
+      - observation_id: shornikov_2024_na2o_p4o10_fig2c_series10
+        type: activity_coefficient
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 3
+          published_page: 68
+          pdf_page_index: 2
+          figure: '2'
+          panel: C
+          note: >-
+            Caption series 10, NaPO3 activity at 1673 K. 600 dpi render: one
+            continuous stroke labelled 10. Series 8, 9 and 11 are not labelled on
+            panel C. NaPO3 is printed as the compound 2Na2O · P4O10.
+        phase: condensed
+        units: dimensionless activity as plotted, log10
+        T_range_K: [1673, 1673]
+        standard_state: >-
+          Published page 69 (PDF page 4) names crystalline and liquid Na2O and
+          P4O10 as formation-energy inputs. It does not state the reference of the
+          plotted NaPO3 activity. NaPO3 is a compound, not a simple oxide. The
+          paper does not state a phase for that activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 10
+          temperature_K: 1673
+          compound_as_printed: NaPO3
+          reason: Continuous calculated stroke. No marker centre.
+      - observation_id: shornikov_2024_na2o_p4o10_fig3_napo3
+        type: partial_pressure
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 4
+          published_page: 69
+          pdf_page_index: 3
+          figure: '3'
+          note: >-
+            Caption series 12, calculated NaPO3 pressure. 600 dpi render: a
+            continuous stroke labelled 12 on panel A (over NaPO3) and on panel B
+            (over Na3PO4). No marker centre. Legend glyphs in the frames are the
+            keys for the cited series, not extra data.
+        phase: gas
+        units: log10(atm) as plotted
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 12
+          reason: Continuous calculated strokes. No marker centre.
+  Na:
+    observations:
+      - observation_id: shornikov_2024_na2o_p4o10_fig3_na
+        type: partial_pressure
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 4
+          published_page: 69
+          pdf_page_index: 3
+          figure: '3'
+          note: Caption series 13, calculated Na pressure. Continuous strokes on panels A and B.
+        phase: gas
+        units: log10(atm) as plotted
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 13
+          reason: Continuous calculated strokes. No marker centre.
+  O2:
+    observations:
+      - observation_id: shornikov_2024_na2o_p4o10_fig3_o2
+        type: partial_pressure
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 4
+          published_page: 69
+          pdf_page_index: 3
+          figure: '3'
+          note: Caption series 14, calculated O2 pressure. Continuous strokes on panels A and B.
+        phase: gas
+        units: log10(atm) as plotted
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 14
+          reason: Continuous calculated strokes. No marker centre.
+  PO:
+    observations:
+      - observation_id: shornikov_2024_na2o_p4o10_fig3a_po
+        type: partial_pressure
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 4
+          published_page: 69
+          pdf_page_index: 3
+          figure: '3'
+          panel: A
+          note: >-
+            Caption series 15, calculated PO. Labelled on panel A only. The body
+            says PO and PO2 over NaPO3 at 1100–1400 K do not exceed 10^-8 atm.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1100, 1400]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 15
+          reason: Continuous calculated stroke. No marker centre. The 10^-8 atm sentence is a bound, stored on the model-scope row.
+  PO2:
+    observations:
+      - observation_id: shornikov_2024_na2o_p4o10_fig3a_po2
+        type: partial_pressure
+        experiment: shornikov_2024_na2o_p4o10_model
+        locator:
+          page: 4
+          published_page: 69
+          pdf_page_index: 3
+          figure: '3'
+          panel: A
+          note: Caption series 16, calculated PO2. Labelled on panel A only.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1100, 1400]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 16
+          reason: Continuous calculated stroke. No marker centre.
+  mixing:
+    observations: []
+    context:
+      - observation_id: shornikov_2024_na2o_p4o10_fig2d_mixing
+        type: mixing_energy_curve
+        locator:
+          page: 3
+          published_page: 68
+          pdf_page_index: 2
+          figure: '2'
+          panel: D
+          note: >-
+            Caption series 8–11, mixing energy calculated in this study at 1073,
+            1173, 1673 and 1873 K. 600 dpi render: continuous strokes labelled
+            8, 9, 10 and 11. No marker centre.
+        units: Delta G^m / RT as plotted
+        values:
+          quantity: mixing energy
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: [8, 9, 10, 11]
+          temperatures_K: [1073, 1173, 1673, 1873]
+          reason: Continuous calculated strokes. No numeric minimum is printed.

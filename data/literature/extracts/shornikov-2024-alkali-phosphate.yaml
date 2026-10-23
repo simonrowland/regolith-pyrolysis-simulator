@@ -1,0 +1,252 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2024-alkali-phosphate
+source:
+  citation: >-
+    Shornikov, S. I. (2024). Thermodynamic properties of the K2O–P4O10 melts.
+    Experiment in Geosciences, 30(1), 70–73.
+  year: 2024
+  corpus_asset: raw/shornikov-2024-alkali-phosphate/shornikov-2024-alkali-phosphate.pdf
+  corpus_sha256: b0c1f49a9fef04b4a73f96c589794ce1032072c35c89aad51e02cda74074b7bd
+extraction:
+  method: >-
+    The PDF is a journal excerpt. This extract is only the K2O–P4O10 article on
+    published pages 70–73 (PDF pages 2–5). The Na2O–P4O10 closing paragraph on
+    published page 70 and the FeO–P4O10 opening on published page 73 are excluded.
+    Na2O curves drawn on Fig. 3 are comparison context, not a second paper. No
+    numeric table is printed. Figures were inspected at 600 dpi. Calculated curves
+    have no discrete markers of this study, so no coordinates were read. Cited
+    experimental symbols were not read.
+  date: '2026-10-20'
+  worker: t1372-w2-w6-t1
+review_status: draft
+fidelity_samples:
+  - species: K2O
+    observable: activity_coefficient
+    observation_id: shornikov_2024_k2o_fig3_curve_1
+    field: method_class
+    value: figure_only
+    locator:
+      page: 4
+      published_page: 72
+      pdf_page_index: 3
+      figure: '3'
+      note: Curve 1 is the calculated K2O activity at 1673 K. No point was digitized.
+  - species: K2O
+    observable: thermodynamic_example
+    observation_id: shornikov_2024_k2o_po2_o2_bound
+    field: partial_pressure_upper_bound_atm
+    value: '1e-6'
+    locator:
+      page: 4
+      published_page: 72
+      pdf_page_index: 3
+      figure: '2'
+      note: Printed upper bound for PO2 and O2 over KPO3 at 1300 K.
+experiments:
+  - experiment_id: shornikov-2024-k2o-model
+    kind: thermodynamic_model
+    locator: {page: 2, pdf_page_index: 1, published_page: 70, section: Abstract}
+    method: >-
+      Semi-empirical model, 600–1900 K, described in Shornikov (2019). Oxide
+      activities, mixing energies and partial pressures are calculated. Parents
+      are the cited ΔG° compilations, not printed per point.
+  - experiment_id: shornikov-2024-k2o-cited-points
+    kind: literature
+    locator: {page: 4, pdf_page_index: 3, published_page: 72, figure: '2'}
+    method: >-
+      Symbols 1–4 on Fig. 2 are Ratkovsky et al. (1975, 1976), Alikhanyan et al.
+      (1975) and Steblevsky et al. (1977). They are not measurements of this article.
+species:
+  K2O:
+    observations:
+    - observation_id: shornikov_2024_k2o_fig3_curve_1
+      type: activity_coefficient
+      experiment: shornikov-2024-k2o-model
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 72
+        figure: '3'
+        panel: A
+        note: Curve 1. Calculated lg a(K2O) at 1673 K.
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Published page 71: the initial values of the standard Gibbs energies of
+        the formation of K2O and P4O10 in the crystalline and liquid state.
+        The activity reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, figure: '3'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no single mole percent is printed for this line.'}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, figure: '3'}
+      values:
+        quantity: activity
+        T_K: '1673'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Continuous calculated curve has no discrete data markers; no numeric points are sampled.
+        component: K2O
+        curve_number: '1'
+        attribution: the present study
+    - observation_id: shornikov_2024_k2o_fig2_partial_pressures
+      type: partial_pressure
+      experiment: shornikov-2024-k2o-model
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 72
+        figure: '2'
+        note: >-
+          Lines 5 and 6 are calculated PO2 and O2 over KPO3. Symbols 1–4 are
+          Knudsen measurements of KPO3, K2P2O6 and K.
+      phase: g
+      units: atm, as printed on the figure
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: 'Fig. 2 spans about 1050–1300 K. The prose bounds are at 1300 K and 1175 K.'}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, figure: '2'}
+        composition:
+          state: {tag: unknown, reason: 'The panel is the compound KPO3 (2K2O · P4O10), not a composition series.'}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, figure: '2'}
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: >-
+          Lines 5 and 6 are continuous calculated curves. Symbols 1–4 are
+          Ratkovsky et al. (1975, 1976) and Alikhanyan et al. (1975) with
+          Steblevsky et al. (1977). No pressure was read from the figure.
+          The printed upper bounds are stored as context.
+        attribution: the present study for lines 5 and 6; the cited Knudsen papers for symbols 1–4
+    context:
+    - observation_id: shornikov_2024_k2o_po2_o2_bound
+      type: thermodynamic_example
+      units: atm
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 72
+        section: Results
+        figure: '2'
+      values:
+        quantity: partial pressure upper bound
+        method_class: quoted_attributed
+        temperature_K: 1300
+        composition: KPO3 melt (2K2O · P4O10), as printed
+        species: PO2 and O2
+        partial_pressure_upper_bound_atm: '1e-6'
+        sentence_as_published: >-
+          The PO2 and O2 partial pressures over the KPO3 melt at 1300 K calculated
+          in the present study do not exceed 10−6 atm (Fig. 2).
+        reference_phase: >-
+          A gas partial pressure. Not an oxide activity standard.
+    - observation_id: shornikov_2024_k2o_k_pressure_bound
+      type: thermodynamic_example
+      units: atm
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 72
+        section: Results
+        figure: '2'
+      values:
+        quantity: partial pressure upper bound
+        method_class: quoted_attributed
+        temperature_K: 1175
+        composition: potassium metaphosphate
+        species: K
+        partial_pressure_upper_bound_atm: '1e-14'
+        sentence_as_published: >-
+          The K partial pressure over the potassium metaphosphate at 1175 K is no
+          more than 10−14 atm, which significantly differs from the results obtained
+          by Steblevsky et al. (1977). The value determined by them is too high
+          (Fig. 2, symbol 4).
+        reference_phase: >-
+          A gas partial pressure. The Steblevsky number is not printed; symbol 4
+          was not read.
+    - observation_id: shornikov_2024_k2o_fig3_mixing_and_na
+      type: thermodynamic_example
+      units: kJ/mol for the mixing panel; dimensionless activity for the Na2O comparison
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 72
+        figure: '3'
+      values:
+        admission_status: refused
+        reason: >-
+          Fig. 3A curves 1–4 and Fig. 3B curves 5 and 6 are calculated in the
+          present study at 1673 K. Curves 2, 4 and 6 are the Na2O–P4O10 comparison.
+          The Na2O article body is not in this PDF. No discrete markers are on
+          these lines. The mixing-energy minimum is described as the eutectic
+          range between KPO3 and K4P2O7, more negative than the Na melt, and no
+          numeric minimum is printed. The curves were not digitized.
+    - observation_id: shornikov_2024_k2o_fig1_phase_diagram
+      type: thermodynamic_example
+      units: not an activity
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 71
+        figure: '1'
+      values:
+        admission_status: refused
+        reason: >-
+          Fig. 1 is the phase diagram according to Xie et al. (2020). Congruent
+          melting at 1086, 1376 and 1892 K, and the 916 K dissociation of K5P3O10,
+          are cited from Markina and Voskresenskaya (1969), not measured here.
+    - observation_id: shornikov_2024_k2o_vapor_species
+      type: thermodynamic_example
+      units: not printed as a pressure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 71
+        section: Results
+      values:
+        species_as_printed: >-
+          K, K2, KO, K2O, K2O2, P, P2, P3, P4, PO, PO2, P2O3, P2O4, P2O5, P3O6,
+          P4O6, P4O7, P4O8, P4O9, P4O10, KPO3, K2P2O6, O, O2, O3, O4
+        reason: >-
+          The list is the vapor set used in the equilibrium calculation. The only
+          printed pressures are the two upper bounds stored above.
+  P4O10:
+    observations:
+    - observation_id: shornikov_2024_k2o_fig3_p4o10_curve_3
+      type: activity_coefficient
+      experiment: shornikov-2024-k2o-model
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 72
+        figure: '3'
+        panel: A
+        note: Curve 3. Calculated lg a(P4O10) in the K2O–P4O10 melt at 1673 K.
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Published page 71: the initial values of the standard Gibbs energies of
+        the formation of K2O and P4O10 in the crystalline and liquid state.
+        The activity reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, figure: '3'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no single mole percent is printed for this line.'}
+          locator: {page: 4, pdf_page_index: 3, published_page: 72, figure: '3'}
+      values:
+        quantity: activity
+        T_K: '1673'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: >-
+          Curve 3 is a continuous calculated line. Curve 4 is the Na2O–P4O10
+          comparison, also continuous and calculated in the present study.
+          No numeric points are sampled.
+        component: P4O10
+        curve_number: '3'
+        attribution: the present study
