@@ -468,3 +468,227 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
     assert len(sossi_ti_ids) == 43
     assert hashimoto_ids <= numeric_references
     assert sossi_ti_ids <= numeric_references
+
+
+def _liquid_row(name: str, band: tuple[float, float], *, below_floor: bool) -> dict:
+    """Provenance shape `_hashimoto_liquid_row_provenance` already stores."""
+
+    return {
+        "channel": name,
+        "parent": name.split("(")[0],
+        "liquid_row": {
+            "row": name,
+            "source": "recorded-fit",
+            "T_fit_K": [band[0], band[1]],
+            "extrapolated_below_floor": below_floor,
+        },
+    }
+
+
+def test_sossi_below_liquid_floor_reaches_the_scored_notice(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A below-floor liquid row is predicted and the scored residual carries the flag.
+
+    MnO(l) on the gas pack is fitted from 1200 K. No Sossi extract is that cold,
+    so the cohort fixture marks one run below that recorded floor.
+    """
+
+    from simulator.battery.enums import Authority, Engine, NoticeKind, Quantity, Rail
+    from simulator.battery.score import load_score_context, score_store
+    import simulator.battery.residue as residue
+
+    context = load_score_context(sources=("kems-012-sossi-2019",))
+    # The production selector's nearest MnO(l) interval below its floor.
+    certified_band = (1200.0, 1600.0)
+    below_floor_run: dict[str, str] = {}
+
+    def fake_cohort(experiments, *_args, **_kwargs):
+        below_floor_run["id"] = str(experiments[0]["experiment_id"])
+        rows = []
+        for experiment in experiments:
+            experiment_id = str(experiment["experiment_id"])
+            below = experiment_id == below_floor_run["id"]
+            rows.append(
+                SimpleNamespace(
+                    experiment_id=experiment_id,
+                    primary_element_ppm={"Mn": 900.0, "Ti": 450.0},
+                    sensitivity_band_ppm={
+                        "Mn": (800.0, 1000.0),
+                        "Ti": (400.0, 500.0),
+                    },
+                    channel_missing_elements=(),
+                    provenance={
+                        "integration": {"primary": {"status": "converged"}},
+                        "code_revision": "fixture-revision",
+                        "liquid_rows_used": (
+                            _liquid_row(
+                                "MnO(l)", certified_band, below_floor=below
+                            ),
+                            _liquid_row(
+                                "TiO2(l)", (1500.0, 3000.0), below_floor=False
+                            ),
+                        ),
+                    },
+                )
+            )
+        return tuple(rows)
+
+    monkeypatch.setattr(residue, "_predict_sossi_residue_cohort", fake_cohort)
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.RESIDUE_COMPOSITION,
+    )
+
+    def manganese(short_id: str):
+        matched = []
+        for residual in residuals:
+            reference = context.observations.get(residual.reference)
+            if reference is None:
+                continue
+            short = reference.experiment_id.rsplit("::", 1)[-1]
+            formula = reference.identity.species.formula
+            if short == short_id and formula == "Mn":
+                matched.append(residual)
+        assert len(matched) == 1
+        return matched[0]
+
+    flagged = manganese(below_floor_run["id"])
+    assert flagged.numeric is not None
+    floor_notices = [
+        notice
+        for notice in flagged.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.reason == "extrapolated_below_floor"
+    ]
+    assert len(floor_notices) == 1
+    notice = floor_notices[0]
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.authority.value == "extrapolated"
+    assert notice.affected_quantities == (
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    )
+    assert "MnO(l)" in (notice.band or "")
+    assert "1200" in (notice.band or "")
+    assert "1600" in (notice.band or "")
+    assert "3000" not in (notice.band or "")
+
+    other_id = next(
+        str(experiment_id)
+        for experiment_id in {
+            row.experiment_id.rsplit("::", 1)[-1]
+            for row in context.observations.values()
+            if row.source_id == "kems-012-sossi-2019"
+        }
+        if experiment_id != below_floor_run["id"]
+    )
+    unflagged = manganese(other_id)
+    assert unflagged.numeric is not None
+    assert all(
+        notice.reason != "extrapolated_below_floor" for notice in unflagged.notices
+    )
+
+
+def test_hashimoto_liquid_floor_notice_text_is_unchanged(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The Hashimoto scored floor notice stays the summary text it emits today."""
+
+    from simulator.battery.enums import (
+        Engine,
+        ExecutionState,
+        NoticeKind,
+        Quantity,
+    )
+    from simulator.battery.records import Notice
+    from simulator.battery.score import (
+        _hashimoto_residue_prediction,
+        load_score_context,
+        quantity_token,
+    )
+    import simulator.battery.residue as residue
+
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-015-hashimoto-1983"
+        and "::hashimoto_1983_table3_residue_composition_series::"
+        in row.observation_id
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and row.identity.species.formula == "FeO"
+    )
+
+    def fake_cohort(experiments, _catalog, *, engine, **_kwargs):
+        rows = []
+        for experiment in experiments:
+            experiment_id = experiment["experiment_id"]
+            values = {
+                "FeO": 12.5,
+                "MgO": 20.0,
+                "SiO2": 30.0,
+                "CaO": 4.0,
+                "Al2O3": 5.0,
+            }
+            provenance = {
+                "experiment_id": experiment_id,
+                "engine": engine,
+                "integration": {"refinement_status": "converged"},
+                "geometry_refusal_by_geometry": {},
+                "code_revision": "fixture-revision",
+                "openimcc_liquid_row_extrapolated": True,
+            }
+            rows.extend(
+                (
+                    SimpleNamespace(
+                        experiment_id=experiment_id,
+                        alpha_arm="alpha_common_unity_sensitivity",
+                        primary_geometry_policy_id="sphere_shrinking",
+                        primary_oxide_wt_pct=values,
+                        sensitivity_band_wt_pct={
+                            name: (value - 1.0, value + 1.0)
+                            for name, value in values.items()
+                        },
+                        provenance=provenance,
+                    ),
+                    SimpleNamespace(
+                        experiment_id=experiment_id,
+                        alpha_arm="alpha_runtime_catalog",
+                        primary_geometry_policy_id="sphere_shrinking",
+                        primary_oxide_wt_pct=values,
+                        geometry_oxide_wt_pct={"sphere_shrinking": values},
+                        sensitivity_band_wt_pct={
+                            name: (value - 1.0, value + 1.0)
+                            for name, value in values.items()
+                        },
+                        provenance={"engine": engine, "alpha_arm": "alpha_runtime_catalog"},
+                    ),
+                )
+            )
+        return tuple(rows)
+
+    monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", fake_cohort)
+    prediction = _hashimoto_residue_prediction(
+        context, reference, Engine.OPENIMCC, {}
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == 12.5
+    assert prediction.notices == (
+        Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason="feo_melt_redox_stack2_pending; regimes=M5,M2,M4",
+            origin="hashimoto-residue-r4",
+            band="1973-2273 K; engine tip 191960ce8",
+        ),
+        Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason="OpenIMCC liquid-row extrapolation below fitted temperature floor",
+            origin="hashimoto-residue-addendum-a",
+            band="liquid-row floors are recorded in provenance",
+        ),
+    )
+    assert prediction.notices[1].authority is None
