@@ -4432,10 +4432,22 @@ class CondensationModel:
                 alpha_s_value=float(alpha_s_value),
             )
 
+        # Incident gas and wall equilibrium pressure are independent inputs.
+        P_local_pa = _deposition_finite_scalar(
+            'flowing_pressure_pa', self.wall_species_partial_pressures_pa.get(species)
+            if self._species_partial_pressures_configured else None,
+        )
+        if P_local_pa < 0.0:
+            raise DepositionInputRefusal(
+                'flowing_pressure_pa', P_local_pa, 'pressure must be nonnegative',
+            )
+        if P_local_pa == 0.0:
+            return _mint_zero('nonpositive_flowing_pressure', flowing_pressure_pa=0.0)
+
         # Resolve Antoine (or catalog) Psat at T_cond; uncovered segments and
         # range errors are typed refusals (b-127), never a fabricated 100 Pa.
         psat_notices = antoine_extrapolations if antoine_extrapolations is not None else {}
-        P_local_pa, psat_refused = _try_antoine_psat_pa(
+        route_psat_pa, psat_refused = _try_antoine_psat_pa(
             species,
             T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
             vapor_pressure_data=self.vapor_pressure_data,
@@ -4443,7 +4455,7 @@ class CondensationModel:
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         )
         domain_outcome = None
-        if psat_refused or P_local_pa is None:
+        if psat_refused or route_psat_pa is None:
             notice = psat_notices.get(
                 f'{species}#wall:{T_cond_C + CELSIUS_TO_KELVIN_OFFSET}', {}
             )
@@ -4467,16 +4479,6 @@ class CondensationModel:
                     'condensation_temperatures_C', declared_temperature,
                     'declared routing temperature must be above absolute zero',
                 )
-            P_local_pa = _deposition_finite_scalar(
-                'flowing_pressure_pa', self.wall_species_partial_pressures_pa.get(species)
-                if self._species_partial_pressures_configured else None,
-            )
-            if P_local_pa < 0.0:
-                raise DepositionInputRefusal(
-                    'flowing_pressure_pa', P_local_pa, 'pressure must be nonnegative',
-                )
-            if P_local_pa == 0.0:
-                return _mint_zero('nonpositive_flowing_pressure', flowing_pressure_pa=0.0)
             # The existing Si/SiO2 reactive-product limit supplies P_sat ~= 0
             # below the declared routing temperature. Flow supplies pressure;
             # the 1 mbar routing reference never substitutes for measured flow.
@@ -4533,12 +4535,6 @@ class CondensationModel:
                 )
                 domain_outcome['capture_budget_regularizer_notice'] = dict(CAPTURE_BUDGET_REGULARIZER_NOTICE)
                 return domain_outcome['eta']
-        if P_local_pa <= 0.0:
-            return _mint_zero(
-                'nonpositive_local_pressure',
-                P_local_pa=float(P_local_pa),
-            )
-
         T_ref_K = max(T_cond_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
         reference_flux = _hkl_impingement_flux_mol_m2_s(
             species,
@@ -4585,6 +4581,18 @@ class CondensationModel:
                 sample_extrapolated = sample_extrapolated or bool(
                     sample_eval.get('alpha_s_extrapolated')
                 )
+            # Premise: Hertz-Knudsen net molar flux is
+            # j = alpha*(p_actual-P_sat(T_wall))/sqrt(2*pi*M*R*T)
+            # in the isothermal limit. Here the shared owner evaluates the
+            # incident kinetic coefficient at T_gas, and P_sat at T_wall.
+            # M in kg/mol, R in J/(mol K). Pa / sqrt(M*R*T) has units
+            # mol/(m^2 s). The shared owner clips the condensation part at
+            # zero (re-evaporation has its own owner), then adds transport
+            # resistance. Average the 33 midpoint j samples across this
+            # temperature band; j_bar*A*residence/available_mol is eta.
+            # At p_actual=P_sat each reversible sample gives zero; for
+            # p_actual >> P_sat its surface flux tends to alpha times the
+            # incident impingement flux. Never use P_sat(T_cond) as p_actual.
             # 0.5.2 Phase B (series-resistance + stir-Sherwood): same
             # series-resistance form as the wall-deposit candidate path so
             # the stage-condensation band integration honors the canonical
@@ -5308,6 +5316,7 @@ def antoine_dew_temperature_diagnostic(
     from engines.builtin.vapor_pressure import (
         vapor_pressure_valid_range_K,
         wall_condensation_antoine_coefficients,
+        _wall_reference_qualification,
     )
 
     _, block_name = wall_condensation_antoine_coefficients(data)
@@ -5379,9 +5388,12 @@ def antoine_dew_temperature_diagnostic(
             low = midpoint
         else:
             high = midpoint
+    temperature_K = (low + high) / 2.0
+    qualification = _wall_reference_qualification(data, temperature_K)
     return {
         "status": "diagnostic_only",
-        "temperature_K": (low + high) / 2.0,
+        "temperature_K": temperature_K,
+        **({"reason": qualification} if qualification else {}),
         "partial_pressure_Pa": target,
         "valid_range_K": certified_range,
         "provenance": "existing_condensation_antoine_surface",
@@ -5973,6 +5985,7 @@ def _antoine_psat_pa(
         vapor_pressure_source_equation_range_K,
         vapor_pressure_valid_range_K,
         wall_condensation_antoine_coefficients,
+        _wall_reference_qualification,
     )
 
     reconstructed_limit = reconstructed_vapor_pressure_authority_limit(
@@ -5994,6 +6007,7 @@ def _antoine_psat_pa(
         data,
         temperature_K=T_K,
     )
+    reference_qualification = _wall_reference_qualification(data, T_K)
     if coefficient_block == 'pure_component_antoine' and antoine:
         # Surface certification follows the selected relation, not the
         # independent melt-source band (crown chunk 1 precedent).
@@ -6038,6 +6052,7 @@ def _antoine_psat_pa(
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
+    domain_reason = domain_reason or reference_qualification
     if domain_reason is not None:
         if antoine_extrapolation_warnings is not None and domain_reason not in antoine_extrapolation_warnings:
             antoine_extrapolation_warnings.append(domain_reason)
@@ -6116,37 +6131,6 @@ def _try_antoine_psat_pa(
     if pressure_pa is None:
         return None, True
     return float(pressure_pa), False
-
-
-def _local_species_pressure_pa(
-    species: str,
-    T_cond_C: float,
-    *,
-    vapor_pressure_data: Mapping[str, Any] | None = None,
-    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
-    antoine_extrapolation_warnings: list[str] | None = None,
-) -> float:
-    """Local stage pressure from the Antoine/catalog helper, or 0.0 on
-    typed refusal.
-
-    Refused / uncovered Antoine temperatures return 0.0. This helper
-    returns 0.0 rather than a fabricated 100 Pa (b-127). It is not
-    called from ``_condensation_efficiency``; that method inlines
-    ``_try_antoine_psat_pa`` and mints its own pass-through via
-    ``_mint_zero``.
-    """
-    P_local_pa, refused = _try_antoine_psat_pa(
-        species,
-        T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
-        vapor_pressure_data=vapor_pressure_data,
-        antoine_extrapolations=antoine_extrapolations,
-        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-    )
-    if refused:
-        return 0.0
-    if P_local_pa is not None and P_local_pa > 0.0:
-        return P_local_pa
-    return 0.0
 
 
 def _record_wall_surface_antoine_telemetry(

@@ -6176,6 +6176,7 @@ def predict_with_engine(
                 COEFF_BLOCK_PURE_COMPONENT,
                 VaporPressureComputationError,
                 _liquid_reference_pressure_from_solid,
+                _wall_reference_qualification,
                 _pow10_pressure_or_raise,
                 vapor_pressure_valid_range_K,
                 wall_condensation_antoine_coefficients,
@@ -6323,6 +6324,20 @@ def predict_with_engine(
                         authority=Authority.EXTRAPOLATED,
                     ),
                 )
+            if reservoir[1] == Phase.CR.value and polymorph_token(identity.reservoir.value) is None:
+                qualification = _wall_reference_qualification(row, float(T))
+                if qualification:
+                    authority = Authority.EXTRAPOLATED
+                    notices += (
+                        Notice(
+                            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                            affected_quantities=(Quantity.P_SAT,),
+                            reason=qualification,
+                            origin=observation.observation_id,
+                            source=source_phase,
+                            authority=Authority.EXTRAPOLATED,
+                        ),
+                    )
             sidecar_sources = expand_coefficient_sources(("antoine_sidecar",))
             return EnginePrediction(
                 engine=engine,

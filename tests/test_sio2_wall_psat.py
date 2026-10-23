@@ -22,7 +22,8 @@ def test_all_wall_readers_use_the_selected_silica_surface(temperature):
         "SiO2_gas", temperature, antoine_extrapolations=notices,
     )
     assert math.isfinite(pressure) and pressure > 0.0
-    assert notices == {}
+    tridymite_field = 1140 <= temperature <= 1743
+    assert bool(notices) is tridymite_field
     diagnostic = {}
     driving = condensation._wall_deposition_driving_pressure_pa(
         "SiO2_gas", 100.0, temperature, diagnostic_out=diagnostic,
@@ -38,8 +39,9 @@ def test_all_wall_readers_use_the_selected_silica_surface(temperature):
     phase = Phase.CR if temperature <= 1994.4690265486726 else Phase.L
     prediction = _static_prediction(temperature, phase)
     assert float(prediction.value) == pressure
-    assert prediction.authority is Authority.CERTIFIED
-    assert prediction.notices == ()
+    assert prediction.authority is (Authority.EXTRAPOLATED if tridymite_field else Authority.CERTIFIED)
+    assert bool(prediction.notices) is tridymite_field
+    assert ("reason" in inverse) is tridymite_field
 
 
 def _static_prediction(temperature, phase, polymorph=None):

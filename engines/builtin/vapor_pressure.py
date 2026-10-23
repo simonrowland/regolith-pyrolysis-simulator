@@ -2205,6 +2205,30 @@ def wall_condensation_antoine_coefficients(
     return {}, COEFF_BLOCK_PURE_COMPONENT
 
 
+def _wall_reference_qualification(
+    row: Mapping[str, Any] | None, temperature_K: float,
+) -> str | None:
+    """Qualify the incomplete JANAF stable-silica envelope in one place."""
+    if (row or {}).get("formula") != "SiO2" or not 1140.0 <= temperature_K <= 1743.0:
+        return None
+    coefficients, _ = wall_condensation_antoine_coefficients(row, temperature_K)
+    if coefficients.get("phase") == "high_cristobalite":
+        # USGS B1259, pp.137-139, as assessed by the existing thermodynamic
+        # offset owner (battery.score): G_cr-G_tr is nonzero at both field
+        # edges (153.1344 / 5.94128 J/mol). Applying it only inside the field
+        # would break the continuous JANAF envelope. Keep that reference and
+        # flag its identity. For identical ideal gas mu_g+RT ln(P/p0)=G_s,
+        # subtraction gives log10(P_cr/P_tr)=(G_cr-G_tr)/(RT ln(10)); J/mol
+        # cancels J/mol. Equal G gives equal P; lower G_tr gives lower P_tr.
+        # Printed 1200-1500 K comparisons reach 0.006010 dex, i.e. <=0.006
+        # dex rounded to three decimals, not a whole-field uncertainty bound.
+        return (
+            "stable tridymite field: high-cristobalite reference used; "
+            "review-table offset <=0.006 dex (rounded; USGS B1259)"
+        )
+    return None
+
+
 def _liquid_reference_pressure_from_solid(
     species: str, temperature_K: float, solid_pressure_pa: float,
     *, fusion_energy_kJ_mol: float | None = None,

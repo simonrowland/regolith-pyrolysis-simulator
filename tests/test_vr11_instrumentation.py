@@ -276,7 +276,12 @@ def test_finite_live_pressure_map_refuses_nonfinite_silent_drop() -> None:
 
 
 def _efficiency_model() -> CondensationModel:
-    return CondensationModel(CondensationTrain.create_default())
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0, species_partial_pressures_mbar={"SiO": 0.1},
+    )
+    model.wall_species_partial_pressures_pa = {"SiO": 10.0}
+    return model
 
 
 def test_b112_zero_residence_mints_typed_pass_through_outcome() -> None:
@@ -299,18 +304,10 @@ def test_b112_zero_residence_mints_typed_pass_through_outcome() -> None:
     assert outcomes[0]["output_status"] == "status_bearing"
 
 
-def test_b112_nonpositive_local_pressure_mints_typed_outcome(monkeypatch) -> None:
-    import simulator.condensation as condensation_module
-
+def test_b112_nonpositive_flowing_pressure_mints_typed_outcome() -> None:
     model = _efficiency_model()
     stage = next(s for s in model.train.stages if s.stage_number == 3)
-    # Force a non-refused but nonpositive pressure so the nonpositive branch
-    # (not antoine_psat_unavailable_at_T) is the one that mints.
-    monkeypatch.setattr(
-        condensation_module,
-        "_try_antoine_psat_pa",
-        lambda *args, **kwargs: (0.0, False),
-    )
+    model.wall_species_partial_pressures_pa = {"SiO": 0.0}
     outcomes: list[dict[str, Any]] = []
     eta = model._condensation_efficiency(
         stage=stage,
@@ -322,14 +319,14 @@ def test_b112_nonpositive_local_pressure_mints_typed_outcome(monkeypatch) -> Non
         efficiency_outcomes=outcomes,
     )
     assert eta == 0.0
-    assert outcomes[0]["reason"] == "nonpositive_local_pressure"
+    assert outcomes[0]["reason"] == "nonpositive_flowing_pressure"
 
 
 def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
     """b-127: has Antoine data but no usable segment at T → refuse, never 100 Pa.
 
     Red-under-reversion: restoring ``return 100.0`` in
-    ``_local_species_pressure_pa`` or treating ``None`` as non-refused makes
+    the wall pressure owner or treating ``None`` as non-refused makes
     this fail. Fabricated ~1 mbar drove the capture integral with false
     authority.
     """
@@ -364,13 +361,6 @@ def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
     )
     assert pressure_pa is None
     assert refused is True
-    local = condensation_module._local_species_pressure_pa(
-        "Na",
-        T_K - condensation_module.CELSIUS_TO_KELVIN_OFFSET,
-        vapor_pressure_data=vapor_data,
-    )
-    assert local == 0.0
-    assert local != 100.0
 
     model = _efficiency_model()
     model.vapor_pressure_data = vapor_data

@@ -193,6 +193,7 @@ def test_condensation_efficiency_refuses_nonfinite_alpha(alpha_s_value):
 
 def test_condensation_efficiency_refuses_nonfinite_eta(monkeypatch):
     model = _configured_model()
+    model.wall_species_partial_pressures_pa = {"Fe": 100.0}
     monkeypatch.setattr(
         condensation,
         "_series_resistance_deposition_flux_mol_m2_s",
