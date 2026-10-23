@@ -6830,10 +6830,17 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         return None
     if q_token == "cp":
         amount = _num(item.get("cp"))
-        if amount is None or str(units or "").strip().lower() != "cal/deg-mole":
+        if amount is None:
             return None
-        # Beyer RI 8410 Table 1 prints Cp in thermochemical calories per degree-mole.
-        return amount * as_decimal("4.184")
+        unit = str(units or "").strip().lower()
+        if unit == "cal/deg-mole":
+            # Beyer RI 8410 Table 1 prints Cp in thermochemical calories per degree-mole.
+            return amount * as_decimal("4.184")
+        if unit == "j/mol/k":
+            # Chen 2019 Tables 5-12 print molar Cp in J/mol/K. The stored point
+            # is that printed cell (07d0feef1); it is not a calorie conversion.
+            return amount
+        return None
     if q_token == "S":
         amount = next(
             (
