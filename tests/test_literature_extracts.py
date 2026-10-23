@@ -1437,6 +1437,7 @@ def tmp_extracts(tmp_path: Path):
                     "sulfur_solubility_and_sulfate_capacity_series": ["fixture-source"],
                     "composition_series": ["fixture-source"],
                     "equilibrium_phase_composition": ["fixture-source"],
+                    "distribution_ratio": ["fixture-source"],
                 },
             }
         ),
