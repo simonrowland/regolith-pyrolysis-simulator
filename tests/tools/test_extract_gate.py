@@ -137,6 +137,11 @@ def test_scored_species_misfiling_and_three_non_scored_shapes(tmp_path: Path):
                         "quantity": "equilibrium_phase_composition",
                         "component_as_published": "TiO2",
                         "value": "45.9",
+                            # A printed basis keeps this row on the equilibrium-ratio
+                            # reader. The phase-row rule already on this branch
+                            # refuses an equilibrium composition that names neither
+                            # a closed phase role nor a ratio.
+                            "basis_as_published": "TiO2 equilibrium wt.%",
                     },
                 }
             ]
@@ -457,61 +462,185 @@ def test_fraction_sum_uses_numeric_siblings_and_rounding_band():
     assert not any("percent-as-fraction" in issue for issue in gate._composition_issues(doc))
 
 
-def test_transition_composition_flags_nonliquidus_but_allows_liquidus(
+def test_printed_zero_does_not_make_a_mixture():
+    assert not gate._source_prints_mixture(
+        {"composition_as_printed": {"CaO": "0", "SiO2": "0.3"}}, "FeO"
+    )
+
+
+@pytest.mark.parametrize(
+    ("observation_id", "source_composition"),
+    [
+        (
+            "composition_map_mixture",
+            {"composition_as_printed": {"CaO": "0.7", "SiO2": "0.3"}},
+        ),
+        (
+            "unknown_component_mixture",
+            {
+                "composition_as_printed": {
+                    "CaO": "not_reported",
+                    "SiO2": "0.3",
+                }
+            },
+        ),
+        ("x_field_mixture", {"x_SiO2_mol_percent_as_printed": "30"}),
+        (
+            "wt_field_mixture",
+            {
+                "x_CaO_wt_percent_as_printed": "70",
+                "x_SiO2_wt_percent_as_printed": "30",
+            },
+        ),
+        (
+            "mass_field_mixture",
+            {
+                "x_CaO_mass_percent_as_printed": "70",
+                "x_SiO2_mass_percent_as_printed": "30",
+            },
+        ),
+    ],
+    ids=(
+        "composition-map",
+        "unknown-component",
+        "mol-percent",
+        "wt-percent",
+        "mass-percent",
+    ),
+)
+def test_unbound_transition_composition_is_rejected_by_identity_profile(
     tmp_path: Path,
+    observation_id: str,
+    source_composition: dict[str, object],
 ):
     doc = _document()
     row = doc["species"]["Fe"]["observations"][0]
-    row["observation_id"] = "feo_transition"
+    row["observation_id"] = observation_id
     row["type"] = "transition_point"
-    row["experiment_id"] = "mixed-sample"
     row["values"] = {
         "quantity": "transition_temperature",
         "property_kind": "eutectic",
         "temperature_K": 1800,
+        **source_composition,
     }
-    doc["experiments"] = [
-        {
-            "experiment_id": "mixed-sample",
-            "sample": {
-                "printed_composition": {
-                    "state": {
-                        "tag": "value",
-                        "value": {
-                            "basis": "printed_mole_fraction",
-                            "amount_basis": "mole_fraction",
-                            "components": [["CaO", "0.7"], ["SiO2", "0.3"]],
-                        },
-                    }
-                }
-            },
-        }
-    ]
     doc["species"] = {"FeO": {"observations": [row]}}
     doc["fidelity_samples"][0]["path"] = (
-        "species.FeO.observations[feo_transition].values.temperature_K"
+        f"species.FeO.observations[{observation_id}].values.temperature_K"
     )
     doc["fidelity_samples"][0]["value"] = 1800
     report = _run_gate(tmp_path, doc)
 
-    assert "transition-composition" in _checks(report)
-    assert next(item for item in report.findings if item.check == "transition-composition").severity == "HARD"
+    assert "isolated-migration" in _checks(report)
+    assert report.migration_hard_issues > 0
+    assert "printed mixture has no composition" in next(
+        item.detail
+        for item in report.findings
+        if item.check == "isolated-migration"
+    )
 
-    doc["experiments"][0]["sample"]["printed_composition"]["state"]["value"]["components"][0][1] = "0"
-    assert "transition-composition" not in _checks(_run_gate(tmp_path, doc))
-    doc["experiments"][0]["sample"]["printed_composition"]["state"]["value"]["components"][0][1] = "0.7"
 
-    row["values"]["property_kind"] = "liquidus"
+def test_mixed_series_transition_compositions_are_checked_per_point(
+    tmp_path: Path,
+):
+    doc = _document()
+    row = doc["species"]["Fe"]["observations"][0]
+    row.update(observation_id="mixed_transition_series", type="transition_point")
+    row["values"] = {
+        "quantity": "transition_temperature",
+        "property_kind": "melting_point",
+        "points": [
+            {
+                "T_K": 1800,
+                "composition_as_printed": {"CaO": "0.7", "SiO2": "0.3"},
+                "composition_mol": {"CaO": "0.7", "SiO2": "0.3"},
+            },
+            {
+                "T_K": 1900,
+                "sample": "FeO",
+                "sample_as_printed": "FeO",
+                "composition_as_printed": {"FeO": "1"},
+                "composition_mol": {"FeO": "1"},
+            },
+        ],
+    }
+    doc["species"] = {"FeO": {"observations": [row]}}
+    doc["fidelity_samples"][0]["path"] = (
+        "species.FeO.observations[mixed_transition_series].values.points[0].T_K"
+    )
+    doc["fidelity_samples"][0]["value"] = 1800
+
     report = _run_gate(tmp_path, doc)
 
-    assert "transition-composition" not in _checks(report)
+    assert not report.hard_failed
+    assert report.migration_hard_issues == 0
+    assert "isolated-migration" not in _checks(report)
+
+
+def test_inherited_transition_composition_applies_to_unmarked_points(
+    tmp_path: Path,
+):
+    doc = _document()
+    row = doc["species"]["Fe"]["observations"][0]
+    row.update(observation_id="inherited_transition_series", type="transition_point")
+    row["values"] = {
+        "quantity": "transition_temperature",
+        "property_kind": "melting_point",
+        "composition_as_printed": {"CaO": "0.7", "SiO2": "0.3"},
+        "composition_mol": {"CaO": "0.7", "SiO2": "0.3"},
+        "points": [
+            {"T_K": 1800},
+            {
+                "T_K": 1900,
+                "sample": "FeO",
+                "sample_as_printed": "FeO",
+                "composition_as_printed": {"FeO": "1"},
+                "composition_mol": {"FeO": "1"},
+            },
+        ],
+    }
+    doc["species"] = {"FeO": {"observations": [row]}}
+    doc["fidelity_samples"][0]["path"] = (
+        "species.FeO.observations[inherited_transition_series].values.points[0].T_K"
+    )
+    doc["fidelity_samples"][0]["value"] = 1800
+
+    report = _run_gate(tmp_path, doc)
+
+    assert not report.hard_failed
+    assert report.migration_hard_issues == 0
+    assert "isolated-migration" not in _checks(report)
+
+
+def test_profile_bound_transition_extracts_pass_migration_gate():
+    extracts = Path(__file__).resolve().parents[2] / "data/literature/extracts"
+    for source_id, expected_observations in (
+        ("rys-2007-alkali-oxide-thermodynamics", 1001),
+        ("costa-2025-ree-cmas-glass-melt-thermochemistry", 28),
+    ):
+        path = extracts / f"{source_id}.yaml"
+        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+        report = gate.GateReport()
+
+        assert gate._migrate_one(path, doc, report) == []
+        assert report.migration_hard_issues == 0
+        assert sum(report.value_kinds.values()) == expected_observations
 
 
 def test_zero_components_in_shornikov_rows_do_not_make_transition_mixtures():
     path = Path(__file__).resolve().parents[2] / "data/literature/extracts/shornikov-2000-aluminosilicate-vaporization.yaml"
     doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
-    issues = gate._transition_composition_issues(doc)
-    assert not any(f"shornikov_2000_table1_row_{row:02d}" in issue for issue in issues for row in range(1, 6))
+    rows = [
+        (formula, observation)
+        for formula, observation in gate.migrate.iter_extract_observations(doc)
+        if observation.get("observation_id")
+        in {f"shornikov_2000_table1_row_{row:02d}" for row in range(1, 6)}
+    ]
+
+    assert len(rows) == 5
+    assert all(
+        not gate._source_prints_mixture(observation.get("values"), formula)
+        for formula, observation in rows
+    )
 
 
 def test_evidence_classification_is_owned_by_migration_and_validation(tmp_path: Path):

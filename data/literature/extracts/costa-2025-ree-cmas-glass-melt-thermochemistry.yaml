@@ -6,12 +6,12 @@ source:
   doi: 10.1016/j.jnoncrysol.2025.123518
   year: 2025
 extraction:
-  method: 'Born-digital author-manuscript PDF transcribed from pdftotext-layout.txt. The table tool does not accept pdftotext-only
-    tables. Tables 1-10 were transcribed manually and render-checked at 600 dpi on PDF pages 11-16. Figures 1-5 are
-    context-only records with no digitised points. Table 6 layout was corrected against its render: one c/2 Al2O3 row,
+  method: 'Born-digital author-manuscript PDF transcribed from pdftotext-layout.txt. Tables 1-10 were transcribed manually and
+    render-checked at 600 dpi on PDF pages 11-16. Table 3 values and uncertainties are typed as observations. Figures 1-5
+    are context-only records with no digitised points. Table 6 layout was corrected against its render: one c/2 Al2O3 row,
     not the duplicate in pdftotext. No numeric heat-capacity series is printed.'
-  date: '2026-10-18'
-  worker: w6-1018
+  date: '2026-10-19'
+  worker: codex-resume-84155-1792424986
   provenance_path: text/costa-2025-ree-cmas-glass-melt-thermochemistry/pdftotext-layout.txt
   source_path: corpus/raw/costa-2025-ree-cmas-glass-melt-thermochemistry/costa-2025-ree-cmas-glass-melt-thermochemistry.pdf
 review_status: draft
@@ -78,7 +78,1983 @@ fidelity_samples:
     column: ΔHfusion (kJ·mol−1)
 species:
   CaO:
-    observations: []
+    observations:
+      - observation_id: costa_2025_cmas_tg_table3
+        type: transition_point
+        locator: &id013
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: CMAS
+          column: Tg (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: &costa_cmas_formula Ca0.3234Mg0.1071Al0.1524Si0.4933O1.646
+          quantity: transition_temperature
+          property_kind: glass_transition
+          transition_as_printed: onset glass transition (Tg)
+          T_K: 1021
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 —; CaO 32.34(6); MgO 10.71(5); Al2O3 7.62(1); SiO2 49.33(8)
+          composition_mol:
+            basis: printed_mole_fraction
+            CaO: 0.3234
+            MgO: 0.1071
+            Al2O3: 0.0762
+            SiO2: 0.4933
+        uncertainty:
+          reported_status: printed
+          value: 5
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [CaO, 0.3234]
+                  - [MgO, 0.1071]
+                  - [Al2O3, 0.0762]
+                  - [SiO2, 0.4933]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=CMAS'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1021
+            locator: *id013
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: &id014
+              page: 3
+              pdf_page_index: 2
+              section: 2.2 Sample characterization
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_cmas_tc_table3
+        type: transition_point
+        locator: &id015
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: CMAS
+          column: Tc (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_cmas_formula
+          quantity: transition_temperature
+          property_kind: crystallization_temperature
+          transition_as_printed: onset crystallization (Tc)
+          T_K: 1209
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 —; CaO 32.34(6); MgO 10.71(5); Al2O3 7.62(1); SiO2 49.33(8)
+          composition_mol:
+            basis: printed_mole_fraction
+            CaO: 0.3234
+            MgO: 0.1071
+            Al2O3: 0.0762
+            SiO2: 0.4933
+        uncertainty:
+          reported_status: printed
+          value: 6
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [CaO, 0.3234]
+                  - [MgO, 0.1071]
+                  - [Al2O3, 0.0762]
+                  - [SiO2, 0.4933]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=CMAS'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1209
+            locator: *id015
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_cmas_tm_table3
+        type: transition_point
+        locator: &id016
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: CMAS
+          column: Tm (K)
+        phase: cr
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_cmas_formula
+          quantity: transition_temperature
+          property_kind: melting_point
+          transition_as_printed: onset melting (Tm)
+          T_K: 1493
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 —; CaO 32.34(6); MgO 10.71(5); Al2O3 7.62(1); SiO2 49.33(8)
+          composition_mol:
+            basis: printed_mole_fraction
+            CaO: 0.3234
+            MgO: 0.1071
+            Al2O3: 0.0762
+            SiO2: 0.4933
+        uncertainty:
+          reported_status: printed
+          value: 8
+          units: K
+          note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [CaO, 0.3234]
+                  - [MgO, 0.1071]
+                  - [Al2O3, 0.0762]
+                  - [SiO2, 0.4933]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=CMAS'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1493
+            locator: *id016
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_cmas_heat_of_fusion_table3
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: CMAS
+          column: ΔHfusion (kJ·mol−1)
+        phase: cr
+        regime: DSC melting endotherm
+        units: kJ mol−1
+        values:
+          formula: *costa_cmas_formula
+          quantity: heat_of_fusion
+          method_class: measured_direct
+          delta_H_fus_kJ_mol-1: 31.01
+          T_fus_K:
+            value: 1493
+            units: K
+            locator: &id017
+              page: 11
+              pdf_page_index: 10
+              table: '3'
+              row: CMAS
+              column: Tm (K)
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 —; CaO 32.34(6); MgO 10.71(5); Al2O3 7.62(1); SiO2 49.33(8)
+          composition_mol:
+            basis: printed_mole_fraction
+            CaO: 0.3234
+            MgO: 0.1071
+            Al2O3: 0.0762
+            SiO2: 0.4933
+          method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+        uncertainty:
+          reported_status: printed
+          value: 1.55
+          units: kJ/mol
+          note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [CaO, 0.3234]
+                  - [MgO, 0.1071]
+                  - [Al2O3, 0.0762]
+                  - [SiO2, 0.4933]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=CMAS'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1493
+            locator: *id017
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_y_l_tg_table3
+        type: transition_point
+        locator: &id018
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Y-L
+          column: Tg (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: &costa_y_l_formula Ca0.3182Mg0.1054Al0.1502Y0.0297Si0.486O1.665
+          quantity: transition_temperature
+          property_kind: glass_transition
+          transition_as_printed: onset glass transition (Tg)
+          T_K: 1025
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 1.485(7); Yb2O3 —; Gd2O3 —; CaO 31.82(9); MgO 10.54(7); Al2O3 7.51(1); SiO2 48.6(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Y2O3: 0.01485
+            CaO: 0.3182
+            MgO: 0.1054
+            Al2O3: 0.0751
+            SiO2: 0.486
+        uncertainty:
+          reported_status: printed
+          value: 5
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Y2O3, 0.01485]
+                  - [CaO, 0.3182]
+                  - [MgO, 0.1054]
+                  - [Al2O3, 0.0751]
+                  - [SiO2, 0.486]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Y-L'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1025
+            locator: *id018
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_y_l_tc_table3
+        type: transition_point
+        locator: &id019
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Y-L
+          column: Tc (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_y_l_formula
+          quantity: transition_temperature
+          property_kind: crystallization_temperature
+          transition_as_printed: onset crystallization (Tc)
+          T_K: 1245
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 1.485(7); Yb2O3 —; Gd2O3 —; CaO 31.82(9); MgO 10.54(7); Al2O3 7.51(1); SiO2 48.6(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Y2O3: 0.01485
+            CaO: 0.3182
+            MgO: 0.1054
+            Al2O3: 0.0751
+            SiO2: 0.486
+        uncertainty:
+          reported_status: printed
+          value: 6
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Y2O3, 0.01485]
+                  - [CaO, 0.3182]
+                  - [MgO, 0.1054]
+                  - [Al2O3, 0.0751]
+                  - [SiO2, 0.486]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Y-L'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1245
+            locator: *id019
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_y_l_tm_table3
+        type: transition_point
+        locator: &id020
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Y-L
+          column: Tm (K)
+        phase: cr
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_y_l_formula
+          quantity: transition_temperature
+          property_kind: melting_point
+          transition_as_printed: onset melting (Tm)
+          T_K: 1462
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 1.485(7); Yb2O3 —; Gd2O3 —; CaO 31.82(9); MgO 10.54(7); Al2O3 7.51(1); SiO2 48.6(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Y2O3: 0.01485
+            CaO: 0.3182
+            MgO: 0.1054
+            Al2O3: 0.0751
+            SiO2: 0.486
+        uncertainty:
+          reported_status: printed
+          value: 7
+          units: K
+          note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Y2O3, 0.01485]
+                  - [CaO, 0.3182]
+                  - [MgO, 0.1054]
+                  - [Al2O3, 0.0751]
+                  - [SiO2, 0.486]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Y-L'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1462
+            locator: *id020
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_y_l_heat_of_fusion_table3
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Y-L
+          column: ΔHfusion (kJ·mol−1)
+        phase: cr
+        regime: DSC melting endotherm
+        units: kJ mol−1
+        values:
+          formula: *costa_y_l_formula
+          quantity: heat_of_fusion
+          method_class: measured_direct
+          delta_H_fus_kJ_mol-1: 18.54
+          T_fus_K:
+            value: 1462
+            units: K
+            locator: &id021
+              page: 11
+              pdf_page_index: 10
+              table: '3'
+              row: Y-L
+              column: Tm (K)
+          composition_as_published: Y2O3 1.485(7); Yb2O3 —; Gd2O3 —; CaO 31.82(9); MgO 10.54(7); Al2O3 7.51(1); SiO2 48.6(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Y2O3: 0.01485
+            CaO: 0.3182
+            MgO: 0.1054
+            Al2O3: 0.0751
+            SiO2: 0.486
+          method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+        uncertainty:
+          reported_status: printed
+          value: 0.93
+          units: kJ/mol
+          note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Y2O3, 0.01485]
+                  - [CaO, 0.3182]
+                  - [MgO, 0.1054]
+                  - [Al2O3, 0.0751]
+                  - [SiO2, 0.486]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Y-L'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1462
+            locator: *id021
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_yb_l_tg_table3
+        type: transition_point
+        locator: &id022
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Yb-L
+          column: Tg (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: &costa_yb_l_formula Ca0.322Mg0.1057Al0.1484Yb0.0160Si0.490O1.654
+          quantity: transition_temperature
+          property_kind: glass_transition
+          transition_as_printed: onset glass transition (Tg)
+          T_K: 1024
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 0.80(1); Gd2O3 —; CaO 32.2(1); MgO 10.57(5); Al2O3 7.42(2); SiO2 49.0(2)
+          composition_mol:
+            basis: printed_mole_fraction
+            Yb2O3: 0.008
+            CaO: 0.322
+            MgO: 0.1057
+            Al2O3: 0.0742
+            SiO2: 0.49
+        uncertainty:
+          reported_status: printed
+          value: 5
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Yb2O3, 0.008]
+                  - [CaO, 0.322]
+                  - [MgO, 0.1057]
+                  - [Al2O3, 0.0742]
+                  - [SiO2, 0.49]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Yb-L'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1024
+            locator: *id022
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_yb_l_tc_table3
+        type: transition_point
+        locator: &id023
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Yb-L
+          column: Tc (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_yb_l_formula
+          quantity: transition_temperature
+          property_kind: crystallization_temperature
+          transition_as_printed: onset crystallization (Tc)
+          T_K: 1225
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 0.80(1); Gd2O3 —; CaO 32.2(1); MgO 10.57(5); Al2O3 7.42(2); SiO2 49.0(2)
+          composition_mol:
+            basis: printed_mole_fraction
+            Yb2O3: 0.008
+            CaO: 0.322
+            MgO: 0.1057
+            Al2O3: 0.0742
+            SiO2: 0.49
+        uncertainty:
+          reported_status: printed
+          value: 6
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Yb2O3, 0.008]
+                  - [CaO, 0.322]
+                  - [MgO, 0.1057]
+                  - [Al2O3, 0.0742]
+                  - [SiO2, 0.49]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Yb-L'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1225
+            locator: *id023
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_yb_l_tm_table3
+        type: transition_point
+        locator: &id024
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Yb-L
+          column: Tm (K)
+        phase: cr
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_yb_l_formula
+          quantity: transition_temperature
+          property_kind: melting_point
+          transition_as_printed: onset melting (Tm)
+          T_K: 1477
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 0.80(1); Gd2O3 —; CaO 32.2(1); MgO 10.57(5); Al2O3 7.42(2); SiO2 49.0(2)
+          composition_mol:
+            basis: printed_mole_fraction
+            Yb2O3: 0.008
+            CaO: 0.322
+            MgO: 0.1057
+            Al2O3: 0.0742
+            SiO2: 0.49
+        uncertainty:
+          reported_status: printed
+          value: 7
+          units: K
+          note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Yb2O3, 0.008]
+                  - [CaO, 0.322]
+                  - [MgO, 0.1057]
+                  - [Al2O3, 0.0742]
+                  - [SiO2, 0.49]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Yb-L'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1477
+            locator: *id024
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_yb_l_heat_of_fusion_table3
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Yb-L
+          column: ΔHfusion (kJ·mol−1)
+        phase: cr
+        regime: DSC melting endotherm
+        units: kJ mol−1
+        values:
+          formula: *costa_yb_l_formula
+          quantity: heat_of_fusion
+          method_class: measured_direct
+          delta_H_fus_kJ_mol-1: 23.44
+          T_fus_K:
+            value: 1477
+            units: K
+            locator: &id025
+              page: 11
+              pdf_page_index: 10
+              table: '3'
+              row: Yb-L
+              column: Tm (K)
+          composition_as_published: Y2O3 —; Yb2O3 0.80(1); Gd2O3 —; CaO 32.2(1); MgO 10.57(5); Al2O3 7.42(2); SiO2 49.0(2)
+          composition_mol:
+            basis: printed_mole_fraction
+            Yb2O3: 0.008
+            CaO: 0.322
+            MgO: 0.1057
+            Al2O3: 0.0742
+            SiO2: 0.49
+          method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+        uncertainty:
+          reported_status: printed
+          value: 1.17
+          units: kJ/mol
+          note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Yb2O3, 0.008]
+                  - [CaO, 0.322]
+                  - [MgO, 0.1057]
+                  - [Al2O3, 0.0742]
+                  - [SiO2, 0.49]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Yb-L'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1477
+            locator: *id025
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_gd_l_tg_table3
+        type: transition_point
+        locator: &id026
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Gd-L
+          column: Tg (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: &costa_gd_l_formula Ca0.3224Mg0.1048Al0.1516Gd0.0173Si0.488O1.657
+          quantity: transition_temperature
+          property_kind: glass_transition
+          transition_as_printed: onset glass transition (Tg)
+          T_K: 1024
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 0.869(7); CaO 32.24(9); MgO 10.48(7); Al2O3 7.58(1); SiO2 48.8(2)
+          composition_mol:
+            basis: printed_mole_fraction
+            Gd2O3: 0.00869
+            CaO: 0.3224
+            MgO: 0.1048
+            Al2O3: 0.0758
+            SiO2: 0.488
+        uncertainty:
+          reported_status: printed
+          value: 5
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Gd2O3, 0.00869]
+                  - [CaO, 0.3224]
+                  - [MgO, 0.1048]
+                  - [Al2O3, 0.0758]
+                  - [SiO2, 0.488]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Gd-L'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1024
+            locator: *id026
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_gd_l_tc_table3
+        type: transition_point
+        locator: &id027
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Gd-L
+          column: Tc (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_gd_l_formula
+          quantity: transition_temperature
+          property_kind: crystallization_temperature
+          transition_as_printed: onset crystallization (Tc)
+          T_K: 1231
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 0.869(7); CaO 32.24(9); MgO 10.48(7); Al2O3 7.58(1); SiO2 48.8(2)
+          composition_mol:
+            basis: printed_mole_fraction
+            Gd2O3: 0.00869
+            CaO: 0.3224
+            MgO: 0.1048
+            Al2O3: 0.0758
+            SiO2: 0.488
+        uncertainty:
+          reported_status: printed
+          value: 6
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Gd2O3, 0.00869]
+                  - [CaO, 0.3224]
+                  - [MgO, 0.1048]
+                  - [Al2O3, 0.0758]
+                  - [SiO2, 0.488]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Gd-L'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1231
+            locator: *id027
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_gd_l_tm_table3
+        type: transition_point
+        locator: &id028
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Gd-L
+          column: Tm (K)
+        phase: cr
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_gd_l_formula
+          quantity: transition_temperature
+          property_kind: melting_point
+          transition_as_printed: onset melting (Tm)
+          T_K: 1457
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 0.869(7); CaO 32.24(9); MgO 10.48(7); Al2O3 7.58(1); SiO2 48.8(2)
+          composition_mol:
+            basis: printed_mole_fraction
+            Gd2O3: 0.00869
+            CaO: 0.3224
+            MgO: 0.1048
+            Al2O3: 0.0758
+            SiO2: 0.488
+        uncertainty:
+          reported_status: printed
+          value: 7
+          units: K
+          note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Gd2O3, 0.00869]
+                  - [CaO, 0.3224]
+                  - [MgO, 0.1048]
+                  - [Al2O3, 0.0758]
+                  - [SiO2, 0.488]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Gd-L'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1457
+            locator: *id028
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_gd_l_heat_of_fusion_table3
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Gd-L
+          column: ΔHfusion (kJ·mol−1)
+        phase: cr
+        regime: DSC melting endotherm
+        units: kJ mol−1
+        values:
+          formula: *costa_gd_l_formula
+          quantity: heat_of_fusion
+          method_class: measured_direct
+          delta_H_fus_kJ_mol-1: 23.31
+          T_fus_K:
+            value: 1457
+            units: K
+            locator: &id029
+              page: 11
+              pdf_page_index: 10
+              table: '3'
+              row: Gd-L
+              column: Tm (K)
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 0.869(7); CaO 32.24(9); MgO 10.48(7); Al2O3 7.58(1); SiO2 48.8(2)
+          composition_mol:
+            basis: printed_mole_fraction
+            Gd2O3: 0.00869
+            CaO: 0.3224
+            MgO: 0.1048
+            Al2O3: 0.0758
+            SiO2: 0.488
+          method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+        uncertainty:
+          reported_status: printed
+          value: 1.17
+          units: kJ/mol
+          note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Gd2O3, 0.00869]
+                  - [CaO, 0.3224]
+                  - [MgO, 0.1048]
+                  - [Al2O3, 0.0758]
+                  - [SiO2, 0.488]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Gd-L'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1457
+            locator: *id029
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_y_h_tg_table3
+        type: transition_point
+        locator: &id030
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Y-H
+          column: Tg (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: &costa_y_h_formula Ca0.3091Mg0.1008Al0.145Y0.0986Si0.468O1.711
+          quantity: transition_temperature
+          property_kind: glass_transition
+          transition_as_printed: onset glass transition (Tg)
+          T_K: 1040
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 4.93(1); Yb2O3 —; Gd2O3 —; CaO 30.91(8); MgO 10.08(5); Al2O3 7.25(1); SiO2 46.8(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Y2O3: 0.0493
+            CaO: 0.3091
+            MgO: 0.1008
+            Al2O3: 0.0725
+            SiO2: 0.468
+        uncertainty:
+          reported_status: printed
+          value: 5
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Y2O3, 0.0493]
+                  - [CaO, 0.3091]
+                  - [MgO, 0.1008]
+                  - [Al2O3, 0.0725]
+                  - [SiO2, 0.468]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Y-H'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1040
+            locator: *id030
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_y_h_tc_table3
+        type: transition_point
+        locator: &id031
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Y-H
+          column: Tc (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_y_h_formula
+          quantity: transition_temperature
+          property_kind: crystallization_temperature
+          transition_as_printed: onset crystallization (Tc)
+          T_K: 1246
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 4.93(1); Yb2O3 —; Gd2O3 —; CaO 30.91(8); MgO 10.08(5); Al2O3 7.25(1); SiO2 46.8(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Y2O3: 0.0493
+            CaO: 0.3091
+            MgO: 0.1008
+            Al2O3: 0.0725
+            SiO2: 0.468
+        uncertainty:
+          reported_status: printed
+          value: 6
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Y2O3, 0.0493]
+                  - [CaO, 0.3091]
+                  - [MgO, 0.1008]
+                  - [Al2O3, 0.0725]
+                  - [SiO2, 0.468]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Y-H'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1246
+            locator: *id031
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_y_h_tm_table3
+        type: transition_point
+        locator: &id032
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Y-H
+          column: Tm (K)
+        phase: cr
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_y_h_formula
+          quantity: transition_temperature
+          property_kind: melting_point
+          transition_as_printed: onset melting (Tm)
+          T_K: 1462
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 4.93(1); Yb2O3 —; Gd2O3 —; CaO 30.91(8); MgO 10.08(5); Al2O3 7.25(1); SiO2 46.8(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Y2O3: 0.0493
+            CaO: 0.3091
+            MgO: 0.1008
+            Al2O3: 0.0725
+            SiO2: 0.468
+        uncertainty:
+          reported_status: printed
+          value: 7
+          units: K
+          note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Y2O3, 0.0493]
+                  - [CaO, 0.3091]
+                  - [MgO, 0.1008]
+                  - [Al2O3, 0.0725]
+                  - [SiO2, 0.468]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Y-H'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1462
+            locator: *id032
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_y_h_heat_of_fusion_table3
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Y-H
+          column: ΔHfusion (kJ·mol−1)
+        phase: cr
+        regime: DSC melting endotherm
+        units: kJ mol−1
+        values:
+          formula: *costa_y_h_formula
+          quantity: heat_of_fusion
+          method_class: measured_direct
+          delta_H_fus_kJ_mol-1: 14.27
+          T_fus_K:
+            value: 1462
+            units: K
+            locator: &id033
+              page: 11
+              pdf_page_index: 10
+              table: '3'
+              row: Y-H
+              column: Tm (K)
+          composition_as_published: Y2O3 4.93(1); Yb2O3 —; Gd2O3 —; CaO 30.91(8); MgO 10.08(5); Al2O3 7.25(1); SiO2 46.8(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Y2O3: 0.0493
+            CaO: 0.3091
+            MgO: 0.1008
+            Al2O3: 0.0725
+            SiO2: 0.468
+          method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+        uncertainty:
+          reported_status: printed
+          value: 0.71
+          units: kJ/mol
+          note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Y2O3, 0.0493]
+                  - [CaO, 0.3091]
+                  - [MgO, 0.1008]
+                  - [Al2O3, 0.0725]
+                  - [SiO2, 0.468]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Y-H'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1462
+            locator: *id033
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_yb_h_tg_table3
+        type: transition_point
+        locator: &id034
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Yb-H
+          column: Tg (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: &costa_yb_h_formula Ca0.312Mg0.1006Al0.1266Yb0.099Si0.475O1.701
+          quantity: transition_temperature
+          property_kind: glass_transition
+          transition_as_printed: onset glass transition (Tg)
+          T_K: 1044
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 4.95(8); Gd2O3 —; CaO 31.2(1); MgO 10.06(7); Al2O3 6.33(4); SiO2 47.5(3)
+          composition_mol:
+            basis: printed_mole_fraction
+            Yb2O3: 0.0495
+            CaO: 0.312
+            MgO: 0.1006
+            Al2O3: 0.0633
+            SiO2: 0.475
+        uncertainty:
+          reported_status: printed
+          value: 5
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Yb2O3, 0.0495]
+                  - [CaO, 0.312]
+                  - [MgO, 0.1006]
+                  - [Al2O3, 0.0633]
+                  - [SiO2, 0.475]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Yb-H'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1044
+            locator: *id034
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_yb_h_tc_table3
+        type: transition_point
+        locator: &id035
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Yb-H
+          column: Tc (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_yb_h_formula
+          quantity: transition_temperature
+          property_kind: crystallization_temperature
+          transition_as_printed: onset crystallization (Tc)
+          T_K: 1257
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 4.95(8); Gd2O3 —; CaO 31.2(1); MgO 10.06(7); Al2O3 6.33(4); SiO2 47.5(3)
+          composition_mol:
+            basis: printed_mole_fraction
+            Yb2O3: 0.0495
+            CaO: 0.312
+            MgO: 0.1006
+            Al2O3: 0.0633
+            SiO2: 0.475
+        uncertainty:
+          reported_status: printed
+          value: 6
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Yb2O3, 0.0495]
+                  - [CaO, 0.312]
+                  - [MgO, 0.1006]
+                  - [Al2O3, 0.0633]
+                  - [SiO2, 0.475]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Yb-H'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1257
+            locator: *id035
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_yb_h_tm_table3
+        type: transition_point
+        locator: &id036
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Yb-H
+          column: Tm (K)
+        phase: cr
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_yb_h_formula
+          quantity: transition_temperature
+          property_kind: melting_point
+          transition_as_printed: onset melting (Tm)
+          T_K: 1454
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 4.95(8); Gd2O3 —; CaO 31.2(1); MgO 10.06(7); Al2O3 6.33(4); SiO2 47.5(3)
+          composition_mol:
+            basis: printed_mole_fraction
+            Yb2O3: 0.0495
+            CaO: 0.312
+            MgO: 0.1006
+            Al2O3: 0.0633
+            SiO2: 0.475
+        uncertainty:
+          reported_status: printed
+          value: 7
+          units: K
+          note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Yb2O3, 0.0495]
+                  - [CaO, 0.312]
+                  - [MgO, 0.1006]
+                  - [Al2O3, 0.0633]
+                  - [SiO2, 0.475]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Yb-H'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1454
+            locator: *id036
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_yb_h_heat_of_fusion_table3
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Yb-H
+          column: ΔHfusion (kJ·mol−1)
+        phase: cr
+        regime: DSC melting endotherm
+        units: kJ mol−1
+        values:
+          formula: *costa_yb_h_formula
+          quantity: heat_of_fusion
+          method_class: measured_direct
+          delta_H_fus_kJ_mol-1: 19.13
+          T_fus_K:
+            value: 1454
+            units: K
+            locator: &id037
+              page: 11
+              pdf_page_index: 10
+              table: '3'
+              row: Yb-H
+              column: Tm (K)
+          composition_as_published: Y2O3 —; Yb2O3 4.95(8); Gd2O3 —; CaO 31.2(1); MgO 10.06(7); Al2O3 6.33(4); SiO2 47.5(3)
+          composition_mol:
+            basis: printed_mole_fraction
+            Yb2O3: 0.0495
+            CaO: 0.312
+            MgO: 0.1006
+            Al2O3: 0.0633
+            SiO2: 0.475
+          method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+        uncertainty:
+          reported_status: printed
+          value: 0.96
+          units: kJ/mol
+          note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Yb2O3, 0.0495]
+                  - [CaO, 0.312]
+                  - [MgO, 0.1006]
+                  - [Al2O3, 0.0633]
+                  - [SiO2, 0.475]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Yb-H'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1454
+            locator: *id037
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_gd_h_tg_table3
+        type: transition_point
+        locator: &id038
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Gd-H
+          column: Tg (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: &costa_gd_h_formula Ca0.312Mg0.0932Al0.1444Gd0.1004Si0.472O1.716
+          quantity: transition_temperature
+          property_kind: glass_transition
+          transition_as_printed: onset glass transition (Tg)
+          T_K: 1030
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 5.02(2); CaO 31.2(1); MgO 9.32(5); Al2O3 7.22(2); SiO2 47.2(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Gd2O3: 0.0502
+            CaO: 0.312
+            MgO: 0.0932
+            Al2O3: 0.0722
+            SiO2: 0.472
+        uncertainty:
+          reported_status: printed
+          value: 5
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Gd2O3, 0.0502]
+                  - [CaO, 0.312]
+                  - [MgO, 0.0932]
+                  - [Al2O3, 0.0722]
+                  - [SiO2, 0.472]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Gd-H'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1030
+            locator: *id038
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_gd_h_tc_table3
+        type: transition_point
+        locator: &id039
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Gd-H
+          column: Tc (K)
+        phase: glass
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_gd_h_formula
+          quantity: transition_temperature
+          property_kind: crystallization_temperature
+          transition_as_printed: onset crystallization (Tc)
+          T_K: 1243
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 5.02(2); CaO 31.2(1); MgO 9.32(5); Al2O3 7.22(2); SiO2 47.2(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Gd2O3: 0.0502
+            CaO: 0.312
+            MgO: 0.0932
+            Al2O3: 0.0722
+            SiO2: 0.472
+        uncertainty:
+          reported_status: printed
+          value: 6
+          units: K
+          note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Gd2O3, 0.0502]
+                  - [CaO, 0.312]
+                  - [MgO, 0.0932]
+                  - [Al2O3, 0.0722]
+                  - [SiO2, 0.472]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Gd-H'}
+          quench_state:
+            state: {tag: value, value: asserted_preserved}
+            locator: {page: 4, pdf_page_index: 3, section: '3. Results'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1243
+            locator: *id039
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_gd_h_tm_table3
+        type: transition_point
+        locator: &id040
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Gd-H
+          column: Tm (K)
+        phase: cr
+        regime: simultaneous DSC-TGA heating
+        units: K
+        values:
+          formula: *costa_gd_h_formula
+          quantity: transition_temperature
+          property_kind: melting_point
+          transition_as_printed: onset melting (Tm)
+          T_K: 1475
+          method_class: measured_direct
+          method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
+          sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
+            analysis.
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 5.02(2); CaO 31.2(1); MgO 9.32(5); Al2O3 7.22(2); SiO2 47.2(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Gd2O3: 0.0502
+            CaO: 0.312
+            MgO: 0.0932
+            Al2O3: 0.0722
+            SiO2: 0.472
+        uncertainty:
+          reported_status: printed
+          value: 7
+          units: K
+          note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Gd2O3, 0.0502]
+                  - [CaO, 0.312]
+                  - [MgO, 0.0932]
+                  - [Al2O3, 0.0722]
+                  - [SiO2, 0.472]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Gd-H'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1475
+            locator: *id040
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
+      - observation_id: costa_2025_gd_h_heat_of_fusion_table3
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 11
+          pdf_page_index: 10
+          table: '3'
+          row: Gd-H
+          column: ΔHfusion (kJ·mol−1)
+        phase: cr
+        regime: DSC melting endotherm
+        units: kJ mol−1
+        values:
+          formula: *costa_gd_h_formula
+          quantity: heat_of_fusion
+          method_class: measured_direct
+          delta_H_fus_kJ_mol-1: 16.36
+          T_fus_K:
+            value: 1475
+            units: K
+            locator: &id041
+              page: 11
+              pdf_page_index: 10
+              table: '3'
+              row: Gd-H
+              column: Tm (K)
+          composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 5.02(2); CaO 31.2(1); MgO 9.32(5); Al2O3 7.22(2); SiO2 47.2(1)
+          composition_mol:
+            basis: printed_mole_fraction
+            Gd2O3: 0.0502
+            CaO: 0.312
+            MgO: 0.0932
+            Al2O3: 0.0722
+            SiO2: 0.472
+          method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+        uncertainty:
+          reported_status: printed
+          value: 0.82
+          units: kJ/mol
+          note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - [Gd2O3, 0.0502]
+                  - [CaO, 0.312]
+                  - [MgO, 0.0932]
+                  - [Al2O3, 0.0722]
+                  - [SiO2, 0.472]
+            locator: {page: 11, pdf_page_index: 10, table: '1', note: 'row=Gd-H'}
+          temperature_K:
+            state:
+              tag: value
+              value: 1475
+            locator: *id041
+          gas_environment:
+            state:
+              tag: value
+              value: air flow, 20 mL/min
+            locator: *id014
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source reports air flow but no oxygen partial pressure or fO2.
+            locator: *id014
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not reported
+            locator: *id014
     context:
     - observation_id: costa_2025_table1_epma_glass_compositions
       type: characterization
@@ -921,1385 +2897,3 @@ species:
         digitisation: deferred to a figure pass
         attribution: Table 7 thermochemical-cycle calculations; Shannon [32] for rare-earth ionic radii.
         schema_gap: No existing quantity token represents formation enthalpy from oxides; no numeric figure points retained.
-    - observation_id: costa_2025_cmas_tg_table3
-      type: literature_context
-      locator: &id013
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: CMAS
-        column: Tg (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: glass_transition
-        transition_as_printed: onset glass transition (Tg)
-        T_K: 1021
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 —; CaO 32.34(6); MgO 10.71(5); Al2O3 7.62(1); SiO2 49.33(8)
-        composition_mol: *id001
-      uncertainty:
-        reported_status: printed
-        value: 5
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1021
-          locator: *id013
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: &id014
-            page: 4
-            pdf_page_index: 3
-            section: 2.2 Sample characterization
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_cmas_tc_table3
-      type: literature_context
-      locator: &id015
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: CMAS
-        column: Tc (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: crystallization_temperature
-        transition_as_printed: onset crystallization (Tc)
-        T_K: 1209
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 —; CaO 32.34(6); MgO 10.71(5); Al2O3 7.62(1); SiO2 49.33(8)
-        composition_mol: *id001
-      uncertainty:
-        reported_status: printed
-        value: 6
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1209
-          locator: *id015
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_cmas_tm_table3
-      type: literature_context
-      locator: &id016
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: CMAS
-        column: Tm (K)
-      phase: cr
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: melting_point
-        transition_as_printed: onset melting (Tm)
-        T_K: 1493
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 —; CaO 32.34(6); MgO 10.71(5); Al2O3 7.62(1); SiO2 49.33(8)
-        composition_mol: *id001
-      uncertainty:
-        reported_status: printed
-        value: 8
-        units: K
-        note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1493
-          locator: *id016
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_cmas_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: CMAS
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 31.01
-        T_fus_K:
-          value: 1493
-          units: K
-          locator: &id017
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: CMAS
-            column: Tm (K)
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 —; CaO 32.34(6); MgO 10.71(5); Al2O3 7.62(1); SiO2 49.33(8)
-        composition_mol: *id001
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 1.55
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1493
-          locator: *id017
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_y_l_tg_table3
-      type: literature_context
-      locator: &id018
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Y-L
-        column: Tg (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: glass_transition
-        transition_as_printed: onset glass transition (Tg)
-        T_K: 1025
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 1.485(7); Yb2O3 —; Gd2O3 —; CaO 31.82(9); MgO 10.54(7); Al2O3 7.51(1); SiO2 48.6(1)
-        composition_mol: *id002
-      uncertainty:
-        reported_status: printed
-        value: 5
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1025
-          locator: *id018
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_y_l_tc_table3
-      type: literature_context
-      locator: &id019
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Y-L
-        column: Tc (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: crystallization_temperature
-        transition_as_printed: onset crystallization (Tc)
-        T_K: 1245
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 1.485(7); Yb2O3 —; Gd2O3 —; CaO 31.82(9); MgO 10.54(7); Al2O3 7.51(1); SiO2 48.6(1)
-        composition_mol: *id002
-      uncertainty:
-        reported_status: printed
-        value: 6
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1245
-          locator: *id019
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_y_l_tm_table3
-      type: literature_context
-      locator: &id020
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Y-L
-        column: Tm (K)
-      phase: cr
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: melting_point
-        transition_as_printed: onset melting (Tm)
-        T_K: 1462
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 1.485(7); Yb2O3 —; Gd2O3 —; CaO 31.82(9); MgO 10.54(7); Al2O3 7.51(1); SiO2 48.6(1)
-        composition_mol: *id002
-      uncertainty:
-        reported_status: printed
-        value: 7
-        units: K
-        note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1462
-          locator: *id020
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_y_l_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Y-L
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 18.54
-        T_fus_K:
-          value: 1462
-          units: K
-          locator: &id021
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Y-L
-            column: Tm (K)
-        composition_as_published: Y2O3 1.485(7); Yb2O3 —; Gd2O3 —; CaO 31.82(9); MgO 10.54(7); Al2O3 7.51(1); SiO2 48.6(1)
-        composition_mol: *id002
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 0.93
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1462
-          locator: *id021
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_yb_l_tg_table3
-      type: literature_context
-      locator: &id022
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Yb-L
-        column: Tg (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: glass_transition
-        transition_as_printed: onset glass transition (Tg)
-        T_K: 1024
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 0.80(1); Gd2O3 —; CaO 32.2(1); MgO 10.57(5); Al2O3 7.42(2); SiO2 49.0(2)
-        composition_mol: *id003
-      uncertainty:
-        reported_status: printed
-        value: 5
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1024
-          locator: *id022
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_yb_l_tc_table3
-      type: literature_context
-      locator: &id023
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Yb-L
-        column: Tc (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: crystallization_temperature
-        transition_as_printed: onset crystallization (Tc)
-        T_K: 1225
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 0.80(1); Gd2O3 —; CaO 32.2(1); MgO 10.57(5); Al2O3 7.42(2); SiO2 49.0(2)
-        composition_mol: *id003
-      uncertainty:
-        reported_status: printed
-        value: 6
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1225
-          locator: *id023
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_yb_l_tm_table3
-      type: literature_context
-      locator: &id024
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Yb-L
-        column: Tm (K)
-      phase: cr
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: melting_point
-        transition_as_printed: onset melting (Tm)
-        T_K: 1477
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 0.80(1); Gd2O3 —; CaO 32.2(1); MgO 10.57(5); Al2O3 7.42(2); SiO2 49.0(2)
-        composition_mol: *id003
-      uncertainty:
-        reported_status: printed
-        value: 7
-        units: K
-        note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1477
-          locator: *id024
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_yb_l_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Yb-L
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 23.44
-        T_fus_K:
-          value: 1477
-          units: K
-          locator: &id025
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Yb-L
-            column: Tm (K)
-        composition_as_published: Y2O3 —; Yb2O3 0.80(1); Gd2O3 —; CaO 32.2(1); MgO 10.57(5); Al2O3 7.42(2); SiO2 49.0(2)
-        composition_mol: *id003
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 1.17
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1477
-          locator: *id025
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_gd_l_tg_table3
-      type: literature_context
-      locator: &id026
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Gd-L
-        column: Tg (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: glass_transition
-        transition_as_printed: onset glass transition (Tg)
-        T_K: 1024
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 0.869(7); CaO 32.24(9); MgO 10.48(7); Al2O3 7.58(1); SiO2 48.8(2)
-        composition_mol: *id004
-      uncertainty:
-        reported_status: printed
-        value: 5
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1024
-          locator: *id026
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_gd_l_tc_table3
-      type: literature_context
-      locator: &id027
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Gd-L
-        column: Tc (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: crystallization_temperature
-        transition_as_printed: onset crystallization (Tc)
-        T_K: 1231
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 0.869(7); CaO 32.24(9); MgO 10.48(7); Al2O3 7.58(1); SiO2 48.8(2)
-        composition_mol: *id004
-      uncertainty:
-        reported_status: printed
-        value: 6
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1231
-          locator: *id027
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_gd_l_tm_table3
-      type: literature_context
-      locator: &id028
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Gd-L
-        column: Tm (K)
-      phase: cr
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: melting_point
-        transition_as_printed: onset melting (Tm)
-        T_K: 1457
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 0.869(7); CaO 32.24(9); MgO 10.48(7); Al2O3 7.58(1); SiO2 48.8(2)
-        composition_mol: *id004
-      uncertainty:
-        reported_status: printed
-        value: 7
-        units: K
-        note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1457
-          locator: *id028
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_gd_l_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Gd-L
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 23.31
-        T_fus_K:
-          value: 1457
-          units: K
-          locator: &id029
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Gd-L
-            column: Tm (K)
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 0.869(7); CaO 32.24(9); MgO 10.48(7); Al2O3 7.58(1); SiO2 48.8(2)
-        composition_mol: *id004
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 1.17
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1457
-          locator: *id029
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_y_h_tg_table3
-      type: literature_context
-      locator: &id030
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Y-H
-        column: Tg (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: glass_transition
-        transition_as_printed: onset glass transition (Tg)
-        T_K: 1040
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 4.93(1); Yb2O3 —; Gd2O3 —; CaO 30.91(8); MgO 10.08(5); Al2O3 7.25(1); SiO2 46.8(1)
-        composition_mol: *id005
-      uncertainty:
-        reported_status: printed
-        value: 5
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1040
-          locator: *id030
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_y_h_tc_table3
-      type: literature_context
-      locator: &id031
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Y-H
-        column: Tc (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: crystallization_temperature
-        transition_as_printed: onset crystallization (Tc)
-        T_K: 1246
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 4.93(1); Yb2O3 —; Gd2O3 —; CaO 30.91(8); MgO 10.08(5); Al2O3 7.25(1); SiO2 46.8(1)
-        composition_mol: *id005
-      uncertainty:
-        reported_status: printed
-        value: 6
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1246
-          locator: *id031
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_y_h_tm_table3
-      type: literature_context
-      locator: &id032
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Y-H
-        column: Tm (K)
-      phase: cr
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: melting_point
-        transition_as_printed: onset melting (Tm)
-        T_K: 1462
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 4.93(1); Yb2O3 —; Gd2O3 —; CaO 30.91(8); MgO 10.08(5); Al2O3 7.25(1); SiO2 46.8(1)
-        composition_mol: *id005
-      uncertainty:
-        reported_status: printed
-        value: 7
-        units: K
-        note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1462
-          locator: *id032
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_y_h_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Y-H
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 14.27
-        T_fus_K:
-          value: 1462
-          units: K
-          locator: &id033
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Y-H
-            column: Tm (K)
-        composition_as_published: Y2O3 4.93(1); Yb2O3 —; Gd2O3 —; CaO 30.91(8); MgO 10.08(5); Al2O3 7.25(1); SiO2 46.8(1)
-        composition_mol: *id005
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 0.71
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1462
-          locator: *id033
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_yb_h_tg_table3
-      type: literature_context
-      locator: &id034
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Yb-H
-        column: Tg (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: glass_transition
-        transition_as_printed: onset glass transition (Tg)
-        T_K: 1044
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 4.95(8); Gd2O3 —; CaO 31.2(1); MgO 10.06(7); Al2O3 6.33(4); SiO2 47.5(3)
-        composition_mol: *id006
-      uncertainty:
-        reported_status: printed
-        value: 5
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1044
-          locator: *id034
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_yb_h_tc_table3
-      type: literature_context
-      locator: &id035
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Yb-H
-        column: Tc (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: crystallization_temperature
-        transition_as_printed: onset crystallization (Tc)
-        T_K: 1257
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 4.95(8); Gd2O3 —; CaO 31.2(1); MgO 10.06(7); Al2O3 6.33(4); SiO2 47.5(3)
-        composition_mol: *id006
-      uncertainty:
-        reported_status: printed
-        value: 6
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1257
-          locator: *id035
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_yb_h_tm_table3
-      type: literature_context
-      locator: &id036
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Yb-H
-        column: Tm (K)
-      phase: cr
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: melting_point
-        transition_as_printed: onset melting (Tm)
-        T_K: 1454
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 4.95(8); Gd2O3 —; CaO 31.2(1); MgO 10.06(7); Al2O3 6.33(4); SiO2 47.5(3)
-        composition_mol: *id006
-      uncertainty:
-        reported_status: printed
-        value: 7
-        units: K
-        note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1454
-          locator: *id036
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_yb_h_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Yb-H
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 19.13
-        T_fus_K:
-          value: 1454
-          units: K
-          locator: &id037
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Yb-H
-            column: Tm (K)
-        composition_as_published: Y2O3 —; Yb2O3 4.95(8); Gd2O3 —; CaO 31.2(1); MgO 10.06(7); Al2O3 6.33(4); SiO2 47.5(3)
-        composition_mol: *id006
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 0.96
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1454
-          locator: *id037
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_gd_h_tg_table3
-      type: literature_context
-      locator: &id038
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Gd-H
-        column: Tg (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: glass_transition
-        transition_as_printed: onset glass transition (Tg)
-        T_K: 1030
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 5.02(2); CaO 31.2(1); MgO 9.32(5); Al2O3 7.22(2); SiO2 47.2(1)
-        composition_mol: *id007
-      uncertainty:
-        reported_status: printed
-        value: 5
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1030
-          locator: *id038
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_gd_h_tc_table3
-      type: literature_context
-      locator: &id039
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Gd-H
-        column: Tc (K)
-      phase: glass
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: crystallization_temperature
-        transition_as_printed: onset crystallization (Tc)
-        T_K: 1243
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 5.02(2); CaO 31.2(1); MgO 9.32(5); Al2O3 7.22(2); SiO2 47.2(1)
-        composition_mol: *id007
-      uncertainty:
-        reported_status: printed
-        value: 6
-        units: K
-        note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1243
-          locator: *id039
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_gd_h_tm_table3
-      type: literature_context
-      locator: &id040
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Gd-H
-        column: Tm (K)
-      phase: cr
-      regime: simultaneous DSC-TGA heating
-      units: K
-      values:
-        quantity: transition_temperature
-        property_kind: melting_point
-        transition_as_printed: onset melting (Tm)
-        T_K: 1475
-        method_class: measured_direct
-        method: Netzsch Jupiter 449 F3 DSC-TGA; about 20 mg; heated at 10 K/min in 20 mL/min air flow.
-        sample_as_prepared: laser-remelted CMAS glass, quenched to room temperature; XRD confirmed amorphous before thermal
-          analysis.
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 5.02(2); CaO 31.2(1); MgO 9.32(5); Al2O3 7.22(2); SiO2 47.2(1)
-        composition_mol: *id007
-      uncertainty:
-        reported_status: printed
-        value: 7
-        units: K
-        note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1475
-          locator: *id040
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_gd_h_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Gd-H
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 16.36
-        T_fus_K:
-          value: 1475
-          units: K
-          locator: &id041
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Gd-H
-            column: Tm (K)
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 5.02(2); CaO 31.2(1); MgO 9.32(5); Al2O3 7.22(2); SiO2 47.2(1)
-        composition_mol: *id007
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 0.82
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1475
-          locator: *id041
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
