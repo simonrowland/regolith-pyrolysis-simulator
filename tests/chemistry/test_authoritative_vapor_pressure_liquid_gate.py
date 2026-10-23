@@ -57,6 +57,7 @@ def _resolved_liquid_gate_batch(*, parent_inventory_mol: float):
 
 def _with_empty_vapour_batch(sim):
     sim.setpoints = {}
+    sim.atom_ledger = types.SimpleNamespace(project_account_mol=lambda account: {})
     sim.vapor_pressures = {}
     sim._last_vapour_batch_resolve_error = {}
     empty_batch = _resolved_liquid_gate_batch(parent_inventory_mol=0.0)
