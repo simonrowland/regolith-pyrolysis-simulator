@@ -1054,6 +1054,24 @@ def _key_for_fo2_mode(key: str, mode: Fo2Mode | None) -> str:
     return key if mode is None else f"{key}::fo2_mode={mode.value}"
 
 
+def _without_fo2_mode_key_suffix(key: object) -> str:
+    """Drop the trailing ``::fo2_mode=`` field ``_key_for_fo2_mode`` appends.
+
+    The engine remains the field in front of that suffix.
+    """
+
+    text = str(key or "")
+    marker = "::fo2_mode="
+    head, found, tail = text.rpartition(marker)
+    if found and tail and "::" not in tail:
+        return head
+    return text
+
+
+def _engine_from_residual_key(key: object) -> str:
+    return _without_fo2_mode_key_suffix(key).rsplit("::", 1)[-1]
+
+
 def _fo2_mode_from_notices(notices: Sequence[Notice]) -> Fo2Mode | None:
     return next(
         (notice.fo2_mode for notice in notices if notice.fo2_mode is not None),
@@ -1071,11 +1089,12 @@ def _dec_token(value: Decimal) -> str:
 def _residual_key_parts(key: object) -> tuple[str, str, str, str] | None:
     """Split a residual key into head, quantity, rail, and engine.
 
-    None when the key is not four ``::`` fields. An empty quantity field
-    becomes ``MISSING_QUANTITY_KEY_TOKEN``.
+    None when the key is not four ``::`` fields. A trailing ``::fo2_mode=``
+    field is removed first. An empty quantity field becomes
+    ``MISSING_QUANTITY_KEY_TOKEN``.
     """
 
-    parts = str(key or "").rsplit("::", 3)
+    parts = _without_fo2_mode_key_suffix(key).rsplit("::", 3)
     if len(parts) != 4:
         return None
     head, quantity, rail, engine = parts
@@ -12120,7 +12139,7 @@ def _e15_residual_point(
         engine = str(
             request.get("engine")
             if isinstance(request, Mapping) and request.get("engine")
-            else str(row.get("key") or "").rsplit("::", 1)[-1]
+            else _engine_from_residual_key(row.get("key"))
         )
         try:
             residual_dex = as_decimal(numeric.get("value"))
@@ -14631,7 +14650,7 @@ def _engine_from_payload(row: Mapping[str, object]) -> str:
         if len(parts) >= 2:
             return parts[1]
     if row.get("key"):
-        return str(row["key"]).rsplit("::", 1)[-1]
+        return _engine_from_residual_key(row["key"])
     return "unknown"
 
 
@@ -14852,7 +14871,7 @@ def _report_engine_set(rows: Iterable[Mapping[str, object]]) -> tuple[Engine, ..
         engine = (
             str(request.get("engine"))
             if isinstance(request, Mapping) and request.get("engine")
-            else str(row.get("key") or "").rsplit("::", 1)[-1]
+            else _engine_from_residual_key(row.get("key"))
         )
         if engine:
             names.add(engine)
@@ -15504,7 +15523,7 @@ def headline_payloads(
         rail = str(row.get("rail"))
         engine = str(
             ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
-            or str(row.get("key") or "").rsplit("::", 1)[-1]
+            or _engine_from_residual_key(row.get("key"))
         )
         relation = _source_relation_headline_key(
             rail, engine, str(row.get("source_relation") or "")
@@ -15869,7 +15888,7 @@ def flagged_stratum_payloads(
             continue
         engine = str(
             ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
-            or str(row.get("key") or "").rsplit("::", 1)[-1]
+            or _engine_from_residual_key(row.get("key"))
         )
         if engine_names and engine not in engine_names:
             continue
@@ -15983,7 +16002,7 @@ def headline_payload_records(
                 continue
             engine = str(
                 ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
-                or str(row.get("key") or "").rsplit("::", 1)[-1]
+                or _engine_from_residual_key(row.get("key"))
             )
             family = compilation_family(observation.source_id, compilation_origin(reference, origins))
             relation = str(row.get("source_relation") or SourceRelation.UNKNOWN.value)

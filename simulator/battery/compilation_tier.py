@@ -1891,13 +1891,13 @@ def _tier_cell_from_payload_fields(
     derive_eligible: bool,
     numeric_value: Decimal | None = None,
 ) -> _TierCell:
-    from simulator.battery.score import _decision_band_kind
+    from simulator.battery.score import _decision_band_kind, _engine_from_residual_key
 
     request = row.get("candidate_request")
     engine = (
         str(request["engine"])
         if isinstance(request, Mapping) and request.get("engine")
-        else str(row.get("key") or "").rsplit("::", 1)[-1]
+        else _engine_from_residual_key(row.get("key"))
     )
     raw_numeric = row.get("numeric")
     numeric = None
@@ -1956,6 +1956,7 @@ def compilation_tier_lines(
 
     from simulator.battery.score import (
         Residual,
+        _engine_from_residual_key,
         _is_flagged_stratum_notice,
         _is_fusion_conversion_notice,
     )
@@ -1970,7 +1971,7 @@ def compilation_tier_lines(
             if observation is None:
                 continue
             yield _cell_from_observation(
-                engine=residual.key.rsplit("::", 1)[-1],
+                engine=_engine_from_residual_key(residual.key),
                 status=residual.status,
                 relation=residual.source_relation,
                 numeric=None if residual.numeric is None else residual.numeric.value,
