@@ -4,10 +4,10 @@ source:
   citation: "Matchett, J. (2006), \"Production of Lunar Oxygen Through Vacuum Pyrolysis\", Major Research Report MAE 298, The George Washington University, ADA443950"
   year: 2006
 extraction:
-  method: pdftotext -layout + visual certification of Tables 2 and 3; HSC figures not digitized; Cardiff 2007 not rewritten
+  method: pdftotext -layout + visual certification of Tables 2 and 3; HSC figures not digitized; Cardiff 2007 not rewritten; validated in an internal review, 2026-08-27, ocr-repair
   date: '2026-08-27'
   worker: tail-close
-  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/
+  provenance_path: raw/kems-038-matchett-2006/kems-038-matchett-2006.pdf
 review_status: draft
 fidelity_samples:
   - species: Fe
@@ -60,7 +60,7 @@ species:
       experiment: fresnel-test-report-series
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
         table: '3'
         page: 27
       T_range_K:
@@ -181,7 +181,7 @@ species:
     - observation_id: matchett_2006_table2_compiled_dissociation
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
         table: '2'
         page: 18
       T_range_K:

@@ -74,8 +74,8 @@ observations:
           - '0.02952576055032747974863482184'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -165,6 +165,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 1.00 (3); row=A
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -308,12 +309,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=ad+en:h=7641e808be80
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -386,8 +389,8 @@ observations:
           - '0.03319028534475883901165186711'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -477,6 +480,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 0.88 (2); row=AD+En
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -620,12 +624,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=ad+fo:h=590b2263f5f3
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -698,8 +704,8 @@ observations:
           - '0.02686173672120056095191605975'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -789,6 +795,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 1.11 (3); row=AD+Fo
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -932,12 +939,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=ad+qz:h=ba16e1c1c72d
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -1010,8 +1019,8 @@ observations:
           - '0.03483835779677007513963806587'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -1101,6 +1110,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 1.08 (3); row=AD+Qz
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -1244,12 +1254,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=ad+tio2:h=07756d915779
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -1324,8 +1336,8 @@ observations:
           - '0.1507661708140898692565035049'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -1415,6 +1427,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 0.61 (2); row=AD+TiO2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -1593,12 +1606,14 @@ observations:
               table: '4'
               note: Table 4 footnote adds 19.0 wt.% TiO2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=ad+wo:h=df25b5383546
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -1671,8 +1686,8 @@ observations:
           - '0.03092510560408322428820850686'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -1762,6 +1777,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 0.98 (3); row=AD+Wo
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -1905,12 +1921,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=ad-eutectic:h=086fc21cf082
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -1983,8 +2001,8 @@ observations:
           - '0.02926218870801351656934636637'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -2074,6 +2092,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 1.12 (3); row=AD eutectic
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -2217,12 +2236,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=b:h=8f158ab685c4
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -2295,8 +2316,8 @@ observations:
           - '0.0331886941074438955583611949'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -2386,6 +2407,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 0.90 (2); row=B
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -2529,12 +2551,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=c:h=fd23cca99ab9
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -2607,8 +2631,8 @@ observations:
           - '0.03493019911868265519840937078'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -2698,6 +2722,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 0.85 (2); row=C
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -2841,12 +2866,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=cas1:h=dc87e4271e12
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -2917,8 +2944,8 @@ observations:
           - '0.0220286085695257816121519372'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -3008,6 +3035,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 1.62 (4); row=CAS1
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -3130,12 +3158,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=cas2:h=4a27c6ab7d71
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -3206,8 +3236,8 @@ observations:
           - '0.0215477182969063894866902216'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -3297,6 +3327,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 1.58 (4); row=CAS2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -3419,12 +3450,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=cas3:h=9c614aff29c7
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -3495,8 +3528,8 @@ observations:
           - '0.0183060546307898673401480277'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -3586,6 +3619,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 1.29 (2); row=CAS3
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -3708,12 +3742,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=cas4:h=99f55deef750
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -3784,8 +3820,8 @@ observations:
           - '0.03381810628340488239271092275'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -3875,6 +3911,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 0.94 (2); row=CAS4
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -3997,12 +4034,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=d:h=304dcb9afcb3
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -4075,8 +4114,8 @@ observations:
           - '0.02354597682308822212776892231'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -4166,6 +4205,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 1.15 (3); row=D
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -4309,12 +4349,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=e:h=13813b1c7672
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -4387,8 +4429,8 @@ observations:
           - '0.02681063089416076746078216'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -4478,6 +4520,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 1.09 (3); row=E
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -4621,12 +4664,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=f:h=884b354aadb7
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -4699,8 +4744,8 @@ observations:
           - '0.04345861689462893679417059484'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -4790,6 +4835,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 0.82 (2); row=F
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -4933,12 +4979,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=g:h=b6b9febf5c2f
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -5011,8 +5059,8 @@ observations:
           - '0.03630640083905185007502879729'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -5102,6 +5150,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 0.95 (3); row=G
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -5245,12 +5294,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=mas1:h=8bbfb1d3c20f
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -5321,8 +5372,8 @@ observations:
           - '0.03918561012269007132042965467'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -5412,6 +5463,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 0.81 (2); row=MAS1
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -5534,12 +5586,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_coo::T=1673.15:row=mas2:h=d93d4cdc20c3
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -5610,8 +5664,8 @@ observations:
           - '0.03955339345890884748795588319'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -5701,6 +5755,7 @@ observations:
               table: '7'
               note: gamma_CoO cell 0.81 (2); row=MAS2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -5823,12 +5878,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=a:h=4dca412f6316
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -5992,6 +6049,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.359 (22); row=A
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -6044,6 +6102,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -6177,12 +6236,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=ad+en:h=21b61400bf0b
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -6346,6 +6407,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.167 (10); row=AD+En
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -6398,6 +6460,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -6531,12 +6594,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=ad+fo:h=4b8dc81c156a
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -6700,6 +6765,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.468 (25); row=AD+Fo
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -6752,6 +6818,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -6885,12 +6952,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=ad+qz:h=d9976f153a31
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -7054,6 +7123,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.121 (19); row=AD+Qz
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -7106,6 +7176,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -7239,12 +7310,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=ad+tio2:h=1f27a76c9100
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -7410,6 +7483,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 0.935 (17); row=AD+TiO2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -7462,6 +7536,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -7630,12 +7705,14 @@ observations:
               table: '4'
               note: Table 4 footnote adds 19.0 wt.% TiO2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=ad+wo:h=047dba26e1c0
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -7799,6 +7876,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.231 (19); row=AD+Wo
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -7851,6 +7929,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -7984,12 +8063,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=ad-eutectic:h=417e1178409d
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -8153,6 +8234,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.367 (11); row=AD eutectic
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -8205,6 +8287,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -8338,12 +8421,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=b:h=21bb46db7300
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -8507,6 +8592,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.193 (27); row=B
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -8559,6 +8645,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -8692,12 +8779,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=c:h=8a979055d0e6
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -8861,6 +8950,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.091 (14); row=C
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -8913,6 +9003,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -9046,12 +9137,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=cas1:h=66090088295d
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -9213,6 +9306,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.863 (45); row=CAS1
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -9265,6 +9359,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -9377,12 +9472,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=cas2:h=b6ecd4645dc5
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -9544,6 +9641,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.82 (11); row=CAS2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -9596,6 +9694,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -9708,12 +9807,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=cas3:h=3b0fd8912d7f
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -9875,6 +9976,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 2.263 (59); row=CAS3
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -9927,6 +10029,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -10039,12 +10142,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=cas4:h=3c257dd8f0a7
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -10206,6 +10311,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.168 (13); row=CAS4
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -10258,6 +10364,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -10370,12 +10477,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=d:h=8a93d87ad718
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -10539,6 +10648,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.76 (10); row=D
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -10591,6 +10701,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -10724,12 +10835,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=e:h=f0fdc3d73567
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -10893,6 +11006,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.450 (24); row=E
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -10945,6 +11059,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -11078,12 +11193,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=f:h=9289da9f48ef
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -11247,6 +11364,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 0.875 (9); row=F
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -11299,6 +11417,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -11432,12 +11551,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=g:h=cb02d954416a
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -11601,6 +11722,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.091 (14); row=G
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -11653,6 +11775,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -11786,12 +11909,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=mas1:h=ad05fe877f12
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -11953,6 +12078,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.034 (17); row=MAS1
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -12005,6 +12131,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -12117,12 +12244,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=mas2:h=5671a4828521
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -12284,6 +12413,7 @@ observations:
               table: '7'
               note: gamma_FeO cell 1.052 (14); row=MAS2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -12336,6 +12466,7 @@ observations:
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []
     printed_composition:
       state:
         tag: value
@@ -12448,12 +12579,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=a:h=0d4fdea74e62
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -12526,8 +12659,8 @@ observations:
           - '0.02952576055032747974863482184'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -12617,6 +12750,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 183 (11); row=A
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -12760,12 +12894,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=ad+en:h=14b467796049
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -12838,8 +12974,8 @@ observations:
           - '0.03319028534475883901165186711'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -12929,6 +13065,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 168 (13); row=AD+En
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -13072,12 +13209,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=ad+fo:h=288ace5369e8
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -13150,8 +13289,8 @@ observations:
           - '0.02686173672120056095191605975'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -13241,6 +13380,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 131 (14); row=AD+Fo
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -13384,12 +13524,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=ad+qz:h=baf6de3912df
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -13462,8 +13604,8 @@ observations:
           - '0.03483835779677007513963806587'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -13553,6 +13695,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 227 (16); row=AD+Qz
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -13696,12 +13839,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=ad+tio2:h=bf9a445176ed
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -13776,8 +13921,8 @@ observations:
           - '0.1507661708140898692565035049'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -13867,6 +14012,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 67 (4); row=AD+TiO2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -14045,12 +14191,14 @@ observations:
               table: '4'
               note: Table 4 footnote adds 19.0 wt.% TiO2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=ad+wo:h=b884a33e4bc4
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -14123,8 +14271,8 @@ observations:
           - '0.03092510560408322428820850686'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -14214,6 +14362,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 68 (8); row=AD+Wo
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -14357,12 +14506,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=ad-eutectic:h=4044e19d09ed
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -14435,8 +14586,8 @@ observations:
           - '0.02926218870801351656934636637'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -14526,6 +14677,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 136 (12); row=AD eutectic
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -14669,12 +14821,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=b:h=0bdf6d3398c5
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -14747,8 +14901,8 @@ observations:
           - '0.0331886941074438955583611949'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -14838,6 +14992,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 209 (12); row=B
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -14981,12 +15136,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=c:h=d202ec71d695
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -15059,8 +15216,8 @@ observations:
           - '0.03493019911868265519840937078'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -15150,6 +15307,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 150 (10); row=C
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -15293,12 +15451,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=cas1:h=a908459cea94
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -15369,8 +15529,8 @@ observations:
           - '0.0220286085695257816121519372'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -15460,6 +15620,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 44 (5); row=CAS1
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -15582,12 +15743,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=cas2:h=76349b8ea199
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -15658,8 +15821,8 @@ observations:
           - '0.0215477182969063894866902216'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -15749,6 +15912,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 19 (2); row=CAS2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -15871,12 +16035,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=cas4:h=9470ceb3dd5e
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -15947,8 +16113,8 @@ observations:
           - '0.03381810628340488239271092275'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -16038,6 +16204,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 83 (8); row=CAS4
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -16160,12 +16327,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=d:h=2914ca4e47e3
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -16238,8 +16407,8 @@ observations:
           - '0.02354597682308822212776892231'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -16329,6 +16498,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 188 (12); row=D
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -16472,12 +16642,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=e:h=7dc73b372bbe
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -16550,8 +16722,8 @@ observations:
           - '0.02681063089416076746078216'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -16641,6 +16813,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 114 (9); row=E
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -16784,12 +16957,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=f:h=a5ebce7d5261
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -16862,8 +17037,8 @@ observations:
           - '0.04345861689462893679417059484'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -16953,6 +17128,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 152 (10); row=F
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -17096,12 +17272,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=mas1:h=646b48f85b22
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -17172,8 +17350,8 @@ observations:
           - '0.03918561012269007132042965467'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -17263,6 +17441,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 446 (117); row=MAS1
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -17385,12 +17564,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo2::T=1673.15:row=mas2:h=d40287fc6bb4
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -17461,8 +17642,8 @@ observations:
           - '0.03955339345890884748795588319'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -17552,6 +17733,7 @@ observations:
               table: '7'
               note: gamma_MoO2 cell 221 (12); row=MAS2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -17674,12 +17856,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=a:h=3be0df361dbe
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -17752,8 +17936,8 @@ observations:
           - '0.02952576055032747974863482184'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -17843,6 +18027,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.692 (51); row=A
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -17986,12 +18171,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=ad+en:h=88f6cd614888
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -18064,8 +18251,8 @@ observations:
           - '0.03319028534475883901165186711'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -18155,6 +18342,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.433 (38); row=AD+En
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -18298,12 +18486,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=ad+fo:h=a83f8acea8a4
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -18376,8 +18566,8 @@ observations:
           - '0.02686173672120056095191605975'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -18467,6 +18657,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.290 (33); row=AD+Fo
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -18610,12 +18801,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=ad+qz:h=f5d620fd26b6
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -18688,8 +18881,8 @@ observations:
           - '0.03483835779677007513963806587'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -18779,6 +18972,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.793 (78); row=AD+Qz
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -18922,12 +19116,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=ad+tio2:h=4b88ac729c6c
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -19002,8 +19198,8 @@ observations:
           - '0.1507661708140898692565035049'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -19093,6 +19289,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.325 (36); row=AD+TiO2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -19271,12 +19468,14 @@ observations:
               table: '4'
               note: Table 4 footnote adds 19.0 wt.% TiO2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=ad+wo:h=e3b4eef44887
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -19349,8 +19548,8 @@ observations:
           - '0.03092510560408322428820850686'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -19440,6 +19639,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.094 (7); row=AD+Wo
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -19583,12 +19783,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=ad-eutectic:h=291b1254b8d6
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -19661,8 +19863,8 @@ observations:
           - '0.02926218870801351656934636637'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -19752,6 +19954,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.303 (25); row=AD eutectic
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -19895,12 +20098,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=b:h=9c3f0102e98f
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -19973,8 +20178,8 @@ observations:
           - '0.0331886941074438955583611949'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -20064,6 +20269,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.814 (61); row=B
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -20207,12 +20413,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=c:h=4c4ad1e11b1e
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -20285,8 +20493,8 @@ observations:
           - '0.03493019911868265519840937078'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -20376,6 +20584,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.463 (32); row=C
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -20519,12 +20728,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=cas1:h=4ef3a379c30f
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -20595,8 +20806,8 @@ observations:
           - '0.0220286085695257816121519372'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -20686,6 +20897,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.079 (6); row=CAS1
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -20808,12 +21020,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=cas2:h=30af8846ebc2
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -20884,8 +21098,8 @@ observations:
           - '0.0215477182969063894866902216'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -20975,6 +21189,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.027 (2); row=CAS2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -21097,12 +21312,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=cas4:h=d45e9b1b7460
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -21173,8 +21390,8 @@ observations:
           - '0.03381810628340488239271092275'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -21264,6 +21481,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.201 (18); row=CAS4
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -21386,12 +21604,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=d:h=b289c32e99e8
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -21464,8 +21684,8 @@ observations:
           - '0.02354597682308822212776892231'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -21555,6 +21775,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.569 (39); row=D
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -21698,12 +21919,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=e:h=ce0e729117df
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -21776,8 +21999,8 @@ observations:
           - '0.02681063089416076746078216'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -21867,6 +22090,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.240 (15); row=E
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -22010,12 +22234,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=f:h=87ee3bdd7432
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -22088,8 +22314,8 @@ observations:
           - '0.04345861689462893679417059484'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -22179,6 +22405,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 0.496 (35); row=F
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -22322,12 +22549,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=mas1:h=fbdb58075d5c
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -22398,8 +22627,8 @@ observations:
           - '0.03918561012269007132042965467'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -22489,6 +22718,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 1.37 (24); row=MAS1
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -22611,12 +22841,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_moo3::T=1673.15:row=mas2:h=f2eed3ff43b4
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -22687,8 +22919,8 @@ observations:
           - '0.03955339345890884748795588319'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -22778,6 +23010,7 @@ observations:
               table: '7'
               note: gamma_MoO3 cell 1.64 (23); row=MAS2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -22900,12 +23133,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=a:h=92a864a46346
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -22978,8 +23213,8 @@ observations:
           - '0.02952576055032747974863482184'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -23069,6 +23304,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.42 (5); row=A
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -23212,12 +23448,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=ad+en:h=b1a3117656eb
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -23290,8 +23528,8 @@ observations:
           - '0.03319028534475883901165186711'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -23381,6 +23619,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.30 (5); row=AD+En
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -23524,12 +23763,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=ad+fo:h=71b65be647dd
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -23602,8 +23843,8 @@ observations:
           - '0.02686173672120056095191605975'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -23693,6 +23934,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.70 (7); row=AD+Fo
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -23836,12 +24078,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=ad+qz:h=361ef6a2ddb8
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -23914,8 +24158,8 @@ observations:
           - '0.03483835779677007513963806587'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -24005,6 +24249,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.86 (7); row=AD+Qz
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -24148,12 +24393,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=ad+tio2:h=0c544c38fbc6
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -24228,8 +24475,8 @@ observations:
           - '0.1507661708140898692565035049'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -24319,6 +24566,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 1.44 (3); row=AD+TiO2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -24497,12 +24745,14 @@ observations:
               table: '4'
               note: Table 4 footnote adds 19.0 wt.% TiO2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=ad+wo:h=9e3b6fa6b078
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -24575,8 +24825,8 @@ observations:
           - '0.03092510560408322428820850686'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -24666,6 +24916,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.12 (5); row=AD+Wo
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -24809,12 +25060,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=ad-eutectic:h=54e0532c2dc3
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -24887,8 +25140,8 @@ observations:
           - '0.02926218870801351656934636637'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -24978,6 +25231,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.52 (6); row=AD eutectic
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -25121,12 +25375,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=b:h=b572ff7598bf
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -25199,8 +25455,8 @@ observations:
           - '0.0331886941074438955583611949'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -25290,6 +25546,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.12 (5); row=B
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -25433,12 +25690,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=c:h=94deb2a5d729
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -25511,8 +25770,8 @@ observations:
           - '0.03493019911868265519840937078'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -25602,6 +25861,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.03 (3); row=C
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -25745,12 +26005,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=cas1:h=15997847b6af
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -25821,8 +26083,8 @@ observations:
           - '0.0220286085695257816121519372'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -25912,6 +26174,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 3.56 (9); row=CAS1
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -26034,12 +26297,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=cas2:h=f6ca139396d0
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -26110,8 +26375,8 @@ observations:
           - '0.0215477182969063894866902216'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -26201,6 +26466,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 3.48 (9); row=CAS2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -26323,12 +26589,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=cas3:h=485c20ff0b6c
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -26399,8 +26667,8 @@ observations:
           - '0.0183060546307898673401480277'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -26490,6 +26758,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 4.39 (11); row=CAS3
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -26612,12 +26881,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=cas4:h=dddcf8348792
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -26688,8 +26959,8 @@ observations:
           - '0.03381810628340488239271092275'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -26779,6 +27050,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.54 (5); row=CAS4
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -26901,12 +27173,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=d:h=bf941b49cf87
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -26979,8 +27253,8 @@ observations:
           - '0.02354597682308822212776892231'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -27070,6 +27344,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.37 (7); row=D
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -27213,12 +27488,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=e:h=98fb75f1d852
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -27291,8 +27568,8 @@ observations:
           - '0.02681063089416076746078216'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -27382,6 +27659,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.70 (7); row=E
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -27525,12 +27803,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=f:h=905f208fe0df
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -27603,8 +27883,8 @@ observations:
           - '0.04345861689462893679417059484'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -27694,6 +27974,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.15 (4); row=F
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -27837,12 +28118,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=g:h=f623c31eadb3
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -27915,8 +28198,8 @@ observations:
           - '0.03630640083905185007502879729'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -28006,6 +28289,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.40 (6); row=G
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -28149,12 +28433,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=mas1:h=57244f37750f
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -28225,8 +28511,8 @@ observations:
           - '0.03918561012269007132042965467'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -28316,6 +28602,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 2.04 (5); row=MAS1
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -28438,12 +28725,14 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []
 - observation_id: oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_nio::T=1673.15:row=mas2:h=5254b45fda50
   experiment_id: 10.1016/s0009-2541(01)00414-4::experiment::oneill-2002-fe-saturated-cmas
   identity:
@@ -28514,8 +28803,8 @@ observations:
           - '0.03955339345890884748795588319'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000002454708915685030356082721741'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -28605,6 +28894,7 @@ observations:
               table: '7'
               note: gamma_NiO cell 1.94 (6); row=MAS2
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -28727,9 +29017,11 @@ observations:
               pdf_page_index: 10
               table: '4'
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:oneill-2002-feo-activity-coefficients-cmas
     parameters: []
     output_unit: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+    references: []

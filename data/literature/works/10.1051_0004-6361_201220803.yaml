@@ -127,6 +127,7 @@ experiments:
                 section: '2.1'
                 note: UHV base pressure <10^-10 mbar; unit conversion only
           output_unit: Pa
+          references: []
   work_id: 10.1051/0004-6361/201220803
   locator:
     page: 2
@@ -139,7 +140,7 @@ experiments:
         value: Ta Knudsen cell (source); UHV film growth
       locator:
         paragraph: Ta Knudsen cell
-        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
     geometry:
       orifice_diameter_m:
         state:
@@ -210,6 +211,7 @@ experiments:
                 section: '2.4'
                 note: Printed 100 min per anneal; unit conversion only
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown
@@ -250,7 +252,7 @@ experiments:
     equation: '8'
     line_range: 317-329
     note: particle-growth equation; authors call alpha(T) a growth coefficient
-    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
 benches:
 - id: 10.1051/0004-6361/201220803::bench::wetzel-uhv-film-apparatus
   work_id: 10.1051/0004-6361/201220803

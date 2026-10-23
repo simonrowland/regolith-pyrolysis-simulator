@@ -5,10 +5,10 @@ source:
   doi: 10.4236/msce.2015.37009
   year: 2015
 extraction:
-  method: pdftotext -layout + visual certification of Table 1; Figs 1–2 not digitized
+  method: pdftotext -layout + visual certification of Table 1; Figs 1–2 not digitized; validated in an internal review, 2026-08-27, ocr-repair
   date: '2026-08-27'
   worker: tail-close
-  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-040-stolyarova-2015/
+  provenance_path: raw/kems-040-stolyarova-2015/kems-040-stolyarova-2015.pdf
 review_status: draft
 fidelity_samples:
   - species: SiO
@@ -25,7 +25,7 @@ species:
     - observation_id: stolyarova_2015_table1_vapour_species_map
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-040-stolyarova-2015/tables.md
+        source_path: text/kems-040-stolyarova-2015/ocr-repair/kems-040-stolyarova-2015.md
         table: '1'
         page: 82
       T_range_K:

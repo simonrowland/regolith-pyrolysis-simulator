@@ -7,14 +7,14 @@ source:
   url: https://doi.org/10.2355/isijinternational1966.15.115
   year: 1975
 extraction:
-  method: Official J-STAGE OA PDF (raw/kems-088-ichise-1975/kems-088-ichise-1975.pdf). pdftotext -layout
+  method: Official J-STAGE OA PDF (raw/kems-088-ichise-1975/kems-088-ichise-1975.pdf). pdftotext -layout; validated in an internal review, 2026-09-12, kems-extracts
     is a noisy OCR layer and is not data. Tables 1-3 transcribed from 400 dpi pdftoppm renders of PDF
     pages 2-4 (published pp. 116-118). Where the decode and the render disagree, the render wins. Table
     2 ion-intensity ratios kept as measured; Table 3 epsilon/e labelled model_derived from Belton-Fruehan
     integration of Table 2. Figs 1-10 listed figure-only.
   date: '2026-09-13'
   worker: extract-alloys-b1
-  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+  provenance_path: raw/kems-088-ichise-1975/kems-088-ichise-1975.pdf
 review_status: draft
 corrections: []
 benches:

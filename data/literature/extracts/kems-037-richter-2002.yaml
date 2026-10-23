@@ -6,10 +6,10 @@ source:
     and constraints on their thermal evolution", Geochim. Cosmochim. Acta 66:521-540'
   year: 2002
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap geometry extract
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap geometry extract; validated in an internal review, 2026-08-03, ocr-artifacts
   date: '2026-08-03'
   worker: ocr-phase2b-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/
+  provenance_path: raw/kems-037-richter-2002/kems-037-richter-2002.pdf
 review_status: draft
 benches:
 - id: evaporation-furnaces
@@ -181,10 +181,10 @@ species:
       experiment: bcai-evaporation
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
         table: '1'
         figure: '12'
-        line_range: 174-178
+        line_range: '178-180, 546'
         note: γ_Mg evaporation coefficients from vacuum and H2 experiments
       T_range_K:
       - 1673.0
@@ -225,9 +225,9 @@ species:
             table: 1
             note: Avg.area (cm2) column in Table 1; range used to assess recondensation
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
             paragraph: samples with a range of surface areas from 0.063 to 0.416 cm2
-            line_range: '450'
+            line_range: '425'
             note: Authors prose range (Table 1 Avg.area spans ~0.062–0.425; prose rounds to 0.063–0.416)
         chamber_pressure:
           value:
@@ -235,9 +235,9 @@ species:
             hydrogen_bar_example: 0.000187
             one_bar_gas_mix: true
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
             paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
-            line_range: 194-196
+            line_range: 198
           note: Scoped to vacuum-run subset (~10^-6 Torr) that owns the pinned γ_Mg=0.04; H2 (1.87e-4
             bar) and 1-bar gas-mix runs are separate atmospheres in the paper — not collapsed into this
             pressure field.
@@ -245,7 +245,7 @@ species:
     - observation_id: richter_2002_mg_table1_per_run_areas_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
         table: '1'
         paragraph: Avg.area (cm2) and γ_Mg per run
       T_range_K:
@@ -414,7 +414,7 @@ species:
           inferred: true
           inference: A = 0.168 cm2 (BCAI-s1) * 1e-4 m2/cm2 = 1.68e-5 m2; full per-run series in values.per_run_table1
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
             table: '1'
             paragraph: BCAI-s1 Avg.area 0.168 cm2
         chamber_pressure:
@@ -422,7 +422,7 @@ species:
           units: bar
           note: H2 series example; vacuum rows are <1e-9 bar
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
             table: '1'
   SiO:
     observations:
@@ -430,9 +430,9 @@ species:
       experiment: bcai-evaporation
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
         table: '1'
-        line_range: 174-178
+        line_range: 178-180
       T_range_K:
       - 1673.0
       - 1773.0
@@ -464,14 +464,14 @@ species:
             - 0.416
             table: 1
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
             paragraph: samples with a range of surface areas from 0.063 to 0.416 cm2
-            line_range: '450'
+            line_range: '425'
             note: Authors prose range (Table 1 Avg.area spans ~0.062–0.425; prose rounds to 0.063–0.416)
     - observation_id: richter_2002_sio_table1_per_run_areas_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
         table: '1'
       T_range_K:
       - 1773.15
@@ -568,7 +568,7 @@ species:
           inferred: true
           inference: same BCAI-s1 area as Mg package
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
             table: '1'
 fidelity_samples:
 - species: Mg
@@ -577,7 +577,7 @@ fidelity_samples:
   field: alpha
   value: 0.04
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+    source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
     figure: '12'
     paragraph: evaporation coefficient γ_Mg = 0.04
     line_range: 530-548
@@ -587,16 +587,16 @@ fidelity_samples:
   - 0.416
   note: BCAI surface-area range for recondensation test
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+    source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
     paragraph: samples with a range of surface areas from 0.063 to 0.416 cm2
-    line_range: '450'
+    line_range: '425'
 - species: Mg
   observable: alpha
   observation_id: richter_2002_mg_table1_per_run_areas_b1
   field: alpha
   value: 0.04
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+    source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
     table: '1'
     note: representative pin; matrix in per_run
 - species: SiO
@@ -669,6 +669,6 @@ fidelity_samples:
     avg_area_cm2: 0.425
     T_C: 1500
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+    source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
     table: '1'
     note: fidelity pin on one per-run γ_Si point

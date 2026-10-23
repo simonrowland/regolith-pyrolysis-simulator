@@ -5,10 +5,10 @@ source:
   url: "https://arxiv.org/abs/2603.05322"
   year: 2026
 extraction:
-  method: "Manual PDF extraction with page-rendered figure/SVG verification; corpus MinerU markdown was absent, so the embedded PDF text and PDF pages are authoritative. Figure coordinates are explicitly digitized, not printed measurements."
+  method: "Manual PDF extraction with page-rendered figure/SVG verification; corpus MinerU markdown was absent, so the embedded PDF text and PDF pages are authoritative. Figure coordinates are explicitly digitized, not printed measurements.; validated in an internal review, 2026-09-24, inbox-triage"
   date: "2026-09-24"
   worker: extract-pahlevan-2026-protolunar-volatile-outflows
-  provenance_path: docs-private/research/2026-09-24-inbox-triage/queue.jsonl
+  provenance_path: raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
 review_status: draft
 fidelity_samples:
 - path: species.H2O.observations[pahlevan_2026_fig1a_h2o_partial_pressure].values.series[0].P_bar

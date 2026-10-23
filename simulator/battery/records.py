@@ -40,6 +40,7 @@ from simulator.battery.enums import (
     ExecutionState,
     ExperimentKind,
     FO2Channel,
+    Fo2Mode,
     MethodToken,
     MetricOperation,
     NoticeKind,
@@ -430,6 +431,8 @@ class Derivation:
     # not declared — never a stamped false.
     pure_substance_reference: bool | None = None
     raw_inputs: Located[RawInputStatus] | None = None
+    method: Located[str] | None = None
+    references: tuple[str, ...] = ()
 
     @property
     def declares_unprinted_raw_inputs(self) -> bool:
@@ -448,6 +451,31 @@ class Derivation:
             and self.raw_inputs.locator is not None
         )
 
+    @property
+    def has_located_method(self) -> bool:
+        locator = self.method.locator if self.method is not None else None
+        page = locator.page if locator is not None else None
+        has_physical_page = (
+            isinstance(page, int) and not isinstance(page, bool) and page > 0
+        ) or (isinstance(page, str) and bool(page.strip()))
+        return (
+            self.method is not None
+            and self.method.state.is_value
+            and isinstance(self.method.state.value, str)
+            and bool(self.method.state.value.strip())
+            and locator is not None
+            and has_physical_page
+            and isinstance(locator.equation, str)
+            and bool(locator.equation.strip())
+        )
+
+    @property
+    def has_named_references(self) -> bool:
+        return bool(self.references) and all(
+            isinstance(reference, str) and bool(reference.strip())
+            for reference in self.references
+        )
+
     def __post_init__(self) -> None:
         if not self.relation:
             raise ValueError("Derivation.relation is required")
@@ -457,6 +485,21 @@ class Derivation:
             self.pure_substance_reference, bool
         ):
             raise TypeError("Derivation.pure_substance_reference must be bool or absent")
+        if self.method is not None and (
+            not isinstance(self.method, Located)
+            or not isinstance(self.method.state, State)
+        ):
+            raise TypeError("Derivation.method must be a Located string or absent")
+        if (
+            self.method is not None
+            and self.method.state.is_value
+            and not isinstance(self.method.state.value, str)
+        ):
+            raise TypeError("Derivation.method value must be a string")
+        if not isinstance(self.references, tuple) or any(
+            not isinstance(reference, str) for reference in self.references
+        ):
+            raise TypeError("Derivation.references must be a tuple of strings")
 
 
 @dataclass(frozen=True)
@@ -473,6 +516,7 @@ class Notice:
     dropped_mass_fraction: Decimal | None = None
     authority: Authority | None = None
     certification: str | None = None
+    fo2_mode: Fo2Mode | None = None
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
@@ -1294,6 +1338,7 @@ class Residual:
     numeric: ResidualNumeric | None = None
     refusal: ResidualRefusal | None = None
     quench_state: QuenchState | None = None
+    fo2_mode: Fo2Mode | None = None
 
     def __post_init__(self) -> None:
         if not self.key:
@@ -1322,6 +1367,7 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.band,
                 notice.dropped,
                 notice.dropped_mass_fraction,
+                notice.fo2_mode,
             )
             if fingerprint in seen:
                 continue

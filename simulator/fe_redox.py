@@ -882,27 +882,32 @@ def kress91_dropped_components(
     return dropped, dropped_total / total
 
 
-def _kress91_fe2o3_over_feo_molar(
+def _kress91_ln_ratio(
     *,
     fO2_log: float,
     mol_fractions: Mapping[str, float],
     T_K: float,
     pressure_bar: float,
+    fo2_term: float | None = None,
 ) -> float:
-    _validate_kress91_controls(
-        fO2_log=fO2_log,
-        T_K=T_K,
-        pressure_bar=pressure_bar,
-    )
+    """Left fold of Kress91 ln(Fe2O3/FeO).
+
+    The fO2 term is the first addend, matching the historical forward.
+    Pass ``fo2_term=0.0`` to obtain the composition, temperature, and
+    pressure sum the inverse subtracts. ``float(T_K)`` is used only on the
+    inverse-temperature term; the other terms keep ``T_K`` as given.
+    """
+
+    _validate_kress91_controls(fO2_log=fO2_log, T_K=T_K, pressure_bar=pressure_bar)
+    if fo2_term is None:
+        # a*ln(fO2) with fO2 = 10**fO2_log, computed as fO2_log*ln(10).
+        # 10.0**fO2_log underflows to 0.0 at extreme-reducing fO2 and then
+        # math.log(0.0) raises (BUG-159). This product is the canonical term.
+        fo2_term = KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
     x = mol_fractions
     p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
-    ln_ratio = (
-        # a*ln(fO2) with fO2 = 10**fO2_log, computed as fO2_log*ln(10) directly.
-        # The prior 10.0**fO2_log underflows to 0.0 at extreme-reducing fO2 and
-        # then math.log(0.0) raises a domain error, aborting the provider (BUG-159).
-        # This form is algebraically exact and is the canonical Kress91 a*ln(fO2)
-        # term (the sibling exp() at the return is already domain-clamped).
-        KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
+    return (
+        fo2_term
         + KRESS91_INV_T_COEFFICIENT_K / float(T_K)
         - 6.675
         - 2.243 * x.get('Al2O3', 0.0)
@@ -921,7 +926,59 @@ def _kress91_fe2o3_over_feo_molar(
         )
         + KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K)
     )
+
+
+def _kress91_fe2o3_over_feo_molar(
+    *,
+    fO2_log: float,
+    mol_fractions: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    ln_ratio = _kress91_ln_ratio(
+        fO2_log=fO2_log,
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
     return math.exp(max(-745.0, min(709.0, ln_ratio)))
+
+
+def kress91_log10_fO2_from_fe3_over_sigma_fe(
+    *,
+    fe3_over_sigma_fe: float,
+    mol_fractions: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    """Invert Kress91 for log10(fO2/bar) at a printed Fe3+/ΣFe.
+
+    q = 2*ratio/(2*ratio+1), so ratio = q/(2*(1-q)). q of 0 or 1 has no
+    finite oxygen fugacity. This inverts the unclamped ln(ratio) equation;
+    the forward exp() clamp is a numerical guard, not part of the relation.
+    """
+
+    try:
+        fraction = float(fe3_over_sigma_fe)
+    except (TypeError, ValueError) as exc:
+        raise Kress91InvalidControls(
+            "Kress91 Fe3+/sumFe must be a fraction in (0, 1), "
+            f"got {fe3_over_sigma_fe!r}"
+        ) from exc
+    if not math.isfinite(fraction) or fraction <= 0.0 or fraction >= 1.0:
+        raise Kress91InvalidControls(
+            "Kress91 Fe3+/sumFe must be a fraction in (0, 1), "
+            f"got {fe3_over_sigma_fe!r}"
+        )
+    ratio = fraction / (2.0 * (1.0 - fraction))
+    other = _kress91_ln_ratio(
+        fO2_log=0.0,
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+        fo2_term=0.0,
+    )
+    return (math.log(ratio) - other) / (KRESS91_LN_FO2_COEFFICIENT * math.log(10.0))
 
 
 def kress91_fe3_over_sigma_fe(

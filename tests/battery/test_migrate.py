@@ -6,6 +6,7 @@ import csv
 import hashlib
 import itertools
 import json
+import math
 import os
 import re
 import subprocess
@@ -655,9 +656,14 @@ def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
         assert observation.identity.species.phase.value is Phase.L
         assert reference.component_basis == "Fe(1-x)O"
         assert reference.reference_pressure_bar == Decimal("1.01325")
+    for observation in table2:
         assert identity_equal(observation.identity, observation.identity).kind is (
-            IdentityEqualKind.IDENTITY_UNKNOWN
+            IdentityEqualKind.EQUAL
         )
+    for observation in table3:
+        outcome = identity_equal(observation.identity, observation.identity)
+        assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        assert "composition" in outcome.fields
 
     assert all(observation.identity.composition.is_value for observation in table2)
     assert all(observation.identity.composition.is_unknown for observation in table3)
@@ -762,18 +768,33 @@ def _extract_observations(name: str) -> list[dict]:
     return found
 
 
-def _raw_inputs_extract(method_class: str, *, include_locator: bool = True) -> dict:
+def _raw_inputs_extract(
+    method_class: str,
+    *,
+    include_locator: bool = True,
+    include_method: bool = False,
+) -> dict:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     observation = extract["species"]["Na"]["observations"][0]
     observation["values"]["method_class"] = method_class
     raw_inputs = {"state": {"tag": "value", "value": "not_printed"}}
     if include_locator:
         raw_inputs["locator"] = {"page": 2, "section": "3.3"}
-    observation["values"]["derivation"] = {
+    derivation = {
         "relation": "calculated from measured quantities",
         "output_unit": "Pa",
         "raw_inputs": raw_inputs,
     }
+    if include_method:
+        derivation["method"] = {
+            "state": {
+                "tag": "value",
+                "value": "printed equation using Gurvich K°(T) and Mann cross-sections",
+            },
+            "locator": {"page": 2, "equation": "7"},
+        }
+        derivation["references"] = ["Gurvich K°(T)", "Mann cross-sections"]
+    observation["values"]["derivation"] = derivation
     return extract
 
 
@@ -845,7 +866,7 @@ def test_production_migration_rejects_unlocated_unprinted_raw_input_declaration(
         (
             [],
             {"state": {"tag": "value", "value": "not_printed"}},
-            ".values.derivation",
+            ".derivation.raw_inputs",
             "requires a locator",
         ),
         (
@@ -860,7 +881,7 @@ def test_production_migration_rejects_unlocated_unprinted_raw_input_declaration(
         (
             None,
             {"state": {"tag": "value", "value": "not_printed"}},
-            ".values.derivation",
+            ".derivation.raw_inputs",
             "requires a locator",
         ),
     ],
@@ -1441,17 +1462,54 @@ def test_malformed_registry_inference_records_issue_without_dropping_value() -> 
     )
 
 
-def test_production_migration_rejects_model_derived_raw_input_declaration(
+def test_production_migration_accepts_model_derived_raw_input_method(
     tmp_path: Path,
 ) -> None:
     result = migrate(
-        _write_min_tree(tmp_path, _raw_inputs_extract("model_derived")),
+        _write_min_tree(
+            tmp_path,
+            _raw_inputs_extract("model_derived", include_method=True),
+        ),
         write=False,
     )
+    observation = next(iter(result.observations.values()))
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert observation.derivation is not None
+    assert observation.derivation.method is not None
+    assert observation.derivation.method.state.value == (
+        "printed equation using Gurvich K°(T) and Mann cross-sections"
+    )
+    assert observation.derivation.method.locator is not None
+    assert observation.derivation.references == (
+        "Gurvich K°(T)",
+        "Mann cross-sections",
+    )
+    assert result.validation.hard_issues == ()
+    reloaded = observation_from_plain(
+        yaml.safe_load(yaml.safe_dump(to_plain(observation)))
+    )
+    assert reloaded.derivation == observation.derivation
+
+
+@pytest.mark.parametrize(
+    "method", [0, {"nonsense": True}], ids=["numeric", "object"]
+)
+def test_model_derived_raw_input_method_rejects_non_string_values(
+    tmp_path: Path, method: object
+) -> None:
+    extract = _raw_inputs_extract("model_derived", include_method=True)
+    extract["species"]["Na"]["observations"][0]["values"]["derivation"][
+        "method"
+    ] = method
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
     assert any(
-        issue.path.endswith(".derivation.raw_inputs")
-        and "invalid for model_derived" in issue.detail
-        for issue in result.validation.hard_issues
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(".values.derivation")
+        and "Derivation.method" in issue.detail
+        and "must be a string" in issue.detail
+        for issue in result.registry_issues
     )
 
 
@@ -1459,6 +1517,7 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
     tmp_path: Path,
 ) -> None:
     from simulator.battery.migrate import wt_pct_to_mole_fraction
+    from simulator.battery.fo2_ladder import resolve_row_fo2
 
     result = _migrate_real_extract(tmp_path, "kems-020-hastie-1981-nbsir.yaml")
     expected_wt_pct = {
@@ -1581,17 +1640,50 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
     moved_composition = moved_observation.identity.composition
     assert moved_composition is not None and moved_composition.is_value
     assert moved_composition.value.proxy_flag == "initial_charge_only"
+    moved_experiment = result.experiments[moved_observation.experiment_id]
+    moved_fo2 = resolve_row_fo2(
+        moved_experiment,
+        None,
+        moved_observation,
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+    )
+    assert moved_fo2 is not None
+    assert moved_fo2.tier == 4
+    assert moved_fo2.route == "intrinsic_melt_fO2"
+    assert moved_fo2.borrowed is True
+    assert math.isfinite(moved_fo2.log10_fO2_bar)
     moved_prediction = predict_with_engine(
         Engine.OPENIMCC,
         moved_observation,
-        experiment=result.experiments[moved_observation.experiment_id],
+        experiment=moved_experiment,
     )
     assert moved_prediction.value is None
-    assert moved_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert moved_prediction.refusal_detail["reason"] == "missing_evidence"
-    (oxygen_gap,) = moved_prediction.refusal_detail["gaps"]
-    assert oxygen_gap["waypoint"] == "oxygen_condition"
-    assert "fO2_log" in oxygen_gap["missing"]
+    # d-180 supplies numeric intrinsic fO2 for this open TMS row. It reaches
+    # OpenIMCC. The green pin and the venv pack both report single-cation
+    # KO0.5, so the closed-formula match refuses K2O instead of treating an
+    # engine-side species refusal as the terminal result.
+    assert moved_prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert moved_prediction.refusal_detail["reason"] == (
+        "species_unmatched_in_engine_output"
+    )
+    assert moved_prediction.refusal_detail["formula"] == "K2O"
+    assert any(
+        notice.reason.startswith("fo2_tier=4; route=intrinsic_melt_fO2")
+        and notice.authority is not None
+        for notice in moved_prediction.notices
+    )
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    moved_request = activity_request_for_engine(
+        moved_experiment, moved_observation, "openimcc"
+    )
+    assert moved_request is not None
+    assert moved_request.payload is not None
+    assert moved_request.payload["fO2_borrowed"] is True
+    assert any(
+        flag["waypoint"] == "fo2_ladder" and flag["authority"] == "assumed"
+        for flag in moved_request.readiness.flags
+    )
 
     na_kms = next(
         row
@@ -7252,6 +7344,57 @@ def test_nonyield_point_without_numeric_value_is_queued_not_emitted(
         and entry.observation_id == f"{parent_id}::point:points:1"
         for entry in result.queue
     )
+
+
+def test_series_unavailable_value_is_queued_once_with_selector_reason(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="atm",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "series": [
+                {"T_K": 1300, "pressure_atm": 1},
+                {"T_K": 1400},
+            ],
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    parent_id = "fixture-source::na_psat"
+    observations = [
+        obs for oid, obs in result.observations.items()
+        if oid.startswith(parent_id + "::")
+    ]
+
+    assert len(observations) == 2
+    available = next(
+        obs for obs in observations
+        if obs.identity.temperature_K.value == Decimal("1300")
+    )
+    unavailable = next(
+        obs for obs in observations
+        if obs.identity.temperature_K.value == Decimal("1400")
+    )
+    assert available.value.kind is ValueKind.POINT
+    assert available.value.point == Decimal("101325")
+    assert unavailable.value.kind is ValueKind.UNAVAILABLE
+    value_queue = [
+        entry
+        for entry in result.queue
+        if "value" in (entry.axes or ())
+    ]
+    assert len(value_queue) == 1
+    assert not any(
+        entry.observation_id == available.observation_id
+        and "value" in (entry.axes or ())
+        for entry in result.queue
+    )
+    assert value_queue[0].observation_id == unavailable.observation_id
+    assert value_queue[0].why == select_declared_source(
+        Quantity.P_PARTIAL, "atm", {"T_K": 1400}
+    ).reason
 
 
 def test_b718_zero_mass_loss_row_is_initial_without_optional_flag(

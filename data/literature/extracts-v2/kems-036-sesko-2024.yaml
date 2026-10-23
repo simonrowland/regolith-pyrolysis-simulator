@@ -44,8 +44,8 @@ observations:
   locator:
     page: 221
     paragraph: experimental_results_deposit_edx
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
-  read_from: unknown:kems-036-sesko-2024
+    source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
+  read_from: pdftotext:kems-036-sesko-2024
 - observation_id: kems-036-sesko-2024::sesko_2024_deposit_Fe_edx_qualitative
   experiment_id: 10.1016/j.actaastro.2024.08.009::experiment::solar-exposure-12
   identity:
@@ -89,8 +89,8 @@ observations:
     page: 221
     figure: '15'
     paragraph: bottom brown layer has a higher concentration of iron
-    source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
-  read_from: unknown:kems-036-sesko-2024
+    source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
+  read_from: pdftotext:kems-036-sesko-2024
 - observation_id: kems-036-sesko-2024::sesko_2024_deposit_K_edx_range
   experiment_id: 10.1016/j.actaastro.2024.08.009::experiment::solar-exposure-12
   identity:
@@ -133,8 +133,8 @@ observations:
   locator:
     page: 221
     paragraph: both deposit regions showed K concentrations ranging from 5 to 8 wt%
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
-  read_from: unknown:kems-036-sesko-2024
+    source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
+  read_from: pdftotext:kems-036-sesko-2024
 - observation_id: kems-036-sesko-2024::sesko_2024_deposit_Si_edx_range
   experiment_id: 10.1016/j.actaastro.2024.08.009::experiment::solar-exposure-12
   identity:
@@ -177,8 +177,8 @@ observations:
   locator:
     page: 221
     paragraph: Si ranging from 7 to 20 wt%
-    source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
-  read_from: unknown:kems-036-sesko-2024
+    source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
+  read_from: pdftotext:kems-036-sesko-2024
 - observation_id: kems-036-sesko-2024::sesko_2024_fig6_16_figure_only_blocked
   experiment_id: 10.1016/j.actaastro.2024.08.009::kems-036-sesko-2024
   identity:
@@ -224,15 +224,15 @@ observations:
         page: 219
         figure: '6'
         note: also Fig. 16 p. 223; MinerU ~ dumps rejected
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
   notices: []
   source_id: kems-036-sesko-2024
   locator:
     page: 219
     figure: '6'
     note: also Fig. 16 p. 223; MinerU ~ dumps rejected
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
-  read_from: unknown:kems-036-sesko-2024
+    source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
+  read_from: pdftotext:kems-036-sesko-2024
 - observation_id: kems-036-sesko-2024::sesko_2024_table1_eac1_simulant_composition
   experiment_id: 10.1016/j.actaastro.2024.08.009::kems-036-sesko-2024
   identity:
@@ -303,8 +303,8 @@ observations:
     page: 216
     table: '1'
     paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
-  read_from: unknown:kems-036-sesko-2024
+    source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
+  read_from: pdftotext:kems-036-sesko-2024
   point_conditions:
     composition:
       state:
@@ -341,7 +341,7 @@ observations:
         page: 216
         table: '1'
         paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
@@ -356,7 +356,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_SiO2_g_mol
           - state:
               tag: value
@@ -365,7 +365,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - original_FeO_wt_pct
           - state:
               tag: value
@@ -374,7 +374,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_FeO_g_mol
           - state:
               tag: value
@@ -383,7 +383,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - original_MgO_wt_pct
           - state:
               tag: value
@@ -392,7 +392,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_MgO_g_mol
           - state:
               tag: value
@@ -401,7 +401,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - original_CaO_wt_pct
           - state:
               tag: value
@@ -410,7 +410,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_CaO_g_mol
           - state:
               tag: value
@@ -419,7 +419,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - original_Al2O3_wt_pct
           - state:
               tag: value
@@ -428,7 +428,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_Al2O3_g_mol
           - state:
               tag: value
@@ -437,7 +437,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - original_TiO2_wt_pct
           - state:
               tag: value
@@ -446,7 +446,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_TiO2_g_mol
           - state:
               tag: value
@@ -455,7 +455,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - original_Cr2O3_wt_pct
           - state:
               tag: value
@@ -464,7 +464,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_Cr2O3_g_mol
           - state:
               tag: value
@@ -473,7 +473,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - original_MnO_wt_pct
           - state:
               tag: value
@@ -482,7 +482,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_MnO_g_mol
           - state:
               tag: value
@@ -491,7 +491,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - original_Na2O_wt_pct
           - state:
               tag: value
@@ -500,7 +500,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_Na2O_g_mol
           - state:
               tag: value
@@ -509,7 +509,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - original_K2O_wt_pct
           - state:
               tag: value
@@ -518,7 +518,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_K2O_g_mol
           - state:
               tag: value
@@ -527,7 +527,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - original_Fe2O3_wt_pct
           - state:
               tag: value
@@ -536,7 +536,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_Fe2O3_g_mol
           - state:
               tag: value
@@ -545,7 +545,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - original_P2O5_wt_pct
           - state:
               tag: value
@@ -554,7 +554,7 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - M_P2O5_g_mol
           - state:
               tag: value
@@ -563,8 +563,9 @@ observations:
               page: 216
               table: '1'
               paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -586,7 +587,7 @@ observations:
         page: 216
         table: '1'
         paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
 - observation_id: kems-036-sesko-2024::sesko_2024_table1_literature_feedstock_compositions
   experiment_id: 10.1016/j.actaastro.2024.08.009::kems-036-sesko-2024
   identity:
@@ -627,8 +628,8 @@ observations:
   locator:
     page: 216
     table: '1'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
-  read_from: unknown:kems-036-sesko-2024
+    source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
+  read_from: pdftotext:kems-036-sesko-2024
 - observation_id: kems-036-sesko-2024::sesko_2024_table2_factsage_and_literature_o2_yield
   experiment_id: 10.1016/j.actaastro.2024.08.009::kems-036-sesko-2024
   identity:
@@ -672,5 +673,5 @@ observations:
   locator:
     page: 221
     table: '2'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
-  read_from: unknown:kems-036-sesko-2024
+    source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
+  read_from: pdftotext:kems-036-sesko-2024

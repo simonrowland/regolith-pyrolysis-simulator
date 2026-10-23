@@ -81,6 +81,8 @@ to `runs/pomeroy-2006.comparison.json`, with a concise Markdown report at
 `runs/pomeroy-2006.comparison.md`. Assumed recipe fields force
 `assumed-input`; absent pump-outlet or species surfaces produce typed
 unsupported statuses rather than substituted values.
+Battery residuals can carry the typed `fo2_mode` field; see the
+[residual serialization schema](battery/residual-schema.md).
 
 ---
 

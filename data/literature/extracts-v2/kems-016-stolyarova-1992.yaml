@@ -42,8 +42,8 @@ observations:
   locator:
     table: '1'
     line_range: '19'
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_binary_wilson_model_parameters_table2
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -88,8 +88,8 @@ observations:
     table: '2'
     line_range: 47-59
     note: Binary Wilson parameters used to calculate Gibbs energies of multicomponent systems
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_cao_cas_gibbs_table1
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -131,8 +131,8 @@ observations:
   locator:
     table: '1'
     line_range: 27-45
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -141,7 +141,7 @@ observations:
       locator:
         table: '1'
         line_range: 27-45
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_fe_bearing_melt_activity_context
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -183,8 +183,8 @@ observations:
   locator:
     paragraph: CaO-Al2O3-SiO2-FeO-MgO melts studied; oxide activities
     line_range: 7-23
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1833.0:h=d41ed48ee96c
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -227,9 +227,9 @@ observations:
     table: '1'
     paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
     line_range: 27-45
-    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -240,8 +240,8 @@ observations:
         table: '1'
         paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
         line_range: 27-45
-        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1933.0:h=61a64b46c47a
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -284,9 +284,9 @@ observations:
     table: '1'
     paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
     line_range: 27-45
-    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -297,8 +297,8 @@ observations:
         table: '1'
         paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
         line_range: 27-45
-        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1933.0:h=7f88e018bbe5
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -341,9 +341,9 @@ observations:
     table: '1'
     paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
     line_range: 27-45
-    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -354,8 +354,8 @@ observations:
         table: '1'
         paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
         line_range: 27-45
-        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1933.0:h=bc1e0240dd2b
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -398,9 +398,9 @@ observations:
     table: '1'
     paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
     line_range: 27-45
-    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -411,8 +411,8 @@ observations:
         table: '1'
         paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
         line_range: 27-45
-        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1933.0:h=ce7729cbc444
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -455,9 +455,9 @@ observations:
     table: '1'
     paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
     line_range: 27-45
-    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -468,8 +468,8 @@ observations:
         table: '1'
         paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
         line_range: 27-45
-        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1933.0:h=cf8f46ee9671
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -512,9 +512,9 @@ observations:
     table: '1'
     paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
     line_range: 27-45
-    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -525,8 +525,8 @@ observations:
         table: '1'
         paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
         line_range: 27-45
-        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        note: repaired_table_path=text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_k2o_in_nks_gibbs_table3
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -568,8 +568,8 @@ observations:
   locator:
     table: '3'
     line_range: 61-70
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -578,7 +578,7 @@ observations:
       locator:
         table: '3'
         line_range: 61-70
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_mg_bearing_melt_activity_context
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -620,8 +620,8 @@ observations:
   locator:
     paragraph: systems containing MgO among multi-oxide melts
     line_range: 7-23
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=34e7e4733843
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -663,8 +663,8 @@ observations:
     table: '4'
     paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
     line_range: 65-75
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -674,7 +674,7 @@ observations:
         table: '4'
         paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
         line_range: 65-75
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=7799edb641d6
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -716,8 +716,8 @@ observations:
     table: '4'
     paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
     line_range: 65-75
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -727,7 +727,7 @@ observations:
         table: '4'
         paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
         line_range: 65-75
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=913eed662581
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -769,8 +769,8 @@ observations:
     table: '4'
     paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
     line_range: 65-75
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -780,7 +780,7 @@ observations:
         table: '4'
         paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
         line_range: 65-75
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=94357813a9c8
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -822,8 +822,8 @@ observations:
     table: '4'
     paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
     line_range: 65-75
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -833,7 +833,7 @@ observations:
         table: '4'
         paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
         line_range: 65-75
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=d10f059ef489
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -875,8 +875,8 @@ observations:
     table: '4'
     paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
     line_range: 65-75
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -886,7 +886,7 @@ observations:
         table: '4'
         paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
         line_range: 65-75
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=4b24ac670246
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -928,8 +928,8 @@ observations:
     table: '3'
     paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
     line_range: 61-70
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -939,7 +939,7 @@ observations:
         table: '3'
         paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
         line_range: 61-70
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=6bb241e026b0
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -981,8 +981,8 @@ observations:
     table: '3'
     paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
     line_range: 61-70
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -992,7 +992,7 @@ observations:
         table: '3'
         paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
         line_range: 61-70
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=7a9a22ce5e1f
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -1034,8 +1034,8 @@ observations:
     table: '3'
     paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
     line_range: 61-70
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -1045,7 +1045,7 @@ observations:
         table: '3'
         paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
         line_range: 61-70
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=a3d16fd06d21
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -1087,8 +1087,8 @@ observations:
     table: '3'
     paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
     line_range: 61-70
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -1098,7 +1098,7 @@ observations:
         table: '3'
         paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
         line_range: 61-70
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=ac35f888d84f
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -1140,8 +1140,8 @@ observations:
     table: '3'
     paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
     line_range: 61-70
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  read_from: unknown:kems-016-stolyarova-1992
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: pdftotext:kems-016-stolyarova-1992
   point_conditions:
     temperature_K:
       state:
@@ -1151,4 +1151,4 @@ observations:
         table: '3'
         paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
         line_range: 61-70
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md

@@ -6,10 +6,10 @@ source:
   url: https://doi.org/10.1051/0004-6361/201220803
   year: 2013
 extraction:
-  method: manual transcription from vp-acquire-6 alpha-kinetics DRAFT
+  method: manual transcription from vp-acquire-6 alpha-kinetics DRAFT; validated in an internal review, 2026-08-01, vp-acquire-6
   date: '2026-08-01'
   worker: t508-store-gk
-  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/alpha-kinetics.md
+  provenance_path: raw/kems-011-wetzel-gail-2013/kems-011-wetzel-gail-2013.pdf
 review_status: draft
 species:
   SiO:
@@ -17,7 +17,7 @@ species:
     - observation_id: wetzel_gail_2013_sio_arrhenius
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
         equation: '8'
         line_range: 317-329
         note: particle-growth equation; authors call alpha(T) a growth coefficient
@@ -67,7 +67,7 @@ fidelity_samples:
     - 0.067
   note: Numeric form retained; evidence relabelled to the source's solid-film growth class
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
     equation: '8'
     line_range: 323-326
 - species: SiO
@@ -76,6 +76,6 @@ fidelity_samples:
   field: system_class
   value: solid_film_growth
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
     paragraph: growth coefficient used in the particle-growth equation
     line_range: 317-329
