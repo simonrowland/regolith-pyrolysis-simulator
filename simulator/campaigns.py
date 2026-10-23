@@ -280,11 +280,28 @@ def c0_exit_record(
         ]
     prediction_payload = dict(prediction)
     forecast_engine = prediction_payload.pop("forecast_engine", None)
+    forecast_refusal = prediction_payload.pop(
+        "forecast_context_refusal_detail", None
+    )
     if forecast_engine is not None and (
         not isinstance(forecast_engine, str)
         or forecast_engine not in C0_FORECAST_ENGINE_NAMES
     ):
         raise ValueError(f"unknown C0 forecast engine {forecast_engine!r}")
+    message = (
+        "C0 gas is fiat-ledgered at load and release curves are "
+        "uncertified (t-1417); any computed T_exit is a "
+        "liquid-law extrapolation with unknown real-engine phase state; "
+        f"authority level {authority}."
+    )
+    if isinstance(forecast_refusal, Mapping):
+        exception_class = forecast_refusal.get("exception_class")
+        exception_message = forecast_refusal.get("exception_message")
+        if exception_class is not None and exception_message is not None:
+            message += (
+                " Forecast context refusal: "
+                f"{exception_class}: {exception_message}"
+            )
     record = {
         "outcome": "incomplete",
         "backstop": backstop,
@@ -292,12 +309,7 @@ def c0_exit_record(
         "release_curves": "uncertified (t-1417)",
         "ticket": "t-1417",
         "authority": authority,
-        "message": (
-            "C0 gas is fiat-ledgered at load and release curves are "
-            "uncertified (t-1417); any computed T_exit is a "
-            "liquid-law extrapolation with unknown real-engine phase state; "
-            f"authority level {authority}."
-        ),
+        "message": message,
         "ramp_C_per_hr": ramp,
         "ramp_authority": "owner_fiat",
         "ramp_model_bounded": False,

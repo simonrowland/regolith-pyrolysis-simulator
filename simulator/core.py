@@ -73,6 +73,21 @@ class _C0ForecastSulfsatRefusal(RuntimeError):
     prediction_status = 'unavailable_forecast_sulfsat'
 
 
+class _C0ForecastContextRefusal(RuntimeError):
+    """Typed refusal with the failure detail for a C0 snapshot build."""
+
+    prediction_status = 'unavailable_forecast_context'
+
+    def __init__(self, exception: Exception) -> None:
+        source = exception.__cause__ or exception
+        message = str(source)
+        self.detail = {
+            'exception_class': type(source).__name__,
+            'exception_message': message,
+        }
+        super().__init__(f'{type(source).__name__}: {message}')
+
+
 class _RefusalSnapshotHistoryPrefix:
     """O(1) rollback view of committed history with a copied mutable tail.
 
@@ -13748,6 +13763,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """Predict C0 exit in a detached simulator context."""
         context, unavailable_status = self._build_c0_forecast_context()
         if context is None:
+            prediction_status = unavailable_status
+            refusal_detail = None
+            if isinstance(unavailable_status, _C0ForecastContextRefusal):
+                prediction_status = unavailable_status.prediction_status
+                refusal_detail = dict(unavailable_status.detail)
             cfg = self.campaign_mgr._campaign_config(CampaignPhase.C0)
             budget_raw = (
                 cfg.get('alkali_retention_budget_fraction')
@@ -13769,7 +13789,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'phase_state': 'unknown; analytical liquid-law extrapolated',
                 'phase_state_ticket': 't-1460',
                 'release_curves': 'uncertified (t-1417)',
-                'prediction_status': unavailable_status,
+                'prediction_status': prediction_status,
+                **(
+                    {'forecast_context_refusal_detail': refusal_detail}
+                    if refusal_detail is not None
+                    else {}
+                ),
             }
         prediction = context._evaluate_c0_exit_forecast(
             alkali_retention_budget_fraction=(
@@ -13799,7 +13824,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _build_c0_forecast_context(
         self,
-    ) -> tuple['PyrolysisSimulator | None', str]:
+    ) -> tuple['PyrolysisSimulator | None', str | _C0ForecastContextRefusal]:
         """Build an evaluator with private mutable owners for a C0 forecast."""
         backend_factory = getattr(self, '_c0_forecast_backend_factory', None)
         try:
@@ -13857,6 +13882,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 memo[id(live_store)] = forecast_store
             forecast_state = dict(self.__dict__)
             forecast_state['_sulfsat_gate'] = None
+            # The forecast gets independent provider registrations. Deep-copying
+            # the live registry would traverse engine subprocess/warm pools;
+            # sharing it would let forecast dispatch mutate live providers.
+            forecast_state['_chem_registry'] = ProviderRegistry()
+            forecast_state['_chem_kernel'] = None
             context.__dict__.update(
                 _deepcopy_refusal_state(forecast_state, memo)
             )
@@ -13864,8 +13894,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             context._c0_forecast_engine = forecast_engine
             context._c0_forecast_backend_factory = None
             context._chem_kernel = context._build_chemistry_kernel()
-        except Exception:
-            return None, 'unavailable_forecast_context'
+            live_registry = self._chem_registry
+            if (
+                live_registry.authoritative_for(
+                    ChemistryIntent.GATE_LIQUID_FRACTION
+                ) is not None
+                or live_registry.fallback_for(
+                    ChemistryIntent.GATE_LIQUID_FRACTION
+                ) is not None
+            ):
+                context._register_freeze_gate_liquid_fraction_providers()
+        except Exception as exc:
+            return None, _C0ForecastContextRefusal(exc)
         return context, ''
 
     def _evaluate_c0_exit_forecast(
