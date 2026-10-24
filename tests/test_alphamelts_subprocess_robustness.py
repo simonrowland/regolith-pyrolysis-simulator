@@ -132,6 +132,58 @@ def test_sigsegv_alphamelts_returns_composition_and_crash_point(tmp_path):
     assert any('SIGSEGV' in warning for warning in result.warnings)
 
 
+def test_sigabrt_child_stderr_is_preserved_in_typed_refusal(monkeypatch):
+    backend = _backend(Path('/tmp/fake-alphamelts'), timeout_s=1.0)
+
+    def fake_run(*_args, **_kwargs):
+        return SimpleNamespace(
+            returncode=-6,
+            stdout='last alphaMELTS menu line',
+            stderr='fixture abort diagnostic',
+        )
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
+
+    result = _run(backend)
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_failure_category'] == 'engine_crash'
+    assert result.diagnostics['subprocess_failure']['signal'] == 'SIGABRT'
+    assert any(
+        'child stderr tail: fixture abort diagnostic' in warning
+        for warning in result.warnings
+    )
+
+
+@pytest.mark.live_engine
+def test_live_alphamelts_cao_sio2_abort_stays_a_typed_refusal():
+    backend = AlphaMELTSBackend()
+    try:
+        available = backend.initialize({'mode': 'subprocess'})
+    except ImportError as exc:
+        pytest.skip(f'project-local alphaMELTS app is not installed: {exc}')
+    if not available:
+        pytest.skip('project-local alphaMELTS app is not installed')
+
+    result = backend.equilibrate(
+        temperature_C=1659.849976,
+        composition_kg={'CaO': 54.2934, 'SiO2': 45.7066},
+        fO2_log=-11.1774464687,
+        pressure_bar=1.0,
+        subprocess_run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_failure_category'] == 'engine_crash'
+    assert result.diagnostics['subprocess_failure']['signal'] == 'SIGABRT'
+    assert result.diagnostics['commissioning_notice']['authority'] == (
+        'extrapolated'
+    )
+
+
 def test_known_crashing_alkali_silica_binary_refuses_before_launch(tmp_path):
     marker = tmp_path / 'invoked'
     stub = tmp_path / 'alphamelts'

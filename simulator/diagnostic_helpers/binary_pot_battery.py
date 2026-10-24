@@ -3212,6 +3212,7 @@ def assess_qualification_gate(
     valid = bool(domain_assessment.valid) and not t_failed
     return {
         "valid": valid,
+        "composition_valid": bool(domain_assessment.valid),
         "warnings": warnings,
         "reason": domain_assessment.reason,
         "failed_constraints": tuple(failed),
@@ -3239,11 +3240,12 @@ def qualification_notice(gate: Mapping[str, Any]) -> dict[str, Any]:
         "temperature_in_band": bool(gate.get("temperature_in_band")),
         "below_crash_floor": bool(gate.get("below_crash_floor")),
         "sio2_wt_pct": gate.get("sio2_wt_pct"),
-        "run_anyway": True,
+        "run_anyway": bool(gate.get("composition_valid", True)),
         "bypassable_from_harness": [
-            "AlphaMELTSBackend._domain_gate / engines.alphamelts.domain.AlphaMELTSDomainGate (SiO2 band, major-oxide sum, oxide basis)"
+            "certified SiO2 and temperature bands (predict-and-flag)"
         ],
         "not_bypassable_from_harness": [
+            "AlphaMELTS 14-oxide basis and non-empty silicate composition input checks",
             "ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C (certified T min; notice+run, not a pre-launch refusal)",
             "ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR (1 bar inline in _equilibrate_subprocess)",
             "fe_free_and_imposed_absolute_fo2 (Na2O/K2O-SiO2 family; not _domain_gate)",
@@ -3348,12 +3350,15 @@ def load_engine_blocks_from_report(path: Path) -> dict[str, dict[str, Any]]:
 
 
 def _bypass_melts_domain_gate(backend: Any) -> None:
-    """Qualification: record-and-run. Do not change gate VALUES."""
+    """Bypass qualification checks while retaining AlphaMELTS input validation."""
 
     def _pass(*_args: Any, **_kwargs: Any) -> None:
         return None
 
-    if hasattr(backend, "_domain_gate"):
+    if (
+        hasattr(backend, "_domain_gate")
+        and getattr(backend, "backend_name", None) != "alphamelts"
+    ):
         backend._domain_gate = _pass  # type: ignore[method-assign]
 
 
@@ -4058,7 +4063,12 @@ def equilibrate_cell(
         if (
             qualification
             and status == "refusal"
-            and refusal not in {REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH}
+            and refusal not in {
+                REFUSAL_TIMEOUT,
+                REFUSAL_ENGINE_CRASH,
+                REFUSAL_OUT_OF_BASIS,
+                REFUSAL_MAJOR_SUM,
+            }
         ):
             gate_name = (
                 diagnostics.get("backend_failure_reason_code")

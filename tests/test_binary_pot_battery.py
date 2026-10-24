@@ -30,6 +30,8 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     REFUSAL_COMPOSITION_PROJECTED,
     REFUSAL_ENGINE_CRASH,
     REFUSAL_GATE_REFUSED_IN_ADAPTER,
+    REFUSAL_MAJOR_SUM,
+    REFUSAL_OUT_OF_BASIS,
     REFUSAL_TIMEOUT,
     REFUSAL_UNAVAILABLE,
     REFUSAL_VALUE_IS_FLOOR,
@@ -53,6 +55,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     melts_certified_band,
     open_battery_engine,
     pairwise_residuals,
+    qualification_notice,
     qualification_sio2_sweep_pots,
     reclassify_projected_composition_cells,
     recompute_residuals_from_report,
@@ -1988,6 +1991,68 @@ def test_qualification_cell_carries_gate_notice_and_extrapolated_authority() -> 
     assert rebuilt.notices == cell.notices
 
 
+@pytest.mark.parametrize(
+    ("composition_wt_pct", "expected_refusal"),
+    (
+        pytest.param(
+            {"SrO": 25.9, "Al2O3": 74.1},
+            REFUSAL_MAJOR_SUM,
+            id="unsupported-oxide-dominates",
+        ),
+        pytest.param(
+            {"SrO": 1.0, "Al2O3": 29.7, "SiO2": 69.3},
+            REFUSAL_OUT_OF_BASIS,
+            id="unsupported-minor-oxide",
+        ),
+    ),
+)
+def test_alphamelts_qualification_refuses_unsupported_oxide_before_subprocess(
+    monkeypatch,
+    composition_wt_pct: dict[str, float],
+    expected_refusal: str,
+) -> None:
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    pot = BinaryPot(
+        pot_id="sro_al2o3_no_silica",
+        kato_1993_table4_system=None,
+        why="SrO is outside the alphaMELTS oxide basis",
+        composition_wt_pct=composition_wt_pct,
+    )
+    backend = AlphaMELTSBackend()
+    backend._mode = "subprocess"
+    backend._binary_path = Path("/unused/alphaMELTS")
+    subprocess_calls: list[object] = []
+
+    def fail_if_subprocess_called(*_args, **_kwargs):
+        subprocess_calls.append(True)
+        raise AssertionError("invalid oxide composition reached alphaMELTS")
+
+    monkeypatch.setattr(backend, "_equilibrate_subprocess", fail_if_subprocess_called)
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=2437.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        qualification=True,
+        isolated=False,
+    )
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == expected_refusal
+    notice = next(n for n in cell.notices if n["kind"] == "melts_domain_gate")
+    assert notice["run_anyway"] is False
+    assert subprocess_calls == []
+
+
 def test_qualification_temperature_below_and_above_published_band() -> None:
     pot = BinaryPot(
         pot_id="feo_mgo_sio2_30_20_50",
@@ -2005,6 +2070,7 @@ def test_qualification_temperature_below_and_above_published_band() -> None:
     assert 2600.0 > t_max
     assert high["temperature_in_band"] is False
     assert "temperature_range" in high["failed_constraints"]
+    assert qualification_notice(high)["run_anyway"] is True
     assert in_band["temperature_in_band"] is True
     # 1100 K (826.85 C) is above the 800 C subprocess min, so the T gate
     # is valid; 1100/1200 K remain requested qualification points below
