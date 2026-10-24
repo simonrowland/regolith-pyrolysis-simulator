@@ -97,7 +97,13 @@ def test_liquidus_and_solidus_identities_stay_as_migrated(tmp_path: Path) -> Non
     assert solidus.identity.species.formula == "MgO-FeO_melt"
     assert solidus.identity.species.phase.is_unknown
     assert solidus.identity.composition.is_unknown
-    assert solidus.identity.composition.reason == "no composition mapped from source"
+    # The source prints the binary FeO mol-% axis for this Figure 1 point
+    # (13 mol % FeO, 87 mol % MgO). It is unavailable because that basis is
+    # unsupported, not because the source omits composition.
+    assert (
+        solidus.identity.composition.reason
+        == "mole_percent_basis_not_supported_by_schema"
+    )
     assert solidus.identity.temperature_K.is_not_applicable
     assert solidus.value.point == Decimal("2.7E+3")
     assert solidus.identity.total_pressure_Pa.is_unknown
