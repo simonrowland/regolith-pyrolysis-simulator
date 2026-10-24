@@ -299,6 +299,8 @@ def test_high_pressure_dew_bracket_continues_until_target_is_bracketed():
         target_pressure,
         rel=1e-10,
     )
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert authority_allowed(Quantity.WALL_DEW_TEMPERATURE, prediction.authority)
     assert any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         for notice in prediction.notices
@@ -327,6 +329,49 @@ def test_dew_prediction_flags_root_outside_pure_component_wall_band():
     assert prediction.authority is Authority.EXTRAPOLATED
     assert authority_allowed(Quantity.WALL_DEW_TEMPERATURE, prediction.authority)
     assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in prediction.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "valid_range_K", "expected_status"),
+    [
+        ("Si", 1000.0, [100.0, 1685.0], "diagnostic_only"),
+        ("Si", 1500.0, [100.0, 1685.0], "diagnostic_only"),
+        ("Mn", 1400.0, [1228.0, 1519.0], "diagnostic_only"),
+        ("Si", 2000.0, [1700.0, 3500.0], "diagnostic_only"),
+    ],
+)
+def test_dew_prediction_uses_wall_segment_selected_at_root(
+    species,
+    temperature_K,
+    valid_range_K,
+    expected_status,
+):
+    import simulator.condensation as condensation
+
+    target_pressure = condensation._antoine_psat_pa(species, temperature_K)
+    diagnostic = condensation.antoine_dew_temperature_diagnostic(
+        species,
+        target_pressure,
+    )
+    observation, _ = _wall_row(
+        Quantity.WALL_DEW_TEMPERATURE,
+        formula=species,
+        local_pressure_Pa=Decimal(str(target_pressure)),
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert diagnostic["valid_range_K"] == valid_range_K
+    assert diagnostic["status"] == expected_status
+    assert diagnostic["temperature_K"] == pytest.approx(temperature_K, abs=1e-8)
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert float(prediction.value) == pytest.approx(temperature_K, abs=1e-8)
+    assert prediction.authority is Authority.CERTIFIED
+    assert authority_allowed(Quantity.WALL_DEW_TEMPERATURE, prediction.authority)
+    assert not any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         for notice in prediction.notices
     )

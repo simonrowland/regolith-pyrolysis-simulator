@@ -5440,11 +5440,29 @@ def antoine_dew_temperature_diagnostic(
     # Algebra: solve P_sat(T_dew) = p_i by bisection over its pressure bracket.
     # Units: both sides are Pa and the returned root is K. Sanity: feeding
     # P_sat(800 K) returns 800 K to the inverse tolerance.
+    dew_temperature = (low + high) / 2.0
+    _, root_coefficient_block = wall_condensation_antoine_coefficients(
+        data,
+        temperature_K=dew_temperature,
+    )
+    root_authority = _record_antoine_extrapolation(
+        species,
+        dew_temperature,
+        data,
+        root_coefficient_block,
+        antoine_extrapolations=None,
+        antoine_extrapolation_warnings=None,
+    )
+    root_range = root_authority["valid_range_K"]
     return {
-        "status": "extrapolated" if extrapolated else "diagnostic_only",
-        "temperature_K": (low + high) / 2.0,
+        "status": (
+            "extrapolated"
+            if root_authority["authority_level"] == "extrapolated"
+            else "diagnostic_only"
+        ),
+        "temperature_K": dew_temperature,
         "partial_pressure_Pa": target,
-        "valid_range_K": certified_range,
+        "valid_range_K": None if root_range is None else list(root_range),
         "provenance": "existing_condensation_antoine_surface",
         "routing_authority": False,
     }
