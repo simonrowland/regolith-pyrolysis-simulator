@@ -3037,6 +3037,12 @@ def composition_wt_pct(composition: Composition) -> dict[str, float] | None:
     return {k: 100.0 * v / total for k, v in masses.items() if v > 0.0}
 
 
+def _composition_kg_from_wt_pct(wt_pct: Mapping[str, float]) -> dict[str, float]:
+    """Make the scorer's existing 100 g composition batch in kg."""
+
+    return {name: amount / 1000.0 for name, amount in wt_pct.items()}
+
+
 def blocking_qualifications(
     quantity: Quantity | None,
     notices: Sequence[Notice],
@@ -7081,7 +7087,7 @@ def _predict_phase_row(
         result = _equilibrate_phase_assemblage(
             engine,
             temperature_C=float(temperature - Decimal("273.15")),
-            composition_kg={name: amount / 1000.0 for name, amount in wt.items()},
+            composition_kg=_composition_kg_from_wt_pct(wt),
             fO2_log=fo2_log,
             pressure_bar=float(pressure_bar),
             **call_kwargs,
@@ -7486,9 +7492,7 @@ def _predict_transition_temperature(
         )
     try:
         result = finder(
-            composition_kg={
-                oxide: amount / 1000.0 for oxide, amount in composition_wt.items()
-            },
+            composition_kg=_composition_kg_from_wt_pct(composition_wt),
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
         )
