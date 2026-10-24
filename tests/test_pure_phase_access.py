@@ -42,6 +42,7 @@ from simulator.melt_backend.pure_phase import (
     PurePhaseProperties,
     PurePhaseUnknownSymbolError,
 )
+from tests.engine_availability import thermoengine_package_available
 
 # --- availability guards (true skipif, resolved at collection) -------------
 
@@ -55,19 +56,8 @@ needs_magemin_binary = pytest.mark.skipif(
 )
 
 
-def _thermoengine_available() -> bool:
-    try:
-        from simulator.engine_local_config import setup_thermoengine_dylib_path
-
-        setup_thermoengine_dylib_path()
-        import thermoengine  # noqa: F401
-        return True
-    except Exception:
-        return False
-
-
 needs_thermoengine = pytest.mark.skipif(
-    not _thermoengine_available(),
+    not thermoengine_package_available(),
     reason="ThermoEngine dylibs/package unavailable on this machine",
 )
 

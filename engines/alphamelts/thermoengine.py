@@ -777,6 +777,30 @@ _TE_PURE_PHASE_POLYMORPH = {
     'And': 'andalusite',
     'Ky': 'kyanite',
     'Sil': 'sillimanite',
+    # (a) rows, polymorph-confirmed first. Tokens are the phase names in
+    # PurePhaseList.csv, not the Berman ClassName where those differ.
+    # CaTs is calcium_tschermaks_pyroxene, not ca_al_pyroxene.
+    # pWo is the second CaSiO3 crystal so unset CaSiO3 stays unresolved.
+    'Rt': 'rutile',
+    'Mag': 'magnetite',
+    'An': 'anorthite',
+    'Wo': 'wollastonite',
+    'pWo': 'pseudowollastonite',
+    'Gh': 'gehlenite',
+    'Grs': 'grossular',
+    'Hem': 'hematite',
+    'Spn': 'sphene_titanite',
+    'Kls': 'kalsilite',
+    'Cal': 'calcite',
+    'Ak': 'akermanite',
+    'CaTs': 'calcium_tschermaks_pyroxene',
+    'Mgs': 'magnesite',
+    'Nph': 'nepheline',
+    'Prp': 'pyrope',
+    'Jd': 'jadeite',
+    'Chr': 'chromite',
+    'Mtc': 'monticellite',
+    'Prv': 'perovskite',
 }
 
 # BermanStoichiometricPhases.m `#define QUARTZ_ADJUSTMENT -1291.0`, added
