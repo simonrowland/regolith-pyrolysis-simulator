@@ -7580,6 +7580,36 @@ def _predict_evaporation_rate(
                 ),
             },
         )
+    equilibrium_pressure_pa = float(pressure_prediction.value)
+    if equilibrium_pressure_pa <= 0.0:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=identity.composition,
+            reason=RefusalReason.METRIC_DOMAIN,
+            detail={
+                "reason": "equilibrium_vapour_pressure_nonpositive",
+                "P_eq_Pa": equilibrium_pressure_pa,
+            },
+            notices=pressure_prediction.notices,
+        )
+    if equilibrium_pressure_pa <= ambient_pressure:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=identity.composition,
+            reason=RefusalReason.METRIC_DOMAIN,
+            detail={
+                "reason": "evaporation_driving_pressure_nonpositive",
+                "P_eq_Pa": equilibrium_pressure_pa,
+                "P_ambient_Pa": ambient_pressure,
+            },
+            notices=pressure_prediction.notices,
+        )
 
     from engines.builtin.evaporation_flux import _series_resistance_evaporation_flux_kg_m2_s
     from simulator.accounting.formulas import parse_formula

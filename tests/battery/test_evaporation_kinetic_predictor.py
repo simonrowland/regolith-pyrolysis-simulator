@@ -454,6 +454,54 @@ def test_printed_ambient_partial_pressure_is_subtracted():
     assert not any(notice.kind is NoticeKind.INPUT_OMITTED for notice in prediction.notices)
 
 
+@pytest.mark.parametrize(
+    ("equilibrium_pressure", "ambient_pressure", "expected_reason"),
+    (
+        (100, 150, "evaporation_driving_pressure_nonpositive"),
+        (0, 0, "equilibrium_vapour_pressure_nonpositive"),
+    ),
+)
+def test_nonpositive_evaporation_pressure_drive_is_typed_refusal(
+    equilibrium_pressure, ambient_pressure, expected_reason
+):
+    row = _kinetic_row("Mg")
+    ambient = F.observation(
+        "ambient-partial",
+        "kinetic-experiment",
+        replace(row.identity, quantity=Quantity.P_PARTIAL),
+        Decimal(ambient_pressure),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="target-paper",
+    )
+
+    def pressure_predictor(engine, observation, **kwargs):
+        return replace(
+            _pressure_prediction(engine, observation, **kwargs),
+            value=Decimal(equilibrium_pressure),
+        )
+
+    prediction = _predict_evaporation_rate(
+        Engine.INTERNAL_ANALYTICAL,
+        row,
+        experiment=F.tabulation_experiment(
+            "kinetic-experiment", method=MethodToken.TABULATION
+        ),
+        handles=None,
+        isolated=None,
+        bench=None,
+        alpha_observations=(
+            _alpha("alpha-paper-b", "Mg", 0.1),
+            _alpha("alpha-paper-c", "Mg", 0.3),
+        ),
+        partial_pressure_observations=(ambient,),
+        pressure_predictor=pressure_predictor,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail["reason"] == expected_reason
+
+
 def test_total_evaporation_rate_multiplies_hkl_flux_by_printed_area():
     row = _kinetic_row("Mg", per=None)
     experiment = F.tabulation_experiment(
