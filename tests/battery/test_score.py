@@ -13744,9 +13744,24 @@ def test_transition_liquidus_uses_each_engine_finder_at_printed_composition(
     assert calls[0][1]["pressure_bar"] == pytest.approx(1.01325)
     assert calls[0][1]["fO2_log"] is None
     expected_wt = score_mod.composition_wt_pct(observation.identity.composition.value)
-    assert calls[0][1]["composition_kg"] == {
-        oxide: amount / 1000.0 for oxide, amount in expected_wt.items()
-    }
+    composition_kg = calls[0][1]["composition_kg"]
+    assert tuple((name, mass.hex()) for name, mass in composition_kg.items()) == (
+        ("SiO2", "0x1.a7b9d0aa28ad9p-5"),
+        ("CaO", "0x1.8b7962890a85bp-5"),
+    )
+    from simulator.diagnostic_helpers.binary_pot_battery import composition_kg_and_mol
+
+    independent_kg, _ = composition_kg_and_mol(expected_wt)
+    actual_total = sum(composition_kg.values())
+    independent_total = sum(independent_kg.values())
+    assert {
+        oxide: mass / actual_total for oxide, mass in composition_kg.items()
+    } == pytest.approx(
+        {
+            oxide: mass / independent_total
+            for oxide, mass in independent_kg.items()
+        }
+    )
     assert handles[engine.value].backend.__class__.__name__ == "FinderBackend"
 
 
