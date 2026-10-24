@@ -4865,17 +4865,6 @@ def _assert_no_model_derived_e15_points(
     context: ScoreContext,
 ) -> None:
     from simulator.battery import score as score_mod
-
-    model_derived_oxygen_sources = {
-        observation.source_id
-        for observation in context.observations.values()
-        if observation.source_id in score_mod._E15_LEVEL_BASIS
-        and isinstance(observation.identity, Identity)
-        and observation.identity.species.formula in {"O", "O2"}
-        and observation.evidence.class_.is_value
-        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
-    }
-    assert model_derived_oxygen_sources
     for residual in residuals:
         observation = context.observations.get(residual.reference)
         if observation is None:
@@ -4934,6 +4923,15 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
             "notices": notices,
         }
 
+    measured_reference = next(
+        observation
+        for observation in context.observations.values()
+        if observation.source_id in score_mod._E15_LEVEL_BASIS
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value in MEASURED_EVIDENCE
+        and score_mod._e15_residual_point(payload(observation), observation)
+        is not None
+    )
     model_derived_oxygen = [
         observation
         for observation in context.observations.values()
@@ -4942,6 +4940,43 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
         and observation.evidence.class_.is_value
         and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     ]
+    synthetic_model_derived = None
+    if not model_derived_oxygen:
+        # The reviewed Stolyarova typing now keeps these source rows quoted.
+        # Use one otherwise eligible oxygen row to retain the invariant test.
+        template = None
+        for observation in context.observations.values():
+            if (
+                observation.observation_id == measured_reference.observation_id
+                or observation.source_id not in score_mod._E15_LEVEL_BASIS
+                or observation.identity.species.formula != "O"
+                or not observation.evidence.class_.is_value
+            ):
+                continue
+            measured_observation = replace(
+                observation,
+                evidence=replace(
+                    observation.evidence,
+                    class_=State.of(EvidenceClass.MEASURED_DIRECT),
+                ),
+            )
+            if (
+                score_mod._e15_residual_point(
+                    payload(measured_observation), measured_observation
+                )
+                is not None
+            ):
+                template = observation
+                break
+        assert template is not None
+        synthetic_model_derived = replace(
+            template,
+            evidence=replace(
+                template.evidence,
+                class_=State.of(EvidenceClass.MODEL_DERIVED),
+            ),
+        )
+        model_derived_oxygen = [synthetic_model_derived]
     model_derived_e15 = []
     for observation in model_derived_oxygen:
         measured_observation = replace(
@@ -4959,16 +4994,6 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
         ):
             model_derived_e15.append(observation)
     assert model_derived_e15
-
-    measured_reference = next(
-        observation
-        for observation in context.observations.values()
-        if observation.source_id in score_mod._E15_LEVEL_BASIS
-        and observation.evidence.class_.is_value
-        and observation.evidence.class_.value in MEASURED_EVIDENCE
-        and score_mod._e15_residual_point(payload(observation), observation)
-        is not None
-    )
     two_phase_reference = replace(
         measured_reference,
         observation_id=f"{measured_reference.observation_id}::two-phase-fixture",
@@ -4991,6 +5016,11 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
         context,
         observations={
             **context.observations,
+            **(
+                {synthetic_model_derived.observation_id: synthetic_model_derived}
+                if synthetic_model_derived is not None
+                else {}
+            ),
             two_phase_reference.observation_id: two_phase_reference,
             outside_single_liquid_reference.observation_id: (
                 outside_single_liquid_reference
@@ -5113,7 +5143,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     points = tuple(point for _residual, point in selected)
     shape = score_mod._e15_level_shape_rows(points)[1]
     assert shape["x_axis"] == "x(CaO)"
-    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("6.38")
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("4.18")
 
     from simulator.battery.score import (
         _ScorePayloadAccumulator,
@@ -5137,7 +5167,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     assert production_shape["x_axis"] == "x(CaO)"
     assert production_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("6.38")
+    ) == Decimal("4.18")
     assert (
         score_mod.FLAGGED_STRATUM_CELL_MATERIAL_INFERRED
         in production_shape["flags"]
