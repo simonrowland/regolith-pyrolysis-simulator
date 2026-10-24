@@ -124,7 +124,8 @@ def test_typed_1996_source_oxygen_commands_the_reduced_condition(
     row = _row(source_context, "stolyarova-1996-cao-alumina-silica-kems", "AlO")
     condition = _resolve(source_context, row)
     assert isinstance(condition, SourceOxygenCondition)
-    assert condition.observation.observation_id in condition.used_observations
+    assert condition.observation.derived_from
+    assert set(condition.observation.derived_from) <= condition.used_observations
 
     requests, handles = _capture_engine(monkeypatch, row)
     residual, candidate = compile_residual(
