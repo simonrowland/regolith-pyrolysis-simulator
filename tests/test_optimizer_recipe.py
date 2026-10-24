@@ -73,9 +73,12 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
             .setpoints
         )
     ).encode()
-    # Recomputed after phosphorus batch 7e6bebc: its C0b-P controls changed
-    # data/setpoints.yaml, the sole batch input serialized by this resolved
-    # setpoints digest. Empty recipe/setpoints patch bytes remain neutral.
+    # Recomputed after d-252's C0 move. Diffing the resolved setpoints against
+    # green 0761129d0 shows these exact C0 leaves changed: label, notes,
+    # dT_dt_C_per_hr (50 -> 200), endpoint.type, and the new carrier_gas,
+    # p_total_mbar_default, pO2_mbar_default, and alkali budget; atmosphere,
+    # pO2_mbar, endpoint.threshold, and soft_endpoint were removed. Empty
+    # recipe/setpoints patch bytes remain neutral.
     # Recomputed 2026-08-07 (b-147 Mg TE-μ0 demotion): the derived
     # Mg_threshold_grounding roots in data/setpoints.yaml moved with the
     # Pref_GF retarget (moon 1978.564→1892.647 C; asteroid 1840.802→1768.703 C)
@@ -95,7 +98,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # induction_stirring; endpoint_criteria.control.surface_renewal;
     # endpoint_criteria.general; furnace.induction_stirring.note.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "6e96c06bd07493a6db66db50de75fc9599b8a0353c5d08ae37d68f09ec90ccb6"
+        "08f98535b114ef24ff437b7e7a89ab15753632351905ce445cfcd836424a6a13"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
