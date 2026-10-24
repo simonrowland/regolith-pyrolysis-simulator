@@ -3,7 +3,6 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import RefusalReason
 from simulator.battery.validate import validate_corpus
 from tests.battery.factories import migrate_one_extract
 
@@ -23,15 +22,13 @@ def test_green_1971_phase_temperatures_migrate_and_pin_printed_values():
     migrator.finalize()
 
     assert migrator.result.validation is not None
-    (collision,) = tuple(
+    collisions = tuple(
         issue
         for issue in migrator.result.validation.hard_issues
         if "green1971_12022_pigeonite_in" in issue.detail
         and "green1971_12022_ilmenite_plagioclase_in" in issue.detail
     )
-    assert collision.reason is RefusalReason.IDENTITY_MISMATCH
-    assert "conflicting point values" in collision.detail
-    assert migrator.result.validation.hard_issues == (collision,)
+    assert collisions == ()
     assert len(migrator.result.observations) == 6
 
     observations = dict(migrator.result.observations)

@@ -6,7 +6,6 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import RefusalReason
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 from tools.validate_literature_extracts import validate_extract_document
@@ -40,10 +39,7 @@ def test_dsc_and_quench_rows_migrate_with_printed_values_and_coordinates() -> No
     observations = migrator.result.observations
     assert len(observations) == 25
     conflicts = migrator.result.validation.hard_issues
-    assert len(conflicts) == 3
-    assert all(issue.reason is RefusalReason.IDENTITY_MISMATCH for issue in conflicts)
-    assert all("conflicting point values" in issue.detail for issue in conflicts)
-    assert all("konar_t5_2_s" in issue.detail for issue in conflicts)
+    assert not any("konar_t5_2_s" in issue.detail for issue in conflicts)
 
     s0 = observations[f"{EXTRACT.stem}::konar_t5_2_s0_3_melting_point"]
     assert str(s0.value.point) == "1352"

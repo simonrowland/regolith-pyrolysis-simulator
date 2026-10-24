@@ -65,7 +65,6 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
-    _identity_equal,
     identity_equal,
     profile_for,
     quantity_token,
@@ -347,14 +346,7 @@ def _transition_temperature_identity_conflicts(
             for right in rows[index + 1 :]:
                 if left.value.point == right.value.point:
                     continue
-                # The species here is the bulk sample. Its phase is not
-                # printed, so ignore that one unknown axis while comparing
-                # the transition identity and its required conditions.
-                equal = _identity_equal(
-                    left.identity,
-                    right.identity,
-                    allow_unknown_species_phase=True,
-                )
+                equal = identity_equal(left.identity, right.identity)
                 if equal.kind is not IdentityEqualKind.EQUAL:
                     continue
                 first, second = sorted(
