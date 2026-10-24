@@ -1900,7 +1900,7 @@ def _identity_equal(
     unknown: list[str] = []
     invalid: list[str] = []
     for name in _AXIS_NAMES:
-        if name in uncompared_axes:
+        if name in uncompared_axes and name not in profile.required:
             continue
         required = name in profile.required
         permitted_na = name in profile.permitted_not_applicable

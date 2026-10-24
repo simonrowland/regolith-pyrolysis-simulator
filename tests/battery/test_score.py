@@ -445,6 +445,40 @@ def test_condensed_activity_axes_follow_composition_and_pressure() -> None:
     assert high_vs_unknown.kind is IdentityEqualKind.IDENTITY_UNKNOWN
     assert "total_pressure_Pa" in high_vs_unknown.fields
 
+    unknown_pressure = ca_al_identity(
+        State.of(Decimal("1e-8")), State.unknown("not printed")
+    )
+    mismatched_pressure = ca_al_identity(
+        State.of(Decimal("1e-8")), State.of(Decimal("100000"))
+    )
+    high_vs_low = identity_equal(high_pressure, mismatched_pressure)
+    assert high_vs_low.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert "total_pressure_Pa" in high_vs_low.fields
+
+    high_reference = F.observation(
+        "ca-al-activity-high-pressure",
+        experiment.experiment_id,
+        high_pressure,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    for candidate_identity, expected_reason in (
+        (unknown_pressure, RefusalReason.IDENTITY_UNKNOWN),
+        (mismatched_pressure, RefusalReason.IDENTITY_MISMATCH),
+    ):
+        residual, _ = _compile(
+            high_reference,
+            experiment,
+            replace(
+                _predict(Decimal("0.4"), candidate_identity), unit="dimensionless"
+            ),
+        )
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.refusal is not None
+        assert residual.refusal.reason is expected_reason
+
     feo_bearing = Composition(
         basis="ordered_complete_mole_inventory",
         components=(
