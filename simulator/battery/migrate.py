@@ -16179,6 +16179,20 @@ class Migrator:
         composition_located = _composition_located_from_values(
             values, locator, role_refusal=composition_role_refusal
         )
+        source_composition = obs.get("composition")
+        source_composition_state = (
+            source_composition.get("state")
+            if isinstance(source_composition, Mapping)
+            else None
+        )
+        if (
+            composition_located is None
+            and isinstance(source_composition_state, Mapping)
+            and source_composition_state.get("tag") == StateTag.UNKNOWN.value
+        ):
+            composition_located = _composition_located_from_plain(
+                source_composition
+            )
         if composition_role_refusal:
             self.result.add_queue(
                 work.work_id,
@@ -19513,7 +19527,8 @@ class Migrator:
             identity = replace(identity, fO2_Pa=oxygen_state)
         experiment = self.result.experiments.get(experiment_id)
         if (
-            not _knudsen_effusion_chamber_background_not_for_identity(
+            q_token_point is Quantity.VALENCE_RATIO
+            and not _knudsen_effusion_chamber_background_not_for_identity(
                 experiment.method if experiment is not None else None
             )
             and (
