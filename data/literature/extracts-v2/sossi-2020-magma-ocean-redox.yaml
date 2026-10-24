@@ -11,12 +11,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -45,8 +44,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4060883167316594667695829133'
+        - - Al2O3
+          - '0.02269529375240196236091713561'
+        - - FeO
+          - '0.06158219194186623675437332548'
+        - - MgO
+          - '0.4898982482821827813628502894'
+        - - CaO
+          - '0.01965440588323441245027469277'
+        - - Na2O
+          - '0'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0.0000815434086551403020016430136'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -82,6 +100,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -91,7 +114,7 @@ observations:
   locator:
     page: 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -100,6 +123,152 @@ observations:
       locator:
         page: 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4060883167316594667695829133'
+          - - Al2O3
+            - '0.02269529375240196236091713561'
+          - - FeO
+            - '0.06158219194186623675437332548'
+          - - MgO
+            - '0.4898982482821827813628502894'
+          - - CaO
+            - '0.01965440588323441245027469277'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0.0000815434086551403020016430136'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.71'
+            locator:
+              page: 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.43'
+            locator:
+              page: 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '8.47'
+            locator:
+              page: 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.8'
+            locator:
+              page: 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.11'
+            locator:
+              page: 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              page: 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -108,11 +277,11 @@ observations:
         page: 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:
@@ -131,12 +300,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -165,8 +333,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3994836392114300385028915338'
+        - - Al2O3
+          - '0.02251193262172514914350935272'
+        - - FeO
+          - '0.05703049809923441069062035264'
+        - - MgO
+          - '0.501341604165518099624322489'
+        - - CaO
+          - '0.01963232590209230203865627147'
+        - - Na2O
+          - '0'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -202,6 +389,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -211,7 +403,7 @@ observations:
   locator:
     page: 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -220,6 +412,152 @@ observations:
       locator:
         page: 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3994836392114300385028915338'
+          - - Al2O3
+            - '0.02251193262172514914350935272'
+          - - FeO
+            - '0.05703049809923441069062035264'
+          - - MgO
+            - '0.501341604165518099624322489'
+          - - CaO
+            - '0.01963232590209230203865627147'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.22'
+            locator:
+              page: 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.42'
+            locator:
+              page: 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '7.89'
+            locator:
+              page: 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '38.91'
+            locator:
+              page: 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.12'
+            locator:
+              page: 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -228,11 +566,11 @@ observations:
         page: 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:
@@ -251,12 +589,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -285,8 +622,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4031974326476805310934527552'
+        - - Al2O3
+          - '0.02272302629400633172819104321'
+        - - FeO
+          - '0.05652497947412058125830821437'
+        - - MgO
+          - '0.4975932072914041025952485755'
+        - - CaO
+          - '0.01996135429278845332479941177'
+        - - Na2O
+          - '0'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -322,6 +678,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -331,7 +692,7 @@ observations:
   locator:
     page: 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -340,6 +701,152 @@ observations:
       locator:
         page: 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4031974326476805310934527552'
+          - - Al2O3
+            - '0.02272302629400633172819104321'
+          - - FeO
+            - '0.05652497947412058125830821437'
+          - - MgO
+            - '0.4975932072914041025952485755'
+          - - CaO
+            - '0.01996135429278845332479941177'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.53'
+            locator:
+              page: 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.45'
+            locator:
+              page: 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '7.8'
+            locator:
+              page: 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '38.52'
+            locator:
+              page: 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.15'
+            locator:
+              page: 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -348,11 +855,11 @@ observations:
         page: 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:
@@ -371,12 +878,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -405,8 +911,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4095899007653469363691814674'
+        - - Al2O3
+          - '0.02226861006722801191850536268'
+        - - FeO
+          - '0.06102208610210952653372351352'
+        - - MgO
+          - '0.4881898201796702346223089233'
+        - - CaO
+          - '0.01884517321524344529904751904'
+        - - Na2O
+          - '0.00008440967040184525723321414445'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -443,6 +968,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -453,7 +983,7 @@ observations:
     page: 14
     published_page: Supplementary Materials PDF p. 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -463,6 +993,169 @@ observations:
         page: 14
         published_page: Supplementary Materials PDF p. 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4095899007653469363691814674'
+          - - Al2O3
+            - '0.02226861006722801191850536268'
+          - - FeO
+            - '0.06102208610210952653372351352'
+          - - MgO
+            - '0.4881898201796702346223089233'
+          - - CaO
+            - '0.01884517321524344529904751904'
+          - - Na2O
+            - '0.00008440967040184525723321414445'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.04'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.34'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '8.38'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.61'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.02'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -472,11 +1165,11 @@ observations:
         published_page: Supplementary Materials PDF p. 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:
@@ -496,12 +1189,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -530,8 +1222,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4059555538586959936688085806'
+        - - Al2O3
+          - '0.02249264807030986008533240988'
+        - - FeO
+          - '0.0620247110384585045686890178'
+        - - MgO
+          - '0.4900774840392837240385314122'
+        - - CaO
+          - '0.01928376349184440912705333556'
+        - - Na2O
+          - '0.00008428783353253477273198938336'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0.00008155166787497373885325446742'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -567,6 +1278,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_2_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -576,7 +1292,7 @@ observations:
   locator:
     page: 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -585,6 +1301,152 @@ observations:
       locator:
         page: 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4059555538586959936688085806'
+          - - Al2O3
+            - '0.02249264807030986008533240988'
+          - - FeO
+            - '0.0620247110384585045686890178'
+          - - MgO
+            - '0.4900774840392837240385314122'
+          - - CaO
+            - '0.01928376349184440912705333556'
+          - - Na2O
+            - '0.00008428783353253477273198938336'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0.00008155166787497373885325446742'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.69'
+            locator:
+              page: 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.39'
+            locator:
+              page: 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '8.53'
+            locator:
+              page: 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.81'
+            locator:
+              page: 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.07'
+            locator:
+              page: 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              page: 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              page: 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -593,11 +1455,11 @@ observations:
         page: 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:
@@ -616,12 +1478,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -650,8 +1511,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4054061102602983814715887148'
+        - - Al2O3
+          - '0.02244950410342477348621058509'
+        - - FeO
+          - '0.06277447480444108049670950888'
+        - - MgO
+          - '0.4899948755939837359661576273'
+        - - CaO
+          - '0.01929071701102683795528778443'
+        - - Na2O
+          - '0.00008431822682519062404577966263'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -687,6 +1567,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_3_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -696,7 +1581,7 @@ observations:
   locator:
     page: 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -705,6 +1590,152 @@ observations:
       locator:
         page: 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4054061102602983814715887148'
+          - - Al2O3
+            - '0.02244950410342477348621058509'
+          - - FeO
+            - '0.06277447480444108049670950888'
+          - - MgO
+            - '0.4899948755939837359661576273'
+          - - CaO
+            - '0.01929071701102683795528778443'
+          - - Na2O
+            - '0.00008431822682519062404577966263'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.61'
+            locator:
+              page: 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.38'
+            locator:
+              page: 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '8.63'
+            locator:
+              page: 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.79'
+            locator:
+              page: 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.07'
+            locator:
+              page: 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              page: 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -713,11 +1744,11 @@ observations:
         page: 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:
@@ -736,12 +1767,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -770,8 +1800,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4068489528220175190655974626'
+        - - Al2O3
+          - '0.02211714641959367271646886749'
+        - - FeO
+          - '0.06248542978669027684120059438'
+        - - MgO
+          - '0.4891530002487467770486518085'
+        - - CaO
+          - '0.01931379206326399437464565264'
+        - - Na2O
+          - '0'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0.00008167865968775995343561417541'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -807,6 +1856,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_6_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -816,7 +1870,7 @@ observations:
   locator:
     page: 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -825,6 +1879,152 @@ observations:
       locator:
         page: 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4068489528220175190655974626'
+          - - Al2O3
+            - '0.02211714641959367271646886749'
+          - - FeO
+            - '0.06248542978669027684120059438'
+          - - MgO
+            - '0.4891530002487467770486518085'
+          - - CaO
+            - '0.01931379206326399437464565264'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0.00008167865968775995343561417541'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.72'
+            locator:
+              page: 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.31'
+            locator:
+              page: 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '8.58'
+            locator:
+              page: 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.68'
+            locator:
+              page: 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.07'
+            locator:
+              page: 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              page: 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -833,11 +2033,11 @@ observations:
         page: 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:
@@ -856,12 +2056,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -890,8 +2089,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4066534218611097451339157682'
+        - - Al2O3
+          - '0.02234862249633715571209117381'
+        - - FeO
+          - '0.06336100773984810371224225343'
+        - - MgO
+          - '0.4883448259380306460863962023'
+        - - CaO
+          - '0.01929212196467434935535460257'
+        - - Na2O
+          - '0'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -927,6 +2145,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_7_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -936,7 +2159,7 @@ observations:
   locator:
     page: 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -945,6 +2168,152 @@ observations:
       locator:
         page: 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4066534218611097451339157682'
+          - - Al2O3
+            - '0.02234862249633715571209117381'
+          - - FeO
+            - '0.06336100773984810371224225343'
+          - - MgO
+            - '0.4883448259380306460863962023'
+          - - CaO
+            - '0.01929212196467434935535460257'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.75'
+            locator:
+              page: 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.36'
+            locator:
+              page: 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '8.71'
+            locator:
+              page: 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.66'
+            locator:
+              page: 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.07'
+            locator:
+              page: 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -953,11 +2322,11 @@ observations:
         page: 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:
@@ -976,12 +2345,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1010,8 +2378,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4006611385269237524585200881'
+        - - Al2O3
+          - '0.02250293998328799133943906082'
+        - - FeO
+          - '0.06299880103752440971463136748'
+        - - MgO
+          - '0.4944513324259373786885462159'
+        - - CaO
+          - '0.01938578802632646779886326802'
+        - - Na2O
+          - '0'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1047,6 +2434,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_8_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1056,7 +2448,7 @@ observations:
   locator:
     page: 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -1065,6 +2457,152 @@ observations:
       locator:
         page: 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4006611385269237524585200881'
+          - - Al2O3
+            - '0.02250293998328799133943906082'
+          - - FeO
+            - '0.06299880103752440971463136748'
+          - - MgO
+            - '0.4944513324259373786885462159'
+          - - CaO
+            - '0.01938578802632646779886326802'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.06'
+            locator:
+              page: 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.39'
+            locator:
+              page: 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '8.66'
+            locator:
+              page: 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '38.13'
+            locator:
+              page: 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.08'
+            locator:
+              page: 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -1073,11 +2611,11 @@ observations:
         page: 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:
@@ -1096,12 +2634,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1130,8 +2667,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3992996417822990306751613193'
+        - - Al2O3
+          - '0.02230009380075389568145958931'
+        - - FeO
+          - '0.05945769386070486105611335012'
+        - - MgO
+          - '0.5007570093788055499971853922'
+        - - CaO
+          - '0.01818556117743666259008034915'
+        - - Na2O
+          - '0'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1167,6 +2723,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_9_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1176,7 +2737,7 @@ observations:
   locator:
     page: 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -1185,6 +2746,152 @@ observations:
       locator:
         page: 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3992996417822990306751613193'
+          - - Al2O3
+            - '0.02230009380075389568145958931'
+          - - FeO
+            - '0.05945769386070486105611335012'
+          - - MgO
+            - '0.5007570093788055499971853922'
+          - - CaO
+            - '0.01818556117743666259008034915'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.11'
+            locator:
+              page: 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.37'
+            locator:
+              page: 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '8.21'
+            locator:
+              page: 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '38.79'
+            locator:
+              page: 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.96'
+            locator:
+              page: 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -1193,11 +2900,11 @@ observations:
         page: 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:
@@ -1216,12 +2923,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1250,8 +2956,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4049684340439677639029914688'
+        - - Al2O3
+          - '0.02219425930023629927583426001'
+        - - FeO
+          - '0.0646725788931355676374984818'
+        - - MgO
+          - '0.4889424053515184299356691503'
+        - - CaO
+          - '0.01905603138074582114276359246'
+        - - Na2O
+          - '0.00008451732288762828784235523519'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0.00008177370750848981740069132189'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1287,6 +3012,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_ts1_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1296,7 +3026,7 @@ observations:
   locator:
     page: 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -1305,6 +3035,152 @@ observations:
       locator:
         page: 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4049684340439677639029914688'
+          - - Al2O3
+            - '0.02219425930023629927583426001'
+          - - FeO
+            - '0.0646725788931355676374984818'
+          - - MgO
+            - '0.4889424053515184299356691503'
+          - - CaO
+            - '0.01905603138074582114276359246'
+          - - Na2O
+            - '0.00008451732288762828784235523519'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0.00008177370750848981740069132189'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.45'
+            locator:
+              page: 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.32'
+            locator:
+              page: 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '8.87'
+            locator:
+              page: 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.62'
+            locator:
+              page: 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.04'
+            locator:
+              page: 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              page: 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              page: 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -1313,11 +3189,11 @@ observations:
         page: 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:
@@ -1336,12 +3212,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1370,8 +3245,27 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4038941629078860248121220426'
+        - - Al2O3
+          - '0.02231631935205344070374755804'
+        - - FeO
+          - '0.06217982474404012074141955045'
+        - - MgO
+          - '0.4921709232145861102151517059'
+        - - CaO
+          - '0.0193573006928026148528507498'
+        - - Na2O
+          - '0'
+        - - K2O
+          - '0'
+        - - SO2
+          - '0.00008146908863168867470839339715'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1407,6 +3301,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_ts2_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1416,7 +3315,7 @@ observations:
   locator:
     page: 14
     table: S4
-  read_from: unknown:sossi-2020-magma-ocean-redox
+  read_from: pdf:sossi-2020-magma-ocean-redox
   point_conditions:
     temperature_K:
       state:
@@ -1425,6 +3324,152 @@ observations:
       locator:
         page: 14
         table: S4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4038941629078860248121220426'
+          - - Al2O3
+            - '0.02231631935205344070374755804'
+          - - FeO
+            - '0.06217982474404012074141955045'
+          - - MgO
+            - '0.4921709232145861102151517059'
+          - - CaO
+            - '0.0193573006928026148528507498'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          - - SO2
+            - '0.00008146908863168867470839339715'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        table: S4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.5'
+            locator:
+              page: 14
+              table: S4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              table: S4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.36'
+            locator:
+              page: 14
+              table: S4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              table: S4
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '8.56'
+            locator:
+              page: 14
+              table: S4
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              table: S4
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '38.01'
+            locator:
+              page: 14
+              table: S4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              table: S4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.08'
+            locator:
+              page: 14
+              table: S4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              table: S4
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              table: S4
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 14
+              table: S4
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              table: S4
+        - - original_SO2_wt_pct
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              page: 14
+              table: S4
+        - - M_SO2_g_mol
+          - state:
+              tag: value
+              value: '64.058'
+            locator:
+              page: 14
+              table: S4
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value
@@ -1433,11 +3478,11 @@ observations:
         page: 14
         table: S4
   derived_from:
-  - unknown:sossi-2020-magma-ocean-redox
+  - pdf:sossi-2020-magma-ocean-redox
   derivation:
     relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
     inputs:
-    - unknown:sossi-2020-magma-ocean-redox
+    - pdf:sossi-2020-magma-ocean-redox
     parameters:
     - - original_Fe3_over_FeT
       - state:

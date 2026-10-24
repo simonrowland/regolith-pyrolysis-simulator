@@ -84,6 +84,205 @@ observations:
         table: '1'
         note: row=Bas1200C0h2
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.02376295692011644397393066023'
+          - - MgO
+            - '0.1141337377032675754490912716'
+          - - CaO
+            - '0.1296990502225264349969819782'
+          - - TiO2
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C0h2
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Rb2O_wt_pct
+          - state:
+              tag: value
+              value: '1.86'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Rb2O_g_mol
+          - state:
+              tag: value
+              value: '186.9346'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
@@ -172,6 +371,205 @@ observations:
         table: '1'
         note: row=Bas1200C10h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.02376295692011644397393066023'
+          - - MgO
+            - '0.1141337377032675754490912716'
+          - - CaO
+            - '0.1296990502225264349969819782'
+          - - TiO2
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C10h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Rb2O_wt_pct
+          - state:
+              tag: value
+              value: '1.86'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Rb2O_g_mol
+          - state:
+              tag: value
+              value: '186.9346'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
@@ -260,6 +658,205 @@ observations:
         table: '1'
         note: row=Bas1200C1h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.02376295692011644397393066023'
+          - - MgO
+            - '0.1141337377032675754490912716'
+          - - CaO
+            - '0.1296990502225264349969819782'
+          - - TiO2
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C1h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Rb2O_wt_pct
+          - state:
+              tag: value
+              value: '1.86'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Rb2O_g_mol
+          - state:
+              tag: value
+              value: '186.9346'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
@@ -348,6 +945,205 @@ observations:
         table: '1'
         note: row=Bas1200C40h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.02376295692011644397393066023'
+          - - MgO
+            - '0.1141337377032675754490912716'
+          - - CaO
+            - '0.1296990502225264349969819782'
+          - - TiO2
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C40h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Rb2O_wt_pct
+          - state:
+              tag: value
+              value: '1.86'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Rb2O_g_mol
+          - state:
+              tag: value
+              value: '186.9346'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
@@ -436,6 +1232,205 @@ observations:
         table: '1'
         note: row=Bas1200C4h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.02376295692011644397393066023'
+          - - MgO
+            - '0.1141337377032675754490912716'
+          - - CaO
+            - '0.1296990502225264349969819782'
+          - - TiO2
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C4h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Rb2O_wt_pct
+          - state:
+              tag: value
+              value: '1.86'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Rb2O_g_mol
+          - state:
+              tag: value
+              value: '186.9346'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
@@ -524,6 +1519,205 @@ observations:
         table: '1'
         note: row=Bas1400C0m1
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.02376295692011644397393066023'
+          - - MgO
+            - '0.1141337377032675754490912716'
+          - - CaO
+            - '0.1296990502225264349969819782'
+          - - TiO2
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C0m1
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Rb2O_wt_pct
+          - state:
+              tag: value
+              value: '1.86'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Rb2O_g_mol
+          - state:
+              tag: value
+              value: '186.9346'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
@@ -612,6 +1806,205 @@ observations:
         table: '1'
         note: row=Bas1400C15m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.02376295692011644397393066023'
+          - - MgO
+            - '0.1141337377032675754490912716'
+          - - CaO
+            - '0.1296990502225264349969819782'
+          - - TiO2
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C15m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Rb2O_wt_pct
+          - state:
+              tag: value
+              value: '1.86'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Rb2O_g_mol
+          - state:
+              tag: value
+              value: '186.9346'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
@@ -700,6 +2093,205 @@ observations:
         table: '1'
         note: row=Bas1400C30m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.02376295692011644397393066023'
+          - - MgO
+            - '0.1141337377032675754490912716'
+          - - CaO
+            - '0.1296990502225264349969819782'
+          - - TiO2
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C30m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Rb2O_wt_pct
+          - state:
+              tag: value
+              value: '1.86'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Rb2O_g_mol
+          - state:
+              tag: value
+              value: '186.9346'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
@@ -788,6 +2380,205 @@ observations:
         table: '1'
         note: row=Bas1400C60m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.02376295692011644397393066023'
+          - - MgO
+            - '0.1141337377032675754490912716'
+          - - CaO
+            - '0.1296990502225264349969819782'
+          - - TiO2
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C60m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Rb2O_wt_pct
+          - state:
+              tag: value
+              value: '1.86'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Rb2O_g_mol
+          - state:
+              tag: value
+              value: '186.9346'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
@@ -876,6 +2667,205 @@ observations:
         table: '1'
         note: row=Bas1400C90m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.02376295692011644397393066023'
+          - - MgO
+            - '0.1141337377032675754490912716'
+          - - CaO
+            - '0.1296990502225264349969819782'
+          - - TiO2
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C90m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Rb2O_wt_pct
+          - state:
+              tag: value
+              value: '1.86'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Rb2O_g_mol
+          - state:
+              tag: value
+              value: '186.9346'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
@@ -1040,47 +3030,30 @@ observations:
     source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
   read_from: pdf:kems-006-zhang-2021
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '16'
-          CaO: '11.21'
-          FeO: '10.67'
-          K2O: '2.49'
-          MgO: '7.09'
-          Na2O: '2.27'
-          Rb2O: '1.86'
-          SiO2: '45.94'
-          TiO2: '1.79'
-      locator:
-        page: 74
-        table: '4'
-        source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1018135974216813105666661448'
-          - - CaO
-            - '0.1296990502225264349969819782'
-          - - FeO
-            - '0.09635846436686307280176800377'
-          - - K2O
-            - '0.01715081195378051990893623378'
+          - - Na2O
+            - '0.02376295692011644397393066023'
           - - MgO
             - '0.1141337377032675754490912716'
-          - - Na2O
-            - '0.02376295692011644397393066021'
-          - - Rb2O
-            - '0.006455638547163228438046996244'
-          - - SiO2
-            - '0.4960841329630148976092099898'
+          - - CaO
+            - '0.1296990502225264349969819782'
           - - TiO2
-            - '0.0145416099015865162553687213'
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
           amount_basis: mole_fraction
       locator:
         page: 74
@@ -1092,18 +3065,34 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_Al2O3_wt_pct
+        - - original_Na2O_wt_pct
           - state:
               tag: value
-              value: '16'
+              value: '2.27'
             locator:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_Al2O3_g_mol
+        - - M_Na2O_g_mol
           - state:
               tag: value
-              value: '101.960077'
+              value: '61.978538560000004'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
             locator:
               page: 74
               table: '4'
@@ -1120,6 +3109,54 @@ observations:
           - state:
               tag: value
               value: '56.077000000000005'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
             locator:
               page: 74
               table: '4'
@@ -1156,38 +3193,6 @@ observations:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '7.09'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.27'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
         - - original_Rb2O_wt_pct
           - state:
               tag: value
@@ -1204,39 +3209,24 @@ observations:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '45.94'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.79'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '16'
+          CaO: '11.21'
+          FeO: '10.67'
+          K2O: '2.49'
+          MgO: '7.09'
+          Na2O: '2.27'
+          Rb2O: '1.86'
+          SiO2: '45.94'
+          TiO2: '1.79'
+      locator:
+        page: 74
+        table: '4'
+        source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
     temperature_K:
       state:
         tag: value
@@ -1411,47 +3401,30 @@ observations:
     source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
   read_from: pdf:kems-006-zhang-2021
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '16'
-          CaO: '11.21'
-          FeO: '10.67'
-          K2O: '2.49'
-          MgO: '7.09'
-          Na2O: '2.27'
-          Rb2O: '1.86'
-          SiO2: '45.94'
-          TiO2: '1.79'
-      locator:
-        page: 74
-        table: '4'
-        source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1018135974216813105666661448'
-          - - CaO
-            - '0.1296990502225264349969819782'
-          - - FeO
-            - '0.09635846436686307280176800377'
-          - - K2O
-            - '0.01715081195378051990893623378'
+          - - Na2O
+            - '0.02376295692011644397393066023'
           - - MgO
             - '0.1141337377032675754490912716'
-          - - Na2O
-            - '0.02376295692011644397393066021'
-          - - Rb2O
-            - '0.006455638547163228438046996244'
-          - - SiO2
-            - '0.4960841329630148976092099898'
+          - - CaO
+            - '0.1296990502225264349969819782'
           - - TiO2
-            - '0.0145416099015865162553687213'
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
           amount_basis: mole_fraction
       locator:
         page: 74
@@ -1463,18 +3436,34 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_Al2O3_wt_pct
+        - - original_Na2O_wt_pct
           - state:
               tag: value
-              value: '16'
+              value: '2.27'
             locator:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_Al2O3_g_mol
+        - - M_Na2O_g_mol
           - state:
               tag: value
-              value: '101.960077'
+              value: '61.978538560000004'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
             locator:
               page: 74
               table: '4'
@@ -1491,6 +3480,54 @@ observations:
           - state:
               tag: value
               value: '56.077000000000005'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
             locator:
               page: 74
               table: '4'
@@ -1527,38 +3564,6 @@ observations:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '7.09'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.27'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
         - - original_Rb2O_wt_pct
           - state:
               tag: value
@@ -1575,39 +3580,24 @@ observations:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '45.94'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.79'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '16'
+          CaO: '11.21'
+          FeO: '10.67'
+          K2O: '2.49'
+          MgO: '7.09'
+          Na2O: '2.27'
+          Rb2O: '1.86'
+          SiO2: '45.94'
+          TiO2: '1.79'
+      locator:
+        page: 74
+        table: '4'
+        source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
     temperature_K:
       state:
         tag: value
@@ -1788,47 +3778,30 @@ observations:
     source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
   read_from: pdf:kems-006-zhang-2021
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '16'
-          CaO: '11.21'
-          FeO: '10.67'
-          K2O: '2.49'
-          MgO: '7.09'
-          Na2O: '2.27'
-          Rb2O: '1.86'
-          SiO2: '45.94'
-          TiO2: '1.79'
-      locator:
-        page: 74
-        table: '4'
-        source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1018135974216813105666661448'
-          - - CaO
-            - '0.1296990502225264349969819782'
-          - - FeO
-            - '0.09635846436686307280176800377'
-          - - K2O
-            - '0.01715081195378051990893623378'
+          - - Na2O
+            - '0.02376295692011644397393066023'
           - - MgO
             - '0.1141337377032675754490912716'
-          - - Na2O
-            - '0.02376295692011644397393066021'
-          - - Rb2O
-            - '0.006455638547163228438046996244'
-          - - SiO2
-            - '0.4960841329630148976092099898'
+          - - CaO
+            - '0.1296990502225264349969819782'
           - - TiO2
-            - '0.0145416099015865162553687213'
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
           amount_basis: mole_fraction
       locator:
         page: 74
@@ -1840,18 +3813,34 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_Al2O3_wt_pct
+        - - original_Na2O_wt_pct
           - state:
               tag: value
-              value: '16'
+              value: '2.27'
             locator:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_Al2O3_g_mol
+        - - M_Na2O_g_mol
           - state:
               tag: value
-              value: '101.960077'
+              value: '61.978538560000004'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
             locator:
               page: 74
               table: '4'
@@ -1868,6 +3857,54 @@ observations:
           - state:
               tag: value
               value: '56.077000000000005'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
             locator:
               page: 74
               table: '4'
@@ -1904,38 +3941,6 @@ observations:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '7.09'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.27'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
         - - original_Rb2O_wt_pct
           - state:
               tag: value
@@ -1952,39 +3957,24 @@ observations:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '45.94'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.79'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '16'
+          CaO: '11.21'
+          FeO: '10.67'
+          K2O: '2.49'
+          MgO: '7.09'
+          Na2O: '2.27'
+          Rb2O: '1.86'
+          SiO2: '45.94'
+          TiO2: '1.79'
+      locator:
+        page: 74
+        table: '4'
+        source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
     temperature_K:
       state:
         tag: value
@@ -2165,47 +4155,30 @@ observations:
     source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
   read_from: pdf:kems-006-zhang-2021
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '16'
-          CaO: '11.21'
-          FeO: '10.67'
-          K2O: '2.49'
-          MgO: '7.09'
-          Na2O: '2.27'
-          Rb2O: '1.86'
-          SiO2: '45.94'
-          TiO2: '1.79'
-      locator:
-        page: 74
-        table: '4'
-        source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1018135974216813105666661448'
-          - - CaO
-            - '0.1296990502225264349969819782'
-          - - FeO
-            - '0.09635846436686307280176800377'
-          - - K2O
-            - '0.01715081195378051990893623378'
+          - - Na2O
+            - '0.02376295692011644397393066023'
           - - MgO
             - '0.1141337377032675754490912716'
-          - - Na2O
-            - '0.02376295692011644397393066021'
-          - - Rb2O
-            - '0.006455638547163228438046996244'
-          - - SiO2
-            - '0.4960841329630148976092099898'
+          - - CaO
+            - '0.1296990502225264349969819782'
           - - TiO2
-            - '0.0145416099015865162553687213'
+            - '0.01454160990158651625536872131'
+          - - SiO2
+            - '0.4960841329630148976092099902'
+          - - Al2O3
+            - '0.1018135974216813105666661449'
+          - - FeO
+            - '0.09635846436686307280176800383'
+          - - K2O
+            - '0.0171508119537805199089362338'
+          - - Rb2O
+            - '0.006455638547163228438046996249'
           amount_basis: mole_fraction
       locator:
         page: 74
@@ -2217,18 +4190,34 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_Al2O3_wt_pct
+        - - original_Na2O_wt_pct
           - state:
               tag: value
-              value: '16'
+              value: '2.27'
             locator:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_Al2O3_g_mol
+        - - M_Na2O_g_mol
           - state:
               tag: value
-              value: '101.960077'
+              value: '61.978538560000004'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
             locator:
               page: 74
               table: '4'
@@ -2245,6 +4234,54 @@ observations:
           - state:
               tag: value
               value: '56.077000000000005'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 74
+              table: '4'
+              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
             locator:
               page: 74
               table: '4'
@@ -2281,38 +4318,6 @@ observations:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '7.09'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.27'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
         - - original_Rb2O_wt_pct
           - state:
               tag: value
@@ -2329,39 +4334,24 @@ observations:
               page: 74
               table: '4'
               source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '45.94'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.79'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 74
-              table: '4'
-              source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '16'
+          CaO: '11.21'
+          FeO: '10.67'
+          K2O: '2.49'
+          MgO: '7.09'
+          Na2O: '2.27'
+          Rb2O: '1.86'
+          SiO2: '45.94'
+          TiO2: '1.79'
+      locator:
+        page: 74
+        table: '4'
+        source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
     temperature_K:
       state:
         tag: value

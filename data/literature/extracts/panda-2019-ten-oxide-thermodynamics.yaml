@@ -1,0 +1,597 @@
+schema_version: literature_extract.v1
+source_id: panda-2019-ten-oxide-thermodynamics
+source:
+  citation: "Panda, S. K. (2019), Coupled Experimental and Thermodynamic Modeling of Al2O3-CaO-FeO-Fe2O3-MgO-MnO-Mn2O3-SiO2-Ti2O3-TiO2 System, PhD thesis, McGill University, Montreal."
+extraction:
+  method: Born-digital pdftotext-layout transcription checked against 600 dpi PDF renders; MinerU conversion contained no target tables.
+  date: '2026-10-22'
+  worker: Codex
+  schema_gap: "Tables 5.3, 6.3, and 9.4 report metallic-cation mole fractions (Fe/(Fe+Ti), Mn/Ti, or Ti/Mg/Mn), not oxide-component mole fractions accepted by equilibrium_phase_composition. No oxygen stoichiometry or valence was inferred. Table 6.4 reports conditions for activity data shown in Figure 6.6, but no activity values."
+review_status: draft
+fidelity_samples:
+  - path: species.MnO.observations[panda2019_quoted_gamma_mn_ag_ito_1723k].values.activity_coefficient
+    value: '0.395'
+    locator: {page: 253, pdf_page_index: 252, section: 6.6.3}
+  - path: species.MnO.observations[panda2019_quoted_gamma_mn_ag_jung_1723k].values.activity_coefficient
+    value: '0.596'
+    locator: {page: 253, pdf_page_index: 252, section: 6.6.3}
+species:
+  FeO:
+    observations: []
+    context:
+      - observation_id: panda2019_table53_fe_ti_metallic_cation_compositions
+        type: table_context
+        locator:
+          page: 164
+          pdf_page_index: 163
+          published_page: 124
+          table: '5.3'
+        units: mole fraction of metallic cations as printed
+        values:
+          quantity: equilibrium_phase_composition
+          candidate_quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          schema_gap: "The printed Fe and Ti mole fractions are Fe/(Fe+Ti) metallic-cation ratios. EPMA cannot distinguish Fe oxidation states. The store basis is oxide components; these numbers cannot be entered as oxide mole fractions."
+          system_as_printed: Fe-Ti-O
+          atmosphere_as_printed: air
+          starting_composition_components: [Fe2O3, TiO2]
+          phase_composition_components: [Fe, Ti]
+          rows:
+            - sample: FT1
+              starting_composition_mole_fraction: ['0.2', '0.8']
+              temperature_C: '1550'
+              time_hours: '8'
+              phases:
+                - {phase: 'Liq', analyses: '13', Fe: '0.428 ± 0.012', Ti: '0.572 ± 0.012'}
+                - {phase: 'Rut', analyses: '15', Fe: '0.108 ± 0.002', Ti: '0.892 ± 0.002'}
+            - sample: FT2
+              starting_composition_mole_fraction: ['0.2', '0.8']
+              temperature_C: '1580'
+              time_hours: '8'
+              phases:
+                - {phase: 'Liq', analyses: '5', Fe: '0.388 ± 0.006', Ti: '0.612 ± 0.006'}
+                - {phase: 'Rut', analyses: '10', Fe: '0.027 ± 0.003', Ti: '0.973 ± 0.003'}
+            - sample: FT3
+              starting_composition_mole_fraction: ['0.2', '0.8']
+              temperature_C: '1500'
+              time_hours: '15'
+              phases:
+                - {phase: 'Psb', analyses: '10', Fe: '0.532 ± 0.007', Ti: '0.468 ± 0.007'}
+                - {phase: 'Rut', analyses: '10', Fe: '0.127 ± 0.002', Ti: '0.873 ± 0.002'}
+            - sample: FT4
+              starting_composition_mole_fraction: ['0.2', '0.8']
+              temperature_C: '1450'
+              time_hours: '20'
+              phases:
+                - {phase: 'Psb', analyses: '9', Fe: '0.551 ± 0.005', Ti: '0.449 ± 0.005'}
+                - {phase: 'Rut', analyses: '10', Fe: '0.117 ± 0.002', Ti: '0.883 ± 0.002'}
+            - sample: FT5
+              starting_composition_mole_fraction: ['0.7', '0.3']
+              temperature_C: '1450'
+              time_hours: '50'
+              phases:
+                - {phase: 'Psb', analyses: '10', Fe: '0.632 ± 0.003', Ti: '0.368 ± 0.003'}
+                - {phase: 'Ilm', analyses: '10', Fe: '0.858 ± 0.002', Ti: '0.142 ± 0.002'}
+            - sample: FT6
+              starting_composition_mole_fraction: ['0.7', '0.3']
+              temperature_C: '1500'
+              time_hours: '70'
+              phases:
+                - {phase: 'Psb', analyses: '10', Fe: '0.621 ± 0.004', Ti: '0.379 ± 0.004'}
+                - {phase: 'Ilm', analyses: '10', Fe: '0.836± 0.002', Ti: '0.164 ± 0.002'}
+            - sample: FT7
+              starting_composition_mole_fraction: ['0.2', '0.8']
+              temperature_C: '1635'
+              time_hours: '20'
+              phases:
+                - {phase: 'Liq', analyses: '7', Fe: '0.438 ± 0.007', Ti: '0.562 ± 0.007'}
+                - {phase: 'Rut', analyses: '10', Fe: '0.018 ± 0.007', Ti: '0.982 ± 0.007'}
+            - sample: FT8
+              starting_composition_mole_fraction: ['0.2', '0.8']
+              temperature_C: '1350'
+              time_hours: '50'
+              phases:
+                - {phase: 'Psb', analyses: '10', Fe: '0.585 ± 0.006', Ti: '0.415 ± 0.006'}
+                - {phase: 'Rut', analyses: '10', Fe: '0.024 ± 0.005', Ti: '0.976 ± 0.005'}
+          printed_prose:
+            - "About 10 mol % Fe solubility, Fe/(Fe+Ti), in TiO2 rutile solid solution was detected at 1550 °C; it decreases with increasing temperature."
+            - "Figure 5.23 discussion gives the rutile–pseudobrookite eutectic as 56.9 mol % Ti and summarizes Fe solubility in rutile as 2 mol % at 1350 °C, 13 mol % at 1500 °C, and 1.8 mol % at 1635 °C. These are rounded prose summaries of the same work represented by Table 5.3, not additional observations."
+          disposition: Measured phase compositions retained as context because their metallic-cation basis has no matching store token.
+      - observation_id: panda2019_figure523_fe_ti_air_phase_diagram
+        type: figure_record
+        locator:
+          page: 191
+          pdf_page_index: 190
+          published_page: 151
+          figure: '5.23'
+        units: no numeric values digitised
+        values:
+          quantity_as_printed: Fe-Ti-O phase boundaries and phase compositions
+          candidate_quantity: equilibrium_phase_composition
+          axes_as_printed: {x: Fe-Ti metallic-cation mole fraction, y: 'Temperature, °C'}
+          reason: Figure-only phase-boundary data; measured compositions are retained in Table 5.3 context.
+        figure: '5.23'
+        caption_as_printed: Calculated optimized phase diagram of the Fe-Ti-O system in air along with the present experimental data and Wittke (1967).
+        quantity_as_printed: Fe-Ti-O phase boundaries and phase compositions
+        candidate_quantity: equilibrium_phase_composition
+        species_system: Fe-Ti-O
+        phase_as_printed: liquid, rutile, pseudobrookite, ilmenite, and cubic spinel fields
+        T_C_as_printed: Temperature axis in °C, 700–2100
+        axes_as_printed: {x: Fe-Ti metallic-cation mole fraction, y: 'Temperature, °C'}
+        panels: [whole figure]
+        series:
+          - {name: 'This study, rutile phase-boundary markers from Table 5.3', panel: whole figure, marker_count: 6}
+          - {name: 'This study, liquid phase-boundary markers from Table 5.3', panel: whole figure, marker_count: 3}
+          - {name: 'This study, pseudobrookite phase-boundary markers from Table 5.3', panel: whole figure, marker_count: 5}
+          - {name: 'This study, ilmenite phase-boundary markers from Table 5.3', panel: whole figure, marker_count: 2}
+          - {name: 'Wittke (1967), rutile', panel: whole figure, marker_count: null, marker_count_status: deferred}
+          - {name: 'Wittke (1967), pseudobrookite', panel: whole figure, marker_count: null, marker_count_status: deferred}
+        digitisation: deferred to a figure pass
+        attribution: Panda (2019), present work and Wittke (1967)
+        reason: Figure-only phase-boundary data; measured compositions are retained in Table 5.3 context. The d-223 composition basis does not accept the metallic-cation fractions shown.
+  MnO:
+    observations:
+      - observation_id: panda2019_quoted_gamma_mn_ag_ito_1723k
+        type: activity_coefficient
+        locator:
+          page: 253
+          pdf_page_index: 252
+          published_page: 213
+          section: 6.6.3
+        T_K: 1723
+        T_range_K: [1723, 1723]
+        phase: l
+        standard_state: pure liquid Mn at 1723 K
+        units: dimensionless
+        values:
+          quantity: activity_coefficient
+          formula: Mn
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          activity_coefficient: '0.395'
+          temperature_C_as_printed: '1450'
+          attribution: Ito et al. [6.22], as cited by Panda (2019)
+          reference_state_as_printed: liquid Mn
+          solution_as_printed: gamma°Mn(Ag), Mn activity coefficient in Ag alloy
+          note: Used originally by Kim et al. [6.24]; Kang et al. [6.29] recalculated the MnO activities using Jung et al. [6.91].
+      - observation_id: panda2019_quoted_gamma_mn_ag_jung_1723k
+        type: activity_coefficient
+        locator:
+          page: 253
+          pdf_page_index: 252
+          published_page: 213
+          section: 6.6.3
+        T_K: 1723
+        T_range_K: [1723, 1723]
+        phase: l
+        standard_state: pure liquid Mn at 1723 K
+        units: dimensionless
+        values:
+          quantity: activity_coefficient
+          formula: Mn
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          activity_coefficient: '0.596'
+          temperature_C_as_printed: '1450'
+          attribution: Jung et al. [6.91], as cited by Panda (2019)
+          reference_state_as_printed: liquid Mn
+          solution_as_printed: gamma°Mn(Ag), Mn activity coefficient in Ag alloy
+          note: Used by Kang et al. [6.29] to recalculate the MnO activities reported by Kim et al. [6.24].
+    context:
+      - observation_id: panda2019_table63_mn_ti_metallic_cation_compositions
+        type: table_context
+        locator:
+          page: 244
+          pdf_page_index: 243
+          published_page: 204
+          table: '6.3'
+        units: mole fraction of metallic cations as printed
+        values:
+          quantity: equilibrium_phase_composition
+          candidate_quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          schema_gap: "EPMA compositions are reported as Mn and Ti metallic-cation fractions; EPMA cannot distinguish oxidation states. The store basis is oxide components, so these values cannot be entered as oxide mole fractions."
+          system_as_printed: MnO-Mn2O3-TiO2
+          atmosphere_as_printed: air
+          starting_composition_components: [MnO, TiO2]
+          phase_composition_components: [Mn, Ti]
+          starting_samples_and_conditions:
+            - {sample: MT1, starting_composition_mole_fraction: ['0.5', '0.5'], annealing_temperature: '1723 (1450)', time_hours: '12'}
+            - {sample: MT2, starting_composition_mole_fraction: ['0.7', '0.3'], annealing_temperature: '1723 (1450)', time_hours: '12'}
+            - {sample: MT3, starting_composition_mole_fraction: ['0.3', '0.7'], annealing_temperature: '1723 (1450)', time_hours: '9'}
+            - {sample: MT4, starting_composition_mole_fraction: ['0.7', '0.3'], annealing_temperature: '1623 (1350)', time_hours: '12'}
+          phase_rows:
+            - {sample: MT1, phase: Glass, analyses: '8', Mn: '0.496 ± 0.006', Ti: '0.504 ± 0.006'}
+            - {sample: MT2, phase: Glass, analyses: '9', Mn: '0.632 ± 0.01', Ti: '0.368 ± 0.01'}
+            - {sample: MT2, phase: CSpi, analyses: '10', Mn: '0.796 ± 0.004', Ti: '0.204 ± 0.004'}
+            - {sample: MT3, phase: Glass, analyses: '9', Mn: '0.373 ± 0.015', Ti: '0.627 ± 0.015'}
+            - {sample: MT3, phase: Rut, analyses: '10', Mn: '0.005 ± 0.001', Ti: '0.995 ± 0.001'}
+            - {sample: MT4, phase: CSpi, analyses: '10', Mn: '0.787 ± 0.012', Ti: '0.213 ± 0.012'}
+            - {sample: MT4, phase: Ilm, analyses: '10', Mn: '0.520 ± 0.009', Ti: '0.480 ± 0.009'}
+      - observation_id: panda2019_table63_continued_mn_ti_metallic_cation_compositions
+        type: table_context
+        locator:
+          page: 245
+          pdf_page_index: 244
+          published_page: 205
+          table: '6.3'
+        units: mole fraction of metallic cations as printed
+        values:
+          quantity: equilibrium_phase_composition
+          candidate_quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          system_as_printed: MnO-Mn2O3-TiO2
+          atmosphere_as_printed: air
+          phase_composition_components: [Mn, Ti]
+          starting_samples_and_conditions:
+            - {sample: MT5, starting_composition_mole_fraction: ['0.3', '0.7'], annealing_temperature: '1773 (1500)', time_hours: '12'}
+            - {sample: MT6, starting_composition_mole_fraction: ['0.7', '0.3'], annealing_temperature: '1673 (1400)', time_hours: '9'}
+            - {sample: MT7, starting_composition_mole_fraction: ['0.3', '0.7'], annealing_temperature: '1673 (1400)', time_hours: '9'}
+            - {sample: MT8, starting_composition_mole_fraction: ['0.7', '0.3'], annealing_temperature: '1623 (1350)', time_hours: '40'}
+            - {sample: MT9, starting_composition_mole_fraction: ['0.3', '0.7'], annealing_temperature: '1573 (1300)', time_hours: '40'}
+            - {sample: MT10, starting_composition_mole_fraction: ['0.5', '0.5'], annealing_temperature: '1673 (1400)', time_hours: '40'}
+          phase_rows:
+            - {sample: MT5, phase: Glass, analyses: '6', Mn: '0.332 ± 0.006', Ti: '0.668 ± 0.006'}
+            - {sample: MT5, phase: Rut, analyses: '10', Mn: '0.004 ± 0.001', Ti: '0.996 ± 0.001'}
+            - {sample: MT6, phase: Glass, analyses: '10', Mn: '0.5850 ± 0.009', Ti: '0.415 ± 0.009'}
+            - {sample: MT6, phase: CSpi, analyses: '10', Mn: '0.774 ± 0.009', Ti: '0.226 ± 0.009'}
+            - {sample: MT7, phase: Glass, analyses: '9', Mn: '0.396 ± 0.013', Ti: '0.604 ± 0.013'}
+            - {sample: MT7, phase: Rut, analyses: '5', Mn: '0.007 ± 0.001', Ti: '0.993 ± 0.001'}
+            - {sample: MT8, phase: Spi, analyses: '10', Mn: '0.793 ± 0.008', Ti: '0.207 ± 0.008'}
+            - {sample: MT8, phase: Ilm, analyses: '10', Mn: '0.523 ± 0.007', Ti: '0.477 ± 0.007'}
+            - {sample: MT9, phase: Spi, analyses: '10', Mn: '0.812 ± 0.011', Ti: '0.188 ± 0.011'}
+            - {sample: MT9, phase: Ilm, analyses: '10', Mn: '0.528 ± 0.008', Ti: '0.472 ± 0.008'}
+            - {sample: MT10, phase: Glass, analyses: '10', Mn: '0.503 ± 0.007', Ti: '0.497 ± 0.007'}
+          disposition: Measured phase compositions retained as context because their metallic-cation basis has no matching store token.
+      - observation_id: panda2019_context_mt_rutile_solubility
+        type: prose_context
+        locator:
+          page: 245
+          pdf_page_index: 244
+          published_page: 205
+          note: Results paragraph immediately following Table 6.3.
+        units: mole percent as printed
+        values:
+          quantity: MnO solubility in rutile
+          method_class: measured_direct
+          sample: MT3
+          phase: rutile TiO2
+          solubility_as_printed: about 0.5 mol % MnO
+          second_printed_value: about 0.7 mol % Mn in rutile solid solution
+          second_locator: {page: 255, pdf_page_index: 254, published_page: 215}
+          discrepancy_note: Table 6.3 gives MT3 Mn = 0.005 ± 0.001 metallic-cation fraction; its prose summary says about 0.5 mol % MnO, while the Figure 6.7 discussion later says 0.7 mol % Mn. Both prose values are retained as printed; they are not merged or scored twice.
+          disposition: Printed values have no matching oxide-component basis; retained as context.
+      - observation_id: panda2019_context_mn_ti_spinels_solubility
+        type: prose_context
+        locator: {page: 254, pdf_page_index: 253, published_page: 214, section: 6.6.4}
+        units: mol % metallic-cation ratio as printed; K and °C as printed
+        values:
+          quantity: Mn-Ti-O phase composition and phase boundary
+          candidate_quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          printed_values:
+            - {phase: cubic spinel, solubility: up to 22 mol % Ti, temperature: around 1648 K (1375 °C), attribution: present study}
+            - {phase: tetragonal spinel, solubility: around 5 mol % Ti, temperature: 1273 K (1000 °C), attribution: 'Garcia-Rosales et al. [6.20]'}
+          schema_gap: Metallic-cation solubilities are not oxide-component mole fractions.
+      - observation_id: panda2019_context_mn_ti_ilmenite_solubility_and_dissociation
+        type: prose_context
+        locator: {page: 255, pdf_page_index: 254, published_page: 215, section: 6.6.4}
+        units: mol % metallic-cation ratio as printed; K and °C as printed
+        values:
+          quantity: Mn-Ti-O phase composition and phase boundary
+          candidate_quantity: equilibrium_phase_composition
+          printed_values:
+            - {phase: ilmenite, solubility: almost stoichiometric MnTiO3 with 2 mol % solubility toward the Mn-rich side}
+            - {phase boundary: ilmenite dissociation to tetragonal spinel and rutile, temperature: about 1240 K (967 °C), attribution: calculated phase diagram}
+            - {phase: rutile solid solution, solubility: 0.7 mol % Mn, attribution: present study}
+          schema_gap: Metallic-cation solubility has no matching oxide-component basis; the dissociation temperature is a calculated phase-boundary value.
+      - observation_id: panda2019_figure65_ti_valence_ratio
+        type: figure_record
+        locator:
+          page: 252
+          pdf_page_index: 251
+          published_page: 212
+          figure: '6.5'
+        units: no numeric values digitised
+        values:
+          quantity_as_printed: Ti4+/Ti3+ ratio in cubic spinel
+          candidate_quantity: null
+          axes_as_printed: {x: 'log pO2, bar', y: 'log(Ti4+/Ti3+) in cubic spinel'}
+          reason: No generic Ti4+/Ti3+ ratio token exists; no plotted values digitised.
+        figure: '6.5'
+        caption_as_printed: Distribution of Ti valences (Ti3+ and Ti4+) in the spinel solid solution in equilibrium with the manganosite solid solution at 1573 K (1300 °C) as a function of oxygen partial pressure.
+        quantity_as_printed: Ti4+/Ti3+ ratio in cubic spinel
+        candidate_quantity: null
+        species_system: Mn-Ti-O
+        phase_as_printed: cubic spinel solid solution in equilibrium with manganosite
+        T_C_as_printed: '1300'
+        axes_as_printed: {x: 'log pO2, bar', y: 'log(Ti4+/Ti3+) in cubic spinel'}
+        panels: [whole figure]
+        series:
+          - {name: 'Amitani et al. (1996), original experimental data', panel: whole figure, marker_count: 10}
+          - {name: 'Kang et al. (2005), re-evaluated experimental data', panel: whole figure, marker_count: 10}
+          - {name: present thermodynamic model, panel: whole figure, marker_count: 0}
+        digitisation: deferred to a figure pass
+        attribution: Original measurements by Amitani et al. (1996); oxygen partial pressures re-evaluated by Kang et al. (2005); model line by Panda (2019).
+        reason: No generic Ti4+/Ti3+ ratio token exists. The plotted model line is not a measured value.
+      - observation_id: panda2019_table64_mno_activity_measurement_conditions
+        type: table_context
+        locator:
+          page: 252
+          pdf_page_index: 251
+          published_page: 212
+          table: '6.4'
+        units: temperature K (°C); log pO2 (bar)
+        values:
+          quantity: experimental conditions for Mn activity measurements
+          candidate_quantity: activity
+          method_class: measured_tabulated
+          activity_standard_state_as_printed: pure solid MnO
+          rows:
+            - {study_reference: '[6.24]', temperature: '1723 (1450)', reference_metal: Ag, gamma_Mn_original_source: '[6.22]', gamma_Mn_used_in_original_analysis: '[6.22]', gamma_Mn_used_in_this_study: '[6.26]', log_pO2_bar: '-12.137'}
+            - {study_reference: '[6.86]', temperature: '1773 (1500)', reference_metal: Pt, gamma_Mn_original_source: '[6.89]', gamma_Mn_used_in_original_analysis: '[6.89]', gamma_Mn_used_in_this_study: '[6.26]', log_pO2_bar: '-7'}
+            - {study_reference: '[6.87]', temperature: '1773 (1500)', reference_metal: Pt, gamma_Mn_original_source: '[6.87]', gamma_Mn_used_in_original_analysis: '[6.87]', gamma_Mn_used_in_this_study: '[6.87]', log_pO2_bar: '-6 to -7'}
+            - {study_reference: '[6.88]', temperature: '1773 (1500)', reference_metal: Pt, gamma_Mn_original_source: '[6.90]', gamma_Mn_used_in_original_analysis: '[6.90]', gamma_Mn_used_in_this_study: '[6.26]', log_pO2_bar: '-7'}
+            - {study_reference: '[6.87]', temperature: '1823 (1550)', reference_metal: Pt, gamma_Mn_original_source: '[6.87]', gamma_Mn_used_in_original_analysis: '[6.87]', gamma_Mn_used_in_this_study: '[6.87]', log_pO2_bar: '-6.155'}
+            - {study_reference: '[6.23]', temperature: '1873 (1600)', reference_metal: Cu, gamma_Mn_original_source: '[6.23]', gamma_Mn_used_in_original_analysis: '[6.23]', gamma_Mn_used_in_this_study: '[6.23]', log_pO2_bar: '-9.721'}
+          disposition: Table of experimental settings and activity-coefficient sources, not activity measurements. The printed log pO2 values are retained in bar without conversion; the range remains a range.
+      - observation_id: panda2019_figure66_mno_activity
+        type: figure_record
+        locator:
+          page: 254
+          pdf_page_index: 253
+          published_page: 214
+          figure: '6.6'
+        units: no numeric values digitised
+        values:
+          quantity_as_printed: MnO activity
+          candidate_quantity: activity
+          axes_as_printed: {x: MnO-TiOx mole fraction, y: Activity of MnO}
+          reason: Measured activities are plotted but no numeric activity table is printed.
+        figure: '6.6'
+        caption_as_printed: Activity of MnO with respect to pure solid MnO in the MnO-TiOx system; lines calculated under the same pO2 employed in the experiments.
+        quantity_as_printed: MnO activity
+        candidate_quantity: activity
+        species_system: MnO-TiOx
+        phase_as_printed: liquid solution
+        T_C_as_printed: '1450, 1500, 1550, and 1600'
+        axes_as_printed: {x: MnO-TiOx mole fraction, y: Activity of MnO}
+        standard_state_as_printed: pure solid MnO
+        panels: [whole figure]
+        series:
+          - {name: 'Kim et al. (2001), 1723 K, log pO2 = -12.137 bar', panel: whole figure, marker_count: null, marker_count_status: deferred}
+          - {name: 'Martin and Bell (1974), 1773 K, log pO2 = -6 bar', panel: whole figure, marker_count: null, marker_count_status: deferred}
+          - {name: 'Karsud (1984), 1773 K, log pO2 = -7 bar', panel: whole figure, marker_count: null, marker_count_status: deferred}
+          - {name: 'Rao and Gaskell (1981), 1773 K, log pO2 = -6 to -7 bar', panel: whole figure, marker_count: null, marker_count_status: deferred}
+          - {name: 'Rao and Gaskell (1981), 1823 K, log pO2 = -6.155 bar', panel: whole figure, marker_count: null, marker_count_status: deferred}
+          - {name: 'Ohta and Morita (1999), 1873 K, log pO2 = -9.721 bar', panel: whole figure, marker_count: null, marker_count_status: deferred}
+          - {name: present thermodynamic model, panel: whole figure, marker_count: 0}
+        digitisation: deferred to a figure pass
+        attribution: Experimental data from the cited studies; calculated lines by Panda (2019).
+        reason: Measured activities are plotted but no numeric activity table is printed; Table 6.4 supplies the experimental conditions.
+      - observation_id: panda2019_figure67_mn_ti_air_phase_diagram
+        type: figure_record
+        locator:
+          page: 255
+          pdf_page_index: 254
+          published_page: 215
+          figure: '6.7'
+        units: no numeric values digitised
+        values:
+          quantity_as_printed: Mn-Ti-O phase boundaries and phase compositions
+          candidate_quantity: equilibrium_phase_composition
+          axes_as_printed: {x: Mn-Ti metallic-cation mole fraction, y: 'Temperature, K'}
+          reason: Figure-only phase-boundary data; Table 6.3 retains present-work cation compositions.
+        figure: '6.7'
+        caption_as_printed: Calculated phase diagram of the Mn-Ti-O system in air condition along with current experimental data and data from previous studies [6.18, 6.20].
+        quantity_as_printed: Mn-Ti-O phase boundaries and phase compositions
+        candidate_quantity: equilibrium_phase_composition
+        species_system: Mn-Ti-O
+        phase_as_printed: liquid/glass, cubic spinel, ilmenite, and rutile fields
+        T_C_as_printed: Temperature axis in K, 1000–2200
+        axes_as_printed: {x: Mn-Ti metallic-cation mole fraction, y: 'Temperature, K'}
+        panels: [whole figure]
+        series:
+          - {name: 'present study, starting compositions and phase-boundary data', panel: whole figure, marker_count: null, marker_count_status: deferred}
+          - {name: 'Kang and Lee (2005), phase data', panel: whole figure, marker_count: null, marker_count_status: deferred}
+          - {name: 'Garcia-Rosales et al. (1993), phase data', panel: whole figure, marker_count: null, marker_count_status: deferred}
+          - {name: 'Leusmann (1979), phase data', panel: whole figure, marker_count: null, marker_count_status: deferred}
+          - {name: calculated phase boundaries, panel: whole figure, marker_count: 0}
+        digitisation: deferred to a figure pass
+        attribution: Panda (2019), present work and cited previous studies
+        reason: Figure-only phase-boundary data; Table 6.3 retains the present-work metallic-cation composition data.
+      - observation_id: panda2019_figure68_mn_ti_fo2_phase_diagrams
+        type: figure_record
+        locator:
+          page: 263
+          pdf_page_index: 262
+          published_page: 223
+          figure: '6.8'
+          note: Panels (a)–(l) span PDF pages 257–263.
+        units: no numeric values digitised
+        values:
+          quantity_as_printed: Mn-Ti-O phase boundaries and phase compositions
+          candidate_quantity: equilibrium_phase_composition
+          axes_as_printed: {x: Mn-Ti metallic-cation mole fraction, y: 'log pO2, bar'}
+          reason: Figure-only multi-temperature phase data; no marker coordinates digitised.
+        figure: '6.8'
+        caption_as_printed: Calculated phase diagrams of the Mn-Ti-O system with oxygen partial pressure as an axis at several temperatures; experimental data from cited sources and current experiments.
+        quantity_as_printed: Mn-Ti-O phase boundaries and phase compositions
+        candidate_quantity: equilibrium_phase_composition
+        species_system: Mn-Ti-O
+        phase_as_printed: oxide liquid and solid solution fields
+        T_C_as_printed: Panels (a)–(l), 1273–1873 K (1000–1600 °C)
+        axes_as_printed: {x: Mn-Ti metallic-cation mole fraction, y: 'log pO2, bar'}
+        panels: [a, b, c, d, e, f, g, h, i, j, k, l]
+        series:
+          - {name: 'experimental data from references [6.15, 6.17-6.18, 6.20-6.24] and current experiments', panel: a-l, marker_count: null, marker_count_status: deferred}
+          - {name: calculated phase boundaries, panel: a-l, marker_count: 0}
+        digitisation: deferred to a figure pass
+        attribution: Cited experimental studies and Panda (2019), present work; model boundaries by Panda (2019).
+        reason: Figure-only multi-temperature phase data; no marker coordinates digitised in this extraction.
+  MgO:
+    observations: []
+    context:
+      - observation_id: panda2019_table94_mg_mn_ti_metallic_cation_compositions
+        type: table_context
+        locator:
+          page: 372
+          pdf_page_index: 371
+          published_page: 332
+          table: '9.4'
+        units: mole fraction of metallic cations as printed
+        values:
+          quantity: equilibrium_phase_composition
+          candidate_quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          schema_gap: "EPMA compositions are reported as Ti, Mg, and Mn metallic-cation fractions. EPMA cannot distinguish oxidation states; these are not oxide-component mole fractions supported by the store."
+          system_as_printed: Mg-Mn-Ti-O
+          atmosphere_as_printed: air
+          starting_composition_components: [TiO2, MgO, MnO]
+          phase_composition_components: [Ti, Mg, Mn]
+          rows:
+            - sample: MMT1
+              starting_composition_mole_fraction: ['0.50', '0.20', '0.30']
+              temperature_C: '1450'
+              time_hours: '12'
+              phases:
+                - {phase: Liq, analyses: '11', Ti: '0.496 ± 0.008', Mg: '0.128 ± 0.006', Mn: '0.376 ± 0.010'}
+                - {phase: Psb, analyses: '22', Ti: '0.647 ± 0.005', Mg: '0.215 ± 0.006', Mn: '0.138 ± 0.005'}
+                - {phase: Spi, analyses: '10', Ti: '0.318 ± 0.008', Mg: '0.294 ± 0.007', Mn: '0.388 ± 0.010'}
+            - sample: MMT2
+              starting_composition_mole_fraction: ['0.50', '0.20', '0.30']
+              temperature_C: '1500'
+              time_hours: '12'
+              phases:
+                - {phase: Liq, analyses: '4', Ti: '0.493 ± 0.017', Mg: '0.112 ± 0.029', Mn: '0.395 ± 0.046'}
+                - {phase: Ilm, analyses: '15', Ti: '0.508 ± 0.004', Mg: '0.246 ± 0.003', Mn: '0.246 ± 0.003'}
+            - sample: MMT3
+              starting_composition_mole_fraction: ['0.50', '0.20', '0.30']
+              temperature_C: '1400'
+              time_hours: '24'
+              phases:
+                - {phase: Psb, analyses: '10', Ti: '0.645 ± 0.003', Mg: '0.212 ± 0.004', Mn: '0.143 ± 0.002'}
+                - {phase: Ilm, analyses: '10', Ti: '0.502 ± 0.006', Mg: '0.204 ± 0.007', Mn: '0.294 ± 0.008'}
+            - sample: MMT4
+              starting_composition_mole_fraction: ['0.70', '0.10', '0.20']
+              temperature_C: '1500'
+              time_hours: '24'
+              phases:
+                - {phase: Liq, analyses: '24', Ti: '0.647 ± 0.015', Mg: '0.045 ± 0.025', Mn: '0.308 ± 0.030'}
+                - {phase: Psb, analyses: '14', Ti: '0.669 ± 0.005', Mg: '0.207 ± 0.007', Mn: '0.124 ± 0.004'}
+                - {phase: Rut, analyses: '9', Ti: '0.996 ± 0.001', Mg: '0.001 ± 0.001', Mn: '0.003 ± 0.001'}
+            - sample: MMT5
+              starting_composition_mole_fraction: ['0.60', '0.30', '0.10']
+              temperature_C: '1400'
+              time_hours: '24'
+              phases:
+                - {phase: Psb, analyses: '17', Ti: '0.657 ± 0.007', Mg: '0.268 ± 0.009', Mn: '0.075 ± 0.003'}
+                - {phase: Ilm, analyses: '5', Ti: '0.505 ± 0.001', Mg: '0.332 ± 0.015', Mn: '0.163 ± 0.007'}
+            - sample: MMT6
+              starting_composition_mole_fraction: ['0.60', '0.30', '0.10']
+              temperature_C: '1450'
+              time_hours: '24'
+              phases:
+                - {phase: Psb, analyses: '43', Ti: '0.652 ± 0.006', Mg: '0.278 ± 0.006', Mn: '0.07 ± 0.006'}
+                - {phase: Ilm, analyses: '7', Ti: '0.499 ± 0.006', Mg: '0.345 ± 0.012', Mn: '0.156 ± 0.012'}
+            - sample: MMT7
+              starting_composition_mole_fraction: ['0.50', '0.20', '0.30']
+              temperature_C: '1550'
+              time_hours: '40'
+              phases:
+                - {phase: Liq, analyses: '27', Ti: '0.500 ± 0.009', Mg: '0.203 ± 0.010', Mn: '0.297 ± 0.009'}
+            - sample: MMT8
+              starting_composition_mole_fraction: ['0.60', '0.30', '0.10']
+              temperature_C: '1550'
+              time_hours: '40'
+              phases:
+                - {phase: Ilm, analyses: '16', Ti: '0.502 ± 0.008', Mg: '0.260 ± 0.056', Mn: '0.255 ± 0.057'}
+                - {phase: Psb, analyses: '11', Ti: '0.659 ± 0.009', Mg: '0.283 ± 0.012', Mn: '0.058 ± 0.003'}
+            - sample: MMT9
+              starting_composition_mole_fraction: ['0.70', '0.10', '0.20']
+              temperature_C: '1550'
+              time_hours: '40'
+              phases:
+                - {phase: Liq, analyses: '17', Ti: '0.678 ± 0.026', Mg: '0.153 ± 0.044', Mn: '0.169 ± 0.041'}
+                - {phase: Rut, analyses: '5', Ti: '0.997 ± 0.001', Mg: '0.001 ± 0.001', Mn: '0.002 ± 0.001'}
+            - sample: MMT10
+              starting_composition_mole_fraction: ['0.60', '0.30', '0.10']
+              temperature_C: '1500'
+              time_hours: '24'
+              phases:
+                - {phase: Psb, analyses: '31', Ti: '0.659 ± 0.006', Mg: '0.271 ± 0.007', Mn: '0.070 ± 0.002'}
+                - {phase: Ilm, analyses: '9', Ti: '0.505 ± 0.005', Mg: '0.344 ± 0.007', Mn: '0.151 ± 0.005'}
+            - sample: MMT11
+              starting_composition_mole_fraction: ['0.50', '0.20', '0.30']
+              temperature_C: '1250'
+              time_hours: '70'
+              phases:
+                - {phase: Psb, analyses: '6', Ti: '0.642 ± 0.009', Mg: '0.225 ± 0.008', Mn: '0.134 ± 0.002'}
+                - {phase: Ilm, analyses: '24', Ti: '0.497 ± 0.004', Mg: '0.210 ± 0.004', Mn: '0.293 ± 0.004'}
+            - sample: MMT12
+              starting_composition_mole_fraction: ['0.60', '0.30', '0.10']
+              temperature_C: '1250'
+              time_hours: '70'
+              phases:
+                - {phase: Psb, analyses: '11', Ti: '0.646 ± 0.003', Mg: '0.284 ± 0.008', Mn: '0.070 ± 0.007'}
+                - {phase: Ilm, analyses: '3', Ti: '0.497 ± 0.007', Mg: '0.355 ± 0.010', Mn: '0.148 ± 0.007'}
+          disposition: Measured phase compositions retained as context because their metallic-cation basis has no matching store token.
+          precision_note: The authors report 2σ ≤ 0.01 for each solid-phase composition and note that liquid/glass compositions can have large standard deviation due to exsolution.
+      - observation_id: panda2019_figure95_mg_mn_ti_data_projection
+        type: figure_record
+        locator:
+          page: 376
+          pdf_page_index: 375
+          published_page: 336
+          figure: '9.5'
+        units: no numeric values digitised
+        values:
+          quantity_as_printed: projection of experimental composition data
+          candidate_quantity: null
+          axes_as_printed: schematic composition projection from the oxygen corner
+          reason: Schematic projection with no numerical axes or plotted data points.
+        figure: '9.5'
+        caption_as_printed: Graphic representation of experimental data in the MgO-MnO-Mn2O3-TiO2 system from oxygen corner.
+        quantity_as_printed: projection of experimental composition data
+        candidate_quantity: null
+        species_system: Mg-Mn-Ti-O
+        phase_as_printed: oxide phase-diagram composition projection
+        T_C_as_printed: not stated in the figure
+        axes_as_printed: schematic composition projection from the oxygen corner
+        panels: [whole figure]
+        series: []
+        digitisation: deferred to a figure pass
+        attribution: Panda (2019), present work
+        reason: Schematic projection, with no numerical axes or plotted data points.
+      - observation_id: panda2019_figure97_mg_mn_ti_air_phase_diagrams
+        type: figure_record
+        locator:
+          page: 383
+          pdf_page_index: 382
+          published_page: 343
+          figure: '9.7'
+          note: Panels (a)–(g) span PDF pages 380–383.
+        units: no numeric values digitised
+        values:
+          quantity_as_printed: Mg-Mn-Ti-O phase boundaries and phase compositions
+          candidate_quantity: equilibrium_phase_composition
+          axes_as_printed: ternary Mg-Mn-Ti metallic-cation mole fractions
+          reason: Figure-only phase-field and phase-boundary data; Table 9.4 retains present-work cation compositions.
+        figure: '9.7'
+        caption_as_printed: Calculated phase diagrams of MgO-MnO-TiO2 in air along with experimental data by Demin et al. and in the present study, at 1100, 1200, 1250, 1400, 1450, 1500, and 1550 °C.
+        quantity_as_printed: Mg-Mn-Ti-O phase boundaries and phase compositions
+        candidate_quantity: equilibrium_phase_composition
+        species_system: Mg-Mn-Ti-O
+        phase_as_printed: oxide liquid and solid solution fields
+        T_C_as_printed: ['1100', '1200', '1250', '1400', '1450', '1500', '1550']
+        axes_as_printed: ternary Mg-Mn-Ti metallic-cation mole fractions
+        panels: [a, b, c, d, e, f, g]
+        series:
+          - {name: 'Demin et al. (1989), experimental phase data', panel: a-b, marker_count: null, marker_count_status: deferred}
+          - {name: 'present study, starting compositions and phase data from Table 9.4', panel: c-g, marker_count: null, marker_count_status: deferred}
+          - {name: calculated phase boundaries, panel: a-g, marker_count: 0}
+        digitisation: deferred to a figure pass
+        attribution: Demin et al. (1989) and Panda (2019), present work; calculated phase boundaries by Panda (2019).
+        reason: Figure-only phase-field and phase-boundary data; Table 9.4 retains the present-work metallic-cation compositions.

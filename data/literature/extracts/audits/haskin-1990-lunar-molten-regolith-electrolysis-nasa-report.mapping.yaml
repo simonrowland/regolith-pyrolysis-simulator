@@ -1,0 +1,82 @@
+source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+source:
+  citation: "Haskin LA (1990). Oxygen Production by Electrolysis of Molten Lunar Regolith, Annual Progress Report 1989-90, NASA Space Engineering Research Center, report N9125/8."
+  year: 1990
+extraction:
+  method: MinerU draft table mapping for the analyzable metal and glass columns of Table 1.8.
+  date: '2026-10-22'
+  worker: codex-fam50-1022
+review_status: draft
+tables:
+  - page: 66
+    table_index: 9
+    type: concentration_series
+    quantity: equilibrium_phase_composition
+    unit: wt.%
+    evidence_class: measured_direct
+    phase: metal
+    rows: [3, 4, 5, 6, 7, 8, 9]
+    experiment: A12_1 metal analysis
+    temperature: {as_printed: 1350, unit: C, locator: {page: 65, pdf_page_index: 64, section: 'Oxygen Production by Electrolysis of Molten Lunar Regolith'}}
+    species_form: printed_formula
+    value_pairs: [{species_column: 1, value_column: 2, phase: metal}]
+  - page: 66
+    table_index: 9
+    type: concentration_series
+    quantity: equilibrium_phase_composition
+    unit: wt.%
+    evidence_class: measured_direct
+    phase: metal
+    rows: [3, 4, 5, 6, 7, 8, 9]
+    experiment: A12_1cb metal analysis 1
+    temperature: {as_printed: 1350, unit: C, locator: {page: 65, pdf_page_index: 64, section: 'Oxygen Production by Electrolysis of Molten Lunar Regolith'}}
+    species_form: printed_formula
+    value_pairs: [{species_column: 1, value_column: 3, phase: metal}]
+  - page: 66
+    table_index: 9
+    type: concentration_series
+    quantity: equilibrium_phase_composition
+    unit: wt.%
+    evidence_class: measured_direct
+    phase: metal
+    rows: [3, 4, 5, 6, 7, 8, 9]
+    experiment: A12_1cb metal analysis 2
+    temperature: {as_printed: 1350, unit: C, locator: {page: 65, pdf_page_index: 64, section: 'Oxygen Production by Electrolysis of Molten Lunar Regolith'}}
+    species_form: printed_formula
+    value_pairs: [{species_column: 1, value_column: 4, phase: metal}]
+  - page: 66
+    table_index: 9
+    type: concentration_series
+    quantity: equilibrium_phase_composition
+    unit: wt.%
+    evidence_class: measured_direct
+    phase: metal
+    rows: [3, 4, 5, 6, 7, 8, 9]
+    experiment: A12_1cb metal analysis 3
+    temperature: {as_printed: 1350, unit: C, locator: {page: 65, pdf_page_index: 64, section: 'Oxygen Production by Electrolysis of Molten Lunar Regolith'}}
+    species_form: printed_formula
+    value_pairs: [{species_column: 1, value_column: 5, phase: metal}]
+  - page: 66
+    table_index: 10
+    type: concentration_series
+    quantity: equilibrium_phase_composition
+    unit: wt.%
+    evidence_class: measured_direct
+    phase: glass
+    rows: [3, 4, 5, 6, 7, 8, 9, 10]
+    experiment: A12_1 glass analysis
+    temperature: {as_printed: 1350, unit: C, locator: {page: 65, pdf_page_index: 64, section: 'Oxygen Production by Electrolysis of Molten Lunar Regolith'}}
+    species_form: printed_formula
+    value_pairs: [{species_column: 1, value_column: 2, phase: glass}]
+  - page: 66
+    table_index: 10
+    type: concentration_series
+    quantity: equilibrium_phase_composition
+    unit: wt.%
+    evidence_class: measured_direct
+    phase: glass
+    rows: [3, 4, 5, 6, 7, 8, 9, 10]
+    experiment: A12_1cb glass analysis
+    temperature: {as_printed: 1350, unit: C, locator: {page: 65, pdf_page_index: 64, section: 'Oxygen Production by Electrolysis of Molten Lunar Regolith'}}
+    species_form: printed_formula
+    value_pairs: [{species_column: 1, value_column: 4, phase: glass}]

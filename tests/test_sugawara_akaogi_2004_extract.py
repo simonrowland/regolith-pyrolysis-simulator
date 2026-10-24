@@ -11,6 +11,7 @@ from simulator.battery.enums import EvidenceClass, Phase, Quantity
 from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import Migrator
 from tests.battery.factories import migrate_one_extract
+from tests.helpers.literature_extract import find_context_row
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -30,15 +31,6 @@ def _observation(document: dict, observation_id: str) -> dict:
         row
         for species in document["species"].values()
         for row in species.get("observations", [])
-        if row["observation_id"] == observation_id
-    )
-
-
-def _context(document: dict, observation_id: str) -> dict:
-    return next(
-        row
-        for species in document["species"].values()
-        for row in species.get("context", [])
         if row["observation_id"] == observation_id
     )
 
@@ -151,10 +143,10 @@ def test_independent_pins_reject_paired_value_and_composition_mutations() -> Non
 
 
 def _assert_mixture_rows(document: dict) -> None:
-    nf_rows = _context(document, "suga04_t1_nf_ns_nfs_mixture_enthalpies")[
+    nf_rows = find_context_row(document, "suga04_t1_nf_ns_nfs_mixture_enthalpies")[
         "values"
     ]
-    nac_rows = _context(document, "suga04_t1_nac_mixture_enthalpies")["values"]
+    nac_rows = find_context_row(document, "suga04_t1_nac_mixture_enthalpies")["values"]
     assert nf_rows["quantity_as_printed"] == "H_minus_H298"
     assert nf_rows["composition_basis"] == "mole_fraction"
     assert nac_rows["quantity_as_printed"] == "H_minus_H298"
@@ -285,16 +277,16 @@ def test_fits_fusion_excess_and_duplicate_comparisons_keep_distinct_meanings(
     migrated: Migrator,
 ) -> None:
     document = _document()
-    eq4 = _context(document, "suga04_eq4_na2sio3_sio2_fit")["values"]
-    eq8 = _context(document, "suga04_eq8_na2sio3_fe2o3_fit")["values"]
-    eq11 = _context(document, "suga04_eq11_na2sio3_acmite_fit")["values"]
+    eq4 = find_context_row(document, "suga04_eq4_na2sio3_sio2_fit")["values"]
+    eq8 = find_context_row(document, "suga04_eq8_na2sio3_fe2o3_fit")["values"]
+    eq11 = find_context_row(document, "suga04_eq11_na2sio3_acmite_fit")["values"]
     assert (eq4["intercept_kJ_mol"], eq4["slope_kJ_mol_per_mol_percent"]) == (209.5, -1.331)
     assert (eq8["intercept_kJ_mol"], eq8["slope_kJ_mol_per_mol_percent"]) == (210.0, 0.255)
     assert (eq11["intercept_kJ_mol"], eq11["slope_kJ_mol_per_mol_percent"]) == (212.9, 1.136)
     assert all(fit["composition_scale"] == "mol_percent" for fit in (eq4, eq8, eq11))
 
-    hematite_fusion = _context(document, "suga04_hematite_fusion_at_1373_context")
-    excess = _context(document, "suga04_t3_nfs_excess_enthalpy_context")["values"]
+    hematite_fusion = find_context_row(document, "suga04_hematite_fusion_at_1373_context")
+    excess = find_context_row(document, "suga04_t3_nfs_excess_enthalpy_context")["values"]
     assert hematite_fusion["type"] == "fusion_enthalpy_context"
     assert hematite_fusion["values"]["delta_H_fusion_kJ_mol"] == 83.3
     assert excess["quantity_as_printed"] == "excess enthalpy"
@@ -309,10 +301,10 @@ def test_fits_fusion_excess_and_duplicate_comparisons_keep_distinct_meanings(
         Quantity.H_MINUS_H298
     }
 
-    figure8 = _context(document, "suga04_figure8_ko_1977_caption")
+    figure8 = find_context_row(document, "suga04_figure8_ko_1977_caption")
     assert figure8["values"]["fetch_candidate"] == "Ko et al. (1977) primary source"
     assert "series" not in figure8["values"] and "rows" not in figure8["values"]
-    figure6 = _context(document, "suga04_figure6_entropy_fusion_comparison")
+    figure6 = find_context_row(document, "suga04_figure6_entropy_fusion_comparison")
     assert figure6["values"]["points"] == [
         {
             "species": "Fe2O3",
@@ -323,7 +315,7 @@ def test_fits_fusion_excess_and_duplicate_comparisons_keep_distinct_meanings(
         }
     ]
 
-    table4 = _context(document, "suga04_table4_fusion_comparisons")
+    table4 = find_context_row(document, "suga04_table4_fusion_comparisons")
     diopside = next(row for row in table4["values"]["rows"] if row["name"] == "Diopside")
     assert "duplicates ammin-76-904" in diopside["comparison_as_printed"]
     assert not any(

@@ -1,0 +1,3718 @@
+schema_version: literature_extract.v1
+source_id: qi-1987-fe-c-v-interaction
+source:
+  citation: Qi, G., Ji, C. and Che, Y. (1987), “Thermodynamic Activity Interaction Coefficients in Fe-C-V Melts”,
+    Transactions of the Japan Institute of Metals, 28(5), 412–423.
+  doi: 10.2320/matertrans1960.28.412
+  year: 1987
+extraction:
+  method: MinerU table-tool drafts for Tables 1–3; all Table 3 cells render-checked at 600 dpi; fitted tables and
+    figures retained as context.
+  date: '2026-10-22'
+  worker: codex-resume-7103-1792656483
+review_status: draft
+experiments:
+- experiment_id: qi1987-table1-literature-values
+  method: tabulation
+  method_as_printed: Previously published first-order ε_C^V values tabulated for comparison; the original experimental
+    methods and standard states are not specified in this table.
+  locator:
+    page: 1
+    published_page: 412
+    pdf_page_index: 0
+    table: '1'
+  note: Each value retains its reference attribution as printed.
+- experiment_id: qi1987-table2-reference-1
+  method: tabulation
+  method_as_printed: Values from J. Chipman and E. F. Brush, Trans. Met. Soc. AIME, 242 (1968), 35. are quoted in
+    Table 2; original methods are not stated here.
+  locator:
+    page: 2
+    published_page: 413
+    pdf_page_index: 1
+    table: '2'
+  note: Temperature is printed per column in Table 2.
+- experiment_id: qi1987-table2-reference-2
+  method: tabulation
+  method_as_printed: Values from J. A. Kitchner, J. Bockris and D. A. Spratt, Trans. Faraday Soc., 48 (1952), 608.
+    are quoted in Table 2; original methods are not stated here.
+  locator:
+    page: 2
+    published_page: 413
+    pdf_page_index: 1
+    table: '2'
+  note: Temperature is printed per column in Table 2.
+- experiment_id: qi1987-table2-reference-3
+  method: tabulation
+  method_as_printed: Values from S. Matoba and S. Ban-ya, Tetsu-to-Hagane, 43 (1957), 790. are quoted in Table 2;
+    original methods are not stated here.
+  locator:
+    page: 2
+    published_page: 413
+    pdf_page_index: 1
+    table: '2'
+  note: Temperature is printed per column in Table 2.
+- experiment_id: qi1987-table2-present-1623k
+  method: quench_equilibration
+  method_as_printed: Graphite saturation of an Fe-C alloy in a graphite crucible under an argon current, followed
+    by prompt withdrawal and water quenching.
+  locator:
+    page: 2
+    published_page: 413
+    pdf_page_index: 1
+    table: '2'
+    row_label: The present authors
+    column_header: 1623 K solubility
+  conditions:
+    gas_mix:
+      state:
+        tag: value
+        value: Ar
+      locator:
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: The present authors
+  note: The temperature and composition are reported in Table 2; the experiment description is on physical PDF page
+    2.
+- experiment_id: qi1987-table2-present-1673k
+  method: quench_equilibration
+  method_as_printed: Graphite saturation of an Fe-C alloy in a graphite crucible under an argon current, followed
+    by prompt withdrawal and water quenching.
+  locator:
+    page: 2
+    published_page: 413
+    pdf_page_index: 1
+    table: '2'
+    row_label: The present authors
+    column_header: 1673 K solubility
+  conditions:
+    gas_mix:
+      state:
+        tag: value
+        value: Ar
+      locator:
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: The present authors
+  note: The temperature and composition are reported in Table 2; the experiment description is on physical PDF page
+    2.
+- experiment_id: qi1987-table2-present-1773k
+  method: quench_equilibration
+  method_as_printed: Graphite saturation of an Fe-C alloy in a graphite crucible under an argon current, followed
+    by prompt withdrawal and water quenching.
+  locator:
+    page: 2
+    published_page: 413
+    pdf_page_index: 1
+    table: '2'
+    row_label: The present authors
+    column_header: 1773 K solubility
+  conditions:
+    gas_mix:
+      state:
+        tag: value
+        value: Ar
+      locator:
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: The present authors
+  note: The temperature and composition are reported in Table 2; the experiment description is on physical PDF page
+    2.
+- experiment_id: qi1987-table3-1623k
+  method: quench_equilibration
+  method_as_printed: Fe-C-V alloys were equilibrated in a hexa-compartment graphite crucible for 28.8–36 ks (8–10
+    h) in an argon current, then promptly withdrawn and water quenched before C and V analysis.
+  locator: &id001
+    page: 3
+    published_page: 414
+    pdf_page_index: 2
+    table: '3'
+    row_label: 1623 K block
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1623'
+      locator: *id001
+    gas_mix:
+      state:
+        tag: value
+        value: Ar
+      locator: *id001
+  note: Each Table 3 row is an alloy sample; the authors state samples weighed 5–6 g.
+- experiment_id: qi1987-table3-1673k
+  method: quench_equilibration
+  method_as_printed: Fe-C-V alloys were equilibrated in a hexa-compartment graphite crucible for 28.8–36 ks (8–10
+    h) in an argon current, then promptly withdrawn and water quenched before C and V analysis.
+  locator: &id002
+    page: 3
+    published_page: 414
+    pdf_page_index: 2
+    table: '3'
+    row_label: 1673 K block
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator: *id002
+    gas_mix:
+      state:
+        tag: value
+        value: Ar
+      locator: *id002
+  note: Each Table 3 row is an alloy sample; the authors state samples weighed 5–6 g.
+- experiment_id: qi1987-table3-1773k
+  method: quench_equilibration
+  method_as_printed: Fe-C-V alloys were equilibrated in a hexa-compartment graphite crucible for 28.8–36 ks (8–10
+    h) in an argon current, then promptly withdrawn and water quenched before C and V analysis.
+  locator: &id003
+    page: 3
+    published_page: 414
+    pdf_page_index: 2
+    table: '3'
+    row_label: 1773 K block
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator: *id003
+    gas_mix:
+      state:
+        tag: value
+        value: Ar
+      locator: *id003
+  note: Each Table 3 row is an alloy sample; the authors state samples weighed 5–6 g.
+fidelity_samples:
+- path: species.C.observations[qi_1987_table3_1623_191_C].values.component_amount
+  value: '4.74'
+  locator:
+    page: 3
+    published_page: 414
+    pdf_page_index: 2
+    table: '3'
+    row_label: '191'
+- path: species.C.observations[qi_1987_table3_1673_112_V].values.component_amount
+  value: '3.77'
+  locator:
+    page: 3
+    published_page: 414
+    pdf_page_index: 2
+    table: '3'
+    row_label: '112'
+- path: species.C.observations[qi_1987_table3_1773_182_C].values.component_amount
+  value: '5.92'
+  locator:
+    page: 3
+    published_page: 414
+    pdf_page_index: 2
+    table: '3'
+    row_label: '182'
+species:
+  C:
+    observations:
+    - observation_id: qi_1987_table1_row_1_epsilon_C_V
+      type: interaction_parameter
+      experiment: qi1987-table1-literature-values
+      phase: l
+      units: dimensionless
+      locator: &id004
+        page: 1
+        published_page: 412
+        pdf_page_index: 0
+        table: '1'
+        row_label: (1) at 1833 K
+      standard_state: The concentration and standard-state convention for the quoted ε_C^V values is not stated
+        in Table 1.
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: quoted_attributed
+        admission_status: admitted
+        parameter: epsilon_C_V
+        epsilon: '-8.0'
+        T_K: '1833'
+        T_C: '1559.85'
+        attribution: Fuwa and Chipman (ref. 1)
+        note: Quoted first-order interaction coefficient; reference state is not stated in this table.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1833'
+            locator: *id004
+    - observation_id: qi_1987_table1_row_2_epsilon_C_V
+      type: interaction_parameter
+      experiment: qi1987-table1-literature-values
+      phase: l
+      units: dimensionless
+      locator: &id005
+        page: 1
+        published_page: 412
+        pdf_page_index: 0
+        table: '1'
+        row_label: (7) at 1803 K
+      standard_state: The concentration and standard-state convention for the quoted ε_C^V values is not stated
+        in Table 1.
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: quoted_attributed
+        admission_status: admitted
+        parameter: epsilon_C_V
+        epsilon: '-4.49'
+        T_K: '1803'
+        T_C: '1529.85'
+        attribution: reference 7
+        note: Quoted first-order interaction coefficient; reference state is not stated in this table.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1803'
+            locator: *id005
+    - observation_id: qi_1987_table1_row_3_epsilon_C_V
+      type: interaction_parameter
+      experiment: qi1987-table1-literature-values
+      phase: l
+      units: dimensionless
+      locator: &id006
+        page: 1
+        published_page: 412
+        pdf_page_index: 0
+        table: '1'
+        row_label: (8) at 1823 K
+      standard_state: The concentration and standard-state convention for the quoted ε_C^V values is not stated
+        in Table 1.
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: quoted_attributed
+        admission_status: admitted
+        parameter: epsilon_C_V
+        epsilon: '-6.2'
+        T_K: '1823'
+        T_C: '1549.85'
+        attribution: reference 8
+        note: Quoted first-order interaction coefficient; reference state is not stated in this table.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator: *id006
+    - observation_id: qi_1987_table1_row_4_epsilon_C_V
+      type: interaction_parameter
+      experiment: qi1987-table1-literature-values
+      phase: l
+      units: dimensionless
+      locator: &id007
+        page: 1
+        published_page: 412
+        pdf_page_index: 0
+        table: '1'
+        row_label: (9) at 1823 K
+      standard_state: The concentration and standard-state convention for the quoted ε_C^V values is not stated
+        in Table 1.
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: quoted_attributed
+        admission_status: admitted
+        parameter: epsilon_C_V
+        epsilon: '-11'
+        T_K: '1823'
+        T_C: '1549.85'
+        attribution: reference 9
+        note: Quoted first-order interaction coefficient; reference state is not stated in this table.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator: *id007
+    - observation_id: qi_1987_table1_row_5_epsilon_C_V
+      type: interaction_parameter
+      experiment: qi1987-table1-literature-values
+      phase: l
+      units: dimensionless
+      locator: &id008
+        page: 1
+        published_page: 412
+        pdf_page_index: 0
+        table: '1'
+        row_label: (10) at 1833 K
+      standard_state: The concentration and standard-state convention for the quoted ε_C^V values is not stated
+        in Table 1.
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: quoted_attributed
+        admission_status: admitted
+        parameter: epsilon_C_V
+        epsilon: '-16.1'
+        T_K: '1833'
+        T_C: '1559.85'
+        attribution: reference 10
+        note: Quoted first-order interaction coefficient; reference state is not stated in this table.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1833'
+            locator: *id008
+    - observation_id: qi_1987_table1_row_6_epsilon_C_V
+      type: interaction_parameter
+      experiment: qi1987-table1-literature-values
+      phase: l
+      units: dimensionless
+      locator: &id009
+        page: 1
+        published_page: 412
+        pdf_page_index: 0
+        table: '1'
+        row_label: (11) at 1873 K
+      standard_state: The concentration and standard-state convention for the quoted ε_C^V values is not stated
+        in Table 1.
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: quoted_attributed
+        admission_status: admitted
+        parameter: epsilon_C_V
+        epsilon: '-6.8'
+        T_K: '1873'
+        T_C: '1599.85'
+        attribution: reference 11
+        note: Quoted first-order interaction coefficient; reference state is not stated in this table.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1873'
+            locator: *id009
+    - observation_id: qi_1987_table1_row_7_epsilon_C_V
+      type: interaction_parameter
+      experiment: qi1987-table1-literature-values
+      phase: l
+      units: dimensionless
+      locator: &id010
+        page: 1
+        published_page: 412
+        pdf_page_index: 0
+        table: '1'
+        row_label: (13) at 1873 K
+      standard_state: The concentration and standard-state convention for the quoted ε_C^V values is not stated
+        in Table 1.
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: quoted_attributed
+        admission_status: admitted
+        parameter: epsilon_C_V
+        epsilon: '-16.1'
+        T_K: '1873'
+        T_C: '1599.85'
+        attribution: reference 13
+        note: Quoted first-order interaction coefficient; reference state is not stated in this table.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1873'
+            locator: *id010
+    - observation_id: qi_1987_table2_chipman_1623_C
+      type: composition_series
+      experiment: qi1987-table2-reference-1
+      phase: l
+      units: wt_percent
+      locator: &id011
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: Chipman et al.(21)
+        column_header: 1623 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '4.77'
+        component_amount_as_published: 4.77 mass% C
+        sample_id: chipman-1623K
+        system_as_printed: Fe-Csat
+        method_class: quoted_attributed
+        admission_status: admitted
+        attribution: Chipman et al. (ref. 21)
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id011
+    - observation_id: qi_1987_table2_chipman_1673_C
+      type: composition_series
+      experiment: qi1987-table2-reference-1
+      phase: l
+      units: wt_percent
+      locator: &id012
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: Chipman et al.(21)
+        column_header: 1673 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '4.90'
+        component_amount_as_published: 4.90 mass% C
+        sample_id: chipman-1673K
+        system_as_printed: Fe-Csat
+        method_class: quoted_attributed
+        admission_status: admitted
+        attribution: Chipman et al. (ref. 21)
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id012
+    - observation_id: qi_1987_table2_chipman_1773_C
+      type: composition_series
+      experiment: qi1987-table2-reference-1
+      phase: l
+      units: wt_percent
+      locator: &id013
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: Chipman et al.(21)
+        column_header: 1773 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '5.02'
+        component_amount_as_published: 5.02 mass% C
+        sample_id: chipman-1773K
+        system_as_printed: Fe-Csat
+        method_class: quoted_attributed
+        admission_status: admitted
+        attribution: Chipman et al. (ref. 21)
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id013
+    - observation_id: qi_1987_table2_kitchner_1623_C
+      type: composition_series
+      experiment: qi1987-table2-reference-2
+      phase: l
+      units: wt_percent
+      locator: &id014
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: Kitchner et al.(22)
+        column_header: 1623 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '4.73'
+        component_amount_as_published: 4.73 mass% C
+        sample_id: kitchner-1623K
+        system_as_printed: Fe-Csat
+        method_class: quoted_attributed
+        admission_status: admitted
+        attribution: Kitchner et al. (ref. 22)
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id014
+    - observation_id: qi_1987_table2_kitchner_1673_C
+      type: composition_series
+      experiment: qi1987-table2-reference-2
+      phase: l
+      units: wt_percent
+      locator: &id015
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: Kitchner et al.(22)
+        column_header: 1673 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '4.86'
+        component_amount_as_published: 4.86 mass% C
+        sample_id: kitchner-1673K
+        system_as_printed: Fe-Csat
+        method_class: quoted_attributed
+        admission_status: admitted
+        attribution: Kitchner et al. (ref. 22)
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id015
+    - observation_id: qi_1987_table2_kitchner_1773_C
+      type: composition_series
+      experiment: qi1987-table2-reference-2
+      phase: l
+      units: wt_percent
+      locator: &id016
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: Kitchner et al.(22)
+        column_header: 1773 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '4.99'
+        component_amount_as_published: 4.99 mass% C
+        sample_id: kitchner-1773K
+        system_as_printed: Fe-Csat
+        method_class: quoted_attributed
+        admission_status: admitted
+        attribution: Kitchner et al. (ref. 22)
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id016
+    - observation_id: qi_1987_table2_matoba_banya_1623_C
+      type: composition_series
+      experiment: qi1987-table2-reference-3
+      phase: l
+      units: wt_percent
+      locator: &id017
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: Matoba and Ban-ya(23)
+        column_header: 1623 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '4.86'
+        component_amount_as_published: 4.86 mass% C
+        sample_id: matoba_banya-1623K
+        system_as_printed: Fe-Csat
+        method_class: quoted_attributed
+        admission_status: admitted
+        attribution: Matoba and Ban-ya (ref. 23)
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id017
+    - observation_id: qi_1987_table2_matoba_banya_1673_C
+      type: composition_series
+      experiment: qi1987-table2-reference-3
+      phase: l
+      units: wt_percent
+      locator: &id018
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: Matoba and Ban-ya(23)
+        column_header: 1673 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '5.00'
+        component_amount_as_published: 5.00 mass% C
+        sample_id: matoba_banya-1673K
+        system_as_printed: Fe-Csat
+        method_class: quoted_attributed
+        admission_status: admitted
+        attribution: Matoba and Ban-ya (ref. 23)
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id018
+    - observation_id: qi_1987_table2_matoba_banya_1773_C
+      type: composition_series
+      experiment: qi1987-table2-reference-3
+      phase: l
+      units: wt_percent
+      locator: &id019
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: Matoba and Ban-ya(23)
+        column_header: 1773 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '5.13'
+        component_amount_as_published: 5.13 mass% C
+        sample_id: matoba_banya-1773K
+        system_as_printed: Fe-Csat
+        method_class: quoted_attributed
+        admission_status: admitted
+        attribution: Matoba and Ban-ya (ref. 23)
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id019
+    - observation_id: qi_1987_table2_present_1623_C
+      type: composition_series
+      experiment: qi1987-table2-present-1623k
+      phase: l
+      units: wt_percent
+      locator: &id020
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: The present authors
+        column_header: 1623 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '4.74'
+        component_amount_as_published: 4.74 mass% C
+        sample_id: present-1623K
+        system_as_printed: Fe-Csat
+        method_class: measured_direct
+        admission_status: admitted
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id020
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id020
+    - observation_id: qi_1987_table2_present_1673_C
+      type: composition_series
+      experiment: qi1987-table2-present-1673k
+      phase: l
+      units: wt_percent
+      locator: &id021
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: The present authors
+        column_header: 1673 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '4.87'
+        component_amount_as_published: 4.87 mass% C
+        sample_id: present-1673K
+        system_as_printed: Fe-Csat
+        method_class: measured_direct
+        admission_status: admitted
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id021
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id021
+    - observation_id: qi_1987_table2_present_1773_C
+      type: composition_series
+      experiment: qi1987-table2-present-1773k
+      phase: l
+      units: wt_percent
+      locator: &id022
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        table: '2'
+        row_label: The present authors
+        column_header: 1773 K
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '5.00'
+        component_amount_as_published: 5.00 mass% C
+        sample_id: present-1773K
+        system_as_printed: Fe-Csat
+        method_class: measured_direct
+        admission_status: admitted
+        note: Graphite-saturated liquid iron; the paper does not provide an alloy sample identifier.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id022
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id022
+    - observation_id: qi_1987_table3_1623_191_C
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id023
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '191'
+        column_header: 1623 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '4.74'
+        component_amount_as_published: 4.74 mass% C
+        sample_id: '191'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id023
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id023
+    - observation_id: qi_1987_table3_1623_191_V
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id023
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '0'
+        component_amount_as_published: 0 mass% V
+        sample_id: '191'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id023
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id023
+    - observation_id: qi_1987_table3_1623_192_C
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id024
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '192'
+        column_header: 1623 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '5.37'
+        component_amount_as_published: 5.37 mass% C
+        sample_id: '192'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id024
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id024
+    - observation_id: qi_1987_table3_1623_192_V
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id024
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '5.20'
+        component_amount_as_published: 5.20 mass% V
+        sample_id: '192'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id024
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id024
+    - observation_id: qi_1987_table3_1623_193_C
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id025
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '193'
+        column_header: 1623 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '4.83'
+        component_amount_as_published: 4.83 mass% C
+        sample_id: '193'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id025
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id025
+    - observation_id: qi_1987_table3_1623_193_V
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id025
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '0.46'
+        component_amount_as_published: 0.46 mass% V
+        sample_id: '193'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id025
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id025
+    - observation_id: qi_1987_table3_1623_194_C
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id026
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '194'
+        column_header: 1623 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '5.13'
+        component_amount_as_published: 5.13 mass% C
+        sample_id: '194'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id026
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id026
+    - observation_id: qi_1987_table3_1623_194_V
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id026
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '3.00'
+        component_amount_as_published: 3.00 mass% V
+        sample_id: '194'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id026
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id026
+    - observation_id: qi_1987_table3_1623_195_C
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id027
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '195'
+        column_header: 1623 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '5.08'
+        component_amount_as_published: 5.08 mass% C
+        sample_id: '195'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id027
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id027
+    - observation_id: qi_1987_table3_1623_195_V
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id027
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '2.46'
+        component_amount_as_published: 2.46 mass% V
+        sample_id: '195'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id027
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id027
+    - observation_id: qi_1987_table3_1623_201_C
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id028
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '201'
+        column_header: 1623 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '4.73'
+        component_amount_as_published: 4.73 mass% C
+        sample_id: '201'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id028
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id028
+    - observation_id: qi_1987_table3_1623_201_V
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id028
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '0'
+        component_amount_as_published: 0 mass% V
+        sample_id: '201'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id028
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id028
+    - observation_id: qi_1987_table3_1623_202_C
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id029
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '202'
+        column_header: 1623 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '5.53'
+        component_amount_as_published: 5.53 mass% C
+        sample_id: '202'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id029
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id029
+    - observation_id: qi_1987_table3_1623_202_V
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id029
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '5.94'
+        component_amount_as_published: 5.94 mass% V
+        sample_id: '202'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id029
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id029
+    - observation_id: qi_1987_table3_1623_203_C
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id030
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '203'
+        column_header: 1623 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '4.88'
+        component_amount_as_published: 4.88 mass% C
+        sample_id: '203'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id030
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id030
+    - observation_id: qi_1987_table3_1623_203_V
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id030
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '0.67'
+        component_amount_as_published: 0.67 mass% V
+        sample_id: '203'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id030
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id030
+    - observation_id: qi_1987_table3_1623_205_C
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id031
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '205'
+        column_header: 1623 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '4.97'
+        component_amount_as_published: 4.97 mass% C
+        sample_id: '205'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id031
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id031
+    - observation_id: qi_1987_table3_1623_205_V
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id031
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '1.47'
+        component_amount_as_published: 1.47 mass% V
+        sample_id: '205'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id031
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id031
+    - observation_id: qi_1987_table3_1623_206_C
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id032
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '206'
+        column_header: 1623 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '5.38'
+        component_amount_as_published: 5.38 mass% C
+        sample_id: '206'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id032
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id032
+    - observation_id: qi_1987_table3_1623_206_V
+      type: composition_series
+      experiment: qi1987-table3-1623k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id032
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1349.85'
+        component_amount: '4.73'
+        component_amount_as_published: 4.73 mass% V
+        sample_id: '206'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1623'
+            locator: *id032
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id032
+    - observation_id: qi_1987_table3_1673_111_C
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id033
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '111'
+        column_header: 1673 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '4.90'
+        component_amount_as_published: 4.90 mass% C
+        sample_id: '111'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id033
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id033
+    - observation_id: qi_1987_table3_1673_111_V
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id033
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '0.71'
+        component_amount_as_published: 0.71 mass% V
+        sample_id: '111'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id033
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id033
+    - observation_id: qi_1987_table3_1673_112_C
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id034
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '112'
+        column_header: 1673 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '5.40'
+        component_amount_as_published: 5.40 mass% C
+        sample_id: '112'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id034
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id034
+    - observation_id: qi_1987_table3_1673_112_V
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id034
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '3.77'
+        component_amount_as_published: 3.77 mass% V
+        sample_id: '112'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id034
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id034
+    - observation_id: qi_1987_table3_1673_113_C
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id035
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '113'
+        column_header: 1673 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '5.10'
+        component_amount_as_published: 5.10 mass% C
+        sample_id: '113'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id035
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id035
+    - observation_id: qi_1987_table3_1673_113_V
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id035
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '1.69'
+        component_amount_as_published: 1.69 mass% V
+        sample_id: '113'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id035
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id035
+    - observation_id: qi_1987_table3_1673_115_C
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id036
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '115'
+        column_header: 1673 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '5.25'
+        component_amount_as_published: 5.25 mass% C
+        sample_id: '115'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id036
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id036
+    - observation_id: qi_1987_table3_1673_115_V
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id036
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '2.98'
+        component_amount_as_published: 2.98 mass% V
+        sample_id: '115'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id036
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id036
+    - observation_id: qi_1987_table3_1673_116_C
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id037
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '116'
+        column_header: 1673 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '4.87'
+        component_amount_as_published: 4.87 mass% C
+        sample_id: '116'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id037
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id037
+    - observation_id: qi_1987_table3_1673_116_V
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id037
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '0'
+        component_amount_as_published: 0 mass% V
+        sample_id: '116'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id037
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id037
+    - observation_id: qi_1987_table3_1673_131_C
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id038
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '131'
+        column_header: 1673 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '4.87'
+        component_amount_as_published: 4.87 mass% C
+        sample_id: '131'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id038
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id038
+    - observation_id: qi_1987_table3_1673_131_V
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id038
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '0'
+        component_amount_as_published: 0 mass% V
+        sample_id: '131'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id038
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id038
+    - observation_id: qi_1987_table3_1673_132_C
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id039
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '132'
+        column_header: 1673 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '5.51'
+        component_amount_as_published: 5.51 mass% C
+        sample_id: '132'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id039
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id039
+    - observation_id: qi_1987_table3_1673_132_V
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id039
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '4.88'
+        component_amount_as_published: 4.88 mass% V
+        sample_id: '132'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id039
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id039
+    - observation_id: qi_1987_table3_1673_134_C
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id040
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '134'
+        column_header: 1673 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '4.89'
+        component_amount_as_published: 4.89 mass% C
+        sample_id: '134'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id040
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id040
+    - observation_id: qi_1987_table3_1673_134_V
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id040
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '0'
+        component_amount_as_published: 0 mass% V
+        sample_id: '134'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id040
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id040
+    - observation_id: qi_1987_table3_1673_135_C
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id041
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '135'
+        column_header: 1673 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '5.27'
+        component_amount_as_published: 5.27 mass% C
+        sample_id: '135'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id041
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id041
+    - observation_id: qi_1987_table3_1673_135_V
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id041
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '3.19'
+        component_amount_as_published: 3.19 mass% V
+        sample_id: '135'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id041
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id041
+    - observation_id: qi_1987_table3_1673_136_C
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id042
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '136'
+        column_header: 1673 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '5.20'
+        component_amount_as_published: 5.20 mass% C
+        sample_id: '136'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id042
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id042
+    - observation_id: qi_1987_table3_1673_136_V
+      type: composition_series
+      experiment: qi1987-table3-1673k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id042
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1399.85'
+        component_amount: '2.34'
+        component_amount_as_published: 2.34 mass% V
+        sample_id: '136'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1673'
+            locator: *id042
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id042
+    - observation_id: qi_1987_table3_1773_181_C
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id043
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '181'
+        column_header: 1773 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '5.06'
+        component_amount_as_published: 5.06 mass% C
+        sample_id: '181'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id043
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id043
+    - observation_id: qi_1987_table3_1773_181_V
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id043
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '0.061'
+        component_amount_as_published: 0.061 mass% V
+        sample_id: '181'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id043
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id043
+    - observation_id: qi_1987_table3_1773_182_C
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id044
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '182'
+        column_header: 1773 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '5.92'
+        component_amount_as_published: 5.92 mass% C
+        sample_id: '182'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id044
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id044
+    - observation_id: qi_1987_table3_1773_182_V
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id044
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '5.91'
+        component_amount_as_published: 5.91 mass% V
+        sample_id: '182'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id044
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id044
+    - observation_id: qi_1987_table3_1773_183_C
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id045
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '183'
+        column_header: 1773 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '5.15'
+        component_amount_as_published: 5.15 mass% C
+        sample_id: '183'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id045
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id045
+    - observation_id: qi_1987_table3_1773_183_V
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id045
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '0.69'
+        component_amount_as_published: 0.69 mass% V
+        sample_id: '183'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id045
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id045
+    - observation_id: qi_1987_table3_1773_184_C
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id046
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '184'
+        column_header: 1773 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '5.64'
+        component_amount_as_published: 5.64 mass% C
+        sample_id: '184'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id046
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id046
+    - observation_id: qi_1987_table3_1773_184_V
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id046
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '3.97'
+        component_amount_as_published: 3.97 mass% V
+        sample_id: '184'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id046
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id046
+    - observation_id: qi_1987_table3_1773_185_C
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id047
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '185'
+        column_header: 1773 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '5.31'
+        component_amount_as_published: 5.31 mass% C
+        sample_id: '185'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id047
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id047
+    - observation_id: qi_1987_table3_1773_185_V
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id047
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '1.77'
+        component_amount_as_published: 1.77 mass% V
+        sample_id: '185'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id047
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id047
+    - observation_id: qi_1987_table3_1773_186_C
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: &id048
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        table: '3'
+        row_label: '186'
+        column_header: 1773 K; C and V mass%
+      values:
+        quantity: equilibrium_phase_composition
+        formula: C
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '5.82'
+        component_amount_as_published: 5.82 mass% C
+        sample_id: '186'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id048
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id048
+    - observation_id: qi_1987_table3_1773_186_V
+      type: composition_series
+      experiment: qi1987-table3-1773k
+      regime: quench_equilibration
+      phase: l
+      units: wt_percent
+      locator: *id048
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1499.85'
+        component_amount: '4.88'
+        component_amount_as_published: 4.88 mass% V
+        sample_id: '186'
+        system_as_printed: Fe-C-V
+        method_class: measured_direct
+        admission_status: admitted
+        note: Carbon-saturated Fe-C-V liquid alloy; Fe balance is not reported.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773'
+            locator: *id048
+          gas_mix:
+            state:
+              tag: value
+              value: Ar
+            locator: *id048
+    context:
+    - observation_id: qi_1987_table4_second_order_fit_context
+      type: model_fit_context
+      locator:
+        page: 7
+        published_page: 418
+        pdf_page_index: 6
+        table: '4'
+      units: as printed
+      values:
+        quantity_as_printed: second-order interaction parameters rho_V^C and rho_V^{C,V}
+        method_class: model_derived
+        candidate_tokens_checked:
+        - wagner_interaction_parameter
+        reason: The store has no scalar field for the printed second-order rho parameters; they are not first-order
+          epsilon parameters.
+        temperature_K:
+        - '1623'
+        - '1673'
+        - '1723'
+        - '1773'
+        rows:
+        - parameter: rho_V^C
+          values_as_printed:
+          - '-10.6'
+          - '-10.8'
+          - '-10.9'
+          - '-11.1'
+        - parameter: rho_V^{C,V}
+          values_as_printed:
+          - '9.93'
+          - '10.2'
+          - '10.4'
+          - '10.6'
+        equations_as_printed:
+        - ln gamma_V^0 = −3.36×10^3/T (Eq. 42)
+        - epsilon_V^V = 8.8×10^3/T (Eq. 43)
+        - rho_V^V = −4.4×10^3/T (Eq. 44)
+        - rho_V^C = 8.80×10^3/T − 16.1 (Eq. 45)
+        - rho_V^{C,V} = 1.32×10^4/T − 18.0 (Eq. 46)
+        discrepancy: Table 4 prints rho_V^{C,V} values 9.93, 10.2, 10.4, 10.6. Eq. (46) evaluates negative at these
+          temperatures, while the authors state 10.6 at 1773 K later on this page. The abstract separately prints
+          rho_V^{C,V} = −1.32×10^4/T − 18.0 (physical page 1). The positive table values and each printed equation
+          are preserved without reconciliation.
+    - observation_id: qi_1987_table5_lattice_ratio_regression_context
+      type: model_fit_context
+      locator:
+        page: 11
+        published_page: 422
+        pdf_page_index: 10
+        table: '5'
+      units: as printed
+      values:
+        quantity_as_printed: lattice-ratio concentration fit parameters A, theta*, and gamma
+        method_class: model_derived
+        candidate_tokens_checked:
+        - wagner_interaction_parameter
+        - activity_coefficient
+        reason: Table 5 reports fitted concentration-variable regression coefficients and fit values, not scalar
+          Wagner epsilon parameters or measured activity points.
+        column_order:
+        - system
+        - temperature_K
+        - A
+        - theta_star
+        - gamma
+        rows:
+        - system: Fe-C-B
+          rows:
+          - - '1673'
+            - '1.45'
+            - '2.68'
+            - '.98'
+          - - '1723'
+            - '1.38'
+            - '2.80'
+            - '.98'
+          - - '1773'
+            - '1.35'
+            - '2.17'
+            - '.98'
+          b: '8'
+          range: 0–3.7*
+          attribution: ref. 34
+        - system: Fe-C-Al
+          rows:
+          - - '1873'
+            - '1.17'
+            - '3.03'
+            - '.997'
+          b: '2'
+          range: 0–24*
+          attribution: ref. 35
+        - system: Fe-C-Si
+          rows:
+          - - '1573'
+            - '1.22'
+            - '2.17'
+            - '.999'
+          - - '1673'
+            - '1.16'
+            - '1.89'
+            - '.998'
+          - - '1773'
+            - '1.10'
+            - '1.70'
+            - '.998'
+          - - '1873'
+            - '1.04'
+            - '1.48'
+            - '.996'
+          - - '1973'
+            - '.98'
+            - '1.35'
+            - '.996'
+          b: '1'
+          range: 0–20*
+          attribution: ref. 36
+        - system: Fe-C-P
+          rows:
+          - - '1563'
+            - '1.36'
+            - '4.99'
+            - '.979'
+          - - '1763'
+            - '1.26'
+            - '4.54'
+            - '.979'
+          - - '1848'
+            - '1.19'
+            - '4.63'
+            - '.976'
+          b: '4'
+          range: 0–4.2*
+          attribution: ref. 37
+        - system: Fe-C-S
+          rows:
+          - - '1473'
+            - '1.50'
+            - '1.70'
+            - '.87'
+          - - '1623'
+            - '1.40'
+            - '2.18'
+            - '.90'
+          - - '1773'
+            - '1.31'
+            - '2.84'
+            - '.84'
+          b: '4'
+          range: 0–1.18*
+          attribution: ref. 38
+        - system: Fe-C-Ti
+          rows:
+          - - 1698**
+            - '1.15'
+            - '-3.87'
+            - '.979'
+          - - '1782'
+            - '1.09'
+            - '-4.30'
+            - '.996'
+          - - '1863'
+            - '1.03'
+            - '-4.13'
+            - '.999'
+          b: '1'
+          range: up to where TiC participates
+          attribution: ref. 39
+        - system: Fe-C-V
+          rows:
+          - - '1623'
+            - '1.19'
+            - '-2.12'
+            - '.994'
+          - - '1673'
+            - '1.16'
+            - '-2.25'
+            - '.993'
+          - - '1773'
+            - '1.11'
+            - '-2.36'
+            - '.998'
+          b: '1'
+          range: 0–6*
+          attribution: present study
+        - system: Fe-C-Cr
+          rows:
+          - - '1873'
+            - '.99'
+            - -.92
+            - '.988'
+          b: '1'
+          range: 0–17
+          attribution: ref. 40
+        - system: Fe-C-Co
+          rows:
+          - - '1623'
+            - '1.18'
+            - '.62'
+            - '1.0'
+          - - '1823'
+            - '1.00'
+            - '.49'
+            - '.998'
+          b: '1'
+          range: 0–80
+          attribution: ref. 41
+        - system: Fe-C-Ni
+          rows:
+          - - '1623'
+            - '1.02'
+            - '1.70'
+            - '.987'
+          - - '1823'
+            - '1.00'
+            - '1.08'
+            - '.997'
+          b: '1'
+          range: 0–80 (1623 K); 0–75 (1823 K)
+          attribution: ref. 41
+        - system: Fe-C-Cu
+          rows:
+          - - '1823'
+            - '1.05'
+            - '1.58'
+            - blank gamma
+          b: '1'
+          range: 0–7
+          attribution: ref. 42
+        - system: Fe-C-Mn
+          rows:
+          - - '1573'
+            - '1.18'
+            - -.58
+            - '.166'
+          - - '1673'
+            - '1.12'
+            - -.52
+            - '.129'
+          - - '1773'
+            - '1.06'
+            - -.47
+            - '.098'
+          - - '1873'
+            - '1.00'
+            - -.43
+            - '.072'
+          - - '1973'
+            - '.95'
+            - -.395
+            - '.550'
+          b: '1'
+          range: 0–70
+          attribution: ref. 36
+        equations_as_printed:
+        - ln psi_C = A + theta* Z_j
+        - 'For Fe-C-Mn: ln psi_C = A + theta* Z_j + pi* Z_j^2'
+        - For Fe-C-Mn, theta = 0.35 − 1450/T (gamma = 0.999); pi = −0.39 + 872/T (gamma = 0.998)
+        - For Fe-C-V, theta = −4.87 + 4440/T (gamma = 0.976)
+        - For Fe-C-S, theta = 8.34 − 6970/T (gamma = 0.99)
+        - For Fe-C-Si, theta = −1.91 + 6393/T (gamma = 0.998)
+        - For Fe-C-Ti, theta = −0.39 − 6970/T
+        discrepancy: The Fe-C-Mn 1973 K row prints gamma = 0.550; the nearby fitted equation gives gamma = 0.998.
+          The tabulated value is preserved as printed.
+    - observation_id: qi_1987_abstract_equations_context
+      type: author_equations_context
+      locator:
+        page: 1
+        published_page: 412
+        pdf_page_index: 0
+      units: as printed
+      values:
+        quantity_as_printed: published solubility and interaction-coefficient fits
+        method_class: model_derived
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+        reason: These are equations and fitted coefficients, not individual measured points.
+        equations_as_printed:
+        - X_C = 0.083 + 6.57×10^-5 T − (0.492 − 5.60×10^-4 T) X_V
+        - epsilon_C^V = 2.39×10^4/T − 22.9
+        - rho_C^V = 1.86×10^3/T − 1.28
+        - rho_C^{C,V} = 3.84×10^3/T − 2.98
+        - rho_V^C = 8.81×10^3/T − 16.1
+        - rho_V^{C,V} = −1.32×10^4/T − 18.0
+        note: The first three interaction equations are repeated in Eqs. (26)–(28) on physical page 5. The abstract
+          second-order rho equation differs from Eq. (46) on physical page 7 and from Table 4.
+    - observation_id: qi_1987_table3_linear_fits_context
+      type: author_equations_context
+      locator:
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+      units: as printed
+      values:
+        quantity_as_printed: linear regressions of carbon solubility against vanadium concentration
+        method_class: model_derived
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        reason: These are fitted lines; the measured Table 3 composition rows are typed separately.
+        equations_as_printed:
+        - X_C = 0.189 + 0.423 X_V (1623 K, Eq. 4)
+        - X_C = 0.193 + 0.453 X_V (1673 K, Eq. 5)
+        - X_C = 0.199 + 0.508 X_V (1773 K, Eq. 6)
+    - observation_id: qi_1987_page4_carbon_binary_fit_context
+      type: author_equations_context
+      locator:
+        page: 4
+        published_page: 415
+        pdf_page_index: 3
+      units: as printed
+      values:
+        quantity_as_printed: carbon activity-coefficient fit for the Fe-C system
+        method_class: model_derived
+        candidate_tokens_checked:
+        - activity_coefficient
+        reason: A temperature-dependent fit is printed rather than individual measured values.
+        equation_as_printed: epsilon_C^C = 7.82×10^3/T + 3.66 (Eq. 18)
+    - observation_id: qi_1987_page5_interaction_fits_context
+      type: author_equations_context
+      locator:
+        page: 5
+        published_page: 416
+        pdf_page_index: 4
+      units: as printed
+      values:
+        quantity_as_printed: fitted interaction and regression coefficients
+        method_class: model_derived
+        candidate_tokens_checked:
+        - wagner_interaction_parameter
+        reason: These are fitted equation outputs, not individual measured or tabulated first-order epsilon values.
+        equations_as_printed:
+        - rho_C^C = 1.56×10^4/T + 5.33 (Eq. 19)
+        - D = 3.20 + 2.30×10^-4 T (Eq. 20)
+        - epsilon*_C^V = 5.93×10^3/T − 5.84 (Eq. 21)
+        - rho*_C^V = −1.41×10^3/T + 11.1 (Eq. 22)
+        - A = −8.22 − 0.38 X_V (1623 K, Eq. 23)
+        - A = −8.69 − 0.48 X_V (1673 K, Eq. 24)
+        - A = −9.51 − 0.64 X_V (1773 K, Eq. 25)
+        - epsilon_C^V = 2.39×10^4/T − 22.9 (Eq. 26)
+        - rho_C^V = 1.86×10^3/T − 1.28 (Eq. 27)
+        - rho_C^{C,V} = 3.84×10^3/T − 2.98 (Eq. 28)
+        standard_state: Mole-fraction activity-interaction equations; carbon is at graphite saturation.
+    - observation_id: qi_1987_page6_activity_model_context
+      type: author_equations_context
+      locator:
+        page: 6
+        published_page: 417
+        pdf_page_index: 5
+      units: as printed
+      values:
+        quantity_as_printed: integrated activity model and fit equations
+        method_class: model_derived
+        candidate_tokens_checked:
+        - activity_coefficient
+        - wagner_interaction_parameter
+        reason: The displayed equations define model calculations; the figure-led results are deferred and no numeric
+          points are digitised.
+        equations_as_printed:
+        - ln gamma_C^0 = 2010/T − 1.71 (Eq. 36)
+        - ln gamma_V^b = 1873/T(−1.80 + 4.70 X_V − 2.35 X_V^2) (Eq. 37)
+        - R* = (G^E)_Fe-V = RT(X_V^b ln gamma_V^b + X_Fe^b ln gamma_Fe^b) (Eq. 38)
+        standard_state: Carbon activity at graphite saturation is set to a_C = 1; the V activity is obtained by
+          Gibbs-Duhem integration using the Fe-V binary system.
+    - observation_id: qi_1987_figure_1_deferred
+      type: figure_only
+      locator:
+        page: 2
+        published_page: 413
+        pdf_page_index: 1
+        figure: '1'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: apparatus_schematic
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: experimental apparatus
+        temperature_as_printed: temperature not shown
+        axes_as_printed: no axes
+        caption_as_printed: Hexa-compartment graphite crucible.
+        series:
+        - name: crucible apparatus
+          marker_count: 0
+        marker_count_per_series:
+          crucible apparatus: 0
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_2_deferred
+      type: figure_only
+      locator:
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        figure: '2'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: metal
+        temperature_as_printed: 1623–1773 K plus cited comparison data
+        axes_as_printed: 'x: temperature, K; y: carbon solubility, mass%'
+        caption_as_printed: Solubility of carbon in pure iron.
+        series:
+        - name: Matoba & Ban-ya
+          marker_count: 0
+        - name: Chipman et al.
+          marker_count: 0
+        - name: Kitchner et al.
+          marker_count: 0
+        - name: This study
+          marker_count: 0
+        marker_count_per_series:
+          Matoba & Ban-ya: 0
+          Chipman et al.: 0
+          Kitchner et al.: 0
+          This study: 0
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_3_deferred
+      type: figure_only
+      locator:
+        page: 3
+        published_page: 414
+        pdf_page_index: 2
+        figure: '3'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: metal
+        temperature_as_printed: 1623, 1673, 1773 K
+        axes_as_printed: 'x: V, mass%; y: C, mass%'
+        caption_as_printed: Solubility of carbon in Fe-C-V melts.
+        series:
+        - name: 1623 K
+          marker_count: 10
+        - name: 1673 K
+          marker_count: 10
+        - name: 1773 K
+          marker_count: 6
+        marker_count_per_series:
+          1623 K: 10
+          1673 K: 10
+          1773 K: 6
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_4_deferred
+      type: figure_only
+      locator:
+        page: 4
+        published_page: 415
+        pdf_page_index: 3
+        figure: '4'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: metal
+        temperature_as_printed: 1623, 1673, 1773 K
+        axes_as_printed: 'x: X_V; y: X_C'
+        caption_as_printed: Solubility of carbon in Fe-C-V melts.
+        series:
+        - name: 1623 K
+          marker_count: 10
+        - name: 1673 K
+          marker_count: 10
+        - name: 1773 K
+          marker_count: 6
+        marker_count_per_series:
+          1623 K: 10
+          1673 K: 10
+          1773 K: 6
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_5_deferred
+      type: figure_only
+      locator:
+        page: 4
+        published_page: 415
+        pdf_page_index: 3
+        figure: '5'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: metal
+        temperature_as_printed: temperature axis; values from cited authors and this study
+        axes_as_printed: 'x: (1/T) × 10^-4; y: epsilon*_C^V'
+        caption_as_printed: Comparison of epsilon*_C^V values of different authors.
+        series:
+        - name: Sanbongi & Ohtani (ref. 6)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Fuwa & Chipman (ref. 1)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Piwowarsky (ref. 2)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Neumann & Schenck (ref. 4)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Neumann & Schenck (ref. 5)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Mori et al. (ref. 3)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Schenck & Golz (ref. 7)
+          marker_count: count unresolved due to overlapping symbols
+        - name: This study
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          Sanbongi & Ohtani (ref. 6): count unresolved due to overlapping symbols
+          Fuwa & Chipman (ref. 1): count unresolved due to overlapping symbols
+          Piwowarsky (ref. 2): count unresolved due to overlapping symbols
+          Neumann & Schenck (ref. 4): count unresolved due to overlapping symbols
+          Neumann & Schenck (ref. 5): count unresolved due to overlapping symbols
+          Mori et al. (ref. 3): count unresolved due to overlapping symbols
+          Schenck & Golz (ref. 7): count unresolved due to overlapping symbols
+          This study: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_6_deferred
+      type: figure_only
+      locator:
+        page: 5
+        published_page: 416
+        pdf_page_index: 4
+        figure: '6'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: metal
+        temperature_as_printed: temperature axis; 1873 K for present-study regression
+        axes_as_printed: 'x: (1/T) × 10^-4; y: epsilon_C^V'
+        caption_as_printed: Comparison of epsilon_C^V values of different authors.
+        series:
+        - name: Suzuki & Ban-ya (ref. 10)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Sigworth & Elliott (ref. 13)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Mori et al. (ref. 9)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Fuwa & Chipman (ref. 1)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Stermmitz et al. (ref. 11)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Foo & Lupis (ref. 8)
+          marker_count: count unresolved due to overlapping symbols
+        - name: Schenck & Golz (ref. 7)
+          marker_count: count unresolved due to overlapping symbols
+        - name: This study
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          Suzuki & Ban-ya (ref. 10): count unresolved due to overlapping symbols
+          Sigworth & Elliott (ref. 13): count unresolved due to overlapping symbols
+          Mori et al. (ref. 9): count unresolved due to overlapping symbols
+          Fuwa & Chipman (ref. 1): count unresolved due to overlapping symbols
+          Stermmitz et al. (ref. 11): count unresolved due to overlapping symbols
+          Foo & Lupis (ref. 8): count unresolved due to overlapping symbols
+          Schenck & Golz (ref. 7): count unresolved due to overlapping symbols
+          This study: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_7_deferred
+      type: figure_only
+      locator:
+        page: 6
+        published_page: 417
+        pdf_page_index: 5
+        figure: '7'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: V
+        phase: liquid metal
+        temperature_as_printed: 1873 K reference integration
+        axes_as_printed: schematic ternary composition path; no numerical axes
+        caption_as_printed: Path of the Gibbs-Duhem equation integration for Eq. (34).
+        series:
+        - name: integration path
+          marker_count: 0
+        marker_count_per_series:
+          integration path: 0
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+        note: This schematic illustrates the Gibbs-Duhem integration path; labels a and P are not experimental data
+          markers.
+    - observation_id: qi_1987_figure_8_deferred
+      type: figure_only
+      locator:
+        page: 8
+        published_page: 419
+        pdf_page_index: 7
+        figure: '8'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1673, 1723, 1773 K
+        axes_as_printed: 'x: Z_B; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_B (data from ref. 34).
+        series:
+        - name: 1673 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1723 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1773 K
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          1673 K: count unresolved due to overlapping symbols
+          1723 K: count unresolved due to overlapping symbols
+          1773 K: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_9_deferred
+      type: figure_only
+      locator:
+        page: 8
+        published_page: 419
+        pdf_page_index: 7
+        figure: '9'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1873 K
+        axes_as_printed: 'x: Z_Al; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_Al (data from ref. 35).
+        series:
+        - name: 1873 K
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          1873 K: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_10_deferred
+      type: figure_only
+      locator:
+        page: 8
+        published_page: 419
+        pdf_page_index: 7
+        figure: '10'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1573, 1673, 1773, 1873, 1973 K
+        axes_as_printed: 'x: Z_Si; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_Si (data from ref. 36).
+        series:
+        - name: 1573 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1673 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1773 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1873 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1973 K
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          1573 K: count unresolved due to overlapping symbols
+          1673 K: count unresolved due to overlapping symbols
+          1773 K: count unresolved due to overlapping symbols
+          1873 K: count unresolved due to overlapping symbols
+          1973 K: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_11_deferred
+      type: figure_only
+      locator:
+        page: 8
+        published_page: 419
+        pdf_page_index: 7
+        figure: '11'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1563, 1763, 1848 K
+        axes_as_printed: 'x: Z_P; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_P (data from ref. 37).
+        series:
+        - name: 1563 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1763 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1848 K
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          1563 K: count unresolved due to overlapping symbols
+          1763 K: count unresolved due to overlapping symbols
+          1848 K: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_12_deferred
+      type: figure_only
+      locator:
+        page: 8
+        published_page: 419
+        pdf_page_index: 7
+        figure: '12'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1473, 1623, 1773 K
+        axes_as_printed: 'x: Z_S; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_S (data from ref. 38).
+        series:
+        - name: 1473 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1623 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1773 K
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          1473 K: count unresolved due to overlapping symbols
+          1623 K: count unresolved due to overlapping symbols
+          1773 K: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_13_deferred
+      type: figure_only
+      locator:
+        page: 9
+        published_page: 420
+        pdf_page_index: 8
+        figure: '13'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1698**, 1782, 1863 K
+        axes_as_printed: 'x: Z_Ti; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_Ti (data from ref. 39).
+        series:
+        - name: 1698 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1782 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1863 K
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          1698 K: count unresolved due to overlapping symbols
+          1782 K: count unresolved due to overlapping symbols
+          1863 K: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_14_deferred
+      type: figure_only
+      locator:
+        page: 9
+        published_page: 420
+        pdf_page_index: 8
+        figure: '14'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1623, 1673, 1773 K
+        axes_as_printed: 'x: Z_V; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_V (present study).
+        series:
+        - name: 1623 K
+          marker_count: 10
+        - name: 1673 K
+          marker_count: 10
+        - name: 1773 K
+          marker_count: 6
+        marker_count_per_series:
+          1623 K: 10
+          1673 K: 10
+          1773 K: 6
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_15_deferred
+      type: figure_only
+      locator:
+        page: 9
+        published_page: 420
+        pdf_page_index: 8
+        figure: '15'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1873 K
+        axes_as_printed: 'x: Z_Cr; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_Cr (data from ref. 40).
+        series:
+        - name: 1873 K
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          1873 K: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_16_deferred
+      type: figure_only
+      locator:
+        page: 9
+        published_page: 420
+        pdf_page_index: 8
+        figure: '16'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1623, 1823 K and Co-Csat
+        axes_as_printed: 'x: Z_Co; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_Co (data from ref. 41).
+        series:
+        - name: 1623 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1823 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: Co-Csat
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          1623 K: count unresolved due to overlapping symbols
+          1823 K: count unresolved due to overlapping symbols
+          Co-Csat: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_17_deferred
+      type: figure_only
+      locator:
+        page: 9
+        published_page: 420
+        pdf_page_index: 8
+        figure: '17'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1623, 1823 K and Ni-Csat
+        axes_as_printed: 'x: Z_Ni; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_Ni (data from ref. 41).
+        series:
+        - name: 1623 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1823 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: Ni-Csat
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          1623 K: count unresolved due to overlapping symbols
+          1823 K: count unresolved due to overlapping symbols
+          Ni-Csat: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_18_deferred
+      type: figure_only
+      locator:
+        page: 10
+        published_page: 421
+        pdf_page_index: 9
+        figure: '18'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1873 K
+        axes_as_printed: 'x: Z_Cu; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_Cu (data from ref. 42).
+        series:
+        - name: 1873 K
+          marker_count: 0
+        marker_count_per_series:
+          1873 K: 0
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_19_deferred
+      type: figure_only
+      locator:
+        page: 10
+        published_page: 421
+        pdf_page_index: 9
+        figure: '19'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1573, 1773, 1973 K
+        axes_as_printed: 'x: Z_Mn; y: ln psi_C'
+        caption_as_printed: ln psi_C versus Z_Mn (data from ref. 36).
+        series:
+        - name: 1573 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1773 K
+          marker_count: count unresolved due to overlapping symbols
+        - name: 1973 K
+          marker_count: count unresolved due to overlapping symbols
+        marker_count_per_series:
+          1573 K: count unresolved due to overlapping symbols
+          1773 K: count unresolved due to overlapping symbols
+          1973 K: count unresolved due to overlapping symbols
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+    - observation_id: qi_1987_figure_20_deferred
+      type: figure_only
+      locator:
+        page: 10
+        published_page: 421
+        pdf_page_index: 9
+        figure: '20'
+      units: as plotted
+      attribution: Qi, Ji and Che (1987), present paper; figure source attribution is stated in caption where applicable.
+      values:
+        quantity: lattice_ratio_regression_parameter
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Figure digitisation is deferred; no numerical points were read from this figure.
+        digitisation: deferred to a figure pass
+        species_formula: C
+        phase: liquid metal
+        temperature_as_printed: 1873 K
+        axes_as_printed: 'x: atomic number; y: theta*_C^j'
+        caption_as_printed: Variation of theta*_C^j with the atomic number of j.
+        series:
+        - name: V
+          marker_count: 1
+        - name: Ti
+          marker_count: 1
+        - name: Cr
+          marker_count: 1
+        - name: Mn
+          marker_count: 1
+        - name: Co
+          marker_count: 1
+        - name: Ni
+          marker_count: 1
+        - name: Cu
+          marker_count: 1
+        marker_count_per_series:
+          V: 1
+          Ti: 1
+          Cr: 1
+          Mn: 1
+          Co: 1
+          Ni: 1
+          Cu: 1
+        panels:
+        - single
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - activity_coefficient
+        - wagner_interaction_parameter
+        note: theta*_C^j is a lattice-ratio regression coefficient, not a first-order Wagner epsilon parameter;
+          no numerical points were digitised.

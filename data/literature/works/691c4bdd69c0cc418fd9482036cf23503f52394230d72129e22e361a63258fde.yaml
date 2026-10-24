@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 0d5432dcaaffdcae3d879cde3559857d827c63f3
     files:
     - asset_id: pdf:costa-2016-lpsc-forsterite-olivine-vaporization
       role: pdf
@@ -23,6 +23,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
+    - asset_id: tables:costa-2016-lpsc-forsterite-olivine-vaporization
+      role: table_csv
+      path: tables/costa-2016-lpsc-forsterite-olivine-vaporization
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:costa-2016-lpsc-forsterite-olivine-vaporization
       role: pdftotext
       path: unknown

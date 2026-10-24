@@ -82,7 +82,7 @@ observations:
   value:
     kind: point
     point: '0.1'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -115,7 +115,7 @@ observations:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters: []
     output_unit: Pa
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2293.15:row=murchison:h=c45cf192f6ac
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2293.15:row=murchison:h=cfdb7ade0601
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
@@ -220,6 +220,14 @@ observations:
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_compositions_not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
     temperature_K:
       state:
         tag: value
@@ -254,8 +262,10 @@ observations:
               table: O2
               note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
         output_unit: K
+  derived_from:
+  - pdf:kems-029-yakovlev-shornikov-2011
   derivation:
-    relation: bar_to_Pa
+    relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
     inputs:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters:
@@ -268,6 +278,31 @@ observations:
           pdf_page_index: 2
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000019'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -278,7 +313,7 @@ observations:
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
     output_unit: Pa
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2345.15:row=murchison:h=74922dcecaad
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2345.15:row=murchison:h=a82274abdc58
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
@@ -383,6 +418,14 @@ observations:
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_compositions_not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
     temperature_K:
       state:
         tag: value
@@ -417,8 +460,10 @@ observations:
               table: O2
               note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
         output_unit: K
+  derived_from:
+  - pdf:kems-029-yakovlev-shornikov-2011
   derivation:
-    relation: bar_to_Pa
+    relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
     inputs:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters:
@@ -431,6 +476,31 @@ observations:
           pdf_page_index: 2
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000021'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -441,7 +511,7 @@ observations:
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
     output_unit: Pa
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2403.15:row=efremovka_type_a:h=b03ef1c4e602
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2403.15:row=efremovka_type_a:h=0ee9de2de956
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
@@ -546,6 +616,14 @@ observations:
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_compositions_not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
     temperature_K:
       state:
         tag: value
@@ -580,8 +658,10 @@ observations:
               table: O2
               note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
         output_unit: K
+  derived_from:
+  - pdf:kems-029-yakovlev-shornikov-2011
   derivation:
-    relation: bar_to_Pa
+    relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
     inputs:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters:
@@ -594,6 +674,31 @@ observations:
           pdf_page_index: 2
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000027'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -604,7 +709,7 @@ observations:
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
     output_unit: Pa
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2403.15:row=efremovka_type_b:h=2f16e158839d
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2403.15:row=efremovka_type_b:h=ee53709ca37e
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
@@ -709,6 +814,14 @@ observations:
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_compositions_not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
     temperature_K:
       state:
         tag: value
@@ -743,8 +856,10 @@ observations:
               table: O2
               note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
         output_unit: K
+  derived_from:
+  - pdf:kems-029-yakovlev-shornikov-2011
   derivation:
-    relation: bar_to_Pa
+    relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
     inputs:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters:
@@ -757,6 +872,31 @@ observations:
           pdf_page_index: 2
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000045'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -767,7 +907,7 @@ observations:
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
     output_unit: Pa
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2403.15:row=murchison:h=2b73eca23947
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2403.15:row=murchison:h=b19cc514a583
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
@@ -872,6 +1012,14 @@ observations:
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_compositions_not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
     temperature_K:
       state:
         tag: value
@@ -906,8 +1054,10 @@ observations:
               table: O2
               note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
         output_unit: K
+  derived_from:
+  - pdf:kems-029-yakovlev-shornikov-2011
   derivation:
-    relation: bar_to_Pa
+    relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
     inputs:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters:
@@ -920,6 +1070,31 @@ observations:
           pdf_page_index: 2
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000002'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -930,7 +1105,7 @@ observations:
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
     output_unit: Pa
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2453.15:row=efremovka_type_a:h=3b806b1f50ca
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2453.15:row=efremovka_type_a:h=e1ccbf7e3174
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
@@ -1035,6 +1210,14 @@ observations:
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_compositions_not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
     temperature_K:
       state:
         tag: value
@@ -1069,8 +1252,10 @@ observations:
               table: O2
               note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
         output_unit: K
+  derived_from:
+  - pdf:kems-029-yakovlev-shornikov-2011
   derivation:
-    relation: bar_to_Pa
+    relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
     inputs:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters:
@@ -1083,6 +1268,31 @@ observations:
           pdf_page_index: 2
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000063'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -1093,7 +1303,7 @@ observations:
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
     output_unit: Pa
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2478.15:row=efremovka_type_a:h=ee9f05acf330
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2478.15:row=efremovka_type_a:h=e503ffc6eb9a
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
@@ -1198,6 +1408,14 @@ observations:
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_compositions_not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
     temperature_K:
       state:
         tag: value
@@ -1232,8 +1450,10 @@ observations:
               table: O2
               note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
         output_unit: K
+  derived_from:
+  - pdf:kems-029-yakovlev-shornikov-2011
   derivation:
-    relation: bar_to_Pa
+    relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
     inputs:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters:
@@ -1246,6 +1466,31 @@ observations:
           pdf_page_index: 2
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000048'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -1256,7 +1501,7 @@ observations:
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
     output_unit: Pa
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2478.15:row=efremovka_type_b:h=077344f03ec6
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2478.15:row=efremovka_type_b:h=ce278596c3b4
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
@@ -1361,6 +1606,14 @@ observations:
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_compositions_not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
     temperature_K:
       state:
         tag: value
@@ -1395,8 +1648,10 @@ observations:
               table: O2
               note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
         output_unit: K
+  derived_from:
+  - pdf:kems-029-yakovlev-shornikov-2011
   derivation:
-    relation: bar_to_Pa
+    relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
     inputs:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters:
@@ -1409,6 +1664,31 @@ observations:
           pdf_page_index: 2
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000037'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -1419,7 +1699,7 @@ observations:
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
     output_unit: Pa
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2540.15:row=efremovka_type_a:h=70e13b8ab716
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2540.15:row=efremovka_type_a:h=14064192ce90
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
@@ -1524,6 +1804,14 @@ observations:
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_compositions_not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
     temperature_K:
       state:
         tag: value
@@ -1558,8 +1846,10 @@ observations:
               table: O2
               note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
         output_unit: K
+  derived_from:
+  - pdf:kems-029-yakovlev-shornikov-2011
   derivation:
-    relation: bar_to_Pa
+    relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
     inputs:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters:
@@ -1572,6 +1862,31 @@ observations:
           pdf_page_index: 2
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000073'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -1582,7 +1897,7 @@ observations:
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
     output_unit: Pa
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2540.15:row=efremovka_type_b:h=3a17d5dcdbca
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2540.15:row=efremovka_type_b:h=6723872634a4
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
@@ -1687,6 +2002,14 @@ observations:
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_compositions_not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
     temperature_K:
       state:
         tag: value
@@ -1721,8 +2044,10 @@ observations:
               table: O2
               note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
         output_unit: K
+  derived_from:
+  - pdf:kems-029-yakovlev-shornikov-2011
   derivation:
-    relation: bar_to_Pa
+    relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
     inputs:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters:
@@ -1735,6 +2060,31 @@ observations:
           pdf_page_index: 2
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000055'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -1745,7 +2095,7 @@ observations:
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
     output_unit: Pa
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2621.15:row=efremovka_type_a:h=d3fbee262c81
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2621.15:row=efremovka_type_a:h=5270c356489d
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
@@ -1850,6 +2200,14 @@ observations:
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_compositions_not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
     temperature_K:
       state:
         tag: value
@@ -1884,8 +2242,10 @@ observations:
               table: O2
               note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
         output_unit: K
+  derived_from:
+  - pdf:kems-029-yakovlev-shornikov-2011
   derivation:
-    relation: bar_to_Pa
+    relation: Authors report the thermodynamic-analysis oxygen pressures for meteorite and CAI melts in this table.
     inputs:
     - pdf:kems-029-yakovlev-shornikov-2011
     parameters:
@@ -1898,6 +2258,31 @@ observations:
           pdf_page_index: 2
           table: O2
           note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000025'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 2
+                pdf_page_index: 2
+                table: O2
+                note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+          output_unit: Pa
     - - factor
       - state:
           tag: value

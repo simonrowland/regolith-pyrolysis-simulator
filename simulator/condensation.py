@@ -4174,11 +4174,13 @@ class CondensationModel:
             factor: float,
         ) -> dict[str, dict[Any, float]]:
             relaxed: dict[str, dict[Any, float]] = {}
-            for species in set(previous) | set(current):
+            for species in sorted(set(previous) | set(current)):
                 values: dict[Any, float] = {}
                 for location in (
-                    set(previous.get(species, {}))
-                    | set(current.get(species, {}))
+                    sorted(
+                        set(previous.get(species, {}))
+                        | set(current.get(species, {}))
+                    )
                 ):
                     old_value = float(
                         previous.get(species, {}).get(location, 0.0)
@@ -5838,7 +5840,10 @@ def _record_antoine_extrapolation(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
     antoine_extrapolation_warnings: list[str] | None,
 ) -> None:
-    from engines.builtin.vapor_pressure import vapor_pressure_valid_range_K
+    from engines.builtin.vapor_pressure import (
+        _coefficient_mapping,
+        vapor_pressure_valid_range_K,
+    )
 
     valid_range = vapor_pressure_valid_range_K(
         data,
@@ -5868,6 +5873,36 @@ def _record_antoine_extrapolation(
         'reason': 'wall_saturation_pressure_out_of_validated_range',
         'status': 'extrapolated',
     }
+    # The selector already chose the flank and attached the gap flag.
+    # Copy that flag onto the extrapolation record. Do not re-decide
+    # which phase the temperature belongs to.
+    selected = _coefficient_mapping(
+        data,
+        coefficient_block,
+        temperature_K=T_K,
+    )
+    if isinstance(selected, Mapping) and selected.get("gap_band_K") is not None:
+        record["reason"] = str(
+            selected.get("selection_refusal") or record["reason"]
+        )
+        record["segment_used"] = selected.get("segment_used")
+        record["segment_choice"] = selected.get("segment_choice")
+        record["certified_band_K"] = tuple(
+            float(value) for value in selected["certified_band_K"]
+        )
+        record["gap_band_K"] = tuple(
+            float(value) for value in selected["gap_band_K"]
+        )
+        record["left_segment_band_K"] = tuple(
+            float(value) for value in selected["left_segment_band_K"]
+        )
+        record["right_segment_band_K"] = tuple(
+            float(value) for value in selected["right_segment_band_K"]
+        )
+        if selected.get("transition_temperature_K") is not None:
+            record["transition_temperature_K"] = float(
+                selected["transition_temperature_K"]
+            )
     if antoine_extrapolations is not None:
         existing_records = [
             existing
@@ -5981,6 +6016,35 @@ def _antoine_psat_pa(
     source_band = vapor_pressure_source_equation_range_K(
         data, coefficient_block, T_K,
     ) or vapor_pressure_valid_range_K(data, coefficient_block, T_K)
+    # A coefficient-free phase-gap marker has no flank to evaluate.
+    # That is a typed wall refusal. When the selector has already
+    # attached a finite flank, those coefficients are the prediction;
+    # the extrapolation record carries the selector's flag. Choosing
+    # the flank stays in the selector.
+    selection_refusal = (
+        antoine.get("selection_refusal") if isinstance(antoine, Mapping) else None
+    )
+    coefficients_finite = False
+    if isinstance(antoine, Mapping):
+        try:
+            coefficients_finite = all(
+                math.isfinite(float(antoine.get(key))) for key in ("A", "B", "C")
+            )
+        except (TypeError, ValueError):
+            coefficients_finite = False
+    if selection_refusal and not coefficients_finite:
+        refusal = WallSaturationPressureRefusal(
+            species,
+            T_K,
+            "no extrapolation available: "
+            f"{selection_refusal}; "
+            f"left_segment={antoine.get('left_segment')}({antoine.get('left_phase')}) "
+            f"right_segment={antoine.get('right_segment')}({antoine.get('right_phase')}); "
+            f"valid_range_K={source_band}",
+        )
+        refusal.valid_range_K = source_band
+        refusal.band_scope = str(selection_refusal)
+        raise refusal
     if not antoine:
         declared = _coefficient_mapping(data, coefficient_block, temperature_K=T_K)
         if declared:

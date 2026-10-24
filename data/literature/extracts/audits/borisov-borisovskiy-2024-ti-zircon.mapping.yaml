@@ -1,0 +1,44 @@
+source_id: borisov-borisovskiy-2024-ti-zircon
+source:
+  citation: "Borisov AA, Borisovskiy SE (2024). Titanium partitioning between zircon and melt: an experimental study at high temperatures. Petrologiya 32(4):497-508."
+  doi: 10.31857/S0869590324040047
+  year: 2024
+extraction:
+  method: MinerU table drafts; glass components selected and transcribed into sample-bound observations in the extract.
+  date: '2026-10-22'
+  worker: codex-fam50-1022
+review_status: draft
+tables:
+  - page: 3
+    table_index: 2
+    type: concentration_series
+    quantity: equilibrium_phase_composition
+    unit: wt.%
+    evidence_class: measured_direct
+    phase: glass
+    per: row
+    temperature: {column: 2, unit: C}
+    values:
+      - {column: 5, species: SiO2, phase: glass, quantity: equilibrium_phase_composition}
+      - {column: 6, species: TiO2, phase: glass, quantity: equilibrium_phase_composition}
+      - {column: 8, species: Al2O3, phase: glass, quantity: equilibrium_phase_composition}
+      - {column: 9, species: MgO, phase: glass, quantity: equilibrium_phase_composition}
+      - {column: 10, species: CaO, phase: glass, quantity: equilibrium_phase_composition}
+      - {column: 11, species: ZrO2, phase: glass, quantity: equilibrium_phase_composition}
+  - page: 3
+    table_index: 3
+    type: concentration_series
+    quantity: equilibrium_phase_composition
+    unit: wt.%
+    evidence_class: quoted_attributed
+    attribution: Borisov and Aranovich (2019)
+    phase: glass
+    per: row
+    temperature: {column: 2, unit: C}
+    values:
+      - {column: 5, species: SiO2, phase: glass, quantity: equilibrium_phase_composition}
+      - {column: 6, species: TiO2, phase: glass, quantity: equilibrium_phase_composition}
+      - {column: 8, species: Al2O3, phase: glass, quantity: equilibrium_phase_composition}
+      - {column: 9, species: MgO, phase: glass, quantity: equilibrium_phase_composition}
+      - {column: 10, species: CaO, phase: glass, quantity: equilibrium_phase_composition}
+      - {column: 11, species: ZrO2, phase: glass, quantity: equilibrium_phase_composition}
