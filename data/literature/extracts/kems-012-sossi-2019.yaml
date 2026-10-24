@@ -6561,6 +6561,65 @@ species:
           semantics: competing_observation_do_not_average
           note: γ-derived α_e,KO0.5 range 0.3–3.4 @1400°C; authors set α_e=1 for MVE suite.
     observations:
+    - observation_id: sossi_2019_na_logKstar_table3_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+      supersedes: sossi_2019_na_logKstar_table3
+      type: activity_coefficient
+      class: model
+      phase: silicate_melt_ferrobasalt_FCMAS
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+        page: 56
+        table: '3'
+        quote: "Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares fit to the experimental data. Na | NaO0.5(l) = Na(g) + ¼O2 | 1 | 0 |  | -4.25±0.10 |  |"
+        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      uncertainty:
+        note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+        by_T_K:
+          1673.15:
+            log10_K_star_SD: 0.1
+            quote: -4.25±0.10
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 56
+              table: '3'
+              quote: '1673.15 K: -4.25±0.10'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        admission_status: admitted
+        derived_from:
+        - tables:kems-012-sossi-2019
+        inference:
+          relation: nonlinear_least_squares_K_star_fit
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: log10_dimensionless
+        derivation:
+          relation: nonlinear_least_squares_K_star_fit
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: log10_dimensionless
+        evidence_class: model
+        method_class: model_derived
+        reaction: NaO0.5(l) = Na(g) + ¼O2
+        n_electrons: 1
+        t0_min: 0.0
+        log10_K_star: -4.25
+        log10_K_star_by_T_K:
+          1673.15:
+            log10_K_star: -4.25
+            N_points_at_T: 2
+        gas_species: Na(g)
     - observation_id: sossi_2019_na_table4_gamma_this_work_quoted_20260906
       supersedes: sossi_2019_na_table4_gamma_this_work
       type: activity_coefficient
@@ -7257,7 +7316,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 15
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 759.6
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -7265,7 +7324,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 15
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 747.0
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -7273,7 +7332,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 15
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 775.6
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -7281,7 +7340,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 15
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 805.9
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -7289,7 +7348,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 60
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 709.6
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -7297,7 +7356,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 60
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 734.5
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -7305,7 +7364,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 60
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 800.5
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -7313,7 +7372,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 60
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 782.9
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -7321,7 +7380,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 120
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 593.4
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -7329,7 +7388,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 120
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 756.5
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -7337,7 +7396,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 120
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 721.6
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -7345,7 +7404,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 828.4
           form_note: at_or_above_liquidus
@@ -7353,7 +7412,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 760.4
           form_note: at_or_above_liquidus
@@ -7361,7 +7420,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 833.9
           form_note: at_or_above_liquidus
@@ -7369,7 +7428,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 802.1
           form_note: at_or_above_liquidus
@@ -7377,7 +7436,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 722.0
           form_note: at_or_above_liquidus
@@ -7385,7 +7444,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 851.2
           form_note: at_or_above_liquidus
@@ -7393,7 +7452,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 692.7
           form_note: at_or_above_liquidus
@@ -7401,7 +7460,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 721.4
           form_note: at_or_above_liquidus
@@ -7409,7 +7468,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 863.9
           form_note: at_or_above_liquidus
@@ -7417,7 +7476,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 852.5
           form_note: at_or_above_liquidus
@@ -7425,7 +7484,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 784.8
           form_note: at_or_above_liquidus
@@ -7433,7 +7492,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 749.3
           form_note: at_or_above_liquidus
@@ -7441,7 +7500,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 820.4
           form_note: at_or_above_liquidus
@@ -7449,7 +7508,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 845.8
           form_note: at_or_above_liquidus
@@ -7457,7 +7516,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 120
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 779.3
           form_note: at_or_above_liquidus
@@ -7465,7 +7524,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 120
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 754.6
           form_note: at_or_above_liquidus
@@ -7473,7 +7532,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 120
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 819.9
           form_note: at_or_above_liquidus
@@ -7481,7 +7540,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 930
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 782.4
           form_note: at_or_above_liquidus
@@ -7489,7 +7548,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 720
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 843.3
           form_note: at_or_above_liquidus
@@ -7497,7 +7556,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 15
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 848.9
           form_note: at_or_above_liquidus
@@ -7505,7 +7564,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 15
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 742.5
           form_note: at_or_above_liquidus
@@ -7513,7 +7572,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 15
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 739.9
           form_note: at_or_above_liquidus
@@ -7521,7 +7580,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 15
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 738.1
           form_note: at_or_above_liquidus
@@ -7529,7 +7588,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 60
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 764.0
           form_note: at_or_above_liquidus
@@ -7537,7 +7596,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 60
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 717.7
           form_note: at_or_above_liquidus
@@ -7545,7 +7604,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 60
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 760.1
           form_note: at_or_above_liquidus
@@ -7553,7 +7612,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 60
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 784.9
           form_note: at_or_above_liquidus
@@ -7561,7 +7620,7 @@ species:
           T_C: 1550
           T_K: 1823.15
           t_min: 15
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 801.1
           form_note: at_or_above_liquidus
@@ -7569,7 +7628,7 @@ species:
           T_C: 1550
           T_K: 1823.15
           t_min: 15
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 825.4
           form_note: at_or_above_liquidus
@@ -7577,7 +7636,7 @@ species:
           T_C: 1550
           T_K: 1823.15
           t_min: 15
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 747.4
           form_note: at_or_above_liquidus
@@ -7585,7 +7644,7 @@ species:
           T_C: 1550
           T_K: 1823.15
           t_min: 15
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 766.4
           form_note: at_or_above_liquidus
@@ -7593,7 +7652,7 @@ species:
           T_C: 1550
           T_K: 1823.15
           t_min: 15
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 819.6
           form_note: at_or_above_liquidus
@@ -7952,7 +8011,7 @@ species:
         - run_id: 2M-15-07-16c
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 759.6
           locator:
@@ -7967,7 +8026,7 @@ species:
         - run_id: 2M-15-07-16d
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 747.0
           locator:
@@ -7982,7 +8041,7 @@ species:
         - run_id: 2M-15-07-16g
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 775.6
           locator:
@@ -7997,7 +8056,7 @@ species:
         - run_id: 2M-15-07-16h
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 805.9
           locator:
@@ -8012,7 +8071,7 @@ species:
         - run_id: P11-06-18a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 709.6
           locator:
@@ -8027,7 +8086,7 @@ species:
         - run_id: 1M-15-07-16a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 734.5
           locator:
@@ -8042,7 +8101,7 @@ species:
         - run_id: 1M-15-07-16b
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 800.5
           locator:
@@ -8057,7 +8116,7 @@ species:
         - run_id: 1M-PS6
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 782.9
           locator:
@@ -8072,7 +8131,7 @@ species:
         - run_id: 3M-18-07-16b
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 593.4
           locator:
@@ -8087,7 +8146,7 @@ species:
         - run_id: 2M-18-07-16a
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 756.5
           locator:
@@ -8102,7 +8161,7 @@ species:
         - run_id: 2M-18-07-16c
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 721.6
           locator:
@@ -8117,7 +8176,7 @@ species:
         - run_id: 1M-PS3
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 828.4
           locator:
@@ -8132,7 +8191,7 @@ species:
         - run_id: 1M-PS2
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 760.4
           locator:
@@ -8147,7 +8206,7 @@ species:
         - run_id: 1M-PS4
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 833.9
           locator:
@@ -8162,7 +8221,7 @@ species:
         - run_id: P09/06/18b*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 802.1
           locator:
@@ -8177,7 +8236,7 @@ species:
         - run_id: P09/06/18a*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 722.0
           locator:
@@ -8192,7 +8251,7 @@ species:
         - run_id: 1M-PS5
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 851.2
           locator:
@@ -8207,7 +8266,7 @@ species:
         - run_id: P08-02-17b*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 692.7
           locator:
@@ -8222,7 +8281,7 @@ species:
         - run_id: 3M-29/2/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 721.4
           locator:
@@ -8237,7 +8296,7 @@ species:
         - run_id: 1M-2/3/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 863.9
           locator:
@@ -8252,7 +8311,7 @@ species:
         - run_id: C18/12/15*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 852.5
           locator:
@@ -8267,7 +8326,7 @@ species:
         - run_id: 1M-PS1*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 784.8
           locator:
@@ -8282,7 +8341,7 @@ species:
         - run_id: P09/06/18c*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 749.3
           locator:
@@ -8297,7 +8356,7 @@ species:
         - run_id: C17/12/15a
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 820.4
           locator:
@@ -8312,7 +8371,7 @@ species:
         - run_id: 1M-1/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 845.8
           locator:
@@ -8327,7 +8386,7 @@ species:
         - run_id: 3M-1/3/16
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 779.3
           locator:
@@ -8342,7 +8401,7 @@ species:
         - run_id: C17/12/15b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 754.6
           locator:
@@ -8357,7 +8416,7 @@ species:
         - run_id: 1M-1/3/16b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 819.9
           locator:
@@ -8372,7 +8431,7 @@ species:
         - run_id: 3M-29/2/16b
           T_C: 1400.0
           t_min: 930.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 782.4
           locator:
@@ -8387,7 +8446,7 @@ species:
         - run_id: C17/12/15c
           T_C: 1400.0
           t_min: 720.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 843.3
           locator:
@@ -8402,7 +8461,7 @@ species:
         - run_id: 2M-16-07-16e
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 848.9
           locator:
@@ -8417,7 +8476,7 @@ species:
         - run_id: 2M-16-07-16a
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 742.5
           locator:
@@ -8432,7 +8491,7 @@ species:
         - run_id: 2M-16-07-16b
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 739.9
           locator:
@@ -8447,7 +8506,7 @@ species:
         - run_id: 2M-16-07-16c
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 738.1
           locator:
@@ -8462,7 +8521,7 @@ species:
         - run_id: 3M-2/3/16
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 764.0
           locator:
@@ -8477,7 +8536,7 @@ species:
         - run_id: 2M-17-07-16a
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 717.7
           locator:
@@ -8492,7 +8551,7 @@ species:
         - run_id: 2M-17-07-16b
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 760.1
           locator:
@@ -8507,7 +8566,7 @@ species:
         - run_id: 2M-17-07-16c
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 784.9
           locator:
@@ -8522,7 +8581,7 @@ species:
         - run_id: 2M-16-07-16f
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 801.1
           locator:
@@ -8537,7 +8596,7 @@ species:
         - run_id: 2M-16-07-16g
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 825.4
           locator:
@@ -8552,7 +8611,7 @@ species:
         - run_id: P11-06-18b
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 747.4
           locator:
@@ -8567,7 +8626,7 @@ species:
         - run_id: 2M-16-07-16h
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 766.4
           locator:
@@ -8582,7 +8641,7 @@ species:
         - run_id: 2M-16-07-16d
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 819.6
           locator:
@@ -8708,7 +8767,7 @@ species:
         - run_id: 2M-15-07-16c
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 759.6
           locator:
@@ -8761,7 +8820,7 @@ species:
         - run_id: 2M-15-07-16d
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 747.0
           locator:
@@ -8814,7 +8873,7 @@ species:
         - run_id: 2M-15-07-16g
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 775.6
           locator:
@@ -8867,7 +8926,7 @@ species:
         - run_id: 2M-15-07-16h
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 805.9
           locator:
@@ -8920,7 +8979,7 @@ species:
         - run_id: P11-06-18a
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 709.6
           locator:
@@ -8973,7 +9032,7 @@ species:
         - run_id: 1M-15-07-16a
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 734.5
           locator:
@@ -9026,7 +9085,7 @@ species:
         - run_id: 1M-15-07-16b
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 800.5
           locator:
@@ -9079,7 +9138,7 @@ species:
         - run_id: 1M-PS6
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 782.9
           locator:
@@ -9132,7 +9191,7 @@ species:
         - run_id: 3M-18-07-16b
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 593.4
           locator:
@@ -9185,7 +9244,7 @@ species:
         - run_id: 2M-18-07-16a
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 756.5
           locator:
@@ -9238,7 +9297,7 @@ species:
         - run_id: 2M-18-07-16c
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 721.6
           locator:
@@ -9291,7 +9350,7 @@ species:
         - run_id: 1M-PS3
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 828.4
           locator:
@@ -9344,7 +9403,7 @@ species:
         - run_id: 1M-PS2
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 760.4
           locator:
@@ -9397,7 +9456,7 @@ species:
         - run_id: 1M-PS4
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 833.9
           locator:
@@ -9450,7 +9509,7 @@ species:
         - run_id: P09/06/18b
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 802.1
           locator:
@@ -9503,7 +9562,7 @@ species:
         - run_id: P09/06/18a
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 722.0
           locator:
@@ -9556,7 +9615,7 @@ species:
         - run_id: 1M-PS5
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 851.2
           locator:
@@ -9609,7 +9668,7 @@ species:
         - run_id: P08-02-17b
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 692.7
           locator:
@@ -9662,7 +9721,7 @@ species:
         - run_id: 3M-29/2/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 721.4
           locator:
@@ -9715,7 +9774,7 @@ species:
         - run_id: 1M-2/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 863.9
           locator:
@@ -9768,7 +9827,7 @@ species:
         - run_id: C18/12/15
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 852.5
           locator:
@@ -9821,7 +9880,7 @@ species:
         - run_id: 1M-PS1
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 784.8
           locator:
@@ -9874,7 +9933,7 @@ species:
         - run_id: P09/06/18c
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 749.3
           locator:
@@ -9927,7 +9986,7 @@ species:
         - run_id: C17/12/15a
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 820.4
           locator:
@@ -9980,7 +10039,7 @@ species:
         - run_id: 1M-1/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 845.8
           locator:
@@ -10033,7 +10092,7 @@ species:
         - run_id: 3M-1/3/16
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 779.3
           locator:
@@ -10086,7 +10145,7 @@ species:
         - run_id: C17/12/15b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 754.6
           locator:
@@ -10139,7 +10198,7 @@ species:
         - run_id: 1M-1/3/16b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 819.9
           locator:
@@ -10192,7 +10251,7 @@ species:
         - run_id: 3M-29/2/16b
           T_C: 1400.0
           t_min: 930.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 782.4
           locator:
@@ -10245,7 +10304,7 @@ species:
         - run_id: C17/12/15c
           T_C: 1400.0
           t_min: 720.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 843.3
           locator:
@@ -10298,7 +10357,7 @@ species:
         - run_id: 2M-16-07-16e
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 848.9
           locator:
@@ -10351,7 +10410,7 @@ species:
         - run_id: 2M-16-07-16a
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 742.5
           locator:
@@ -10404,7 +10463,7 @@ species:
         - run_id: 2M-16-07-16b
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 739.9
           locator:
@@ -10457,7 +10516,7 @@ species:
         - run_id: 2M-16-07-16c
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 738.1
           locator:
@@ -10510,7 +10569,7 @@ species:
         - run_id: 3M-2/3/16
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 764.0
           locator:
@@ -10563,7 +10622,7 @@ species:
         - run_id: 2M-17-07-16a
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 717.7
           locator:
@@ -10616,7 +10675,7 @@ species:
         - run_id: 2M-17-07-16b
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 760.1
           locator:
@@ -10669,7 +10728,7 @@ species:
         - run_id: 2M-17-07-16c
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 784.9
           locator:
@@ -10722,7 +10781,7 @@ species:
         - run_id: 2M-16-07-16f
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 801.1
           locator:
@@ -10775,7 +10834,7 @@ species:
         - run_id: 2M-16-07-16g
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 825.4
           locator:
@@ -10828,7 +10887,7 @@ species:
         - run_id: P11-06-18b
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 747.4
           locator:
@@ -10881,7 +10940,7 @@ species:
         - run_id: 2M-16-07-16h
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 766.4
           locator:
@@ -10934,7 +10993,7 @@ species:
         - run_id: 2M-16-07-16d
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 819.6
           locator:
@@ -11003,7 +11062,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 15
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1312.4
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -11011,7 +11070,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 15
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1196.3
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -11019,7 +11078,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 15
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1285.4
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -11027,7 +11086,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 15
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1425.6
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -11035,7 +11094,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 60
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1120.8
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -11043,7 +11102,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 60
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1235.9
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -11051,7 +11110,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 60
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1385.7
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -11059,7 +11118,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 60
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1368.3
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -11067,7 +11126,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 120
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1224.3
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -11075,7 +11134,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 120
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1255.8
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -11083,7 +11142,7 @@ species:
           T_C: 1300
           T_K: 1573.15
           t_min: 120
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1417.5
           form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
@@ -11091,7 +11150,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1276.6
           form_note: at_or_above_liquidus
@@ -11099,7 +11158,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1258.3
           form_note: at_or_above_liquidus
@@ -11107,7 +11166,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1350.8
           form_note: at_or_above_liquidus
@@ -11115,7 +11174,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1156.0
           form_note: at_or_above_liquidus
@@ -11123,7 +11182,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1180.8
           form_note: at_or_above_liquidus
@@ -11131,7 +11190,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 15
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1290.5
           form_note: at_or_above_liquidus
@@ -11139,7 +11198,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1188.2
           form_note: at_or_above_liquidus
@@ -11147,7 +11206,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1084.4
           form_note: at_or_above_liquidus
@@ -11155,7 +11214,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1273.1
           form_note: at_or_above_liquidus
@@ -11163,7 +11222,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 1346.1
           form_note: at_or_above_liquidus
@@ -11171,7 +11230,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1135.3
           form_note: at_or_above_liquidus
@@ -11179,7 +11238,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1135.7
           form_note: at_or_above_liquidus
@@ -11187,7 +11246,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1418.9
           form_note: at_or_above_liquidus
@@ -11195,7 +11254,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 60
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1396.8
           form_note: at_or_above_liquidus
@@ -11203,7 +11262,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 120
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1323.2
           form_note: at_or_above_liquidus
@@ -11211,7 +11270,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 120
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1317.2
           form_note: at_or_above_liquidus
@@ -11219,7 +11278,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 120
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1385.9
           form_note: at_or_above_liquidus
@@ -11227,7 +11286,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 930
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1170.0
           form_note: at_or_above_liquidus
@@ -11235,7 +11294,7 @@ species:
           T_C: 1400
           T_K: 1673.15
           t_min: 720
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1349.0
           form_note: at_or_above_liquidus
@@ -11243,7 +11302,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 15
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1319.0
           form_note: at_or_above_liquidus
@@ -11251,7 +11310,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 15
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1219.5
           form_note: at_or_above_liquidus
@@ -11259,7 +11318,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 15
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1238.0
           form_note: at_or_above_liquidus
@@ -11267,7 +11326,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 15
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1247.0
           form_note: at_or_above_liquidus
@@ -11275,7 +11334,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 60
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1210.9
           form_note: at_or_above_liquidus
@@ -11283,7 +11342,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 60
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1239.6
           form_note: at_or_above_liquidus
@@ -11291,7 +11350,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 60
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1214.1
           form_note: at_or_above_liquidus
@@ -11299,7 +11358,7 @@ species:
           T_C: 1500
           T_K: 1773.15
           t_min: 60
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1312.0
           form_note: at_or_above_liquidus
@@ -11307,7 +11366,7 @@ species:
           T_C: 1550
           T_K: 1823.15
           t_min: 15
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1298.5
           form_note: at_or_above_liquidus
@@ -11315,7 +11374,7 @@ species:
           T_C: 1550
           T_K: 1823.15
           t_min: 15
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1368.7
           form_note: at_or_above_liquidus
@@ -11323,7 +11382,7 @@ species:
           T_C: 1550
           T_K: 1823.15
           t_min: 15
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1123.5
           form_note: at_or_above_liquidus
@@ -11331,7 +11390,7 @@ species:
           T_C: 1550
           T_K: 1823.15
           t_min: 15
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1239.6
           form_note: at_or_above_liquidus
@@ -11339,7 +11398,7 @@ species:
           T_C: 1550
           T_K: 1823.15
           t_min: 15
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1220.5
           form_note: at_or_above_liquidus
@@ -11457,7 +11516,7 @@ species:
         - run_id: 2M-15-07-16c
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1312.4
           locator:
@@ -11472,7 +11531,7 @@ species:
         - run_id: 2M-15-07-16d
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1196.3
           locator:
@@ -11487,7 +11546,7 @@ species:
         - run_id: 2M-15-07-16g
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1285.4
           locator:
@@ -11502,7 +11561,7 @@ species:
         - run_id: 2M-15-07-16h
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1425.6
           locator:
@@ -11517,7 +11576,7 @@ species:
         - run_id: P11-06-18a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1120.8
           locator:
@@ -11532,7 +11591,7 @@ species:
         - run_id: 1M-15-07-16a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1235.9
           locator:
@@ -11547,7 +11606,7 @@ species:
         - run_id: 1M-15-07-16b
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1385.7
           locator:
@@ -11562,7 +11621,7 @@ species:
         - run_id: 1M-PS6
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1368.3
           locator:
@@ -11577,7 +11636,7 @@ species:
         - run_id: 3M-18-07-16b
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1224.3
           locator:
@@ -11592,7 +11651,7 @@ species:
         - run_id: 2M-18-07-16a
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1255.8
           locator:
@@ -11607,7 +11666,7 @@ species:
         - run_id: 2M-18-07-16c
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1417.5
           locator:
@@ -11622,7 +11681,7 @@ species:
         - run_id: 1M-PS3
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1276.6
           locator:
@@ -11637,7 +11696,7 @@ species:
         - run_id: 1M-PS2
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1258.3
           locator:
@@ -11652,7 +11711,7 @@ species:
         - run_id: 1M-PS4
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1350.8
           locator:
@@ -11667,7 +11726,7 @@ species:
         - run_id: P09/06/18b*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1156.0
           locator:
@@ -11682,7 +11741,7 @@ species:
         - run_id: P09/06/18a*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1180.8
           locator:
@@ -11697,7 +11756,7 @@ species:
         - run_id: 1M-PS5
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1290.5
           locator:
@@ -11712,7 +11771,7 @@ species:
         - run_id: P08-02-17b*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1188.2
           locator:
@@ -11727,7 +11786,7 @@ species:
         - run_id: 3M-29/2/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1084.4
           locator:
@@ -11742,7 +11801,7 @@ species:
         - run_id: 1M-2/3/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1273.1
           locator:
@@ -11757,7 +11816,7 @@ species:
         - run_id: C18/12/15*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 1346.1
           locator:
@@ -11772,7 +11831,7 @@ species:
         - run_id: 1M-PS1*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1135.3
           locator:
@@ -11787,7 +11846,7 @@ species:
         - run_id: P09/06/18c*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1135.7
           locator:
@@ -11802,7 +11861,7 @@ species:
         - run_id: C17/12/15a
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1418.9
           locator:
@@ -11817,7 +11876,7 @@ species:
         - run_id: 1M-1/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1396.8
           locator:
@@ -11832,7 +11891,7 @@ species:
         - run_id: 3M-1/3/16
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1323.2
           locator:
@@ -11847,7 +11906,7 @@ species:
         - run_id: C17/12/15b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1317.2
           locator:
@@ -11862,7 +11921,7 @@ species:
         - run_id: 1M-1/3/16b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1385.9
           locator:
@@ -11877,7 +11936,7 @@ species:
         - run_id: 3M-29/2/16b
           T_C: 1400.0
           t_min: 930.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1170.0
           locator:
@@ -11892,7 +11951,7 @@ species:
         - run_id: C17/12/15c
           T_C: 1400.0
           t_min: 720.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1349.0
           locator:
@@ -11907,7 +11966,7 @@ species:
         - run_id: 2M-16-07-16e
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1319.0
           locator:
@@ -11922,7 +11981,7 @@ species:
         - run_id: 2M-16-07-16a
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1219.5
           locator:
@@ -11937,7 +11996,7 @@ species:
         - run_id: 2M-16-07-16b
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1238.0
           locator:
@@ -11952,7 +12011,7 @@ species:
         - run_id: 2M-16-07-16c
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1247.0
           locator:
@@ -11967,7 +12026,7 @@ species:
         - run_id: 3M-2/3/16
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1210.9
           locator:
@@ -11982,7 +12041,7 @@ species:
         - run_id: 2M-17-07-16a
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1239.6
           locator:
@@ -11997,7 +12056,7 @@ species:
         - run_id: 2M-17-07-16b
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1214.1
           locator:
@@ -12012,7 +12071,7 @@ species:
         - run_id: 2M-17-07-16c
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1312.0
           locator:
@@ -12027,7 +12086,7 @@ species:
         - run_id: 2M-16-07-16f
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1298.5
           locator:
@@ -12042,7 +12101,7 @@ species:
         - run_id: 2M-16-07-16g
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1368.7
           locator:
@@ -12057,7 +12116,7 @@ species:
         - run_id: P11-06-18b
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1123.5
           locator:
@@ -12072,7 +12131,7 @@ species:
         - run_id: 2M-16-07-16h
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1239.6
           locator:
@@ -12087,7 +12146,7 @@ species:
         - run_id: 2M-16-07-16d
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1220.5
           locator:
@@ -12137,7 +12196,7 @@ species:
         - run_id: 2M-15-07-16c
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1312.4
           locator:
@@ -12190,7 +12249,7 @@ species:
         - run_id: 2M-15-07-16d
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1196.3
           locator:
@@ -12243,7 +12302,7 @@ species:
         - run_id: 2M-15-07-16g
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1285.4
           locator:
@@ -12296,7 +12355,7 @@ species:
         - run_id: 2M-15-07-16h
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1425.6
           locator:
@@ -12349,7 +12408,7 @@ species:
         - run_id: P11-06-18a
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1120.8
           locator:
@@ -12402,7 +12461,7 @@ species:
         - run_id: 1M-15-07-16a
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1235.9
           locator:
@@ -12455,7 +12514,7 @@ species:
         - run_id: 1M-15-07-16b
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1385.7
           locator:
@@ -12508,7 +12567,7 @@ species:
         - run_id: 1M-PS6
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1368.3
           locator:
@@ -12561,7 +12620,7 @@ species:
         - run_id: 3M-18-07-16b
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1224.3
           locator:
@@ -12614,7 +12673,7 @@ species:
         - run_id: 2M-18-07-16a
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1255.8
           locator:
@@ -12667,7 +12726,7 @@ species:
         - run_id: 2M-18-07-16c
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1417.5
           locator:
@@ -12720,7 +12779,7 @@ species:
         - run_id: 1M-PS3
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1276.6
           locator:
@@ -12773,7 +12832,7 @@ species:
         - run_id: 1M-PS2
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1258.3
           locator:
@@ -12826,7 +12885,7 @@ species:
         - run_id: 1M-PS4
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1350.8
           locator:
@@ -12879,7 +12938,7 @@ species:
         - run_id: P09/06/18b
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1156.0
           locator:
@@ -12932,7 +12991,7 @@ species:
         - run_id: P09/06/18a
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1180.8
           locator:
@@ -12985,7 +13044,7 @@ species:
         - run_id: 1M-PS5
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1290.5
           locator:
@@ -13038,7 +13097,7 @@ species:
         - run_id: P08-02-17b
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1188.2
           locator:
@@ -13091,7 +13150,7 @@ species:
         - run_id: 3M-29/2/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1084.4
           locator:
@@ -13144,7 +13203,7 @@ species:
         - run_id: 1M-2/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1273.1
           locator:
@@ -13197,7 +13256,7 @@ species:
         - run_id: C18/12/15
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 1346.1
           locator:
@@ -13250,7 +13309,7 @@ species:
         - run_id: 1M-PS1
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1135.3
           locator:
@@ -13303,7 +13362,7 @@ species:
         - run_id: P09/06/18c
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1135.7
           locator:
@@ -13356,7 +13415,7 @@ species:
         - run_id: C17/12/15a
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1418.9
           locator:
@@ -13409,7 +13468,7 @@ species:
         - run_id: 1M-1/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1396.8
           locator:
@@ -13462,7 +13521,7 @@ species:
         - run_id: 3M-1/3/16
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1323.2
           locator:
@@ -13515,7 +13574,7 @@ species:
         - run_id: C17/12/15b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1317.2
           locator:
@@ -13568,7 +13627,7 @@ species:
         - run_id: 1M-1/3/16b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1385.9
           locator:
@@ -13621,7 +13680,7 @@ species:
         - run_id: 3M-29/2/16b
           T_C: 1400.0
           t_min: 930.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1170.0
           locator:
@@ -13674,7 +13733,7 @@ species:
         - run_id: C17/12/15c
           T_C: 1400.0
           t_min: 720.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1349.0
           locator:
@@ -13727,7 +13786,7 @@ species:
         - run_id: 2M-16-07-16e
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1319.0
           locator:
@@ -13780,7 +13839,7 @@ species:
         - run_id: 2M-16-07-16a
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1219.5
           locator:
@@ -13833,7 +13892,7 @@ species:
         - run_id: 2M-16-07-16b
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1238.0
           locator:
@@ -13886,7 +13945,7 @@ species:
         - run_id: 2M-16-07-16c
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1247.0
           locator:
@@ -13939,7 +13998,7 @@ species:
         - run_id: 3M-2/3/16
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1210.9
           locator:
@@ -13992,7 +14051,7 @@ species:
         - run_id: 2M-17-07-16a
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1239.6
           locator:
@@ -14045,7 +14104,7 @@ species:
         - run_id: 2M-17-07-16b
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1214.1
           locator:
@@ -14098,7 +14157,7 @@ species:
         - run_id: 2M-17-07-16c
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1312.0
           locator:
@@ -14151,7 +14210,7 @@ species:
         - run_id: 2M-16-07-16f
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1298.5
           locator:
@@ -14204,7 +14263,7 @@ species:
         - run_id: 2M-16-07-16g
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1368.7
           locator:
@@ -14257,7 +14316,7 @@ species:
         - run_id: P11-06-18b
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1123.5
           locator:
@@ -14310,7 +14369,7 @@ species:
         - run_id: 2M-16-07-16h
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1239.6
           locator:
@@ -14363,7 +14422,7 @@ species:
         - run_id: 2M-16-07-16d
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1220.5
           locator:
@@ -14489,7 +14548,7 @@ species:
         - run_id: 2M-15-07-16c
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1085.4
           locator:
@@ -14504,7 +14563,7 @@ species:
         - run_id: 2M-15-07-16d
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1040.7
           locator:
@@ -14519,7 +14578,7 @@ species:
         - run_id: 2M-15-07-16g
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1100.5
           locator:
@@ -14534,7 +14593,7 @@ species:
         - run_id: 2M-15-07-16h
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1138.9
           locator:
@@ -14549,7 +14608,7 @@ species:
         - run_id: P11-06-18a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1023.2
           locator:
@@ -14564,7 +14623,7 @@ species:
         - run_id: 1M-15-07-16a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1064.7
           locator:
@@ -14579,7 +14638,7 @@ species:
         - run_id: 1M-15-07-16b
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1203.7
           locator:
@@ -14594,7 +14653,7 @@ species:
         - run_id: 1M-PS6
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1184.2
           locator:
@@ -14609,7 +14668,7 @@ species:
         - run_id: 3M-18-07-16b
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1053.5
           locator:
@@ -14624,7 +14683,7 @@ species:
         - run_id: 2M-18-07-16a
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1092.9
           locator:
@@ -14639,7 +14698,7 @@ species:
         - run_id: 2M-18-07-16c
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1149.6
           locator:
@@ -14654,7 +14713,7 @@ species:
         - run_id: 1M-PS3
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1209.1
           locator:
@@ -14669,7 +14728,7 @@ species:
         - run_id: 1M-PS2
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1229.9
           locator:
@@ -14684,7 +14743,7 @@ species:
         - run_id: 1M-PS4
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1240.4
           locator:
@@ -14699,7 +14758,7 @@ species:
         - run_id: P09/06/18b*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1006.1
           locator:
@@ -14714,7 +14773,7 @@ species:
         - run_id: P09/06/18a*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1087.0
           locator:
@@ -14729,7 +14788,7 @@ species:
         - run_id: 1M-PS5
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1177.3
           locator:
@@ -14744,7 +14803,7 @@ species:
         - run_id: P08-02-17b*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1112.2
           locator:
@@ -14759,7 +14818,7 @@ species:
         - run_id: 3M-29/2/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1100.3
           locator:
@@ -14774,7 +14833,7 @@ species:
         - run_id: 1M-2/3/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1279.7
           locator:
@@ -14789,7 +14848,7 @@ species:
         - run_id: C18/12/15*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 1230.0
           locator:
@@ -14804,7 +14863,7 @@ species:
         - run_id: 1M-PS1*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1008.1
           locator:
@@ -14819,7 +14878,7 @@ species:
         - run_id: P09/06/18c*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1049.5
           locator:
@@ -14834,7 +14893,7 @@ species:
         - run_id: C17/12/15a
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1294.5
           locator:
@@ -14849,7 +14908,7 @@ species:
         - run_id: 1M-1/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1363.5
           locator:
@@ -14864,7 +14923,7 @@ species:
         - run_id: 3M-1/3/16
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1102.7
           locator:
@@ -14879,7 +14938,7 @@ species:
         - run_id: C17/12/15b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1223.9
           locator:
@@ -14894,7 +14953,7 @@ species:
         - run_id: 1M-1/3/16b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1320.6
           locator:
@@ -14909,7 +14968,7 @@ species:
         - run_id: 3M-29/2/16b
           T_C: 1400.0
           t_min: 930.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1233.4
           locator:
@@ -14924,7 +14983,7 @@ species:
         - run_id: C17/12/15c
           T_C: 1400.0
           t_min: 720.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1308.9
           locator:
@@ -14939,7 +14998,7 @@ species:
         - run_id: 2M-16-07-16e
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1137.2
           locator:
@@ -14954,7 +15013,7 @@ species:
         - run_id: 2M-16-07-16a
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1130.0
           locator:
@@ -14969,7 +15028,7 @@ species:
         - run_id: 2M-16-07-16b
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1106.7
           locator:
@@ -14984,7 +15043,7 @@ species:
         - run_id: 2M-16-07-16c
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1081.0
           locator:
@@ -14999,7 +15058,7 @@ species:
         - run_id: 3M-2/3/16
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1227.5
           locator:
@@ -15014,7 +15073,7 @@ species:
         - run_id: 2M-17-07-16a
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1069.1
           locator:
@@ -15029,7 +15088,7 @@ species:
         - run_id: 2M-17-07-16b
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1082.7
           locator:
@@ -15044,7 +15103,7 @@ species:
         - run_id: 2M-17-07-16c
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1103.9
           locator:
@@ -15059,7 +15118,7 @@ species:
         - run_id: 2M-16-07-16f
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1137.0
           locator:
@@ -15074,7 +15133,7 @@ species:
         - run_id: 2M-16-07-16g
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1149.4
           locator:
@@ -15089,7 +15148,7 @@ species:
         - run_id: P11-06-18b
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1066.8
           locator:
@@ -15104,7 +15163,7 @@ species:
         - run_id: 2M-16-07-16h
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1106.0
           locator:
@@ -15119,7 +15178,7 @@ species:
         - run_id: 2M-16-07-16d
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1079.6
           locator:
@@ -15242,7 +15301,7 @@ species:
         - run_id: 2M-15-07-16c
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1098.9
           locator:
@@ -15257,7 +15316,7 @@ species:
         - run_id: 2M-15-07-16d
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1141.8
           locator:
@@ -15272,7 +15331,7 @@ species:
         - run_id: 2M-15-07-16g
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1270.7
           locator:
@@ -15287,7 +15346,7 @@ species:
         - run_id: 2M-15-07-16h
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1412.2
           locator:
@@ -15302,7 +15361,7 @@ species:
         - run_id: P11-06-18a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1211.7
           locator:
@@ -15317,7 +15376,7 @@ species:
         - run_id: 1M-15-07-16a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1113.7
           locator:
@@ -15332,7 +15391,7 @@ species:
         - run_id: 1M-15-07-16b
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1403.4
           locator:
@@ -15347,7 +15406,7 @@ species:
         - run_id: 1M-PS6
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1343.1
           locator:
@@ -15362,7 +15421,7 @@ species:
         - run_id: 3M-18-07-16b
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1015.7
           locator:
@@ -15377,7 +15436,7 @@ species:
         - run_id: 2M-18-07-16a
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1294.5
           locator:
@@ -15392,7 +15451,7 @@ species:
         - run_id: 2M-18-07-16c
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1283.4
           locator:
@@ -15407,7 +15466,7 @@ species:
         - run_id: 1M-PS3
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1181.1
           locator:
@@ -15422,7 +15481,7 @@ species:
         - run_id: 1M-PS2
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1188.1
           locator:
@@ -15437,7 +15496,7 @@ species:
         - run_id: 1M-PS4
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1218.0
           locator:
@@ -15452,7 +15511,7 @@ species:
         - run_id: P09/06/18b*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1179.1
           locator:
@@ -15467,7 +15526,7 @@ species:
         - run_id: P09/06/18a*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1129.2
           locator:
@@ -15482,7 +15541,7 @@ species:
         - run_id: 1M-PS5
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1223.5
           locator:
@@ -15497,7 +15556,7 @@ species:
         - run_id: P08-02-17b*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1190.2
           locator:
@@ -15512,7 +15571,7 @@ species:
         - run_id: 3M-29/2/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1025.8
           locator:
@@ -15527,7 +15586,7 @@ species:
         - run_id: 1M-2/3/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1148.6
           locator:
@@ -15542,7 +15601,7 @@ species:
         - run_id: C18/12/15*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 1132.3
           locator:
@@ -15557,7 +15616,7 @@ species:
         - run_id: 1M-PS1*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1194.8
           locator:
@@ -15572,7 +15631,7 @@ species:
         - run_id: P09/06/18c*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1155.8
           locator:
@@ -15587,7 +15646,7 @@ species:
         - run_id: C17/12/15a
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1140.8
           locator:
@@ -15602,7 +15661,7 @@ species:
         - run_id: 1M-1/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1449.9
           locator:
@@ -15617,7 +15676,7 @@ species:
         - run_id: 3M-1/3/16
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1258.5
           locator:
@@ -15632,7 +15691,7 @@ species:
         - run_id: C17/12/15b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1129.1
           locator:
@@ -15647,7 +15706,7 @@ species:
         - run_id: 1M-1/3/16b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1280.5
           locator:
@@ -15662,7 +15721,7 @@ species:
         - run_id: 3M-29/2/16b
           T_C: 1400.0
           t_min: 930.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1149.1
           locator:
@@ -15677,7 +15736,7 @@ species:
         - run_id: C17/12/15c
           T_C: 1400.0
           t_min: 720.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1190.2
           locator:
@@ -15692,7 +15751,7 @@ species:
         - run_id: 2M-16-07-16e
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1148.8
           locator:
@@ -15707,7 +15766,7 @@ species:
         - run_id: 2M-16-07-16a
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1213.4
           locator:
@@ -15722,7 +15781,7 @@ species:
         - run_id: 2M-16-07-16b
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1188.5
           locator:
@@ -15737,7 +15796,7 @@ species:
         - run_id: 2M-16-07-16c
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1154.1
           locator:
@@ -15752,7 +15811,7 @@ species:
         - run_id: 3M-2/3/16
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1200.3
           locator:
@@ -15767,7 +15826,7 @@ species:
         - run_id: 2M-17-07-16a
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1095.5
           locator:
@@ -15782,7 +15841,7 @@ species:
         - run_id: 2M-17-07-16b
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1145.4
           locator:
@@ -15797,7 +15856,7 @@ species:
         - run_id: 2M-17-07-16c
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1199.8
           locator:
@@ -15812,7 +15871,7 @@ species:
         - run_id: 2M-16-07-16f
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1232.4
           locator:
@@ -15827,7 +15886,7 @@ species:
         - run_id: 2M-16-07-16g
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1175.1
           locator:
@@ -15842,7 +15901,7 @@ species:
         - run_id: P11-06-18b
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1120.4
           locator:
@@ -15857,7 +15916,7 @@ species:
         - run_id: 2M-16-07-16h
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1161.5
           locator:
@@ -15872,7 +15931,7 @@ species:
         - run_id: 2M-16-07-16d
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1108.4
           locator:
@@ -15995,7 +16054,7 @@ species:
         - run_id: 2M-15-07-16c
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1088.1
           locator:
@@ -16010,7 +16069,7 @@ species:
         - run_id: 2M-15-07-16d
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1184.7
           locator:
@@ -16025,7 +16084,7 @@ species:
         - run_id: 2M-15-07-16g
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1193.6
           locator:
@@ -16040,7 +16099,7 @@ species:
         - run_id: 2M-15-07-16h
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1262.9
           locator:
@@ -16055,7 +16114,7 @@ species:
         - run_id: P11-06-18a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1228.8
           locator:
@@ -16070,7 +16129,7 @@ species:
         - run_id: 1M-15-07-16a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1190.9
           locator:
@@ -16085,7 +16144,7 @@ species:
         - run_id: 1M-15-07-16b
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1374.1
           locator:
@@ -16100,7 +16159,7 @@ species:
         - run_id: 1M-PS6
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1252.8
           locator:
@@ -16115,7 +16174,7 @@ species:
         - run_id: 3M-18-07-16b
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1193.4
           locator:
@@ -16130,7 +16189,7 @@ species:
         - run_id: 2M-18-07-16a
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1219.5
           locator:
@@ -16145,7 +16204,7 @@ species:
         - run_id: 2M-18-07-16c
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1341.5
           locator:
@@ -16160,7 +16219,7 @@ species:
         - run_id: 1M-PS3
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1193.7
           locator:
@@ -16175,7 +16234,7 @@ species:
         - run_id: 1M-PS2
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1198.2
           locator:
@@ -16190,7 +16249,7 @@ species:
         - run_id: 1M-PS4
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1242.8
           locator:
@@ -16205,7 +16264,7 @@ species:
         - run_id: P09/06/18b*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1092.2
           locator:
@@ -16220,7 +16279,7 @@ species:
         - run_id: P09/06/18a*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1126.5
           locator:
@@ -16235,7 +16294,7 @@ species:
         - run_id: 1M-PS5
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1209.0
           locator:
@@ -16250,7 +16309,7 @@ species:
         - run_id: P08-02-17b*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1076.3
           locator:
@@ -16265,7 +16324,7 @@ species:
         - run_id: 3M-29/2/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1119.2
           locator:
@@ -16280,7 +16339,7 @@ species:
         - run_id: 1M-2/3/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1232.1
           locator:
@@ -16295,7 +16354,7 @@ species:
         - run_id: C18/12/15*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 1090.0
           locator:
@@ -16310,7 +16369,7 @@ species:
         - run_id: 1M-PS1*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1085.8
           locator:
@@ -16325,7 +16384,7 @@ species:
         - run_id: P09/06/18c*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1011.0
           locator:
@@ -16340,7 +16399,7 @@ species:
         - run_id: C17/12/15a
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1499.7
           locator:
@@ -16355,7 +16414,7 @@ species:
         - run_id: 1M-1/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1132.6
           locator:
@@ -16370,7 +16429,7 @@ species:
         - run_id: 3M-1/3/16
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1187.9
           locator:
@@ -16385,7 +16444,7 @@ species:
         - run_id: C17/12/15b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1245.3
           locator:
@@ -16400,7 +16459,7 @@ species:
         - run_id: 1M-1/3/16b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1896.7
           locator:
@@ -16415,7 +16474,7 @@ species:
         - run_id: 3M-29/2/16b
           T_C: 1400.0
           t_min: 930.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1062.8
           locator:
@@ -16430,7 +16489,7 @@ species:
         - run_id: C17/12/15c
           T_C: 1400.0
           t_min: 720.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1013.3
           locator:
@@ -16445,7 +16504,7 @@ species:
         - run_id: 2M-16-07-16e
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1253.0
           locator:
@@ -16460,7 +16519,7 @@ species:
         - run_id: 2M-16-07-16a
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1185.7
           locator:
@@ -16475,7 +16534,7 @@ species:
         - run_id: 2M-16-07-16b
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1155.6
           locator:
@@ -16490,7 +16549,7 @@ species:
         - run_id: 2M-16-07-16c
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1155.5
           locator:
@@ -16505,7 +16564,7 @@ species:
         - run_id: 3M-2/3/16
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1136.7
           locator:
@@ -16520,7 +16579,7 @@ species:
         - run_id: 2M-17-07-16a
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1155.0
           locator:
@@ -16535,7 +16594,7 @@ species:
         - run_id: 2M-17-07-16b
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1163.7
           locator:
@@ -16550,7 +16609,7 @@ species:
         - run_id: 2M-17-07-16c
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1158.8
           locator:
@@ -16565,7 +16624,7 @@ species:
         - run_id: 2M-16-07-16f
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1189.9
           locator:
@@ -16580,7 +16639,7 @@ species:
         - run_id: 2M-16-07-16g
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1240.3
           locator:
@@ -16595,7 +16654,7 @@ species:
         - run_id: P11-06-18b
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1057.7
           locator:
@@ -16610,7 +16669,7 @@ species:
         - run_id: 2M-16-07-16h
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1201.6
           locator:
@@ -16625,7 +16684,7 @@ species:
         - run_id: 2M-16-07-16d
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1188.0
           locator:
@@ -16748,7 +16807,7 @@ species:
         - run_id: 2M-15-07-16c
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1113.8
           locator:
@@ -16763,7 +16822,7 @@ species:
         - run_id: 2M-15-07-16d
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 973.9
           locator:
@@ -16778,7 +16837,7 @@ species:
         - run_id: 2M-15-07-16g
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1055.9
           locator:
@@ -16793,7 +16852,7 @@ species:
         - run_id: 2M-15-07-16h
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1124.1
           locator:
@@ -16808,7 +16867,7 @@ species:
         - run_id: P11-06-18a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1061.3
           locator:
@@ -16823,7 +16882,7 @@ species:
         - run_id: 1M-15-07-16a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1009.0
           locator:
@@ -16838,7 +16897,7 @@ species:
         - run_id: 1M-15-07-16b
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1184.5
           locator:
@@ -16853,7 +16912,7 @@ species:
         - run_id: 1M-PS6
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1087.5
           locator:
@@ -16868,7 +16927,7 @@ species:
         - run_id: 3M-18-07-16b
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1019.4
           locator:
@@ -16883,7 +16942,7 @@ species:
         - run_id: 2M-18-07-16a
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1068.6
           locator:
@@ -16898,7 +16957,7 @@ species:
         - run_id: 2M-18-07-16c
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1132.0
           locator:
@@ -16913,7 +16972,7 @@ species:
         - run_id: 1M-PS3
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1028.8
           locator:
@@ -16928,7 +16987,7 @@ species:
         - run_id: 1M-PS2
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1024.4
           locator:
@@ -16943,7 +17002,7 @@ species:
         - run_id: 1M-PS4
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1067.2
           locator:
@@ -16958,7 +17017,7 @@ species:
         - run_id: P09/06/18b*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1003.8
           locator:
@@ -16973,7 +17032,7 @@ species:
         - run_id: P09/06/18a*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1026.6
           locator:
@@ -16988,7 +17047,7 @@ species:
         - run_id: 1M-PS5
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1020.5
           locator:
@@ -17003,7 +17062,7 @@ species:
         - run_id: P08-02-17b*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1033.8
           locator:
@@ -17018,7 +17077,7 @@ species:
         - run_id: 3M-29/2/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 915.9
           locator:
@@ -17033,7 +17092,7 @@ species:
         - run_id: 1M-2/3/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1074.7
           locator:
@@ -17048,7 +17107,7 @@ species:
         - run_id: C18/12/15*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 1044.3
           locator:
@@ -17063,7 +17122,7 @@ species:
         - run_id: 1M-PS1*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1037.6
           locator:
@@ -17078,7 +17137,7 @@ species:
         - run_id: P09/06/18c*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1049.7
           locator:
@@ -17093,7 +17152,7 @@ species:
         - run_id: C17/12/15a
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1083.9
           locator:
@@ -17108,7 +17167,7 @@ species:
         - run_id: 1M-1/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1203.8
           locator:
@@ -17123,7 +17182,7 @@ species:
         - run_id: 3M-1/3/16
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1117.6
           locator:
@@ -17138,7 +17197,7 @@ species:
         - run_id: C17/12/15b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1022.5
           locator:
@@ -17153,7 +17212,7 @@ species:
         - run_id: 1M-1/3/16b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1159.5
           locator:
@@ -17168,7 +17227,7 @@ species:
         - run_id: 3M-29/2/16b
           T_C: 1400.0
           t_min: 930.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1033.7
           locator:
@@ -17183,7 +17242,7 @@ species:
         - run_id: C17/12/15c
           T_C: 1400.0
           t_min: 720.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1105.7
           locator:
@@ -17198,7 +17257,7 @@ species:
         - run_id: 2M-16-07-16e
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1034.3
           locator:
@@ -17213,7 +17272,7 @@ species:
         - run_id: 2M-16-07-16a
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1025.7
           locator:
@@ -17228,7 +17287,7 @@ species:
         - run_id: 2M-16-07-16b
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 988.5
           locator:
@@ -17243,7 +17302,7 @@ species:
         - run_id: 2M-16-07-16c
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 967.9
           locator:
@@ -17258,7 +17317,7 @@ species:
         - run_id: 3M-2/3/16
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1032.8
           locator:
@@ -17273,7 +17332,7 @@ species:
         - run_id: 2M-17-07-16a
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 980.9
           locator:
@@ -17288,7 +17347,7 @@ species:
         - run_id: 2M-17-07-16b
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 991.7
           locator:
@@ -17303,7 +17362,7 @@ species:
         - run_id: 2M-17-07-16c
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1016.1
           locator:
@@ -17318,7 +17377,7 @@ species:
         - run_id: 2M-16-07-16f
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1051.4
           locator:
@@ -17333,7 +17392,7 @@ species:
         - run_id: 2M-16-07-16g
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1052.9
           locator:
@@ -17348,7 +17407,7 @@ species:
         - run_id: P11-06-18b
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1004.2
           locator:
@@ -17363,7 +17422,7 @@ species:
         - run_id: 2M-16-07-16h
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1002.7
           locator:
@@ -17378,7 +17437,7 @@ species:
         - run_id: 2M-16-07-16d
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 975.9
           locator:
@@ -17501,7 +17560,7 @@ species:
         - run_id: 2M-15-07-16c
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1276.0
           locator:
@@ -17516,7 +17575,7 @@ species:
         - run_id: 2M-15-07-16d
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1125.9
           locator:
@@ -17531,7 +17590,7 @@ species:
         - run_id: 2M-15-07-16g
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1192.3
           locator:
@@ -17546,7 +17605,7 @@ species:
         - run_id: 2M-15-07-16h
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1293.8
           locator:
@@ -17561,7 +17620,7 @@ species:
         - run_id: P11-06-18a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1040.4
           locator:
@@ -17576,7 +17635,7 @@ species:
         - run_id: 1M-15-07-16a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1164.9
           locator:
@@ -17591,7 +17650,7 @@ species:
         - run_id: 1M-15-07-16b
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1358.1
           locator:
@@ -17606,7 +17665,7 @@ species:
         - run_id: 1M-PS6
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1171.2
           locator:
@@ -17621,7 +17680,7 @@ species:
         - run_id: 3M-18-07-16b
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1175.1
           locator:
@@ -17636,7 +17695,7 @@ species:
         - run_id: 2M-18-07-16a
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1211.1
           locator:
@@ -17651,7 +17710,7 @@ species:
         - run_id: 2M-18-07-16c
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1284.3
           locator:
@@ -17666,7 +17725,7 @@ species:
         - run_id: 1M-PS3
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1098.1
           locator:
@@ -17681,7 +17740,7 @@ species:
         - run_id: 1M-PS2
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1101.1
           locator:
@@ -17696,7 +17755,7 @@ species:
         - run_id: 1M-PS4
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1170.6
           locator:
@@ -17711,7 +17770,7 @@ species:
         - run_id: P09/06/18b*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 930.5
           locator:
@@ -17726,7 +17785,7 @@ species:
         - run_id: P09/06/18a*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 978.1
           locator:
@@ -17741,7 +17800,7 @@ species:
         - run_id: 1M-PS5
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1096.3
           locator:
@@ -17756,7 +17815,7 @@ species:
         - run_id: P08-02-17b*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1001.2
           locator:
@@ -17771,7 +17830,7 @@ species:
         - run_id: 3M-29/2/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 992.2
           locator:
@@ -17786,7 +17845,7 @@ species:
         - run_id: 1M-2/3/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1154.5
           locator:
@@ -17801,7 +17860,7 @@ species:
         - run_id: C18/12/15*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 1121.8
           locator:
@@ -17816,7 +17875,7 @@ species:
         - run_id: 1M-PS1*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1129.6
           locator:
@@ -17831,7 +17890,7 @@ species:
         - run_id: P09/06/18c*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 951.0
           locator:
@@ -17846,7 +17905,7 @@ species:
         - run_id: C17/12/15a
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1199.7
           locator:
@@ -17861,7 +17920,7 @@ species:
         - run_id: 1M-1/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1276.6
           locator:
@@ -17876,7 +17935,7 @@ species:
         - run_id: 3M-1/3/16
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1219.0
           locator:
@@ -17891,7 +17950,7 @@ species:
         - run_id: C17/12/15b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1110.5
           locator:
@@ -17906,7 +17965,7 @@ species:
         - run_id: 1M-1/3/16b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1270.7
           locator:
@@ -17921,7 +17980,7 @@ species:
         - run_id: 3M-29/2/16b
           T_C: 1400.0
           t_min: 930.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1108.6
           locator:
@@ -17936,7 +17995,7 @@ species:
         - run_id: C17/12/15c
           T_C: 1400.0
           t_min: 720.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1196.4
           locator:
@@ -17951,7 +18010,7 @@ species:
         - run_id: 2M-16-07-16e
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1194.3
           locator:
@@ -17966,7 +18025,7 @@ species:
         - run_id: 2M-16-07-16a
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1168.3
           locator:
@@ -17981,7 +18040,7 @@ species:
         - run_id: 2M-16-07-16b
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1134.6
           locator:
@@ -17996,7 +18055,7 @@ species:
         - run_id: 2M-16-07-16c
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1117.7
           locator:
@@ -18011,7 +18070,7 @@ species:
         - run_id: 3M-2/3/16
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1092.1
           locator:
@@ -18026,7 +18085,7 @@ species:
         - run_id: 2M-17-07-16a
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1116.5
           locator:
@@ -18041,7 +18100,7 @@ species:
         - run_id: 2M-17-07-16b
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1142.3
           locator:
@@ -18056,7 +18115,7 @@ species:
         - run_id: 2M-17-07-16c
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1138.9
           locator:
@@ -18071,7 +18130,7 @@ species:
         - run_id: 2M-16-07-16f
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1197.7
           locator:
@@ -18086,7 +18145,7 @@ species:
         - run_id: 2M-16-07-16g
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1198.4
           locator:
@@ -18101,7 +18160,7 @@ species:
         - run_id: P11-06-18b
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 964.8
           locator:
@@ -18116,7 +18175,7 @@ species:
         - run_id: 2M-16-07-16h
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1144.9
           locator:
@@ -18131,7 +18190,7 @@ species:
         - run_id: 2M-16-07-16d
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1117.6
           locator:
@@ -18254,7 +18313,7 @@ species:
         - run_id: 2M-15-07-16c
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1273.7
           locator:
@@ -18269,7 +18328,7 @@ species:
         - run_id: 2M-15-07-16d
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1124.8
           locator:
@@ -18284,7 +18343,7 @@ species:
         - run_id: 2M-15-07-16g
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -5.63
+          log10_fO2: {value: -5.63, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1207.0
           locator:
@@ -18299,7 +18358,7 @@ species:
         - run_id: 2M-15-07-16h
           T_C: 1300.0
           t_min: 15.0
-          log10_fO2: -7.99
+          log10_fO2: {value: -7.99, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1296.7
           locator:
@@ -18314,7 +18373,7 @@ species:
         - run_id: P11-06-18a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1073.8
           locator:
@@ -18329,7 +18388,7 @@ species:
         - run_id: 1M-15-07-16a*
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1175.6
           locator:
@@ -18344,7 +18403,7 @@ species:
         - run_id: 1M-15-07-16b
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -5.67
+          log10_fO2: {value: -5.67, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1366.1
           locator:
@@ -18359,7 +18418,7 @@ species:
         - run_id: 1M-PS6
           T_C: 1300.0
           t_min: 60.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1149.3
           locator:
@@ -18374,7 +18433,7 @@ species:
         - run_id: 3M-18-07-16b
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1197.6
           locator:
@@ -18389,7 +18448,7 @@ species:
         - run_id: 2M-18-07-16a
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -3.44
+          log10_fO2: {value: -3.44, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1218.7
           locator:
@@ -18404,7 +18463,7 @@ species:
         - run_id: 2M-18-07-16c
           T_C: 1300.0
           t_min: 120.0
-          log10_fO2: -7.33
+          log10_fO2: {value: -7.33, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1284.6
           locator:
@@ -18419,7 +18478,7 @@ species:
         - run_id: 1M-PS3
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1101.8
           locator:
@@ -18434,7 +18493,7 @@ species:
         - run_id: 1M-PS2
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -5.49
+          log10_fO2: {value: -5.49, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1091.8
           locator:
@@ -18449,7 +18508,7 @@ species:
         - run_id: 1M-PS4
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -8.0
+          log10_fO2: {value: -8.0, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1167.3
           locator:
@@ -18464,7 +18523,7 @@ species:
         - run_id: P09/06/18b*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 947.3
           locator:
@@ -18479,7 +18538,7 @@ species:
         - run_id: P09/06/18a*
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -9.23
+          log10_fO2: {value: -9.23, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1006.7
           locator:
@@ -18494,7 +18553,7 @@ species:
         - run_id: 1M-PS5
           T_C: 1400.0
           t_min: 15.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1090.7
           locator:
@@ -18509,7 +18568,7 @@ species:
         - run_id: P08-02-17b*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 992.6
           locator:
@@ -18524,7 +18583,7 @@ species:
         - run_id: 3M-29/2/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 984.1
           locator:
@@ -18539,7 +18598,7 @@ species:
         - run_id: 1M-2/3/16*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1178.0
           locator:
@@ -18554,7 +18613,7 @@ species:
         - run_id: C18/12/15*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -3.07
+          log10_fO2: {value: -3.07, units: "log10(bar)"}
           loop: Ir
           residue_ppm: 1110.6
           locator:
@@ -18569,7 +18628,7 @@ species:
         - run_id: 1M-PS1*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1113.6
           locator:
@@ -18584,7 +18643,7 @@ species:
         - run_id: P09/06/18c*
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -5.51
+          log10_fO2: {value: -5.51, units: "log10(bar)"}
           loop: Re
           residue_ppm: 967.6
           locator:
@@ -18599,7 +18658,7 @@ species:
         - run_id: C17/12/15a
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1193.8
           locator:
@@ -18614,7 +18673,7 @@ species:
         - run_id: 1M-1/3/16
           T_C: 1400.0
           t_min: 60.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1276.8
           locator:
@@ -18629,7 +18688,7 @@ species:
         - run_id: 3M-1/3/16
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1247.2
           locator:
@@ -18644,7 +18703,7 @@ species:
         - run_id: C17/12/15b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1111.9
           locator:
@@ -18659,7 +18718,7 @@ species:
         - run_id: 1M-1/3/16b
           T_C: 1400.0
           t_min: 120.0
-          log10_fO2: -10.01
+          log10_fO2: {value: -10.01, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1275.3
           locator:
@@ -18674,7 +18733,7 @@ species:
         - run_id: 3M-29/2/16b
           T_C: 1400.0
           t_min: 930.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1132.6
           locator:
@@ -18689,7 +18748,7 @@ species:
         - run_id: C17/12/15c
           T_C: 1400.0
           t_min: 720.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1198.2
           locator:
@@ -18704,7 +18763,7 @@ species:
         - run_id: 2M-16-07-16e
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1220.7
           locator:
@@ -18719,7 +18778,7 @@ species:
         - run_id: 2M-16-07-16a
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1191.4
           locator:
@@ -18734,7 +18793,7 @@ species:
         - run_id: 2M-16-07-16b
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1158.2
           locator:
@@ -18749,7 +18808,7 @@ species:
         - run_id: 2M-16-07-16c
           T_C: 1500.0
           t_min: 15.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1135.9
           locator:
@@ -18764,7 +18823,7 @@ species:
         - run_id: 3M-2/3/16
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1108.4
           locator:
@@ -18779,7 +18838,7 @@ species:
         - run_id: 2M-17-07-16a
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -2.74
+          log10_fO2: {value: -2.74, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1136.9
           locator:
@@ -18794,7 +18853,7 @@ species:
         - run_id: 2M-17-07-16b
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -5.5
+          log10_fO2: {value: -5.5, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1160.1
           locator:
@@ -18809,7 +18868,7 @@ species:
         - run_id: 2M-17-07-16c
           T_C: 1500.0
           t_min: 60.0
-          log10_fO2: -7.97
+          log10_fO2: {value: -7.97, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1153.4
           locator:
@@ -18824,7 +18883,7 @@ species:
         - run_id: 2M-16-07-16f
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -0.68
+          log10_fO2: {value: -0.68, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1212.1
           locator:
@@ -18839,7 +18898,7 @@ species:
         - run_id: 2M-16-07-16g
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -2.59
+          log10_fO2: {value: -2.59, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1217.0
           locator:
@@ -18854,7 +18913,7 @@ species:
         - run_id: P11-06-18b
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -5.48
+          log10_fO2: {value: -5.48, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 998.6
           locator:
@@ -18869,7 +18928,7 @@ species:
         - run_id: 2M-16-07-16h
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -6.01
+          log10_fO2: {value: -6.01, units: "log10(bar)"}
           loop: Pt
           residue_ppm: 1162.8
           locator:
@@ -18884,7 +18943,7 @@ species:
         - run_id: 2M-16-07-16d
           T_C: 1550.0
           t_min: 15.0
-          log10_fO2: -9.56
+          log10_fO2: {value: -9.56, units: "log10(bar)"}
           loop: Re
           residue_ppm: 1128.9
           locator:

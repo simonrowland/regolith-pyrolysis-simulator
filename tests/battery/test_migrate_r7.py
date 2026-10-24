@@ -936,6 +936,26 @@ def _numeric_evidence_paths(leaves):
     ]
 
 
+def _numeric_field_evidence_paths(leaves, field):
+    field_path = re.compile(r"(?:^|\.)" + re.escape(field) + r"(?:\.|\[|$)")
+    metadata = re.compile(
+        r"(?:^|\.)(?:locator|page|published_page|pdf_page_index|index)(?:\.|\[|$)"
+    )
+    numeric = []
+    for path, value in leaves:
+        if not field_path.search(path) or metadata.search(path):
+            continue
+        if isinstance(value, bool) or value in (None, ""):
+            continue
+        try:
+            amount = Decimal(str(value))
+        except (ArithmeticError, TypeError, ValueError):
+            continue
+        if amount.is_finite():
+            numeric.append(path)
+    return numeric
+
+
 def _store_kind(path: Path) -> str | None:
     parts = path.parts
     if "extracts-v2" in parts:
@@ -1047,9 +1067,21 @@ def absence_audit(paths=STORE_PATHS):
                         if found:
                             contradiction = found
                     elif match := re.search(r"source does not state (?:a numeric )?(\w+)", reason):
-                        found = [p for p, value in leaves if value not in (None, "") and
-                                 not p.endswith((".tag", ".reason")) and
-                                 re.search(r"(?:^|\.)" + re.escape(match[1]) + r"(?:\.|\[|$)", p)]
+                        if "numeric" in reason:
+                            found = _numeric_field_evidence_paths(leaves, match[1])
+                        else:
+                            found = [
+                                path
+                                for path, value in leaves
+                                if value not in (None, "")
+                                and not path.endswith((".tag", ".reason"))
+                                and re.search(
+                                    r"(?:^|\.)"
+                                    + re.escape(match[1])
+                                    + r"(?:\.|\[|$)",
+                                    path,
+                                )
+                            ]
                         if found:
                             contradiction = found[:3]
                     if contradiction:

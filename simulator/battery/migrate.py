@@ -1374,7 +1374,9 @@ def _point_condition_from_plain(
     if key in {"fO2_control", "atmosphere", "gas_mix"}:
         return _located_from_plain(
             payload,
-            lambda value: value if isinstance(value, str) else as_decimal(value),
+            lambda value: value
+            if isinstance(value, (str, Mapping))
+            else as_decimal(value),
         )
     if isinstance(payload, Mapping) and isinstance(payload.get("state"), Mapping):
         state = payload["state"]
@@ -1581,8 +1583,11 @@ def _composition_from_plain(payload: object) -> Composition:
         wt = _mass_percent_components(payload)
         if wt is not None:
             return replace(wt_pct_to_mole_fraction(wt), **metadata)
-        raise ValueError(
-            "mass-percent composition contains unsupported or ambiguous components"
+        return Composition(
+            basis=str(payload.get("basis") or "as_published"),
+            components=pairs,
+            amount_basis=AmountBasis.MASS_PERCENT,
+            **metadata,
         )
     return Composition(
         basis=str(payload.get("basis") or "unknown"),
@@ -5240,9 +5245,15 @@ def _point_condition_decimal(node: object) -> Decimal | None:
     if isinstance(node, Mapping):
         state = node.get("state")
         if isinstance(state, Mapping):
-            return _as_dec_or_none(state.get("value"))
+            value = state.get("value")
+            if isinstance(value, Mapping) and value.get("kind") == "point":
+                value = value.get("point")
+            return _as_dec_or_none(value)
         if "value" in node:
-            return _as_dec_or_none(node.get("value"))
+            value = node.get("value")
+            if isinstance(value, Mapping) and value.get("kind") == "point":
+                value = value.get("point")
+            return _as_dec_or_none(value)
     return _as_dec_or_none(node)
 
 
@@ -12896,6 +12907,24 @@ def _row_oxygen_point_conditions(
     return _overlay_raw_oxygen_conditions(out, (raw_item,))
 
 
+def _defaulted_row_derived_plante_oxygen(
+    admission: Admission,
+    point_conditions: Mapping[str, Any] | None,
+) -> bool:
+    """Keep Plante's inferred oxygen as a point condition on defaulted rows."""
+
+    if not admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX):
+        return False
+    oxygen = (point_conditions or {}).get("fO2_Pa")
+    return (
+        isinstance(oxygen, Located)
+        and oxygen.inference is not None
+        and oxygen.inference.relation.startswith(
+            "congruent_vaporization_P_O2_atm="
+        )
+    )
+
+
 def _scoped_oxygen_decision(
     *,
     facts: PrintedOxygenFacts,
@@ -16087,11 +16116,37 @@ class Migrator:
         )
         if values.get("formula"):
             measured.formulas += 1
+        source_standard_state = obs.get("standard_state") or values.get(
+            "standard_state"
+        )
+        source_reference_state = (
+            reference_state_from_extract(
+                source_standard_state,
+                species_formula=species_formula,
+                values=values,
+            )
+            if q_token
+            in {
+                Quantity.ACTIVITY,
+                Quantity.ACTIVITY_COEFFICIENT,
+                Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT,
+            }
+            else None
+        )
         species_polymorph = (
             None
             if measured_tabulated_gas_formula is not None
             else polymorph_from_extract(obs, species_formula)
         )
+        if (
+            source_reference_state is not None
+            and source_reference_state.is_value
+            and source_reference_state.value.endmember.formula == species_formula
+            and source_reference_state.value.endmember.polymorph is not None
+            and source_reference_state.value.endmember.polymorph.is_value
+            and (species_polymorph is None or not species_polymorph.is_value)
+        ):
+            species_polymorph = source_reference_state.value.endmember.polymorph
         species = make_species(
             species_formula, phase, polymorph=species_polymorph
         )
@@ -16738,7 +16793,6 @@ class Migrator:
             and values.get("Delta_f_G_298_kJ_mol") is not None
         ):
             ident_kwargs["temperature_K"] = State.of(Decimal("298.15"))
-        source_reference_state = None
         if q_token in {
             Quantity.ACTIVITY,
             Quantity.ACTIVITY_COEFFICIENT,
@@ -16748,14 +16802,6 @@ class Migrator:
             # closed quantity contract; ``per`` records that basis rather
             # than an unstated source measurement.
             ident_kwargs["per"] = State.of(PerBasis.DIMENSIONLESS)
-            source_standard_state = obs.get("standard_state")
-            if source_standard_state in (None, ""):
-                source_standard_state = values.get("standard_state")
-            source_reference_state = reference_state_from_extract(
-                source_standard_state,
-                species_formula=species.formula,
-                values=values,
-            )
         elif obs.get("per") is not None:
             raw_per = obs["per"]
             try:
@@ -17298,7 +17344,9 @@ class Migrator:
             oxygen_decision,
             from_fallback=oxygen_decision_fallback,
         )
-        if oxygen_state is not None:
+        if oxygen_state is not None and not _defaulted_row_derived_plante_oxygen(
+            admission, row_point_conditions
+        ):
             ident_kwargs["fO2_Pa"] = oxygen_state
         if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
             experiment = self.result.experiments.get(experiment_id)
@@ -19459,9 +19507,14 @@ class Migrator:
             oxygen_decision,
             from_fallback=oxygen_decision_fallback,
         )
-        if oxygen_state is not None:
+        if oxygen_state is not None and not _defaulted_row_derived_plante_oxygen(
+            admission, row_point_conditions
+        ):
             identity = replace(identity, fO2_Pa=oxygen_state)
-        if q_token_point is Quantity.VALENCE_RATIO:
+        if (
+            identity.total_pressure_Pa is None
+            or identity.total_pressure_Pa.is_unknown
+        ):
             total_pressure = (point_conditions or {}).get("total_pressure_Pa")
             if (
                 isinstance(total_pressure, Located)
