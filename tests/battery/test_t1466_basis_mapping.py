@@ -17,7 +17,15 @@ from simulator.battery.compilation_tier import (
     _iter_compilation_series_cells,
     predict_thermo_attempt,
 )
-from simulator.battery.enums import Engine, PerBasis, Quantity, RefusalReason, ValueKind
+from simulator.battery.enums import (
+    Authority,
+    Engine,
+    NoticeKind,
+    PerBasis,
+    Quantity,
+    RefusalReason,
+    ValueKind,
+)
 from simulator.battery.identity import atm_to_pa, bar_to_pa, quantity_token
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.battery.migrate import (
@@ -183,9 +191,9 @@ def test_b677_potassium_gas_uses_printed_ideal_gas_basis(tmp_path: Path) -> None
     assert refused_enthalpy.value is None
     phase = mismatched_enthalpy.identity.species.phase
     assert phase.is_unknown
-    assert phase.reason == (
-        "phase string '(c,1,g)' is not in the closed automatic map"
-    )
+    # The record flags its "(c,1,g)" heading as OCR-suspect; the extract
+    # prints K(c,l,g). Keep the mixed phase unknown (records/table-0095.json:6-27;
+    # source/mineru/pankratz-1984-usbm-b677-p041-p080.md:863-876).
     assert refused_enthalpy.refusal_reason is RefusalReason.UNSUPPORTED
     assert refused_enthalpy.refusal_detail["reason"] == "engine-thermo-does-not-emit"
     assert refused_enthalpy.refusal_detail["quantity"] == "H_minus_H298"
@@ -197,8 +205,20 @@ def test_b677_potassium_gas_uses_printed_ideal_gas_basis(tmp_path: Path) -> None
     assert admitted.refusal_reason is None
     assert admitted.value is not None
     outside = _attempt(Engine.VAPOROCK, _cell_at(heat_capacity, "298"))
-    assert outside.value is None
-    assert outside.refusal_detail["reason"] == "vaporock-temperature-outside-janaf-row"
+    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
+
+    printed_cp = janaf_tabulated_gas_thermo("K", Decimal("298.15")).heat_capacity
+    assert outside.refusal_reason is None
+    assert outside.value == printed_cp
+    assert outside.authority is Authority.BRIDGE
+    assert len(outside.notices) == 1
+    notice = outside.notices[0]
+    assert notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+    assert notice.affected_quantities == (Quantity.CP,)
+    assert notice.authority is Authority.BRIDGE
+    assert "branch=table" in outside.call_evidence
+    assert "coefficient_interval=outside" in outside.call_evidence
+    assert "janaf_table_id=K-005" in outside.call_evidence
     assert _cell_at(heat_capacity, "298").identity.per.value is PerBasis.MOL_SPECIES
 
 
