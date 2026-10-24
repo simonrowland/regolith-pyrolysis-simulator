@@ -14,16 +14,15 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-import yaml
-
-from simulator.battery.enums import EvidenceClass, ValueKind
-from simulator.battery.identity import quantity_token
 from simulator.yaml_cache import load_cached_safe_yaml
 
+from simulator.battery.enums import EvidenceClass
 from simulator.battery.migrate import REPO_ROOT, migrate
-from simulator.battery.score import rail_for_quantity
 from simulator.battery.validate import validate_corpus
-from tests.battery.test_migrate import _write_min_tree
+from tests.battery.test_migrate import (
+    _assert_jacobson_table1_predictions_migrated,
+    _write_min_tree,
+)
 
 _EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
 
@@ -94,48 +93,11 @@ def test_printed_point_temperature_routes(
         assert getattr(locator, locator_key) == locator_value
 
 
-def test_jacobson_table1_points_keep_printed_temperature_and_typed_reason(
+def test_jacobson_table1_predictions_migrate_as_partial_pressures(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(tmp_path, "kems-139-jacobson-2024")
-    parent_id = (
-        "kems-139-jacobson-2024::"
-        "jacobson_2024_t1_factsage_2500k_predicted_psat"
-    )
-    assert parent_id not in result.observations
-    points = [
-        obs for oid, obs in result.observations.items()
-        if oid.startswith(parent_id + "::")
-    ]
-    printed_species = [
-        "PO2", "SiO", "Fe", "Na", "PO", "K", "FeO", "O", "O2", "Mg",
-        "SiO2", "TiO2", "P", "KO", "TiO", "Ca", "CaO", "Al", "Si", "K2", "Ti",
-    ]
-    assert len(points) == len(printed_species) == 21
-    assert [obs.identity.species.formula for obs in points] == printed_species
-    for obs in points:
-        assert obs.identity.quantity.is_unknown
-        assert "predicted_partial_pressure" in obs.identity.quantity.reason
-        assert obs.value.kind is ValueKind.UNAVAILABLE
-        assert obs.evidence.class_.is_value
-        assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-        assert obs.evidence.attribution == (
-            "Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)"
-        )
-        assert rail_for_quantity(
-            quantity_token(obs.identity),
-            species_formula=obs.identity.species.formula,
-        ) is None
-        temperature = (obs.point_conditions or {}).get("temperature_K")
-        assert temperature is not None and temperature.state.is_value
-        assert temperature.state.value == Decimal("2500.0")
-        assert temperature.locator is not None
-        assert temperature.locator.table == "1"
-    assert any(
-        entry.observation_id in {obs.observation_id for obs in points}
-        and "unsupported quantity 'predicted_partial_pressure'" in entry.why
-        for entry in result.queue
-    )
+    _assert_jacobson_table1_predictions_migrated(result)
     report = validate_corpus(
         result.works, result.experiments, result.observations, residuals=None
     )

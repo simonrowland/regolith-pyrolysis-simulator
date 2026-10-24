@@ -47,7 +47,7 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
-from simulator.battery.score import predict_with_engine
+from simulator.battery.score import predict_with_engine, rail_for_quantity
 from simulator.battery.migrate import (
     REPO_ROOT,
     _notice_from_plain,
@@ -8549,6 +8549,7 @@ def test_l01_map_quantity_direct_witnesses() -> None:
         ("partial_pressure_SiO", Quantity.P_PARTIAL),
         ("partial_pressure_over_illite", Quantity.P_PARTIAL),
         ("partial_pressure_series", Quantity.P_PARTIAL),
+        ("predicted_partial_pressure", Quantity.P_PARTIAL),
         ("partial_pressure_vs_setpoint_T", Quantity.P_PARTIAL),
         ("P_Na_over_soda_lime_glass", Quantity.P_PARTIAL),
         ("undetected_radionuclide_partial_pressure_limit", Quantity.P_PARTIAL),
@@ -15766,6 +15767,75 @@ def test_shornikov_1994_printed_mullite_composition_reaches_every_point(
 
     assert found_named == set(named)
 
+def _assert_jacobson_table1_predictions_migrated(result) -> None:
+    source_id = "kems-139-jacobson-2024"
+    document = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-139-jacobson-2024.yaml").read_text()
+    )
+    source_observation = document["species"]["SiO"]["observations"][0]
+    source_points = source_observation["values"]["points"]
+    expected_species = [
+        "PO2", "SiO", "Fe", "Na", "PO", "K", "FeO", "O", "O2", "Mg",
+        "SiO2", "TiO2", "P", "KO", "TiO", "Ca", "CaO", "Al", "Si", "K2", "Ti",
+    ]
+    parent_id = "jacobson_2024_t1_factsage_2500k_predicted_psat"
+    points = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == source_id
+        and obs.observation_id.startswith(f"{source_id}::{parent_id}::")
+    ]
+    assert len(points) == len(expected_species)
+    assert [observation.identity.species.formula for observation in points] == expected_species
+    for observation, source_point in zip(points, source_points, strict=True):
+        formula = observation.identity.species.formula
+        assert quantity_token(observation.identity) is Quantity.P_PARTIAL
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == (
+            Decimal(str(source_point["p_bar"])) * Decimal("1e5")
+        )
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.G
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.value == Decimal("2500.0")
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        composition_id = (
+            f"{source_id}::jacobson_2024_t1_snyder_12022_composition"
+        )
+        assert observation.derived_from == (composition_id,)
+        assert observation.derivation is not None
+        assert observation.derivation.inputs == (composition_id,)
+        assert observation.derivation.output_unit == "Pa"
+        assert observation.evidence.attribution == (
+            "Jacobson et al. 2024, Table 1, calculated with FactSage "
+            "(ref. 115, Bale et al. 2002)"
+        )
+        assert (
+            rail_for_quantity(Quantity.P_PARTIAL, species_formula=formula)
+            is not None
+        )
+        assert observation.locator is not None
+        assert observation.locator.published_page == 18
+        assert observation.locator.table == "1"
+        temperature = (observation.point_conditions or {}).get("temperature_K")
+        assert temperature is not None and temperature.state.is_value
+        assert temperature.state.value == Decimal("2500.0")
+        assert temperature.locator is not None and temperature.locator.table == "1"
+
+    unavailable_id = "jacobson_2024_t2_hfo_third_law_compilation"
+    enthalpies = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == source_id
+        and obs.observation_id.startswith(f"{source_id}::{unavailable_id}::")
+    ]
+    assert len(enthalpies) == 8
+    for observation in enthalpies:
+        assert observation.identity.quantity.is_unknown
+        assert "third_law_reaction_enthalpy" in observation.identity.quantity.reason
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+
 
 def test_ohara_1987_printed_compositions_reach_migrated_observations(
     tmp_path: Path,
@@ -16366,3 +16436,125 @@ def test_exploded_rows_keep_parent_evidence_outside_author_estimates(
         assert {
             observation.evidence.attribution for observation in observations
         } == {expected_attribution}
+
+
+def test_jacobson_2024_predicted_partial_pressures_migrate_as_p_partial(
+    tmp_path: Path,
+) -> None:
+    source_id = "kems-139-jacobson-2024"
+    result = _migrate_real_extract(tmp_path, f"{source_id}.yaml", write=False)
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source_id
+        and "jacobson_2024_t1_factsage_2500k_predicted_psat"
+        in observation.observation_id
+    ]
+
+    assert len(observations) == 21
+    for observation in observations:
+        assert quantity_token(observation.identity) is Quantity.P_PARTIAL
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.value == Decimal("2500.0")
+        assert observation.point_conditions is not None
+        temperature = observation.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == Decimal("2500.0")
+        assert temperature.locator is not None
+        assert temperature.locator.table == "1"
+        assert observation.locator is not None
+        assert observation.locator.published_page == 18
+        assert observation.locator.table == "1"
+
+    sio = next(
+        observation
+        for observation in observations
+        if observation.identity.species.formula == "SiO"
+    )
+    assert sio.value.point == Decimal("454.113900")
+
+    expected = (
+        ("1934.0", "170.4", "616914.8", "8.3"),
+        ("1986.0", "457.6", "616051.4", "14.5"),
+        ("1957.0", "296.1", "614763.3", "18.7"),
+        ("1945.0", "228.0", "615477.5", "11.6"),
+        ("1994.0", "519.9", "616241.7", "25.7"),
+        ("2034.0", "896.0", "618509.3", "21.4"),
+        ("1952.0", "264.5", "615133.3", "14.4"),
+        ("2004.0", "622.2", "616119.7", "18.1"),
+    )
+    source_doc = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-139-jacobson-2024.yaml").read_text()
+    )
+    source_enthalpy_points = next(
+        observation["values"]["points"]
+        for observation in source_doc["species"]["HfO"]["observations"]
+        if observation["observation_id"]
+        == "jacobson_2024_t2_hfo_third_law_compilation"
+    )
+    source_enthalpy_by_temperature = {
+        Decimal(str(point["T_K"])): Decimal(str(point["delta_rH_298_J_mol"]))
+        for point in source_enthalpy_points
+    }
+
+    ion_rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source_id
+        and "jacobson_2024_t2_hfo_ion_intensity" in observation.observation_id
+    ]
+    assert len(ion_rows) == len(expected)
+    for observation, (temperature, intensity, _enthalpy, sigma) in zip(
+        ion_rows, expected, strict=True
+    ):
+        assert quantity_token(observation.identity) is Quantity.ION_INTENSITY
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == Decimal(intensity)
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.value == Decimal(temperature)
+        assert observation.point_conditions is not None
+        located_temperature = observation.point_conditions["temperature_K"]
+        assert located_temperature.state.is_value
+        assert located_temperature.state.value == Decimal(temperature)
+        assert located_temperature.locator is not None
+        assert located_temperature.locator.table == "2"
+        assert observation.locator is not None
+        assert observation.locator.published_page == 23
+        assert observation.locator.table == "2"
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+        assert observation.uncertainty.kind is UncertaintyKind.PRINTED
+        assert Decimal(str(observation.uncertainty.verbatim["sigma"])) == Decimal(sigma)
+
+    enthalpy_rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source_id
+        and "jacobson_2024_t2_hfo_third_law_compilation"
+        in observation.observation_id
+    ]
+    assert len(enthalpy_rows) == len(expected)
+    for observation, (temperature, _intensity, enthalpy, _sigma) in zip(
+        enthalpy_rows, expected, strict=True
+    ):
+        assert observation.identity.quantity.is_unknown
+        assert "third_law_reaction_enthalpy" in observation.identity.quantity.reason
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.value == Decimal(temperature)
+        assert observation.point_conditions is not None
+        located_temperature = observation.point_conditions["temperature_K"]
+        assert located_temperature.state.is_value
+        assert located_temperature.state.value == Decimal(temperature)
+        assert located_temperature.locator is not None
+        assert located_temperature.locator.table == "2"
+        assert observation.locator is not None
+        assert observation.locator.published_page == 23
+        assert observation.locator.table == "2"
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+        temperature_value = observation.identity.temperature_K.value
+        assert source_enthalpy_by_temperature[temperature_value] == Decimal(enthalpy)

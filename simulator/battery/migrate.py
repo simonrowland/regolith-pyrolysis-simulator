@@ -463,6 +463,7 @@ QUANTITY_ALIASES = {
     "partial_pressure_SiO": Quantity.P_PARTIAL,
     "partial_pressure_over_illite": Quantity.P_PARTIAL,
     "partial_pressure_series": Quantity.P_PARTIAL,
+    "predicted_partial_pressure": Quantity.P_PARTIAL,
     "partial_pressure_vs_setpoint_T": Quantity.P_PARTIAL,
     "P_Na_over_soda_lime_glass": Quantity.P_PARTIAL,
     "undetected_radionuclide_partial_pressure_limit": Quantity.P_PARTIAL,
@@ -8669,7 +8670,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "value",
     ),
     Quantity.EVAPORATION_RATE: ("evaporation_rate",),
-    Quantity.ION_INTENSITY: ("ion_intensity",),
+    Quantity.ION_INTENSITY: ("ion_intensity", "I_cps"),
     Quantity.ION_INTENSITY_RATIO: ("ion_intensity_ratio", "ion_current_ratio"),
     Quantity.VALENCE_RATIO: ("value",),
     Quantity.O2_YIELD: (
