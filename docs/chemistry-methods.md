@@ -65,7 +65,7 @@ Vapor pressure is the driving quantity for the whole extraction sequence: it set
 leave the melt at a given temperature and pressure. The authoritative provider is analytic — an
 Antoine reference for the pure component, coupled to an Ellingham/activity correction that converts the
 pure-component pressure into the effective pressure over the actual melt.
-<!-- impl: §2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:2667 — Antoine Ellingham path -->
+<!-- impl: §2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:2958 — Antoine Ellingham path -->
 
 ### §2.1 Pure-component reference
 
@@ -85,7 +85,7 @@ via the WebBook Antoine table; potassium traces to Fiock & Rodebush 1926
 1947 compilation ([doi:10.1021/ie50448a022](https://doi.org/10.1021/ie50448a022)). These are the
 `pure_component_psat` species (Ca, Al, Ti, Cr, Mn, and the alkalis' pure references) and their fits are
 CITED — traceable to a primary measurement on the basis the reference used.
-<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py vapor_pressure_antoine_coefficients:2103 — Antoine row selection -->
+<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py vapor_pressure_antoine_coefficients:2385 — Antoine row selection -->
 <!-- impl: §2.1 -> data/vapor_pressures.yaml families.metals_na_family.physical_properties.species.Na.pure_component_antoine:796 — pure Antoine data -->
 
 Iron is a documented exception. The WebBook carries no simple high-temperature elemental Antoine row
@@ -111,7 +111,7 @@ and mass-action pO₂ scaling. Potassium also uses a `standard_reaction_term` on
 Where a usable `pure_component_antoine` sidecar exists, the runtime selector prefers it over any
 inactive pseudo fallback. The VapoRock target itself comes from Wolf et al. 2023 (REF-044; *ApJ* 947:64,
 [doi:10.3847/1538-4357/acbcc7](https://doi.org/10.3847/1538-4357/acbcc7)).
-<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:2468 — pseudo guard -->
+<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:2759 — pseudo guard -->
 <!-- impl: §2.1 -> data/vapor_pressures.yaml families.oxide_vapors_sio_family.physical_properties.species.SiO.reaction:4655 — SiO standard reaction term (replaces pseudo backsolve; 3a85f59) -->
 
 ### §2.2 From pure component to effective pressure over the melt
@@ -132,7 +132,7 @@ Ellingham free energies use piecewise multiphase segments re-grounded from NIST-
 (Chase 1998, Monograph 9), on a per-mole-O₂ basis. Segment boundaries follow in-band metal and oxide
 phase transitions; each segment carries its own linear `dH - T*dS` representation rather than one
 condensed-phase fit across the full temperature range.
-<!-- impl: §2.2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:2667 — activity times Psat -->
+<!-- impl: §2.2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:2958 — activity times Psat -->
 <!-- impl: §2.2 -> simulator/chemistry/ellingham_thermo.py ELLINGHAM_FIT_SEGMENTS:133 — JANAF Ellingham table -->
 
 ### §2.3 The oxygen-pressure dissociation lever
@@ -197,7 +197,7 @@ its own oxygen-pressure exponent, and is charged the reaction enthalpy once rath
 heat plus a separate dissociation. When the melt temperature exceeds a row's measured Antoine range,
 the provider switches to a bounded fallback fit and guards against numerical blow-up rather than
 extrapolating the pure-component curve unphysically.
-<!-- impl: §2.4 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:2667 — oxide vapor scaling -->
+<!-- impl: §2.4 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:2958 — oxide vapor scaling -->
 
 ---
 
@@ -238,7 +238,7 @@ interactive and batch simulator runs: those runs pass intrinsic oxygen fugacity 
 pressure provider, so FeO uses the redox-resolved ferrous activity from the Kress & Carmichael /
 CALPHAD treatment of §7. The builtin single-cation-gamma, Kress-for-iron activity surface is what
 the vapor pressures of §2 are built on.
-<!-- impl: §3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:2667 — FeO Kress activity -->
+<!-- impl: §3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:2958 — FeO Kress activity -->
 <!-- impl: §3 -> simulator/fe_redox.py kress91_ferrous_feo_activity:951 — FeO activity path -->
 
 The silicate-equilibrium engines compute activities too, on the MELTS convention
@@ -547,7 +547,7 @@ through the condensation route inside the mass-balance closure. At each wall the
 sink competes against the onward condensed sink, and the split is set by a per-species, per-segment,
 temperature-dependent wall sticking coefficient. The remainder — the capture budget minus the wall
 deposit — is what reaches the designated condenser.
-<!-- impl: §6 -> simulator/condensation.py _series_resistance_deposition_flux_mol_m2_s:6853 — wall HKL MT split -->
+<!-- impl: §6 -> simulator/condensation.py _series_resistance_deposition_flux_mol_m2_s:6917 — wall HKL MT split -->
 
 Wall re-evaporation is handled by a per-species reactivity class:
 
@@ -577,7 +577,7 @@ transient wall state) are enumerated in [`docs/model-limitations.md`](model-limi
 The Knudsen number is reported per segment as a transport diagnostic and drives cold-spot warnings, but
 it does not gate deposition routing — the transport regimes are treated as continuous, consistent with
 modelling coating as a rate rather than a threshold.
-<!-- impl: §6 -> simulator/condensation.py _knudsen_regime_factor:7252 — wall Kn weighting -->
+<!-- impl: §6 -> simulator/condensation.py _knudsen_regime_factor:7316 — wall Kn weighting -->
 
 ---
 
