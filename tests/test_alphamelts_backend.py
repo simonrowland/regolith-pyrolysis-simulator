@@ -2387,6 +2387,7 @@ def test_alphamelts_phase_main_preserves_same_base_instances_and_formulas():
 
 def test_builtin_subprocess_vapor_projection_populates_representative_melt():
     backend = AlphaMELTSBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     result = EquilibriumResult(
         temperature_C=1400.0,
         pressure_bar=1.0,
@@ -2481,6 +2482,7 @@ def test_builtin_subprocess_vapor_projection_refuses_silent_empty_or_unsourced(
     reason_fragment,
 ):
     backend = AlphaMELTSBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     backend._subprocess_vapor_pressure_provider = types.SimpleNamespace(
         dispatch=lambda _request: types.SimpleNamespace(
             status='ok', warnings=(), diagnostic=diagnostic
@@ -2521,6 +2523,7 @@ def test_builtin_subprocess_vapor_projection_unavailable_paths_are_typed(
     reason_fragment,
 ):
     backend = AlphaMELTSBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     backend._subprocess_vapor_pressure_provider = types.SimpleNamespace(
         dispatch=lambda _request: types.SimpleNamespace(
             status=provider_status,
@@ -6642,6 +6645,10 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
         PyrolysisSimulator._evaporation_bulk_partial_pressure_pa,
         sim,
     )
+    sim._evaporation_bulk_partials_pa = types.MethodType(
+        PyrolysisSimulator._evaporation_bulk_partials_pa,
+        sim,
+    )
     sim._resolve_evaporation_batch_flux_state = types.MethodType(
         PyrolysisSimulator._resolve_evaporation_batch_flux_state,
         sim,
@@ -9256,6 +9263,7 @@ def test_real_vaporock_path_does_not_warn_for_pseudo_fallback_rows():
             )
 
     backend = AlphaMELTSBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     backend._vaporock_helper = RealVapoRock()
     backend._vapor_pressure_table = {
         'K': {
@@ -9295,6 +9303,7 @@ def test_vaporock_empty_and_antoine_empty_returns_typed_activity_refusal():
             )
 
     backend = AlphaMELTSBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     backend._vaporock_helper = EmptyVapoRock()
 
     with pytest.warns(UserWarning, match='using activity x Antoine fallback rows'):
@@ -9325,6 +9334,7 @@ def test_vaporock_empty_volatile_free_melt_returns_physical_zero():
             )
 
     backend = AlphaMELTSBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     backend._vaporock_helper = EmptyVapoRock()
 
     with pytest.warns(UserWarning, match='using activity x Antoine fallback rows'):
@@ -10629,6 +10639,7 @@ def test_vapor_bridge_no_liquid_phase_returns_physical_zero_without_helper():
 
 def test_vapor_bridge_liquid_present_empty_solved_comp_fails_loud():
     backend = AlphaMELTSBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     backend._vaporock_available = True
     helper = _vaporock_helper_returning({'Na': 5.0})
     backend._vaporock_helper = helper
@@ -10651,6 +10662,7 @@ def test_vapor_bridge_liquid_present_empty_solved_comp_fails_loud():
 
 def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty():
     backend = AlphaMELTSBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     backend._vaporock_available = True
 
     class _Down:
@@ -10697,6 +10709,7 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
 
 def test_vapor_bridge_empty_vaporock_result_falls_back_to_antoine_with_label():
     backend = AlphaMELTSBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     backend._vaporock_available = True
     # Helper available but returns out_of_domain + empty pressures.
     backend._vaporock_helper = _vaporock_helper_returning(
@@ -10723,6 +10736,7 @@ def test_vapor_bridge_empty_vaporock_result_falls_back_to_antoine_with_label():
 
 def test_vapor_bridge_reraises_library_exception_as_labelled_runtime_error():
     backend = AlphaMELTSBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     backend._vaporock_available = True
 
     class _Boom:
@@ -10764,6 +10778,7 @@ def test_thermoengine_callsite_wires_vaporock_source_and_solved_liquid(monkeypat
             )
 
     backend = ThermoEngineBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     backend._mode = 'thermoengine'
     backend._thermoengine_transport = FakeTransport()
     backend._vaporock_available = True
@@ -10811,6 +10826,7 @@ def test_thermoengine_vaporock_empty_fallback_marks_vapor_facet_degraded():
             )
 
     backend = ThermoEngineBackend()
+    backend._set_vapor_transport_pO2_bar(1e-9, floor_bar=backend._vapor_transport_floor_bar)
     backend._mode = 'thermoengine'
     backend._thermoengine_transport = FakeTransport()
     backend._vaporock_available = True

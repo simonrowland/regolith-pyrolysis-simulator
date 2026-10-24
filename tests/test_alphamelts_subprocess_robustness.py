@@ -264,6 +264,10 @@ def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance(
         assert eq.liquid_composition_wt_pct == pytest.approx(
             solved_liquid_wt_pct
         )
+        backend._set_vapor_transport_pO2_bar(
+            pO2_bar, floor_bar=backend._vapor_transport_floor_bar,
+            admission='observation',
+        )
         pressures_pa, sources, _diagnostic = (
             backend._builtin_vapor_projection_for_subprocess(eq)
         )
