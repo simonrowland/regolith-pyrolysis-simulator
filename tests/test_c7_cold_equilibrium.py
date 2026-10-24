@@ -1,7 +1,11 @@
 """A proved cold closure must not repeat an unchanged condensed solve."""
+import pytest
+
 from simulator.melt_backend.base import EquilibriumResult
 from tests.magemin_test_support import close_test_owned_magemin_backend
 from tests.test_c7_closure_routing import simulation
+
+pytestmark = [pytest.mark.serial, pytest.mark.xdist_group('serial')]
 
 
 def test_cold_step_queries_condensed_backend_once(monkeypatch):

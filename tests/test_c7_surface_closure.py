@@ -178,6 +178,33 @@ def test_projection_is_read_only_and_commits_the_same_signed_amounts():
         close_test_owned_magemin_backend(sim)
 
 
+def test_pressure_projections_share_committed_history_and_copy_mutable_frontier():
+    class CommittedSnapshot:
+        def __deepcopy__(self, _memo):
+            raise AssertionError('pressure trials must not recursively copy committed history')
+
+    sim = simulation()
+    try:
+        committed = CommittedSnapshot()
+        sim.record.snapshots.append(committed)
+        sim.condensation_model.operating_history.append({'nested': {'wall_temperature_C': 25.0}})
+        before = sim.atom_ledger.mol_by_account()
+        trial = sim._detached_evaporation_projection()
+        nested = trial._detached_evaporation_projection()
+        for projection in (trial, nested):
+            assert projection.record.snapshots[0] is committed
+            assert projection.record.snapshots is not sim.record.snapshots
+            assert projection.atom_ledger.mol_by_account() == before
+            assert projection.atom_ledger is not sim.atom_ledger
+        trial.record.snapshots.append(committed)
+        trial.condensation_model.operating_history[-1]['nested']['wall_temperature_C'] = 99.0
+        assert len(sim.record.snapshots) == len(nested.record.snapshots) == 1
+        assert sim.condensation_model.operating_history[-1]['nested']['wall_temperature_C'] == 25.0
+        assert nested.condensation_model.operating_history[-1]['nested']['wall_temperature_C'] == 25.0
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
 @pytest.mark.parametrize('finite_capacity', (False, True))
 def test_real_hour_closes_current_sources_and_preserves_oxygen_atoms(monkeypatch, finite_capacity):
     sim = simulation()

@@ -305,6 +305,16 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
     for result in drive_session(session, 400, DecisionPolicy.AUTO_APPLY):
         snapshot = result.snapshot
         assert abs(snapshot.mass_balance_error_pct) <= 5e-12
+        if sim.melt.hour == 20:
+            # Golden from the accepted signed-excess solve before changing
+            # history copying: actual lunar C0B, 980 C and 0.009 bar bulk.
+            # Retain the finite PO/PO2 source, not just a validity assertion.
+            closure = sim._last_surface_oxygen_diagnostic
+            assert {key: value.hex() for key, value in closure['source_terms_mol_m2_s'].items()} == {
+                'PO': '0x1.add70c0cedf81p-63', 'PO2': '0x1.dacf0ec342ea3p-46',
+            }
+            assert closure['oxygen_flux_mol_m2_s'].hex() == '0x1.dacfe5aec8f0bp-46'
+            assert closure['reaction_pO2_bar'].hex() == '0x1.26e978d4fe7a6p-7'
         if sim.melt.hour in (167, 168):
             hot_hours.add(sim.melt.hour)
             assert sim._current_melt_redox_fO2_log() <= math.log10(
