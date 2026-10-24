@@ -579,6 +579,32 @@ def test_default_lunar_staged_continues_after_refused_window():
                for r in margin.status_payload["coating_violation_reasons"])
 
 
+def test_default_lunar_post_c4_hot_continuation_admits_or_records_refusal():
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti")
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    # Warm-start at the C4 outlet; the full default trajectory is measured
+    # separately. Use the production successor so its scoped continuation
+    # overrides participate, without replaying the preceding campaigns here.
+    sim.melt.temperature_C = sim.setpoints["campaigns"]["C4"]["temp_range_C"][-1]
+    successor = sim.campaign_mgr.get_next_campaign(CampaignPhase.C4, sim.record)
+    assert successor == CampaignPhase.C2A
+    sim.start_campaign(successor)
+    for _ in range(3):
+        hour = sim.melt.hour
+        assert sim.condensation_model.train.collection_route["stage3_route"] == "through"
+        sim.step()
+        events = [e for e in sim._condensation_model.cold_spot_history
+                  if e.get("event") == "stage3_opening_refused" and e["hour"] == hour]
+        route = sim.train.collection_route
+        assert (route["stage3_route"] == "through"
+                or (route.get("opening_refused_hour") == hour and events))
+        for event in events:
+            assert event["campaign"] == "C2A"
+            assert event["resolved_stage3_route"] == "divert"
+            assert event["reason"] == "alkali_purity_exceeded"
+
+
 def test_refused_proposal_does_not_record_hypothetical_silica_surfaces():
     through = _model("through", hard_gate=False)
     diverted = _model("through", hard_gate=False)

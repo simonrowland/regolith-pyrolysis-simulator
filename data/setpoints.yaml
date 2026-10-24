@@ -131,7 +131,9 @@ campaigns:
   #        Replaces deprecated separate C1 + C2A entries.
   # --------------------------------------------------------------------------
   C2A_continuous:
-    stage3_route: divert
+    # d-268: collect the hot SiO release, including the post-C4 continuation.
+    # d-278: the hourly purity gate refuses alkali-rich parcels to the bypass.
+    stage3_route: through
     label: "Continuous Adaptive pN2 Ramp -- Na/K + Fe + SiO2 Co-Extraction (Path A)"
     activation_condition: "Path_A AND NOT preserving_CMAS_glass_for_glass_or_ceramics"
     preferred_default: false
