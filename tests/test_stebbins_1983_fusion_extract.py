@@ -85,6 +85,9 @@ def test_stebbins_fusion_values_migrate_with_printed_fields_and_conditions() -> 
         assert observation.point_conditions["temperature_K"].locator == observation.locator
         assert observation.point_conditions["pressure_bar"].state.value == Decimal("1")
         assert observation.point_conditions["pressure_bar"].locator == observation.locator
+        if observation_id not in model_derived_ids:
+            assert not observation.derived_from
+            assert observation.derivation is None
 
     model_derived_points = {
         observation_id: enthalpy_points[observation_id]
@@ -105,20 +108,6 @@ def test_stebbins_fusion_values_migrate_with_printed_fields_and_conditions() -> 
             for parent in observation.derived_from
         )
         assert set(observation.derivation.inputs).issubset(observation.derived_from)
-
-    lineage_issues = [
-        issue
-        for issue in migrator.result.validation.hard_issues
-        if any(
-            observation_id in str(issue)
-            for observation_id in model_derived_ids
-        )
-        and any(
-            field in str(issue).lower()
-            for field in ("lineage", "derived_from", "derivation")
-        )
-    ]
-    assert lineage_issues == []
 
     entropy_ids = {
         "stebbins_1983_diopside_entropy_of_fusion_discussion": Decimal("84.5168"),
@@ -142,6 +131,18 @@ def test_stebbins_fusion_values_migrate_with_printed_fields_and_conditions() -> 
         assert observation.derivation is not None
         assert observation.point_conditions["temperature_K"].state.tag is StateTag.VALUE
         assert observation.point_conditions["temperature_K"].locator == observation.locator
+
+    newly_numeric_ids = set(expected_enthalpy) | set(entropy_ids)
+    lineage_issues = [
+        issue
+        for issue in migrator.result.validation.hard_issues
+        if any(observation_id in str(issue) for observation_id in newly_numeric_ids)
+        and any(
+            field in str(issue).lower()
+            for field in ("lineage", "derived_from", "derivation")
+        )
+    ]
+    assert lineage_issues == []
 
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     assert check_all_fidelity_samples_match(document, label=str(EXTRACT)) == []
