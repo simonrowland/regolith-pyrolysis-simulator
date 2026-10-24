@@ -1120,6 +1120,25 @@ def validate_observation(
                 "raw_inputs declaration conflicts with listed derivation inputs",
             )
         )
+    if (
+        raw_inputs is not None
+        and ev.is_value
+        and ev.value is EvidenceClass.MODEL_DERIVED
+        and not (
+            derivation is not None
+            and derivation.has_located_unprinted_raw_inputs
+            and not derivation.inputs
+            and derivation.has_located_method
+            and derivation.has_named_references
+        )
+    ):
+        issues.append(
+            _issue(
+                f"{path}.derivation.raw_inputs",
+                RefusalReason.CONDITIONAL_FIELD,
+                "raw_inputs declaration is invalid for model_derived without a located not_printed declaration, method, and named references",
+            )
+        )
     if ev.is_value and ev.value is EvidenceClass.ENGINE_PREDICTION:
         if observation.engine is None:
             issues.append(
