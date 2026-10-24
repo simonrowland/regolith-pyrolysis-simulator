@@ -76,6 +76,44 @@ def test_runtime_override_numeric_error_pin(value, suffix):
     assert str(caught.value) == f"runtime_campaign_overrides.C4.pO2_mbar {suffix}"
 
 
+@pytest.mark.parametrize("route", ["divert", "through", "garbage"])
+def test_web_start_and_replay_stage3_route(monkeypatch, route):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    client.get_received()
+    before = set(_simulations)
+    payload = {
+        "backend": "internal-analytical", "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1, "speed": 0, "track": "pyrolysis",
+        "runtime_campaign_overrides": {"C2A_staged": {"stage3_route": route}},
+    }
+    try:
+        for _ in range(2):
+            client.emit("start_simulation", payload)
+            statuses = [event["args"][0] for event in client.get_received()
+                        if event["name"] == "simulation_status"]
+            assert statuses
+            if route == "garbage":
+                assert statuses[-1]["status"] == "error"
+                assert "stage3_route must be divert or through" in statuses[-1]["message"]
+                assert set(_simulations) == before
+            else:
+                assert statuses[-1]["status"] == "started", statuses
+                sid, = set(_simulations) - before
+                state, _ = _current_simulation_state(sid)
+                overrides = {"C2A_staged": {"stage3_route": route}}
+                assert state["recipe_inputs"]["runtime_campaign_overrides"] == overrides
+                assert state["session"].simulator.campaign_mgr.overrides == overrides
+                # Replay the JSON-serialized startup identity retained by the web.
+                payload = json.loads(json.dumps(state["recipe_inputs"]))
+                _clear_simulation_state(sid)
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
 def test_product_story_bucket_omits_species_rounded_to_zero() -> None:
     bucket = web_events._product_story_bucket({"Fe": 3e-13})
 

@@ -2347,6 +2347,32 @@ def test_recipe_runtime_override_numeric_error_pin(value, field):
     )
 
 
+@pytest.mark.parametrize("route", ["divert", "through", "garbage"])
+def test_recipe_capture_stage3_route(client, tmp_path, monkeypatch, route):
+    from web import events as web_events
+    monkeypatch.setattr(web_events, "recipe_save_context", lambda _sid: {})
+    client.application.config["RECIPE_LIBRARY_DIR"] = tmp_path / "recipes"
+    response = client.post("/recipes/save", json={
+        "title": "Route Recipe", "sid": "sid-1",
+        "setpoints_patch": {"furnace_max_T_C": 1800.0},
+        "controls": {
+            "feedstock": "lunar_mare_low_ti", "mass_kg": 1,
+            "backend": "internal-analytical", "track": "pyrolysis",
+            "runtime_campaign_overrides": {"C2A_staged": {"stage3_route": route}},
+        },
+    })
+    if route == "garbage":
+        assert response.status_code == 400
+        assert "stage3_route" in response.get_json()["error"]
+        return
+    assert response.status_code == 200, response.get_json()
+    loaded = client.post("/recipes/load", json={"name": "route-recipe"})
+    assert loaded.status_code == 200, loaded.get_json()
+    assert loaded.get_json()["controls"]["runtime_campaign_overrides"] == {
+        "C2A_staged": {"stage3_route": route},
+    }
+
+
 def test_recipe_save_load_start_behavior_identity_uses_browser_controls(
     client,
     tmp_path,
