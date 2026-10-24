@@ -25,6 +25,7 @@ from simulator.battery.migrate import (
     _YAML_LOADER,
     _standard_state_from_extract_text,
     compilation_family_from_store_path,
+    convert_temperature_to_k,
     iter_observation_store_paths,
     map_quantity,
     migrate,
@@ -905,6 +906,68 @@ def test_g1_unmapped_composition_and_nested_admission_are_not_absent(tmp_path):
     ):
         assert schaefer.admission.status.value == "pending"
         assert not any(notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in schaefer.notices)
+
+
+def test_yamada_table2_interaction_parameters_keep_their_printed_values_and_conditions(
+    tmp_path: Path,
+) -> None:
+    filename = "kems-105-yamada-1983.yaml"
+    extract = yaml.safe_load((EXTRACTS_DIR / filename).read_text(encoding="utf-8"))
+    result = _migrate_real_extract(tmp_path, filename)
+
+    for observation_id in (
+        "yamada_1983_epsilon_P_i_this_work_1600C",
+        "yamada_1983_table2_quoted_interaction_coefficients",
+    ):
+        source_observation = next(
+            observation
+            for observations in extract["species"].values()
+            for observation in observations["observations"]
+            if observation.get("observation_id") == observation_id
+        )
+        expected_rows = source_observation["values"]["rows"]
+        migrated_rows = [
+            observation
+            for key, observation in result.observations.items()
+            if f"::{observation_id}::" in key
+        ]
+        assert len(migrated_rows) == len(expected_rows)
+
+        expected_by_identity = {
+            (
+                row["point_conditions"]["solute"]["state"]["value"],
+                Decimal(str(row["epsilon_P_i"])),
+            ): row["T_C"]
+            for row in expected_rows
+        }
+        assert len(expected_by_identity) == len(expected_rows)
+        for observation in migrated_rows:
+            assert quantity_token(observation.identity) is Quantity.INTERACTION_PARAMETER
+            assert observation.value.kind is ValueKind.POINT
+            solute = observation.point_conditions["solute"]
+            assert solute.state.is_value
+            assert solute.state.value in {
+                row["point_conditions"]["solute"]["state"]["value"]
+                for row in expected_rows
+            }
+            key = (solute.state.value, observation.value.point)
+            temperature_c = expected_by_identity[key]
+            expected_temperature_k, _trail = convert_temperature_to_k(
+                temperature_c, "C"
+            )
+            temperature = observation.point_conditions["temperature_K"]
+            assert temperature.state.is_value
+            assert temperature.state.value == expected_temperature_k
+            assert solute.locator.published_page == 54
+            assert observation.value.point == key[1]
+
+    body_text = result.observations[
+        f"{extract['source_id']}::yamada_1983_epsilon_P_Al_body_4p0_printed"
+    ]
+    assert quantity_token(body_text.identity) is Quantity.INTERACTION_PARAMETER
+    assert body_text.value.kind is ValueKind.POINT
+    assert body_text.value.point == Decimal("4.0")
+    assert body_text.point_conditions["solute"].state.value == "Al"
 
 
 def _leaves(value, prefix=""):

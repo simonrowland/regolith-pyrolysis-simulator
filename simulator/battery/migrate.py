@@ -8682,7 +8682,11 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "mass_yield_percent",
     ),
     Quantity.EVOLVED_GAS_YIELD: ("yield_ug_g",),
-    Quantity.INTERACTION_PARAMETER: ("wagner_interaction_parameter", "epsilon"),
+    Quantity.INTERACTION_PARAMETER: (
+        "wagner_interaction_parameter",
+        "epsilon",
+        "epsilon_P_i",
+    ),
     Quantity.TRANSITION_TEMPERATURE: (
         "value_K",
         "T_m_K",
