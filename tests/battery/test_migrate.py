@@ -8122,15 +8122,19 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "isotope_delta": 22
     }
     # Family car (F39-F50): Bonnand, Bruand, Matzen et al. (2020) adds 14 printed
-    # Fe3+/Fe2+ ratio series. Measured with _series_census on a regenerated store
-    # of the family car re-merge: fe3_fe2_ratio 38->52 and n_numeric 3136->3150,
-    # no other category or source moved, mismatches stays 0. The count moved
-    # because the data became visible, not because a check was relaxed.
+    # Fe3+/Fe2+ ratio series (49fddc0e7). Kress-Carmichael 1991 adds 13 more
+    # oxide-wt%-derived ratios (d599bd273; census conversion was pinned in
+    # c777fdbc4): fe3_fe2_ratio 52->65. The full-store census was re-pinned at
+    # 8251 in 9e1623bdf; the 14 Bonnand cells (49fddc0e7) bring this combined
+    # regeneration to 8265 numeric cells, replacing the stale 3150 family pin.
+    assert per_source.get("kress-carmichael-1991-iron-redox-calibration") == {
+        "fe3_fe2_ratio": 13
+    }
     assert per_source.get(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
-    assert census.get("fe3_fe2_ratio") == 52
-    assert n_numeric == 3150, (n_numeric, census, n_unavailable)
+    assert census.get("fe3_fe2_ratio") == 65
+    assert n_numeric == 8265, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
