@@ -17354,6 +17354,15 @@ class Migrator:
                 extra_unc = raw_item.get(_WIMPENNY_DELTA_2SIGMA_FIELD)
                 if extra_unc not in (None, ""):
                     extra_unc_k = 2
+            if (
+                extra_unc is None
+                and q_for_species is Quantity.ISOTOPE_DELTA
+                and value_sel is not None
+                and value_sel.field_name == "delta25Mg_permil"
+            ):
+                extra_unc = raw_item.get("Mg_2std_permil")
+                if extra_unc not in (None, ""):
+                    extra_unc_k = 2
         else:
             if content_stable_id:
                 point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)
@@ -17401,6 +17410,17 @@ class Migrator:
             if isinstance(quantity, State) and quantity.is_value
             else (quantity if isinstance(quantity, Quantity) else None)
         )
+        if (
+            q_token_point is Quantity.ISOTOPE_DELTA
+            and isinstance(parent_values, Mapping)
+            and isinstance(parent_values.get("isotope_reference"), str)
+            and parent_values["isotope_reference"].strip()
+        ):
+            provenance = dict(provenance or {})
+            provenance["isotope_reference"] = Located(
+                State.of(parent_values["isotope_reference"].strip()),
+                locator=point_locator,
+            )
         if (
             q_token_point is Quantity.ACTIVITY_COEFFICIENT
             and isinstance(raw_item, Mapping)

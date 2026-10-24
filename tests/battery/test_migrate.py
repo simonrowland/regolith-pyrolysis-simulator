@@ -7387,6 +7387,19 @@ def test_mendybaev_table2_splits_isotopes_and_refuses_element_fractions() -> Non
             }
         },
     }
+    expected_2std = {
+        "CAI4B2-2": Decimal("0.05"),
+        "CAI4B2-16": Decimal("0.05"),
+        "CAI4B2-12": Decimal("0.05"),
+        "CAI4B2-3": Decimal("0.05"),
+        "CAI4B2-14": Decimal("0.05"),
+        "CAI4B2-10": Decimal("0.05"),
+        "CAI4B2-1": Decimal("0.05"),
+        "CAI4B2-25": Decimal("0.06"),
+        "CAI4B2-22": Decimal("0.06"),
+        "CAI4B2-21": Decimal("0.06"),
+        "CAI4B2-23": Decimal("0.06"),
+    }
     from simulator.battery.score import rail_for_quantity
 
     for observation_id, expected_by_ratio in expected.items():
@@ -7403,9 +7416,24 @@ def test_mendybaev_table2_splits_isotopes_and_refuses_element_fractions() -> Non
             condition = row.point_conditions["temperature_C"]
             assert condition.state.value == Decimal("1600")
             assert condition.locator.published_page == "7-8"
+            reference = row.provenance["isotope_reference"]
+            assert reference.state.value == "DSM-3"
+            assert reference.locator.published_page == 29
+            assert reference.locator.table == "2"
             assert rail_for_quantity(Quantity.ISOTOPE_DELTA) is None
             sample = row.observation_id.split("row=", 1)[1].split(":", 1)[0].upper()
             assert row.value.point.as_tuple() == values[sample].as_tuple()
+            if observation_id == "delta25Mg":
+                uncertainty = row.uncertainty
+                assert uncertainty.kind is UncertaintyKind.PRINTED
+                assert uncertainty.value == expected_2std[sample]
+                assert uncertainty.value.as_tuple() == expected_2std[sample].as_tuple()
+                assert uncertainty.basis == "2sigma"
+                assert uncertainty.verbatim["sigma"] == str(expected_2std[sample])
+                assert uncertainty.verbatim["k"] == 2
+            else:
+                assert row.uncertainty.kind is UncertaintyKind.NONE
+                assert row.uncertainty.value is None
             by_sample[sample] = row.value.point
         assert by_sample == values
 
