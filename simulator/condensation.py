@@ -5360,15 +5360,19 @@ def antoine_dew_temperature_diagnostic(
         # not grant routing authority to the result.
         bracket_temperature = high if (target > max(p_low, p_high)) == increasing else low
         bracket_pressure = p_high if bracket_temperature == high else p_low
+        extending_high_temperature = bracket_temperature == high
         for _ in range(80):
-            extending_high_temperature = bracket_temperature == high
             needs_extension = (
                 bracket_pressure < target
                 if increasing == extending_high_temperature
                 else bracket_pressure > target
             )
             if needs_extension:
-                next_temperature = bracket_temperature * 2.0 if bracket_temperature == high else bracket_temperature / 2.0
+                next_temperature = (
+                    bracket_temperature * 2.0
+                    if extending_high_temperature
+                    else bracket_temperature / 2.0
+                )
             else:
                 break
             if not math.isfinite(next_temperature) or next_temperature <= 0.0:
@@ -5384,7 +5388,7 @@ def antoine_dew_temperature_diagnostic(
             if next_pressure is None or not math.isfinite(next_pressure) or next_pressure <= 0.0:
                 break
             if (next_pressure < target) != (bracket_pressure < target):
-                if bracket_temperature == high:
+                if extending_high_temperature:
                     low, high = sorted((bracket_temperature, next_temperature))
                 else:
                     low, high = sorted((next_temperature, bracket_temperature))

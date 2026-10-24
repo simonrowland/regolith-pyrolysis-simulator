@@ -252,6 +252,30 @@ def test_pure_species_dew_inverse_recovers_wall_saturation_pressure():
     assert predicted_pressure == pytest.approx(partial_pressure_Pa, rel=1e-10)
 
 
+def test_high_pressure_dew_bracket_continues_until_target_is_bracketed():
+    import simulator.condensation as condensation
+
+    target_pressure = 10.0 * condensation._antoine_psat_pa("Na", 1600.0)
+    observation, _ = _wall_row(
+        Quantity.WALL_DEW_TEMPERATURE,
+        local_pressure_Pa=Decimal(str(target_pressure)),
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    dew_temperature = float(prediction.value)
+    assert dew_temperature > 1600.0
+    assert condensation._antoine_psat_pa("Na", dew_temperature) == pytest.approx(
+        target_pressure,
+        rel=1e-10,
+    )
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in prediction.notices
+    )
+
+
 @pytest.mark.parametrize("pressure_scale", [0.5, 2.0])
 def test_out_of_band_dew_is_extrapolated_and_flagged(pressure_scale):
     import simulator.condensation as condensation
