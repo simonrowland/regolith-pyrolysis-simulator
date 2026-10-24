@@ -5844,6 +5844,24 @@ def _predict_oxygen_fugacity(
             RefusalReason.METRIC_DOMAIN,
             {"reason": "thermoengine_intrinsic_solved_fO2_log_missing_or_invalid"},
         )
+    diagnostic_authority = diagnostics.get("authority")
+    authority = (
+        Authority(str(diagnostic_authority))
+        if diagnostic_authority is not None
+        else Authority.BRIDGE
+    )
+    certified_band = _interval_certified_band(diagnostics.get("certified_band"))
+    commissioning_notice = diagnostics.get("commissioning_notice")
+    notices: tuple[Notice, ...] = ()
+    if isinstance(commissioning_notice, Mapping):
+        notices = (
+            replace(
+                qualification_battery_notice(
+                    Quantity.FUGACITY, engine, commissioning_notice
+                ),
+                authority=authority,
+            ),
+        )
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -5853,9 +5871,11 @@ def _predict_oxygen_fugacity(
         ),
         value=_log_fO2_to_pa(Decimal(str(solved_fO2_log))),
         unit="Pa",
-        authority=Authority.BRIDGE,
+        authority=authority,
+        notices=notices,
         coefficient_sources=sources,
         lineage_complete=False,
+        certified_band=certified_band,
         identity=identity,
         version="thermoengine-intrinsic-closed-fugacity",
     )

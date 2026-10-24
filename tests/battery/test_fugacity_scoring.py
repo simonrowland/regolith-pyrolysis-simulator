@@ -140,6 +140,11 @@ def test_openimcc_predicts_fugacity_from_closed_printed_oxide_split(monkeypatch)
 def test_thermoengine_uses_intrinsic_closed_solved_fugacity(monkeypatch):
     experiment, observation = _fugacity_case()
     calls = []
+    from engines.engine_commissioning import assess_engine_commissioning
+
+    commissioning = assess_engine_commissioning(
+        "thermoengine", sio2_wt_pct=47.8, temperature_K=1800.0
+    )
 
     def intrinsic_equilibrium(engine, **kwargs):
         calls.append((engine, kwargs))
@@ -147,7 +152,12 @@ def test_thermoengine_uses_intrinsic_closed_solved_fugacity(monkeypatch):
             status="ok",
             # A default-looking field must not override the solved diagnostic.
             fO2_log=-9.0,
-            diagnostics={"solved_fO2_log": -8.5},
+            diagnostics={
+                "solved_fO2_log": -8.5,
+                "authority": commissioning.notice["authority"],
+                "certified_band": commissioning.spec.certified_band(),
+                "commissioning_notice": commissioning.notice,
+            },
         )
 
     monkeypatch.setattr(
@@ -161,11 +171,54 @@ def test_thermoengine_uses_intrinsic_closed_solved_fugacity(monkeypatch):
     assert prediction.execution.state is ExecutionState.PRODUCED
     assert prediction.value == _log_fO2_to_pa(Decimal("-8.5"))
     assert prediction.unit == "Pa"
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert prediction.certified_band == {
+        "sio2_wt_pct": (30.0, 80.0),
+        "temperature_K": (1073.15, 1700.0),
+    }
+    out_of_band = tuple(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    assert len(out_of_band) == 1
+    assert out_of_band[0].affected_quantities == (Quantity.FUGACITY,)
+    assert out_of_band[0].reason == commissioning.notice["reason"]
+    assert out_of_band[0].band == str(commissioning.notice["certified_band"])
+    assert out_of_band[0].authority is Authority.EXTRAPOLATED
     assert len(calls) == 1
     engine, kwargs = calls[0]
     assert engine is Engine.THERMOENGINE
     assert kwargs["fO2_log"] is None
     assert kwargs["pressure_bar"] == 1.0
+
+
+@pytest.mark.parametrize(
+    ("status", "solved_fO2_log"),
+    (("ok", None), ("ok", math.nan), ("out_of_domain", -8.5)),
+)
+def test_thermoengine_refuses_invalid_intrinsic_solved_fugacity(
+    monkeypatch, status, solved_fO2_log
+):
+    experiment, observation = _fugacity_case()
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            status=status,
+            diagnostics={"solved_fO2_log": solved_fO2_log},
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE, observation, experiment=experiment
+    )
+
+    assert prediction.value is None
+    assert prediction.authority is Authority.REFUSED
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail == {
+        "reason": "thermoengine_intrinsic_solved_fO2_log_missing_or_invalid"
+    }
 
 
 def test_imposed_fugacity_is_refused_as_circular(monkeypatch):
