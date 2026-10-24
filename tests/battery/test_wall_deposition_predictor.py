@@ -6,6 +6,7 @@ from decimal import Decimal
 import pytest
 
 from simulator.battery.enums import (
+    Authority,
     Engine,
     ExecutionState,
     NoticeKind,
@@ -23,6 +24,7 @@ from simulator.battery.records import (
 )
 from simulator.battery.score import (
     _wall_deposition_formula_registry,
+    authority_allowed,
     metric_operation,
     predict_with_engine,
 )
@@ -97,7 +99,10 @@ def test_wall_flux_converts_owner_molar_flux_with_registry_mass_and_local_inputs
 ):
     import simulator.condensation as condensation
 
-    observation, experiment = _wall_row(Quantity.WALL_DEPOSITION_FLUX)
+    observation, experiment = _wall_row(
+        Quantity.WALL_DEPOSITION_FLUX,
+        wall_temperature_K=Decimal("1000"),
+    )
     calls = []
 
     def fixed_molar_flux(species, P_local_pa, T_surface_K, alpha_s, **kwargs):
@@ -119,7 +124,9 @@ def test_wall_flux_converts_owner_molar_flux_with_registry_mass_and_local_inputs
     assert prediction.execution.state is ExecutionState.PRODUCED
     assert float(prediction.value) == pytest.approx(2.298976928e-6, rel=1e-15)
     assert prediction.unit == "kg_per_m2_per_s"
-    assert calls[0][0:3] == ("Na", 17.5, 600.0)
+    assert calls[0][0:3] == ("Na", 17.5, 1000.0)
+    assert prediction.authority is Authority.CERTIFIED
+    assert authority_allowed(Quantity.WALL_DEPOSITION_FLUX, prediction.authority)
     assert any("local_regime=viscous" in notice.reason for notice in prediction.notices)
     assert any("alpha_s_source=" in notice.reason for notice in prediction.notices)
 
@@ -138,7 +145,10 @@ def test_wall_flux_exposes_regime_approximations_and_range_provenance(
 ):
     import simulator.condensation as condensation
 
-    observation, experiment = _wall_row(Quantity.WALL_DEPOSITION_FLUX)
+    observation, experiment = _wall_row(
+        Quantity.WALL_DEPOSITION_FLUX,
+        wall_temperature_K=Decimal("1000"),
+    )
     monkeypatch.setattr(
         condensation,
         "_series_resistance_deposition_flux_mol_m2_s",
@@ -248,6 +258,8 @@ def test_pure_species_dew_inverse_recovers_wall_saturation_pressure():
 
     assert prediction.execution.state is ExecutionState.PRODUCED
     assert 924.0 <= float(prediction.value) <= 1118.0
+    assert prediction.authority is Authority.CERTIFIED
+    assert authority_allowed(Quantity.WALL_DEW_TEMPERATURE, prediction.authority)
     assert not any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         for notice in prediction.notices
@@ -300,6 +312,26 @@ def test_dew_prediction_flags_root_outside_pure_component_wall_band():
     assert diagnostic["status"] == "extrapolated"
     assert diagnostic["temperature_K"] == pytest.approx(1200.0, abs=1e-8)
     assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert authority_allowed(Quantity.WALL_DEW_TEMPERATURE, prediction.authority)
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in prediction.notices
+    )
+
+
+def test_wall_flux_copies_extrapolated_psat_authority_from_wall_owner():
+    observation, experiment = _wall_row(Quantity.WALL_DEPOSITION_FLUX)
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert authority_allowed(Quantity.WALL_DEPOSITION_FLUX, prediction.authority)
     assert any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         for notice in prediction.notices

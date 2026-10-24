@@ -701,7 +701,11 @@ def _predict_wall_deposition(
             ),
             value=as_decimal(str(dew_temperature)),
             unit=QUANTITY_UNITS[quantity],
-            authority=Authority.EXTRAPOLATED if notices else None,
+            authority=(
+                Authority.EXTRAPOLATED
+                if status == "extrapolated"
+                else Authority.CERTIFIED
+            ),
             notices=tuple(notices),
             coefficient_sources=("existing_condensation_antoine_surface",),
             lineage_complete=False,
@@ -857,7 +861,13 @@ def _predict_wall_deposition(
         )
     )
     saturation_notice = diagnostic.get("wall_saturation_pressure_notice")
-    if isinstance(saturation_notice, Mapping) and saturation_notice.get("authority_level") == "extrapolated":
+    wall_authority = (
+        Authority.EXTRAPOLATED
+        if isinstance(saturation_notice, Mapping)
+        and saturation_notice.get("authority_level") == "extrapolated"
+        else Authority.CERTIFIED
+    )
+    if wall_authority is Authority.EXTRAPOLATED:
         notices.append(
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
@@ -878,6 +888,7 @@ def _predict_wall_deposition(
         ),
         value=as_decimal(str(mass_flux_kg_m2_s)),
         unit=QUANTITY_UNITS[quantity],
+        authority=wall_authority,
         notices=tuple(notices),
         coefficient_sources=(
             "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
