@@ -9,6 +9,15 @@ source:
   corpus_asset: raw/neuman-2026-levitation-k-isotopes/neuman-2026-levitation-k-isotopes.pdf
   corpus_sha256: 02e602b38a470d2e8b1db0d357817dabeacfbe2a9a4a341b4c451d98715b4c75
   supporting_material_sha256: 0f745b41c8f76c6b5c77ba7c44275d59f5a910f4e1f236a93c10632c4358720e
+source_files:
+  corpus_repo: regolith-corpus
+  files:
+  - asset_id: tables:neuman-2026-levitation-k-isotopes
+    role: table_csv
+    path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+    sha256:
+      tag: value
+      value: dfac6d46efdce284773d281f718ab0df88a9162bbf87ba557be476a7eccd4a74
 extraction:
   method: Born-digital pdftotext-layout was primary; publisher MMC2 supplied table cells and printed precision;
     every table group was checked against 600 dpi PDF renders of physical pages 3–7.
