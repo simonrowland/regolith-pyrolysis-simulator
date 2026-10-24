@@ -16360,6 +16360,51 @@ def test_visscher_formula_fields_reach_modelled_pressure_expressions(
         assert observation.locator.equation == equation
 
 
+def test_no27_log_equilibrium_fits_keep_coefficients_and_model_domain(
+    tmp_path: Path,
+) -> None:
+    source_id = "no27-fegley-cameron-1987-epsl"
+    path = REPO_ROOT / "data/literature/extracts/no27-fegley-cameron-1987-epsl.yaml"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    source_observations = {
+        observation["observation_id"]: observation
+        for species in doc["species"].values()
+        for observation in species["observations"]
+    }
+    result = _migrate_real_extract(
+        tmp_path, "no27-fegley-cameron-1987-epsl.yaml", write=False
+    )
+    tables = (
+        ("fegley_cameron_1987_table1_pure_liquid_oxide_vaporization", "1", EvidenceClass.COMPILATION_ASSESSED),
+        ("fegley_cameron_1987_table2_gas_formation_data", "2", EvidenceClass.COMPILATION_ASSESSED),
+        ("fegley_cameron_1987_table3_imcc_pseudo_species", "3", EvidenceClass.MODEL_DERIVED),
+    )
+    for observation_id, table, evidence_class in tables:
+        rows = source_observations[observation_id]["values"]["rows"]
+        prefix = f"{source_id}::{observation_id}::"
+        migrated = [
+            observation
+            for key, observation in result.observations.items()
+            if key.startswith(prefix)
+        ]
+        assert len(migrated) == len(rows)
+        for observation, row in zip(migrated, rows, strict=True):
+            assert quantity_token(observation.identity) is Quantity.LOG10_KF
+            assert observation.value.kind is ValueKind.EXPRESSION
+            assert observation.value.expression_text == "log10 K = A + B/T"
+            assert dict(observation.value.expression_parameters) == {
+                "A": Decimal(str(row["A"])),
+                "B": Decimal(str(row["B"])),
+            }
+            assert "2500-3500 K" in observation.value.expression_domain
+            assert "log10_K = A + B/T; T in K" in observation.value.expression_domain
+            assert observation.identity.temperature_K is not None
+            assert observation.identity.temperature_K.is_unknown
+            assert observation.evidence.class_.value is evidence_class
+            assert observation.locator is not None
+            assert observation.locator.table == table
+
+
 @pytest.mark.parametrize(
     ("filename", "observation_ids", "expected_class", "expected_count"),
     [

@@ -9598,6 +9598,29 @@ def _selection_from_named_field(
             condition_ranges=condition_ranges,
             field_name=field_name,
         )
+    if q_token is Quantity.LOG10_KF:
+        a = _as_dec_or_none(payload.get("A"))
+        b = _as_dec_or_none(payload.get("B"))
+        validity = payload.get("temperature_range_as_printed")
+        if a is not None and b is not None and isinstance(validity, str) and validity:
+            return SourceSelection(
+                value=Value(
+                    ValueKind.EXPRESSION,
+                    expression_text="log10 K = A + B/T",
+                    expression_parameters=(("A", a), ("B", b)),
+                    expression_domain=json.dumps(
+                        {
+                            "temperature_range_as_printed": validity,
+                            "units_as_printed": units,
+                        },
+                        ensure_ascii=False,
+                        separators=(",", ":"),
+                    ),
+                ),
+                field_name="A/B",
+                unit_trail=units,
+                condition_ranges=condition_ranges,
+            )
     if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
         expression = payload.get("expression")
         validity = payload.get("temperature_range_as_printed")
@@ -17340,6 +17363,18 @@ class Migrator:
                 quantity if isinstance(quantity, Quantity) else None
             )
             selection_payload: Mapping[str, Any] = raw_item
+            if (
+                q_token is Quantity.LOG10_KF
+                and isinstance(parent_values, Mapping)
+                and isinstance(parent_values.get("temperature_range_as_printed"), str)
+                and "temperature_range_as_printed" not in raw_item
+            ):
+                selection_payload = {
+                    **raw_item,
+                    "temperature_range_as_printed": parent_values[
+                        "temperature_range_as_printed"
+                    ],
+                }
             if (
                 q_token is Quantity.EVOLVED_GAS_YIELD
                 and isinstance(parent_values, Mapping)
