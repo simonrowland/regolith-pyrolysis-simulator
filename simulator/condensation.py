@@ -2075,6 +2075,7 @@ class CondensationModel:
         )
         self.species_formula_registry = species_formula_registry or {}
         self.retained_vapor_mol: dict[str, float] = {}
+        self.retained_supply_projection: dict[str, Any] = {}
         self.stage3_bypass: Mapping[str, Any] = {}
         self.last_stage3_route_diagnostic: dict[str, Any] = {}
         self.hard_stage3_gate = False  # Explicit opt-in for terminal constraints.
@@ -2707,7 +2708,9 @@ class CondensationModel:
     def _admit_stage3_route(self, evap_flux: EvaporationFlux, melt: MeltState):
         from simulator.condensation_routing import STAGE3_PURITY_FIELDS, validate_stage3_purity
         route = dict(self.train.collection_route)
-        diagnostic: dict[str, Any] = {**route, 'findings': []}
+        diagnostic: dict[str, Any] = {
+            **route, 'findings': [],
+            'retained_supply_projection': copy.deepcopy(self.retained_supply_projection)}
         self.last_stage3_route_diagnostic = diagnostic
         if route['stage3_route'] == 'divert':
             return self._route(evap_flux, melt)

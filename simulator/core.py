@@ -1533,7 +1533,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
         # Include all retained vapor, including parcels absent from fresh flux.
         self._condensation_model.retained_vapor_mol = dict(
-            self.atom_ledger.mol_by_account('process.overhead_gas'))
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas'))
+        self._condensation_model.retained_supply_projection = copy.deepcopy(
+            self.atom_ledger.last_physical_mol_projection)
         return self._condensation_model
 
     @property
@@ -3512,7 +3514,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         live_overhead_o2_mol = max(
             0.0,
             float(
-                self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                     OXYGEN_SPECIES,
                     0.0,
                 )
@@ -4097,7 +4099,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _overhead_holdup_mol(self) -> Dict[str, float]:
         return {
             species: float(mol)
-            for species, mol in self.atom_ledger.mol_by_account(
+            for species, mol in self.atom_ledger.physical_mol_by_account(
                 'process.overhead_gas').items()
             if float(mol) > 0.0
         }
@@ -4270,13 +4272,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         incoming_sweep_pO2 = max(0.0, float(self.melt.pO2_mbar) / 1000.0)
         residual_o2_mol = max(0.0, float(head_o2_mol))
         if self._overhead_headspace_enabled() and residual_o2_mol > 0.0:
-            holdup_mol = {
-                species: max(0.0, float(mol))
-                for species, mol in self.atom_ledger.mol_by_account(
-                    'process.overhead_gas'
-                ).items()
-                if max(0.0, float(mol)) > 0.0
-            }
+            holdup_mol = self._overhead_holdup_mol()
             total_mol = sum(holdup_mol.values())
             total_kg = 0.0
             holdup_kg: Dict[str, float] = {}
@@ -4358,7 +4354,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
     ) -> OxygenReservoirState:
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -5606,7 +5602,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f'got {reference_T_K!r}'
                 )
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -5673,7 +5669,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -6723,7 +6719,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -6882,7 +6878,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             candidate_fO2_log=candidate_fO2_log,
         )
         post_head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )

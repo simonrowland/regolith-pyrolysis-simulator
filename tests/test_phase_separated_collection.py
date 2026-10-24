@@ -605,6 +605,35 @@ def test_default_lunar_post_c4_hot_continuation_admits_or_records_refusal():
             assert event["reason"] == "alkali_purity_exceeded"
 
 
+def test_retained_alkali_roundoff_projects_to_zero_before_admission():
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.campaign_mgr.overrides["C0"] = {"stage3_route": "through"}
+    sim.atom_ledger._balances.setdefault("process.overhead_gas", {})["Na"] = -1.1e-16
+    model = _model("through", hard_gate=False)
+    model.train = sim.train
+    sim._condensation_model = model
+    model = sim.condensation_model
+    assert model.retained_vapor_mol["Na"] == 0.0
+    model.route(EvaporationFlux({"Na": 1.0, "SiO": 1.0}), sim.melt)
+    diagnostic = model.last_stage3_route_diagnostic
+    assert diagnostic["event"] == "stage3_opening_refused"
+    assert diagnostic["unavailable"] == []
+    assert diagnostic["retained_supply_projection"]["roundoff_projected_mol"][
+        "Na"]["signed_mol"] == -1.1e-16
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas")["Na"] == -1.1e-16
+
+
+def test_negative_retained_na_still_refuses_without_terminal_purity_gate():
+    model = _model("through", hard_gate=False)
+    model.retained_vapor_mol = {"Na": -1.0}
+    with pytest.raises(Stage3SilicaExposureRefusal) as caught:
+        model.route(EvaporationFlux({"SiO": 1.0}), MeltState())
+    assert caught.value.stage3_route_diagnostic["unavailable"] == [{
+        "species": "Na", "source": "retained_mol",
+        "detail": "Na must be finite and non-negative"}]
+
+
 def test_refused_proposal_does_not_record_hypothetical_silica_surfaces():
     through = _model("through", hard_gate=False)
     diverted = _model("through", hard_gate=False)
