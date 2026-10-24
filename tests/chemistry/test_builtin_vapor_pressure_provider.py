@@ -3710,8 +3710,8 @@ def test_shadow_parity_across_short_simulation_run(
             temperature_C=T_C,
             pressure_bar=sim.melt.p_total_mbar / 1000.0,
             control_inputs={
-                "pO2_bar": sim._headspace_transport_pO2_bar(),
-                "intrinsic_fO2_log": sim.melt.melt_fO2_log,
+                "pO2_bar": sim._vapor_pressure_dispatch_pO2_bar(),
+                "intrinsic_fO2_log": sim._intrinsic_oxygen_publication()['published_intrinsic_fO2_log'],
             },
         )
         kernel_vp = dict(

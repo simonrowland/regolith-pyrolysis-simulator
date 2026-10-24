@@ -1,4 +1,4 @@
-"""Pre-C7 runtime receipts, captured through production controls at f2ee412fa.
+"""C7 source and consumer regressions against the reviewed chunk-2 receipts.
 
 These are refactor pins, not experimental validation. The independent oxygen
 balance and d-259 tests supply the physical and guard checks.
@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 
 from simulator.config import load_config_bundle
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CampaignPhase
@@ -23,6 +24,7 @@ from tests.chemistry.test_vaporock_authority_promotion import _force_vaporock_av
 # Reuse the stateful redox suite's serial engine lifecycle contract.
 pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
 PINS = Path(__file__).parent / "fixtures/c7_closure_routing.json"
+SURFACE_PINS = Path(__file__).parent / "fixtures/c7_surface_routing.json"
 SPECIES = ("SiO", "Na", "K", "Fe", "Mg")
 
 
@@ -199,7 +201,13 @@ def lunar_trajectory(request):
 def test_real_controls_oxygen_receipt(oxygen):
     receipt = consumer_receipt(oxygen)
     assert receipt['raw'] == json.loads(PINS.read_text())["consumers"][str(oxygen)]['raw']
+    assert_consumer_values(receipt, json.loads(SURFACE_PINS.read_text())["consumers"][str(oxygen)])
     assert_solved_controls(receipt)
+
+
+def assert_consumer_values(receipt, expected):
+    for field in ('raw', 'legacy_pressures_Pa', 'vaporock_transport_audit', 'intrinsic'):
+        assert receipt[field] == expected[field], field
 
 
 def assert_solved_controls(receipt):
@@ -211,6 +219,42 @@ def assert_solved_controls(receipt):
         assert request['controls']['pO2_bar'] == request['resolved'] == receipt['dispatch']
     # PT0 may canonicalize other inputs; it must not round solved oxygen.
     assert receipt['requests'][0]['controls']['pO2_admission'] == 'surface_closure'
+    for audit in receipt['vaporock_transport_audit']:
+        assert audit['requested']['transport_pO2_bar'] == audit['applied']['transport_pO2_bar'] == receipt['dispatch']
+        assert float.fromhex(audit['applied']['transport_fO2_log']) == math.log10(oxygen)
+        assert audit['applied']['intrinsic_fO2_log'] == receipt['intrinsic']
+
+
+def test_fixed_state_source_pressure_exponents_at_solved_oxygen():
+    sim = simulation()
+    try:
+        sim.melt.temperature_C = 1600.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+        sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        boundary = sim._solve_evaporative_oxygen_boundary()
+        cases = []
+        for oxygen in (1e-9, boundary.reaction_pO2_bar):
+            trial = sim._detached_evaporation_projection()
+            trial._reaction_pO2_bar = oxygen
+            trial._frozen_evaporation_carriers = boundary.payload[2]._frozen_evaporation_carriers
+            result = trial._get_equilibrium()
+            diagnostic = trial._last_vapor_pressure_diagnostic
+            assert diagnostic['source_reaction_fO2_bar'] == oxygen
+            cases.append((result.vapor_pressures_Pa, diagnostic['activities']))
+        assert cases[0][1] == cases[1][1]
+        # Fixed T, activity and inventory: M-O = M(g) + n/2 O2 gives
+        # P_M proportional to pO2**(-n/2). SiO/Fe/Mg release half O2;
+        # single-cation Na/K release quarter O2. Ratios are dimensionless
+        # (bar/bar); equal oxygen must give unity. Depletion is excluded.
+        ratio = boundary.reaction_pO2_bar / 1e-9
+        assert ratio != 1.0
+        for species, exponent in (('SiO', -.5), ('Fe', -.5), ('Mg', -.5),
+                                  ('Na', -.25), ('K', -.25)):
+            assert cases[1][0][species] / cases[0][0][species] == pytest.approx(
+                ratio ** exponent, rel=1e-12, abs=0.0), species
+    finally:
+        close_test_owned_magemin_backend(sim)
 
 
 @pytest.mark.parametrize("legacy_sweep,quantized", ((True, False), (False, True)))
@@ -219,6 +263,7 @@ def test_real_controls_alternate_routing_receipt(oxygen, legacy_sweep, quantized
     key = f"{legacy_sweep}:{quantized}:{oxygen}"
     receipt = consumer_receipt(oxygen, legacy_sweep=legacy_sweep, quantized=quantized)
     assert receipt['raw'] == json.loads(PINS.read_text())["alternate_consumers"][key]['raw']
+    assert_consumer_values(receipt, json.loads(SURFACE_PINS.read_text())["alternate_consumers"][key])
     assert_solved_controls(receipt)
 
 
@@ -227,6 +272,18 @@ def test_lunar_24_hour_sources_and_oxygen(lunar_trajectory, hour):
     campaign, receipt = lunar_trajectory
     row = receipt(hour)
     assert row['hour'] == hour
+    expected = json.loads(SURFACE_PINS.read_text())['reviewed_hourly_sources'][campaign]['hours'][hour - 1]
+    # The reviewed one-hour evolved receipt includes the native Fe parcel.
+    # Add native mol * kg/mol once to the ordinary kg/h * 1 h source;
+    # all other species already match the reviewed interval quantity.
+    mass = resolve_species_formula('Fe').molar_mass_kg_per_mol()
+    evolved = {s: float.fromhex(row['source_kg_hr'][s]) + (
+        float.fromhex(row['native_fe_vapor_mol']) * mass if s == 'Fe' else 0.0)
+        for s in SPECIES}
+    assert evolved == pytest.approx({s: float.fromhex(expected['evolved_kg'][s])
+                                    for s in SPECIES}, rel=1e-10, abs=0.0)
+    for field in ('native_fe_vapor_mol', 'intrinsic_log_fO2'):
+        assert row[field] == expected[field], field
     for rate in row['source_kg_hr'].values():
         assert math.isfinite(float.fromhex(rate)) and float.fromhex(rate) >= 0.0
     closure = row['closure']
