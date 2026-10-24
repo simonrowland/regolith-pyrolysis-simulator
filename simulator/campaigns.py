@@ -18,10 +18,10 @@ from __future__ import annotations
 
 import ast
 import math
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Literal, Optional, Tuple, TypedDict
 
 from simulator import mre_ladder
 from simulator.accounting import UnknownSpeciesError, resolve_species_formula
@@ -90,6 +90,13 @@ C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
 C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
     'c4_preheat_wall_clock_exhausted'
 )
+
+
+class C0ForecastAdjustmentNotice(TypedDict):
+    type: Literal["c0_forecast_predates_adjustment"]
+    adjusted_fields: list[str]
+    campaign_hour: int
+    loss_budget_re_evaluated: Literal[False]
 
 
 class CampaignPressureSetpointRefusal(ValueError):
@@ -241,6 +248,7 @@ def c0_exit_record(
     ramp_C_per_hr: float,
     prediction: Mapping[str, object],
     unreleased_inventory: Mapping[str, object] | None = None,
+    forecast_adjustment_notices: Sequence[C0ForecastAdjustmentNotice] = (),
 ) -> dict[str, object]:
     """One predict-and-flag record for any C0 exit.
 
@@ -323,6 +331,10 @@ def c0_exit_record(
     }
     if forecast_engine is not None:
         record["forecast_engine"] = forecast_engine
+    if forecast_adjustment_notices:
+        record["forecast_adjustment_notices"] = [
+            dict(notice) for notice in forecast_adjustment_notices
+        ]
     return record
 
 
@@ -423,6 +435,9 @@ class CampaignManager:
         self.last_c3_na_hold_adjustment: dict[str, object] | None = None
         self.last_c0_exit: dict[str, object] | None = None
         self.c0_exit_prediction: dict[str, object] | None = None
+        self.c0_forecast_adjustment_notices: list[
+            C0ForecastAdjustmentNotice
+        ] = []
         self.c0_first_melt_backstop = False
         self.c5_enabled = False
         self._c2a_staged_stage_idx: int = 0
@@ -740,6 +755,20 @@ class CampaignManager:
                     merged.setdefault('setpoints', ovr['setpoints'])
                 merged.update(ovr)
         return merged
+
+    def record_c0_forecast_adjustment(
+        self,
+        adjusted_field: str,
+        campaign_hour: int,
+    ) -> C0ForecastAdjustmentNotice:
+        notice: C0ForecastAdjustmentNotice = {
+            "type": "c0_forecast_predates_adjustment",
+            "adjusted_fields": [adjusted_field],
+            "campaign_hour": int(campaign_hour),
+            "loss_budget_re_evaluated": False,
+        }
+        self.c0_forecast_adjustment_notices.append(notice)
+        return notice
 
     @staticmethod
     def _float(value, default: float) -> float:
@@ -2367,6 +2396,9 @@ class CampaignManager:
                     ramp_C_per_hr=ramp_C_per_hr,
                     prediction=prediction_payload,
                     unreleased_inventory=unreleased_inventory,
+                    forecast_adjustment_notices=(
+                        self.c0_forecast_adjustment_notices
+                    ),
                 )
                 return True
 
@@ -2387,6 +2419,9 @@ class CampaignManager:
                         ramp_C_per_hr=ramp_C_per_hr,
                         prediction=prediction_payload,
                         unreleased_inventory=unreleased_inventory,
+                        forecast_adjustment_notices=(
+                            self.c0_forecast_adjustment_notices
+                        ),
                     )
                     return True
 
@@ -2400,6 +2435,9 @@ class CampaignManager:
                     ramp_C_per_hr=ramp_C_per_hr,
                     prediction=prediction_payload,
                     unreleased_inventory=unreleased_inventory,
+                    forecast_adjustment_notices=(
+                        self.c0_forecast_adjustment_notices
+                    ),
                 )
                 return True
             return False

@@ -1295,6 +1295,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._subsolidus_handed_off = False
         self._last_subsolidus_bakeout: Dict[str, Any] = {}
         self._subsolidus_bakeout_by_hour: list[Dict[str, Any]] = []
+        self._pending_c0_forecast_adjustment_notices: list[
+            Dict[str, Any]
+        ] = []
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
         self._feedstock_recovered_reagent_kg_by_species: Dict[str, float] = {}
         self._non_feedstock_reagent_element_kg_by_account: Dict[
@@ -13009,6 +13012,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if campaign == CampaignPhase.C0:
             self.campaign_mgr.c0_exit_prediction = None
             self.campaign_mgr.last_c0_exit = None
+            self.campaign_mgr.c0_forecast_adjustment_notices = []
+            self._pending_c0_forecast_adjustment_notices = []
         self.paused_for_decision = False
         self.pending_decision = None
 
@@ -13088,6 +13093,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _refresh_c0_exit_prediction(self) -> None:
         """Recompute the stored C0 exit after a live C0 setpoint change."""
         self.campaign_mgr.c0_exit_prediction = self._predict_c0_exit()
+
+    def _handle_c0_forecast_adjustment(self, adjusted_field: str) -> None:
+        if self.melt.campaign != CampaignPhase.C0:
+            return
+        # CampaignManager's endpoint logic reads this campaign-local counter;
+        # the core increments it only after a completed hourly snapshot.
+        campaign_hour = int(self.melt.campaign_hour)
+        if campaign_hour == 0:
+            self._refresh_c0_exit_prediction()
+            return
+        notice = self.campaign_mgr.record_c0_forecast_adjustment(
+            adjusted_field,
+            campaign_hour,
+        )
+        self._pending_c0_forecast_adjustment_notices.append(notice)
 
     def is_complete(self) -> bool:
         # C4 typed endpoint refusal is a non-resumable terminal latch
@@ -15529,9 +15549,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         snapshot.partial_melt_offgassing_diagnostic = dict(
             self._last_partial_melt_offgassing_diagnostic
         )
-        snapshot.subsolidus_bakeout_diagnostic = dict(
-            getattr(self, "_last_subsolidus_bakeout", {}) or {}
-        )
+        bakeout_diagnostic = getattr(self, "_last_subsolidus_bakeout", {})
+        bakeout_diagnostic = dict(bakeout_diagnostic or {})
+        if self._pending_c0_forecast_adjustment_notices:
+            adjustment_notices = [
+                dict(notice)
+                for notice in self._pending_c0_forecast_adjustment_notices
+            ]
+            bakeout_diagnostic["forecast_adjustment_notices"] = (
+                adjustment_notices
+            )
+            current_bakeout_diagnostic = getattr(
+                self, "_last_subsolidus_bakeout", None
+            )
+            if (
+                isinstance(current_bakeout_diagnostic, dict)
+                and current_bakeout_diagnostic.get("skipped") != "not_c0"
+            ):
+                current_bakeout_diagnostic[
+                    "forecast_adjustment_notices"
+                ] = adjustment_notices
+            self._pending_c0_forecast_adjustment_notices = []
+        snapshot.subsolidus_bakeout_diagnostic = bakeout_diagnostic
         snapshot.fe_redox_split = fe_redox_split
         snapshot.redox_source_breakdown = self._redox_source_breakdown_diagnostic()
         snapshot.energy = energy
