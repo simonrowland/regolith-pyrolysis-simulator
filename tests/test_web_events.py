@@ -56,6 +56,26 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 _RECIPE_DIR = _REPO_ROOT / "data" / "recipes"
 
 
+def test_runtime_override_numeric_boundary_pin():
+    assert web_events._coerce_runtime_campaign_overrides({
+        "C4": {"hold_temp_C": "1600.125", "ramp_rate": -2, "pO2_mbar": 0,
+               "stage3_product_purity": "0.999", "stage3_instantaneous_purity": 0.99},
+    }) == {"C4": {"hold_temp_C": 1600.125, "ramp_rate": -2.0, "pO2_mbar": 0.0,
+                  "stage3_product_purity": 0.999, "stage3_instantaneous_purity": 0.99}}
+
+
+@pytest.mark.parametrize(("value", "suffix"), [
+    (None, "is required"), ("", "is required"),
+    (True, "must be numeric"), ("bad", "must be numeric"),
+    ("nan", "must be finite"), ("inf", "must be finite"),
+    (-1, "must be >= 0"),
+])
+def test_runtime_override_numeric_error_pin(value, suffix):
+    with pytest.raises(web_events.InputValidationError) as caught:
+        web_events._coerce_runtime_campaign_overrides({"C4": {"pO2_mbar": value}})
+    assert str(caught.value) == f"runtime_campaign_overrides.C4.pO2_mbar {suffix}"
+
+
 def test_product_story_bucket_omits_species_rounded_to_zero() -> None:
     bucket = web_events._product_story_bucket({"Fe": 3e-13})
 

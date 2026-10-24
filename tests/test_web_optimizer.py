@@ -2320,6 +2320,33 @@ def test_recipe_collision_reservation_is_atomic(tmp_path, monkeypatch) -> None:
     assert destination.read_text(encoding="utf-8") == "complete: true\n"
 
 
+def test_recipe_runtime_override_numeric_boundary_pin():
+    from web.routes import _recipe_inputs_from_controls
+    assert _recipe_inputs_from_controls({"runtime_campaign_overrides": {
+        "C4": {"hold_temp_C": "1600.125", "pO2_mbar": 0,
+               "max_hours": None, "ramp_rate": "",
+               "stage3_product_purity": "0.999", "stage3_instantaneous_purity": 0.99},
+    }}) == {"runtime_campaign_overrides": {
+        "C4": {"hold_temp_C": 1600.125, "pO2_mbar": 0.0,
+               "stage3_product_purity": 0.999, "stage3_instantaneous_purity": 0.99},
+    }}
+
+
+@pytest.mark.parametrize("value", [True, "bad", "nan", "inf", -1])
+@pytest.mark.parametrize("field", ["pO2_mbar", "hold_temp_C", "ramp_rate"])
+def test_recipe_runtime_override_numeric_error_pin(value, field):
+    from web.routes import _recipe_inputs_from_controls
+    from werkzeug.exceptions import BadRequest
+    with pytest.raises(BadRequest) as caught:
+        _recipe_inputs_from_controls({"runtime_campaign_overrides": {
+            "C4": {field: value},
+        }})
+    assert caught.value.description == (
+        f"controls.runtime_campaign_overrides.C4.{field} "
+        "must be a finite non-negative number"
+    )
+
+
 def test_recipe_save_load_start_behavior_identity_uses_browser_controls(
     client,
     tmp_path,
