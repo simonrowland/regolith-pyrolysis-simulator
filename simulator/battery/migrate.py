@@ -8575,6 +8575,11 @@ _ANCILLARY_SERIES_KEYS = (
 )
 
 _PARTIAL_PRESSURE_FIELDS = ("partial_pressure_pa", "p_Ga_Pa", "p_In_Pa", "p_O2_calc_Pa")
+_PARTIAL_PRESSURE_HEADER_SCALES = {
+    "P_P2_x1e8_atm_as_printed": Decimal("1e-8"),
+    "P_PO_x1e7_atm_as_printed": Decimal("1e-7"),
+    "P_PO2_x1e8_atm_as_printed": Decimal("1e-8"),
+}
 
 QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.ACTIVITY: ("activity", "a_P2O5_times_1e17_as_printed"),
@@ -9194,6 +9199,11 @@ def _point_selection(
     )
 
 
+def _kambayashi_table7_activity_from_printed(value: object) -> Decimal | None:
+    amount = _as_dec_or_none(value)
+    return None if amount is None else amount * Decimal("1e-17")
+
+
 def _interval_selection(
     lo: Decimal,
     hi: Decimal,
@@ -9659,6 +9669,34 @@ def _selection_from_named_field(
                 unit_trail=trail or "identity",
             )
         if q_token is Quantity.P_PARTIAL:
+            for key, scale in _PARTIAL_PRESSURE_HEADER_SCALES.items():
+                if key not in payload:
+                    continue
+                mantissa = _numeric_field(payload, key)
+                if mantissa is None:
+                    return _unavailable_selection(
+                        f"{key} is not a numeric printed pressure mantissa",
+                        condition_ranges=condition_ranges,
+                        unused_ancillary=_unused_ancillary(payload, key),
+                        field_name=key,
+                    )
+                # Table 6 headers give the atmosphere scale for each printed
+                # mantissa; apply that header once before the standard atm→Pa conversion.
+                val, trail = convert_pressure_to_pa(mantissa * scale, "atm")
+                if val is not None:
+                    return _point_selection(
+                        val,
+                        key,
+                        f"printed_header_scale:{scale} atm; {trail or 'atm_to_Pa'}",
+                        payload,
+                        condition_ranges,
+                    )
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded pressure",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                )
             for key in _PARTIAL_PRESSURE_FIELDS:
                 if key not in payload:
                     continue
@@ -9741,7 +9779,8 @@ def _selection_from_named_field(
         ):
             # Kambayashi Table 7 prints a_P2O5 x 10^17. Store the activity
             # defined by that header directly; do not select its old derived twin.
-            amount *= Decimal("1e-17")
+            amount = _kambayashi_table7_activity_from_printed(amount)
+            assert amount is not None
             return _point_selection(
                 amount,
                 key,

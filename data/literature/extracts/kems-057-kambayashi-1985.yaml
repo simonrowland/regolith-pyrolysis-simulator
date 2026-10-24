@@ -56,7 +56,7 @@ fidelity_samples:
     published_page: 1914
     pdf_page_index: 4
     note: Table 4 sample 1 P2O5 = 1.52 wt%
-- path: species.PO.observations[kambayashi_1985_table6_partial_pressures_and_dg].values.rows[0].P_PO_x1e7_atm_as_printed
+- path: species.PO.observations[kambayashi_1985_po_table6_partial_pressure].values.rows[0].P_PO_x1e7_atm_as_printed
   value: 2.86
   locator:
     table: '6'
@@ -1927,11 +1927,11 @@ species:
         note: Table 6 partial pressures above FetO-P2O5 and Delta-G for P2+2PO2=4PO
       phase: gas
       condensed_form: *id002
-      standard_state: partial pressure in atm; P_Fe from JANAF at the measurement T
+      standard_state: P2(g)+2PO2(g)=4PO(g) reaction Delta-G as printed
       regime: kems_effusion
-      units: atm as published (column scales 10^-8, 10^-7, 10^-8); Delta-G in kJ
+      units: kJ as published
       values:
-        quantity: partial_pressure_and_gas_reaction_delta_G
+        quantity: gas_reaction_delta_G
         method_class: model_derived
         model_or_data_source: 'Eq. (10) from measured ion currents with Mann ionization cross-section
           ratios, isotope abundances, and SEM gain ~ sqrt(mass); P_Fe from JANAF. Reaction (11): P2(g)+2PO2(g)=4PO(g).'
@@ -1960,312 +1960,289 @@ species:
           point_conditions: *kb85_sample_1_conditions
           T_C: 1370
           X_P2O5: 0.0075
-          P_P2_atm: 1.14e-08
-          P_P2_x1e8_atm_as_printed: 1.14
-          P_PO_atm: 2.86e-07
-          P_PO_x1e7_atm_as_printed: 2.86
-          P_PO2_atm: 3.78e-08
-          P_PO2_x1e8_atm_as_printed: 3.78
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 107
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 1
           composition_mol: *kb85_sample_1_mol
           point_conditions: *kb85_sample_1_conditions
           T_C: 1380
           X_P2O5: 0.0075
-          P_P2_atm: 1.4e-08
-          P_P2_x1e8_atm_as_printed: 1.4
-          P_PO_atm: 3.46e-07
-          P_PO_x1e7_atm_as_printed: 3.46
-          P_PO2_atm: 4.53e-08
-          P_PO2_x1e8_atm_as_printed: 4.53
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 105
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 1
           composition_mol: *kb85_sample_1_mol
           point_conditions: *kb85_sample_1_conditions
           T_C: 1390
           X_P2O5: 0.0075
-          P_P2_atm: 1.81e-08
-          P_P2_x1e8_atm_as_printed: 1.81
-          P_PO_atm: 4.4800000000000004e-07
-          P_PO_x1e7_atm_as_printed: 4.48
-          P_PO2_atm: 5.52e-08
-          P_PO2_x1e8_atm_as_printed: 5.52
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 100
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 2
           composition_mol: *kb85_sample_2_mol
           point_conditions: *kb85_sample_2_conditions
           T_C: 1370
           X_P2O5: 0.0202
-          P_P2_atm: 3.03e-08
-          P_P2_x1e8_atm_as_printed: 3.03
-          P_PO_atm: 5.69e-07
-          P_PO_x1e7_atm_as_printed: 5.69
-          P_PO2_atm: 6.93e-08
-          P_PO2_x1e8_atm_as_printed: 6.93
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 99
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 2
           composition_mol: *kb85_sample_2_mol
           point_conditions: *kb85_sample_2_conditions
           T_C: 1380
           X_P2O5: 0.0202
-          P_P2_atm: 3.77e-08
-          P_P2_x1e8_atm_as_printed: 3.77
-          P_PO_atm: 6.98e-07
-          P_PO_x1e7_atm_as_printed: 6.98
-          P_PO2_atm: 8.470000000000001e-08
-          P_PO2_x1e8_atm_as_printed: 8.47
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 97
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 2
           composition_mol: *kb85_sample_2_mol
           point_conditions: *kb85_sample_2_conditions
           T_C: 1390
           X_P2O5: 0.0202
-          P_P2_atm: 4.72e-08
-          P_P2_x1e8_atm_as_printed: 4.72
-          P_PO_atm: 9.089999999999999e-07
-          P_PO_x1e7_atm_as_printed: 9.09
-          P_PO2_atm: 1.0640000000000001e-07
-          P_PO2_x1e8_atm_as_printed: 10.64
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
           T_C: 1370
           X_P2O5: 0.0271
-          P_P2_atm: 1.5000000000000002e-08
-          P_P2_x1e8_atm_as_printed: 1.5
-          P_PO_atm: 7.61e-07
-          P_PO_x1e7_atm_as_printed: 7.61
-          P_PO2_atm: 9.449999999999999e-08
-          P_PO2_x1e8_atm_as_printed: 9.45
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 82
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
           T_C: 1380
           X_P2O5: 0.0271
-          P_P2_atm: 1.93e-08
-          P_P2_x1e8_atm_as_printed: 1.93
-          P_PO_atm: 9.75e-07
-          P_PO_x1e7_atm_as_printed: 9.75
-          P_PO2_atm: 1.181e-07
-          P_PO2_x1e8_atm_as_printed: 11.81
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 78
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
           T_C: 1390
           X_P2O5: 0.0271
-          P_P2_atm: 2.32e-08
-          P_P2_x1e8_atm_as_printed: 2.32
-          P_PO_atm: 1.2e-06
-          P_PO_x1e7_atm_as_printed: 12.0
-          P_PO2_atm: 1.3900000000000001e-07
-          P_PO2_x1e8_atm_as_printed: 13.9
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 74
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
           T_C: 1370
           X_P2O5: 0.0427
-          P_P2_atm: 5.6399999999999995e-08
-          P_P2_x1e8_atm_as_printed: 5.64
-          P_PO_atm: 8.439999999999999e-07
-          P_PO_x1e7_atm_as_printed: 8.44
-          P_PO2_atm: 1.089e-07
-          P_PO2_x1e8_atm_as_printed: 10.89
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 98
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
           T_C: 1380
           X_P2O5: 0.0427
-          P_P2_atm: 7.0e-08
-          P_P2_x1e8_atm_as_printed: 7.0
-          P_PO_atm: 1.072e-06
-          P_PO_x1e7_atm_as_printed: 10.72
-          P_PO2_atm: 1.333e-07
-          P_PO2_x1e8_atm_as_printed: 13.33
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 94
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
           T_C: 1390
           X_P2O5: 0.0427
-          P_P2_atm: 8.68e-08
-          P_P2_x1e8_atm_as_printed: 8.68
-          P_PO_atm: 1.332e-06
-          P_PO_x1e7_atm_as_printed: 13.32
-          P_PO2_atm: 1.6550000000000002e-07
-          P_PO2_x1e8_atm_as_printed: 16.55
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 5
           composition_mol: *kb85_sample_5_mol
           point_conditions: *kb85_sample_5_conditions
           T_C: 1370
           X_P2O5: 0.0499
-          P_P2_atm: 7.040000000000001e-08
-          P_P2_x1e8_atm_as_printed: 7.04
-          P_PO_atm: 1.0779999999999999e-06
-          P_PO_x1e7_atm_as_printed: 10.78
-          P_PO2_atm: 1.2699999999999999e-07
-          P_PO2_x1e8_atm_as_printed: 12.7
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
           T_C: 1370
           X_P2O5: 0.0691
-          P_P2_atm: 6.85e-08
-          P_P2_x1e8_atm_as_printed: 6.85
-          P_PO_atm: 1.1759999999999998e-06
-          P_PO_x1e7_atm_as_printed: 11.76
-          P_PO2_atm: 1.389e-07
-          P_PO2_x1e8_atm_as_printed: 13.89
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 89
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
           T_C: 1380
           X_P2O5: 0.0691
-          P_P2_atm: 8.52e-08
-          P_P2_x1e8_atm_as_printed: 8.52
-          P_PO_atm: 1.4749999999999999e-06
-          P_PO_x1e7_atm_as_printed: 14.75
-          P_PO2_atm: 1.73e-07
-          P_PO2_x1e8_atm_as_printed: 17.3
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 86
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
           T_C: 1390
           X_P2O5: 0.0691
-          P_P2_atm: 1.1150000000000001e-07
-          P_P2_x1e8_atm_as_printed: 11.15
-          P_PO_atm: 1.853e-06
-          P_PO_x1e7_atm_as_printed: 18.53
-          P_PO2_atm: 2.1100000000000002e-07
-          P_PO2_x1e8_atm_as_printed: 21.1
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 84
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
           T_C: 1370
           X_P2O5: 0.0764
-          P_P2_atm: 8.660000000000001e-08
-          P_P2_x1e8_atm_as_printed: 8.66
-          P_PO_atm: 1.2019999999999999e-06
-          P_PO_x1e7_atm_as_printed: 12.02
-          P_PO2_atm: 1.423e-07
-          P_PO2_x1e8_atm_as_printed: 14.23
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
           T_C: 1380
           X_P2O5: 0.0764
-          P_P2_atm: 1.084e-07
-          P_P2_x1e8_atm_as_printed: 10.84
-          P_PO_atm: 1.519e-06
-          P_PO_x1e7_atm_as_printed: 15.19
-          P_PO2_atm: 1.745e-07
-          P_PO2_x1e8_atm_as_printed: 17.45
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 88
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
           T_C: 1390
           X_P2O5: 0.0764
-          P_P2_atm: 1.367e-07
-          P_P2_x1e8_atm_as_printed: 13.67
-          P_PO_atm: 1.9399999999999996e-06
-          P_PO_x1e7_atm_as_printed: 19.4
-          P_PO2_atm: 2.114e-07
-          P_PO2_x1e8_atm_as_printed: 21.14
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 84
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 8
           composition_mol: *kb85_sample_8_mol
           point_conditions: *kb85_sample_8_conditions
           T_C: 1370
           X_P2O5: 0.0991
-          P_P2_atm: 7.16e-08
-          P_P2_x1e8_atm_as_printed: 7.16
-          P_PO_atm: 1.522e-06
-          P_PO_x1e7_atm_as_printed: 15.22
-          P_PO2_atm: 1.832e-07
-          P_PO2_x1e8_atm_as_printed: 18.32
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 83
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 8
           composition_mol: *kb85_sample_8_mol
           point_conditions: *kb85_sample_8_conditions
           T_C: 1380
           X_P2O5: 0.0991
-          P_P2_atm: 8.93e-08
-          P_P2_x1e8_atm_as_printed: 8.93
-          P_PO_atm: 1.912e-06
-          P_PO_x1e7_atm_as_printed: 19.12
-          P_PO2_atm: 2.287e-07
-          P_PO2_x1e8_atm_as_printed: 22.87
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 81
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
         - sample_no: 8
           composition_mol: *kb85_sample_8_mol
           point_conditions: *kb85_sample_8_conditions
           T_C: 1390
           X_P2O5: 0.0991
-          P_P2_atm: 1.14e-07
-          P_P2_x1e8_atm_as_printed: 11.4
-          P_PO_atm: 2.3179999999999997e-06
-          P_PO_x1e7_atm_as_printed: 23.18
-          P_PO2_atm: 2.997e-07
-          P_PO2_x1e8_atm_as_printed: 29.97
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 81
-          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
-            atm)'
       uncertainty:
         note: P2 partial pressure carries large error because empty-cell P2+ contamination can be tens
           of percent; Delta-G scatter follows. Averages still match JANAF.
+    - observation_id: kambayashi_1985_po_table6_partial_pressure
+      type: psat_series
+      locator:
+        table: '6'
+        published_page: 1917
+        pdf_page_index: 7
+        note: Table 6 partial pressure of PO above FetO-P2O5
+      phase: gas
+      condensed_form: *id002
+      standard_state: P_PO in atm from Table 6 (x 10^-7 atm column)
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure
+        gas_species: PO(g)
+        method_class: model_derived
+        model_or_data_source: Eq. (10) from measured ion currents with Mann ionization cross-section ratios,
+          isotope abundances, and SEM gain ~ sqrt(mass); P_Fe from JANAF.
+        rows:
+        - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
+          T_C: 1370
+          X_P2O5: 0.0075
+          P_PO_x1e7_atm_as_printed: 2.86
+        - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
+          T_C: 1380
+          X_P2O5: 0.0075
+          P_PO_x1e7_atm_as_printed: 3.46
+        - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
+          T_C: 1390
+          X_P2O5: 0.0075
+          P_PO_x1e7_atm_as_printed: 4.48
+        - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
+          T_C: 1370
+          X_P2O5: 0.0202
+          P_PO_x1e7_atm_as_printed: 5.69
+        - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
+          T_C: 1380
+          X_P2O5: 0.0202
+          P_PO_x1e7_atm_as_printed: 6.98
+        - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
+          T_C: 1390
+          X_P2O5: 0.0202
+          P_PO_x1e7_atm_as_printed: 9.09
+        - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
+          T_C: 1370
+          X_P2O5: 0.0271
+          P_PO_x1e7_atm_as_printed: 7.61
+        - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
+          T_C: 1380
+          X_P2O5: 0.0271
+          P_PO_x1e7_atm_as_printed: 9.75
+        - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
+          T_C: 1390
+          X_P2O5: 0.0271
+          P_PO_x1e7_atm_as_printed: 12.0
+        - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
+          T_C: 1370
+          X_P2O5: 0.0427
+          P_PO_x1e7_atm_as_printed: 8.44
+        - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
+          T_C: 1380
+          X_P2O5: 0.0427
+          P_PO_x1e7_atm_as_printed: 10.72
+        - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
+          T_C: 1390
+          X_P2O5: 0.0427
+          P_PO_x1e7_atm_as_printed: 13.32
+        - sample_no: 5
+          composition_mol: *kb85_sample_5_mol
+          point_conditions: *kb85_sample_5_conditions
+          T_C: 1370
+          X_P2O5: 0.0499
+          P_PO_x1e7_atm_as_printed: 10.78
+        - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
+          T_C: 1370
+          X_P2O5: 0.0691
+          P_PO_x1e7_atm_as_printed: 11.76
+        - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
+          T_C: 1380
+          X_P2O5: 0.0691
+          P_PO_x1e7_atm_as_printed: 14.75
+        - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
+          T_C: 1390
+          X_P2O5: 0.0691
+          P_PO_x1e7_atm_as_printed: 18.53
+        - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
+          T_C: 1370
+          X_P2O5: 0.0764
+          P_PO_x1e7_atm_as_printed: 12.02
+        - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
+          T_C: 1380
+          X_P2O5: 0.0764
+          P_PO_x1e7_atm_as_printed: 15.19
+        - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
+          T_C: 1390
+          X_P2O5: 0.0764
+          P_PO_x1e7_atm_as_printed: 19.4
+        - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
+          T_C: 1370
+          X_P2O5: 0.0991
+          P_PO_x1e7_atm_as_printed: 15.22
+        - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
+          T_C: 1380
+          X_P2O5: 0.0991
+          P_PO_x1e7_atm_as_printed: 19.12
+        - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
+          T_C: 1390
+          X_P2O5: 0.0991
+          P_PO_x1e7_atm_as_printed: 23.18
+      uncertainty:
+        note: PO pressure shares the Table 6 reduction and its printed x 10^-7 atm column scale.
   PO2:
     observations:
     - observation_id: kambayashi_1985_po2_table6_partial_pressure
@@ -2293,154 +2270,132 @@ species:
           T_C: 1370
           X_P2O5: 0.0075
           P_PO2_x1e8_atm_as_printed: 3.78
-          P_atm: 3.78e-08
         - sample_no: 1
           composition_mol: *kb85_sample_1_mol
           point_conditions: *kb85_sample_1_conditions
           T_C: 1380
           X_P2O5: 0.0075
           P_PO2_x1e8_atm_as_printed: 4.53
-          P_atm: 4.53e-08
         - sample_no: 1
           composition_mol: *kb85_sample_1_mol
           point_conditions: *kb85_sample_1_conditions
           T_C: 1390
           X_P2O5: 0.0075
           P_PO2_x1e8_atm_as_printed: 5.52
-          P_atm: 5.52e-08
         - sample_no: 2
           composition_mol: *kb85_sample_2_mol
           point_conditions: *kb85_sample_2_conditions
           T_C: 1370
           X_P2O5: 0.0202
           P_PO2_x1e8_atm_as_printed: 6.93
-          P_atm: 6.93e-08
         - sample_no: 2
           composition_mol: *kb85_sample_2_mol
           point_conditions: *kb85_sample_2_conditions
           T_C: 1380
           X_P2O5: 0.0202
           P_PO2_x1e8_atm_as_printed: 8.47
-          P_atm: 8.470000000000001e-08
         - sample_no: 2
           composition_mol: *kb85_sample_2_mol
           point_conditions: *kb85_sample_2_conditions
           T_C: 1390
           X_P2O5: 0.0202
           P_PO2_x1e8_atm_as_printed: 10.64
-          P_atm: 1.0640000000000001e-07
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
           T_C: 1370
           X_P2O5: 0.0271
           P_PO2_x1e8_atm_as_printed: 9.45
-          P_atm: 9.449999999999999e-08
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
           T_C: 1380
           X_P2O5: 0.0271
           P_PO2_x1e8_atm_as_printed: 11.81
-          P_atm: 1.181e-07
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
           T_C: 1390
           X_P2O5: 0.0271
           P_PO2_x1e8_atm_as_printed: 13.9
-          P_atm: 1.3900000000000001e-07
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
           T_C: 1370
           X_P2O5: 0.0427
           P_PO2_x1e8_atm_as_printed: 10.89
-          P_atm: 1.089e-07
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
           T_C: 1380
           X_P2O5: 0.0427
           P_PO2_x1e8_atm_as_printed: 13.33
-          P_atm: 1.333e-07
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
           T_C: 1390
           X_P2O5: 0.0427
           P_PO2_x1e8_atm_as_printed: 16.55
-          P_atm: 1.6550000000000002e-07
         - sample_no: 5
           composition_mol: *kb85_sample_5_mol
           point_conditions: *kb85_sample_5_conditions
           T_C: 1370
           X_P2O5: 0.0499
           P_PO2_x1e8_atm_as_printed: 12.7
-          P_atm: 1.2699999999999999e-07
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
           T_C: 1370
           X_P2O5: 0.0691
           P_PO2_x1e8_atm_as_printed: 13.89
-          P_atm: 1.389e-07
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
           T_C: 1380
           X_P2O5: 0.0691
           P_PO2_x1e8_atm_as_printed: 17.3
-          P_atm: 1.73e-07
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
           T_C: 1390
           X_P2O5: 0.0691
           P_PO2_x1e8_atm_as_printed: 21.1
-          P_atm: 2.1100000000000002e-07
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
           T_C: 1370
           X_P2O5: 0.0764
           P_PO2_x1e8_atm_as_printed: 14.23
-          P_atm: 1.423e-07
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
           T_C: 1380
           X_P2O5: 0.0764
           P_PO2_x1e8_atm_as_printed: 17.45
-          P_atm: 1.745e-07
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
           T_C: 1390
           X_P2O5: 0.0764
           P_PO2_x1e8_atm_as_printed: 21.14
-          P_atm: 2.114e-07
         - sample_no: 8
           composition_mol: *kb85_sample_8_mol
           point_conditions: *kb85_sample_8_conditions
           T_C: 1370
           X_P2O5: 0.0991
           P_PO2_x1e8_atm_as_printed: 18.32
-          P_atm: 1.832e-07
         - sample_no: 8
           composition_mol: *kb85_sample_8_mol
           point_conditions: *kb85_sample_8_conditions
           T_C: 1380
           X_P2O5: 0.0991
           P_PO2_x1e8_atm_as_printed: 22.87
-          P_atm: 2.287e-07
         - sample_no: 8
           composition_mol: *kb85_sample_8_mol
           point_conditions: *kb85_sample_8_conditions
           T_C: 1390
           X_P2O5: 0.0991
           P_PO2_x1e8_atm_as_printed: 29.97
-          P_atm: 2.997e-07
       uncertainty:
         note: empty-cell PO2+ contamination 2-5% subtracted
   P2:
@@ -2471,154 +2426,132 @@ species:
           T_C: 1370
           X_P2O5: 0.0075
           P_P2_x1e8_atm_as_printed: 1.14
-          P_atm: 1.14e-08
         - sample_no: 1
           composition_mol: *kb85_sample_1_mol
           point_conditions: *kb85_sample_1_conditions
           T_C: 1380
           X_P2O5: 0.0075
           P_P2_x1e8_atm_as_printed: 1.4
-          P_atm: 1.4e-08
         - sample_no: 1
           composition_mol: *kb85_sample_1_mol
           point_conditions: *kb85_sample_1_conditions
           T_C: 1390
           X_P2O5: 0.0075
           P_P2_x1e8_atm_as_printed: 1.81
-          P_atm: 1.81e-08
         - sample_no: 2
           composition_mol: *kb85_sample_2_mol
           point_conditions: *kb85_sample_2_conditions
           T_C: 1370
           X_P2O5: 0.0202
           P_P2_x1e8_atm_as_printed: 3.03
-          P_atm: 3.03e-08
         - sample_no: 2
           composition_mol: *kb85_sample_2_mol
           point_conditions: *kb85_sample_2_conditions
           T_C: 1380
           X_P2O5: 0.0202
           P_P2_x1e8_atm_as_printed: 3.77
-          P_atm: 3.77e-08
         - sample_no: 2
           composition_mol: *kb85_sample_2_mol
           point_conditions: *kb85_sample_2_conditions
           T_C: 1390
           X_P2O5: 0.0202
           P_P2_x1e8_atm_as_printed: 4.72
-          P_atm: 4.72e-08
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
           T_C: 1370
           X_P2O5: 0.0271
           P_P2_x1e8_atm_as_printed: 1.5
-          P_atm: 1.5000000000000002e-08
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
           T_C: 1380
           X_P2O5: 0.0271
           P_P2_x1e8_atm_as_printed: 1.93
-          P_atm: 1.93e-08
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
           T_C: 1390
           X_P2O5: 0.0271
           P_P2_x1e8_atm_as_printed: 2.32
-          P_atm: 2.32e-08
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
           T_C: 1370
           X_P2O5: 0.0427
           P_P2_x1e8_atm_as_printed: 5.64
-          P_atm: 5.6399999999999995e-08
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
           T_C: 1380
           X_P2O5: 0.0427
           P_P2_x1e8_atm_as_printed: 7.0
-          P_atm: 7.0e-08
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
           T_C: 1390
           X_P2O5: 0.0427
           P_P2_x1e8_atm_as_printed: 8.68
-          P_atm: 8.68e-08
         - sample_no: 5
           composition_mol: *kb85_sample_5_mol
           point_conditions: *kb85_sample_5_conditions
           T_C: 1370
           X_P2O5: 0.0499
           P_P2_x1e8_atm_as_printed: 7.04
-          P_atm: 7.040000000000001e-08
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
           T_C: 1370
           X_P2O5: 0.0691
           P_P2_x1e8_atm_as_printed: 6.85
-          P_atm: 6.85e-08
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
           T_C: 1380
           X_P2O5: 0.0691
           P_P2_x1e8_atm_as_printed: 8.52
-          P_atm: 8.52e-08
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
           T_C: 1390
           X_P2O5: 0.0691
           P_P2_x1e8_atm_as_printed: 11.15
-          P_atm: 1.1150000000000001e-07
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
           T_C: 1370
           X_P2O5: 0.0764
           P_P2_x1e8_atm_as_printed: 8.66
-          P_atm: 8.660000000000001e-08
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
           T_C: 1380
           X_P2O5: 0.0764
           P_P2_x1e8_atm_as_printed: 10.84
-          P_atm: 1.084e-07
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
           T_C: 1390
           X_P2O5: 0.0764
           P_P2_x1e8_atm_as_printed: 13.67
-          P_atm: 1.367e-07
         - sample_no: 8
           composition_mol: *kb85_sample_8_mol
           point_conditions: *kb85_sample_8_conditions
           T_C: 1370
           X_P2O5: 0.0991
           P_P2_x1e8_atm_as_printed: 7.16
-          P_atm: 7.16e-08
         - sample_no: 8
           composition_mol: *kb85_sample_8_mol
           point_conditions: *kb85_sample_8_conditions
           T_C: 1380
           X_P2O5: 0.0991
           P_P2_x1e8_atm_as_printed: 8.93
-          P_atm: 8.93e-08
         - sample_no: 8
           composition_mol: *kb85_sample_8_mol
           point_conditions: *kb85_sample_8_conditions
           T_C: 1390
           X_P2O5: 0.0991
           P_P2_x1e8_atm_as_printed: 11.4
-          P_atm: 1.14e-07
       uncertainty:
         note: P2+ empty-cell contamination can be tens of percent; largest pressure error in Table 6
   P4O10:

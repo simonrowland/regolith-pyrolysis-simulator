@@ -16234,6 +16234,7 @@ def _assert_kambayashi_sample_associations(doc: dict, result) -> None:
     sample_linked_series = (
         ("kambayashi_1985_table5_feto_p2o5_ion_current_ratios", "5", False),
         ("kambayashi_1985_table6_partial_pressures_and_dg", "6", True),
+        ("kambayashi_1985_po_table6_partial_pressure", "6", True),
         ("kambayashi_1985_po2_table6_partial_pressure", "6", True),
         ("kambayashi_1985_p2_table6_partial_pressure", "6", True),
         ("kambayashi_1985_table7_raoultian_a_p2o5", "7", True),
@@ -16248,6 +16249,51 @@ def _assert_kambayashi_sample_associations(doc: dict, result) -> None:
             expected = samples[int(row["sample_no"])]
             assert_composition_condition(observation, expected, "4")
             assert_temperature(observation, row, table)
+            if observation_id == "kambayashi_1985_table6_partial_pressures_and_dg":
+                assert observation.value.kind is ValueKind.UNAVAILABLE
+                assert "declared quantity is unknown" in (
+                    observation.value.unavailable_reason or ""
+                )
+                assert not any(
+                    key in row
+                    for key in (
+                        "P_P2_atm",
+                        "P_PO_atm",
+                        "P_PO2_atm",
+                        "P_P2_x1e8_atm_as_printed",
+                        "P_PO_x1e7_atm_as_printed",
+                        "P_PO2_x1e8_atm_as_printed",
+                    )
+                )
+            if observation_id == "kambayashi_1985_po_table6_partial_pressure":
+                printed = Decimal(str(row["P_PO_x1e7_atm_as_printed"]))
+                assert quantity_token(observation.identity) is Quantity.P_PARTIAL
+                assert observation.value.kind is ValueKind.POINT
+                assert observation.value.point == printed * Decimal("1e-7") * Decimal("101325")
+                if row["sample_no"] == 1 and row["T_C"] == 1370:
+                    # PDF p. 1917, Table 6: 2.86 x 10^-7 atm is the PO cell.
+                    assert printed == Decimal("2.86")
+                    assert observation.value.point == Decimal("2.86e-7") * Decimal("101325")
+            if observation_id == "kambayashi_1985_p2_table6_partial_pressure":
+                printed = Decimal(str(row["P_P2_x1e8_atm_as_printed"]))
+                assert quantity_token(observation.identity) is Quantity.P_PARTIAL
+                assert observation.value.kind is ValueKind.POINT
+                assert observation.value.point == printed * Decimal("1e-8") * Decimal("101325")
+                assert "P_atm" not in row
+                if row["sample_no"] == 1 and row["T_C"] == 1370:
+                    # PDF p. 1917, Table 6: 1.14 x 10^-8 atm is the P2 cell.
+                    assert printed == Decimal("1.14")
+                    assert observation.value.point == Decimal("1.14e-8") * Decimal("101325")
+            if observation_id == "kambayashi_1985_po2_table6_partial_pressure":
+                printed = Decimal(str(row["P_PO2_x1e8_atm_as_printed"]))
+                assert quantity_token(observation.identity) is Quantity.P_PARTIAL
+                assert observation.value.kind is ValueKind.POINT
+                assert observation.value.point == printed * Decimal("1e-8") * Decimal("101325")
+                assert "P_atm" not in row
+                if row["sample_no"] == 1 and row["T_C"] == 1370:
+                    # PDF p. 1917, Table 6: 3.78 x 10^-8 atm is the PO2 cell.
+                    assert printed == Decimal("3.78")
+                    assert observation.value.point == Decimal("3.78e-8") * Decimal("101325")
             if observation_id == "kambayashi_1985_table7_raoultian_a_p2o5":
                 assert quantity_token(observation.identity) is Quantity.ACTIVITY
                 assert observation.value.kind is ValueKind.POINT
@@ -16256,11 +16302,15 @@ def _assert_kambayashi_sample_associations(doc: dict, result) -> None:
                     * Decimal("1e-17")
                 )
                 assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+                if row["sample_no"] == 1 and row["T_C"] == 1370:
+                    # Header a_P2O5 × 10^17 = 1.2 means a = 1.2e-17 (PDF p. 1917, Table 7).
+                    assert observation.value.point == Decimal("1.2e-17")
             if composition_is_identity:
                 assert observation.identity.composition is not None
                 assert observation.identity.composition.is_value
                 assert dict(observation.identity.composition.value.components) == expected
             if observation_id in {
+                "kambayashi_1985_po_table6_partial_pressure",
                 "kambayashi_1985_po2_table6_partial_pressure",
                 "kambayashi_1985_p2_table6_partial_pressure",
             }:

@@ -195,6 +195,21 @@ def test_activity_comparator_celsius_offset_is_273_15() -> None:
     assert _row_temperature_K({"T_K": 1643.0}, {}) == pytest.approx(1643.0)
 
 
+def test_kambayashi_table7_comparator_uses_migrated_header_scale() -> None:
+    comparator = next(
+        item
+        for item in iter_activity_comparators()
+        if item.observation_id == "kambayashi_1985_table7_raoultian_a_p2o5"
+        and item.sample_no == 1
+        and item.temperature_K == pytest.approx(1643.15)
+    )
+    # Header a_P2O5 × 10^17 = 1.2 means a = 1.2e-17 (PDF p. 1917, Table 7).
+    assert comparator.measured == pytest.approx(1.2e-17, rel=0.0)
+    assert comparator.row["a_P2O5_times_1e17_as_printed"] == 1.2
+    assert "a_P2O5" not in comparator.row
+    assert comparator.method_class == "model_derived"
+
+
 def test_model_derived_observation_is_not_scored() -> None:
     pots = build_scoring_pots_from_extracts()
     pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
