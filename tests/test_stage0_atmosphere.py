@@ -694,17 +694,18 @@ def test_air_atmosphere_projects_oxygen_fraction_without_assuming_co2(
     assert partial_pressures['N2'] == 790.0
     assert 'CO2' not in partial_pressures
     projection_melt = deepcopy(sim.melt)
-    projection_melt.atmosphere = Atmosphere.CONTROLLED_O2
-    projection_melt.p_total_mbar = sim.melt.ambient_pressure_mbar
-    projection_melt.pO2_mbar = partial_pressures['O2']
-    projection_melt.background_gas_species = 'N2'
-    projection_melt.background_gas_mole_fraction = 1.0
+    projection_melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
+    projection_melt.ambient_atmosphere = 'air'
+    projection_melt.p_total_mbar = projection_melt.ambient_pressure_mbar
+    projection_melt.pO2_mbar = 0.0
     gas = _project_overhead_atmosphere(
         projection_melt,
         finite_headspace=finite_headspace,
     )
-    assert gas.composition['O2'] == partial_pressures['O2']
-    assert gas.composition['N2'] == partial_pressures['N2']
+    # The CO2_BACKPRESSURE arm must project the declared ambient gas. Reverting
+    # it to the former hard-coded 96% CO2 cover removes these O2/N2 partials.
+    assert gas.composition['O2'] == 210.0
+    assert gas.composition['N2'] == 790.0
     assert 'CO2' not in gas.composition
     assert sim._headspace_transport_pO2_bar_from_ledger(0.0) == pytest.approx(0.21)
     assert sim._commanded_pO2_bar() == pytest.approx(0.21)
