@@ -143,16 +143,21 @@ def _close_openimcc_evaluation_worker() -> None:
     if worker is None:
         return
     process, connection, _evaluate = worker
-    if process.is_alive():
-        try:
-            connection.send(None)
+    try:
+        if process.is_alive():
+            try:
+                connection.send(None)
+            except (BrokenPipeError, EOFError, OSError):
+                pass
             process.join(timeout=1.0)
-        except (BrokenPipeError, EOFError, OSError):
-            pass
-    if process.is_alive():
-        process.terminate()
-        process.join()
-    connection.close()
+        if process.is_alive():
+            process.terminate()
+            process.join(timeout=1.0)
+        if process.is_alive():
+            process.kill()
+            process.join(timeout=1.0)
+    finally:
+        connection.close()
 
 
 atexit.register(_close_openimcc_evaluation_worker)
@@ -259,6 +264,9 @@ def _evaluate_openimcc_isolated(
         if error_name == "ImccNonconvergenceError":
             raise ResidueEngineNonconvergence("openimcc", str(detail))
         raise RuntimeError(f"isolated OpenIMCC {error_name}: {detail}")
+    except BaseException:
+        _close_openimcc_evaluation_worker()
+        raise
     finally:
         if not process.is_alive():
             _close_openimcc_evaluation_worker()
