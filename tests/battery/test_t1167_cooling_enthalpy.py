@@ -102,6 +102,7 @@ def test_zigo_table_fit_and_composite_rows_use_existing_quantities() -> None:
         if observation["observation_id"] == "zigo_1987_t4_melt_cooling_enthalpy_measured"
     )["values"]
     assert raw_cooling["quantity"] == "sample_dependent_enthalpy_change_on_cooling"
+    assert "pp. 172 and 178" in raw_cooling["note"]
     assert "proportions and structures" in raw_cooling["note"]
     assert [point["minus_delta_H_cool_kJ_mol-1"] for point in raw_cooling["points"]] == [
         545.1, 548.9, 561.5, 571.7, 584.3
