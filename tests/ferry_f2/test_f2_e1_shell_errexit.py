@@ -10,6 +10,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -37,45 +39,77 @@ def _init_git_checkout(path: Path, filename: str, contents: str) -> str:
 
 
 def _reported_path_matches(output: str, key: str, expected: Path) -> bool:
-    prefix = f"{key}="
-    reported = next(
-        (
-            token[len(prefix) :].rstrip(";,")
-            for token in output.split()
-            if token.startswith(prefix)
+    # Match the separators used by enginepatch's one-line KEY=value reports.
+    delimiters = {
+        "RESOLVED": (
+            " PYTHON=",
+            " RESOLUTION=",
+            " patches=",
+            " (explicit ",
+            " — ",
         ),
-        None,
-    )
-    if reported is None:
-        return False
-    try:
-        return os.path.samefile(reported, expected)
-    except OSError:
-        return False
+        "IMPORTED": (" PIN=",),
+        "PIN": ("; verifying IMPORTED=",),
+    }[key]
+    marker = f"{key}="
+    for line in output.splitlines():
+        marker_start = line.find(marker)
+        if marker_start < 0:
+            continue
+        value_start = marker_start + len(marker)
+        end_positions = (
+            line.find(delimiter, value_start) for delimiter in delimiters
+        )
+        value_end = min(
+            (position for position in end_positions if position >= 0),
+            default=len(line),
+        )
+        try:
+            return os.path.samefile(line[value_start:value_end], expected)
+        except OSError:
+            return False
+    return False
 
 
-def test_reported_path_matches_filesystem_identity(tmp_path: Path, monkeypatch) -> None:
+def test_reported_path_matches_case_variant_on_case_insensitive_volume(
+    tmp_path: Path,
+) -> None:
+    case_probe = tmp_path / "CaseProbe"
+    case_probe.write_text("probe", encoding="utf-8")
+    if not (tmp_path / "caseprobe").exists():
+        pytest.skip("temporary volume is case-sensitive")
+
     checkout = tmp_path / "Checkout"
     checkout.mkdir()
-    different = tmp_path / "different"
-    different.mkdir()
     case_variant = tmp_path / "checkout"
-    real_samefile = os.path.samefile
+    output = f"vaporock: MATCH RESOLVED={case_variant} PYTHON=/usr/bin/python"
 
-    def case_insensitive_samefile(first, second):
-        try:
-            return real_samefile(first, second)
-        except FileNotFoundError:
-            return (
-                os.path.realpath(first).casefold()
-                == os.path.realpath(second).casefold()
-            )
-
-    monkeypatch.setattr(os.path, "samefile", case_insensitive_samefile)
-
-    output = f"RESOLVED={case_variant}\n"
     assert _reported_path_matches(output, "RESOLVED", checkout)
-    assert not _reported_path_matches(output, "RESOLVED", different)
+
+
+def test_reported_path_parser_preserves_spaces_and_trailing_comma(
+    tmp_path: Path,
+) -> None:
+    spaced_checkout = tmp_path / "checkout with spaces"
+    spaced_checkout.mkdir()
+    different_checkout = tmp_path / "different"
+    different_checkout.mkdir()
+    comma_checkout = tmp_path / "checkout,"
+    comma_checkout.mkdir()
+
+    resolved = (
+        f"vaporock: MATCH RESOLVED={spaced_checkout} "
+        "PYTHON=/usr/bin/python RESOLUTION=located"
+    )
+    assert _reported_path_matches(resolved, "RESOLVED", spaced_checkout)
+    assert not _reported_path_matches(resolved, "RESOLVED", different_checkout)
+
+    warning = (
+        f"WARNING: vaporock imported checkout differs; IMPORTED={spaced_checkout} "
+        f"PIN={comma_checkout}; verifying IMPORTED={spaced_checkout}"
+    )
+    assert _reported_path_matches(warning, "IMPORTED", spaced_checkout)
+    assert _reported_path_matches(warning, "PIN", comma_checkout)
 
 
 def test_collect_recipe_db_exits_nonzero_when_zero_studies() -> None:
