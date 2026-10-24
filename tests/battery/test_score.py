@@ -14421,14 +14421,15 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         )
     ] == [30, 10, 15]
     # dc7eafe24 adds the quoted Table 4 gamma successors. 5f44bd3ee copies the
-    # parent derivation onto them, so they migrate as model_derived: 26 Sossi
-    # plus 24 ms2000 rows. 28->50. The union and the headline each gain those
-    # 22 rows (91->113, 55->77). The calculated oxygen columns stay quoted.
-    assert len(kems_model_derived) == 50
+    # parent derivation onto them, and 4000d10b6 adds the printed PbO# channel:
+    # its 1573.15 K cell is admitted as model_derived (extract species.PbO,
+    # observation sossi_2019_pb_table4_gamma_this_work_quoted_20260906_pbo_hash,
+    # Table 4 p. 57). The combined KEMS cohort is 51.
+    assert len(kems_model_derived) == 51
     assert len(
         stolyarova_activities | stolyarova_atomic_oxygen_pressures | kems_model_derived
-    ) == 113
-    assert len(headline_diagnostic_references) == 77
+    ) == 114
+    assert len(headline_diagnostic_references) == 78
     assert admitted_model_derived == (
         headline_diagnostic_references - stolyarova_atomic_oxygen_pressures
     )
