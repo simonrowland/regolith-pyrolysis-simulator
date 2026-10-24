@@ -457,6 +457,8 @@ species:
         experiment: high-temperature-drop-calorimetry-series
         type: heat_capacity_and_heat_content_series
         locator: {table: '7', page: 723}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 723}}
         T_range_K: [1665, 1665]
         phase: CaMgSi2O6_liquid_and_crystalline_diopside
         crystal_phase_as_stated: diopside
@@ -468,29 +470,26 @@ species:
         values:
           composition: CaMgSi2O6
           quantity: heat_of_fusion
-          method_class: measured_reduced
+          method_class: model_derived
           derived_from: [stebbins_1983_diopside_calorimetry_measured_tables_1_3, pdf:stebbins-carmichael-weill-1983]
+          T_K: 1665
+          preferred_estimate: 33.0
           derivation:
             relation: Delta H_f(T) = H_liquid(T) - H_crystal(T); the paper combines liquid and crystal heat contents, heat of vitrification, and heat-capacity integrations as in Equations 3-4.
             inputs: ["Crystalline diopside drop data of White (1919) and Wagner (1932), compiled by Kelley (1960) and Robie et al. (1979), plus Ferrier (1968a)'s equation fitted to 38 measurements and combined with earlier studies (printed p. 721)", "Table 4 liquid heat-content fit", "Table 6 heat-of-vitrification values; Weill et al. (1980a) selected by the authors (printed p. 721)", "Subtract 1100 cal/mol from the glass enthalpy difference H^g_985-H^g_300 to include the enthalpy of annealing (printed p. 721)"]
           table_7_heat_of_fusion:
-            evidence_class: measured_reduced
-            method_class: measured_reduced
+            evidence_class: model_derived
+            method_class: model_derived
             derivation:
               relation: liquid-minus-crystal enthalpy at the stated fusion temperature; heat-of-vitrification and heat-capacity integrals are combined as described in Equations 3-4
               inputs: ["Crystalline diopside drop data of White (1919) and Wagner (1932), compiled by Kelley (1960) and Robie et al. (1979), plus Ferrier (1968a)'s equation fitted to 38 measurements and combined with earlier studies (printed p. 721)", "Table 4 liquid heat-content fit", "Table 6 heat-of-vitrification values; Weill et al. (1980a) selected by the authors (printed p. 721)", "Subtract 1100 cal/mol from the glass enthalpy difference H^g_985-H^g_300 to include the enthalpy of annealing (printed p. 721)"]
             derived_from: [stebbins_1983_diopside_calorimetry_measured_tables_1_3, pdf:stebbins-carmichael-weill-1983]
-            entropy_of_fusion: {value: 20.2, units: cal/mol/K, locator: {page: 728, section: Discussion}}
             conversion_to_kJ_per_mol_formula_unit:
               premise: 1 kcal = 4.184 kJ
               algebra: 33.0 kcal/mol CaMgSi2O6 * 4.184 kJ/kcal = 138.072 kJ/mol CaMgSi2O6
               unit_check: kcal cancels; result is kJ per mole of CaMgSi2O6 formula units
               sanity_check: approximately 138 kJ/mol, consistent with the printed 33.0 kcal/mol
             locator: {table: '7', page: PDF p. 7 / printed p. 723}
-            pressure_bar: 1
-            T_K: 1665
-            units: kcal/mol
-            preferred_estimate: 33.0
             preferred_uncertainty: 0.5
             preferred_uncertainty_source:
               locators:
@@ -502,9 +501,27 @@ species:
               - 26.117*T - 1.2775e-3*T^2 - 6935
             simplified_equation_valid_range_K: [900, 2000]
         uncertainty: {value: 0.5, units: kcal/mol, locator: {page: 717, section: Abstract}}
+      - observation_id: stebbins_1983_diopside_entropy_of_fusion_discussion
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 728, section: Discussion}
+        phase: CaMgSi2O6_liquid_and_crystalline_diopside
+        standard_state: entropy of fusion at the melting temperature
+        units: cal/mol/K
+        values:
+          quantity: entropy_of_fusion
+          method_class: model_derived
+          T_K: 1665
+          value: 20.2
+          derived_from: [stebbins_1983_diopside_heat_of_fusion_table_7]
+          derivation:
+            relation: fusion_entropy_calculated_from_heat_of_fusion_and_fusion_temperature
+            inputs: [stebbins_1983_diopside_heat_of_fusion_table_7]
+            locator: {page: 728, section: Discussion}
       - observation_id: stebbins_1983_diopside_ferrier_table_7_fusion_quote
         type: heat_capacity_and_heat_content_series
         locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}}
         T_range_K: [1665, 1665]
         phase: CaMgSi2O6_liquid_and_crystalline_diopside
         crystal_phase_as_stated: diopside
@@ -517,11 +534,14 @@ species:
           method_class: quoted_attributed
           attribution: Ferrier (1968a)
           value_kcal_per_mol: 30.7
+          T_K: 1665
           locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
           derivation: {relation: quoted earlier-worker result, inputs: [Ferrier (1968a)]}
       - observation_id: stebbins_1983_diopside_weill_table_7_fusion_quote
         type: heat_capacity_and_heat_content_series
         locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}}
         phase: CaMgSi2O6_liquid_and_crystalline_diopside
         crystal_phase_as_stated: diopside
         condensed_form:
@@ -532,12 +552,16 @@ species:
           composition: CaMgSi2O6
           quantity: heat_of_fusion
           method_class: quoted_attributed
+          attribution: Weill et al. (1980a)
+          T_K: 1665
           estimate_from_liquid_glass_Cp_and_Tg: 34.1
           locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
           derivation: {relation: quoted earlier-worker estimate, inputs: [Table 7 footnote 1, Weill et al. (1980a)]}
       - observation_id: stebbins_1983_diopside_robie_table_7_fusion_quote
         type: heat_capacity_and_heat_content_series
         locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}}
         phase: CaMgSi2O6_liquid_and_crystalline_diopside
         crystal_phase_as_stated: diopside
         condensed_form:
@@ -548,6 +572,8 @@ species:
           composition: CaMgSi2O6
           quantity: heat_of_fusion
           method_class: quoted_attributed
+          attribution: Robie et al. (1979)
+          T_K: 1665
           estimate_from_glass_Cp_only: 18.5
           locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
           derivation: {relation: quoted earlier-worker estimate, inputs: [Table 7 footnote 2, Robie et al. (1979)]}
@@ -669,6 +695,8 @@ species:
         experiment: high-temperature-drop-calorimetry-series
         type: heat_capacity_and_heat_content_series
         locator: {table: '7', page: 723}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 723}}
         T_range_K: [1373, 1373]
         phase: NaAlSi3O8_liquid_and_disordered_crystalline_albite
         crystal_phase_as_stated: disordered crystalline albite, probably monoclinic near melting; Table 5 calls it analbite
@@ -680,8 +708,10 @@ species:
         values:
           composition: NaAlSi3O8
           quantity: heat_of_fusion
-          method_class: measured_reduced
+          method_class: model_derived
           derived_from: [stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5, pdf:stebbins-carmichael-weill-1983, Stebbins et al. (1982) albite glass and liquid heat-content series]
+          T_K: 1373
+          preferred_estimate: 15.0
           derivation:
             relation: Delta H_f(T) = H_liquid(T) - H_crystal(T), combining the stable-liquid and disordered-crystal heat-content functions with heat-of-vitrification and heat-capacity corrections (Equations 3-4).
             inputs: ["Hemingway et al. (1981) crystalline albite heat-capacity equation selected for the disordered phase (printed p. 725)", "Weill et al. (1980a) heat-of-vitrification estimate selected and adjusted to 1373 K (printed p. 725)", "Subtract the 555 cal/mol annealing term at 981 K (Table 1 annealed-minus-unannealed difference; printed pp. 720 and 725)", "Table 5 crystalline analbite and low-albite melt heat contents", "Stebbins et al. (1982) albite glass/liquid heat-content series"]
@@ -693,27 +723,18 @@ species:
               preferred_kcal_per_mol: 15.0
               note: Evaluated in cal/mol; 14.9539802 kcal/mol rounds to the preferred 15.0 kcal/mol at the printed precision.
           table_7_heat_of_fusion:
-            evidence_class: measured_reduced
-            method_class: measured_reduced
+            evidence_class: model_derived
+            method_class: model_derived
             derivation:
               relation: liquid-minus-crystal enthalpy at 1373 K using the stable-liquid and disordered-crystal heat-content equations
               inputs: ["Hemingway et al. (1981) crystalline albite heat-capacity equation selected for the disordered phase (printed p. 725)", "Weill et al. (1980a) heat-of-vitrification estimate selected and adjusted to 1373 K (printed p. 725)", "Subtract the 555 cal/mol annealing term at 981 K (Table 1 annealed-minus-unannealed difference; printed pp. 720 and 725)", "Table 5 crystalline analbite and low-albite melt heat contents", "Stebbins et al. (1982) albite glass/liquid heat-content series"]
             derived_from: [stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5, pdf:stebbins-carmichael-weill-1983, Stebbins et al. (1982) albite glass and liquid heat-content series]
-            entropy_of_fusion:
-              values:
-                - {value: 10.9, units: cal/mol/K, locator: {page: 717, section: Abstract}}
-                - {value: 10.7, units: cal/mol/K, locator: {page: 728, section: Discussion}}
-              note: Both printed values are retained; the paper does not reconcile the difference.
             conversion_to_kJ_per_mol_formula_unit:
               premise: 1 kcal = 4.184 kJ
               algebra: 15.0 kcal/mol NaAlSi3O8 * 4.184 kJ/kcal = 62.76 kJ/mol NaAlSi3O8
               unit_check: kcal cancels; result is kJ per mole of NaAlSi3O8 formula units
               sanity_check: approximately 63 kJ/mol, consistent with the printed 15.0 kcal/mol
             locator: {table: '7', page: PDF p. 7 / printed p. 723}
-            pressure_bar: 1
-            T_K: 1373
-            units: kcal/mol
-            preferred_estimate: 15.0
             preferred_uncertainty: 0.5
             preferred_uncertainty_source:
               locators:
@@ -726,9 +747,43 @@ species:
               - 21.195*T - 3.912e-3*T^2 - 6760
             simplified_equation_valid_range_K: [900, 2000]
         uncertainty: {value: 0.5, units: kcal/mol, locator: {page: 717, section: Abstract}}
+      - observation_id: stebbins_1983_albite_entropy_of_fusion_abstract
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 717, section: Abstract}
+        phase: NaAlSi3O8_liquid_and_disordered_crystalline_albite
+        standard_state: entropy of fusion at the melting temperature
+        units: cal/mol/K
+        values:
+          quantity: entropy_of_fusion
+          method_class: model_derived
+          T_K: 1373
+          value: 10.9
+          derived_from: [stebbins_1983_albite_heat_of_fusion_table_7]
+          derivation:
+            relation: fusion_entropy_calculated_from_heat_of_fusion_and_fusion_temperature
+            inputs: [stebbins_1983_albite_heat_of_fusion_table_7]
+            locator: {page: 717, section: Abstract}
+      - observation_id: stebbins_1983_albite_entropy_of_fusion_discussion
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 728, section: Discussion}
+        phase: NaAlSi3O8_liquid_and_disordered_crystalline_albite
+        standard_state: entropy of fusion at the melting temperature
+        units: cal/mol/K
+        values:
+          quantity: entropy_of_fusion
+          method_class: model_derived
+          T_K: 1373
+          value: 10.7
+          derived_from: [stebbins_1983_albite_heat_of_fusion_table_7]
+          derivation:
+            relation: fusion_entropy_calculated_from_heat_of_fusion_and_fusion_temperature
+            inputs: [stebbins_1983_albite_heat_of_fusion_table_7]
+            locator: {page: 728, section: Discussion}
       - observation_id: stebbins_1983_albite_weill_table_7_fusion_quote
         type: heat_capacity_and_heat_content_series
         locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}}
         phase: NaAlSi3O8_liquid_and_crystalline_disordered_albite
         crystal_phase_as_stated: disordered albite
         units: kcal/mol
@@ -737,12 +792,16 @@ species:
           composition: NaAlSi3O8
           quantity: heat_of_fusion
           method_class: quoted_attributed
+          attribution: Weill et al. (1980a)
+          T_K: 1373
           estimate_from_liquid_glass_Cp_and_Tg: 15.4
           locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
           derivation: {relation: quoted earlier-worker estimate, inputs: [Table 7 footnote 1, Weill et al. (1980a), adjusted to 1373 K for albite]}
       - observation_id: stebbins_1983_albite_robie_table_7_fusion_quote
         type: heat_capacity_and_heat_content_series
         locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}}
         phase: NaAlSi3O8_liquid_and_crystalline_disordered_albite
         crystal_phase_as_stated: disordered albite
         units: kcal/mol
@@ -751,6 +810,8 @@ species:
           composition: NaAlSi3O8
           quantity: heat_of_fusion
           method_class: quoted_attributed
+          attribution: Robie et al. (1978)
+          T_K: 1373
           estimate_from_glass_Cp_only: 14.0
           locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
           derivation: {relation: quoted earlier-worker estimate, inputs: [Table 7 footnote 3, Robie et al. (1978), adjusted to 1373 K for albite]}
@@ -860,6 +921,8 @@ species:
         experiment: high-temperature-drop-calorimetry-series
         type: heat_capacity_and_heat_content_series
         locator: {table: '7', page: 723}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 723}}
         T_range_K: [1473, 1473]
         phase: KAlSi3O8_liquid_and_crystalline_sanidine
         crystal_phase_as_stated: sanidine; high/low subtype is not specified
@@ -871,8 +934,10 @@ species:
         values:
           composition: KAlSi3O8
           quantity: heat_of_fusion
-          method_class: measured_reduced
+          method_class: model_derived
           derived_from: [stebbins_1983_sanidine_calorimetry_measured_table_3, pdf:stebbins-carmichael-weill-1983, Waldbaum (1968) metastable melting-temperature estimate]
+          T_K: 1473
+          preferred_estimate: 13.8
           derivation:
             relation: Delta H_f(T) = H_liquid(T) - H_crystal(T) at the hypothetical metastable 1473 K reference; the paper combines liquid and crystal heat contents, heat of vitrification, and heat-capacity corrections as in Equations 3-4.
             inputs: ["Hemingway et al. (1981) crystalline sanidine heat-capacity equation based on DSC data to 1000 K, extrapolated above (printed p. 726)", "Waldbaum and Robie (1971) heat-of-vitrification value selected for sanidine (printed p. 726)", "Add approximately 555 cal/mol because the Waldbaum and Robie glass was thoroughly annealed relative to the rapidly quenched calorimeter glass (printed p. 726)", "Table 3 heat-content series and Krupka et al. (1979) DSC glass heat-capacity data", "Waldbaum (1968) metastable melting-temperature estimate"]
@@ -884,13 +949,12 @@ species:
               preferred_kcal_per_mol: 13.8
               note: Evaluated in cal/mol; 13.7596197 kcal/mol rounds to the preferred 13.8 kcal/mol at the printed precision.
           table_7_heat_of_fusion:
-            evidence_class: measured_reduced
-            method_class: measured_reduced
+            evidence_class: model_derived
+            method_class: model_derived
             derivation:
               relation: metastable congruent liquid-minus-crystal enthalpy at the extrapolated 1473 K melting point
               inputs: ["Hemingway et al. (1981) crystalline sanidine heat-capacity equation based on DSC data to 1000 K, extrapolated above (printed p. 726)", "Waldbaum and Robie (1971) heat-of-vitrification value selected for sanidine (printed p. 726)", "Add approximately 555 cal/mol because the Waldbaum and Robie glass was thoroughly annealed relative to the rapidly quenched calorimeter glass (printed p. 726)", "Table 3 heat-content series and Krupka et al. (1979) DSC glass heat-capacity data", "Waldbaum (1968) metastable melting-temperature estimate"]
             derived_from: [stebbins_1983_sanidine_calorimetry_measured_table_3, pdf:stebbins-carmichael-weill-1983]
-            entropy_of_fusion: {value: 9.4, units: cal/mol/K, locator: {page: 717, section: Abstract}}
             direct_fusion_temperature_estimate: {value: 1473, uncertainty: 40, units: K, source: Waldbaum (1968), locator: {page: 726, section: Sanidine}}
             conversion_to_kJ_per_mol_formula_unit:
               premise: 1 kcal = 4.184 kJ
@@ -898,11 +962,7 @@ species:
               unit_check: kcal cancels; result is kJ per mole of KAlSi3O8 formula units
               sanity_check: approximately 58 kJ/mol, consistent with the printed 13.8 kcal/mol
             locator: {table: '7', page: PDF p. 7 / printed p. 723}
-            pressure_bar: 1
-            T_K: 1473
             metastable: true
-            units: kcal/mol
-            preferred_estimate: 13.8
             preferred_uncertainty: 1.0
             preferred_uncertainty_source:
               locators:
@@ -914,9 +974,27 @@ species:
               - 25.429*T - 5.2361e-3*T^2 - 12338
             simplified_equation_valid_range_K: [900, 2000]
         uncertainty: {value: 1.0, units: kcal/mol, locator: {page: 717, section: Abstract}}
+      - observation_id: stebbins_1983_sanidine_entropy_of_fusion_abstract
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 717, section: Abstract}
+        phase: KAlSi3O8_liquid_and_crystalline_sanidine
+        standard_state: entropy of fusion at the melting temperature
+        units: cal/mol/K
+        values:
+          quantity: entropy_of_fusion
+          method_class: model_derived
+          T_K: 1473
+          value: 9.4
+          derived_from: [stebbins_1983_sanidine_heat_of_fusion_table_7]
+          derivation:
+            relation: fusion_entropy_calculated_from_heat_of_fusion_and_fusion_temperature
+            inputs: [stebbins_1983_sanidine_heat_of_fusion_table_7]
+            locator: {page: 717, section: Abstract}
       - observation_id: stebbins_1983_sanidine_robie_table_7_fusion_quote
         type: heat_capacity_and_heat_content_series
         locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}}
         phase: KAlSi3O8_liquid_and_crystalline_sanidine
         crystal_phase_as_stated: sanidine; high/low subtype is not specified
         units: kcal/mol
@@ -925,6 +1003,8 @@ species:
           composition: KAlSi3O8
           quantity: heat_of_fusion
           method_class: quoted_attributed
+          attribution: Robie et al. (1978)
+          T_K: 1473
           estimate_from_glass_Cp_only: 11.9
           locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
           derivation: {relation: quoted earlier-worker estimate, inputs: [Table 7 footnote 3, Robie et al. (1978)]}
@@ -1033,6 +1113,8 @@ species:
         experiment: high-temperature-drop-calorimetry-series
         type: heat_capacity_and_heat_content_series
         locator: {table: '7', page: 723}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 723}}
         T_range_K: [1750, 1750]
         phase: NaAlSiO4_liquid_and_metastable_crystalline_gamma_nepheline
         crystal_phase_as_stated: metastable γ-nepheline; α→β at 467 K, β→γ at 1180 K, carnegieite at 1525 K, carnegieite melting at 1799 K
@@ -1045,20 +1127,22 @@ species:
         values:
           composition: NaAlSiO4
           quantity: heat_of_fusion
-          method_class: measured_reduced
+          method_class: model_derived
           derived_from: [stebbins_1983_nepheline_calorimetry_measured_table_3, pdf:stebbins-carmichael-weill-1983, phase-diagram estimate of metastable γ-nepheline melting temperature]
           derivation:
             relation: Delta H_f(T) = H_liquid(T) - H_crystal(T) at the estimated metastable γ-nepheline temperature; the authors use β-nepheline heat of vitrification at 985 K and the reported zero β-to-γ transition enthalpy.
             inputs: ["Kelley et al. (1953) heat capacities for the four nepheline polymorphs; the authors report zero enthalpy change from beta to gamma (printed p. 726)", "Navrotsky et al. (1980) beta-nepheline heat-of-vitrification value measured at 985 K (printed p. 726)", "Table 3 liquid heat-content series and Table 4 glass/liquid functions", "Phase-diagram estimate of metastable gamma-nepheline melting at 1750 +/- 50 K; gamma-to-carnegieite conversion at 1525 K (printed pp. 726-727)"]
             qualification: Carnegieite solution-calorimetry data were unavailable; the 1750 K estimate is for metastable γ-nepheline and is not stable congruent fusion.
+          T_K: 1750
+          T_uncertainty_K: 50
+          preferred_estimate: 11.7
           table_7_heat_of_fusion:
-            evidence_class: measured_reduced
-            method_class: measured_reduced
+            evidence_class: model_derived
+            method_class: model_derived
             derivation:
               relation: liquid-minus-crystal enthalpy at the estimated metastable 1750 K γ-nepheline fusion temperature
               inputs: ["Kelley et al. (1953) heat capacities for the four nepheline polymorphs; the authors report zero enthalpy change from beta to gamma (printed p. 726)", "Navrotsky et al. (1980) beta-nepheline heat-of-vitrification value measured at 985 K (printed p. 726)", "Table 3 liquid heat-content series and Table 4 glass/liquid functions", "Phase-diagram estimate of metastable gamma-nepheline melting at 1750 +/- 50 K; gamma-to-carnegieite conversion at 1525 K (printed pp. 726-727)"]
             derived_from: [stebbins_1983_nepheline_calorimetry_measured_table_3, pdf:stebbins-carmichael-weill-1983]
-            entropy_of_fusion: {value: 6.7, uncertainty: 0.2, units: cal/mol/K, T_uncertainty_K: 50, locator: {page: 728, section: Discussion}}
             entropy_alternate_basis: {value: 0.96, uncertainty: 0.03, units: cal/gram-atom/K, locator: {page: 728, section: Discussion}}
             conversion_to_kJ_per_mol_formula_unit:
               premise: 1 kcal = 4.184 kJ
@@ -1066,12 +1150,7 @@ species:
               unit_check: kcal cancels; result is kJ per mole of NaAlSiO4 formula units
               sanity_check: approximately 49 kJ/mol, consistent with the printed 11.7 kcal/mol
             locator: {table: '7', page: PDF p. 7 / printed p. 723}
-            pressure_bar: 1
-            T_K: 1750
-            T_uncertainty_K: 50
             metastable: true
-            units: kcal/mol
-            preferred_estimate: 11.7
             preferred_uncertainty: 0.5
             preferred_uncertainty_source:
               locators:
@@ -1084,6 +1163,24 @@ species:
             simplified_equation_valid_range_K: [1180, 1800]
             validity_note: Table 7's γ-nepheline fusion equation applies over the γ phase interval reported on pp. 726-727; the separate 900-2000 K recommendation is for simplified crystalline equations.
         uncertainty: {value: 0.5, units: kcal/mol, locator: {page: 717, section: Abstract}}
+      - observation_id: stebbins_1983_nepheline_entropy_of_fusion_discussion
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 728, section: Discussion}
+        phase: NaAlSiO4_liquid_and_metastable_crystalline_gamma_nepheline
+        standard_state: entropy of fusion at the estimated metastable gamma-nepheline fusion temperature
+        units: cal/mol/K
+        values:
+          quantity: entropy_of_fusion
+          method_class: model_derived
+          T_K: 1750
+          T_uncertainty_K: 50
+          value: 6.7
+          derived_from: [stebbins_1983_nepheline_heat_of_fusion_table_7]
+          derivation:
+            relation: fusion_enthalpy_divided_by_fusion_temperature
+            inputs: [stebbins_1983_nepheline_heat_of_fusion_table_7]
+            locator: {page: 728, section: Discussion}
+        uncertainty: {value: 0.2, units: cal/mol/K, locator: {page: 728, section: Discussion}}
   CaAl2Si2O8:
     observations:
       - observation_id: stebbins_1983_anorthite_calorimetry_measured_table_1
@@ -1124,6 +1221,8 @@ species:
       - observation_id: stebbins_1983_anorthite_table_7_fusion_quotes
         type: heat_capacity_and_heat_content_series
         locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}}
         phase: CaAl2Si2O8_glass_and_crystalline_anorthite
         crystal_phase_as_stated: anorthite, as named for the cited heat-of-fusion estimate
         condensed_form:
@@ -1135,33 +1234,43 @@ species:
           composition: CaAl2Si2O8
           quantity: heat_of_fusion
           method_class: quoted_attributed
-          attribution: 'Weill et al. (1980b); Robie et al. (1978)'
-          derived_from: [Weill et al. (1980b), Robie et al. (1978) glass-Cp-only estimate]
-          table_7_heat_of_fusion:
-            locator: {table: '7', page: PDF p. 7 / printed p. 723}
-            pressure_bar: 1
-            T_K: 1830
-            units: kcal/mol
-            preferred_estimate: 32.4
-            estimate_from_glass_Cp_only: 19.4
-            estimate_from_glass_Cp_only_source: Robie et al. (1978)
-            preferred_estimate_source: Weill et al. (1980b)
-            evidence_class: quoted_attributed
-            method_class: quoted_attributed
-            derivation: {relation: none_in_this_paper, inputs: [Weill et al. (1980b)]}
-            derived_from: [Weill et al. (1980b) anorthite heat-of-fusion estimate]
+          attribution: Weill et al. (1980b)
+          T_K: 1830
+          preferred_estimate: 32.4
         uncertainty: {note: Table 7 states no uncertainty for the quoted preferred estimate.}
         equipment: {}
+      - observation_id: stebbins_1983_anorthite_robie_table_7_fusion_quote
+        type: heat_capacity_and_heat_content_series
+        locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}
+        point_conditions:
+          pressure_bar: {state: {tag: value, value: 1}, locator: {table: '7', page: 'PDF p. 7 / printed p. 723'}}
+        phase: CaAl2Si2O8_glass_and_crystalline_anorthite
+        crystal_phase_as_stated: anorthite, as named for the cited fusion estimate
+        condensed_form:
+          polymorph: anorthite
+        polymorph_notes: "Table 7 names anorthite for the cited fusion estimate without specifying a further crystalline subtype (printed p. 723)."
+        standard_state: heat of fusion at 1 bar
+        units: kcal/mol
+        quote: "Table 7 footnote 3: Robie et al. (1978)."
+        values:
+          composition: CaAl2Si2O8
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          attribution: Robie et al. (1978)
+          T_K: 1830
+          estimate_from_glass_Cp_only: 19.4
+        uncertainty: {note: Table 7 states no uncertainty for the quoted glass-Cp-only estimate.}
+        equipment: {}
 fidelity_samples:
-  - path: species.CaMgSi2O6.observations[stebbins_1983_diopside_heat_of_fusion_table_7].values.table_7_heat_of_fusion.preferred_estimate
+  - path: species.CaMgSi2O6.observations[stebbins_1983_diopside_heat_of_fusion_table_7].values.preferred_estimate
     value: 33.0
     locator: {table: '7', page: 723, note: 'Preferred heat of fusion, kcal/mol'}
-  - path: species.NaAlSi3O8.observations[stebbins_1983_albite_heat_of_fusion_table_7].values.table_7_heat_of_fusion.preferred_estimate
+  - path: species.NaAlSi3O8.observations[stebbins_1983_albite_heat_of_fusion_table_7].values.preferred_estimate
     value: 15.0
     locator: {table: '7', page: 723, note: 'Preferred heat of fusion, kcal/mol'}
-  - path: species.KAlSi3O8.observations[stebbins_1983_sanidine_heat_of_fusion_table_7].values.table_7_heat_of_fusion.preferred_estimate
+  - path: species.KAlSi3O8.observations[stebbins_1983_sanidine_heat_of_fusion_table_7].values.preferred_estimate
     value: 13.8
     locator: {table: '7', page: 723, note: 'Metastable preferred heat of fusion, kcal/mol'}
-  - path: species.NaAlSiO4.observations[stebbins_1983_nepheline_heat_of_fusion_table_7].values.table_7_heat_of_fusion.preferred_estimate
+  - path: species.NaAlSiO4.observations[stebbins_1983_nepheline_heat_of_fusion_table_7].values.preferred_estimate
     value: 11.7
     locator: {table: '7', page: 723, note: 'Metastable preferred heat of fusion, kcal/mol'}

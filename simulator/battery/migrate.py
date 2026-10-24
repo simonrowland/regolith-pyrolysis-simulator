@@ -8610,6 +8610,10 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.ENTHALPY_OF_FUSION: (
         "delta_H_fus_kJ_mol-1",
         "delta_H_fusion_kJ_mol",
+        "value_kcal_per_mol",
+        "preferred_estimate",
+        "estimate_from_liquid_glass_Cp_and_Tg",
+        "estimate_from_glass_Cp_only",
         "value",
     ),
     Quantity.ENTROPY_OF_FUSION: (
