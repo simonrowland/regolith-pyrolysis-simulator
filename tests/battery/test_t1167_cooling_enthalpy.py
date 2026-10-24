@@ -2,12 +2,14 @@
 
 from decimal import Decimal
 
+import yaml
+
 from simulator.battery.enums import EvidenceClass, Quantity, StateTag, ValueKind
 from simulator.battery.migrate import REPO_ROOT
 from tests.battery.factories import migrate_one_extract
 
 
-def test_zigo_measured_cooling_column_maps_to_H_minus_H298_with_provenance() -> None:
+def test_zigo_crystal_cooling_column_maps_to_H_minus_H298_with_provenance() -> None:
     migrator = migrate_one_extract(
         REPO_ROOT,
         REPO_ROOT / "data/literature/extracts/zigo-1987-gehlenite-fusion.yaml"
@@ -70,13 +72,53 @@ def test_zigo_table_fit_and_composite_rows_use_existing_quantities() -> None:
         )
     ]
     assert len(table4_cooling) == 5
-    assert all(point.identity.quantity.value is Quantity.H_MINUS_H298 for point in table4_cooling)
+    assert all(point.identity.quantity.tag is StateTag.UNKNOWN for point in table4_cooling)
+    assert all(
+        "sample_dependent_enthalpy_change_on_cooling" in point.identity.quantity.reason
+        for point in table4_cooling
+    )
+    assert all(point.value.kind is ValueKind.UNAVAILABLE for point in table4_cooling)
     assert all(point.evidence.class_.value is EvidenceClass.MEASURED_DIRECT for point in table4_cooling)
     assert all(point.locator.page == 177 and point.locator.table == "4" for point in table4_cooling)
+    expected_temperatures = {
+        Decimal("1873"), Decimal("1888"), Decimal("1908"), Decimal("1932"), Decimal("1948")
+    }
+    assert {
+        point.point_conditions["temperature_K"].state.value for point in table4_cooling
+    } == expected_temperatures
     assert all(
         point.point_conditions["temperature_K"].state.tag is StateTag.VALUE
         and point.point_conditions["temperature_K"].locator == point.locator
         for point in table4_cooling
+    )
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/zigo-1987-gehlenite-fusion.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    raw_cooling = next(
+        observation
+        for observation in source["species"]["gehlenite"]["observations"]
+        if observation["observation_id"] == "zigo_1987_t4_melt_cooling_enthalpy_measured"
+    )["values"]
+    assert raw_cooling["quantity"] == "sample_dependent_enthalpy_change_on_cooling"
+    assert "proportions and structures" in raw_cooling["note"]
+    assert [point["minus_delta_H_cool_kJ_mol-1"] for point in raw_cooling["points"]] == [
+        545.1, 548.9, 561.5, 571.7, 584.3
+    ]
+
+    melt_relative_enthalpy = [
+        observation
+        for observation in observations.values()
+        if observation.observation_id.split("::", 1)[1].startswith(
+            "zigo_1987_t4_melt_relative_enthalpy_fit"
+        )
+    ]
+    assert melt_relative_enthalpy
+    assert all(
+        observation.identity.quantity.tag is StateTag.UNKNOWN
+        and observation.value.kind is ValueKind.UNAVAILABLE
+        for observation in melt_relative_enthalpy
     )
 
     sensitivity = [
