@@ -14058,6 +14058,112 @@ def test_transition_missing_pressure_uses_ambient_pressure_with_notice(
     )
 
 
+def test_ambient_transition_pressure_is_compared_only_with_its_notice(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    calls = []
+    _transition_finder_handle(
+        monkeypatch,
+        Engine.MAGEMIN,
+        LiquidusSolidusResult(
+            liquidus_T_C=1400.0,
+            liquidus_T_K=1673.15,
+            solidus_T_C=1200.0,
+            liquid_fraction=1.0,
+            status="ok",
+        ),
+        calls,
+    )
+    experiment = F.tabulation_experiment()
+    observation = replace(
+        _transition_temperature_observation(pressure_pa=None),
+        value=Value.point_of(Decimal("0")),
+    )
+    context = _context(F.work(), experiment, observation)
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.MAGEMIN,
+        context=context,
+        prediction=prediction,
+        comparison_ids={observation.observation_id},
+    )
+
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.numeric.value == prediction.value == Decimal("1673.15")
+    ambient_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and notice.reason == "ambient pressure assumed, not printed"
+    )
+    assert ambient_notice in residual.notices
+    assert observation.identity.total_pressure_Pa.is_unknown
+    assert prediction.identity.total_pressure_Pa.is_unknown
+    assert calls[0][1]["pressure_bar"] == 1.0
+
+    no_notice_prediction = replace(
+        prediction,
+        notices=tuple(
+            notice for notice in prediction.notices if notice is not ambient_notice
+        ),
+    )
+    no_notice_residual, _candidate = compile_residual(
+        observation,
+        Engine.MAGEMIN,
+        context=context,
+        prediction=no_notice_prediction,
+        comparison_ids={observation.observation_id},
+    )
+
+    assert no_notice_residual.status is ResidualStatus.REFUSED
+    assert no_notice_residual.refusal is not None
+    assert no_notice_residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert no_notice_residual.refusal.detail["fields"] == ["total_pressure_Pa"]
+
+    high_pressure_experiment = replace(
+        experiment,
+        apparatus=Apparatus(
+            cell_material_and_liner=Located(State.of("diamond anvil"))
+        ),
+    )
+    high_pressure_observation = replace(
+        observation,
+        observation_id="transition-temperature::high-pressure",
+    )
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda _name: pytest.fail("high-pressure rows must refuse before engine open"),
+    )
+    high_pressure_prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        high_pressure_observation,
+        experiment=high_pressure_experiment,
+    )
+    high_pressure_context = _context(
+        F.work(), high_pressure_experiment, high_pressure_observation
+    )
+    high_pressure_residual, _candidate = compile_residual(
+        high_pressure_observation,
+        Engine.MAGEMIN,
+        context=high_pressure_context,
+        prediction=high_pressure_prediction,
+        comparison_ids={high_pressure_observation.observation_id},
+    )
+
+    assert high_pressure_residual.status is ResidualStatus.REFUSED
+    assert high_pressure_residual.refusal is not None
+    assert high_pressure_residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert high_pressure_residual.refusal.detail["reason"] == "total_pressure_unknown"
+    assert high_pressure_observation.identity.total_pressure_Pa.is_unknown
+
+
 @pytest.mark.parametrize(
     "apparatus_text",
     ["piston-cylinder press", "multi-anvil press", "autoclave", "diamond cell"],
