@@ -255,6 +255,56 @@ def test_unitless_holzheid_ad10_log_is_one_bar_with_notice(tmp_path: Path) -> No
     assert "fO2_Pa" not in _same_row_identity(observation).fields
 
 
+def test_unitless_log_iw_band_edges_follow_the_row_temperature(tmp_path: Path) -> None:
+    """Closed window at this row's T: IW±6 is 1 bar; IW±6.0001 stays unknown.
+
+    The centre is ``feo_iw_log10_fO2_bar`` at the row temperature, then
+    ``Decimal(str(centre))``, the same conversion the migrator applies.
+    """
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+
+    temperature = Decimal("1677")
+    centre = Decimal(str(feo_iw_log10_fO2_bar(float(temperature), a_feo=1.0)))
+    cases = (
+        (centre - Decimal(6), True),
+        (centre + Decimal(6), True),
+        (centre - Decimal("6.0001"), False),
+        (centre + Decimal("6.0001"), False),
+    )
+    for edge, accepted in cases:
+        log = format(edge, "f")
+        result = _migrate_fixture(
+            tmp_path / log.replace("-", "m").replace(".", "p"),
+            quantity="activity_coefficient",
+            point={
+                "T_K": int(temperature),
+                "gamma": "1.62",
+                "log_fO2": log,
+                "locator": {"published_page": 23, "table": "2", "row": "IW edge"},
+            },
+        )
+        observation = _series_logged(result, Quantity.ACTIVITY_COEFFICIENT, log)
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.value == temperature
+        located_log = observation.point_conditions["fO2_log"]
+        assert located_log.state.is_value
+        assert _decimal_point(located_log.state) == Decimal(log)
+        oxygen = observation.identity.fO2_Pa
+        assert oxygen is not None
+        if accepted:
+            assert oxygen.is_value
+            assert oxygen.value == _log_fO2_to_pa(Decimal(log))
+            assert any(
+                notice.reason == _BARE_LOG_BAR_NOTICE for notice in observation.notices
+            )
+        else:
+            assert oxygen.is_unknown
+            assert oxygen.reason == _BARE_LOG_SCALE_UNKNOWN
+            outcome = _same_row_identity(observation)
+            assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+            assert "fO2_Pa" in outcome.fields
+
+
 def test_unitless_log_outside_iw_band_stays_unknown(tmp_path: Path) -> None:
     result = _migrate_fixture(
         tmp_path,
