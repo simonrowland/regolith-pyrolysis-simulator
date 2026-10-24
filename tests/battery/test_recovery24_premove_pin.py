@@ -74,7 +74,9 @@ def test_kress_fe_redox_output_is_bit_identical():
         assert prediction.version == "Kress-Carmichael-1991"
         assert prediction.identity is not None
         assert prediction.identity.fO2_Pa is not None
-        assert prediction.identity.fO2_Pa.value == Decimal("20892.96130854039")
+        assert prediction.identity.fO2_Pa.value == Decimal(
+            "20892.96130854039483122233736"
+        )
         assert prediction.identity.total_pressure_Pa is not None
         assert prediction.identity.total_pressure_Pa.value == Decimal("101325")
         assert prediction.certified_band == {
