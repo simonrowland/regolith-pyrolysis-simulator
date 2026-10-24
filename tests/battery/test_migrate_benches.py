@@ -490,11 +490,11 @@ def test_legacy_equipment_extract_output_has_no_empty_bench_key(tmp_path) -> Non
         digest.update(b"\0")
         digest.update(path.read_bytes())
         digest.update(b"\0")
-    # Byte pin of this fixture after the merged migrator. The checks above
-    # are the behaviour; the digest moves when row identity or bench wiring
-    # changes the written tree.
+    # 32f8a434f adds Derivation.references; the generic dataclass writer emits
+    # its empty tuple as references: [] in these fixture records. The checks
+    # above are the behavior; this digest pins the complete written tree.
     assert digest.hexdigest() == (
-        "69d1ac13c09d9bcc31ee40032342c3ffe035a5e84aaa656ce729439041ebea6f"
+        "3b9705c38dc37a96ec5a3cb5c975e91d65a14076a3e3b5a07a66b9b69587fbdc"
     )
 
 
