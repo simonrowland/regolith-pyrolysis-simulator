@@ -248,10 +248,17 @@ When the source does not print raw inputs, omit `inputs` entirely. The paper
 is never an input, and no invented observation may stand in for the unprinted
 inputs.
 
-`raw_inputs` is a typed `not_printed` value with its own source locator. It is
+`raw_inputs` is a typed status with its own source locator. `not_printed` is
 valid only for `measured_reduced`, cannot appear with `derived_from`, and does
 not replace the required derivation method or locator. Model-derived rows
 always require `derived_from`.
+
+`printed_unresolved` means every derivation input was printed prose and none
+of it resolves to a record id or asset. `inputs` is then empty. The verbatim
+text stays on the conditional-field issue and the migration-queue entry. The
+status is located by the derivation's locator or the row's locator. It is not
+complete lineage. When some inputs resolve, those ids stay in `inputs` and
+`raw_inputs` stays absent.
 
 Exactly one of:
 

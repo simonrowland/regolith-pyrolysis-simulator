@@ -140,6 +140,9 @@ class EvidenceClass(StrEnum):
 
 class RawInputStatus(StrEnum):
     NOT_PRINTED = "not_printed"
+    # Printed text that does not resolve to a record id or asset. It is kept
+    # on the conditional-field issue and the migration queue, not as lineage.
+    PRINTED_UNRESOLVED = "printed_unresolved"
 
 
 class RefusalReason(StrEnum):
