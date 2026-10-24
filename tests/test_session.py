@@ -574,10 +574,36 @@ def test_campaign_transition_zero_po2_override_leaves_atmosphere_at_default():
 
 
 def test_c0_forecast_reacts_to_web_ordered_ramp_override():
+    def parity_setpoints():
+        setpoints = _load_yaml("setpoints.yaml")
+        kernel = dict(setpoints.get("chemistry_kernel", {}) or {})
+        kernel["allow_unmeasured_alpha_fallback"] = True
+        series = dict(
+            kernel.get("evaporation_series_resistance", {}) or {}
+        )
+        series["gas_resistance_enabled"] = False
+        kernel["evaporation_series_resistance"] = series
+        setpoints["chemistry_kernel"] = kernel
+        return setpoints
+
+    setpoints = parity_setpoints()
     configured_before_start = SimSession().start(
-        _config(runtime_campaign_overrides={"C0": {"ramp_rate": 2000.0}})
+        _config(
+            setpoints=setpoints,
+            runtime_campaign_overrides={
+                "C0": {"max_hours": 1.0, "ramp_rate": 2000.0}
+            },
+        )
     )
-    started_before_adjustment = SimSession().start(_config())
+    started_before_adjustment = SimSession().start(
+        _config(setpoints=setpoints)
+    )
+    started_before_adjustment.adjust(
+        "campaign_override",
+        1.0,
+        campaign="C0",
+        field="max_hours",
+    )
     started_before_adjustment.adjust(
         "campaign_override",
         2000.0,
