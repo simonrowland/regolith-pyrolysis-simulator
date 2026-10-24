@@ -1763,6 +1763,44 @@ def test_alphamelts_subprocess_liquidus_finder_selects_native_mode():
     assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
 
 
+@pytest.mark.parametrize('backend_type', (AlphaMELTSBackend, ThermoEngineBackend))
+def test_condensed_equilibrium_without_transport_oxygen(monkeypatch, backend_type):
+    backend = backend_type()
+    backend._mode = 'thermoengine' if backend_type is ThermoEngineBackend else 'subprocess'
+    monkeypatch.setattr(backend, 'is_available', lambda: True)
+
+    def native(**kwargs):
+        result = EquilibriumResult(
+            status='ok', temperature_C=1300.0, pressure_bar=1.0,
+            fO2_log=-9.0,
+            liquid_fraction=(min(1.0, max(0.0, (kwargs['temperature_C'] - 1200.0) / 100.0))
+                             if backend_type is ThermoEngineBackend else 1.0),
+            liquidus_T_C=1300.0,
+            phase_masses_kg={'liquid': 1.0},
+            liquid_composition_wt_pct=_melts_domain_composition(),
+        )
+        pressures, sources, diagnostic = backend._builtin_vapor_projection_for_subprocess(result)
+        assert pressures == sources == {}
+        if result.liquid_fraction:
+            assert diagnostic['vapor_pressure_backend_status'] == 'refused'
+            assert diagnostic['vapor_pressure_backend_status_reason'] == 'missing_transport_pO2'
+        else:
+            assert diagnostic['vapor_pressure_zero_reason'] == 'no_liquid_phase'
+        return result
+
+    monkeypatch.setattr(backend, '_equilibrate_prepared', native)
+    result = backend.equilibrate(1300.0, composition_kg=_melts_domain_composition(),
+                                 fO2_log=-9.0, pressure_bar=1.0)
+    assert result.status == 'ok' and result.liquid_fraction == 1.0
+    liquidus = backend.find_liquidus_solidus(
+        composition_kg=_melts_domain_composition(), fO2_log=-9.0, pressure_bar=1.0)
+    assert liquidus.status == 'ok'
+    assert liquidus.liquidus_T_C == pytest.approx(1300.0, abs=2.0)
+    if backend_type is ThermoEngineBackend:
+        assert liquidus.solidus_T_C == pytest.approx(1200.0, abs=2.0)
+    assert backend._vapor_transport_pO2_bar is None
+
+
 def test_alphamelts_subprocess_liquidus_pins_single_absolute_melts_request(
     monkeypatch,
 ):

@@ -1073,7 +1073,8 @@ class _MELTSBackendSupport(MeltBackend):
         if admission not in ('environment', 'observation', 'surface_closure'):
             raise ValueError(f'unsupported vapor_transport_pO2_admission={admission!r}')
         if value is None:
-            raise ValueError('vapor_transport_pO2_bar requires an explicit physical oxygen boundary')
+            self._vapor_transport_pO2_bar = None
+            return
         request = IntentRequest(
             intent=ChemistryIntent.VAPOR_PRESSURE,
             account_view=ProviderAccountView(
@@ -5343,6 +5344,15 @@ class _MELTSBackendSupport(MeltBackend):
     # Vapor pressure helpers
     # ------------------------------------------------------------------
 
+    def _missing_vapor_transport_refusal(self) -> VaporPressureActivityRefusal | None:
+        if self._vapor_transport_pO2_bar is None:
+            return VaporPressureActivityRefusal(
+                missing_precursor_species=(),
+                context='vapor pressure requires an explicit physical oxygen boundary',
+                reason='missing_transport_pO2',
+            )
+        return None
+
     def _builtin_vapor_projection_for_subprocess(
         self,
         eq: EquilibriumResult,
@@ -5365,6 +5375,10 @@ class _MELTSBackendSupport(MeltBackend):
                 ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
                 'missing solved liquid composition for positive liquid fraction',
             )
+
+        refusal = self._missing_vapor_transport_refusal()
+        if refusal is not None:
+            return {}, {}, self._vapor_pressure_diagnostics({}, {}, refusal)
 
         from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
         from simulator.chemistry.offgas_fo2 import (
@@ -5546,6 +5560,10 @@ class _MELTSBackendSupport(MeltBackend):
         ) == MeltRegime.FROZEN:
             return {}, 'no_liquid_phase'
 
+        refusal = self._missing_vapor_transport_refusal()
+        if refusal is not None:
+            return {}, refusal
+
         # Composition alphaMELTS actually solved, projected to the
         # VapoRock helper by the canonical oxide names it filters on.
         # wt% are relative masses, so handing them in as composition_kg
@@ -5648,6 +5666,9 @@ class _MELTSBackendSupport(MeltBackend):
         pO2_bar: float | None = None,
         context: str,
     ) -> Dict[str, float] | VaporPressureActivityRefusal:
+        refusal = self._missing_vapor_transport_refusal() if pO2_bar is None else None
+        if refusal is not None:
+            return refusal
         table = self._load_vapor_pressure_table()
         if not table:
             raise RuntimeError(
