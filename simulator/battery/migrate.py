@@ -8577,7 +8577,7 @@ _ANCILLARY_SERIES_KEYS = (
 _PARTIAL_PRESSURE_FIELDS = ("partial_pressure_pa", "p_Ga_Pa", "p_In_Pa", "p_O2_calc_Pa")
 
 QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
-    Quantity.ACTIVITY: ("activity",),
+    Quantity.ACTIVITY: ("activity", "a_P2O5_times_1e17_as_printed"),
     Quantity.ACTIVITY_COEFFICIENT: ("gamma", "activity_coefficient"),
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: ("alpha", "alpha_times_Gamma"),
     Quantity.CP: (
@@ -9690,6 +9690,21 @@ def _selection_from_named_field(
                 )
             continue
         amount = _numeric_field(payload, key)
+        if (
+            q_token is Quantity.ACTIVITY
+            and key == "a_P2O5_times_1e17_as_printed"
+            and amount is not None
+        ):
+            # Kambayashi Table 7 prints a_P2O5 x 10^17. Store the activity
+            # defined by that header directly; do not select its old derived twin.
+            amount *= Decimal("1e-17")
+            return _point_selection(
+                amount,
+                key,
+                "printed_header_multiplier:10^-17",
+                payload,
+                condition_ranges,
+            )
         if (
             amount is None
             and q_token is Quantity.MASS_LOSS_FRACTION

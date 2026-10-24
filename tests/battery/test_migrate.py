@@ -16248,6 +16248,14 @@ def _assert_kambayashi_sample_associations(doc: dict, result) -> None:
             expected = samples[int(row["sample_no"])]
             assert_composition_condition(observation, expected, "4")
             assert_temperature(observation, row, table)
+            if observation_id == "kambayashi_1985_table7_raoultian_a_p2o5":
+                assert quantity_token(observation.identity) is Quantity.ACTIVITY
+                assert observation.value.kind is ValueKind.POINT
+                assert observation.value.point == (
+                    Decimal(str(row["a_P2O5_times_1e17_as_printed"]))
+                    * Decimal("1e-17")
+                )
+                assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
             if composition_is_identity:
                 assert observation.identity.composition is not None
                 assert observation.identity.composition.is_value
