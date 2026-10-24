@@ -206,8 +206,28 @@ def test_real_controls_oxygen_receipt(oxygen):
 
 
 def assert_consumer_values(receipt, expected):
-    for field in ('raw', 'legacy_pressures_Pa', 'vaporock_transport_audit', 'intrinsic'):
+    for field in ('raw', 'intrinsic'):
         assert receipt[field] == expected[field], field
+    # Reviewed roots used log10(p/bar) Brent tolerances of 1e-12. For
+    # P proportional to 10**(e*z), dP/P = ln(10)*e*dz; the unitless
+    # 1e-10 pressure budget covers that root precision in these cases.
+    # dz -> 0 recovers identity. Keep all independent controls exact.
+    for actual, old in zip(receipt['legacy_pressures_Pa'], expected['legacy_pressures_Pa'], strict=True):
+        assert actual.keys() == old.keys()
+        assert {s: float.fromhex(v) for s, v in actual.items()} == pytest.approx(
+            {s: float.fromhex(v) for s, v in old.items()}, rel=1e-10, abs=0.0)
+    audit = deepcopy(receipt['vaporock_transport_audit'])
+    old_audit = expected['vaporock_transport_audit']
+    for actual, old in zip(audit, old_audit, strict=True):
+        for plane, fields in (('requested', ('transport_pO2_bar',)),
+                              ('applied', ('transport_pO2_bar', 'transport_fO2_log', 'fO2_log'))):
+            for field in fields:
+                is_log = field.endswith('_log')
+                assert float.fromhex(actual[plane][field]) == pytest.approx(
+                    float.fromhex(old[plane][field]),
+                    rel=0.0 if is_log else 1e-10, abs=1e-10 if is_log else 0.0)
+                actual[plane][field] = old[plane][field]
+    assert audit == old_audit
 
 
 def assert_solved_controls(receipt):
@@ -280,10 +300,14 @@ def test_lunar_24_hour_sources_and_oxygen(lunar_trajectory, hour):
     evolved = {s: float.fromhex(row['source_kg_hr'][s]) + (
         float.fromhex(row['native_fe_vapor_mol']) * mass if s == 'Fe' else 0.0)
         for s in SPECIES}
+    # The reviewed trajectory used the same sqrt(epsilon) signed-flux
+    # acceptance. Compare its source values at that numerical resolution,
+    # retaining exact zeros (abs=0); the new delta roots close more tightly.
     assert evolved == pytest.approx({s: float.fromhex(expected['evolved_kg'][s])
-                                    for s in SPECIES}, rel=1e-10, abs=0.0)
-    for field in ('native_fe_vapor_mol', 'intrinsic_log_fO2'):
-        assert row[field] == expected[field], field
+                                    for s in SPECIES}, rel=math.sqrt(math.ulp(1.0)), abs=0.0)
+    assert row['native_fe_vapor_mol'] == expected['native_fe_vapor_mol']
+    assert float.fromhex(row['intrinsic_log_fO2']) == pytest.approx(
+        float.fromhex(expected['intrinsic_log_fO2']), rel=0.0, abs=1e-12)
     for rate in row['source_kg_hr'].values():
         assert math.isfinite(float.fromhex(rate)) and float.fromhex(rate) >= 0.0
     closure = row['closure']
