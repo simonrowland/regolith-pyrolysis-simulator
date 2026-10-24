@@ -10051,7 +10051,7 @@ def compile_residual(
             {
                 "reason": "static_equilibrium_method_is_vapour_rail_only",
                 "quantity": quantity.value,
-                "rail": rail.value,
+                "rail": None if rail is None else rail.value,
             },
             execution=Execution(state=ExecutionState.NOT_PROBED),
         )

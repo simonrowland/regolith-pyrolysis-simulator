@@ -188,6 +188,26 @@ def test_score_compiler_routes_non_alkali_rate_without_headline_rail():
     assert residual.refusal.detail["reason"] == "alpha_loo_insufficient_sources"
 
 
+def test_static_equilibrium_rate_without_rail_returns_typed_refusal():
+    row = _kinetic_row("Fe")
+    experiment = F.tabulation_experiment(
+        "kinetic-experiment", method=MethodToken.STATIC_EQUILIBRIUM
+    )
+    context = ScoreContext(
+        works={},
+        experiments={experiment.experiment_id: experiment},
+        observations={row.observation_id: row},
+    )
+
+    residual, _candidate = compile_residual(
+        row, Engine.INTERNAL_ANALYTICAL, context=context
+    )
+
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "static_equilibrium_method_is_vapour_rail_only"
+    assert residual.refusal.detail["rail"] is None
+
+
 def test_areal_rate_compiles_with_two_other_alpha_sources(monkeypatch):
     row = _kinetic_row("Mg")
     row = replace(
