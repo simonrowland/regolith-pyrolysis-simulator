@@ -89,7 +89,7 @@ def test_table2_comment_row_citations_match_pdf_pages() -> None:
         (12, 30, 24, "Equation corresponds to [K2O] ~ 14."),
         (13, 30, 24, "[K2O] 18.9-17.6."),
         (14, 30, 24, "23.3-22.1 [K2O]."),
-        (16, 31, 25, "6[K2O]."),
+        (16, 32, 25, "6[K2O]."),
     )
     for index, page, folio, quote in cited_rows:
         locator = rows[index]["composition_role"]["locator"]
