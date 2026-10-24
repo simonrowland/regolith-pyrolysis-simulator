@@ -40,7 +40,7 @@ def _borisov_rows():
     )
     _ROWS = {
         "row4": rows[f"{extract.stem}::borisov_2018_table2_row_4"],
-        "row155": rows[f"{extract.stem}::borisov_2018_table2_row_155"],
+        "table1_row1": rows[f"{extract.stem}::borisov_2018_table1_row_1"],
         "hot": rows[f"{extract.stem}::{hot['observation_id']}"],
     }
     return _ROWS
@@ -56,13 +56,14 @@ def _activity_case():
 def test_kress_fe_redox_output_is_bit_identical():
     rows = _borisov_rows()
     row4 = predict_with_engine(Engine.INTERNAL_ANALYTICAL, rows["row4"])
-    row155 = predict_with_engine(Engine.INTERNAL_ANALYTICAL, rows["row155"])
+    table1_row1 = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, rows["table1_row1"]
+    )
     hot = predict_with_engine(Engine.INTERNAL_ANALYTICAL, rows["hot"])
 
     assert row4.value == Decimal("1.838360613009497")
-    assert row155.value == Decimal("3.2770002461454593")
     assert hot.value == Decimal("0.915061835458987")
-    for prediction in (row4, row155, hot):
+    for prediction in (row4, hot):
         assert prediction.execution.state is ExecutionState.PRODUCED
         assert prediction.execution.call_evidence == "simulator.fe_redox:kress91_split"
         assert prediction.refusal_reason is None
@@ -81,8 +82,6 @@ def test_kress_fe_redox_output_is_bit_identical():
         }
     assert row4.authority is Authority.BRIDGE
     assert row4.notices == ()
-    assert row155.authority is Authority.BRIDGE
-    assert row155.notices == ()
     assert hot.authority is Authority.EXTRAPOLATED
     assert len(hot.notices) == 1
     notice = hot.notices[0]
@@ -96,6 +95,17 @@ def test_kress_fe_redox_output_is_bit_identical():
     assert notice.origin == "simulator.fe_redox:kress91_split"
     assert notice.band == "[1473.15, 1903.15] K"
     assert notice.authority is Authority.EXTRAPOLATED
+
+    # The re-read Table 1 cell is a direct ratio but its primary assay omits
+    # TiO2 and P2O5; the supplementary recalculation is secondary evidence.
+    assert rows["table1_row1"].identity.composition.is_unknown
+    assert "TiO2 and P2O5" in rows["table1_row1"].identity.composition.reason
+    assert table1_row1.value is None
+    assert table1_row1.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert table1_row1.refusal_detail == {
+        "reason": "missing_input",
+        "input": "composition",
+    }
 
     refused = predict_with_engine(Engine.MAGEMIN, rows["row4"])
     assert refused.value is None
