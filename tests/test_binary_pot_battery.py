@@ -145,8 +145,9 @@ def test_internal_analytical_observation_oxygen_reaches_transport_unchanged(monk
 
     monkeypatch.setattr(BuiltinVaporPressureProvider, 'dispatch', capture)
     oxygen = 1.3e-12
+    engine = open_battery_engine('internal-analytical')
     cell = equilibrate_cell(
-        open_battery_engine('internal-analytical'),
+        engine,
         BinaryPot('observation', None, 'transport receipt', {'SiO2': 90., 'FeO': 10.}),
         temperature_K=1873.15,
         po2=Po2Request(mode='commanded', po2_bar=oxygen),
@@ -156,8 +157,11 @@ def test_internal_analytical_observation_oxygen_reaches_transport_unchanged(monk
     request, result = receipts[-1]
     assert request.control_inputs['pO2_bar'] == oxygen
     assert result.diagnostic['pO2_bar'] == oxygen
-    assert request.fO2_log == math.log10(oxygen)
-    assert request.control_inputs['intrinsic_fO2_log'] == math.log10(oxygen)
+    core = engine.backend._core
+    published = core._intrinsic_oxygen_publication()['published_intrinsic_fO2_log']
+    assert request.fO2_log == published
+    assert request.control_inputs['intrinsic_fO2_log'] == published
+    assert core.melt.oxygen_reservoir.melt_intrinsic_fO2_log == math.log10(oxygen)
     assert request.control_inputs['vacuum_floor_bar'] == 1e-9
 
 
