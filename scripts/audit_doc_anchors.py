@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS_DIR = ROOT / "docs"
-DEFAULT_TOLERANCE = 25
+DEFAULT_TOLERANCE = 0
 
 ANCHOR_RE = re.compile(
     r"(?P<prefix><!--\s*impl:\s*§(?P<section>\d+(?:\.\d+)*)\s*->\s*"
@@ -319,19 +319,36 @@ def main(argv: list[str] | None = None) -> int:
 
     issues, anchor_count = audit(tolerance=args.tolerance)
     if args.refresh:
-        fixed = fix(issues)
+        fixed = fix(
+            [issue for issue in issues if issue.corrected_line is not None]
+        )
         if fixed:
             issues, anchor_count = audit(tolerance=args.tolerance)
         print(f"doc anchor audit: refreshed {fixed} drifted line hint(s)")
-    elif any(issue.corrected_line is not None for issue in issues):
+    warnings = [issue for issue in issues if issue.corrected_line is not None]
+    errors = [issue for issue in issues if issue.corrected_line is None]
+
+    if warnings:
+        print(
+            f"doc anchor audit: WARNING ({len(warnings)} stale line hint(s), "
+            f"{anchor_count} anchor(s))"
+        )
+        for issue in warnings:
+            rel_doc = issue.anchor.doc_path.relative_to(ROOT)
+            print(
+                f"{rel_doc}:{issue.anchor.line_no}: "
+                f"§{issue.anchor.section or '?'} "
+                f"{issue.anchor.target_path or '?'} "
+                f"{issue.anchor.symbol or '?'}: {issue.message}"
+            )
         print(
             "Refresh stale line hints with: "
             "python3 scripts/audit_doc_anchors.py --refresh"
         )
 
-    if issues:
-        print(f"doc anchor audit: FAIL ({len(issues)} issue(s), {anchor_count} anchor(s))")
-        for issue in issues:
+    if errors:
+        print(f"doc anchor audit: FAIL ({len(errors)} issue(s), {anchor_count} anchor(s))")
+        for issue in errors:
             rel_doc = issue.anchor.doc_path.relative_to(ROOT)
             print(
                 f"{rel_doc}:{issue.anchor.line_no}: "
