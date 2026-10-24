@@ -14166,7 +14166,14 @@ def test_ambient_transition_pressure_is_compared_only_with_its_notice(
 
 @pytest.mark.parametrize(
     "apparatus_text",
-    ["piston-cylinder press", "multi-anvil press", "autoclave", "diamond cell"],
+    [
+        "piston-cylinder press",
+        "multi-anvil press",
+        "autoclave",
+        "diamond cell",
+        "diamond anvil",
+        "high pressure",
+    ],
 )
 def test_transition_missing_pressure_with_high_pressure_apparatus_still_refuses(
     monkeypatch, apparatus_text: str
@@ -14190,6 +14197,37 @@ def test_transition_missing_pressure_with_high_pressure_apparatus_still_refuses(
         _transition_temperature_observation(pressure_pa=None),
         experiment=experiment,
     )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert prediction.refusal_detail["reason"] == "total_pressure_unknown"
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [State.unknown("source does not state phase"), Phase.G],
+    ids=["unknown", "vapour"],
+)
+def test_transition_missing_pressure_with_unknown_or_vapour_phase_refuses(
+    monkeypatch, phase: Phase | State
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda _name: pytest.fail("non-condensed rows must refuse before engine open"),
+    )
+    observation = _transition_temperature_observation(pressure_pa=None)
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            species=replace(observation.identity.species, phase=phase),
+        ),
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
 
     assert prediction.value is None
     assert prediction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
