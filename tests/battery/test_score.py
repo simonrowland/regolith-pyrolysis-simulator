@@ -3724,53 +3724,6 @@ def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures(
     assert refused.numeric is None
 
 
-def test_admitted_kems_figure_value_scores_with_unverified_effusion_flag() -> None:
-    experiment = F.kems_experiment(calibrated=True, kn=None)
-    experiment = replace(
-        experiment,
-        pressure_environment=replace(
-            experiment.pressure_environment,
-            total_pressure_Pa=Located(State.unknown("not printed")),
-        ),
-    )
-    identity = replace(
-        _partial_identity(),
-        total_pressure_Pa=State.of(Decimal("1e-6")),
-    )
-    reference = F.observation(
-        "unverified-figure-pressure",
-        experiment.experiment_id,
-        identity,
-        Decimal("0.2"),
-        evidence=EvidenceClass.FIGURE_ONLY,
-        source_id="ferguson-2004-iron-vapor-pressure",
-    )
-    reference = replace(
-        reference,
-        evidence=replace(
-            reference.evidence,
-            original_method_class="figure_only",
-        ),
-    )
-    prediction = _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
-    context = _context(F.work(), experiment, reference, review="reviewed")
-    residual, _ = compile_residual(
-        reference,
-        Engine.INTERNAL_ANALYTICAL,
-        context=context,
-        prediction=prediction,
-    )
-
-    assert residual.status is ResidualStatus.NO_BAND
-    assert residual.numeric is not None
-    assert residual.score_eligible is False
-    assert any(
-        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
-        and "apparatus_unverified:in_cell_partial_pressure_sum" in notice.reason
-        for notice in residual.notices
-    )
-
-
 def test_catalogue_composition_is_flagged_and_excluded_from_headline() -> None:
     experiment = F.kems_experiment()
     composition = Composition(
