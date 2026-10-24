@@ -964,12 +964,35 @@ def test_sossi_table4_successors_supersede_predecessors_in_full_extract(
 
     source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
     source_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    source_rows = [
+        row
+        for species_doc in source_doc["species"].values()
+        for row in species_doc.get("observations", [])
+    ]
+    source_rows_by_id = {
+        str(row.get("observation_id")): row for row in source_rows
+    }
+    parent_ids = set()
+    for row in source_rows:
+        if row.get("observation_id") not in target_ids:
+            continue
+        values = row.get("values") or {}
+        raw_parents = values.get("derived_from", row.get("derived_from", ()))
+        if raw_parents is None:
+            continue
+        if isinstance(raw_parents, str):
+            raw_parents = (raw_parents,)
+        for parent in raw_parents:
+            local_id = str(parent).removeprefix(f"{source_id}::")
+            if local_id in source_rows_by_id:
+                parent_ids.add(local_id)
+    isolated_ids = target_ids | parent_ids
     isolated_species = {}
     for formula, species_doc in source_doc["species"].items():
         selected = [
             deepcopy(row)
             for row in species_doc.get("observations", [])
-            if row.get("observation_id") in target_ids
+            if row.get("observation_id") in isolated_ids
         ]
         if selected:
             isolated_species[formula] = {"observations": selected}
@@ -984,7 +1007,17 @@ def test_sossi_table4_successors_supersede_predecessors_in_full_extract(
     assert isolated_result.validation is not None
     assert not isolated_result.validation.hard_issues
     isolated_observations = list(isolated_result.observations.values())
-    assert len(isolated_observations) == 31
+    target_observations = [
+        observation
+        for observation in isolated_observations
+        if observation.observation_id.split("::", 1)[-1].split("::T=", 1)[0]
+        in target_ids
+    ]
+    assert len(target_observations) == 31
+    assert {
+        observation.observation_id.split("::", 1)[-1].split("::T=", 1)[0]
+        for observation in isolated_observations
+    } >= parent_ids
     for formula, predecessor_id in predecessors.items():
         rows = [
             observation
@@ -1004,7 +1037,7 @@ def test_sossi_table4_successors_supersede_predecessors_in_full_extract(
     ]
     assert len(isolated_successor_points) == 23
     isolated_actual = set()
-    for observation in isolated_observations:
+    for observation in isolated_successor_points:
         assert observation.value.kind is ValueKind.POINT
         temperature = observation.identity.temperature_K
         assert temperature is not None and temperature.is_value
@@ -1013,17 +1046,14 @@ def test_sossi_table4_successors_supersede_predecessors_in_full_extract(
         assert conditions["temperature_K"].state.value == temperature.value
         assert conditions["temperature_K"].locator.page == 57
         assert conditions["temperature_K"].locator.pdf_page_index == 56
-        if observation in isolated_successor_points:
-            assert observation.admission.status is AdmissionStatus.ADMITTED
-            isolated_actual.add(
-                (
-                    observation.identity.species.formula,
-                    str(temperature.value),
-                    str(observation.value.point),
-                )
+        assert observation.admission.status is AdmissionStatus.ADMITTED
+        isolated_actual.add(
+            (
+                observation.identity.species.formula,
+                str(temperature.value),
+                str(observation.value.point),
             )
-        else:
-            assert observation.admission.status is AdmissionStatus.SUPERSEDED
+        )
     assert isolated_actual == {
         (formula, temperature, value)
         for formula, temperature, value, _channel in expected
@@ -6848,15 +6878,29 @@ def test_t998_admitted_source_rows_survive_migration(tmp_path: Path) -> None:
     target = [
         observation
         for observation in sossi.observations.values()
-        if observation.observation_id.split("::", 1)[-1]
+        if observation.observation_id.split("::", 1)[-1].split("::T=", 1)[0]
         in {
-            "sossi_2019_na_logKstar_table3",
-            "sossi_2019_k_logKstar_table3",
-            "sossi_2019_na_table4_gamma_this_work",
-            "sossi_2019_k_table4_gamma_this_work",
+            "sossi_2019_na_logKstar_table3_quoted_20260906",
+            "sossi_2019_k_logKstar_table3_quoted_20260906",
+            "sossi_2019_na_table4_gamma_this_work_quoted_20260906",
+            "sossi_2019_k_table4_gamma_this_work_quoted_20260906",
         }
     ]
     assert len(target) == 4
+    assert {row.admission.status for row in target} == {AdmissionStatus.ADMITTED}
+    assert {
+        (
+            row.identity.species.formula,
+            quantity_token(row.identity),
+            str(row.value.point),
+        )
+        for row in target
+    } == {
+        ("Na", Quantity.LOG10_K_STAR, "-4.25"),
+        ("K", Quantity.LOG10_K_STAR, "-3.95"),
+        ("Na", Quantity.ACTIVITY_COEFFICIENT, "0.001"),
+        ("K", Quantity.ACTIVITY_COEFFICIENT, "0.00022"),
+    }
     assert {quantity_token(row.identity) for row in target} == {
         Quantity.LOG10_K_STAR,
         Quantity.ACTIVITY_COEFFICIENT,
@@ -16418,8 +16462,12 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
                 time_min = Decimal(str(item["t_min"]))
                 run_key = (formula, temperature, time_min, f"sossi-2019-run-{run_id}")
                 expected_sossi[run_key] += 1
+                fo2 = item["log10_fO2"]
+                if isinstance(fo2, dict):
+                    assert fo2["units"] == "log10(bar)"
+                    fo2 = fo2["value"]
                 expected_sossi_conditions[run_key] = (
-                    Decimal(str(item["log10_fO2"])),
+                    Decimal(str(fo2)),
                     Decimal(str(values["starting_measured_ppm"])),
                 )
 
