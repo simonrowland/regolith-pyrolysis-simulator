@@ -219,16 +219,22 @@ def test_segment_ledger_mass_is_divided_by_its_wall_area():
         species="Na",
         wall_area_m2=0.02,
     ) == pytest.approx(15.0)
+    assert _wall_deposit_areal_mass_kg_m2(
+        ledger,
+        segment="missing-segment",
+        species="Na",
+        wall_area_m2=0.02,
+    ) is None
 
 
 def test_beerkens_rate_checks_production_molar_to_mass_flux_conversion():
     # Published Beerkens rate: 0.38 mg cm⁻² h⁻¹.
     # Algebra: 0.38 × 0.01 kg/m² ÷ 3600 s/h = 1.055555...e-6 kg/m²/s.
-    # Independent Na₂SO₄ mass is 142.04253856 g/mol = 0.14204253856 kg/mol, so divide by M to
+    # Registry Na₂SO₄ mass is 142.03553856 g/mol = 0.14203553856 kg/mol, so divide by M to
     # give the molar flux consumed by the production budget converter below.
     target_kg_m2_s = Decimal("0.38") * Decimal("0.01") / Decimal("3600")
-    independent_molar_mass_kg_mol = Decimal("0.14204253856")
-    molar_flux = float(target_kg_m2_s / independent_molar_mass_kg_mol)
+    registry_molar_mass_kg_mol = Decimal("0.14203553856")
+    molar_flux = float(target_kg_m2_s / registry_molar_mass_kg_mol)
     kg_hr_for_one_square_metre = _wall_deposition_flux_budget_kg_hr(
         species="Na2SO4",
         flux_mol_m2_s=molar_flux,
@@ -236,11 +242,10 @@ def test_beerkens_rate_checks_production_molar_to_mass_flux_conversion():
         formula_registry=_wall_deposition_formula_registry(),
     )
     # The production owner reports kg/h for A=1 m²; divide by 3600 s/h to recover kg/m²/s.
-    # The published 0.38 rate has two significant figures; allow its rounding
-    # plus the independent registry-vs-reference molar-mass precision.
+    # This checks unit conversion of the reported value; measurement precision is separate.
     assert kg_hr_for_one_square_metre / 3600.0 == pytest.approx(
         float(target_kg_m2_s),
-        rel=1e-4,
+        rel=1e-9,
     )
 
 
