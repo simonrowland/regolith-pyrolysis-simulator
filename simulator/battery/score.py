@@ -5753,10 +5753,41 @@ def _predict_oxygen_fugacity(
             )
         log10_fO2_bar = Decimal(str(lambda_ln_f_o2 / math.log(10.0)))
         predicted_pa = _log_fO2_to_pa(log10_fO2_bar)
+        extrapolated_redox_rows = tuple(result.extrapolated_redox_rows)
         authority = (
             Authority.EXTRAPOLATED
-            if result.extrapolated_redox_rows
+            if extrapolated_redox_rows
             else Authority.BRIDGE
+        )
+        band = tuple(
+            Decimal(str(value))
+            for value in result.active_row_band_intersection_K
+        )
+        notices: tuple[Notice, ...] = ()
+        if extrapolated_redox_rows:
+            band_text = f"[{band[0]:g}, {band[1]:g}] K"
+            notices = (
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.FUGACITY,),
+                    reason=(
+                        "openimcc_redox_pack_extrapolation; rows="
+                        f"{', '.join(extrapolated_redox_rows)}; "
+                        f"flags={', '.join(result.flags)}"
+                    ),
+                    origin="openimcc.evaluate_redox",
+                    band=band_text,
+                    authority=authority,
+                ),
+            )
+        notices += tuple(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.FUGACITY,),
+                reason=str(flag),
+                origin="openimcc.evaluate_redox",
+            )
+            for flag in result.flags
         )
         return EnginePrediction(
             engine=engine,
@@ -5768,10 +5799,12 @@ def _predict_oxygen_fugacity(
             value=predicted_pa,
             unit="Pa",
             authority=authority,
+            notices=notices,
             coefficient_sources=(
                 f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
             ),
             lineage_complete=False,
+            certified_band={"temperature_K": band},
             identity=identity,
             version="openimcc-closed-redox-fugacity",
         )

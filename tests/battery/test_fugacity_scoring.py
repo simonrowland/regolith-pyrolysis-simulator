@@ -11,6 +11,7 @@ from simulator.battery.enums import (
     Engine,
     ExecutionState,
     FO2Channel,
+    NoticeKind,
     Phase,
     Quantity,
     Rail,
@@ -112,12 +113,28 @@ def test_openimcc_predicts_fugacity_from_closed_printed_oxide_split(monkeypatch)
     assert prediction.execution.state is ExecutionState.PRODUCED
     assert prediction.value is not None
     assert prediction.unit == "Pa"
+    assert prediction.authority is Authority.BRIDGE
     assert len(calls) == 1
     args, kwargs, result = calls[0]
     assert args[2] == "closed"
     assert "lambda_imposed" not in kwargs
     log10_fO2_bar = result.lambda_ln_f_o2 / math.log(10.0)
     assert prediction.value == _log_fO2_to_pa(Decimal(str(log10_fO2_bar)))
+    assert len(result.flags) == 6
+    assert tuple(
+        notice.reason
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    ) == tuple(result.flags)
+    assert all(
+        notice.affected_quantities == (Quantity.FUGACITY,)
+        and notice.origin == "openimcc.evaluate_redox"
+        for notice in prediction.notices
+    )
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in prediction.notices
+    )
 
 
 def test_thermoengine_uses_intrinsic_closed_solved_fugacity(monkeypatch):
