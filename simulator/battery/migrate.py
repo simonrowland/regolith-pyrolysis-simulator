@@ -10324,6 +10324,23 @@ def select_declared_source(
     )
 
 
+def _point_series_items(
+    values: Mapping[str, Any], quantity: Quantity | State[Quantity] | None
+) -> list[Any] | None:
+    """Return the direct, per-temperature rows owned by point migration."""
+
+    series = values.get("series")
+    if isinstance(series, list) and series:
+        return series
+    q_token = _quantity_token(quantity)
+    if q_token is None or q_token is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT:
+        return None
+    per_temperature = values.get("per_temperature")
+    if isinstance(per_temperature, list) and per_temperature:
+        return per_temperature
+    return None
+
+
 def empty_value_from_payload(
     values: Mapping[str, Any] | list[Any] | None,
     obs_type: str | None,
@@ -10345,8 +10362,8 @@ def empty_value_from_payload(
         sel = select_declared_source(quantity, units, None)
         return sel.value, exploded, sel
 
-    series = values.get("series")
-    if isinstance(series, list) and series:
+    series = _point_series_items(values, quantity)
+    if series is not None:
         for i, item in enumerate(series):
             exploded.append({"index": i, "item": item, "units": units})
         sel = select_declared_source(quantity, units, values)
@@ -16386,7 +16403,7 @@ class Migrator:
                     row_point_containers.append(("tests", test_items))
         if (
             exploded
-            and isinstance(values.get("series"), list)
+            and _point_series_items(values, q_token) is not None
             and not _parent_bound_categorical(value_sel)
         ):
             before = self._count(source_key).observations_out

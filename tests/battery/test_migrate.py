@@ -4658,12 +4658,13 @@ def test_t1235_real_derivation_rows_are_valid_after_repair(tmp_path: Path) -> No
                             table_asset.get("file_count") or 0
                         ) > 0, (source_id, row["observation_id"], ref)
 
-    def assert_target_rows_clean(issues: tuple) -> None:
+    def assert_target_rows_clean(issues: tuple, additional_ids=()) -> None:
         qualified_ids = {
             f"{source_id}::{observation_id}"
             for source_id, observation_ids in target_rows.items()
             for observation_id in observation_ids
         }
+        qualified_ids.update(additional_ids)
         failures = []
         for issue in issues:
             if not any(
@@ -4783,17 +4784,33 @@ def test_t1235_real_derivation_rows_are_valid_after_repair(tmp_path: Path) -> No
 
     result = migrate(root, write=False)
     assert result.validation is not None
-    assert_target_rows_clean(result.validation.hard_issues)
     sossi_source_id = "kems-012-sossi-2019"
+    exploded_sossi_ids = {
+        observation_id
+        for observation_id in result.observations
+        if any(
+            observation_id.startswith(f"{sossi_source_id}::{parent_id}::T=")
+            for parent_id in sossi_observation_parents
+        )
+    }
+    assert_target_rows_clean(result.validation.hard_issues, exploded_sossi_ids)
     for observation_id, expected_parents in sossi_observation_parents.items():
-        observation = result.observations[f"{sossi_source_id}::{observation_id}"]
+        parent_id = f"{sossi_source_id}::{observation_id}"
+        observations = [
+            observation
+            for qualified_id, observation in result.observations.items()
+            if qualified_id == parent_id
+            or qualified_id.startswith(parent_id + "::T=")
+        ]
+        assert observations, parent_id
         qualified_parents = (
             f"tables:{sossi_source_id}",
             *(f"{sossi_source_id}::{parent_id}" for parent_id in expected_parents),
         )
-        assert observation.derived_from == qualified_parents
-        assert observation.derivation is not None
-        assert observation.derivation.inputs == qualified_parents
+        for observation in observations:
+            assert observation.derived_from == qualified_parents
+            assert observation.derivation is not None
+            assert observation.derivation.inputs == qualified_parents
 
     fragmentation = result.observations[
         f"{okazaki_id}::okazaki_2022_fragmentation_assumptions_and_model_output"
@@ -7732,6 +7749,150 @@ def test_nonyield_point_without_numeric_value_is_queued_not_emitted(
         entry.why == "source omitted numeric cell"
         and entry.observation_id == f"{parent_id}::point:points:1"
         for entry in result.queue
+    )
+
+
+@pytest.mark.parametrize(
+    ("quantity", "obs_type", "value_field", "values"),
+    (
+        (
+            "activity_coefficient",
+            "activity_coefficient",
+            "gamma",
+            ("0.25", "0.18"),
+        ),
+        (
+            "evaporation_coefficient_alpha",
+            "evaporation_coefficient_alpha",
+            "alpha",
+            ("0.4", "0.3"),
+        ),
+    ),
+)
+def test_nonyield_per_temperature_rows_use_point_migration(
+    tmp_path: Path,
+    quantity: str,
+    obs_type: str,
+    value_field: str,
+    values: tuple[str, str],
+) -> None:
+    extract = _scalar_extract(
+        quantity=quantity,
+        units="dimensionless",
+        obs_type=obs_type,
+        values={
+            "quantity": quantity,
+            "method_class": "measured_direct",
+            "per_temperature": [
+                {
+                    "T_C": 1000,
+                    value_field: values[0],
+                    "locator": {"page": 8, "table": "4"},
+                },
+                {
+                    "T_C": 1200,
+                    value_field: values[1],
+                    "locator": {"page": 8, "table": "4"},
+                },
+            ],
+        },
+    )
+    extract["species"]["Na"]["observations"][0]["point_conditions"] = {
+        "fO2_log": {
+            "state": {"tag": "unknown", "reason": "source does not report fO2"},
+            "locator": {"page": 8, "table": "4"},
+        }
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    parent_id = "fixture-source::na_psat"
+    points = sorted(
+        (
+            observation
+            for oid, observation in result.observations.items()
+            if oid.startswith(parent_id + "::")
+        ),
+        key=lambda observation: observation.identity.temperature_K.value,
+    )
+
+    assert len(points) == 2
+    for point, temperature_c, expected_value in zip(
+        points, (1000, 1200), values
+    ):
+        temperature_k = Decimal(temperature_c) + Decimal("273.15")
+        assert point.value.kind is ValueKind.POINT
+        assert point.value.point == Decimal(expected_value)
+        assert point.identity.temperature_K.value == temperature_k
+        temperature = point.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == temperature_k
+        assert temperature.locator is not None
+        assert temperature.locator.page == 8
+        assert str(temperature.locator.table) == "4"
+        assert point.locator is not None
+        assert point.locator.page == 8
+        assert str(point.locator.table) == "4"
+        f_o2 = point.point_conditions["fO2_log"]
+        assert f_o2.state.is_unknown
+        assert f_o2.state.reason == "source does not report fO2"
+        assert f_o2.locator is not None
+        assert f_o2.locator.page == 8
+
+
+def test_composite_per_temperature_channels_stay_unavailable(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="activity_coefficient",
+        units="dimensionless",
+        obs_type="activity_coefficient",
+        values={
+            "quantity": "activity_coefficient",
+            "method_class": "measured_direct",
+            "per_temperature_by_channel": {
+                "NaO0.5": [{"T_K": 1600, "gamma": 0.25}],
+                "KO0.5": [{"T_K": 1600, "gamma": 0.15}],
+            },
+        },
+    )
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    parent_id = "fixture-source::na_psat"
+    parent = result.observations[parent_id]
+
+    assert parent.value.kind is ValueKind.UNAVAILABLE
+    assert parent.value.unavailable_reason
+    assert "per_temperature_by_channel" in parent.value.unavailable_reason
+    assert not any(
+        oid.startswith(parent_id + "::") for oid in result.observations
+    )
+
+
+def test_activity_coefficient_fit_stays_as_parent_expression(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="activity_coefficient_temperature_fit",
+        units="dimensionless",
+        obs_type="activity_coefficient_temperature_fit",
+        values={
+            "quantity": "activity_coefficient_temperature_fit",
+            "method_class": "model_derived",
+            "A_printed": 1.2,
+            "B_printed": -3500,
+            "notes_printed": "Fit over 1200–1800 K",
+            "per_temperature": [{"T_K": 1500, "gamma": 0.4}],
+        },
+    )
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    parent_id = "fixture-source::na_psat"
+    parent = result.observations[parent_id]
+
+    assert parent.value.kind is ValueKind.EXPRESSION
+    assert parent.value.expression_text == "log10 γ = A + B/T"
+    assert not any(
+        oid.startswith(parent_id + "::") for oid in result.observations
     )
 
 
