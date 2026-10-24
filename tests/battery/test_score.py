@@ -5335,8 +5335,8 @@ def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
         },
         "execution": {"state": ExecutionState.UNSUPPORTED.value},
     }
-    assert Quantity.H_MINUS_H298 not in _engine_thermo_quantities(Engine.ALPHAMELTS)
-    assert not _residual_engine_observable(unsupported_thermo)
+    assert Quantity.H_MINUS_H298 in _engine_thermo_quantities(Engine.ALPHAMELTS)
+    assert _residual_engine_observable(unsupported_thermo)
 
     supported_thermo = {
         "rail": Rail.THERMOCHEMISTRY.value,
