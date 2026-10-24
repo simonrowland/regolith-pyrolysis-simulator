@@ -1599,11 +1599,12 @@ def _tabulated_gas_basis_matches(
 
     A JANAF row matches only its own table id. Mg-001 above the boiling
     point is the gas on the condensed 298.15 K zero; Mg-005 is the ideal-gas
-    zero. A non-JANAF row matches only when that compilation's elemental
-    reference owner says the 298.15 K reference is this ideal gas. A
-    reference-state table that is crystal at 298.15 K does not, including
-    temperatures where the stable phase has become gas. H−H298 is the
-    only quantity that calls this. Cp and S do not.
+    zero. A non-JANAF row matches only when its source-specific reference
+    owner establishes that the 298.15 K reference is this ideal gas. B677's
+    standalone K(g) table is such a match; its combined K(c,l,g) table is not.
+    A reference-state table that is crystal at 298.15 K does not, including
+    temperatures where the stable phase has become gas. H−H298 is the only
+    quantity that calls this. Cp and S do not.
     """
 
     if _is_janaf_compilation_observation(observation, None):
@@ -1622,6 +1623,19 @@ def _tabulated_gas_basis_matches(
         return b1259_ideal_gas(formula)
     if source_id == b1452_source:
         return b1452_ideal_gas(formula)
+    if source_id == "pankratz-1984-usbm-b677":
+        # B677 defines H°−H°298 from T0=298.15 K and says H°298
+        # "refers to the pure elements or compounds stable or assumed to be
+        # stable at 298.15 K" (Bulletin 677, source p001-p040.md:223,259).
+        # Its separate table-0096 is headed K(g), "Potassium (ideal
+        # monatomic gas)", and prints H°−H°298 = 0 at 298 K
+        # (source p041-p080.md:873-876), so that row has the K-005 gas zero.
+        # The combined K(c,l,g) table-0095 retains the condensed 298 K zero.
+        return (
+            formula == "K"
+            and table_id == "K-005"
+            and _locator_table_id(observation) == "table-0096"
+        )
     return False
 
 
