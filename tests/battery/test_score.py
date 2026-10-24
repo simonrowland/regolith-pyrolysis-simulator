@@ -14010,18 +14010,73 @@ def test_non_melts_engines_do_not_predict_transition_temperature(
     }
 
 
-def test_transition_missing_pressure_refuses_without_engine_open(monkeypatch) -> None:
+@pytest.mark.parametrize(
+    "subtype, expected_temperature",
+    [("liquidus", "1673.15"), ("solidus", "1473.15")],
+)
+def test_transition_missing_pressure_uses_ambient_pressure_with_notice(
+    monkeypatch, subtype: str, expected_temperature: str
+) -> None:
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    calls = []
+    _transition_finder_handle(
+        monkeypatch,
+        Engine.MAGEMIN,
+        LiquidusSolidusResult(
+            liquidus_T_C=1400.0,
+            liquidus_T_K=1673.15,
+            solidus_T_C=1200.0,
+            liquid_fraction=1.0,
+            status="ok",
+        ),
+        calls,
+    )
+    observation = _transition_temperature_observation(
+        subtype=subtype, pressure_pa=None
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.value == Decimal(expected_temperature), prediction.refusal_detail
+    assert calls[0][1]["pressure_bar"] == 1.0
+    assert observation.identity.total_pressure_Pa.is_unknown
+    assert prediction.identity.total_pressure_Pa.is_unknown
+    assert any(
+        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and notice.reason == "ambient pressure assumed, not printed"
+        for notice in prediction.notices
+    )
+
+
+@pytest.mark.parametrize(
+    "apparatus_text",
+    ["piston-cylinder press", "multi-anvil press", "autoclave", "diamond cell"],
+)
+def test_transition_missing_pressure_with_high_pressure_apparatus_still_refuses(
+    monkeypatch, apparatus_text: str
+) -> None:
     from simulator.diagnostic_helpers import binary_pot_battery as battery
 
     monkeypatch.setattr(
         battery,
         "open_battery_engine",
-        lambda _name: pytest.fail("missing pressure must refuse before engine open"),
+        lambda _name: pytest.fail("high-pressure rows must refuse before engine open"),
     )
-    observation = _transition_temperature_observation(pressure_pa=None)
+    experiment = replace(
+        F.tabulation_experiment(),
+        apparatus=Apparatus(
+            cell_material_and_liner=Located(State.of(apparatus_text))
+        ),
+    )
 
-    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        _transition_temperature_observation(pressure_pa=None),
+        experiment=experiment,
+    )
 
+    assert prediction.value is None
     assert prediction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
     assert prediction.refusal_detail["reason"] == "total_pressure_unknown"
 

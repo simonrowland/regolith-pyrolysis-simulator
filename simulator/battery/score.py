@@ -7347,6 +7347,8 @@ def _predict_transition_temperature(
     sources: tuple[str, ...],
     handles: Mapping[str, object] | None,
     opener,
+    experiment: Experiment | None,
+    bench: Bench | None,
 ) -> EnginePrediction:
     def refused(
         reason: RefusalReason,
@@ -7441,22 +7443,54 @@ def _predict_transition_temperature(
         )
 
     pressure_state = identity.total_pressure_Pa
+    pressure_notice: Notice | None = None
     if (
         pressure_state is None
         or not pressure_state.is_value
         or pressure_state.value is None
     ):
-        return refused(
-            RefusalReason.IDENTITY_UNKNOWN,
-            {"reason": "total_pressure_unknown"},
+        apparatus_text = " ".join(
+            (
+                repr(experiment.apparatus) if experiment is not None else "",
+                repr(experiment.method) if experiment is not None else "",
+                repr(experiment.bench_id) if experiment is not None else "",
+                repr(experiment.pressure_environment)
+                if experiment is not None
+                else "",
+                repr(bench) if bench is not None else "",
+            )
+        ).casefold()
+        normalized_apparatus_text = re.sub(r"[-_]", " ", apparatus_text)
+        high_pressure_markers = (
+            "piston cylinder",
+            "multi anvil",
+            "autoclave",
+            "diamond cell",
+            "diamond anvil",
+            "high pressure",
         )
-    pressure_pa = as_decimal(pressure_state.value)
-    if not pressure_pa.is_finite() or pressure_pa <= 0:
-        return refused(
-            RefusalReason.INVALID_IDENTITY,
-            {"reason": "total_pressure_invalid", "value": str(pressure_pa)},
+        if phase_token(identity.species) not in CONDENSED_PHASES or any(
+            marker in normalized_apparatus_text for marker in high_pressure_markers
+        ):
+            return refused(
+                RefusalReason.IDENTITY_UNKNOWN,
+                {"reason": "total_pressure_unknown"},
+            )
+        # dT_liq/dP = dV/dS ~ 0.01 K/bar for silicate melts, so using 1 bar
+        # when ambient pressure is unprinted has a small temperature effect.
+        pressure_bar = 1.0
+        pressure_notice = _assumption_notice(
+            Quantity.TRANSITION_TEMPERATURE,
+            "ambient pressure assumed, not printed",
         )
-    pressure_bar = float(pressure_pa / PA_PER_BAR_DEC)
+    else:
+        pressure_pa = as_decimal(pressure_state.value)
+        if not pressure_pa.is_finite() or pressure_pa <= 0:
+            return refused(
+                RefusalReason.INVALID_IDENTITY,
+                {"reason": "total_pressure_invalid", "value": str(pressure_pa)},
+            )
+        pressure_bar = float(pressure_pa / PA_PER_BAR_DEC)
 
     fO2_log = _printed_fo2_log10_bar(identity)
     if fO2_log is None:
@@ -7564,7 +7598,9 @@ def _predict_transition_temperature(
 
     diagnostic_authority = diagnostics.get("authority")
     extrapolated = status == "out_of_domain" or diagnostic_authority == Authority.EXTRAPOLATED.value
-    notices: tuple[Notice, ...] = ()
+    notices: tuple[Notice, ...] = (
+        () if pressure_notice is None else (pressure_notice,)
+    )
     authority = Authority.BRIDGE
     if extrapolated:
         authority = Authority.EXTRAPOLATED
@@ -7582,14 +7618,17 @@ def _predict_transition_temperature(
             if isinstance(commissioning, Mapping)
             else None
         ) or str(diagnostics.get("backend_status_reason") or status)
-        notices = (
-            Notice(
-                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(Quantity.TRANSITION_TEMPERATURE,),
-                reason=str(reason),
-                origin=f"engine:{engine.value}",
-                band=band,
-                authority=Authority.EXTRAPOLATED,
+        notices = union_notices(
+            notices,
+            (
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.TRANSITION_TEMPERATURE,),
+                    reason=str(reason),
+                    origin=f"engine:{engine.value}",
+                    band=band,
+                    authority=Authority.EXTRAPOLATED,
+                ),
             ),
         )
     return EnginePrediction(
@@ -7669,6 +7708,8 @@ def predict_with_engine(
             sources,
             handles,
             open_battery_engine,
+            experiment,
+            bench,
         )
     if quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES:
         return _predict_mass_loss_with_residue(
