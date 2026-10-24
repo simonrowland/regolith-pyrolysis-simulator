@@ -480,7 +480,7 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     # independent to unknown. Kress attribution stays UNKNOWN unless both
     # walks are complete. No numeric field moved.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "08afbc44bd2416437d91f351d908e4f02a30c507804f147e1d7f8aaad390ef19"
+        "11313cf08df6b900eb17e50da8ab69b4387ac75d91956105d34e50cfcdee33d5"
     )
 
 
