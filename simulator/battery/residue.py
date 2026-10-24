@@ -207,7 +207,7 @@ def collect_measured_evaporation_alphas(
                     if value
                 )
                 if any(
-                    label in {"compilation_assessed", "model_derived"}
+                    label in {"compilation_assessed", "model_derived", "model"}
                     or label.startswith("assumed")
                     for label in classifications
                 ):

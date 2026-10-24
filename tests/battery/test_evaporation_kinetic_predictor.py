@@ -278,6 +278,16 @@ def test_alpha_collection_rejects_unmeasured_context_forms():
                         "alpha_form": {"type": "arrhenius", "gamma_o": 1.0,
                                        "E_J_per_mol": 1000.0},
                     },
+                }, {
+                    "observation_id": "model-tagged-fit",
+                    "type": "alpha_context",
+                    "class_tag": "model",
+                    "values": {
+                        "gas_species": "Mg(g)",
+                        "evidence_class": "measured_direct",
+                        "alpha_form": {"type": "arrhenius", "gamma_o": 1.0,
+                                       "E_J_per_mol": 1000.0},
+                    },
                 }]
             }
         },
