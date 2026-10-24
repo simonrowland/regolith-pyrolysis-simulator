@@ -1,0 +1,13 @@
+source_id: chen-2019-sioch-cp-entropy-gibbs
+input: MinerU cell CSVs for PDF pages 4-8
+method: Cell columns are paired by printed headers T/K and Cp,m/J K-1 mol-1. The paper's first table is source table 5; following source tables 7-13 are published Tables 6-12. Each row maps all three adjacent temperature/heat-capacity pairs. R337 continues from page 4 to page 5; six continuation values were transcribed from page 5 and retained with its physical page locator.
+tables:
+  - {published_table: 5, source_tables: [5], page: 4, sample_id: R337, pairs: [[1, 2], [3, 4], [5, 6]]}
+  - {published_table: 5, source_tables: [5], page: 5, sample_id: R337, pairs: [[1, 2], [3, 4]]}
+  - {published_table: 6, source_tables: [7], page: 5, sample_id: '300', pairs: [[1, 2], [3, 4], [5, 6]]}
+  - {published_table: 7, source_tables: [8], page: 5, sample_id: '844', pairs: [[1, 2], [3, 4], [5, 6]]}
+  - {published_table: 8, source_tables: [9], page: 6, sample_id: '539', pairs: [[1, 2], [3, 4], [5, 6]]}
+  - {published_table: 9, source_tables: [10], page: 6, sample_id: '338', pairs: [[1, 2], [3, 4], [5, 6]]}
+  - {published_table: 10, source_tables: [11], page: 7, sample_id: '248', pairs: [[1, 2], [3, 4], [5, 6]]}
+  - {published_table: 11, source_tables: [12], page: 7, sample_id: '149', pairs: [[1, 2], [3, 4], [5, 6]]}
+  - {published_table: 12, source_tables: [13], page: 8, sample_id: '659', pairs: [[1, 2], [3, 4], [5, 6]]}

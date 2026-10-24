@@ -20,7 +20,7 @@ fidelity_samples:
 - path: species.Al.observations[shults_1994_t2_al_partial_pressure_1933k].values.pressure_coefficient_as_printed
   value: 3.29
   locator:
-    page: 96
+    page: 2
     published_page: 96
     pdf_page_index: 1
     table: '2'
@@ -28,7 +28,7 @@ fidelity_samples:
 - path: species.O.observations[shults_1994_t2_o_partial_pressure_2033k].values.pressure_coefficient_as_printed
   value: 15.8
   locator:
-    page: 96
+    page: 2
     published_page: 96
     pdf_page_index: 1
     table: '2'
@@ -36,7 +36,7 @@ fidelity_samples:
 - path: species.Al2O3.observations[shults_1994_t6_al2o3_activity_1833k].values.activity
   value: 1.05
   locator:
-    page: 97
+    page: 3
     published_page: 97
     pdf_page_index: 2
     table: '6'
@@ -44,7 +44,7 @@ fidelity_samples:
 - path: species.SiO2.observations[shults_1994_t6_sio2_activity_2033k].values.activity
   value: 0.17
   locator:
-    page: 97
+    page: 3
     published_page: 97
     pdf_page_index: 2
     table: '6'
@@ -58,7 +58,7 @@ benches:
       tag: value
       value: MI-1201 mass spectrometer modified for high-temperature experiments
     locator:
-      page: 95
+      page: 1
       published_page: 95
       pdf_page_index: 0
       section: Experimental
@@ -68,7 +68,7 @@ benches:
       tag: value
       value: molybdenum chambers; liner not stated
     locator:
-      page: 95
+      page: 1
       published_page: 95
       pdf_page_index: 0
       section: Experimental
@@ -78,7 +78,7 @@ benches:
       tag: value
       value: Mo
     locator:
-      page: 95
+      page: 1
       published_page: 95
       pdf_page_index: 0
       section: Experimental
@@ -92,7 +92,7 @@ benches:
           bound_operator: '>='
           bound_value: '0.0025'
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -103,7 +103,7 @@ benches:
         tag: unknown
         reason: not_published
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -113,7 +113,7 @@ benches:
         tag: unknown
         reason: not_published
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -123,7 +123,7 @@ benches:
       tag: value
       value: MI-1201 mass spectrometer
     locator:
-      page: 95
+      page: 1
       published_page: 95
       pdf_page_index: 0
       section: Experimental
@@ -134,7 +134,7 @@ benches:
         tag: unknown
         reason: not_published
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -145,7 +145,7 @@ benches:
         tag: unknown
         reason: not_published
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -158,7 +158,7 @@ benches:
           kind: point
           point: '70'
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -168,7 +168,7 @@ experiments:
   bench_id: shults-1994-mi1201-mo-kems
   method: knudsen_effusion
   locator:
-    page: 95
+    page: 1
     published_page: 95
     pdf_page_index: 0
     section: Experimental
@@ -179,7 +179,7 @@ experiments:
         tag: value
         value: mullite, 3Al2O3·2SiO2
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -196,7 +196,7 @@ experiments:
           - - SiO2
             - '0.4'
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -207,7 +207,7 @@ experiments:
         tag: value
         value: precursor method, details in reference [7]
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -218,7 +218,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Results
@@ -230,9 +230,9 @@ experiments:
           tag: value
           value: comparison of ionic currents
         locator:
-          page: 96
+          page: 1
           published_page: 96
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: Results
           note: Partial pressures were determined by “the method of comparing ionic currents.”
       reference_substance:
@@ -240,9 +240,9 @@ experiments:
           tag: value
           value: silver and gold vapors
         locator:
-          page: 96
+          page: 1
           published_page: 96
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: Results
           note: Silver and gold vapor partial pressures were used as standards (Table 2).
       ionization_cross_sections:
@@ -250,9 +250,9 @@ experiments:
           tag: unknown
           reason: not_published
         locator:
-          page: 96
+          page: 1
           published_page: 96
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: Results
           note: Ionization cross-sections and their source are not stated.
       multiplier_or_isotope_corrections:
@@ -260,7 +260,7 @@ experiments:
           tag: unknown
           reason: not_published
         locator:
-          page: 95
+          page: 1
           published_page: 95
           pdf_page_index: 0
           section: Experimental
@@ -273,7 +273,7 @@ experiments:
             kind: point
             point: '70'
         locator:
-          page: 95
+          page: 1
           published_page: 95
           pdf_page_index: 0
           section: Experimental
@@ -284,7 +284,7 @@ experiments:
           tag: unknown
           reason: not_published
         locator:
-          page: 95
+          page: 1
           published_page: 95
           pdf_page_index: 0
           section: Experimental
@@ -294,7 +294,7 @@ experiments:
           tag: unknown
           reason: not_published
         locator:
-          page: 95
+          page: 1
           published_page: 95
           pdf_page_index: 0
           section: Experimental
@@ -307,7 +307,7 @@ experiments:
           kind: categorical
           categorical: 1833, 1933, 1983, 2033 K
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -323,7 +323,7 @@ experiments:
           - species: SiO2
             mole_fraction: 0.4
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -333,7 +333,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -345,7 +345,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -355,7 +355,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -365,7 +365,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         section: Experimental
@@ -375,7 +375,7 @@ experiments:
       tag: value
       value: Al2O3 and SiO2 activities are calculated from vapor-pressure ratios using equations (7) and (8), respectively.
     locator:
-      page: 97
+      page: 3
       published_page: 97
       pdf_page_index: 2
       table: '6'
@@ -390,7 +390,7 @@ species:
       units: atm; printed coefficient under p_Al × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_al_partial_pressure_1833k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -432,7 +432,7 @@ species:
               kind: point
               point: '5.268899999999999e-07'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -443,7 +443,7 @@ species:
       units: atm; printed coefficient under p_Al × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_al_partial_pressure_1933k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -485,7 +485,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -496,7 +496,7 @@ species:
       units: atm; printed coefficient under p_Al × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_al_partial_pressure_1983k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -538,7 +538,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -549,7 +549,7 @@ species:
       units: atm; printed coefficient under p_Al × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_al_partial_pressure_2033k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -591,7 +591,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -604,7 +604,7 @@ species:
       units: atm; printed coefficient under p_AlO × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_alo_partial_pressure_1933k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -646,7 +646,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -657,7 +657,7 @@ species:
       units: atm; printed coefficient under p_AlO × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_alo_partial_pressure_1983k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -699,7 +699,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -710,7 +710,7 @@ species:
       units: atm; printed coefficient under p_AlO × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_alo_partial_pressure_2033k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -752,7 +752,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -765,7 +765,7 @@ species:
       units: atm; printed coefficient under p_Al2O × 10^9 atm, pressure_atm = coefficient × 10^-9
       observation_id: shults_1994_t2_al2o_partial_pressure_1933k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -807,7 +807,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -818,7 +818,7 @@ species:
       units: atm; printed coefficient under p_Al2O × 10^9 atm, pressure_atm = coefficient × 10^-9
       observation_id: shults_1994_t2_al2o_partial_pressure_1983k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -860,7 +860,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -871,7 +871,7 @@ species:
       units: atm; printed coefficient under p_Al2O × 10^9 atm, pressure_atm = coefficient × 10^-9
       observation_id: shults_1994_t2_al2o_partial_pressure_2033k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -913,7 +913,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -926,7 +926,7 @@ species:
       units: atm; printed coefficient under p_SiO × 10^5 atm, pressure_atm = coefficient × 10^-5
       observation_id: shults_1994_t2_sio_partial_pressure_1833k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -968,7 +968,7 @@ species:
               kind: point
               point: '5.268899999999999e-07'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -979,7 +979,7 @@ species:
       units: atm; printed coefficient under p_SiO × 10^5 atm, pressure_atm = coefficient × 10^-5
       observation_id: shults_1994_t2_sio_partial_pressure_1933k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1021,7 +1021,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1032,7 +1032,7 @@ species:
       units: atm; printed coefficient under p_SiO × 10^5 atm, pressure_atm = coefficient × 10^-5
       observation_id: shults_1994_t2_sio_partial_pressure_1983k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1074,7 +1074,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1085,7 +1085,7 @@ species:
       units: atm; printed coefficient under p_SiO × 10^5 atm, pressure_atm = coefficient × 10^-5
       observation_id: shults_1994_t2_sio_partial_pressure_2033k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1127,7 +1127,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1140,7 +1140,7 @@ species:
       units: atm; printed coefficient under p_SiO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_sio2_partial_pressure_1833k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1182,7 +1182,7 @@ species:
               kind: point
               point: '5.268899999999999e-07'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1193,7 +1193,7 @@ species:
       units: atm; printed coefficient under p_SiO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_sio2_partial_pressure_1933k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1235,7 +1235,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1246,7 +1246,7 @@ species:
       units: atm; printed coefficient under p_SiO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_sio2_partial_pressure_1983k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1288,7 +1288,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1299,7 +1299,7 @@ species:
       units: atm; printed coefficient under p_SiO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_sio2_partial_pressure_2033k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1341,7 +1341,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1362,7 +1362,7 @@ species:
         note: Inferred from equations (7)–(8), which normalize vapor pressures to the pure oxide; the paper does
           not name the condensed phase or polymorph.
         locator:
-          page: 97
+          page: 3
           published_page: 97
           pdf_page_index: 2
           table: '6'
@@ -1371,7 +1371,7 @@ species:
       units: dimensionless activity as printed
       observation_id: shults_1994_t6_sio2_activity_1833k
       locator:
-        page: 97
+        page: 3
         published_page: 97
         pdf_page_index: 2
         table: '6'
@@ -1408,7 +1408,7 @@ species:
             tag: unknown
             reason: not_published
           locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             table: '6'
@@ -1429,7 +1429,7 @@ species:
               kind: point
               point: '5.268899999999999e-07'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1440,7 +1440,7 @@ species:
       units: dimensionless activity as printed
       observation_id: shults_1994_t6_sio2_activity_1933k
       locator:
-        page: 97
+        page: 3
         published_page: 97
         pdf_page_index: 2
         table: '6'
@@ -1486,7 +1486,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1497,7 +1497,7 @@ species:
       units: dimensionless activity as printed
       observation_id: shults_1994_t6_sio2_activity_1983k
       locator:
-        page: 97
+        page: 3
         published_page: 97
         pdf_page_index: 2
         table: '6'
@@ -1543,7 +1543,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1554,7 +1554,7 @@ species:
       units: dimensionless activity as printed
       observation_id: shults_1994_t6_sio2_activity_2033k
       locator:
-        page: 97
+        page: 3
         published_page: 97
         pdf_page_index: 2
         table: '6'
@@ -1600,7 +1600,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1613,7 +1613,7 @@ species:
       units: atm; printed coefficient under p_AlSiO × 10^10 atm, pressure_atm = coefficient × 10^-10
       observation_id: shults_1994_t2_alsio_partial_pressure_1933k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1655,7 +1655,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1666,7 +1666,7 @@ species:
       units: atm; printed coefficient under p_AlSiO × 10^10 atm, pressure_atm = coefficient × 10^-10
       observation_id: shults_1994_t2_alsio_partial_pressure_1983k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1708,7 +1708,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1719,7 +1719,7 @@ species:
       units: atm; printed coefficient under p_AlSiO × 10^10 atm, pressure_atm = coefficient × 10^-10
       observation_id: shults_1994_t2_alsio_partial_pressure_2033k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1761,7 +1761,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1774,7 +1774,7 @@ species:
       units: atm; printed coefficient under p_MoO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_moo2_partial_pressure_1833k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1816,7 +1816,7 @@ species:
               kind: point
               point: '5.268899999999999e-07'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1827,7 +1827,7 @@ species:
       units: atm; printed coefficient under p_MoO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_moo2_partial_pressure_1933k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1869,7 +1869,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1880,7 +1880,7 @@ species:
       units: atm; printed coefficient under p_MoO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_moo2_partial_pressure_1983k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1922,7 +1922,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1933,7 +1933,7 @@ species:
       units: atm; printed coefficient under p_MoO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
       observation_id: shults_1994_t2_moo2_partial_pressure_2033k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -1975,7 +1975,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -1988,7 +1988,7 @@ species:
       units: atm; printed coefficient under p_MoO3 × 10^9 atm, pressure_atm = coefficient × 10^-9
       observation_id: shults_1994_t2_moo3_partial_pressure_1833k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2030,7 +2030,7 @@ species:
               kind: point
               point: '5.268899999999999e-07'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2041,7 +2041,7 @@ species:
       units: atm; printed coefficient under p_MoO3 × 10^9 atm, pressure_atm = coefficient × 10^-9
       observation_id: shults_1994_t2_moo3_partial_pressure_1933k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2083,7 +2083,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2094,7 +2094,7 @@ species:
       units: atm; printed coefficient under p_MoO3 × 10^9 atm, pressure_atm = coefficient × 10^-9
       observation_id: shults_1994_t2_moo3_partial_pressure_1983k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2136,7 +2136,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2147,7 +2147,7 @@ species:
       units: atm; printed coefficient under p_MoO3 × 10^9 atm, pressure_atm = coefficient × 10^-9
       observation_id: shults_1994_t2_moo3_partial_pressure_2033k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2189,7 +2189,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2202,7 +2202,7 @@ species:
       units: atm; printed coefficient under p_O × 10^9 atm, pressure_atm = coefficient × 10^-9
       observation_id: shults_1994_t2_o_partial_pressure_1833k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2251,7 +2251,7 @@ species:
               kind: point
               point: '5.268899999999999e-07'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2262,7 +2262,7 @@ species:
       units: atm; printed coefficient under p_O × 10^9 atm, pressure_atm = coefficient × 10^-9
       observation_id: shults_1994_t2_o_partial_pressure_1933k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2311,7 +2311,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2322,7 +2322,7 @@ species:
       units: atm; printed coefficient under p_O × 10^9 atm, pressure_atm = coefficient × 10^-9
       observation_id: shults_1994_t2_o_partial_pressure_1983k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2371,7 +2371,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2382,7 +2382,7 @@ species:
       units: atm; printed coefficient under p_O × 10^9 atm, pressure_atm = coefficient × 10^-9
       observation_id: shults_1994_t2_o_partial_pressure_2033k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2431,7 +2431,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2444,7 +2444,7 @@ species:
       units: atm; printed coefficient under p_O2 × 10^11 atm, pressure_atm = coefficient × 10^-11
       observation_id: shults_1994_t2_o2_partial_pressure_1833k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2493,7 +2493,7 @@ species:
               kind: point
               point: '5.268899999999999e-07'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2504,7 +2504,7 @@ species:
       units: atm; printed coefficient under p_O2 × 10^11 atm, pressure_atm = coefficient × 10^-11
       observation_id: shults_1994_t2_o2_partial_pressure_1933k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2553,7 +2553,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2564,7 +2564,7 @@ species:
       units: atm; printed coefficient under p_O2 × 10^11 atm, pressure_atm = coefficient × 10^-11
       observation_id: shults_1994_t2_o2_partial_pressure_1983k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2613,7 +2613,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2624,7 +2624,7 @@ species:
       units: atm; printed coefficient under p_O2 × 10^11 atm, pressure_atm = coefficient × 10^-11
       observation_id: shults_1994_t2_o2_partial_pressure_2033k
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -2673,7 +2673,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2696,7 +2696,7 @@ species:
         note: Inferred from equations (7)–(8), which normalize vapor pressures to the pure oxide; the paper does
           not name the condensed phase or polymorph.
         locator:
-          page: 97
+          page: 3
           published_page: 97
           pdf_page_index: 2
           table: '6'
@@ -2705,7 +2705,7 @@ species:
       units: dimensionless activity as printed
       observation_id: shults_1994_t6_al2o3_activity_1833k
       locator:
-        page: 97
+        page: 3
         published_page: 97
         pdf_page_index: 2
         table: '6'
@@ -2742,7 +2742,7 @@ species:
             tag: unknown
             reason: not_published
           locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             table: '6'
@@ -2763,7 +2763,7 @@ species:
               kind: point
               point: '5.268899999999999e-07'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2774,7 +2774,7 @@ species:
       units: dimensionless activity as printed
       observation_id: shults_1994_t6_al2o3_activity_1933k
       locator:
-        page: 97
+        page: 3
         published_page: 97
         pdf_page_index: 2
         table: '6'
@@ -2820,7 +2820,7 @@ species:
               kind: point
               point: '4.6508175e-06'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2831,7 +2831,7 @@ species:
       units: dimensionless activity as printed
       observation_id: shults_1994_t6_al2o3_activity_1983k
       locator:
-        page: 97
+        page: 3
         published_page: 97
         pdf_page_index: 2
         table: '6'
@@ -2877,7 +2877,7 @@ species:
               kind: point
               point: '1.3881525e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2888,7 +2888,7 @@ species:
       units: dimensionless activity as printed
       observation_id: shults_1994_t6_al2o3_activity_2033k
       locator:
-        page: 97
+        page: 3
         published_page: 97
         pdf_page_index: 2
         table: '6'
@@ -2934,7 +2934,7 @@ species:
               kind: point
               point: '3.475447499999999e-05'
           locator:
-            page: 96
+            page: 2
             published_page: 96
             pdf_page_index: 1
             table: '2'
@@ -2945,7 +2945,7 @@ species:
     - observation_id: shults_1994_table1_mass_spectral_data
       type: thermodynamic_example
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         table: '1'
@@ -3033,7 +3033,7 @@ species:
     - observation_id: shults_1994_table3_alsio_reaction_enthalpies
       type: thermodynamic_example
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '3'
@@ -3103,7 +3103,7 @@ species:
     - observation_id: shults_1994_table4_alsio_formation_enthalpies
       type: thermodynamic_example
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '4'
@@ -3159,7 +3159,7 @@ species:
     - observation_id: shults_1994_table5_alsio_appearance_and_atomization
       type: thermodynamic_example
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '5'
@@ -3212,7 +3212,7 @@ species:
     - observation_id: shults_1994_table7_mullite_formation_functions
       type: thermodynamic_example
       locator:
-        page: 97
+        page: 3
         published_page: 97
         pdf_page_index: 2
         table: '7'
@@ -3300,7 +3300,7 @@ species:
     - observation_id: shults_1994_source_relationship_to_existing_mullite_extract
       type: source_relationship
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         note: The simulator corpus contains shornikov-1994-mullite-kems (Rapid Communications, pp. 478–480), explicitly
@@ -3331,7 +3331,7 @@ species:
     - observation_id: shults_1994_method_and_sample_context
       type: method
       locator:
-        page: 95
+        page: 1
         published_page: 95
         pdf_page_index: 0
         note: Experiment facts and the source statements that qualify or compare the results; exact quotations were
@@ -3361,7 +3361,7 @@ species:
         - MoO3+
         method_qualifications:
         - locator:
-            page: 95
+            page: 1
             published_page: 95
             pdf_page_index: 0
             section: Introduction
@@ -3369,21 +3369,21 @@ species:
             system.
           classification: stated stability and temperature threshold
         - locator:
-            page: 95
+            page: 1
             published_page: 95
             pdf_page_index: 0
             section: Introduction
           quote: This compound melts incongruently at 2163 ± 4 K [1].
           classification: transition temperature with stated uncertainty
         - locator:
-            page: 95
+            page: 1
             published_page: 95
             pdf_page_index: 0
             section: Introduction
           quote: However, the appropriate findings diverge considerably.
           classification: comparison of prior methods
         - locator:
-            page: 95
+            page: 1
             published_page: 95
             pdf_page_index: 0
             section: Introduction
@@ -3392,28 +3392,28 @@ species:
             molecules were detected in the vapors over the melts of the system [6].
           classification: prior study composition range and detected species
         - locator:
-            page: 95
+            page: 1
             published_page: 95
             pdf_page_index: 0
             section: Experimental
           quote: The mullite samples were prepared by the precursor method described in detail in [7].
           classification: sample preparation; reagents/purity details deferred to reference
         - locator:
-            page: 95
+            page: 1
             published_page: 95
             pdf_page_index: 0
             section: Experimental
           quote: 'the ratio of areas of effusion and evaporation apertures was no less than 1 : 400'
           classification: apparatus area ratio bound
         - locator:
-            page: 95
+            page: 1
             published_page: 95
             pdf_page_index: 0
             section: Experimental
           quote: Ionization energy was 70 eV.
           classification: instrument setting
         - locator:
-            page: 95
+            page: 1
             published_page: 95
             pdf_page_index: 0
             section: Experimental
@@ -3422,7 +3422,7 @@ species:
             ions.
           classification: species detection and temperature range
         - locator:
-            page: 95
+            page: 1
             published_page: 95
             pdf_page_index: 0
             section: Experimental
@@ -3431,7 +3431,7 @@ species:
             and silicon oxides (Table 1).
           classification: comparative result and maximum relative error
         - locator:
-            page: 95
+            page: 1
             published_page: 95
             pdf_page_index: 0
             section: Results
@@ -3439,7 +3439,7 @@ species:
             transition into the gas phase of appropriate oxides.
           classification: comparative interpretation
         - locator:
-            page: 95
+            page: 1
             published_page: 95
             pdf_page_index: 0
             section: Results
@@ -3448,31 +3448,31 @@ species:
             Al–Al2O3–SiO2 systems [9, 10].
           classification: first detection and comparison with earlier systems
         - locator:
-            page: 96
+            page: 1
             published_page: 96
-            pdf_page_index: 1
+            pdf_page_index: 0
             section: Results
           quote: The appearance potential of the AlSiO+ in the mass spectra of vapors over mullite, determined by
             Warren’s method using the silver appearance potential as a standard, is 6.5 ± 0.5 eV.
           classification: appearance potential and uncertainty
         - locator:
-            page: 96
+            page: 1
             published_page: 96
-            pdf_page_index: 1
+            pdf_page_index: 0
             section: Results
           quote: Partial pressures of molecular forms of vapors over mullite were determined by the method of comparing
             ionic currents; partial pressures of silver and gold vapors were used as standard ones (Table 2).
           classification: pressure calibration method and standards
         - locator:
-            page: 96
+            page: 1
             published_page: 96
-            pdf_page_index: 1
+            pdf_page_index: 0
             section: Results
           quote: Partial pressures of atomic and molecular oxygen were calculated, as was done earlier [8], using
             data on the reaction equilibria in the gas phase [11].
           classification: calculated oxygen pressures and source
         - locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             section: Results
@@ -3480,7 +3480,7 @@ species:
             experimental error that did not exceed 15%, to the values found when using the following equilibria:'
           classification: oxygen-pressure cross-check and maximum relative error
         - locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             section: Results
@@ -3488,7 +3488,7 @@ species:
             Clausius–Clapeyron equation.
           classification: calculation method
         - locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             section: Results
@@ -3496,7 +3496,7 @@ species:
             Gibbs–Helmholtz equations are in satisfactory agreement with the data [10].
           classification: method comparison
         - locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             section: Results
@@ -3504,7 +3504,7 @@ species:
             higher.
           classification: uncertainty comparison between laws
         - locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             section: Results
@@ -3512,7 +3512,7 @@ species:
             molecule are consistent with those reported earlier in [9, 10].
           classification: comparison with prior results
         - locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             section: Results
@@ -3520,7 +3520,7 @@ species:
             of the following relationships:'
           classification: activity derivation; equations (7) and (8)
         - locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             section: Results
@@ -3528,7 +3528,7 @@ species:
             for 1 mol of 3Al2O3 · 2SiO2.
           classification: Gibbs-energy figure uncertainty and formula basis
         - locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             section: Results
@@ -3536,7 +3536,7 @@ species:
             2 and 3) disagree with the calculated ones (dependence 4).
           classification: directional/comparative discrepancy
         - locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             section: Results
@@ -3544,7 +3544,7 @@ species:
             calorimetry of dissolution [5].
           classification: comparison with calorimetry
         - locator:
-            page: 97
+            page: 3
             published_page: 97
             pdf_page_index: 2
             section: Conclusion
@@ -3552,7 +3552,7 @@ species:
             with those earlier obtained in [9, 10].
           classification: comparison with earlier results
         - locator:
-            page: 98
+            page: 4
             published_page: 98
             pdf_page_index: 3
             section: Conclusion
@@ -3562,7 +3562,7 @@ species:
     - observation_id: shults_1994_table2_oxygen_condition_by_temperature
       type: laboratory_conditions
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         table: '2'
@@ -3601,7 +3601,7 @@ species:
     - observation_id: shults_1994_calibration_and_measurement_context
       type: method
       locator:
-        page: 96
+        page: 2
         published_page: 96
         pdf_page_index: 1
         note: Ionization energy 70 eV is on p. 95, PDF index 0; appearance potential 6.5 ± 0.5 eV, Warren method
@@ -3628,7 +3628,7 @@ species:
     - observation_id: shults_1994_activity_standard_states_and_defining_pressures
       type: thermodynamic_example
       locator:
-        page: 97
+        page: 3
         published_page: 97
         pdf_page_index: 2
         table: '6'
@@ -3648,7 +3648,7 @@ species:
     - observation_id: shults_1994_figure1_gibbs_formation_curve
       type: figure_only
       locator:
-        page: 98
+        page: 4
         published_page: 98
         pdf_page_index: 3
         figure: '1'

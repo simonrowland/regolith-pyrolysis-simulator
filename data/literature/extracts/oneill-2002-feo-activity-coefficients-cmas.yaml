@@ -17,7 +17,7 @@ experiments:
     method: quench_equilibration
     method_as_printed: "Samples were equilibrated using the wire-loop method in a conventional vertical tube furnace equipped for gas mixing, using CO – CO2 mixtures to control fO2."
     locator:
-      page: 155
+      page: 5
       published_page: 155
       pdf_page_index: 4
       section: Sample equilibration
@@ -27,7 +27,7 @@ experiments:
           tag: value
           value: '1673.15'
         locator:
-          page: 163
+          page: 13
           published_page: 163
           pdf_page_index: 12
           table: '7'
@@ -42,7 +42,7 @@ fidelity_samples:
 - path: species.FeO.observations[oneill_2002_table7_feo].values.series[0].gamma
   value: '1.367'
   locator:
-    page: 163
+    page: 13
     published_page: 163
     pdf_page_index: 12
     table: '7'
@@ -51,7 +51,7 @@ fidelity_samples:
 - path: species.NiO.observations[oneill_2002_table7_nio].values.series[1].gamma
   value: '2.70'
   locator:
-    page: 163
+    page: 13
     published_page: 163
     pdf_page_index: 12
     table: '7'
@@ -60,7 +60,7 @@ fidelity_samples:
 - path: species.CoO.observations[oneill_2002_table7_coo].values.series[6].gamma
   value: '1.00'
   locator:
-    page: 163
+    page: 13
     published_page: 163
     pdf_page_index: 12
     table: '7'
@@ -69,7 +69,7 @@ fidelity_samples:
 - path: species.MoO2.observations[oneill_2002_table7_moo2].values.series[7].gamma
   value: '209'
   locator:
-    page: 163
+    page: 13
     published_page: 163
     pdf_page_index: 12
     table: '7'
@@ -78,7 +78,7 @@ fidelity_samples:
 - path: species.MoO3.observations[oneill_2002_table7_moo3].values.series[12].gamma
   value: '1.37'
   locator:
-    page: 163
+    page: 13
     published_page: 163
     pdf_page_index: 12
     table: '7'
@@ -92,7 +92,7 @@ fidelity_samples:
     SiO2: '52.4'
     FeO: '4.22'
   locator:
-    page: 161
+    page: 11
     published_page: 161
     pdf_page_index: 10
     table: '4'
@@ -106,7 +106,7 @@ fidelity_samples:
     SiO2: '46.7'
     FeO: '2.82'
   locator:
-    page: 161
+    page: 11
     published_page: 161
     pdf_page_index: 10
     table: '4'
@@ -119,7 +119,7 @@ fidelity_samples:
     SiO2: '58.7'
     FeO: '4.76'
   locator:
-    page: 161
+    page: 11
     published_page: 161
     pdf_page_index: 10
     table: '4'
@@ -132,7 +132,7 @@ species:
       experiment: oneill-2002-fe-saturated-cmas
       type: activity_coefficient
       locator:
-        page: 163
+        page: 13
         published_page: 163
         pdf_page_index: 12
         table: '7'
@@ -141,12 +141,12 @@ species:
       phase: condensed_liquid
       standard_state: pure liquid FeO at the temperature and pressure of interest; Table 6 (p. 163) gives Fe(s) + 0.5 O2 = FeO(liq) at 1 bar. The paper's general statement is on p. 153.
       standard_state_locator:
-        page: 153
+        page: 3
         published_page: 153
         pdf_page_index: 2
         section: Definition of activity coefficients
       standard_state_thermodynamic_locator:
-        page: 163
+        page: 13
         published_page: 163
         pdf_page_index: 12
         table: '6'
@@ -157,7 +157,7 @@ species:
         note: "Errors are one standard deviation and do not include systematic errors, e.g., in the standard state thermodynamic data. Table 7 parenthetical digits apply to the last printed digits (for example, 1.367 (11) gives a one-sigma width of 0.011)."
         confidence_level: one_sigma
         locator:
-          page: 163
+          page: 13
           published_page: 163
           pdf_page_index: 12
           table: '7'
@@ -177,7 +177,7 @@ species:
           method_class: model_derived
           derivation: Calculated by the authors from the CO-CO2 gas mixture; the source says the Fe experiments used 10^-12.61 bars (99% CO).
           locator:
-            page: 161
+            page: 11
             published_page: 161
             pdf_page_index: 10
             table: '4'
@@ -188,7 +188,7 @@ species:
           method_class: model_derived
           derivation: "Converted fO2, not a separately measured pO2: fO2_Pa = 10^(-12.61 log10(bar)) x 100000 Pa/bar."
           locator:
-            page: 161
+            page: 11
             published_page: 161
             pdf_page_index: 10
             table: '4'
@@ -210,7 +210,7 @@ species:
               amount_basis: mass_percent
               components: *comp_ad_eutectic
               locator: &loc4_ad_eutectic
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -229,7 +229,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -251,7 +251,7 @@ species:
               amount_basis: mass_percent
               components: *comp_ad_fo
               locator: &loc4_ad_fo
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -270,7 +270,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -292,7 +292,7 @@ species:
               amount_basis: mass_percent
               components: *comp_ad_en
               locator: &loc4_ad_en
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -311,7 +311,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -333,7 +333,7 @@ species:
               amount_basis: mass_percent
               components: *comp_ad_wo
               locator: &loc4_ad_wo
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -352,7 +352,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -374,7 +374,7 @@ species:
               amount_basis: mass_percent
               components: *comp_ad_qz
               locator: &loc4_ad_qz
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -393,7 +393,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -417,7 +417,7 @@ species:
               amount_basis: mass_percent
               components: *comp_ad_tio2
               locator: &loc4_ad_tio2
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -437,7 +437,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -459,7 +459,7 @@ species:
               amount_basis: mass_percent
               components: *comp_cmas_a
               locator: &loc4_cmas_a
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -478,7 +478,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -500,7 +500,7 @@ species:
               amount_basis: mass_percent
               components: *comp_cmas_b
               locator: &loc4_cmas_b
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -519,7 +519,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -541,7 +541,7 @@ species:
               amount_basis: mass_percent
               components: *comp_cmas_c
               locator: &loc4_cmas_c
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -560,7 +560,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -582,7 +582,7 @@ species:
               amount_basis: mass_percent
               components: *comp_cmas_d
               locator: &loc4_cmas_d
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -601,7 +601,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -623,7 +623,7 @@ species:
               amount_basis: mass_percent
               components: *comp_cmas_e
               locator: &loc4_cmas_e
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -642,7 +642,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -664,7 +664,7 @@ species:
               amount_basis: mass_percent
               components: *comp_cmas_f
               locator: &loc4_cmas_f
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -683,7 +683,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -705,7 +705,7 @@ species:
               amount_basis: mass_percent
               components: *comp_cmas_g
               locator: &loc4_cmas_g
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -724,7 +724,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -746,7 +746,7 @@ species:
               amount_basis: mass_percent
               components: *comp_mas1
               locator: &loc4_mas1
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -765,7 +765,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -787,7 +787,7 @@ species:
               amount_basis: mass_percent
               components: *comp_mas2
               locator: &loc4_mas2
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -806,7 +806,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -828,7 +828,7 @@ species:
               amount_basis: mass_percent
               components: *comp_cas1
               locator: &loc4_cas1
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -847,7 +847,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -869,7 +869,7 @@ species:
               amount_basis: mass_percent
               components: *comp_cas2
               locator: &loc4_cas2
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -888,7 +888,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -910,7 +910,7 @@ species:
               amount_basis: mass_percent
               components: *comp_cas3
               locator: &loc4_cas3
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -929,7 +929,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -951,7 +951,7 @@ species:
               amount_basis: mass_percent
               components: *comp_cas4
               locator: &loc4_cas4
-                page: 161
+                page: 11
                 published_page: 161
                 pdf_page_index: 10
                 table: '4'
@@ -970,7 +970,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -982,7 +982,7 @@ species:
       experiment: oneill-2002-fe-saturated-cmas
       type: activity_coefficient
       locator:
-        page: 163
+        page: 13
         published_page: 163
         pdf_page_index: 12
         table: '7'
@@ -991,12 +991,12 @@ species:
       phase: condensed_liquid
       standard_state: pure liquid NiO at the temperature and pressure of interest; Table 6 (p. 163) gives Ni(s) + 0.5 O2 = NiO(liq) at 1 bar. The paper's general statement is on p. 153.
       standard_state_locator:
-        page: 153
+        page: 3
         published_page: 153
         pdf_page_index: 2
         section: Definition of activity coefficients
       standard_state_thermodynamic_locator:
-        page: 163
+        page: 13
         published_page: 163
         pdf_page_index: 12
         table: '6'
@@ -1020,7 +1020,7 @@ species:
           method_class: model_derived
           derivation: Calculated by the authors from the CO-CO2 gas mixture; the source says the Fe experiments used 10^-12.61 bars (99% CO).
           locator:
-            page: 161
+            page: 11
             published_page: 161
             pdf_page_index: 10
             table: '4'
@@ -1049,7 +1049,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1078,7 +1078,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1107,7 +1107,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1136,7 +1136,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1165,7 +1165,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1195,7 +1195,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1224,7 +1224,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1253,7 +1253,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1282,7 +1282,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1311,7 +1311,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1340,7 +1340,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1369,7 +1369,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1398,7 +1398,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1428,7 +1428,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1458,7 +1458,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1488,7 +1488,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1518,7 +1518,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1548,7 +1548,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1578,7 +1578,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1590,7 +1590,7 @@ species:
       experiment: oneill-2002-fe-saturated-cmas
       type: activity_coefficient
       locator:
-        page: 163
+        page: 13
         published_page: 163
         pdf_page_index: 12
         table: '7'
@@ -1599,12 +1599,12 @@ species:
       phase: condensed_liquid
       standard_state: pure liquid CoO at the temperature and pressure of interest; Table 6 (p. 163) gives Co(s) + 0.5 O2 = CoO(liq) at 1 bar. The paper's general statement is on p. 153.
       standard_state_locator:
-        page: 153
+        page: 3
         published_page: 153
         pdf_page_index: 2
         section: Definition of activity coefficients
       standard_state_thermodynamic_locator:
-        page: 163
+        page: 13
         published_page: 163
         pdf_page_index: 12
         table: '6'
@@ -1628,7 +1628,7 @@ species:
           method_class: model_derived
           derivation: Calculated by the authors from the CO-CO2 gas mixture; the source says the Fe experiments used 10^-12.61 bars (99% CO).
           locator:
-            page: 161
+            page: 11
             published_page: 161
             pdf_page_index: 10
             table: '4'
@@ -1657,7 +1657,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1686,7 +1686,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1715,7 +1715,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1744,7 +1744,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1773,7 +1773,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1803,7 +1803,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1832,7 +1832,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1861,7 +1861,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1890,7 +1890,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1919,7 +1919,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1948,7 +1948,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -1977,7 +1977,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2006,7 +2006,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2036,7 +2036,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2066,7 +2066,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2096,7 +2096,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2126,7 +2126,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2156,7 +2156,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2186,7 +2186,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2198,7 +2198,7 @@ species:
       experiment: oneill-2002-fe-saturated-cmas
       type: activity_coefficient
       locator:
-        page: 163
+        page: 13
         published_page: 163
         pdf_page_index: 12
         table: '7'
@@ -2207,12 +2207,12 @@ species:
       phase: condensed_liquid
       standard_state: pure liquid MoO2 (hypothetical); Table 6 (p. 163) estimates MoO2(s) = MoO2(liq) using a hypothetical melting point of 2200 K and entropy of melting 31.4 J K-1 mol-1. The paper's general statement is on p. 153.
       standard_state_locator:
-        page: 153
+        page: 3
         published_page: 153
         pdf_page_index: 2
         section: Definition of activity coefficients
       standard_state_thermodynamic_locator:
-        page: 163
+        page: 13
         published_page: 163
         pdf_page_index: 12
         table: '6'
@@ -2236,7 +2236,7 @@ species:
           method_class: model_derived
           derivation: Calculated by the authors from the CO-CO2 gas mixture; the source says the Fe experiments used 10^-12.61 bars (99% CO).
           locator:
-            page: 161
+            page: 11
             published_page: 161
             pdf_page_index: 10
             table: '4'
@@ -2265,7 +2265,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2294,7 +2294,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2323,7 +2323,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2352,7 +2352,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2381,7 +2381,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2411,7 +2411,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2440,7 +2440,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2469,7 +2469,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2498,7 +2498,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2527,7 +2527,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2556,7 +2556,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2585,7 +2585,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2615,7 +2615,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2645,7 +2645,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2675,7 +2675,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2705,7 +2705,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2735,7 +2735,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2747,7 +2747,7 @@ species:
       experiment: oneill-2002-fe-saturated-cmas
       type: activity_coefficient
       locator:
-        page: 163
+        page: 13
         published_page: 163
         pdf_page_index: 12
         table: '7'
@@ -2756,12 +2756,12 @@ species:
       phase: condensed_liquid
       standard_state: pure liquid MoO3; Table 6 (p. 163) gives Mo(s) + 1.5O2 = MoO3(liq) at 1 bar. The paper's general statement is on p. 153.
       standard_state_locator:
-        page: 153
+        page: 3
         published_page: 153
         pdf_page_index: 2
         section: Definition of activity coefficients
       standard_state_thermodynamic_locator:
-        page: 163
+        page: 13
         published_page: 163
         pdf_page_index: 12
         table: '6'
@@ -2785,7 +2785,7 @@ species:
           method_class: model_derived
           derivation: Calculated by the authors from the CO-CO2 gas mixture; the source says the Fe experiments used 10^-12.61 bars (99% CO).
           locator:
-            page: 161
+            page: 11
             published_page: 161
             pdf_page_index: 10
             table: '4'
@@ -2814,7 +2814,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2843,7 +2843,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2872,7 +2872,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2901,7 +2901,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2930,7 +2930,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2960,7 +2960,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -2989,7 +2989,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -3018,7 +3018,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -3047,7 +3047,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -3076,7 +3076,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -3105,7 +3105,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -3134,7 +3134,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -3164,7 +3164,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -3194,7 +3194,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -3224,7 +3224,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -3254,7 +3254,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'
@@ -3284,7 +3284,7 @@ species:
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
           locator:
-            page: 163
+            page: 13
             published_page: 163
             pdf_page_index: 12
             table: '7'

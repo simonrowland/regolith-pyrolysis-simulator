@@ -1,0 +1,25 @@
+source_id: yokokawa-1984-alumina-carbon-volatilization
+source:
+  citation: >-
+    Yokokawa H., Fujishige M., Ujiie S., Kameyama T., Dokiya M. and Fukuda K. (1984).
+    Volatilization of Aluminum Oxycarbides and of Alumina with Carbon in Reduction of Alumina.
+    Transactions of the Japan Institute of Metals 25(3):187–196.
+  doi: 10.2320/matertrans1960.25.187
+  year: 1984
+extraction:
+  method: mineru_table_draft emit; cell values checked against pdftotext-layout and table render
+  date: '2026-10-20'
+  worker: codex
+review_status: draft
+tables:
+  - page: 5
+    table_index: 1
+    type: mass_loss
+    quantity: mass_loss_fraction
+    evidence_class: measured_tabulated
+    unit: fraction
+    published_page: 191
+    rows: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    values:
+      - column: 6
+        species: unknown

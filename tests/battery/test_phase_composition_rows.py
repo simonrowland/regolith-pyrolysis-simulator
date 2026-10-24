@@ -49,7 +49,9 @@ from simulator.battery.score import (
     ScoreContext,
     _ScorePayloadAccumulator,
     _alignment_axes,
+    _phase_component_reference_wt_percent,
     _residual_engine_observable,
+    compile_residual,
     compute_metric,
     metric_operation_for_identity,
     no_headline_rail_reason,
@@ -77,6 +79,72 @@ SULFIDE_EXPONENT_ON_CHLORIDE = (
 )
 T_C = 1400
 P_O2_PA = 10
+
+
+def test_mass_ppm_phase_reference_converts_to_wt_percent() -> None:
+    identity = _phase_identity(
+        "O",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.METAL,
+        subtype="element_ppm_by_mass",
+    )
+    assert _phase_component_reference_wt_percent(identity, Decimal("250")) == Decimal("0.025")
+    assert _phase_component_reference_wt_percent(
+        replace(identity, subtype=State.of("wt_percent")), Decimal("250")
+    ) == Decimal("250")
+
+
+def test_mass_ppm_phase_residual_compiles_against_converted_reference() -> None:
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    identity = _phase_identity(
+        "O",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.METAL,
+        subtype="element_ppm_by_mass",
+    )
+    reference = F.observation(
+        "ppm-phase-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("250"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="ppm-phase-source",
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={reference.observation_id: reference},
+        extract_review={reference.source_id: "reviewed"},
+        hostname="test",
+    )
+    prediction = EnginePrediction(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel="ppm-phase-test",
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="phase ppm residual test",
+        ),
+        value=Decimal("0.05"),
+        unit=QUANTITY_UNITS[Quantity.EQUILIBRIUM_PHASE_COMPOSITION],
+        authority=Authority.CERTIFIED,
+        coefficient_sources=(),
+        lineage_complete=False,
+        identity=identity,
+    )
+
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+        comparison_ids={reference.observation_id},
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.value == compute_metric(
+        MetricOperation.DEX, Decimal("0.05"), Decimal("0.025")
+    )
 
 
 def _located(value: object, *, table: str, page: int) -> dict:
@@ -937,6 +1005,37 @@ def test_non_phase_engines_refuse_and_the_refusal_is_counted(
     accumulator.add(phase_payload)
     accumulator.add(capacity_payload)
     assert sum(accumulator.refusal_counts.values()) == 2
+
+
+def test_phase_rows_refuse_mass_percent_identity_as_engine_moles() -> None:
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    mass_percent_identity = replace(
+        identity,
+        composition=State.of(
+            Composition(
+                basis="printed_phase_composition",
+                components=(("SiO2", Decimal("60")), ("MgO", Decimal("40"))),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
+        ),
+    )
+    observation = F.observation(
+        "sio2-melt-mass-percent",
+        "sample-1",
+        mass_percent_identity,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.authority is Authority.REFUSED
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_detail["identity_amount_basis"] == "mass_percent"
 
 
 def test_printed_experiment_pressure_reaches_the_scorer(

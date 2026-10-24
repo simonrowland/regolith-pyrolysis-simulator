@@ -1,0 +1,244 @@
+schema_version: literature_extract.v1
+source_id: morita-sano-2004-cr-oxide-activity-cao-sio2
+source:
+  citation: 'Morita, K. & Sano, N. (2004), Activity of chromium oxide in CaO-SiO2 based slags at 1873 K, VII International Conference on Molten Slags Fluxes and Salts, South African Institute of Mining and Metallurgy.'
+  year: 2004
+extraction:
+  method: 'Born-digital pdftotext-layout transcription; all plotted figure data deferred under wave rules; MinerU found no tables.'
+  date: '2026-10-20'
+  worker: fam34-1020
+review_status: draft
+species:
+  CrOx:
+    observations: []
+    context:
+      - observation_id: morita_sano_2004_fig1
+        type: figure_only
+        locator: {figure: '1', page: 2, pdf_page_index: 1}
+        units: mass percent Cr
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: solubility of MgCr2O4 in MgO-SiO2(-CaO)(-CrOx) melts
+          species: CrOx
+          phase: liquid
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: log pO2 (atm)
+          y_axis_as_printed: Cr content (mass %)
+          caption_as_printed: 'Oxygen partial pressure dependence of the solubility of MgCr2O4 in MgO-SiO2(-CaO)(-CrOx) melts (Mg2SiO4 saturated) at 1873 K.'
+          panel: single
+          series: [{name: 'total Cr; no CaO addition', marker_count: null}, {name: 'Cr2+; no CaO addition', marker_count: null}, {name: 'total Cr; 10 mass % CaO addition', marker_count: null}, {name: 'Cr7C3 saturated', marker_count: null}]
+          attribution: Morita and Sano (2004); underlying prior work cited as reference 2
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_fig2
+        type: figure_only
+        locator: {figure: '2', page: 2, pdf_page_index: 1}
+        units: log ratio
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: Cr2+/Cr3+ ratio
+          species: CrOx
+          phase: liquid
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: log pO2 (atm)
+          y_axis_as_printed: log(Cr2+/Cr3+)
+          caption_as_printed: 'Oxygen partial pressure dependence of Cr2+/Cr3+ ratio in MgO-SiO2(-CrOx) melts (Mg2SiO4 saturated) at 1873 K.'
+          panel: single
+          series: [{name: 'Cr2+/Cr3+ ratio', marker_count: null}]
+          attribution: Morita and Sano (2004); underlying prior work cited as reference 2
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_fig3
+        type: figure_only
+        locator: {figure: '3', page: 2, pdf_page_index: 1}
+        units: mass percent
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: solubility of MgCr2O4
+          species: CrOx
+          phase: liquid
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: composition (mass % CrOx)
+          y_axis_as_printed: composition (mass % MgO and SiO2)
+          caption_as_printed: 'Solubility of MgCr2O4 in MgO-SiO2(-CrOx) melts at 1873 K under a lower oxygen partial pressure.'
+          panel: single
+          series: [{name: 'printed composition series', marker_count: null}]
+          attribution: Morita and Sano (2004); prior-work summary
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_fig4
+        type: figure_only
+        locator: {figure: '4', page: 3, pdf_page_index: 2}
+        units: mass percent; mole-fraction ratio
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: CrOx activity contours and phase relations
+          species: CrOx
+          phase: liquid and coexisting solids as printed
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: slag composition (mass %)
+          y_axis_as_printed: slag composition (mass %)
+          caption_as_printed: 'Iso-activity contours of CrOx and phase relations for CaO-SiO2-CrOx at 1873 K with pO2 = 6.95 × 10^-11 atm.'
+          panel: single
+          series: [{name: 'phase boundaries and CrOx activity contours', marker_count: 0}]
+          attribution: Morita and Sano (2004), summarizing reference 7
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_fig5
+        type: figure_only
+        locator: {figure: '5', page: 3, pdf_page_index: 2}
+        units: ratio
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: Cr3+/Cr2+ ratio
+          species: CrOx
+          phase: liquid slag, quenched before analysis
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: MgO content (mass %)
+          y_axis_as_printed: Cr3+/Cr2+
+          caption_as_printed: 'Effect of MgO addition on Cr3+/Cr2+ ratio for 41 mass % CaO-41 mass % SiO2-10 mass % Al2O3-8 mass % CrOx slags at 1873 K with pO2 = 6.95 × 10^-11 atm.'
+          panel: single
+          series: [{name: 'Cr3+/Cr2+', marker_count: null}]
+          attribution: Morita and Sano (2004)
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_fig6
+        type: figure_only
+        locator: {figure: '6', page: 3, pdf_page_index: 2}
+        units: dimensionless
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: activity coefficient of CrOx
+          species: CrOx
+          phase: liquid slag, quenched before analysis
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: MgO content (mass %)
+          y_axis_as_printed: activity coefficient of CrOx
+          caption_as_printed: 'Effect of MgO addition on activity coefficient of CrOx for 41 mass % CaO-41 mass % SiO2-10 mass % Al2O3-8 mass % CrOx slags at 1873 K with pO2 = 6.95 × 10^-11 atm.'
+          panel: single
+          series: [{name: 'activity coefficient of CrOx', marker_count: null}]
+          attribution: Morita and Sano (2004)
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_fig7
+        type: figure_only
+        locator: {figure: '7', page: 3, pdf_page_index: 2}
+        units: ratio
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: Cr3+/Cr2+ ratio
+          species: CrOx
+          phase: liquid slag, quenched before analysis
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: Al2O3 content (mass %)
+          y_axis_as_printed: Cr3+/Cr2+
+          caption_as_printed: 'Effect of Al2O3 addition on Cr3+/Cr2+ ratio for 43 mass % CaO-43 mass % SiO2-5 mass % MgO-9 mass % CrOx slags at 1873 K with pO2 = 6.95 × 10^-11 atm.'
+          panel: single
+          series: [{name: 'Cr3+/Cr2+', marker_count: null}]
+          attribution: Morita and Sano (2004)
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_fig8
+        type: figure_only
+        locator: {figure: '8', page: 4, pdf_page_index: 3}
+        units: dimensionless
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: activity coefficient of CrOx
+          species: CrOx
+          phase: liquid slag, quenched before analysis
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: Al2O3 content (mass %)
+          y_axis_as_printed: activity coefficient of CrOx
+          caption_as_printed: 'Effect of Al2O3 addition on activity coefficient of CrOx for 43 mass % CaO-43 mass % SiO2-5 mass % MgO-9 mass % CrOx slags at 1873 K with pO2 = 6.95 × 10^-11 atm.'
+          panel: single
+          series: [{name: 'activity coefficient of CrOx', marker_count: null}]
+          attribution: Morita and Sano (2004)
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_fig9
+        type: figure_only
+        locator: {figure: '9', page: 4, pdf_page_index: 3}
+        units: dimensionless
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: activity coefficient of CrO1.5
+          species: CrO1.5
+          phase: liquid slag
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: X_CaO / X_SiO2
+          y_axis_as_printed: activity coefficient of CrO1.5
+          caption_as_printed: 'Effect of X_CaO/X_SiO2 on activity coefficient of CrO1.5 for CaO-SiO2-CrOx slags at 1873 K with pO2 = 6.95 × 10^-11 atm.'
+          panel: single
+          series: [{name: 'T.Cr 15.0-16.6 mass %', marker_count: null}, {name: 'T.Cr 9.1-9.9 mass %', marker_count: null}, {name: 'T.Cr 3.5-4.9 mass %', marker_count: null}]
+          attribution: Morita and Sano (2004), summarizing reference 7
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_fig10
+        type: figure_only
+        locator: {figure: '10', page: 4, pdf_page_index: 3}
+        units: dimensionless
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: activity coefficient of CrO
+          species: CrO
+          phase: liquid slag
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: X_CaO / X_SiO2
+          y_axis_as_printed: activity coefficient of CrO
+          caption_as_printed: 'Effect of X_CaO/X_SiO2 on activity coefficient of CrO for CaO-SiO2-CrOx slags at 1873 K with pO2 = 6.95 × 10^-11 atm.'
+          panel: single
+          series: [{name: 'T.Cr 15.0-16.6 mass %', marker_count: null}, {name: 'T.Cr 9.1-9.9 mass %', marker_count: null}, {name: 'T.Cr 3.5-4.9 mass %', marker_count: null}]
+          attribution: Morita and Sano (2004), summarizing reference 7
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_fig11
+        type: figure_only
+        locator: {figure: '11', page: 4, pdf_page_index: 3}
+        units: ratio
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: Cr3+/Cr2+ ratio
+          species: CrOx
+          phase: liquid slag
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: X_CaO / X_SiO2
+          y_axis_as_printed: Cr3+/Cr2+
+          caption_as_printed: 'Effect of X_CaO/X_SiO2 on Cr3+/Cr2+ ratio for CaO-SiO2-CrOx slags at 1873 K with pO2 = 6.95 × 10^-11 atm.'
+          panel: single
+          series: [{name: 'T.Cr 15.0-16.6 mass %', marker_count: null}, {name: 'T.Cr 9.1-9.9 mass %', marker_count: null}, {name: 'T.Cr 3.5-4.9 mass %', marker_count: null}]
+          attribution: Morita and Sano (2004), summarizing reference 7
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_fig12
+        type: figure_only
+        locator: {figure: '12', page: 5, pdf_page_index: 4}
+        units: dimensionless
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: activity coefficient of CrOx
+          species: CrOx
+          phase: liquid slag
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: X_CaO / X_SiO2
+          y_axis_as_printed: activity coefficient of CrOx
+          caption_as_printed: 'Effect of X_CaO/X_SiO2 on activity coefficient of CrOx for CaO-SiO2-10 mass % Al2O3-5 mass % MgO-10 mass % CrOx slags at 1873 K with pO2 = 6.95 × 10^-11 atm.'
+          panel: single
+          series: [{name: 'activity coefficient of CrOx', marker_count: null}]
+          attribution: Morita and Sano (2004)
+          digitisation: deferred to a figure pass
+      - observation_id: morita_sano_2004_cu_cr_activity_coefficient_parameter
+        type: relation
+        locator: {page: 2, pdf_page_index: 1, section: Experimental}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          quantity_as_printed: activity coefficient of Cr at infinite dilution in Cu-Cr alloy
+          species: Cr
+          phase: liquid alloy
+          temperature_as_printed: 1873 K experimental basis
+          value_as_printed: '11.07'
+          attribution_status: source cites a general thermodynamics text nearby, but does not identify the provenance of this value
+          candidate_quantity_tokens: [activity_coefficient]
+          note: Calculation input, not a new measurement from this paper; retained as context because its attribution and independent measurement basis are not stated.

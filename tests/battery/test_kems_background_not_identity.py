@@ -384,37 +384,28 @@ def test_knudsen_engine_point_keeps_source_grounded_row_pressure() -> None:
 def test_langmuir_free_evaporation_still_inherits_experiment_total(
     tmp_path: Path,
 ) -> None:
-    """CORRECT langmuir control (Fedkin 2006): identity inheritance unchanged."""
+    """Fedkin 2006 Table 3 is context, so no scored Langmuir row inherits 0.0013 Pa.
+
+    The printed Hashimoto chamber pressure stays on the Table 3 equipment
+    context (1.3e-8 bar). 7baaf334b keeps those fit outputs out of observations.
+    """
 
     result = _migrate_real_extract(tmp_path, "kems-005-fedkin-2006.yaml")
-    expected = Decimal("0.001300000")
-    inherited = []
-    for experiment_id, experiment in result.experiments.items():
-        if not (
-            experiment.method.is_value
-            and experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
-        ):
-            continue
-        total = experiment.pressure_environment.total_pressure_Pa
-        if not total.state.is_value:
-            continue
-        value = total.state.value
-        if not (isinstance(value, Value) and value.kind is ValueKind.POINT):
-            continue
-        if value.point != expected:
-            continue
-        for observation in result.observations.values():
-            if observation.experiment_id != experiment_id:
-                continue
-            identity_pressure = observation.identity.total_pressure_Pa
-            if (
-                identity_pressure is not None
-                and identity_pressure.is_value
-                and identity_pressure.value == expected
-            ):
-                inherited.append(observation.observation_id)
-                break
-    assert inherited, "expected at least one langmuir observation to inherit experiment total"
+    assert result.observations == {}
+    assert result.experiments == {}
+    table3 = next(
+        context
+        for records in result.context_by_work.values()
+        for context in records
+        if context.get("source_id") == "kems-005-fedkin-2006"
+        and context.get("table") == "3"
+    )
+    assert table3["type"] == "evaporation_coefficient_table_context"
+    chamber = table3["equipment"]["chamber_pressure_bar"]
+    assert Decimal(str(chamber["value"])) == Decimal("1.3e-8")
+    fe = next(row for row in table3["values"] if row["element"] == "Fe")
+    fe_1973 = next(item for item in fe["temperature_values"] if item["T_K"] == 1973.0)
+    assert Decimal(str(fe_1973["alpha"])) == Decimal("0.23")
 
 
 def test_transpiration_still_inherits_experiment_total(tmp_path: Path) -> None:

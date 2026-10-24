@@ -1,0 +1,41 @@
+source_id: matsumaru-1999-plasma-arc-silicate-evaporation
+source:
+  doi: 10.2320/jinstmet1952.63.1_21
+  year: 1999
+drafts:
+  - file: p005-t01.csv
+    page: 5
+    table_index: 1
+    printed_table: '1'
+    candidate_tokens: [interaction_parameter]
+    disposition: context_only
+    reason: >-
+      The nine ion-pair interaction energies are cited regular-solution model
+      inputs from Banya (1992), not measured activity observations. The pairs
+      are not species identities for migrated records.
+  - file: p006-t02.csv
+    page: 6
+    table_index: 2
+    printed_table: '2'
+    candidate_tokens: [mass_loss_rate, evaporation_rate]
+    disposition: context_only
+    reason: >-
+      Two measured aggregate assembly rates and three Hertz-Knudsen model rates
+      are printed. The measurements cover the whole sample/rod/crucible weight
+      change and cannot be filed as one species' rate without changing their
+      identity; the model rates remain context.
+  - file: p006-t03.csv
+    page: 6
+    table_index: 3
+    printed_table: '3'
+    candidate_tokens: [equilibrium_phase_composition, residue_component_composition]
+    disposition: context_only
+    reason: >-
+      The three quoted bulk incinerator-ash compositions are neither an
+      equilibrium phase nor a residue produced in this study.
+table_tool_emit:
+  disposition: not_run
+  reason: >-
+    The emitter creates one migrated observation per mapped numeric value cell.
+    No table's values can be mapped to a species-level observation without
+    changing what the source reports; the tables are preserved in context.

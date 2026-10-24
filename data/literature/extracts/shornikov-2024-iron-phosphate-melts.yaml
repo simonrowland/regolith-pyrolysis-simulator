@@ -1,0 +1,542 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2024-iron-phosphate-melts
+source:
+  citation: >-
+    Shornikov, S. I. (2024). Thermodynamic properties of the FeO–P4O10 melts.
+    Experiment in Geosciences, 30(1), 73–76.
+  year: 2024
+  venue: Experiment in Geosciences
+  corpus_asset: raw/shornikov-2024-iron-phosphate-melts/shornikov-2024-iron-phosphate-melts.pdf
+  corpus_sha256: 23b280d7a3d1e55238bd44fa81f3d7650ee771a8f0db97598fd947eca2323eb4
+extraction:
+  method: >-
+    No numerical table is printed. MinerU content list for this PDF has charts and
+    images and no table blocks, so mineru_table_draft emit was not run. Figures 1–4
+    were read on 600 dpi renders of PDF pages 3 and 4. This-study series are continuous
+    calculated strokes with no marker centre. Literature symbols stay in the audit
+    sidecar and are not re-extracted.
+  date: '2026-10-20'
+  worker: t1372-w2-w7-t1
+review_status: draft
+fidelity_samples:
+  - species: FeO
+    observable: activity_coefficient
+    observation_id: shornikov_2024_feo_p4o10_fig2a_series2
+    field: admission_status
+    value: typed_refusal
+    locator:
+      page: 3
+      published_page: 74
+      pdf_page_index: 2
+      figure: '2'
+      panel: A
+      note: Series 2 is the red calculated FeO activity stroke. No marker centre.
+  - species: Fe
+    observable: partial_pressure
+    observation_id: shornikov_2024_feo_p4o10_fig4_fe_pressure
+    field: admission_status
+    value: typed_refusal
+    locator:
+      page: 4
+      published_page: 75
+      pdf_page_index: 3
+      figure: '4'
+      note: Series 1 is the calculated Fe pressure stroke at 1673 K. No marker centre.
+experiments:
+  - experiment_id: shornikov_2024_feo_p4o10_model
+    method: engine_evaluation
+    locator:
+      page: 2
+      published_page: 73
+      pdf_page_index: 1
+      section: Abstract
+      note: Semi-empirical model calculations for 600–1700 K. No Knudsen cell is used in this paper.
+    conditions:
+      temperature_K:
+        state:
+          tag: unknown
+          reason: range_only_not_a_single_temperature
+        locator:
+          page: 2
+          published_page: 73
+          pdf_page_index: 1
+          section: Abstract
+          note: The model covers 600–1700 K.
+species:
+  FeO:
+    observations:
+      - observation_id: shornikov_2024_feo_p4o10_fig2a_series2
+        type: activity_coefficient
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 3
+          published_page: 74
+          pdf_page_index: 2
+          figure: '2'
+          panel: A
+          note: >-
+            Caption series 2, the red stroke, calculated in the present study.
+            600 dpi render of PDF page 3: continuous stroke, no marker centre.
+        phase: condensed
+        units: dimensionless activity as plotted
+        T_range_K: [1643, 1673]
+        standard_state: >-
+          Published page 74 (PDF page 3): the model adopts standard Gibbs energies of
+          formation of FeO and P4O10 in the crystalline and liquid state (Barin, 1995).
+          The paper does not state which of those phases is the reference of the plotted
+          FeO activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 2
+          reason: >-
+            Continuous calculated stroke on the 600 dpi render. Sampling it would invent
+            points the paper does not print.
+      - observation_id: shornikov_2024_feo_p4o10_fig4_feo_activity
+        type: activity_coefficient
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '4'
+          panel: B
+          note: >-
+            Caption series 7, FeO activity at 1673 K, calculated in the present study.
+            600 dpi render of PDF page 4: continuous red stroke, no marker centre.
+        phase: condensed
+        units: dimensionless activity as plotted
+        T_range_K: [1673, 1673]
+        standard_state: >-
+          Published page 74 (PDF page 3): the model adopts standard Gibbs energies of
+          formation of FeO and P4O10 in the crystalline and liquid state (Barin, 1995).
+          The paper does not state which of those phases is the reference of the plotted
+          FeO activity. Figure 4 itself does not add a reference sentence.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 7
+          temperature_K: 1673
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+    context:
+      - observation_id: shornikov_2024_feo_p4o10_model_scope
+        type: model_scope
+        locator:
+          page: 3
+          published_page: 74
+          pdf_page_index: 2
+          section: body
+        units: as reported
+        values:
+          quantity: model scope
+          method_class: model_derived
+          temperature_range_K: [600, 1700]
+          model: Semi-empirical model (Shornikov, 2019).
+          model_inputs: >-
+            Standard Gibbs energies of FeO and P4O10 in the crystalline and liquid state,
+            and of FeP4O11, FeP2O6, Fe2P2O7, Fe3P2O8 and Fe5P3O13. Gas species from Barin
+            (1995) and Stolyarova et al. (2004).
+          gas_species_considered:
+            [Fe, Fe2, FeO, FeO2, P, P2, P3, P4, PO, PO2, P2O3, P2O4, P2O5, P3O6, P4O6, P4O7, P4O8, P4O9, P4O10, FePO2, FePO3, O, O2, O3, O4]
+          condensed_compounds_as_printed:
+            - {formula: FeP4O11, oxide_equivalent: FeO · P4O10, congruent_melting_K: '998±10', source: 'Weil and Glaum, 1998'}
+            - {formula: FeP2O6, oxide_equivalent: 2FeO · P4O10, congruent_melting_K: '1218±8', source: 'Zhang, 2010'}
+            - {formula: Fe2P2O7, oxide_equivalent: 4FeO · P4O10, congruent_melting_K: '1378±8', source: 'Zhang, 2010'}
+            - {formula: Fe3P2O8, oxide_equivalent: 6FeO · P4O10, congruent_melting_K: '1323±15', source: Tromel and Schwerdtfeger}
+          fe_partial_pressure_bound: >-
+            The Fe partial vapor pressure, and gaseous FePO2 and FePO3, over these iron
+            phosphates does not exceed 10^-12 atm at 1275–1525 K. Published page 75.
+            The 600 dpi render of PDF page 4 prints the exponent as a superscript minus.
+            This is a bound, not a point.
+          mixing_energy_minimum: >-
+            The minimum mixing energy is in the concentration range close to the eutectic
+            between Fe2P2O7 and FeP2O6. No numeric minimum is printed.
+      - observation_id: shornikov_2024_feo_p4o10_fig1_phase_diagram
+        type: phase_diagram
+        locator:
+          page: 3
+          published_page: 74
+          pdf_page_index: 2
+          figure: '1'
+        units: figure-only
+        values:
+          quantity: FeO–P4O10 phase diagram
+          method_class: figure_only
+          attribution: Compiled in this paper from the melting citations named in the introduction.
+          reason: Region diagram. Boundaries were not digitized.
+  P4O10:
+    observations:
+      - observation_id: shornikov_2024_feo_p4o10_fig2b_series5
+        type: activity_coefficient
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 3
+          published_page: 74
+          pdf_page_index: 2
+          figure: '2'
+          panel: B
+          note: >-
+            Caption series 5, the red stroke, calculated in the present study.
+            600 dpi render of PDF page 3: continuous stroke, no marker centre.
+        phase: condensed
+        units: dimensionless activity as plotted, log10
+        T_range_K: [1643, 1673]
+        standard_state: >-
+          Published page 74 (PDF page 3): the model adopts standard Gibbs energies of
+          formation of FeO and P4O10 in the crystalline and liquid state (Barin, 1995).
+          The paper does not state which of those phases is the reference of the plotted
+          P4O10 activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 5
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+      - observation_id: shornikov_2024_feo_p4o10_fig4_p4o10_activity
+        type: activity_coefficient
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '4'
+          panel: B
+          note: >-
+            Caption series 8, P4O10 activity at 1673 K. 600 dpi render of PDF page 4:
+            continuous purple stroke, no marker centre.
+        phase: condensed
+        units: dimensionless activity as plotted
+        T_range_K: [1673, 1673]
+        standard_state: >-
+          Published page 74 (PDF page 3): the model adopts standard Gibbs energies of
+          formation of FeO and P4O10 in the crystalline and liquid state (Barin, 1995).
+          The paper does not state which of those phases is the reference of the plotted
+          P4O10 activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 8
+          temperature_K: 1673
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+      - observation_id: shornikov_2024_feo_p4o10_fig4_p4o10_pressure
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '4'
+          panel: A
+          note: Caption series 4, p(P4O10) at 1673 K. Continuous red stroke, no marker centre.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1673, 1673]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 4
+          species_as_printed: P4O10
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+  Fe:
+    observations:
+      - observation_id: shornikov_2024_feo_p4o10_fig4_fe_pressure
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '4'
+          panel: A
+          note: Caption series 1, p(Fe) at 1673 K. Continuous black stroke, no marker centre.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1673, 1673]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 1
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+  PO:
+    observations:
+      - observation_id: shornikov_2024_feo_p4o10_fig3_po_calculated
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '3'
+          note: >-
+            Caption series 3, calculated PO over Fe2P2O7 (panel A) and Fe3P2O8 (panel B).
+            600 dpi render: straight strokes, no marker centres. Series 1 is Lopatin (1995)
+            and is not stored.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1300, 1500]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 3
+          reason: Continuous calculated strokes. No marker centre.
+      - observation_id: shornikov_2024_feo_p4o10_fig4_po_pressure
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '4'
+          panel: A
+          note: Caption series 2, p(PO) at 1673 K. Continuous teal stroke, no marker centre.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1673, 1673]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 2
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+  PO2:
+    observations:
+      - observation_id: shornikov_2024_feo_p4o10_fig3_po2_calculated
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '3'
+          note: >-
+            Caption series 4, calculated PO2. 600 dpi render: straight strokes, no marker
+            centres. Series 2 is Lopatin (1995) and is not stored.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1300, 1500]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 4
+          reason: Continuous calculated strokes. No marker centre.
+      - observation_id: shornikov_2024_feo_p4o10_fig4_po2_pressure
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '4'
+          panel: A
+          note: Caption series 3, p(PO2) at 1673 K. Continuous purple stroke, no marker centre.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1673, 1673]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 3
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+  P2O3:
+    observations:
+      - observation_id: shornikov_2024_feo_p4o10_fig3_p2o3
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '3'
+          note: Caption series 5, calculated P2O3. Straight strokes, no marker centres.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1300, 1500]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 5
+          reason: Continuous calculated strokes. No marker centre.
+  P2O4:
+    observations:
+      - observation_id: shornikov_2024_feo_p4o10_fig3_p2o4
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '3'
+          note: Caption series 6, calculated P2O4. Straight strokes, no marker centres.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1300, 1500]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 6
+          reason: Continuous calculated strokes. No marker centre.
+  P4O9:
+    observations:
+      - observation_id: shornikov_2024_feo_p4o10_fig3_p4o9
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '3'
+          panel: A
+          note: Caption series 7, calculated P4O9 on panel A. Teal stroke, no marker centre. Panel B has no series 7.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1300, 1425]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 7
+          reason: Continuous calculated stroke. No marker centre.
+  O:
+    observations:
+      - observation_id: shornikov_2024_feo_p4o10_fig3_o
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '3'
+          panel: B
+          note: Caption series 8, calculated atomic O on panel B. No marker centre.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1375, 1525]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 8
+          reason: Continuous calculated stroke. No marker centre.
+      - observation_id: shornikov_2024_feo_p4o10_fig4_o_pressure
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '4'
+          panel: A
+          note: Caption series 5, p(O) at 1673 K. Continuous blue stroke, no marker centre.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1673, 1673]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 5
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+  O2:
+    observations:
+      - observation_id: shornikov_2024_feo_p4o10_fig3_o2
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '3'
+          panel: A
+          note: Caption series 9, calculated O2 on panel A. No marker centre. Panel B's series 9 is a separate O2 stroke, same refusal.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1300, 1525]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 9
+          reason: Continuous calculated strokes on both panels. No marker centre.
+      - observation_id: shornikov_2024_feo_p4o10_fig4_o2_pressure
+        type: partial_pressure
+        experiment: shornikov_2024_feo_p4o10_model
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '4'
+          panel: A
+          note: Caption series 6, p(O2) at 1673 K. Continuous teal stroke, no marker centre.
+        phase: gas
+        units: log10(atm) as plotted
+        T_range_K: [1673, 1673]
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 6
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+  mixing:
+    observations: []
+    context:
+      - observation_id: shornikov_2024_feo_p4o10_fig4_mixing_energy
+        type: mixing_energy_curve
+        locator:
+          page: 4
+          published_page: 75
+          pdf_page_index: 3
+          figure: '4'
+          panel: B
+          note: Caption series 9, mixing energy at 1673 K. Continuous teal stroke, no marker centre. Not an activity.
+        units: kJ/mol as plotted on the Delta G / RT axis; the axis label is lg a_i, Delta G^m / RT
+        values:
+          quantity: mixing energy
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 9
+          temperature_K: 1673
+          reason: Continuous calculated stroke. No numeric minimum is printed.

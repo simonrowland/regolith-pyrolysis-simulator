@@ -117,8 +117,49 @@ class _RefusalSnapshotHistoryPrefix:
         memo.clear()
 
 
+class _RefusalSnapshotInsertedMapping:
+    """Rollback view of an insert-only mapping. Committed values are shared.
+
+    ``PyrolysisSimulator._yield_disposition_ledger_snapshots`` gains one key
+    per committed hour. Production writes that key with a new dict
+    (``capture_ledger_snapshot``); it does not mutate a committed value.
+    The hot snapshot therefore keeps the value references taken at the start
+    of the hour. A key overwritten during the hour still restores the
+    reference captured here. Terminal refusal deep-copies those references
+    into an owned dict. Any other attribute, and a non-dict value of this
+    attribute, stays on the ordinary deep-copy path.
+    """
+
+    __slots__ = ('_source', '_items', '_memo')
+
+    def __init__(self, source: dict[Any, Any], memo: Dict[int, Any]) -> None:
+        self._source = source
+        # Capture the mapping as it exists now. A key inserted or replaced
+        # during the hour must not appear in the restored mapping.
+        self._items = tuple(source.items())
+        self._memo = memo
+        memo[id(source)] = self
+
+    def materialize(self) -> dict[Any, Any]:
+        materialized: dict[Any, Any] = {}
+        self._memo[id(self._source)] = materialized
+        for key, item in self._items:
+            # Match dict deepcopy's value-before-key order.
+            copied_item = _deepcopy_refusal_value(item, self._memo)
+            copied_key = _deepcopy_refusal_value(key, self._memo)
+            materialized[copied_key] = copied_item
+        return materialized
+
+    def release(self) -> None:
+        """Break the prefix↔memo cycle once the attempted hour resolves."""
+
+        memo = self._memo
+        self._memo = {}
+        memo.clear()
+
+
 def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
-    """Replace an internal history-prefix view with its rollback list."""
+    """Replace an internal history-prefix view with its rollback payload."""
 
     record = state.get('record')
     history = getattr(record, 'snapshots', None)
@@ -128,6 +169,9 @@ def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
     history = getattr(model, 'operating_history', None)
     if isinstance(history, _RefusalSnapshotHistoryPrefix):
         model.operating_history = history.materialize()
+    inserted = state.get('_yield_disposition_ledger_snapshots')
+    if isinstance(inserted, _RefusalSnapshotInsertedMapping):
+        state['_yield_disposition_ledger_snapshots'] = inserted.materialize()
 
 
 _REFUSAL_MISSING = object()
@@ -13771,6 +13815,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             memo[id(operating_history)] = _RefusalSnapshotHistoryPrefix(
                 operating_history, memo, mutable_tail=1,
             )
+        yield_rows = getattr(self, '_yield_disposition_ledger_snapshots', None)
+        if defer_committed_history and type(yield_rows) is dict:
+            # Insert-only hour rows. Share the committed values; a non-dict
+            # occupant of this attribute falls through to the copy below.
+            _RefusalSnapshotInsertedMapping(yield_rows, memo)
         state_source = {
             name: value
             for name, value in self.__dict__.items()
@@ -13888,6 +13937,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 terminal_refusal_state.get('_condensation_model'),
                 'operating_history', None,
             ),
+            terminal_refusal_state.get('_yield_disposition_ledger_snapshots'),
         )
         try:
             return self._step_one_hour()
@@ -13937,7 +13987,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             raise
         finally:
             for history in terminal_refusal_histories:
-                if isinstance(history, _RefusalSnapshotHistoryPrefix):
+                if isinstance(
+                    history,
+                    (
+                        _RefusalSnapshotHistoryPrefix,
+                        _RefusalSnapshotInsertedMapping,
+                    ),
+                ):
                     history.release()
 
     def _step_one_hour(self) -> HourSnapshot:

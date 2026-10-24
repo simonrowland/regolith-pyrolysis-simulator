@@ -1,0 +1,194 @@
+# Table 2's activity rows and rate cells are scalar, but table row labels carry
+# pressure and experiment type that cannot be copied into per-row conditions.
+# The paper gives no rate unit in Table 2; the unit is kept verbatim as printed.
+source_id: ta-dacko-conradt-low-p-transpiration
+source:
+  citation: >-
+    Dacko, Wilsmann and Conradt (2004), Low Pressure evaporation from boron
+    containing glass melts by the transpiration method, Glastech. Ber. Glass Sci. Technol. 77 C.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: emitbt-1018
+review_status: draft
+tables:
+  - page: 5
+    table_index: 4
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: author_derived
+    unit: dimensionless activity; T C
+    phase: glass
+    published_page: 209
+    rows: [2]
+    temperature:
+      as_printed: '1400'
+      unit: C
+    values:
+      - column: 2
+        species: Na
+  - page: 5
+    table_index: 4
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: author_derived
+    unit: dimensionless activity; T C
+    phase: glass
+    published_page: 209
+    rows: [2]
+    temperature:
+      as_printed: '1500'
+      unit: C
+    values:
+      - column: 3
+        species: Na
+  - page: 5
+    table_index: 4
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: author_derived
+    unit: dimensionless activity; T C
+    phase: glass
+    published_page: 209
+    rows: [2]
+    temperature:
+      as_printed: '1600'
+      unit: C
+    values:
+      - column: 4
+        species: Na
+  - page: 5
+    table_index: 4
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: author_derived
+    unit: dimensionless activity; T C
+    phase: glass
+    published_page: 209
+    rows: [3]
+    temperature:
+      as_printed: '1400'
+      unit: C
+    values:
+      - column: 2
+        species: B
+  - page: 5
+    table_index: 4
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: author_derived
+    unit: dimensionless activity; T C
+    phase: glass
+    published_page: 209
+    rows: [3]
+    temperature:
+      as_printed: '1500'
+      unit: C
+    values:
+      - column: 3
+        species: B
+  - page: 5
+    table_index: 4
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: author_derived
+    unit: dimensionless activity; T C
+    phase: glass
+    published_page: 209
+    rows: [3]
+    temperature:
+      as_printed: '1600'
+      unit: C
+    values:
+      - column: 4
+        species: B
+  - page: 5
+    table_index: 4
+    type: rate_series
+    quantity: mass_loss_rate
+    evidence_class: author_derived
+    unit: as printed; Table 2 does not state the rate unit
+    phase: glass
+    published_page: 209
+    rows: [4, 5, 6]
+    temperature:
+      as_printed: '1400'
+      unit: C
+    values:
+      - column: 2
+        species: Na
+  - page: 5
+    table_index: 4
+    type: rate_series
+    quantity: mass_loss_rate
+    evidence_class: author_derived
+    unit: as printed; Table 2 does not state the rate unit
+    phase: glass
+    published_page: 209
+    rows: [4, 5, 6]
+    temperature:
+      as_printed: '1500'
+      unit: C
+    values:
+      - column: 3
+        species: Na
+  - page: 5
+    table_index: 4
+    type: rate_series
+    quantity: mass_loss_rate
+    evidence_class: author_derived
+    unit: as printed; Table 2 does not state the rate unit
+    phase: glass
+    published_page: 209
+    rows: [4, 5, 6]
+    temperature:
+      as_printed: '1600'
+      unit: C
+    values:
+      - column: 4
+        species: Na
+  - page: 5
+    table_index: 4
+    type: rate_series
+    quantity: mass_loss_rate
+    evidence_class: measured_direct
+    unit: as printed; Table 2 does not state the rate unit
+    phase: glass
+    published_page: 209
+    rows: [7, 8, 9]
+    temperature:
+      as_printed: '1400'
+      unit: C
+    values:
+      - column: 2
+        species: Na
+  - page: 5
+    table_index: 4
+    type: rate_series
+    quantity: mass_loss_rate
+    evidence_class: measured_direct
+    unit: as printed; Table 2 does not state the rate unit
+    phase: glass
+    published_page: 209
+    rows: [7, 8, 9]
+    temperature:
+      as_printed: '1500'
+      unit: C
+    values:
+      - column: 3
+        species: Na
+  - page: 5
+    table_index: 4
+    type: rate_series
+    quantity: mass_loss_rate
+    evidence_class: measured_direct
+    unit: as printed; Table 2 does not state the rate unit
+    phase: glass
+    published_page: 209
+    rows: [7, 8, 9]
+    temperature:
+      as_printed: '1600'
+      unit: C
+    values:
+      - column: 4
+        species: Na

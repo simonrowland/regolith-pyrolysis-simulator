@@ -39,10 +39,15 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
     assert "Mann" in method
     assert "not printed" in method
     assert [observation["values"]["method_class"] for observation in observations] == [
-        "model_derived",
-        "model_derived",
-        "model_derived",
+        "quoted_attributed",
+        "quoted_attributed",
+        "quoted_attributed",
     ]
+    assert all(
+        "row ion currents and numerical constants are not printed"
+        in observation["values"]["method_as_printed"]
+        for observation in observations
+    )
     assert [observation["reaction_as_printed"] for observation in observations] == [
         "(MoO3) = (MoO2) + (O)",
         "(AlO) = (Al) + (O)",
@@ -145,3 +150,18 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
         and _e15_residual_point(e15_probe, observation) is None
         for observation in oxygen_rows
     )
+    assert not migrated.validation.hard_issues
+    expected_reactants = {
+        "stolyarova_1996_table2_pO_1933k": {"MoO3", "MoO2", "O"},
+        "stolyarova_1996_table2_pO_prime_1933k": {"AlO", "Al", "O"},
+        "stolyarova_1996_table2_pO_double_prime_1933k": {"SiO2", "SiO", "O"},
+    }
+    for observation in oxygen_rows:
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert observation.identity.reaction is not None
+        assert observation.identity.reaction.is_value
+        assert {
+            term.species.formula
+            for term in observation.identity.reaction.value.terms
+        } == expected_reactants[observation.observation_id.split("::")[1]]

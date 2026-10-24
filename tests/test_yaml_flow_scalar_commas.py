@@ -5,108 +5,13 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-import yaml
 
 from simulator.battery.migrate import discover_extracts
-from simulator.yaml_cache import YAML12SafeLoader
+from simulator.yaml_cache import yaml_mapping_source_issues
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
-
-
-def _format_path(path: tuple[object, ...]) -> str:
-    result = ""
-    for part in path:
-        if isinstance(part, int):
-            result += f"[{part}]"
-        else:
-            result += f".{part}" if result else str(part)
-    return result
-
-
-def _walk_mapping_source_issues(
-    node: object,
-    loader: YAML12SafeLoader,
-    source: str,
-    path: tuple[object, ...] = (),
-) -> list[tuple[str, int, str]]:
-    """Report constructed duplicate keys and flow keys lacking a value token."""
-    issues: list[tuple[str, int, str]] = []
-    if isinstance(node, yaml.MappingNode):
-        constructed_keys: dict[object, yaml.Mark] = {}
-        merge_key_seen = False
-        for key_node, value_node in node.value:
-            if key_node.tag == "tag:yaml.org,2002:merge":
-                if merge_key_seen:
-                    issues.append(
-                        (
-                            "duplicate explicit merge key",
-                            key_node.start_mark.line + 1,
-                            f"{_format_path(path)}: <<",
-                        )
-                    )
-                merge_key_seen = True
-            else:
-                constructed_key = loader.construct_object(key_node, deep=True)
-                try:
-                    first_mark = constructed_keys.get(constructed_key)
-                except TypeError:
-                    # The production loader rejects unhashable mapping keys
-                    # while constructing the document below.
-                    first_mark = None
-                if first_mark is not None:
-                    issues.append(
-                        (
-                            "duplicate constructed mapping key",
-                            key_node.start_mark.line + 1,
-                            f"{_format_path(path)}: {key_node.value!r} constructs as "
-                            f"{constructed_key!r}; first at line {first_mark.line + 1}",
-                        )
-                    )
-                else:
-                    try:
-                        constructed_keys[constructed_key] = key_node.start_mark
-                    except TypeError:
-                        pass
-
-            if (
-                node.flow_style
-                and isinstance(value_node, yaml.ScalarNode)
-                and value_node.tag == "tag:yaml.org,2002:null"
-                and value_node.value == ""
-                and ":"
-                not in source[
-                    key_node.end_mark.index : value_node.start_mark.index
-                ]
-            ):
-                issues.append(
-                    (
-                        "flow mapping key has no value indicator",
-                        key_node.start_mark.line + 1,
-                        f"{_format_path(path)}: {key_node.value!r}",
-                    )
-                )
-
-            issues.extend(
-                _walk_mapping_source_issues(
-                    value_node,
-                    loader,
-                    source,
-                    path + (key_node.value,),
-                )
-            )
-    elif isinstance(node, yaml.SequenceNode):
-        for index, value_node in enumerate(node.value):
-            issues.extend(
-                _walk_mapping_source_issues(
-                    value_node,
-                    loader,
-                    source,
-                    path + (index,),
-                )
-            )
-    return issues
 
 
 @pytest.mark.parametrize(
@@ -203,14 +108,7 @@ def test_mapping_source_guard_cases(
     probe = tmp_path / "probe.yaml"
     probe.write_text(source, encoding="utf-8")
     source = probe.read_text(encoding="utf-8")
-    loader = YAML12SafeLoader(source)
-    try:
-        node = loader.get_single_node()
-        assert node is not None
-        issues = _walk_mapping_source_issues(node, loader, source)
-        loader.construct_document(node)
-    finally:
-        loader.dispose()
+    issues = yaml_mapping_source_issues(source)
 
     assert {kind for kind, _line, _detail in issues} == expected_issue_kinds, issues
 
@@ -229,17 +127,7 @@ def test_battery_loader_rejects_comma_splits_and_duplicate_keys():
     for path in paths:
         source = path.read_text(encoding="utf-8")
         lines = source.splitlines()
-        loader = YAML12SafeLoader(source)
-        try:
-            source_tree = loader.get_single_node()
-            if source_tree is None:
-                continue
-            issues = _walk_mapping_source_issues(source_tree, loader, source)
-            # Construct the document with the same production loader instance;
-            # its mapping construction defines key identity and validates keys.
-            loader.construct_document(source_tree)
-        finally:
-            loader.dispose()
+        issues = yaml_mapping_source_issues(source)
         for kind, line_number, detail in issues:
             source_line = lines[line_number - 1].strip()
             mapping_issues.append(

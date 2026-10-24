@@ -1,0 +1,2135 @@
+schema_version: literature_extract.v1
+source_id: shornikov-1997-cao-al2o3
+source:
+  citation: "Shornikov, S. I., V. L. Stolyarov, and M. M. Shul'ts (1997), The thermodynamic properties\
+    \ and estimation of the enthalpy of fusion of the components in the CaO–Al2O3 system, Russian Journal\
+    \ of Physical Chemistry, vol. 71, no. 1, pp. 23–27. Translated from Zhurnal Fizicheskoi Khimii, vol.\
+    \ 71, no. 1, pp. 28–32."
+  year: 1997
+  corpus_asset: raw/shornikov-1997-cao-al2o3/shornikov-1997-cao-al2o3.pdf
+extraction:
+  method: "mineru_table_draft emit of Table 1, then hand placement of ± splits, composition complements,\
+    \ and the 1833–2033 K range. The fourteen partial-entropy cells were type-refused: Quantity has no\
+    \ partial-molar entropy, and they are not absolute S. Table 2 This-work rows and Table 3 This-study\
+    \ fusion rows were entered from the 600 dpi pages because the compound name is a spanning header.\
+    \ The right-column This-work rows above CaO·2Al2O3 continue the CaO·Al2O3 block. The 5CaO·3Al2O3 equation\
+    \ (8) uncertainty glyph is not a resolved digit."
+  date: '2026-10-20'
+  worker: t1372-w1
+review_status: draft
+fidelity_samples:
+- path: "species.CaO.observations[shornikov_1997_cao_al2o3_t1_cao_h_x0143].values.partial_molar_enthalpy_kJ_mol"
+  value: "-28.9"
+  note: Table 1, x(CaO)=0.143, H_CaO.
+  locator:
+    page: 2
+    published_page: 24
+    pdf_page_index: 1
+    table: '1'
+- path: "species.CaO.observations[shornikov_1997_cao_al2o3_t1_cao_h_x0750].values.partial_molar_enthalpy_kJ_mol"
+  value: '0.0'
+  note: Table 1, x(CaO)=0.750, printed zero H_CaO.
+  locator:
+    page: 2
+    published_page: 24
+    pdf_page_index: 1
+    table: '1'
+- path: "species.Ca3Al2O6.observations[shornikov_1997_cao_al2o3_t2_ca3al2o6_v_1833_2033_left_h].values.delta_fH.value"
+  value: '14.7'
+  note: Table 2 left column, method V, 1833–2033 K, 3CaO·Al2O3.
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    table: '2'
+- path: "species.CaAl2O4.observations[shornikov_1997_cao_al2o3_t2_caal2o4_v_1833_2033_right_h].values.delta_fH.value"
+  value: '23.0'
+  note: Table 2 right column, method V, 1833–2033 K, continuation of CaO·Al2O3.
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    table: '2'
+- path: "species.Ca3Al2O6.observations[shornikov_1997_cao_al2o3_t3_ca3al2o6_eq7].values.value.value"
+  value: '21.3'
+  note: Table 3, 3CaO·Al2O3, equation (7), hand-added header row.
+  locator:
+    page: 4
+    published_page: 26
+    pdf_page_index: 3
+    table: '3'
+- path: "species.Ca5Al6O14.observations[shornikov_1997_cao_al2o3_t3_ca5al6o14_eq8].values.value.value"
+  value: '25.2'
+  note: Table 3, 5CaO·3Al2O3, equation (8), central value 25.2. Uncertainty glyph unresolved.
+  locator:
+    page: 4
+    published_page: 26
+    pdf_page_index: 3
+    table: '3'
+experiments:
+- experiment_id: shornikov-1997-cao-al2o3-partials
+  kind: kems
+  locator:
+    page: 1
+    published_page: 23
+    pdf_page_index: 0
+    section: Thermodynamic properties of the CaO–Al2O3 system
+  method: "The approach of the authors' 1996 mass-spectrometric study was used to estimate partial enthalpies\
+    \ and entropies from the temperature dependences of the chemical potentials, assuming those partials\
+    \ constant over 1833–2033 K. This paper does not reprint the ion currents."
+- experiment_id: shornikov-1997-cao-al2o3-formation
+  kind: derived_thermochemistry
+  locator:
+    page: 2
+    published_page: 24
+    pdf_page_index: 1
+    equation: 3-4
+    table: '2'
+  method: "Integral formation values per 1 mol of compound. Method V is the Knudsen effusion reduction.\
+    \ Method III is this paper's calculation from literature data."
+- experiment_id: shornikov-1997-cao-al2o3-fusion
+  kind: derived_thermochemistry
+  locator:
+    page: 2
+    published_page: 24
+    pdf_page_index: 1
+    equation: 7-8
+    table: '3'
+  method: H_fus = H_T(liq) − H_T(sol), and H_fus = T_fus (S_T(liq) − S_T(sol)). Tfus is cited from Nurse
+    et al., Chatterjee and Zhmoidin, and Chemekova and Udalov.
+species:
+  CaO:
+    observations:
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_h_x0143
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.143'
+        column_header: H_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.143'
+          Al2O3: '0.857'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '1.8'
+        partial_molar_enthalpy_kJ_mol: "-28.9"
+        partial_molar_enthalpy_as_printed: "-28.9 ± 1.8"
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_h_x0333
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.333'
+        column_header: H_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.333'
+          Al2O3: '0.667'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '1.2'
+        partial_molar_enthalpy_kJ_mol: "-26.8"
+        partial_molar_enthalpy_as_printed: "-26.8 ± 1.2"
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_h_x0500
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.500'
+        column_header: H_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.500'
+          Al2O3: '0.500'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '1.0'
+        partial_molar_enthalpy_kJ_mol: '26.8'
+        partial_molar_enthalpy_as_printed: 26.8 ± 1.0
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_h_x0625
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.625'
+        column_header: H_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.625'
+          Al2O3: '0.375'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '0.8'
+        partial_molar_enthalpy_kJ_mol: '5.9'
+        partial_molar_enthalpy_as_printed: 5.9 ± 0.8
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_h_x0632
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.632'
+        column_header: H_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.632'
+          Al2O3: '0.368'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '0.7'
+        partial_molar_enthalpy_kJ_mol: '7.3'
+        partial_molar_enthalpy_as_printed: 7.3 ± 0.7
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_h_x0750
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.750'
+        column_header: H_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.750'
+          Al2O3: '0.250'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '0.1'
+        partial_molar_enthalpy_kJ_mol: '0.0'
+        partial_molar_enthalpy_as_printed: 0.0 ± 0.1
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_h_x0860
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.860'
+        column_header: H_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.860'
+          Al2O3: '0.140'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '0.1'
+        partial_molar_enthalpy_kJ_mol: '0.0'
+        partial_molar_enthalpy_as_printed: 0.0 ± 0.1
+    context:
+    - observation_id: shornikov_1997_cao_al2o3_fig1_context
+      type: figure_chemical_potential_fit
+      locator:
+        page: 1
+        published_page: 23
+        pdf_page_index: 0
+        figure: '1'
+        note: Panels (a) CaO and (b) Al2O3. Compositions 1–7 are the Table 1 mole fractions. Not digitized.
+      units: kJ/mol
+      values:
+        quantity_as_printed: −μ_i,T, kJ/mol
+        method_class: figure_only
+        status: context_only
+        unavailable_reason: fitted_lines_of_table_1
+        value_as_printed: not sampled
+        schema_gap: Fig. 1 draws the Table 1 fit, μ_i,T = H_i − T S_i, as seven lines per oxide with endpoint
+          dots. It is not an independent measurement.
+    - observation_id: shornikov_1997_cao_al2o3_fig2_context
+      type: figure_integral_enthalpy_entropy
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        figure: '2'
+        note: "Integral curves versus mol% CaO. Not digitized."
+      units: kJ/mol
+      values:
+        quantity_as_printed: H_T, T S_T, kJ/mol
+        method_class: figure_only
+        status: context_only
+        unavailable_reason: integral_of_table_1_and_model_curves
+        value_as_printed: not sampled
+        schema_gap: Series 1 and 4 are this study via equations (3) and (4) from the Table 1 partials.
+          Series 2 and 5 are the Duhem–Margules integrals (1) and (2). Series 3 and 6 are the solid-state
+          analytical equations (5) and (6).
+    - observation_id: shornikov_1997_cao_al2o3_eq5_eq6_context
+      type: solid_state_analytical_fit
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        equation: 5-6
+        note: Published p. 24. Solid-state expressions. Not expanded into a composition grid.
+      units: as printed
+      values:
+        value_as_printed: "_f H_T = −35420 x_CaO x_Al2O3; _f S_T = 4570 x_CaO x_Al2O3; errors not exceeding\
+          \ 20%; solid state."
+        schema_gap: Equations (5) and (6) are analytical concentration fits, not a table of measured points.
+          The printed formation entropy has no quantity token.
+    - observation_id: shornikov_1997_cao_al2o3_other_author_tables_context
+      type: literature_comparison_not_admitted
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        note: Same refusal covers Table 3 on published p. 26. The two This-work rows above the CaO·2Al2O3
+          header are the continuation of CaO·Al2O3 and are stored under CaAl2O4.
+      units: as printed
+      values:
+        value_as_printed: other-author cells of Tables 2 and 3 were not stored
+        schema_gap: Tables 2 and 3 also print Allibert, Hallstedt, Berman, Barin, and other cited numbers.
+          Those rows are not measurements of this paper.
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_s_x0143
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.143'
+        column_header: S_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_CaO
+        partial_entropy_as_printed: 30.2 ± 1.8
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.143'
+          Al2O3: '0.857'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_s_x0333
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.333'
+        column_header: S_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_CaO
+        partial_entropy_as_printed: 22.2 ± 1.4
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.333'
+          Al2O3: '0.667'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_s_x0500
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.500'
+        column_header: S_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_CaO
+        partial_entropy_as_printed: 32.9 ± 2.0
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.500'
+          Al2O3: '0.500'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_s_x0625
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.625'
+        column_header: S_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_CaO
+        partial_entropy_as_printed: 7.2 ± 0.5
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.625'
+          Al2O3: '0.375'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_s_x0632
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.632'
+        column_header: S_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_CaO
+        partial_entropy_as_printed: 7.5 ± 0.4
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.632'
+          Al2O3: '0.368'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_s_x0750
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.750'
+        column_header: S_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_CaO
+        partial_entropy_as_printed: 0.0 ± 0.1
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.750'
+          Al2O3: '0.250'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_cao_s_x0860
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.860'
+        column_header: S_CaO
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_CaO
+        partial_entropy_as_printed: 0.1 ± 0.1
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: CaO
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.860'
+          Al2O3: '0.140'
+        T_range_K:
+        - 1833
+        - 2033
+  Al2O3:
+    observations:
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_h_x0143
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.143'
+        column_header: H_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.143'
+          Al2O3: '0.857'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '0.1'
+        partial_molar_enthalpy_kJ_mol: '1.4'
+        partial_molar_enthalpy_as_printed: 1.4 ± 0.1
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_h_x0333
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.333'
+        column_header: H_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.333'
+          Al2O3: '0.667'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '0.2'
+        partial_molar_enthalpy_kJ_mol: '3.9'
+        partial_molar_enthalpy_as_printed: 3.9 ± 0.2
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_h_x0500
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.500'
+        column_header: H_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.500'
+          Al2O3: '0.500'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '0.9'
+        partial_molar_enthalpy_kJ_mol: '19.2'
+        partial_molar_enthalpy_as_printed: 19.2 ± 0.9
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_h_x0625
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.625'
+        column_header: H_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.625'
+          Al2O3: '0.375'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '2.0'
+        partial_molar_enthalpy_kJ_mol: '41.1'
+        partial_molar_enthalpy_as_printed: 41.1 ± 2.0
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_h_x0632
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.632'
+        column_header: H_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.632'
+          Al2O3: '0.368'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '2.2'
+        partial_molar_enthalpy_kJ_mol: '44.5'
+        partial_molar_enthalpy_as_printed: 44.5 ± 2.2
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_h_x0750
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.750'
+        column_header: H_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.750'
+          Al2O3: '0.250'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '3.1'
+        partial_molar_enthalpy_kJ_mol: '58.9'
+        partial_molar_enthalpy_as_printed: 58.9 ± 3.1
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_h_x0860
+      type: gibbs_table
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.860'
+        column_header: H_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      regime: kems_effusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      derivation:
+        relation: Table 1 partial enthalpies and entropies were estimated from the temperature dependences
+          of the chemical potentials in Fig. 1. Fig. 1 is that fit, drawn as lines, and is not a second
+          set of points.
+        inputs:
+        - Fig. 1 chemical potentials, published p. 23
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.860'
+          Al2O3: '0.140'
+        T_range_K:
+        - 1833
+        - 2033
+        sigma: '5.0'
+        partial_molar_enthalpy_kJ_mol: '72.2'
+        partial_molar_enthalpy_as_printed: 72.2 ± 5.0
+    context:
+    - observation_id: shornikov_1997_cao_al2o3_fig1b_context
+      type: figure_chemical_potential_fit
+      locator:
+        page: 1
+        published_page: 23
+        pdf_page_index: 0
+        figure: '1'
+        note: Panel (b). The lines are the Table 1 Al2O3 partials. Not digitized.
+      units: kJ/mol
+      values:
+        quantity_as_printed: −μ_Al2O3,T, kJ/mol
+        method_class: figure_only
+        status: context_only
+        unavailable_reason: fitted_lines_of_table_1
+        value_as_printed: not sampled
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_s_x0143
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.143'
+        column_header: S_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_Al2O3
+        partial_entropy_as_printed: 0.8 ± 0.1
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.143'
+          Al2O3: '0.857'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_s_x0333
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.333'
+        column_header: S_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_Al2O3
+        partial_entropy_as_printed: 3.8 ± 0.2
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.333'
+          Al2O3: '0.667'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_s_x0500
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.500'
+        column_header: S_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_Al2O3
+        partial_entropy_as_printed: 23.3 ± 1.0
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.500'
+          Al2O3: '0.500'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_s_x0625
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.625'
+        column_header: S_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_Al2O3
+        partial_entropy_as_printed: 55.0 ± 2.5
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.625'
+          Al2O3: '0.375'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_s_x0632
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.632'
+        column_header: S_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_Al2O3
+        partial_entropy_as_printed: 57.7 ± 2.7
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.632'
+          Al2O3: '0.368'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_s_x0750
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.750'
+        column_header: S_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_Al2O3
+        partial_entropy_as_printed: 72.6 ± 4.8
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.750'
+          Al2O3: '0.250'
+        T_range_K:
+        - 1833
+        - 2033
+    - observation_id: shornikov_1997_cao_al2o3_t1_al2o3_s_x0860
+      type: partial_molar_entropy_refused
+      locator:
+        page: 2
+        published_page: 24
+        pdf_page_index: 1
+        table: '1'
+        row_label: '0.860'
+        column_header: S_Al2O3
+        note: The table prints only the CaO mole fraction. x(Al2O3) stored here is the binary complement
+          1 − x(CaO) of that printed value, not a second printed column.
+      T_range_K:
+      - 1833
+      - 2033
+      phase: l
+      standard_state: "Published p. 23 equation: μ_i,T = RT ln a_i,T = H_i −\
+        \ T S_i, with H_i and S_i taken as constant over 1833–2033 K. The paper does not state a reference\
+        \ state."
+      experiment: shornikov-1997-cao-al2o3-partials
+      units: J/(mol K)
+      values:
+        quantity_as_printed: S_Al2O3
+        partial_entropy_as_printed: 81.3 ± 5.0
+        status: type_refused
+        refusal: Quantity has partial_molar_enthalpy and S, and no partial-molar entropy. Table 1 defines
+          these cells through μ_i,T = H_i − T S_i, so they are partial molar entropies. They are not stored
+          as absolute S.
+        method_class: derived
+        formula: Al2O3
+        composition_mol:
+          basis: printed_cao_mole_fraction_plus_binary_complement
+          CaO: '0.860'
+          Al2O3: '0.140'
+        T_range_K:
+        - 1833
+        - 2033
+  Ca3Al2O6:
+    observations:
+    - observation_id: shornikov_1997_cao_al2o3_t2_ca3al2o6_iii_1600_1808_left_h
+      type: gibbs_table
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        row_label: 3CaO·Al2O3 III 1600-1808
+        note: "left-hand column. Printed compound 3CaO·Al2O3. Method III: calculations from the literature\
+          \ data, done in this paper (footnote III). Values are per 1 mol of the compound (published p.\
+          \ 24). Printed interval ends at the Table 3 fusion temperature 1808 ± 5 K, so one condensed\
+          \ phase is not assigned. The printed formation entropy has no quantity token and is kept only\
+          \ as printed text on this formation-enthalpy row."
+      T_range_K:
+      - 1600
+      - 1808
+      experiment: shornikov-1997-cao-al2o3-formation
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      values:
+        quantity: delta_fH
+        method_class: derived
+        formula: Ca3Al2O6
+        printed_compound: 3CaO·Al2O3
+        method_as_printed: III
+        column_as_printed: left
+        T_range_K:
+        - 1600
+        - 1808
+        delta_fH:
+          value: "-3.5"
+          units: kJ/mol
+          as_printed: "-3.5 ± 0.6"
+        sigma: '0.6'
+        delta_fS_as_printed: 7.5 ± 0.5 J/(mol K)
+        formation_basis_as_printed: per 1 mol of the compounds
+    - observation_id: shornikov_1997_cao_al2o3_t2_ca3al2o6_iii_1808_2033_left_h
+      type: gibbs_table
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        row_label: 3CaO·Al2O3 III 1808-2033
+        note: "left-hand column. Printed compound 3CaO·Al2O3. Method III: calculations from the literature\
+          \ data, done in this paper (footnote III). Values are per 1 mol of the compound (published p.\
+          \ 24). Printed interval starts at the Table 3 fusion temperature 1808 ± 5 K, so one condensed\
+          \ phase is not assigned. The printed formation entropy has no quantity token and is kept only\
+          \ as printed text on this formation-enthalpy row."
+      T_range_K:
+      - 1808
+      - 2033
+      experiment: shornikov-1997-cao-al2o3-formation
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      values:
+        quantity: delta_fH
+        method_class: derived
+        formula: Ca3Al2O6
+        printed_compound: 3CaO·Al2O3
+        method_as_printed: III
+        column_as_printed: left
+        T_range_K:
+        - 1808
+        - 2033
+        delta_fH:
+          value: '17.2'
+          units: kJ/mol
+          as_printed: 17.2 ± 2.6
+        sigma: '2.6'
+        delta_fS_as_printed: 19.0 ± 1.6 J/(mol K)
+        formation_basis_as_printed: per 1 mol of the compounds
+    - observation_id: shornikov_1997_cao_al2o3_t2_ca3al2o6_v_1833_2033_left_h
+      type: gibbs_table
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        row_label: 3CaO·Al2O3 V 1833-2033
+        note: "left-hand column. Printed compound 3CaO·Al2O3. Method V: mass-spectrometric Knudsen effusion\
+          \ method (footnote V). Values are per 1 mol of the compound (published p. 24). Interval 1833–2033\
+          \ K lies entirely above the Table 3 fusion temperature 1808 ± 5 K. Published p. 26: the liquid\
+          \ phase is characterized by the inequalities _f G < 0, H > 0, and S > 0. The Refs. cell is a\
+          \ ditto of This work. The printed formation entropy has no quantity token and is kept only as\
+          \ printed text on this formation-enthalpy row."
+      T_range_K:
+      - 1833
+      - 2033
+      experiment: shornikov-1997-cao-al2o3-formation
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      values:
+        quantity: delta_fH
+        method_class: author_derived
+        formula: Ca3Al2O6
+        printed_compound: 3CaO·Al2O3
+        method_as_printed: V
+        column_as_printed: left
+        T_range_K:
+        - 1833
+        - 2033
+        delta_fH:
+          value: '14.7'
+          units: kJ/mol
+          as_printed: 14.7 ± 0.9
+        sigma: '0.9'
+        delta_fS_as_printed: 18.1 ± 1.3 J/(mol K)
+        formation_basis_as_printed: per 1 mol of the compounds
+      phase: l
+    - observation_id: shornikov_1997_cao_al2o3_t3_ca3al2o6_eq7
+      derived_from:
+        - shornikov_1997_cao_al2o3_t2_ca3al2o6_v_1833_2033_left_h
+      derivation:
+        relation: >-
+          Equation (7), published page 24: ΔH_fus = ΔH_T(liq) − ΔH_T(sol).
+          The liquid enthalpy is the method V row, 14.7 kJ/mol, phase liquid.
+          Equation (5) prints Δf H_T = −35420 x_CaO x_Al2O3 with no unit.
+          Table 3 prints kJ/mol. For 3CaO·Al2O3, x_CaO = 3/4. Treating the
+          printed coefficient as J/mol gives ΔH_T(sol) = −6.6413 kJ/mol and
+          ΔH_fus = 21.3413 kJ/mol, which rounds to the printed 21.3.
+        output_unit: kJ/mol
+        inputs:
+          - shornikov_1997_cao_al2o3_t2_ca3al2o6_v_1833_2033_left_h
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: 3CaO·Al2O3
+        note: "This study, equation (7), superscript a. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The Refs. cell is This study or a ditto of it. MinerU classified this 3CaO·Al2O3\
+          \ block as header rows, so emit cannot select it. The cell was read from the 600 dpi page and\
+          \ from pdftotext-layout."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths on the fusion enthalpy and on Tfus. No confidence level is stated.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: Ca3Al2O6
+        printed_compound: 3CaO·Al2O3
+        T_K: '1808'
+        T_fus_as_printed: 1808 ± 5
+        equation_as_printed: '7'
+        superscript_as_printed: a
+        value:
+          value: '21.3'
+          units: kJ/mol
+          as_printed: 21.3 ± 2.4
+        sigma: '2.4'
+        attribution: This study
+    - observation_id: shornikov_1997_cao_al2o3_t3_ca3al2o6_eq8
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: 3CaO·Al2O3
+        note: "This study, equation (8), superscript b. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The Refs. cell is This study or a ditto of it. MinerU classified this 3CaO·Al2O3\
+          \ block as header rows, so emit cannot select it. The cell was read from the 600 dpi page and\
+          \ from pdftotext-layout."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths on the fusion enthalpy and on Tfus. No confidence level is stated.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: Ca3Al2O6
+        printed_compound: 3CaO·Al2O3
+        T_K: '1808'
+        T_fus_as_printed: 1808 ± 5
+        equation_as_printed: '8'
+        superscript_as_printed: b
+        value:
+          value: '17.3'
+          units: kJ/mol
+          as_printed: 17.3 ± 2.8
+        sigma: '2.8'
+        attribution: This study
+  Ca12Al14O33:
+    observations:
+    - observation_id: shornikov_1997_cao_al2o3_t2_ca12al14o33_iii_1600_1733_left_h
+      type: gibbs_table
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        row_label: 12CaO·7Al2O3 III 1600-1733
+        note: "left-hand column. Printed compound 12CaO·7Al2O3. Method III: calculations from the literature\
+          \ data, done in this paper (footnote III). Values are per 1 mol of the compound (published p.\
+          \ 24). Printed interval ends at the Table 3 fusion temperature 1733 ± 5 K, so one condensed\
+          \ phase is not assigned. The printed formation entropy has no quantity token and is kept only\
+          \ as printed text on this formation-enthalpy row."
+      T_range_K:
+      - 1600
+      - 1733
+      experiment: shornikov-1997-cao-al2o3-formation
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      values:
+        quantity: delta_fH
+        method_class: derived
+        formula: Ca12Al14O33
+        printed_compound: 12CaO·7Al2O3
+        method_as_printed: III
+        column_as_printed: left
+        T_range_K:
+        - 1600
+        - 1733
+        delta_fH:
+          value: "-2.0"
+          units: kJ/mol
+          as_printed: "-2.0 ± 0.6"
+        sigma: '0.6'
+        delta_fS_as_printed: 13.0 ± 0.5 J/(mol K)
+        formation_basis_as_printed: per 1 mol of the compounds
+    - observation_id: shornikov_1997_cao_al2o3_t2_ca12al14o33_v_1833_2033_left_h
+      type: gibbs_table
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        row_label: 12CaO·7Al2O3 V 1833-2033
+        note: "left-hand column. Printed compound 12CaO·7Al2O3. Method V: mass-spectrometric Knudsen effusion\
+          \ method (footnote V). Values are per 1 mol of the compound (published p. 24). Interval 1833–2033\
+          \ K lies entirely above the Table 3 fusion temperature 1733 ± 5 K. Published p. 26: the liquid\
+          \ phase is characterized by the inequalities _f G < 0, H > 0, and S > 0. The printed formation\
+          \ entropy has no quantity token and is kept only as printed text on this formation-enthalpy\
+          \ row."
+      T_range_K:
+      - 1833
+      - 2033
+      experiment: shornikov-1997-cao-al2o3-formation
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      values:
+        quantity: delta_fH
+        method_class: author_derived
+        formula: Ca12Al14O33
+        printed_compound: 12CaO·7Al2O3
+        method_as_printed: V
+        column_as_printed: left
+        T_range_K:
+        - 1833
+        - 2033
+        delta_fH:
+          value: '21.0'
+          units: kJ/mol
+          as_printed: 21.0 ± 1.3
+        sigma: '1.3'
+        delta_fS_as_printed: 26.0 ± 1.3 J/(mol K)
+        formation_basis_as_printed: per 1 mol of the compounds
+      phase: l
+    - observation_id: shornikov_1997_cao_al2o3_t3_ca12al14o33_eq7
+      derived_from:
+        - shornikov_1997_cao_al2o3_t2_ca12al14o33_v_1833_2033_left_h
+      derivation:
+        relation: >-
+          Equation (7), published page 24: ΔH_fus = ΔH_T(liq) − ΔH_T(sol).
+          The liquid enthalpy is the method V row, 21.0 kJ/mol, phase liquid.
+          Equation (5) prints Δf H_T = −35420 x_CaO x_Al2O3 with no unit.
+          Table 3 prints kJ/mol. For 12CaO·7Al2O3, x_CaO = 12/19. Treating
+          the printed coefficient as J/mol gives ΔH_T(sol) = −8.2418 kJ/mol
+          and ΔH_fus = 29.2418 kJ/mol, which rounds to the printed 29.2.
+        output_unit: kJ/mol
+        inputs:
+          - shornikov_1997_cao_al2o3_t2_ca12al14o33_v_1833_2033_left_h
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: 12CaO·7Al2O3
+        note: "This study, equation (7), superscript a. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The Refs. cell is This study or a ditto of it."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths on the fusion enthalpy and on Tfus. No confidence level is stated.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: Ca12Al14O33
+        printed_compound: 12CaO·7Al2O3
+        T_K: '1733'
+        T_fus_as_printed: 1733 ± 5
+        equation_as_printed: '7'
+        superscript_as_printed: a
+        value:
+          value: '29.2'
+          units: kJ/mol
+          as_printed: 29.2 ± 3.0
+        sigma: '3.0'
+        attribution: This study
+    - observation_id: shornikov_1997_cao_al2o3_t3_ca12al14o33_eq8
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: 12CaO·7Al2O3
+        note: "This study, equation (8), superscript b. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The Refs. cell is This study or a ditto of it."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths on the fusion enthalpy and on Tfus. No confidence level is stated.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: Ca12Al14O33
+        printed_compound: 12CaO·7Al2O3
+        T_K: '1733'
+        T_fus_as_printed: 1733 ± 5
+        equation_as_printed: '8'
+        superscript_as_printed: b
+        value:
+          value: '26.6'
+          units: kJ/mol
+          as_printed: 26.6 ± 3.0
+        sigma: '3.0'
+        attribution: This study
+  Ca5Al6O14:
+    observations:
+    - observation_id: shornikov_1997_cao_al2o3_t2_ca5al6o14_v_1833_2033_left_h
+      type: gibbs_table
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        row_label: 5CaO·3Al2O3 V 1833-2033
+        note: "left-hand column. Printed compound 5CaO·3Al2O3. Method V: mass-spectrometric Knudsen effusion\
+          \ method (footnote V). Values are per 1 mol of the compound (published p. 24). Interval 1833–2033\
+          \ K lies entirely above the Table 3 fusion temperature 1753 ± 5 K. Published p. 26: the liquid\
+          \ phase is characterized by the inequalities _f G < 0, H > 0, and S > 0. The printed formation\
+          \ entropy has no quantity token and is kept only as printed text on this formation-enthalpy\
+          \ row."
+      T_range_K:
+      - 1833
+      - 2033
+      experiment: shornikov-1997-cao-al2o3-formation
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      values:
+        quantity: delta_fH
+        method_class: author_derived
+        formula: Ca5Al6O14
+        printed_compound: 5CaO·3Al2O3
+        method_as_printed: V
+        column_as_printed: left
+        T_range_K:
+        - 1833
+        - 2033
+        delta_fH:
+          value: '19.1'
+          units: kJ/mol
+          as_printed: 19.1 ± 1.3
+        sigma: '1.3'
+        delta_fS_as_printed: 25.1 ± 1.3 J/(mol K)
+        formation_basis_as_printed: per 1 mol of the compounds
+      phase: l
+    - observation_id: shornikov_1997_cao_al2o3_t3_ca5al6o14_eq7
+      derived_from:
+        - shornikov_1997_cao_al2o3_t2_ca5al6o14_v_1833_2033_left_h
+      derivation:
+        relation: >-
+          Equation (7), published page 24: ΔH_fus = ΔH_T(liq) − ΔH_T(sol).
+          The liquid enthalpy is the method V row, 19.1 kJ/mol, phase liquid.
+          Equation (5) prints Δf H_T = −35420 x_CaO x_Al2O3 with no unit.
+          Table 3 prints kJ/mol. For 5CaO·3Al2O3, x_CaO = 5/8. Treating the
+          printed coefficient as J/mol gives ΔH_T(sol) = −8.3016 kJ/mol and
+          ΔH_fus = 27.4016 kJ/mol, which rounds to the printed 27.4.
+        output_unit: kJ/mol
+        inputs:
+          - shornikov_1997_cao_al2o3_t2_ca5al6o14_v_1833_2033_left_h
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: 5CaO·3Al2O3
+        note: "This study, equation (7), superscript a. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The Refs. cell is This study or a ditto of it."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths on the fusion enthalpy and on Tfus. No confidence level is stated.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: Ca5Al6O14
+        printed_compound: 5CaO·3Al2O3
+        T_K: '1753'
+        T_fus_as_printed: 1753 ± 5
+        equation_as_printed: '7'
+        superscript_as_printed: a
+        value:
+          value: '27.4'
+          units: kJ/mol
+          as_printed: 27.4 ± 3.0
+        sigma: '3.0'
+        attribution: This study
+    - observation_id: shornikov_1997_cao_al2o3_t3_ca5al6o14_eq8
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: 5CaO·3Al2O3
+        note: "This study, equation (8), superscript b. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The central value 25.2 is printed. The mark after 3. is not an unambiguous digit.\
+          \ 600 dpi crop of PDF page 4, x 1450–1760 and y 2240–2400, and the same cell at 1200 dpi, x\
+          \ 2900–3600 and y 4480–4800, show a baseline letter b and a second b as the equation superscript.\
+          \ The row above prints a closed 0 in 27.4 ± 3.0. The numeric uncertainty is unresolved."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The central fusion enthalpy 25.2 is printed. The uncertainty glyph after 3. is the letter
+          b, not a resolved digit, with a superscript b for equation (8). No numeric uncertainty is stored.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: Ca5Al6O14
+        printed_compound: 5CaO·3Al2O3
+        T_K: '1753'
+        T_fus_as_printed: 1753 ± 5
+        equation_as_printed: '8'
+        superscript_as_printed: b
+        value:
+          value: '25.2'
+          units: kJ/mol
+          as_printed: 25.2 ± 3.b
+        attribution: This study
+  CaAl2O4:
+    observations:
+    - observation_id: shornikov_1997_cao_al2o3_t2_caal2o4_iii_1600_1877_right_h
+      type: gibbs_table
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        row_label: CaO·Al2O3 III 1600-1877
+        note: Right-hand column, before the CaO·2Al2O3 header. The left column begins the CaO·Al2O3 block
+          at the bottom and does not finish it; this column continues that block. Method III, This work.
+          The interval 1600–1877 K ends on the Table 3 fusion temperature of CaO·Al2O3, 1877 ± 5 K, so
+          no single condensed phase is assigned. The printed formation entropy has no quantity token and
+          is kept only as printed text on this formation-enthalpy row.
+      T_range_K:
+      - 1600
+      - 1877
+      experiment: shornikov-1997-cao-al2o3-formation
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      values:
+        quantity: delta_fH
+        method_class: derived
+        formula: CaAl2O4
+        printed_compound: CaO·Al2O3
+        method_as_printed: III
+        column_as_printed: right
+        T_range_K:
+        - 1600
+        - 1877
+        delta_fH:
+          value: "-7.1"
+          units: kJ/mol
+          as_printed: "-7.1 ± 0.6"
+        sigma: '0.6'
+        delta_fS_as_printed: 10.1 ± 0.5 J/(mol K)
+        formation_basis_as_printed: per 1 mol of the compounds
+    - observation_id: shornikov_1997_cao_al2o3_t2_caal2o4_v_1833_2033_right_h
+      type: gibbs_table
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        row_label: CaO·Al2O3 V 1833-2033
+        note: Right-hand column, before the CaO·2Al2O3 header. The left column begins the CaO·Al2O3 block
+          at the bottom and does not finish it; this column continues that block. Method V, This work.
+          The interval 1833–2033 K includes the Table 3 fusion temperature of CaO·Al2O3, 1877 ± 5 K, so
+          no single condensed phase is assigned. The printed formation entropy has no quantity token and
+          is kept only as printed text on this formation-enthalpy row.
+      T_range_K:
+      - 1833
+      - 2033
+      experiment: shornikov-1997-cao-al2o3-formation
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      values:
+        quantity: delta_fH
+        method_class: author_derived
+        formula: CaAl2O4
+        printed_compound: CaO·Al2O3
+        method_as_printed: V
+        column_as_printed: right
+        T_range_K:
+        - 1833
+        - 2033
+        delta_fH:
+          value: '23.0'
+          units: kJ/mol
+          as_printed: 23.0 ± 1.0
+        sigma: '1.0'
+        delta_fS_as_printed: 28.1 ± 1.5 J/(mol K)
+        formation_basis_as_printed: per 1 mol of the compounds
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal2o4_eq7
+      derived_from:
+        - shornikov_1997_cao_al2o3_t2_caal2o4_v_1833_2033_right_h
+      derivation:
+        relation: >-
+          Equation (7), published page 24: ΔH_fus = ΔH_T(liq) − ΔH_T(sol).
+          The stored method V enthalpy is 23.0 kJ/mol. Its interval
+          1833–2033 K includes T_fus 1877 ± 5 K, so this extract assigns
+          that row no single condensed phase. Equation (5) prints
+          Δf H_T = −35420 x_CaO x_Al2O3 with no unit. Table 3 prints
+          kJ/mol. For CaO·Al2O3, x_CaO = 1/2. Treating the printed
+          coefficient as J/mol gives ΔH_T(sol) = −8.8550 kJ/mol and
+          ΔH_fus = 31.8550 kJ/mol, which rounds to the printed 31.9.
+        output_unit: kJ/mol
+        inputs:
+          - shornikov_1997_cao_al2o3_t2_caal2o4_v_1833_2033_right_h
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·Al2O3
+        note: "This study, equation (7), superscript a. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The Refs. cell is This study or a ditto of it."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths on the fusion enthalpy and on Tfus. No confidence level is stated.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: CaAl2O4
+        printed_compound: CaO·Al2O3
+        T_K: '1877'
+        T_fus_as_printed: 1877 ± 5
+        equation_as_printed: '7'
+        superscript_as_printed: a
+        value:
+          value: '31.9'
+          units: kJ/mol
+          as_printed: 31.9 ± 3.0
+        sigma: '3.0'
+        attribution: This study
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal2o4_eq8
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·Al2O3
+        note: "This study, equation (8), superscript b. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The Refs. cell is This study or a ditto of it."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths on the fusion enthalpy and on Tfus. No confidence level is stated.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: CaAl2O4
+        printed_compound: CaO·Al2O3
+        T_K: '1877'
+        T_fus_as_printed: 1877 ± 5
+        equation_as_printed: '8'
+        superscript_as_printed: b
+        value:
+          value: '31.3'
+          units: kJ/mol
+          as_printed: 31.3 ± 3.0
+        sigma: '3.0'
+        attribution: This study
+  CaAl4O7:
+    observations:
+    - observation_id: shornikov_1997_cao_al2o3_t2_caal4o7_iii_1600_2033_right_h
+      type: gibbs_table
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        row_label: CaO·2Al2O3 III 1600-2033
+        note: Right-hand column under the CaO·2Al2O3 header. Method III, This work. The interval 1600–2033
+          K reaches 2033 K, which lies inside the Table 3 fusion temperature 2035 ± 10 K, so no single
+          condensed phase is assigned. The printed formation entropy has no quantity token and is kept
+          only as printed text on this formation-enthalpy row.
+      T_range_K:
+      - 1600
+      - 2033
+      experiment: shornikov-1997-cao-al2o3-formation
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      values:
+        quantity: delta_fH
+        method_class: derived
+        formula: CaAl4O7
+        printed_compound: CaO·2Al2O3
+        method_as_printed: III
+        column_as_printed: right
+        T_range_K:
+        - 1600
+        - 2033
+        delta_fH:
+          value: "-7.1"
+          units: kJ/mol
+          as_printed: "-7.1 ± 0.8"
+        sigma: '0.8'
+        delta_fS_as_printed: 10.1 ± 0.6 J/(mol K)
+        formation_basis_as_printed: per 1 mol of the compounds
+    - observation_id: shornikov_1997_cao_al2o3_t2_caal4o7_v_1833_2033_right_h
+      type: gibbs_table
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        row_label: CaO·2Al2O3 V 1833-2033
+        note: Right-hand column under the CaO·2Al2O3 header. Method V, This work. The interval 1833–2033
+          K reaches 2033 K, which lies inside the Table 3 fusion temperature 2035 ± 10 K, so no single
+          condensed phase is assigned. The printed formation entropy has no quantity token and is kept
+          only as printed text on this formation-enthalpy row.
+      T_range_K:
+      - 1833
+      - 2033
+      experiment: shornikov-1997-cao-al2o3-formation
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      values:
+        quantity: delta_fH
+        method_class: author_derived
+        formula: CaAl4O7
+        printed_compound: CaO·2Al2O3
+        method_as_printed: V
+        column_as_printed: right
+        T_range_K:
+        - 1833
+        - 2033
+        delta_fH:
+          value: "-6.3"
+          units: kJ/mol
+          as_printed: "-6.3 ± 0.5"
+        sigma: '0.5'
+        delta_fS_as_printed: 9.9 ± 0.6 J/(mol K)
+        formation_basis_as_printed: per 1 mol of the compounds
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal4o7_eq7
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·2Al2O3
+        note: "This study, equation (7), superscript a. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The Refs. cell is This study or a ditto of it."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths on the fusion enthalpy and on Tfus. No confidence level is stated.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: CaAl4O7
+        printed_compound: CaO·2Al2O3
+        T_K: '2035'
+        T_fus_as_printed: 2035 ± 10
+        equation_as_printed: '7'
+        superscript_as_printed: a
+        value:
+          value: '23.6'
+          units: kJ/mol
+          as_printed: 23.6 ± 2.8
+        sigma: '2.8'
+        attribution: This study
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal4o7_eq8
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·2Al2O3
+        note: "This study, equation (8), superscript b. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The Refs. cell is This study or a ditto of it."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths on the fusion enthalpy and on Tfus. No confidence level is stated.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: CaAl4O7
+        printed_compound: CaO·2Al2O3
+        T_K: '2035'
+        T_fus_as_printed: 2035 ± 10
+        equation_as_printed: '8'
+        superscript_as_printed: b
+        value:
+          value: '27.0'
+          units: kJ/mol
+          as_printed: 27.0 ± 2.5
+        sigma: '2.5'
+        attribution: This study
+  CaAl12O19:
+    observations:
+    - observation_id: shornikov_1997_cao_al2o3_t2_caal12o19_v_1833_2033_right_h
+      type: gibbs_table
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        table: '2'
+        row_label: CaO·6Al2O3 V 1833-2033
+        note: "right-hand column. Printed compound CaO·6Al2O3. Method V: mass-spectrometric Knudsen effusion\
+          \ method (footnote V). Values are per 1 mol of the compound (published p. 24). Interval 1833–2033\
+          \ K lies entirely below the Table 3 fusion temperature 2148 ± 10 K. Published p. 26: in the\
+          \ solid state, Gibbs energies and enthalpies are negative. The printed formation entropy has\
+          \ no quantity token and is kept only as printed text on this formation-enthalpy row."
+      T_range_K:
+      - 1833
+      - 2033
+      experiment: shornikov-1997-cao-al2o3-formation
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths. No confidence level is stated.
+      values:
+        quantity: delta_fH
+        method_class: author_derived
+        formula: CaAl12O19
+        printed_compound: CaO·6Al2O3
+        method_as_printed: V
+        column_as_printed: right
+        T_range_K:
+        - 1833
+        - 2033
+        delta_fH:
+          value: "-2.9"
+          units: kJ/mol
+          as_printed: "-2.9 ± 0.3"
+        sigma: '0.3'
+        delta_fS_as_printed: 5.0 ± 0.3 J/(mol K)
+        formation_basis_as_printed: per 1 mol of the compounds
+      phase: cr
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal12o19_eq7
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·6Al2O3
+        note: "This study, equation (7), superscript a. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The Refs. cell is This study or a ditto of it."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths on the fusion enthalpy and on Tfus. No confidence level is stated.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: CaAl12O19
+        printed_compound: CaO·6Al2O3
+        T_K: '2148'
+        T_fus_as_printed: 2148 ± 10
+        equation_as_printed: '7'
+        superscript_as_printed: a
+        value:
+          value: '12.5'
+          units: kJ/mol
+          as_printed: 12.5 ± 2.5
+        sigma: '2.5'
+        attribution: This study
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal12o19_eq8
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·6Al2O3
+        note: "This study, equation (8), superscript b. Tfus is taken from refs. [2–4], not measured in\
+          \ this paper. The Refs. cell is This study or a ditto of it."
+      phase: crystal to melt
+      experiment: shornikov-1997-cao-al2o3-fusion
+      units: kJ/mol
+      uncertainty:
+        note: The table prints ± widths on the fusion enthalpy and on Tfus. No confidence level is stated.
+      values:
+        quantity: heat_of_fusion
+        method_class: derived
+        formula: CaAl12O19
+        printed_compound: CaO·6Al2O3
+        T_K: '2148'
+        T_fus_as_printed: 2148 ± 10
+        equation_as_printed: '8'
+        superscript_as_printed: b
+        value:
+          value: '16.8'
+          units: kJ/mol
+          as_printed: 16.8 ± 1.9
+        sigma: '1.9'
+        attribution: This study

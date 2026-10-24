@@ -2601,8 +2601,11 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
     assert len(zero_rows) == 2
     for row in zero_rows:
         assert row["admission"]["status"] == "pending"
-        assert row["identity"]["temperature_K"]["tag"] == "unknown"
-        assert "T_range_K" in row["identity"]["temperature_K"]["reason"]
+        temperature = row["identity"]["temperature_K"]
+        assert temperature["tag"] == "unknown"
+        assert temperature["reason"] == "no single temperature_K mapped from source"
+        assert "value" not in temperature
+        assert (row.get("point_conditions") or {}).get("temperature_K") is None
     assert {
         Decimal(row["value"]["point"])
         for row in mass_loss_rows.values()
@@ -2623,11 +2626,30 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
         if _quantity(row) == "residue_component_composition"
     }
     assert len(residue) == 110
+    in_band_residue = {
+        observation_id: row
+        for observation_id, row in residue.items()
+        if Decimal("1950")
+        <= Decimal(row["identity"]["temperature_K"]["value"])
+        <= Decimal("2473.15")
+    }
+    assert len(in_band_residue) == 65
+    for observation_id, row in in_band_residue.items():
+        assert row["value"]["kind"] == "point", observation_id
+        assert row["identity"]["species"]["phase"]["value"] == "l", observation_id
+        assert row["evidence"]["class"]["value"] == "measured_direct", observation_id
+        temperature = row["point_conditions"]["temperature_K"]
+        assert temperature["state"]["tag"] == "value", observation_id
+        assert temperature["locator"]["table"] == "2", observation_id
+
     printed_cells = {
         ("VI", "1748.15", "MgO"): Decimal("36.92"),
+        ("VI", "1999.15", "SiO2"): Decimal("41.77"),
+        ("VI", "1999.15", "CaO"): Decimal("8.79"),
         ("VI", "2156.15", "SiO2"): Decimal("13.6"),
         ("VI", "2311.15", "MgO"): Decimal("0.0"),
         ("V", "1992.15", "MgO"): Decimal("8.11"),
+        ("V", "2473.15", "CaO"): Decimal("18.57"),
     }
     for (panel, temperature, oxide), expected in printed_cells.items():
         matching = [

@@ -28,7 +28,8 @@ def test_feo_table_7_rows_keep_their_own_printed_one_sigma():
         "Errors are one standard deviation and do not include systematic errors, "
         "e.g., in the standard state thermodynamic data."
     )
-    assert source_uncertainty["locator"]["page"] == 163
+    assert source_uncertainty["locator"]["page"] == 13
+    assert source_uncertainty["locator"]["published_page"] == 163
     assert source_uncertainty["locator"]["table"] == "7"
 
     migrator = migrate_one_extract(ROOT, EXTRACT, index=None, aliases={})

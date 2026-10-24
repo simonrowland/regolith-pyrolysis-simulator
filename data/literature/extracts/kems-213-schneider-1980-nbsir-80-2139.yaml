@@ -1,0 +1,580 @@
+schema_version: literature_extract.v1
+source_id: kems-213-schneider-1980-nbsir-80-2139
+source:
+  citation: Schneider, S. J. (Project Manager) (1980). MHD Materials—Seed/Slag Interactions and Effects, Quarterly Progress Report, April–June 1980. NBSIR 80-2139. National Bureau of Standards, prepared for the U.S. Department of Energy.
+  year: 1980
+  doi: null
+  url: https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nbsir80-2139.pdf
+  corpus_asset: raw/kems-213-schneider-1980-nbsir-80-2139/kems-213-schneider-1980-nbsir-80-2139.pdf
+  corpus_sha256: 086256b998956be02dac07407b77caac93aa2b2fbff7155fdde15d56ef249670
+extraction:
+  method: >-
+    Authoritative pdftotext-layout was reviewed first. The MinerU table converter found no table blocks. The
+    sample compositions and mineral components in Table 1, all nine fit rows in Table 2, and all seven
+    component pairs in Table 3 were transcribed from 600 dpi renders of physical PDF pages 8–10. Figures
+    1–4 were rendered at 600 dpi and recorded without digitising plotted K pressures. The report gives no
+    numerical O2 pressure values and prints no ion-to-pressure calibration method.
+  date: '2026-10-20'
+  worker: fam21-1020
+review_status: draft
+fidelity_samples:
+- species: SiO2
+  observation_id: schneider_1980_table3_pair1_component1
+  field: value
+  value: '35'
+  locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/CaSiO3'}
+benches:
+- id: schneider_1980_kcas_kems
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion, modulated-beam mass spectrometric method
+    locator:
+      page: 6
+      pdf_page_index: 5
+      published_page: 2
+      section: Vaporization Studies
+      note: The report states the K and O2 vapor pressures were determined with this method.
+experiments:
+- experiment_id: schneider_1980_kcas_vp_1
+  bench_id: schneider_1980_kcas_kems
+  method: knudsen_effusion
+  locator: {page: 8, pdf_page_index: 7, published_page: 4, table: '1', row: KCAS-VP-1}
+  sample:
+    form:
+      state:
+        tag: value
+        value: Mechanical mixture of KAlSiO4, Ca2SiO4, Ca3Si2O7, and Ca2Al2SiO7
+      locator: {page: 8, pdf_page_index: 7, published_page: 4, table: '1', row: KCAS-VP-1}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: oxide_weight_percent_as_published
+          amount_basis: mass_percent
+          components: [[K2O, '14.8'], [CaO, '27.5'], [Al2O3, '22.2'], [SiO2, '35.5']]
+      locator: {page: 8, pdf_page_index: 7, published_page: 4, table: '1', row: KCAS-VP-1, note: 'Starting composition, wt%, as printed.'}
+- experiment_id: schneider_1980_kcas_vp_2
+  bench_id: schneider_1980_kcas_kems
+  method: knudsen_effusion
+  locator: {page: 8, pdf_page_index: 7, published_page: 4, table: '1', row: KCAS-VP-2}
+  sample:
+    form:
+      state:
+        tag: value
+        value: Mechanical mixture of KAlSiO4, KAlSi2O6, Ca2Al2SiO7, and CaAl2Si2O8
+      locator: {page: 8, pdf_page_index: 7, published_page: 4, table: '1', row: KCAS-VP-2}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: oxide_weight_percent_as_published
+          amount_basis: mass_percent
+          components: [[K2O, '11.5'], [CaO, '17.6'], [Al2O3, '33.7'], [SiO2, '37.2']]
+      locator: {page: 8, pdf_page_index: 7, published_page: 4, table: '1', row: KCAS-VP-2, note: 'Starting composition, wt%, as printed.'}
+- experiment_id: schneider_1980_kcas_vp_3
+  bench_id: schneider_1980_kcas_kems
+  method: knudsen_effusion
+  locator: {page: 8, pdf_page_index: 7, published_page: 4, table: '1', row: KCAS-VP-3, note: 'Measurements were just beginning, according to the report.'}
+  sample:
+    form:
+      state:
+        tag: value
+        value: Mechanical mixture of KAlSiO4 and CaSiO3
+      locator: {page: 8, pdf_page_index: 7, published_page: 4, table: '1', row: KCAS-VP-3}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: oxide_weight_percent_as_published
+          amount_basis: mass_percent
+          components: [[K2O, '14.8'], [CaO, '24.3'], [Al2O3, '16.0'], [SiO2, '44.9']]
+      locator: {page: 8, pdf_page_index: 7, published_page: 4, table: '1', row: KCAS-VP-3, note: 'Starting composition, wt%, as printed.'}
+species:
+  K:
+    observations: []
+    context:
+    - observation_id: schneider_1980_table2_k_pressure_fit_groups
+      type: fitted_pressure_model_table
+      locator: {page: 9, pdf_page_index: 8, published_page: 5, table: '2'}
+      units: slope A in K as implied by A/T; B dimensionless; standard deviations as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: K
+        formula: K
+        model_as_printed: log P = A/T + B
+        logarithm_base: not stated
+        note: >-
+          Nine least-squares fit groups for measured K-pressure data. The table contains fitted slope and
+          intercept terms, not raw pressure points; pressure units are atm as shown on the figures.
+        rows:
+        - {sample_id: KCAS-VP-1, date: '3/13/80', K2O_wt_pct_range: '14.8–12.4', A_as_printed: '-20047', SD_A_as_printed: '391', B_as_printed: '8.144', SD_B_as_printed: '.255'}
+        - {sample_id: KCAS-VP-1, date: '3/14/80', K2O_wt_pct_range: '12.4–9.3', A_as_printed: '-19071', SD_A_as_printed: '524', B_as_printed: '7.278', SD_B_as_printed: '.234'}
+        - {sample_id: KCAS-VP-1, date: '3/18/80', K2O_wt_pct_range: '9.3–7.2', A_as_printed: '-17429', SD_A_as_printed: '452', B_as_printed: '6.058', SD_B_as_printed: '.289'}
+        - {sample_id: KCAS-VP-1, date: '3/18/80', K2O_wt_pct_range: '6.2–4.8', A_as_printed: '-16372', SD_A_as_printed: '210', B_as_printed: '5.068', SD_B_as_printed: '.129'}
+        - {sample_id: KCAS-VP-1, date: '3/21/80', K2O_wt_pct_range: '4.8–4.0', A_as_printed: '-16896', SD_A_as_printed: '279', B_as_printed: '5.289', SD_B_as_printed: '.178'}
+        - {sample_id: KCAS-VP-2, date: '5/14/80', K2O_wt_pct_range: '11.4–10.7', A_as_printed: '-14632', SD_A_as_printed: '434', B_as_printed: '4.200', SD_B_as_printed: '.278'}
+        - {sample_id: KCAS-VP-2, date: '5/15/80', K2O_wt_pct_range: '10.7–8.6', A_as_printed: '-16366', SD_A_as_printed: '180', B_as_printed: '5.097', SD_B_as_printed: '.112'}
+        - {sample_id: KCAS-VP-2, date: '5/16/80', K2O_wt_pct_range: '8.6–6.5', A_as_printed: '-17571', SD_A_as_printed: '257', B_as_printed: '5.656', SD_B_as_printed: '.158'}
+        - {sample_id: KCAS-VP-2, date: '5/19/80', K2O_wt_pct_range: '6.5–6.2', A_as_printed: '-16606', SD_A_as_printed: '526', B_as_printed: '4.992', SD_B_as_printed: '.321'}
+    - observation_id: schneider_1980_printed_k_pressure_ratios
+      type: typed_refusal
+      locator: {page: 7, pdf_page_index: 6, published_page: 3, section: Vaporization Studies}
+      units: dimensionless ratios
+      values:
+        quantity: unavailable
+        candidate_tokens: [partial_pressure, activity]
+        schema_gap: >-
+          The seven prose values are dimensionless ratios between K pressures; neither a partial pressure
+          nor a K2O activity token describes a pressure ratio.
+        method_class: measured_reduced
+        ratio_convention: first named pressure divided by second named pressure
+        values_as_printed:
+        - {ratio: '250', numerator: calcia-containing KCAS sample at 14.7 wt% K2O, denominator: KAlSiO4-derived sample at 14.7 wt% K2O}
+        - {ratio: about 0.1, approximate: true, temperature_K: '1625', numerator: KCAS-VP-1 at K2O 4.0–1.6 wt%, denominator: KCAS-VP-1 at K2O 14.8–12.4 wt%}
+        - {ratio: '36', temperature_K: '1625', numerator: KCAS-VP-1 at K2O 4.0–1.6 wt%, denominator: KAlSiO4-derived sample at 14.7 wt% K2O}
+        - {ratio: '4.5', temperature_K: '1625', numerator: KCAS-VP-1 at K2O 14.8–12.4 wt%, denominator: KCAS-VP-2 at K2O 11.4–10.7 wt%}
+        - {ratio: '65', temperature_K: '1625', numerator: KCAS-VP-2 at K2O 11.4–10.7 wt%, denominator: KAlSiO4-derived sample at 14.7 wt% K2O}
+        - {ratio: '2.8', temperature_K: '1625', numerator: KCAS-VP-2 at K2O 11.4–10.7 wt%, denominator: KCAS-VP-2 at K2O 6.5–6.2 wt%}
+        - {ratio: '22', temperature_K: '1625', numerator: KCAS-VP-2 at K2O 6.5–6.2 wt%, denominator: KAlSiO4-derived sample at 14.7 wt% K2O}
+    - observation_id: schneider_1980_qualitative_k2o_activity_effect
+      type: qualitative_activity_context
+      locator: {page: 7, pdf_page_index: 6, published_page: 3, section: Vaporization Studies}
+      units: qualitative statement; no numeric activity
+      values:
+        quantity: activity
+        candidate_token: activity
+        method_class: measured_reduced
+        statement_as_printed: >-
+          The authors describe CaO as increasing K2O activity, with its major effect appearing at lower K2O
+          concentrations. No numerical K2O activity or activity reference state is printed.
+        activity_reference_state:
+          state: unknown
+          reason: The report prints no reference measurement temperature, so the stable pure-oxide reference
+            phase cannot be inferred.
+    - observation_id: schneider_1980_oxygen_pressure_measurement_without_values
+      type: typed_refusal
+      locator: {page: 6, pdf_page_index: 5, published_page: 2, section: Vaporization Studies}
+      units: no numerical values printed
+      values:
+        quantity: unavailable
+        candidate_tokens: [partial_pressure]
+        schema_gap: >-
+          The report states K and O2 vapor-pressure measurements were completed for KCAS-VP-1 and KCAS-VP-2,
+          but prints no O2 pressure values in a table or figure.
+        method_class: measured_direct
+        gas_species: O2
+        formula: O2
+    - observation_id: schneider_1980_figure1_k_pressure
+      type: figure_record
+      locator: {page: 11, pdf_page_index: 10, published_page: 7, figure: '1'}
+      panel: whole_figure
+      attribution: Present-work KCAS-VP-1 measurements; comparison curve for a KAlSiO4-derived sample.
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        gas_species: K
+        formula: K
+        phase: gas
+        temperature_as_printed: Plotted versus 10^4/T, K; numerical point temperatures are not printed.
+        composition_as_printed: KCAS-VP-1 at 14.8–12.4 wt% K2O; comparison sample KAlSiO4-derived at 14.7 wt% K2O.
+        axes_as_printed: {x: '10^4/T, K', y: 'Potassium Pressure (atm), logarithmic'}
+        caption_as_printed: >-
+          Potassium pressure over KCAS-VP-1, series 3-13-80, 14.8–12.4 wt% K2O; slight positive deviation
+          from a straight line above initial melting; comparison curve from a sample initially consisting of
+          KAlSiO4 reduced to 14.7 wt% K2O by vaporization.
+        series:
+        - {name: KCAS-VP-1, composition_as_printed: '14.8–12.4 wt% K2O', marker: open circles, marker_count: 16, evidence_class: measured_reduced}
+        - {name: least-squares line through KCAS-VP-1 data, marker: line, marker_count: 0, evidence_class: model_derived}
+        - {name: KAlSiO4-derived sample, composition_as_printed: '14.7 wt% K2O', marker: line, marker_count: 0, evidence_class: quoted_attributed}
+        digitisation: deferred to a figure pass
+    - observation_id: schneider_1980_figure2_k_pressure
+      type: figure_record
+      locator: {page: 12, pdf_page_index: 11, published_page: 8, figure: '2'}
+      panel: whole_figure
+      attribution: Present-work KCAS-VP-1 measurements; comparison curves for the earlier KCAS-VP-1 range and a KAlSiO4-derived sample.
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        gas_species: K
+        formula: K
+        phase: gas
+        temperature_as_printed: Plotted versus 10^4/T, K; numerical point temperatures are not printed.
+        composition_as_printed: KCAS-VP-1 at 4.8–4.0 and 4.0–1.6 wt% K2O; comparison ranges 14.8–12.4 wt% and 14.7 wt% K2O.
+        axes_as_printed: {x: '10^4/T, K', y: 'Potassium Pressure (atm), logarithmic'}
+        caption_as_printed: >-
+          Last KCAS-VP-1 data series; straight line fitted over 4.8–4.0 wt% K2O, additional points show
+          pressure decrease as K2O is depleted; upper curve is the original 14.8–12.4 wt% range and lower
+          curve is the KAlSiO4-derived sample at 14.7 wt% K2O.
+        series:
+        - {name: KCAS-VP-1, composition_as_printed: '4.8–4.0 wt% K2O', marker: open circles, marker_count: 8, evidence_class: measured_reduced}
+        - {name: KCAS-VP-1 depleted, composition_as_printed: '4.0–1.6 wt% K2O', marker: filled circles, marker_count: 6, evidence_class: measured_reduced}
+        - {name: KCAS-VP-1 earlier range, composition_as_printed: '14.8–12.4 wt% K2O', marker: line, marker_count: 0, evidence_class: quoted_attributed}
+        - {name: KAlSiO4-derived sample, composition_as_printed: '14.7 wt% K2O', marker: line, marker_count: 0, evidence_class: quoted_attributed}
+        digitisation: deferred to a figure pass
+    - observation_id: schneider_1980_figure3_k_pressure
+      type: figure_record
+      locator: {page: 13, pdf_page_index: 12, published_page: 9, figure: '3'}
+      panel: whole_figure
+      attribution: Present-work KCAS-VP-1 and KCAS-VP-2 measurements; KAlSiO4-derived comparison curve.
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        gas_species: K
+        formula: K
+        phase: gas
+        temperature_as_printed: Plotted versus 10^4/T, K; numerical point temperatures are not printed.
+        composition_as_printed: KCAS-VP-1 14.8–12.4 wt% K2O; KCAS-VP-2 11.4–10.7 wt%; KAlSiO4-derived sample 14.7 wt%.
+        axes_as_printed: {x: '10^4/T, K', y: 'Potassium Pressure (atm), logarithmic'}
+        caption_as_printed: >-
+          Comparison of KCAS-VP-1 data at 14.8–12.4 wt% K2O, KCAS-VP-2 data at 11.4–10.7 wt% K2O, and
+          the 14.7 wt% K2O sample obtained by evaporation of K2O from KAlSiO4.
+        series:
+        - {name: KCAS-VP-1, composition_as_printed: '14.8–12.4 wt% K2O', marker: open circles, marker_count: 0, evidence_class: measured_reduced}
+        - {name: KCAS-VP-2, composition_as_printed: '11.4–10.7 wt% K2O', marker: open circles, marker_count: 17, evidence_class: measured_reduced}
+        - {name: KAlSiO4-derived sample, composition_as_printed: '14.7 wt% K2O', marker: line, marker_count: 0, evidence_class: quoted_attributed}
+        digitisation: deferred to a figure pass
+    - observation_id: schneider_1980_figure4_k_pressure
+      type: figure_record
+      locator: {page: 14, pdf_page_index: 13, published_page: 10, figure: '4'}
+      panel: whole_figure
+      attribution: Present-work KCAS-VP-2 measurements; comparison curves for an earlier KCAS-VP-2 range and a KAlSiO4-derived sample.
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        gas_species: K
+        formula: K
+        phase: gas
+        temperature_as_printed: Plotted versus 10^4/T, K; numerical point temperatures are not printed.
+        composition_as_printed: KCAS-VP-2 at 6.5–6.2 wt% K2O; comparison ranges 11.4–10.7 wt% and 14.7 wt% K2O.
+        axes_as_printed: {x: '10^4/T, K', y: 'Potassium Pressure (atm), logarithmic'}
+        caption_as_printed: >-
+          Comparison of KCAS-VP-2 data at 6.5–6.2 wt% K2O, the 11.4–10.7 wt% K2O range, and the 14.7 wt%
+          K2O sample obtained by evaporation of KAlSiO4.
+        series:
+        - {name: KCAS-VP-2, composition_as_printed: '6.5–6.2 wt% K2O', marker: open circles, marker_count: 2, evidence_class: measured_reduced}
+        - {name: KCAS-VP-2 earlier range, composition_as_printed: '11.4–10.7 wt% K2O', marker: line, marker_count: 0, evidence_class: quoted_attributed}
+        - {name: KAlSiO4-derived sample, composition_as_printed: '14.7 wt% K2O', marker: line, marker_count: 0, evidence_class: quoted_attributed}
+        digitisation: deferred to a figure pass
+  SiO2:
+    observations:
+    - observation_id: schneider_1980_kcas_vp_1_liquid_phase_first_forms
+      type: transition_point
+      locator: {page: 6, pdf_page_index: 5, published_page: 2, section: Vaporization Studies}
+      phase: l
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        sample_id: KCAS-VP-1
+        property_kind: temperature at which a liquid phase first forms
+        transition_as_printed: temperature at which a liquid phase first forms
+        points:
+        - T_C: '1310'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: The KCAS-VP-1 run-state composition at liquid-phase appearance is not reported.
+              locator: {page: 6, pdf_page_index: 5, published_page: 2, section: Vaporization Studies}
+    - observation_id: schneider_1980_table3_pair1_component1
+      type: equilibrium_phase_composition
+      locator: &table3_pair1_locator {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/CaSiO3'}
+      phase: l
+      units: mol pct
+      point_conditions: &table3_pair1_conditions
+        temperature_K:
+          state: {tag: unknown, reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.}
+          locator: *table3_pair1_locator
+        composition:
+          state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[KAlSiO4, '0.35'], [CaSiO3, '0.65']]}}
+          locator: *table3_pair1_locator
+        assemblage_id:
+          state: {tag: value, value: schneider80_table3_pair1}
+          locator: *table3_pair1_locator
+        full_assemblage:
+          state: {tag: value, value: 'Binary invariant melt; components KAlSiO4/CaSiO3 as printed'}
+          locator: *table3_pair1_locator
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: KAlSiO4
+        basis_as_published: mole percent of binary invariant melt components
+        value: '35'
+        value_as_printed: '35'
+        approximate: true
+        composition_mol: &table3_pair1_composition {basis: printed_mole_fraction, KAlSiO4: '0.35', CaSiO3: '0.65'}
+    - observation_id: schneider_1980_table3_pair1_component2
+      type: equilibrium_phase_composition
+      locator: *table3_pair1_locator
+      phase: l
+      units: mol pct
+      point_conditions: *table3_pair1_conditions
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: CaSiO3
+        basis_as_published: mole percent of binary invariant melt components
+        value: '65'
+        value_as_printed: '65'
+        approximate: true
+        composition_mol: *table3_pair1_composition
+    - observation_id: schneider_1980_table3_pair2_component1
+      type: equilibrium_phase_composition
+      locator: &table3_pair2_locator {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/CaAl2Si2O8'}
+      phase: l
+      units: mol pct
+      point_conditions: &table3_pair2_conditions
+        temperature_K:
+          state: {tag: unknown, reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/CaAl2Si2O8'}
+        composition:
+          state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[KAlSiO4, '0.19'], [CaAl2Si2O8, '0.81']]}}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/CaAl2Si2O8'}
+        assemblage_id:
+          state: {tag: value, value: schneider80_table3_pair2}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/CaAl2Si2O8'}
+        full_assemblage:
+          state: {tag: value, value: 'Binary invariant melt; components KAlSiO4/CaAl2Si2O8 as printed'}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/CaAl2Si2O8'}
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: KAlSiO4
+        basis_as_published: mole percent of binary invariant melt components
+        value: '19'
+        value_as_printed: '19'
+        approximate: true
+        composition_mol: &table3_pair2_composition {basis: printed_mole_fraction, KAlSiO4: '0.19', CaAl2Si2O8: '0.81'}
+    - observation_id: schneider_1980_table3_pair2_component2
+      type: equilibrium_phase_composition
+      locator: *table3_pair2_locator
+      phase: l
+      units: mol pct
+      point_conditions: *table3_pair2_conditions
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: CaAl2Si2O8
+        basis_as_published: mole percent of binary invariant melt components
+        value: '81'
+        value_as_printed: '81'
+        approximate: true
+        composition_mol: *table3_pair2_composition
+    - observation_id: schneider_1980_table3_pair3_component1
+      type: equilibrium_phase_composition
+      locator: &table3_pair3_locator {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/Ca2Al2SiO7'}
+      phase: l
+      units: mol pct
+      point_conditions: &table3_pair3_conditions
+        temperature_K:
+          state: {tag: unknown, reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/Ca2Al2SiO7'}
+        composition:
+          state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[KAlSiO4, '0.37'], [Ca2Al2SiO7, '0.63']]}}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/Ca2Al2SiO7'}
+        assemblage_id:
+          state: {tag: value, value: schneider80_table3_pair3}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/Ca2Al2SiO7'}
+        full_assemblage:
+          state: {tag: value, value: 'Binary invariant melt; components KAlSiO4/Ca2Al2SiO7 as printed'}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/Ca2Al2SiO7'}
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: KAlSiO4
+        basis_as_published: mole percent of binary invariant melt components
+        value: '37'
+        value_as_printed: '37'
+        approximate: true
+        composition_mol: &table3_pair3_composition {basis: printed_mole_fraction, KAlSiO4: '0.37', Ca2Al2SiO7: '0.63'}
+    - observation_id: schneider_1980_table3_pair3_component2
+      type: equilibrium_phase_composition
+      locator: *table3_pair3_locator
+      phase: l
+      units: mol pct
+      point_conditions: *table3_pair3_conditions
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: Ca2Al2SiO7
+        basis_as_published: mole percent of binary invariant melt components
+        value: '63'
+        value_as_printed: '63'
+        approximate: true
+        composition_mol: *table3_pair3_composition
+    - observation_id: schneider_1980_table3_pair4_component1
+      type: equilibrium_phase_composition
+      locator: &table3_pair4_locator {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/Ca2SiO4'}
+      phase: l
+      units: mol pct
+      point_conditions: &table3_pair4_conditions
+        temperature_K:
+          state: {tag: unknown, reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/Ca2SiO4'}
+        composition:
+          state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[KAlSiO4, '0.17'], [Ca2SiO4, '0.83']]}}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/Ca2SiO4'}
+        assemblage_id:
+          state: {tag: value, value: schneider80_table3_pair4}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/Ca2SiO4'}
+        full_assemblage:
+          state: {tag: value, value: 'Binary invariant melt; components KAlSiO4/Ca2SiO4 as printed'}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/Ca2SiO4'}
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: KAlSiO4
+        basis_as_published: mole percent of binary invariant melt components
+        value: '17'
+        value_as_printed: '17'
+        approximate: true
+        composition_mol: &table3_pair4_composition {basis: printed_mole_fraction, KAlSiO4: '0.17', Ca2SiO4: '0.83'}
+    - observation_id: schneider_1980_table3_pair4_component2
+      type: equilibrium_phase_composition
+      locator: *table3_pair4_locator
+      phase: l
+      units: mol pct
+      point_conditions: *table3_pair4_conditions
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: Ca2SiO4
+        basis_as_published: mole percent of binary invariant melt components
+        value: '83'
+        value_as_printed: '83'
+        approximate: true
+        composition_mol: *table3_pair4_composition
+    - observation_id: schneider_1980_table3_pair5_component1
+      type: equilibrium_phase_composition
+      locator: &table3_pair5_locator {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/CaSiO3'}
+      phase: l
+      units: mol pct
+      point_conditions: &table3_pair5_conditions
+        temperature_K:
+          state: {tag: unknown, reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/CaSiO3'}
+        composition:
+          state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[KAlSi2O6, '0.39'], [CaSiO3, '0.61']]}}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/CaSiO3'}
+        assemblage_id:
+          state: {tag: value, value: schneider80_table3_pair5}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/CaSiO3'}
+        full_assemblage:
+          state: {tag: value, value: 'Binary invariant melt; components KAlSi2O6/CaSiO3 as printed'}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/CaSiO3'}
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: KAlSi2O6
+        basis_as_published: mole percent of binary invariant melt components
+        value: '39'
+        value_as_printed: '39'
+        approximate: true
+        composition_mol: &table3_pair5_composition {basis: printed_mole_fraction, KAlSi2O6: '0.39', CaSiO3: '0.61'}
+    - observation_id: schneider_1980_table3_pair5_component2
+      type: equilibrium_phase_composition
+      locator: *table3_pair5_locator
+      phase: l
+      units: mol pct
+      point_conditions: *table3_pair5_conditions
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: CaSiO3
+        basis_as_published: mole percent of binary invariant melt components
+        value: '61'
+        value_as_printed: '61'
+        approximate: true
+        composition_mol: *table3_pair5_composition
+    - observation_id: schneider_1980_table3_pair6_component1
+      type: equilibrium_phase_composition
+      locator: &table3_pair6_locator {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/Ca2Al2SiO7'}
+      phase: l
+      units: mol pct
+      point_conditions: &table3_pair6_conditions
+        temperature_K:
+          state: {tag: unknown, reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/Ca2Al2SiO7'}
+        composition:
+          state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[KAlSi2O6, '0.43'], [Ca2Al2SiO7, '0.57']]}}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/Ca2Al2SiO7'}
+        assemblage_id:
+          state: {tag: value, value: schneider80_table3_pair6}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/Ca2Al2SiO7'}
+        full_assemblage:
+          state: {tag: value, value: 'Binary invariant melt; components KAlSi2O6/Ca2Al2SiO7 as printed'}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/Ca2Al2SiO7'}
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: KAlSi2O6
+        basis_as_published: mole percent of binary invariant melt components
+        value: '43'
+        value_as_printed: '43'
+        approximate: true
+        composition_mol: &table3_pair6_composition {basis: printed_mole_fraction, KAlSi2O6: '0.43', Ca2Al2SiO7: '0.57'}
+    - observation_id: schneider_1980_table3_pair6_component2
+      type: equilibrium_phase_composition
+      locator: *table3_pair6_locator
+      phase: l
+      units: mol pct
+      point_conditions: *table3_pair6_conditions
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: Ca2Al2SiO7
+        basis_as_published: mole percent of binary invariant melt components
+        value: '57'
+        value_as_printed: '57'
+        approximate: true
+        composition_mol: *table3_pair6_composition
+    - observation_id: schneider_1980_table3_pair7_component1
+      type: equilibrium_phase_composition
+      locator: &table3_pair7_locator {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/CaAl2Si2O8'}
+      phase: l
+      units: mol pct
+      point_conditions: &table3_pair7_conditions
+        temperature_K:
+          state: {tag: unknown, reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/CaAl2Si2O8'}
+        composition:
+          state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[KAlSi2O6, '0.30'], [CaAl2Si2O8, '0.70']]}}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/CaAl2Si2O8'}
+        assemblage_id:
+          state: {tag: value, value: schneider80_table3_pair7}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/CaAl2Si2O8'}
+        full_assemblage:
+          state: {tag: value, value: 'Binary invariant melt; components KAlSi2O6/CaAl2Si2O8 as printed'}
+          locator: {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSi2O6/CaAl2Si2O8'}
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: KAlSi2O6
+        basis_as_published: mole percent of binary invariant melt components
+        value: '30'
+        value_as_printed: '30'
+        approximate: true
+        composition_mol: &table3_pair7_composition {basis: printed_mole_fraction, KAlSi2O6: '0.30', CaAl2Si2O8: '0.70'}
+    - observation_id: schneider_1980_table3_pair7_component2
+      type: equilibrium_phase_composition
+      locator: *table3_pair7_locator
+      phase: l
+      units: mol pct
+      point_conditions: *table3_pair7_conditions
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        formula: CaAl2Si2O8
+        basis_as_published: mole percent of binary invariant melt components
+        value: '70'
+        value_as_printed: '70'
+        approximate: true
+        composition_mol: *table3_pair7_composition
