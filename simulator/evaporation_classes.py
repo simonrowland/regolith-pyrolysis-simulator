@@ -1286,19 +1286,39 @@ def _index_extract_observation_ids(
         for sp, block in (data.get("species") or {}).items():
             if not isinstance(block, Mapping):
                 continue
-            for obs in block.get("observations") or []:
-                if not isinstance(obs, Mapping):
+            records = [*(block.get("observations") or ()), *(block.get("context") or ())]
+            for record in records:
+                if not isinstance(record, Mapping):
                     continue
-                oid = obs.get("observation_id")
-                if not oid:
-                    continue
-                index[(source_id, str(oid))] = {
-                    "species": sp,
-                    "type": obs.get("type"),
-                    "phase": obs.get("phase"),
-                    "regime": obs.get("regime"),
-                    "values": dict(obs.get("values") or {}),
-                }
+                values = record.get("values") or {}
+                oid = record.get("observation_id")
+                if oid:
+                    index[(source_id, str(oid))] = {
+                        "species": sp,
+                        "type": record.get("type"),
+                        "phase": record.get("phase"),
+                        "regime": record.get("regime"),
+                        "values": dict(values) if isinstance(values, Mapping) else {},
+                    }
+                nested_rows = values if isinstance(values, list) else (
+                    values.get("rows") or () if isinstance(values, Mapping) else ()
+                )
+                for nested in nested_rows:
+                    if not isinstance(nested, Mapping):
+                        continue
+                    nested_id = nested.get("source_observation_id")
+                    if not nested_id:
+                        continue
+                    nested_values = nested.get("values")
+                    index[(source_id, str(nested_id))] = {
+                        "species": nested.get("element") or nested.get("species") or sp,
+                        "type": record.get("type"),
+                        "phase": record.get("phase"),
+                        "regime": record.get("regime"),
+                        "values": dict(nested_values)
+                        if isinstance(nested_values, Mapping)
+                        else dict(nested),
+                    }
     return index
 
 

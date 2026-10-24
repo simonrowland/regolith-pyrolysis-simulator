@@ -1,0 +1,47 @@
+source_id: shornikov-2019-ca-feo-vapor
+source:
+  citation: >-
+    Shornikov, S. I., and M. S. Shornikova (2019), “Thermodynamic properties of the CaO–FeO melts,”
+    Experiment in Geosciences 25(1), 82–85.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: trial-lmax-1018
+review_status: draft
+tables:
+  - page: 3
+    table_index: 1
+    type: gibbs_table
+    quantity: delta_fG
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    per: mol_species
+    published_page: 84
+    rows: all
+    species_form: printed_formula
+    temperature:
+      as_printed: '1873'
+      unit: K
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        table: '1'
+        column_header: >-
+          ΔG°1873, kJ/mol
+        note: >-
+          The 1873 K temperature is printed in the Gibbs-energy column heading.
+    attribution: >-
+      Table 1 caption says the values were calculated in the present study. The
+      paper cites source data for the model but does not provide per-row input
+      lineage, so these are attributed values rather than model_derived rows.
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+        phase: cr
+      - species_column: 3
+        value_column: 4
+        phase: l
+      - species_column: 5
+        value_column: 6
+        phase: g

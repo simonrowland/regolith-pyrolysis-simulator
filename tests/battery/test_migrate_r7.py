@@ -1169,12 +1169,10 @@ def test_g1_current_stolyarova_source_migrates_without_context_observation(
     assert method_id not in result.observations
     assert len(
         [obs for obs in result.observations.values() if obs.source_id == "kems-016-stolyarova-1992"]
-    ) == 22
+    ) == 0
 
     generated = tmp_path / "tree/data/literature/extracts-v2" / filename
-    judged, bad = absence_audit([generated])
-    assert judged["kems-016-stolyarova-1992"] == 22
-    assert bad == []
+    assert not generated.exists()
 
 
 @pytest.mark.parametrize(

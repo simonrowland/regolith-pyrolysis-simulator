@@ -115,6 +115,33 @@ def test_each_mechanical_flag_fires_only_on_the_suspect_cell() -> None:
     assert not grid[3][2].flags
 
 
+def test_letter_for_digit_flags_casefold_confusables_without_a_scale_token() -> None:
+    for text in (
+        "L.23 x 10^2",
+        "l.23 x 10^2",
+        "O.23 x 10^2",
+        "o.23 x 10^2",
+        "S.23 x 10^2",
+        "s.23 x 10^2",
+        "O.23 x",
+    ):
+        assert "letter_for_digit" in draft._render_traps(
+            {"text": text, "value_text": text}, None
+        )
+    assert "letter_for_digit" not in draft._render_traps(
+        {"text": "0.23 x", "value_text": "0.23 x"}, None
+    )
+    for text in ("SiO2", "SiO2 x 10", "solid", "Olivine"):
+        assert "letter_for_digit" not in draft._render_traps(
+            {"text": text, "value_text": text}, None
+        )
+
+
+def test_stacked_values_bare_integer_cutoff_stays_at_seven_digits() -> None:
+    assert not draft._stacked_values("123456")
+    assert draft._stacked_values("1234567")
+
+
 def test_comma_formats_distinguish_decimal_from_ambiguous_grouping() -> None:
     grid = draft.parse_table_html(
         "<table><tr><th>Value</th></tr><tr><td>123.456</td></tr>"
@@ -213,6 +240,74 @@ def test_latex_numeric_cells_convert_and_compare(tmp_path: Path) -> None:
     }]}}}
     compared = draft.compare_extract_to_draft(extract, index_path)
     assert [row["status"] for row in compared] == ["presence-only"] * 3
+
+
+def test_compare_typed_transition_temperature_in_cr_unqualified_table(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "p002-t01.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        writer.writerow({
+            "row": 1, "column": 1, "row_type": "header", "text": "Mineral",
+            "value_text": "Mineral", "mark": "", "numeric_column": 0,
+            "origin_row": 1, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 1, "column": 2, "row_type": "header", "text": "T_melt, K",
+            "value_text": "T_melt, K", "mark": "", "numeric_column": 1,
+            "origin_row": 1, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 1, "row_type": "body", "text": "CA",
+            "value_text": "CA", "mark": "", "numeric_column": 0,
+            "origin_row": 2, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 2, "row_type": "body", "text": "1877",
+            "value_text": "1877", "mark": "", "numeric_column": 1,
+            "origin_row": 2, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({
+        "tables": [{
+            "table_key": "p002-t01",
+            "pdf_page": 2,
+            "csv": csv_path.name,
+            "columns": [{"column": 2, "header": "T_melt, K"}],
+        }],
+    }))
+    extract = {
+        "species": {
+            "CaAl2O4": {
+                "observations": [{
+                    "observation_id": "transition_p002_t01_r02_c02",
+                    "type": "transition_point",
+                    "phase": "cr",
+                    "locator": {
+                        "pdf_page_index": 1,
+                        "table": "1",
+                    },
+                    "units": "K",
+                    "values": {
+                        "quantity": "transition_temperature",
+                        "T_m_K": "1877",
+                    },
+                }],
+            },
+        },
+    }
+
+    compared = draft.compare_extract_to_draft(extract, index_path)
+
+    assert [row["status"] for row in compared] == ["matched"]
+    assert compared[0]["matched_cell"]["row"] == 2
+    assert compared[0]["matched_cell"]["column"] == 2
 
 
 def test_nazarov_table_2_rowspan_temperature_header_is_not_a_body_row(
@@ -466,6 +561,92 @@ def test_compare_reads_partial_pressure_atm_strings(tmp_path: Path) -> None:
     assert result[0]["matched_cell"]["text"] == "$1.25 \\times 10^{-6}$"
 
 
+def test_compare_applies_mapped_scale_and_requires_mapping_for_scale_headers(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "p001-t01.csv"
+    header = r"p_O, \\cdot 10^{3}"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        writer.writerow({
+            "row": 1, "column": 1, "row_type": "header", "text": "T, K",
+            "value_text": "T, K", "mark": "", "numeric_column": 0,
+            "origin_row": 1, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 1, "column": 2, "row_type": "header", "text": header,
+            "value_text": header, "mark": "", "numeric_column": 1,
+            "origin_row": 1, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 1, "row_type": "body", "text": "1416",
+            "value_text": "1416", "mark": "", "numeric_column": 0,
+            "origin_row": 2, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 2, "row_type": "body", "text": "100",
+            "value_text": "100", "mark": "", "numeric_column": 1,
+            "origin_row": 2, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p001-t01", "pdf_page": 1, "csv": csv_path.name,
+        "header_rows": [["T, K", header]],
+        "columns": [{"column": 2, "header": header}],
+    }]}), encoding="utf-8")
+    mapping = {"tables": [{
+        "page": 1, "table_index": 1, "quantity": "partial_pressure",
+        "values": [{
+            "column": 2, "species": "O",
+            "scale_factor": {
+                "header": header, "exponent": 3,
+                "direction": "quantity_times_factor_equals_cell",
+            },
+        }],
+    }]}
+
+    def extract(value: str) -> dict:
+        return {"species": {"O": {"observations": [{
+            "observation_id": "scaled-point",
+            "locator": {"pdf_page": 1, "table": "1"},
+            "values": {"points": [{
+                "value": value, "table_row_number": 2, "table_column_number": 2,
+            }]},
+        }]}}}
+
+    correct = draft.compare_extract_to_draft(extract("0.1"), index_path, mapping)[0]
+    unscaled = draft.compare_extract_to_draft(extract("100"), index_path, mapping)[0]
+    unmapped_correct = draft.compare_extract_to_draft(extract("0.1"), index_path)[0]
+    unmapped_raw = draft.compare_extract_to_draft(extract("100"), index_path)[0]
+
+    assert correct["status"] == "matched"
+    assert correct["matched_cell"]["value"] == 100.0
+    assert unscaled["status"] == "mismatch"
+    assert unscaled["matched_cell"] is None
+    assert unmapped_correct["status"] == "needs_mapping"
+    assert unmapped_correct["matched_cell"] is None
+    assert unmapped_raw["status"] == "needs_mapping"
+    assert unmapped_raw["matched_cell"] is None
+
+    temperature_only = {
+        "species": {"O": {"observations": [{
+            "observation_id": "unmapped-temperature",
+            "locator": {"pdf_page": 1, "table": "1"},
+            "values": {"points": [{"value": "1416", "table_row_number": 2}]},
+        }]}}
+    }
+    temperature_match = draft.compare_extract_to_draft(
+        temperature_only, index_path
+    )[0]
+    assert temperature_match["status"] == "matched"
+    assert temperature_match["matched_cell"]["column"] == 1
+
+
 def test_compare_carries_flags_for_matched_cells(tmp_path: Path) -> None:
     chunk_dir = tmp_path / "raw" / "flagged-values" / "ocr-mineru" / "p001-p010"
     chunk_dir.mkdir(parents=True)
@@ -671,6 +852,42 @@ def test_compare_phase_is_bound_to_the_candidate_column(tmp_path: Path) -> None:
     assert result["matched_cell"] is None
 
 
+def test_compare_accepts_a_neutral_equation_column_for_a_typed_phase(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "p006-t03.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        writer.writerow({
+            "row": 5, "column": 3, "row_type": "body", "text": "1.29e-9",
+            "value_text": "1.29e-9", "mark": "", "numeric_column": 3,
+            "origin_row": 5, "origin_column": 3, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p006-t03", "pdf_page": 6, "csv": csv_path.name,
+        "columns": [{"column": 3, "header": "(24)"}],
+    }]}), encoding="utf-8")
+    extract = {"species": {"O": {"observations": [{
+        "observation_id": "equation-24-oxygen-pressure",
+        "locator": {"pdf_page": 6, "table": "3"},
+        "phase": "gas",
+        "values": {"points": [{
+            "pressure_atm": 1.29e-9,
+            "table_row_number": 5,
+            "table_column_number": 3,
+        }]},
+    }]}}}
+
+    result = draft.compare_extract_to_draft(extract, index_path)[0]
+
+    assert result["status"] == "matched"
+    assert result["matched_cell"]["row"] == 5
+    assert result["matched_cell"]["column"] == 3
+
+
 def test_phase_tokens_do_not_match_words_in_other_column_headers(tmp_path: Path) -> None:
     csv_path = tmp_path / "p005-t01.csv"
     with csv_path.open("w", encoding="utf-8", newline="") as stream:
@@ -725,4 +942,17 @@ def test_compare_summary_prints_presence_only_count(tmp_path: Path, capsys) -> N
         argparse.Namespace(extract=str(extract_path), draft_index=str(index_path))
     )
 
-    assert "presence-only=1" in capsys.readouterr().err
+    summary = capsys.readouterr().err
+    assert "presence-only=1" in summary
+    assert "needs_mapping=0" in summary
+
+
+def test_compare_help_documents_scale_mapping(capsys) -> None:
+    with pytest.raises(SystemExit) as exc:
+        draft.main(["compare", "--help"])
+
+    assert exc.value.code == 0
+    help_text = capsys.readouterr().out
+    assert "--mapping MAPPING" in help_text
+    assert "power-of-ten headers" in help_text
+    assert "needs_mapping" in help_text

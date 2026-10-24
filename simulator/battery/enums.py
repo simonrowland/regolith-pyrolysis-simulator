@@ -130,6 +130,12 @@ class ValencePrintedForm(StrEnum):
     MASS_FRACTION_PAIR = "mass_fraction_pair"
 
 
+class ScalarPrintedForm(StrEnum):
+    LOG10 = "log10"
+    NEG_LOG10 = "neg_log10"
+    LN = "ln"
+
+
 class EvidenceClass(StrEnum):
     MEASURED_DIRECT = "measured_direct"
     MEASURED_TABULATED = "measured_tabulated"
@@ -260,6 +266,7 @@ class NoticeKind(StrEnum):
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
     ADMISSION_DEFAULTED = "admission_defaulted"
     FIGURE_ONLY = "figure_only"
+    APPROXIMATE_VALUE = "approximate_value"
     REACTIVE_CELL_NOT_MODELLED = "reactive_cell_not_modelled"
     # t-1123a: printed point sits between printed liquidus positions; scored as
     # liquid, flagged (all-numeric line only). Reason carries the stated liquidus.
@@ -641,7 +648,7 @@ PHASE_ROW_QUANTITIES = PHASE_COMPOSITION_QUANTITIES | PRINTED_CAPACITY_QUANTITIE
 # Closed subtype tokens on a printed phase-composition row. Equilibrium
 # ratios (Darken–Gurry r, pCO2/pCO) reuse EQUILIBRIUM_PHASE_COMPOSITION
 # with a free-text basis and are not in this set.
-PHASE_BASIS_TOKENS = frozenset({"wt_percent", "mole_fraction"})
+PHASE_BASIS_TOKENS = frozenset({"wt_percent", "mole_fraction", "element_ppm_by_mass"})
 KINETIC_YIELD_QUANTITIES = frozenset(
     {
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,

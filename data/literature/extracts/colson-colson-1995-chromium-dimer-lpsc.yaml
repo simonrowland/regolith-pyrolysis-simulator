@@ -1,0 +1,129 @@
+schema_version: literature_extract.v1
+source_id: colson-colson-1995-chromium-dimer-lpsc
+source:
+  citation: 'Colson RO, Colson MC (1995). Chromium, a dimer in silicate melts?: Implications for redox equilibria and partitioning. Lunar and Planetary Science Conference XXVI, 269–270.'
+  year: 1995
+  corpus_asset: raw/colson-colson-1995-chromium-dimer-lpsc/colson-colson-1995-chromium-dimer-lpsc.pdf
+extraction:
+  method: >-
+    Two-page LPSC abstract. The paper states qualitative interpretations of voltammetric curves; its plotted data and fit curves occur only in Figures 1-6 and are deferred without numeric points under the figure rule. No numeric measured Cr redox or partitioning values are printed in the text.
+  table_dispositions:
+    tables: no tables are present in the abstract
+    measured_data: context-only; numeric evidence is shown only as figure traces/markers, deferred to a figure pass
+    model_curves: context-only; theoretical monomerization and competing reduction fits are not measurements
+    figures: six figure records are deferred with no numeric points
+  date: '2026-10-20'
+  worker: fam31-1020
+review_status: draft
+species:
+  Cr:
+    observations: []
+    context:
+    - observation_id: colson_colson_1995_abstract_redox_interpretation
+      type: context
+      locator: {page: 1, published_page: 269, pdf_page_index: 0, section: abstract}
+      attribution: present work
+      units: qualitative interpretation
+      reason: The abstract reports interpretations of plotted voltammetric curves but no printed numeric Cr redox or partitioning measurements.
+      values:
+        interpretation_as_printed: Under some conditions trivalent Cr is interpreted to occur partly as a dimer in silicate melts; the proportions of trivalent monomer and dimer, divalent Cr, and Cr partitioning are said to depend on total Cr concentration. The authors also interpret excess low-potential current as a trivalent Cr monomer contribution.
+        quantitative_result: no numeric measured Cr redox or partitioning values printed in text
+    - observation_id: colson_colson_1995_figure_3_chromium_peak_shift
+      type: figure_record
+      locator: {page: 2, published_page: 270, pdf_page_index: 1, figure: '3'}
+      panel: whole figure
+      attribution: present work
+      units: cathodic peak position mV; ln(peak current)
+      values:
+        quantity_as_printed: Cr cathodic voltammetric peak position versus concentration proxy ln(peak current)
+        species: Cr in silicate melt
+        phase: silicate melt; exact composition not printed on this figure
+        temperature_as_printed: 1425 °C and 1575 °C series
+        axes_as_printed: cathodic peak position (mV) versus ln(peak current)
+        caption: Cr peak shift with concentration; plotted line indicates expected shift for monomerization.
+        series: [{name: 1425 °C, marker: square, marker_count: unknown, marker_count_reason: overlapping plotted samples}, {name: 1575 °C, marker: triangle, marker_count: unknown, marker_count_reason: overlapping plotted samples}, {name: expected monomerization, marker: continuous line, marker_count: 0, method_class: model_derived}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: colson_colson_1995_figure_4_chromium_scan_rate
+      type: figure_record
+      locator: {page: 2, published_page: 270, pdf_page_index: 1, figure: '4'}
+      panel: whole figure
+      attribution: present work
+      units: ratio of peak current to 1200 mV/s peak current; scan rate mV/s
+      values:
+        quantity_as_printed: Cr peak-current ratio versus scan rate
+        species: Cr in silicate melt
+        phase: silicate melt; exact composition not printed on this figure
+        temperature_as_printed: 1425 °C
+        axes_as_printed: Epk/Epk at 1200 mV/s versus scan rate (mV/s)
+        caption: Cr, 1425 °C; ratio of peak current to the peak current at 1200 mV/s versus scan rate; diamonds indicate averages.
+        series: [{name: individual scan-rate measurements, marker: square, marker_count: unknown, marker_count_reason: overlapping plotted samples}, {name: averages, marker: diamond, marker_count: unknown, marker_count_reason: overlapping plotted samples}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: colson_colson_1995_figure_5_chromium_peak_current
+      type: figure_record
+      locator: {page: 2, published_page: 270, pdf_page_index: 1, figure: '5'}
+      panel: whole figure
+      attribution: present work
+      units: peak current mA/cm²; square root of scan rate (mV/s)^0.5
+      values:
+        quantity_as_printed: Cr peak current versus square root of scan rate
+        species: Cr in silicate melt
+        phase: silicate melt; exact composition not printed on this figure
+        temperature_as_printed: 1425 °C; average of several experiments
+        axes_as_printed: current at peak (mA/cm²) versus sqrt(scan rate in mV/sec)
+        caption: Cr, 1425 °C, average of several experiments.
+        series: [{name: measured peak currents, marker: square, marker_count: 3, attribution: present work}, {name: linear trend, marker: continuous line, marker_count: 0, method_class: model_derived}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: colson_colson_1995_figure_6_chromium_fit_curves
+      type: figure_record
+      locator: {page: 2, published_page: 270, pdf_page_index: 1, figure: '6'}
+      panel: whole figure
+      attribution: present work
+      units: current mA/cm²; sweep potential mV
+      values:
+        quantity_as_printed: Cr voltammetric current and theoretical fit alternatives
+        species: Cr in silicate melt
+        phase: silicate melt; exact composition not printed on this figure
+        temperature_as_printed: not stated in panel
+        axes_as_printed: current (mA/cm²) versus sweep potential (millivolts)
+        caption: Cr fit to theoretical curves; legend identifies data, uncertainty, a one-electron plus monomerization fit, and a one-electron plus two-electron fit.
+        series: [{name: measured data, marker: continuous trace, marker_count: 0, attribution: present work}, {name: uncertainty, marker: error band, marker_count: unknown}, {name: one-electron plus monomerization, marker: continuous fit, marker_count: 0, method_class: model_derived}, {name: one-electron plus two-electron, marker: continuous fit, marker_count: 0, method_class: model_derived}]
+        points: []
+      digitisation: deferred to a figure pass
+  Sn:
+    observations: []
+    context:
+    - observation_id: colson_colson_1995_figure_1_tin_voltammetry
+      type: figure_record
+      locator: {page: 2, published_page: 270, pdf_page_index: 1, figure: '1'}
+      panel: whole figure
+      attribution: present work
+      units: current mA/cm²; potential mV
+      values:
+        quantity_as_printed: Sn voltammetric current versus potential
+        species: Sn in silicate melt
+        phase: diopsidic silicate melt; exact composition not recoverable from scanned abstract
+        temperature_as_printed: 1440 °C; scan rate 1200 mV/sec
+        axes_as_printed: current (mA/cm²) versus millivolts
+        caption: Sn voltammetry curve compared with a theoretical monomerization curve.
+        series: [{name: Sn voltammetry curve, marker: continuous trace, marker_count: 0, attribution: present work}, {name: monomerization theoretical curve, marker: continuous trace, marker_count: 0, method_class: model_derived}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: colson_colson_1995_figure_2_tin_peak_shift
+      type: figure_record
+      locator: {page: 2, published_page: 270, pdf_page_index: 1, figure: '2'}
+      panel: whole figure
+      attribution: present work
+      units: peak position; ln(peak current)
+      values:
+        quantity_as_printed: Sn anodic and cathodic peak positions versus concentration proxy ln(peak current)
+        species: Sn in silicate melt
+        phase: diopsidic silicate melt; exact composition not recoverable from scanned abstract
+        temperature_as_printed: not stated in panel
+        axes_as_printed: peak position versus ln(peak current)
+        caption: Sn peak shift with concentration; line indicates expected monomerization.
+        series: [{name: 'anodic, shifted', marker: square, marker_count: unknown, marker_count_reason: overlapping plotted samples}, {name: cathodic, marker: diamond, marker_count: unknown, marker_count_reason: overlapping plotted samples}, {name: expected monomerization, marker: continuous line, marker_count: 0, method_class: model_derived}]
+        points: []
+      digitisation: deferred to a figure pass

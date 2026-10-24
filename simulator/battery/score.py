@@ -108,6 +108,7 @@ from simulator.battery.migrate import (
     load_migrated_store,
     load_yaml,
     _convert_compilation_amount,
+    _log_fO2_to_pa,
     convert_areal_mass_to_kg_per_m2,
     convert_pressure_to_pa,
     fe3_fe2_ratio_from_ferric_fraction,
@@ -480,6 +481,7 @@ FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
+FLAGGED_STRATUM_APPROXIMATE_VALUE = "approximate-printed-value"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
@@ -1216,6 +1218,25 @@ def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
     return metric_operation(quantity)
 
 
+def _phase_component_reference_wt_percent(
+    identity: Identity, reference: Decimal
+) -> Decimal:
+    """Convert a printed mass-ppm phase amount for comparison with wt% engines."""
+    quantity = quantity_token(identity)
+    subtype = (
+        identity.subtype.value
+        if identity.subtype is not None and identity.subtype.is_value
+        else None
+    )
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and subtype == "element_ppm_by_mass"
+    ):
+        # 1 ppm = 1e-6 mass fraction = 1e-4 wt%; 250 ppm = 0.025 wt%.
+        return reference / Decimal("10000")
+    return reference
+
+
 def _residual_metric_operation(
     quantity: Quantity | None, observation: object | None
 ) -> MetricOperation | None:
@@ -1734,6 +1755,8 @@ def _classify_flagged_notice_facts(
         for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
+    if NoticeKind.APPROXIMATE_VALUE.value in kinds:
+        strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
@@ -7722,17 +7745,20 @@ def _predict_phase_row(
         )
     subtype = identity.subtype.value if identity.subtype is not None and identity.subtype.is_value else None
     if solute is None:
-        if subtype in PHASE_BASIS_TOKENS and subtype != "wt_percent":
+        if subtype in PHASE_BASIS_TOKENS and subtype not in {
+            "wt_percent",
+            "element_ppm_by_mass",
+        }:
             return refused(
                 RefusalReason.COEFFICIENT_BASIS_MISMATCH,
                 {
                     "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
                     "basis": subtype,
                     "engine_basis": "wt_percent",
-                    "detail": "engine phase maps are wt%; mole_fraction rows are not converted",
+                    "detail": "engine phase maps are wt%; this phase basis is not converted",
                 },
             )
-        if subtype != "wt_percent":
+        if subtype not in {"wt_percent", "element_ppm_by_mass"}:
             return refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {"reason": "missing_input", "input": "basis"},
@@ -7755,6 +7781,19 @@ def _predict_phase_row(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "composition"},
             execution=ExecutionState.NOT_PROBED,
+        )
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and composition_state.value.amount_basis is AmountBasis.MASS_PERCENT
+    ):
+        return refused(
+            RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+            {
+                "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
+                "identity_amount_basis": AmountBasis.MASS_PERCENT.value,
+                "engine_basis": "mole_fraction or mol_inventory",
+                "detail": "printed mass-percent phase identity cannot be read as moles",
+            },
         )
     wt = composition_wt_pct(composition_state.value)
     if not wt:
@@ -10501,10 +10540,24 @@ def compile_residual(
     )
     if non_measured_comparison:
         evidence_class_notices = (_evidence_class_notice(quantity, source_reference),)
+    # Value owns approximation; this notice carries it through the stratum/report flow.
+    approximate_value_notices = (
+        (
+            Notice(
+                kind=NoticeKind.APPROXIMATE_VALUE,
+                affected_quantities=(quantity,),
+                reason="approximate_printed_value",
+                origin=reference.observation_id,
+            ),
+        )
+        if reference.value.approximate and quantity is not None
+        else ()
+    )
     notices = union_notices(
         reference.notices,
         flagged_notices,
         evidence_class_notices,
+        approximate_value_notices,
         _quench_notices(reference),
     )
     if fo2_mode is Fo2Mode.ENGINE_INTRINSIC and quantity is not None:
@@ -11216,6 +11269,7 @@ def compile_residual(
 
     ref_point = point_magnitude(reference.value)
     assert ref_point is not None
+    ref_point = _phase_component_reference_wt_percent(identity, ref_point)
     printed = _PrintedBandResolution()
     fusion_band_refusal: Mapping[str, object] | None = None
     if implied_alpha:

@@ -85,6 +85,40 @@ def _aithala_fe_rows(result):
     }
 
 
+AITHALA_S3_ROW_TO_S1 = {
+    "VF271": "aithala_2026_vf271_xanes",
+    "VF267": "aithala_2026_vf267_moessbauer",
+    "VF231": "aithala_2026_vf231_moessbauer",
+    "VF268": "aithala_2026_vf268_moessbauer",
+    "VF270": "aithala_2026_vf270_moessbauer",
+    "VF274": "aithala_2026_vf274_moessbauer",
+    "1800-30": "aithala_2026_1800_30_xanes",
+    "1900-30": "aithala_2026_1900_30_xanes",
+    "2000-30": "aithala_2026_2000_30_xanes",
+    "2100-30": "aithala_2026_2100_30_xanes",
+    "2000-10": "aithala_2026_2000_10_xanes",
+    "2000-120": "aithala_2026_2000_120_xanes",
+}
+
+
+def _aithala_s3_raw_exact_matches(doc: dict[str, Any]) -> set[str]:
+    s1 = {
+        row["observation_id"]: row
+        for row in doc["species"]["Fe"]["observations"]
+    }
+    s3 = next(
+        row
+        for row in doc["species"]["Fe"]["context"]
+        if row.get("observation_id") == "aithala_2026_table_s3_raw_series"
+    )
+    return {
+        row["ID"]
+        for row in s3["values"]["rows"]
+        if row["Fe3+/FeT raw"]
+        == s1[AITHALA_S3_ROW_TO_S1[row["ID"]]]["values"]["reported_value"]
+    }
+
+
 def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
     # b-686 change. Pin (006e13b70): quantity unknown ("unsupported quantity
     # 'Fe3+/FeT'"), value UNAVAILABLE, evidence measured_direct.
@@ -99,6 +133,7 @@ def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
     for oid, obs in rows.items():
         r = Decimal(AITHALA_S1_FE3_OVER_FET[oid])
         assert obs.identity.quantity.value is Quantity.FE3_FE2_RATIO, oid
+        assert obs.identity.species.formula == "Fe", oid
         assert obs.value.kind is ValueKind.POINT, oid
         assert obs.value.point == r / (1 - r), oid
         assert obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED, oid
@@ -109,6 +144,7 @@ def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
         assert name == "original_Fe3_over_FeT", oid
         assert printed.state.value == r, oid
         assert printed.locator.table == "S-1", oid
+        assert obs.identity.temperature_K.is_value, oid
         assert obs.derived_from == obs.derivation.inputs, oid
         assert obs.derived_from and set(obs.derived_from).issubset(asset_ids), oid
         assert not [
@@ -143,6 +179,35 @@ def test_aithala_s3_recalculated_rows_are_not_declared_fe3_fe2_ratio() -> None:
     assert labels.count(("concentration_series", "fe3_fe2_ratio")) == 16
     assert labels.count(("recalculation_table", "Fe3+/FeT")) == 20
     assert len(labels) == 36
+    s3 = next(
+        row
+        for row in doc["species"]["Fe"]["context"]
+        if row.get("observation_id") == "aithala_2026_table_s3_raw_series"
+    )
+    assert "11/12 identical" in s3["locator"]["note"]
+    vf271_note = doc["species"]["Fe"]["observations"][0]["locator"]["note"]
+    assert "0.816 ± 0.022 (S-1: ±0.019)" in vf271_note
+    raw_by_id = {row["ID"]: row["Fe3+/FeT raw"] for row in s3["values"]["rows"]}
+    assert raw_by_id["VF267"] == "0.736±0.023"
+    assert raw_by_id["VF231"] == "0.716±0.023"
+    assert raw_by_id["1800-30"] == "0.426±0.018"
+    exact_matches = _aithala_s3_raw_exact_matches(doc)
+    assert len(exact_matches) == 11
+    assert {"VF267", "VF231", "1800-30"}.issubset(exact_matches)
+    assert "VF271" not in exact_matches
+
+    mutated = copy.deepcopy(doc)
+    mutated_s3 = next(
+        row
+        for row in mutated["species"]["Fe"]["context"]
+        if row.get("observation_id") == "aithala_2026_table_s3_raw_series"
+    )
+    mutated_vf267 = next(
+        row for row in mutated_s3["values"]["rows"] if row["ID"] == "VF267"
+    )
+    mutated_vf267["Fe3+/FeT raw"] = "0.737±0.023"
+    assert "VF267" not in _aithala_s3_raw_exact_matches(mutated)
+
     result = _migrate(AITHALA)
     ratio_rows = [
         oid for oid, obs in result.observations.items()

@@ -1,0 +1,29 @@
+source_id: schreiber-haskin-1976-plsc7-chromium-in-basalts
+source:
+  citation: Schreiber & Haskin (1976), Chromium in basalts, Proceedings of the Seventh Lunar Science Conference, 1221-1242.
+tables:
+  - page: 11
+    table: '1'
+    disposition: context-no-token
+    candidate_tokens: [valence_ratio, equilibrium_phase_composition]
+    reason: qualitative chromium coordination and stabilization; no redox measurement table.
+  - page: 15
+    table: '2'
+    disposition: context-no-token
+    candidate_tokens: [delta_fH]
+    reason: reaction enthalpy is not formation enthalpy from elements; no reaction-enthalpy token.
+  - page: 16
+    table: '3'
+    disposition: context-no-token
+    candidate_tokens: [equilibrium_phase_composition]
+    reason: compiled whole-rock bulk ranges and bulk starting mixtures are not single-phase analyses or redox observations.
+  - page: 18
+    table: '4'
+    disposition: context-no-token
+    candidate_tokens: [valence_ratio, delta_fG]
+    reason: relative reactivity ordering and aqueous reduction potentials have no matching token and are not melt redox ratios.
+  - page: 20
+    table: '5'
+    disposition: context-model
+    candidate_tokens: [equilibrium_phase_composition]
+    reason: lattice-site description and predicted chromium substitution are qualitative model context.

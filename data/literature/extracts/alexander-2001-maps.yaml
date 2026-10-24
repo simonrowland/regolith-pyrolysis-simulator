@@ -1,0 +1,165 @@
+schema_version: literature_extract.v1
+source_id: alexander-2001-maps
+source:
+  citation: >-
+    Alexander, C. M. O'D. (2001). "Exploration of quantitative kinetic models for the evaporation of silicate melts in vacuum and in hydrogen." Meteoritics & Planetary Science 36, 255–283.
+  doi: 10.1111/j.1945-5100.2001.tb01870.x
+  year: 2001
+extraction:
+  method: >-
+    MinerU table draft (four tables) and OCR Markdown; source PDF checked against pdfinfo and a 600 dpi first-page render. The paper develops and compares PCR/EQR kinetic models against experiments reported by Hashimoto, Wang, Davis, Yu and Hewins, Floss, Grossman, and Parsad. Figures 1–18 contain the plotted data/model comparisons and are deferred to a figure pass; no points were digitised. Tables 1, 2, and A1 report model inputs or fitted coefficients, not independent measurements. Table 3 compiles diffusion inputs from cited works; diffusion coefficient has no store token, so the table is retained as context. No measured melt-activity series is reported.
+  date: '2026-10-20'
+  worker: fam35-1021
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: alexander_2001_table3_diffusion_data_context
+        type: table_context
+        locator:
+          page: 20
+          published_page: 274
+          pdf_page_index: 19
+          table: '3'
+          note: >-
+            Four compiled diffusion rows. Rendered at 600 dpi: D0 values are 1.98×10^-5, 1.56×10^-5,
+            1.55×10^-4, and 3.7×10^-6 m2/s; E values are 173±27, 172±27, 201±25, and 176±2 kJ/mol;
+            A values are 168, 168, 177, and 184 kJ/mol; printed temperature ranges are 1350–1500,
+            1350–1500, 1294–1398, and 1320–1600 °C. The row sources are LaTourrette et al. (1996),
+            Lowry et al. (1982), and Lesher et al. (1996), as marked in the table. Candidate token:
+            none; the store has no self-diffusion-coefficient token.
+        units: printed units
+        values:
+          quantity: compiled_self_diffusion_and_viscous_flow_inputs
+          method_class: quoted_attributed
+          points:
+            - component: Mg
+              D0_m2_s: 1.98e-5
+              E_kJ_mol: 173
+              E_uncertainty_kJ_mol: 27
+              A_kJ_mol: 168
+              temperature_C: 1350–1500
+              attribution: LaTourrette et al. (1996)
+            - component: Ca
+              D0_m2_s: 1.56e-5
+              E_kJ_mol: 172
+              E_uncertainty_kJ_mol: 27
+              A_kJ_mol: 168
+              temperature_C: 1350–1500
+              attribution: LaTourrette et al. (1996)
+            - component: Fe (Mn and Co analogue)
+              D0_m2_s: 1.55e-4
+              E_kJ_mol: 201
+              E_uncertainty_kJ_mol: 25
+              A_kJ_mol: 177
+              temperature_C: 1294–1398
+              attribution: Lowry et al. (1982), Mn and Co results
+            - component: Si/O
+              D0_m2_s: 3.7e-6
+              E_kJ_mol: 176
+              E_uncertainty_kJ_mol: 2
+              A_kJ_mol: 184
+              temperature_C: 1320–1600
+              attribution: Lesher et al. (1996), extrapolated to zero pressure
+      - observation_id: alexander_2001_table2_fitted_coefficients_context
+        type: model_parameters
+        locator:
+          page: 6
+          published_page: 260
+          pdf_page_index: 5
+          table: '2'
+          note: PCR and EQR fitted model coefficients; not independent observations.
+        units: B as printed; E in J/mol; coefficient pairs as printed
+        values:
+          quantity: fitted_evaporation_and_activity_coefficients
+          method_class: model_derived
+          schema_note: >-
+            Candidate tokens are activity_coefficient and evaporation_coefficient_alpha, but these are fitted
+            model parameters and their experimental fit inputs are not stored in this extract; retained as
+            model context, not scored observations.
+          rows:
+            - {model: PCR Case 1, component: MgO, B: 8525, E_J_mol: -339439, gamma_a: 7.273, gamma_b: -20009}
+            - {model: PCR Case 1, component: SiO2, B: 2687333, E_J_mol: -464476, gamma_a: 3.459, gamma_b: -8363}
+            - {model: PCR Case 1, component: FeO, gamma_a: 1.080, gamma_b: -2002}
+            - {model: PCR Case 1, component: Al2O3, alpha_a: -0.693, gamma_a: 14.608, gamma_b: -35830}
+            - {model: PCR Case 1, component: CaO, alpha_a: 0, gamma_a: 6.344, gamma_b: -26291}
+            - {model: PCR Case 1, component: NaO0.5, condition: '(Na + K) ≤ Al', gamma_a: -7.113}
+            - {model: PCR Case 1, component: NaO0.5, condition: '(Na + K − Al > 0)', gamma_a: -5.784}
+            - {model: PCR Case 2, component: MgO, alpha_a: -4.810, alpha_b: 9024, gamma_a: 7.273, gamma_b: -20009}
+            - {model: PCR Case 2, component: SiO2, alpha_a: -4.625, alpha_b: 5679, gamma_a: 3.459, gamma_b: -8363}
+            - {model: PCR Case 2, component: FeO, gamma_a: 1.080, gamma_b: -2002}
+            - {model: PCR Case 2, component: Al2O3, alpha_a: -0.693, gamma_a: 14.608, gamma_b: -35830}
+            - {model: PCR Case 2, component: CaO, alpha_a: 0, gamma_a: 6.344, gamma_b: -26291}
+            - {model: PCR Case 2, component: NaO0.5, condition: '(Na + K) ≤ Al', gamma_a: -7.113}
+            - {model: PCR Case 2, component: NaO0.5, condition: '(Na + K − Al > 0)', gamma_a: -5.784}
+            - {model: EQR, component: MgO, alpha_a: -3.417, alpha_b: 3587, gamma_a: 9.269, gamma_b: -22037}
+            - {model: EQR, component: SiO2, alpha_a: -5.766, alpha_b: 7390, gamma_a: 3.689, gamma_b: -6759}
+            - {model: EQR, component: FeO, alpha_a: 0.223, alpha_b: -4998, gamma_a: 2.197}
+            - {model: EQR, component: Al2O3, alpha_a: 0, gamma_a: 14.608, gamma_b: -35830}
+            - {model: EQR, component: CaO, alpha_a: -2.813, gamma_a: 6.344, gamma_b: -26291}
+      - observation_id: alexander_2001_table_a1_beta_coefficients_context
+        type: model_parameters
+        locator:
+          page: 28
+          published_page: 282
+          pdf_page_index: 27
+          table: A1
+          note: PCR beta model constants; not measured quantities.
+        units: A–E as printed; beta dimensionless
+        values:
+          quantity: fitted_evaporation_model_coefficients
+          method_class: model_derived
+          schema_note: These constants define the model beta functions and are not experimental measurements.
+          rows:
+            - {reaction: 'NaO0.5 - Na + 0.25 O2', A: -7.21265e12, B: 1.55196e10, C: -12591776, D: 4573.44, E: -0.794, beta_1800: 0.847}
+            - {reaction: 'NaO0.5 - Na + 0.5 O', C: 1718832, D: -14038.8, E: 2.196, beta_1800: 0.015}
+            - {reaction: 'MgO - Mg + 0.5 O2', C: -1747300, D: 2250.39, E: -0.916, beta_1800: 0.789}
+            - {reaction: 'MgO - Mg + O', D: -2734.24, E: 0.501, beta_1800: 0.441}
+            - {reaction: 'Al2O3 - 2Al + 1.5 O2', D: -4462.57, E: 0.034, beta_1800: 0.121}
+            - {reaction: 'Al2O3 - 2Al + 3 O', C: -4672118, D: 5543.22, E: -1.687, beta_1800: 0.905}
+            - {reaction: 'Al2O3 - 2AlO + 0.5 O2', D: -2540.48, E: -0.385, beta_1800: 0.200}
+            - {reaction: 'Al2O3 - 2AlO + O', C: -2864521, D: 1274.62, E: -1.065, beta_1800: 0.327}
+            - {reaction: 'Al2O3 - Al2O + O2', C: -6177996, D: -999.37, E: -0.416, beta_1800: 0.097}
+            - {reaction: 'Al2O3 - Al2O + 2 O', C: -7753251, D: 250.68, E: -0.373, beta_1800: 0.128}
+            - {reaction: 'SiO2 - SiO + 0.5 O2', C: -447264, D: 434.94, E: -0.272, beta_1800: 0.847}
+            - {reaction: 'SiO2 - SiO + O', C: 1022214, D: -994.03, E: -0.408, beta_1800: 0.522}
+            - {reaction: 'CaO - Ca + 0.5 O2', D: 1305.36, E: -1.098, beta_1800: 0.626}
+            - {reaction: 'CaO - Ca + O', C: -3427425, D: 2534.97, E: -0.707, beta_1800: 0.755}
+            - {reaction: 'FeO - Fe + 0.5 O2', C: -1862956, D: 2587.45, E: -0.980, beta_1800: 0.848}
+            - {reaction: 'FeO - Fe + O', C: -1179998, D: -648.21, E: 0.021, beta_1800: 0.544}
+      - observation_id: alexander_2001_figure_read_candidates
+        type: figure_read_queue
+        units: see each printed figure axis
+        locator:
+          page: 7
+          published_page: 261
+          pdf_page_index: 6
+          figure: '1'
+          note: >-
+            Figures 1–18 contain experimental comparisons or model results relevant to evaporation, activity,
+            residue evolution, isotope fractionation, and diffusion. All are deferred; no plotted values are
+            extracted. Figure series and marker inventories are to be recorded during the figure pass.
+        values:
+          quantity: evaporation_rate
+          method_class: figure_only
+          figures:
+            - {figure: '1', page: 7, pdf_page_index: 6, caption: 'Chondritic vacuum evaporation compared with Hashimoto (1983); compositions and mass loss versus time.'}
+            - {figure: '2', page: 8, pdf_page_index: 7, caption: 'Wang (1995) chondritic vacuum evaporation; composition and mass loss versus time.'}
+            - {figure: '3', page: 9, pdf_page_index: 8, caption: 'Forsterite melt silica composition and mass loss; Hashimoto (1990) and Davis et al. (1990).'}
+            - {figure: '4', page: 11, pdf_page_index: 10, caption: 'Berman-model MgO and SiO2 activity coefficients versus SiO2 mole fraction at 1800 and 2000 °C.'}
+            - {figure: '5', page: 12, pdf_page_index: 11, caption: 'Calculated pure molten silica evaporation rates compared with Hashimoto (1990).'}
+            - {figure: '6', page: 13, pdf_page_index: 12, caption: 'Na and K fractions remaining versus time for Yu and Hewins (1997) vacuum evaporation.'}
+            - {figure: '7', page: 14, pdf_page_index: 13, caption: 'Allende major-element evolution versus mass loss; Floss et al. (1996).'}
+            - {figure: '8', page: 16, pdf_page_index: 15, caption: 'Ca and Ti isotope compositions versus percentage mass loss.'}
+            - {figure: '9', page: 18, pdf_page_index: 17, caption: 'Floss et al. (1996) measured fractions remaining compared with PCR/EQR predictions.'}
+            - {figure: '10', page: 19, pdf_page_index: 18, caption: 'Mg and Si fractional evaporation in Davis et al. (1998) CAI-like melt in hydrogen.'}
+            - {figure: '11', page: 20, pdf_page_index: 19, caption: 'Compositional evolution of CAI-like melts in hydrogen; Grossman et al. (2000).'}
+            - {figure: '12', page: 21, pdf_page_index: 20, caption: 'Fe fraction remaining versus experiment duration; Hashimoto (1983) and Wang (1995).'}
+            - {figure: '13', page: 22, pdf_page_index: 21, caption: 'Wang (1995) isotope results for chondritic melts versus mass lost.'}
+            - {figure: '14', page: 20, pdf_page_index: 19, caption: 'Davis et al. (1990) isotopic results for forsteritic melts versus total mass loss.'}
+            - {figure: '15', page: 21, pdf_page_index: 20, caption: 'Peclet number estimates versus sample radius for Mg, Si, Ca, and Fe at 1800 °C.'}
+            - {figure: '16', page: 22, pdf_page_index: 21, caption: 'Wang (1995) and Davis et al. (1990) isotope fractionations versus element remaining.'}
+            - {figure: '17', page: 23, pdf_page_index: 22, caption: 'Predicted core-to-rim compositional profiles for samples 18C5 and SC1.'}
+            - {figure: '18', page: 24, pdf_page_index: 23, caption: 'Measured Mg isotope fractionation factors versus sample size, composition, and Mg loss.'}
+          digitisation: deferred to a figure pass

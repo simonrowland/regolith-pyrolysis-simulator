@@ -2469,6 +2469,38 @@ def test_zero_never_priced_as_value() -> None:
     }
 
 
+def test_one_sided_bound_is_not_scored_as_point() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = F.observation(
+        "o2-bounded-value",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    ref = replace(
+        ref,
+        value=Value(
+            kind=ValueKind.BOUND,
+            bound_operator=">",
+            bound_value=Decimal("0.77"),
+        ),
+    )
+
+    residual, _ = _compile(ref, exp, _predict(Decimal("0.8"), ident))
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert residual.refusal.detail == {
+        "reason": "value_unknown",
+        "value_kind": "bound",
+    }
+
+
 def test_species_formula_unparsed_never_string_matched() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
@@ -4448,6 +4480,61 @@ def test_figure_only_evidence_adds_notice_to_scored_residual() -> None:
     assert FLAGGED_STRATUM_FIGURE_ONLY in flagged_strata(residual.notices)
 
 
+@pytest.mark.parametrize("approximate", (False, True))
+def test_approximate_reference_value_is_scored_but_left_out_of_headline(
+    approximate: bool,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
+        flagged_strata,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity()
+    reference = F.observation(
+        f"approximate-value-{approximate}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    reference = replace(
+        reference,
+        value=replace(reference.value, approximate=approximate),
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=_predict(Decimal("0.3"), identity),
+    )
+
+    assert residual.numeric is not None
+    assert ("not_flagged_stratum" in residual.exclusions) is approximate
+    expected_strata = (
+        (FLAGGED_STRATUM_APPROXIMATE_VALUE,) if approximate else ()
+    )
+    assert flagged_strata(residual.notices) == expected_strata
+    headline = next(
+        row
+        for row in headline_rows(
+            (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+        if row["rail"] == residual.rail.value
+    )
+    assert headline["n"] == (0 if approximate else 1)
+    assert [
+        row["stratum"]
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    ] == list(expected_strata)
+
+
 def test_source_internal_inconsistency_is_flagged_reported_and_excluded() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -5099,6 +5186,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -5144,6 +5232,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
             "liquidus_position_contested:probe",
         ),
+        (
+            FLAGGED_STRATUM_APPROXIMATE_VALUE,
+            NoticeKind.APPROXIMATE_VALUE,
+            "approximate_printed_value",
+        ),
     )
     for stratum, kind, reason in cases:
         notice = Notice(
@@ -5165,6 +5258,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
@@ -5192,6 +5286,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
             "source_flagged_less_reliable:probe",
         ),
         (NoticeKind.FIGURE_ONLY, "figure_only:probe"),
+        (NoticeKind.APPROXIMATE_VALUE, "approximate_printed_value"),
         (NoticeKind.REACTIVE_CELL_NOT_MODELLED, "reactive_cell_not_modelled:probe"),
         (
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
@@ -5217,6 +5312,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
     )
@@ -14247,15 +14343,37 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         for observation in fresh_stolyarova_pressures.values()
     )
-    # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9) are model-derived,
-    # not measured pressures (review, Derived O / O2).
-    assert len(stolyarova_1995_derived_pressures) == 26
-    # Table 2's calculated 1933 K oxygen-pressure columns contain 30 pO,
-    # 10 p'O, and 15 p''O observations, all model-derived.
-    assert len(stolyarova_1996_derived_pressures) == 55
+    # 4e0819f6d and 3de591b81 type the calculated oxygen columns quoted_attributed.
+    # The parents are not printed, so the rows are not model_derived.
+    assert len(stolyarova_1995_derived_pressures) == 0
+    assert len(stolyarova_1996_derived_pressures) == 0
+    stolyarova_1995_quoted_pressures = {
+        key
+        for key, obs in observations.items()
+        if obs.source_id == "stolyarova-1995-cao-alumina-kems"
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    }
+    stolyarova_1996_quoted_pressures = {
+        key
+        for key, obs in observations.items()
+        if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    }
+    # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9).
+    assert len(stolyarova_1995_quoted_pressures) == 26
+    # Table 2's calculated 1933 K oxygen-pressure columns: 30 pO, 10 p'O, 15 p''O.
+    assert len(stolyarova_1996_quoted_pressures) == 55
     assert {
         observations[key].observation_id.split("::")[1]
-        for key in stolyarova_1996_derived_pressures
+        for key in stolyarova_1996_quoted_pressures
     } == {
         "stolyarova_1996_table2_pO_1933k",
         "stolyarova_1996_table2_pO_prime_1933k",
@@ -14264,7 +14382,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     assert [
         sum(
             observations[key].observation_id.split("::")[1] == observation_id
-            for key in stolyarova_1996_derived_pressures
+            for key in stolyarova_1996_quoted_pressures
         )
         for observation_id in (
             "stolyarova_1996_table2_pO_1933k",
@@ -14272,11 +14390,15 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             "stolyarova_1996_table2_pO_double_prime_1933k",
         )
     ] == [30, 10, 15]
-    assert len(kems_model_derived) == 28
+    # dc7eafe24 adds the quoted Table 4 gamma successors. 5f44bd3ee copies the
+    # parent derivation onto them, so they migrate as model_derived: 26 Sossi
+    # plus 24 ms2000 rows. 28->50. The union and the headline each gain those
+    # 22 rows (91->113, 55->77). The calculated oxygen columns stay quoted.
+    assert len(kems_model_derived) == 50
     assert len(
         stolyarova_activities | stolyarova_atomic_oxygen_pressures | kems_model_derived
-    ) == 91
-    assert len(headline_diagnostic_references) == 136
+    ) == 113
+    assert len(headline_diagnostic_references) == 77
     assert admitted_model_derived == (
         headline_diagnostic_references - stolyarova_atomic_oxygen_pressures
     )
@@ -14533,25 +14655,21 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         ]
         assert len(activity_rows) == 54
         assert len(derived_pressure_rows) == 9
+        # 4e0819f6d and 3de591b81 type those oxygen columns quoted, so they
+        # are not the model-derived residual slice. d170a39b8 pinned the
+        # observation counts; the slice of this model-derived set is empty.
         stolyarova_1995_rows = [
             row
             for row in stolyarova_rows
             if row.reference in stolyarova_1995_derived_pressures
         ]
-        assert len(stolyarova_1995_rows) == 26
+        assert len(stolyarova_1995_rows) == 0
         stolyarova_1996_rows = [
             row
             for row in stolyarova_rows
             if row.reference in stolyarova_1996_derived_pressures
         ]
-        assert len(stolyarova_1996_rows) == 55
-        assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_1996_rows)
-        assert all(not row.score_eligible for row in stolyarova_1996_rows)
-        assert {
-            row.refusal.reason
-            for row in stolyarova_1996_rows
-            if row.refusal is not None
-        } == {RefusalReason.IDENTITY_INCOMPLETE}
+        assert len(stolyarova_1996_rows) == 0
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
         assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
         # t-1123a classifies the printed x(SiO2)=0.33/0.25 activity points as

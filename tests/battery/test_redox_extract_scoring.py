@@ -576,7 +576,23 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     result = migrator.result
     source_rows = source["species"]["Fe"]["observations"]
     assert len(source_rows) == 435
-    for row in source_rows:
+    # Article Table 1 (1175b49fc) is the wet-chemical ratio itself: 31 rows,
+    # no values.inference. The 404 quoted Supplementary Table 2 rows keep the
+    # log10 conversion. Quoted evidence does not require derived_from.
+    inferred_rows = [
+        row for row in source_rows if "inference" in (row.get("values") or {})
+    ]
+    table1_rows = [
+        row
+        for row in source_rows
+        if str(row.get("observation_id") or "").startswith("borisov_2018_table1_")
+    ]
+    assert len(table1_rows) == 31
+    assert len(inferred_rows) == 404
+    assert {row["observation_id"] for row in table1_rows}.isdisjoint(
+        {row["observation_id"] for row in inferred_rows}
+    )
+    for row in inferred_rows:
         values = row["values"]
         inference = values["inference"]
         assert inference["relation"] == values["ratio_derivation"]
@@ -590,10 +606,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         assert conversion is not None
         assert conversion.relation == values["ratio_derivation"]
 
-    hard_issue_details = [issue.detail for issue in result.validation.hard_issues]
-    assert hard_issue_details.count("derived observation requires derived_from") == 435
-    assert "derived observation requires derivation" not in hard_issue_details
-    assert set(hard_issue_details) == {"derived observation requires derived_from"}
+    assert result.validation.hard_issues == ()
 
     origins = {
         observation_id: "extracts/borisov-2018-compilation.yaml"
@@ -610,14 +623,14 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert len(comparison_candidates(context)) == 435
     rows_by_id = {row.observation_id: row for row in result.observations.values()}
     row4 = rows_by_id[f"{extract.stem}::borisov_2018_table2_row_4"]
-    row155 = rows_by_id[f"{extract.stem}::borisov_2018_table2_row_155"]
+    # Spreadsheet row 155 is article Table 1 (1175b49fc), not a quoted Table 2 id.
+    assert f"{extract.stem}::borisov_2018_table2_row_155" not in rows_by_id
 
-    # Hand evaluation of Kress & Carmichael 1991 at each printed T and log fO2,
-    # with 1 atm from the cited compilation: row 4 gives Fe2O3/FeO=0.9191803065,
-    # hence Fe3+/Fe2+=2*0.9191803065=1.838361; row 155 gives 1.6385001231,
-    # hence 3.277000. The factor two converts oxide formula units to Fe cations.
+    # Hand evaluation of Kress & Carmichael 1991 at row 4's printed T and log fO2,
+    # with 1 atm from the cited compilation: Fe2O3/FeO=0.9191803065, hence
+    # Fe3+/Fe2+=2*0.9191803065=1.838361. The factor two converts oxide formula
+    # units to Fe cations.
     prediction4 = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row4)
-    prediction155 = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row155)
     assert prediction4.value is not None
     assert abs(prediction4.value - Decimal("1.838360613")) < Decimal("1e-9")
     printed_log = row4.point_conditions["fO2_log"].state.value
@@ -632,10 +645,11 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     float_reconstruction = Decimal(str(100000.0 * 10.0 ** float(printed_log)))
     if canonical_fo2 != float_reconstruction:
         assert prediction4.identity.fO2_Pa.value != float_reconstruction
+    row155 = rows_by_id[f"{extract.stem}::borisov_2018_table2_row_155"]
+    prediction155 = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row155)
     assert prediction155.value is not None
     assert abs(prediction155.value - Decimal("3.277000246")) < Decimal("1e-9")
     assert prediction4.refusal_reason is None
-    assert prediction155.refusal_reason is None
 
     glass_row = replace(
         row4,
@@ -730,10 +744,35 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert "population" not in measured_unknown
     assert (measured_unknown["candidates"], measured_unknown["numeric"]) == (435, 435)
     assert (measured_unknown["certified_numeric"], measured_unknown["flagged_numeric"]) == (425, 10)
+    measured_training = next(
+        row for row in measured_rows
+        if row.get("rail") == Rail.REDOX.value
+        and row.get("source_relation") == "training"
+        and row.get("candidates")
+    )
+    assert measured_training["population"] == "calibration_source_overlap_fit_fidelity"
+    assert (measured_training["candidates"], measured_training["numeric"]) == (223, 223)
+    training_residuals = [
+        residual
+        for residual in residuals
+        if residual.source_relation is score_module.SourceRelation.TRAINING
+    ]
+    assert len(training_residuals) == 223
+    assert sum(
+        "reference_measured_evidence" in residual.exclusions
+        for residual in training_residuals
+    ) == 223
+    assert Decimal(measured_training["metrics"][0]["all_numeric"]["rms"]).quantize(
+        Decimal("0.00001")
+    ) == Decimal("0.11250")
     assert len(residuals) == 435
-    assert all(residual.numeric is not None for residual in residuals)
-    assert all(residual.status is not ResidualStatus.REFUSED for residual in residuals)
-    assert all(residual.numeric.operation.value == "dex" for residual in residuals)
+    assert all(residual.numeric is not None for residual in training_residuals)
+    assert all(
+        residual.status is not ResidualStatus.REFUSED for residual in training_residuals
+    )
+    assert all(
+        residual.numeric.operation.value == "dex" for residual in training_residuals
+    )
 
     conflicting_fo2 = replace(
         row4,
@@ -930,6 +969,216 @@ def test_borisov_redox_headline_is_unknown_pending_kc91_registration(tmp_path):
     assert measured_fit[4] == measured_fit[5] == "435"
     assert measured_fit[6] == "425"
     assert measured_fit[7] == "10"
+
+
+def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_path):
+    root = Path(__file__).resolve().parents[2]
+    extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
+    migrator = migrate_one_extract(root, extract)
+    migrator.finalize()
+    result = migrator.result
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        result.observations,
+        origins={key: extract.name for key in result.observations},
+        benches=result.benches,
+    )
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    records = headline_payload_records(
+        [residual_to_plain(residual) for residual in residuals],
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        observations=result.observations,
+        origins={key: extract.name for key in result.observations},
+    )
+    object_records = score_module.headline_records(
+        residuals,
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    accumulator = score_module._ScorePayloadAccumulator(
+        context, (Engine.INTERNAL_ANALYTICAL,)
+    )
+    for residual in residuals:
+        accumulator.add(score_module.residual_to_plain(residual))
+    accumulator_records = accumulator.headline_records()
+    for headline in (records, object_records, accumulator_records):
+        assert {
+            record.get("population") for record in headline if record.get("population")
+        } == {"independent_source_accuracy"}
+        assert not any(
+            record.get("population") == "calibration_source_overlap_fit_fidelity"
+            or record.get("source_relation") == "training"
+            for record in headline
+        )
+        measured_redox = [
+            record
+            for record in headline
+            if record.get("tier") == "measured"
+            and record.get("rail") == Rail.REDOX.value
+            and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+        ]
+        assert len(measured_redox) == 1
+        independent = measured_redox[0]
+        assert independent["population"] == "independent_source_accuracy"
+        assert independent["source_relation"] == "independent"
+        assert independent["n_candidates"] == 31
+        assert independent["n_refused"] == 31
+        assert independent["n"] == 0
+        assert independent["n_scored"] == 0
+        assert independent["rms_dex"] is None
+        assert independent["median_dex"] is None
+
+    fixture_extract = tmp_path / "data/literature/extracts" / extract.name
+    fixture_extract.parent.mkdir(parents=True)
+    shutil.copy2(extract, fixture_extract)
+    write_outputs(result, tmp_path)
+    subprocess.run(["git", "init", "--quiet", str(tmp_path)], check=True)
+    subprocess.run(["git", "-C", str(tmp_path), "add", "data"], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(tmp_path),
+            "-c",
+            "user.name=Battery score test",
+            "-c",
+            "user.email=battery-score-test@example.invalid",
+            "commit",
+            "--quiet",
+            "-m",
+            "Borisov fixture store",
+        ],
+        check=True,
+    )
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(root / "scripts" / "battery_score.py"),
+            "--root",
+            str(tmp_path),
+            "--engines",
+            Engine.INTERNAL_ANALYTICAL.value,
+            "--rail",
+            Rail.REDOX.value,
+            "--work",
+            "borisov-2018-compilation",
+        ],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    summary = json.loads(
+        (tmp_path / "data/battery/score-summary.json").read_text(encoding="utf-8")
+    )
+    assert {
+        row.get("population") for row in summary["records"] if row.get("population")
+    } == {"independent_source_accuracy"}
+    assert not any(
+        row.get("population") == "calibration_source_overlap_fit_fidelity"
+        or row.get("source_relation") == "training"
+        for row in summary["records"]
+    )
+    production_redox = [
+        row
+        for row in summary["records"]
+        if row.get("tier") == "measured"
+        and row.get("rail") == Rail.REDOX.value
+        and row.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+    ]
+    assert len(production_redox) == 1
+    production_independent = production_redox[0]
+    assert production_independent["population"] == "independent_source_accuracy"
+    assert production_independent["source_relation"] == "independent"
+    assert production_independent["n_candidates"] == 31
+    assert production_independent["n_refused"] == 31
+    assert production_independent["n"] == 0
+    assert production_independent["n_scored"] == 0
+    assert production_independent["rms_dex"] is None
+    report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
+    assert "calibration_source_overlap_fit_fidelity" not in report
+    report_rows = {
+        parts[2]: parts
+        for line in report.splitlines()
+        if line.startswith("| redox | internal-analytical | ")
+        if (parts := [part.strip() for part in line.strip("|").split("|")])
+        and len(parts) == 15
+    }
+    assert set(report_rows) == {"independent_source_accuracy"}
+    independent_row = report_rows["independent_source_accuracy"]
+    assert independent_row[3] == "31"
+    assert independent_row[4] == "31"
+    assert independent_row[5] == "0"
+    assert independent_row[8] == "—"
+
+    measured_completed = subprocess.run(
+        [
+            sys.executable,
+            str(root / "scripts" / "battery_score.py"),
+            "--root",
+            str(tmp_path),
+            "--engines",
+            Engine.INTERNAL_ANALYTICAL.value,
+            "--rail",
+            Rail.REDOX.value,
+            "--work",
+            "borisov-2018-compilation",
+            "--measured-headline",
+        ],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert measured_completed.returncode == 0, measured_completed.stdout + measured_completed.stderr
+    measured_summary = json.loads(
+        (tmp_path / "data/battery/score-summary.json").read_text(encoding="utf-8")
+    )
+    assert {
+        row.get("population")
+        for row in measured_summary["records"]
+        if row.get("population")
+    } == {"independent_source_accuracy"}
+    assert not any(
+        row.get("population") == "calibration_source_overlap_fit_fidelity"
+        or row.get("source_relation") == "training"
+        for row in measured_summary["records"]
+    )
+    measured_redox = [
+        row
+        for row in measured_summary["records"]
+        if row.get("rail") == Rail.REDOX.value
+        and row.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+    ]
+    assert len(measured_redox) == 1
+    measured_independent = measured_redox[0]
+    assert measured_independent["population"] == "independent_source_accuracy"
+    assert measured_independent["source_relation"] == "independent"
+    assert measured_independent["candidates"] == 31
+    assert measured_independent["numeric"] == 0
+    assert measured_independent["refused"] == 31
+    measured_report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
+    assert "calibration_source_overlap_fit_fidelity" not in measured_report
+    measured_rows = [
+        parts
+        for line in measured_report.splitlines()
+        if line.startswith("| redox |")
+        if (parts := [part.strip() for part in line.strip("|").split("|")])
+        and len(parts) == 15
+    ]
+    assert len(measured_rows) == 1
+    assert measured_rows[0][3] == "independent_source_accuracy"
+    assert measured_rows[0][4] == "31"
+    assert measured_rows[0][5] == "0"
+    assert measured_rows[0][8] == "31"
+
+
 
 
 def test_kress91_redox_flags_oxide_outside_its_converter_domain():

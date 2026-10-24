@@ -1,0 +1,35 @@
+source_id: tyurnina-2023-sro-al2o3-sio2-vaporization
+source:
+  citation: 'Tyurnina, N. G., Lopatin, S. I., Shugurov, S. M., Tyurnina, Z. G., Polyakova, I. G. & Balabanova, E. A. (2023). Vapor Formation and the Thermodynamic Properties of the SrO–Al2O3–SiO2 System. Glass Physics and Chemistry, 49(1), 41–49. DOI: 10.1134/S1087659622600909.'
+  doi: 10.1134/S1087659622600909
+  year: 2023
+extraction:
+  method: MinerU table 3 cell mapping with pdftotext-layout row and column reconciliation.
+  date: '2026-10-20'
+  worker: codex-fam33-1020
+review_status: draft
+tables:
+  - page: 6
+    table_index: 2
+    type: partial_pressure
+    quantity: partial_pressure
+    unit: Pa
+    evidence_class: measured_direct
+    phase: gas
+    temperature: {as_printed: '2000', unit: K}
+    values:
+      - {column: 5, species: Sr}
+      - {column: 6, species: SiO}
+      - {column: 7, species: O}
+  - page: 6
+    table_index: 2
+    type: gibbs_table
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: l
+    temperature: {as_printed: '2000', unit: K}
+    values:
+      - {column: 8, species: SrO}
+      - {column: 9, species: Al2O3}
+      - {column: 10, species: SiO2}

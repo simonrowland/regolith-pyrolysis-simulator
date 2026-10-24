@@ -1,0 +1,27 @@
+source_id: itoh-1989-zno-solid-zinc-silicate
+source:
+  citation: >-
+    Itoh, S. and Azakami, T. (1989), Thermodynamic Studies of ZnO in Solid Zinc Silicate,
+    Shigen-to-Sozai 105(9):685-692.
+  doi: 10.2473/shigentosozai.105.685
+  year: 1989
+extraction:
+  method: MinerU table draft emit; Table 6 cell assignments checked against the 600 dpi page 6 render.
+  date: '2026-10-20'
+  worker: fam26-1020
+review_status: draft
+tables:
+  - page: 6
+    table_index: 2
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: cr
+    published_page: 690
+    temperature: {column: 1, unit: K}
+    values:
+      - {column: 2, species: ZnO, quantity: activity}
+      - {column: 3, species: SiO2, quantity: activity}
+      - {column: 4, species: ZnO, quantity: activity}
+      - {column: 5, species: SiO2, quantity: activity}

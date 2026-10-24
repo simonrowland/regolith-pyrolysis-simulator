@@ -26,13 +26,14 @@ from tests.battery.test_waypoints import _bench
 
 
 @pytest.mark.parametrize(
-    ("filename", "observation_selectors", "page", "pdf_page_index"),
+    ("filename", "observation_selectors", "page", "pdf_page_index", "published_page"),
     [
         (
             "kume-2000-cao-activities.yaml",
             ("kume_2000_table2_sample_101",),
-            555,
+            2,
             1,
+            555,
         ),
         (
             "ohta-1996-cao-mgo-al2o3-activities.yaml",
@@ -42,14 +43,16 @@ from tests.battery.test_waypoints import _bench
                 "ohta_1996_al2o3_activity_ca2_spinel_saturation_1873",
                 "ohta_1996_al2o3_activity_ca2_spinel_saturation_1823",
             ),
-            983,
             1,
+            0,
+            983,
         ),
         (
             "seki-2011-ca-o-solubility-fe-cao-al2o3.yaml",
             ("seki_2011_table3_calculated_a_CaO",),
-            1370,
             2,
+            1,
+            1370,
         ),
     ],
 )
@@ -59,6 +62,7 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
     observation_selectors: tuple[str, ...],
     page: int,
     pdf_page_index: int,
+    published_page: int,
 ) -> None:
     migrated = _migrate_real_extract(tmp_path, filename)
     observations = [
@@ -81,7 +85,7 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         assert experiment.locator is not None
         assert experiment.locator.page == page
         assert experiment.locator.pdf_page_index == pdf_page_index
-        assert experiment.locator.published_page == page
+        assert experiment.locator.published_page == published_page
         assert experiment.locator.paragraph
 
     context = ScoreContext(

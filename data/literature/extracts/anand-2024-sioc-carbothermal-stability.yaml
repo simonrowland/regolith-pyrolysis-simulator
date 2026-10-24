@@ -1,0 +1,181 @@
+schema_version: literature_extract.v1
+source_id: anand-2024-sioc-carbothermal-stability
+source:
+  citation: 'Anand, R. and Lu, K. (2024). Understanding thermodynamic stability and carbothermal reduction in SiOC. Materials Chemistry and Physics, 316, 129123.'
+  doi: 10.1016/j.matchemphys.2024.129123
+  year: 2024
+  corpus_asset: raw/anand-2024-sioc-carbothermal-stability/anand-2024-sioc-carbothermal-stability.pdf
+extraction:
+  method: Born-digital pdftotext-layout; Tables 1 and 2 transcribed and checked against a 600 dpi PDF render.
+  date: '2026-10-20'
+  worker: fam30-1020
+  source_note: >-
+    The article reports XPS elemental compositions and computed thermodynamic values for polymer-derived SiOC. Table 1 is XPS
+    composition of whole ceramic samples, not a single phase or a mass-loss result, so it is retained as context. Table 2 and its
+    Gibbs-minimization outputs are model-derived context. The paper gives no quantitative mass-loss or evolved-gas yields; its
+    CO/CO2 statement is qualitative and linked to proposed reactions. The ramp was 2 °C/min under Ar with 300 mL/min gas flow.
+review_status: draft
+species:
+  SiOCH:
+    observations: []
+    context:
+      - observation_id: anand2024_table1_xps_elemental_compositions
+        type: printed_table_context
+        locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '1'}
+        units: atomic percent; composition and ratios as printed
+        values:
+          quantity_as_published: XPS elemental composition and empirical formula of PHMS-TMS-derived SiOC samples
+          candidate_tokens_checked: [residue_component_composition, equilibrium_phase_composition]
+          quantity_token: unavailable
+          schema_gap: The table reports near-surface elemental XPS composition and an empirical formula with mixed-bond SiOC domains and free carbon; no token represents this whole-sample XPS characterization as an equilibrium phase or residue composition.
+          method_class: measured_direct
+          evidence_class: measured_direct
+          analytical_method: X-ray photoelectron spectroscopy (XPS)
+          temperature_kind: precursor pyrolysis temperature, not XPS measurement temperature
+          atmosphere: argon, 99.99% purity
+          heating_rate: 2 °C/min
+          gas_flow_rate: 300 mL/min during heating and cooling
+          printed_rows:
+            - {sample: PHMS-1200, pyrolysis_temperature_C: '1200', Si_at_pct: '24.42', O_at_pct: '46.09', C_at_pct: '29.49', empirical_formula_as_published: 'SiO1.88C0.06 + 1.15 Cfree', C_over_Si: '1.21', O_over_Si: '1.89'}
+            - {sample: PHMS-1400, pyrolysis_temperature_C: '1400', Si_at_pct: '23.3', O_at_pct: '23.69', C_at_pct: '52.99', empirical_formula_as_published: 'SiO1.02C0.49 + 0.53 Cfree', C_over_Si: '2.27', O_over_Si: '1.02'}
+            - {sample: PHMS-1500, pyrolysis_temperature_C: '1500', Si_at_pct: '41.05', O_at_pct: '34.22', C_at_pct: '24.73', empirical_formula_as_published: 'SiO0.8C0.6', C_over_Si: '0.60', O_over_Si: '0.83'}
+            - {sample: PHMS-1600, pyrolysis_temperature_C: '1600', Si_at_pct: '39.73', O_at_pct: '22.18', C_at_pct: '38.09', empirical_formula_as_published: 'SiO0.56C0.72 + 0.24 Cfree', C_over_Si: '0.96', O_over_Si: '0.56'}
+      - observation_id: anand2024_table2_computed_thermodynamics
+        type: printed_table_context
+        locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2'}
+        units: table column units as printed
+        values:
+          quantity_as_published: SiOC domain fractions, thermodynamic formation terms, configurational entropy, and entropy contribution
+          candidate_tokens_checked: [delta_fG, delta_fH, S, equilibrium_phase_composition]
+          method_class: model_derived
+          evidence_class: model_derived
+          reason: The table reports values calculated using a Gibbs free-energy minimization code; none are measurements. The domain fractions are components of mixed-bond SiOC models, not equilibrium phase fractions.
+          calculation_method: Gibbs free-energy minimization code implemented in Mathematica
+          atmosphere: argon
+          printed_rows:
+            - {sample: PHMS-1200, pyrolysis_temperature_C: '1200', f0: '0.79', f1: '0.13', f2: '0.05', f3: '0.02', f4: '0', delta_Gf_as_printed: '−327.10 kJ·K−1·mol−1', delta_Hf_as_printed: '−318.78 kJ·K−1·mol−1', delta_Sf_as_printed: '1.35 J·K−1·mol−1', minus_T_delta_Sf_as_printed_at_1400_C: '−9.45 kJ·mol−1'}
+            - {sample: PHMS-1400, pyrolysis_temperature_C: '1400', f0: '0.14', f1: '0.21', f2: '0.26', f3: '0.33', f4: '0.06', delta_Gf_as_printed: '−224.61 kJ·K−1·mol−1', delta_Hf_as_printed: '−203.92 kJ·K−1·mol−1', delta_Sf_as_printed: '12.37 J·K−1·mol−1', minus_T_delta_Sf_as_printed_at_1400_C: '−20.7 kJ·mol−1'}
+            - {sample: PHMS-1500, pyrolysis_temperature_C: '1500', f0: '0.07', f1: '0.14', f2: '0.24', f3: '0.43', f4: '0.12', delta_Gf_as_printed: '−196.02 kJ·K−1·mol−1', delta_Hf_as_printed: '−175.10 kJ·K−1·mol−1', delta_Sf_as_printed: '11.81 J·K−1·mol−1', minus_T_delta_Sf_as_printed_at_1400_C: '−19.77 kJ·mol−1'}
+            - {sample: PHMS-1600, pyrolysis_temperature_C: '1600', f0: '0.02', f1: '0.07', f2: '0.18', f3: '0.49', f4: '0.24', delta_Gf_as_printed: '−163.36 kJ·K−1·mol−1', delta_Hf_as_printed: '−143.65 kJ·K−1·mol−1', delta_Sf_as_printed: '10.51 J·K−1·mol−1', minus_T_delta_Sf_as_printed_at_1400_C: '−17.60 kJ·mol−1'}
+      - observation_id: anand2024_qualitative_carbothermal_gas_products
+        type: textual_fact
+        locator: {page: 6, published_page: 6, pdf_page_index: 5, section: '3.4. Microstructure evolution'}
+        units: qualitative statement
+        values:
+          quantity_as_published: gas products associated with carbothermal reduction
+          method_class: model_derived
+          evidence_class: model_derived
+          printed_statement: Predominantly CO gas releases during carbothermal reduction along with CO2, as shown in Eqs. (1)–(3).
+          reason: The paper reports no quantitative measured mass loss or gas yield with temperature; this qualitative reaction statement is not a gas-evolution measurement.
+          atmosphere: argon
+          heating_rate: 2 °C/min
+      - observation_id: anand2024_figure1_deferred
+        type: figure_record
+        locator: {page: 2, published_page: 2, pdf_page_index: 1, figure: '1'}
+        units: structure as published
+        values:
+          quantity: precursor_molecular_structure
+          method_class: method_only
+          evidence_class: method_only
+          species: PHMS-TMS precursor
+          phase: precursor
+          temperature: room temperature as described in text
+          axes_as_published: none
+          caption: Molecular structure of the PHMS-TMS precursor.
+          panel: all
+          series: [{name: PHMS-TMS precursor structure, marker_count: 0}]
+          digitisation: deferred to a figure pass
+      - observation_id: anand2024_figure2_deferred
+        type: figure_record
+        locator: {page: 2, published_page: 2, pdf_page_index: 1, figure: '2'}
+        units: intensity as published
+        values:
+          quantity: X-ray diffraction pattern
+          method_class: measured_direct
+          evidence_class: measured_direct
+          species: polymer-derived SiOC samples
+          phase: amorphous SiOC and β-SiC as discussed in text
+          temperature: 1200–1600 °C pyrolysis
+          atmosphere: argon
+          axes_as_published: {x: '2θ (°)', y: 'Intensity [a.u.]'}
+          caption: X-ray diffraction patterns of PHMS-TMS pyrolyzed from 1200 °C to 1600 °C in argon.
+          panel: all
+          series:
+            - {name: PHMS-1200 trace, marker_count: 0}
+            - {name: PHMS-1400 trace, marker_count: 0}
+            - {name: PHMS-1500 trace, marker_count: 0}
+            - {name: PHMS-1600 trace, marker_count: 0}
+            - {name: β-SiC phase-marker diamonds, marker_count: 5}
+            - {name: C phase-marker dots, marker_count: 1}
+          digitisation: deferred to a figure pass
+      - observation_id: anand2024_figure3_deferred
+        type: figure_record
+        locator: {page: 5, published_page: 5, pdf_page_index: 4, figure: '3'}
+        units: intensity [a.u.] versus binding energy [eV]
+        values:
+          quantity: X-ray photoelectron spectra
+          method_class: measured_direct
+          evidence_class: measured_direct
+          species: polymer-derived SiOC samples
+          phase: Si–O–C ceramic surface bonds
+          temperature: 1200–1600 °C pyrolysis
+          axes_as_published: {x: 'Binding Energy (eV)', y: 'Intensity (a.u.)'}
+          caption: XPS survey and high-resolution spectra of PHMS-TMS-derived SiOC samples pyrolyzed at 1200 °C–1600 °C; panels (b) Si2p, (c) C1s, and (d) O1s.
+          panel: a–d
+          series:
+            - {name: PHMS-1200 XPS spectra, marker_count: 0}
+            - {name: PHMS-1400 XPS spectra, marker_count: 0}
+            - {name: PHMS-1500 XPS spectra, marker_count: 0}
+            - {name: PHMS-1600 XPS spectra, marker_count: 0}
+            - {name: fitted XPS components, evidence_class: model_derived, marker_count: 0}
+          digitisation: deferred to a figure pass
+      - observation_id: anand2024_figure4_deferred
+        type: figure_record
+        locator: {page: 5, published_page: 5, pdf_page_index: 4, figure: '4'}
+        units: schematic as published
+        values:
+          quantity: conceptual_carbothermal_reduction_structure
+          method_class: model_derived
+          evidence_class: model_derived
+          species: SiOC to SiC
+          phase: ceramic
+          temperature: not specified in figure
+          axes_as_published: none
+          caption: Illustration of structural changes in SiOC during conversion of SiOC to SiC.
+          panel: all
+          series: [{name: SiOC to SiC structural schematic, marker_count: 0}]
+          digitisation: deferred to a figure pass
+      - observation_id: anand2024_figure5_deferred
+        type: figure_record
+        locator: {page: 6, published_page: 6, pdf_page_index: 5, figure: '5'}
+        units: SEM micrographs as published
+        values:
+          quantity: ceramic_microstructure
+          method_class: measured_direct
+          evidence_class: measured_direct
+          species: polymer-derived SiOC samples
+          phase: ceramic microstructure
+          temperature: 1200–1600 °C pyrolysis
+          axes_as_published: none; image scale bars as printed
+          caption: SEM micrograph of PHMS-TMS pyrolyzed at 1200 °C, 1400 °C, 1500 °C, and 1600 °C; high-resolution images are shown for 1400 °C and 1600 °C.
+          panel: a–d
+          series:
+            - {name: panel a PHMS-1200 SEM, marker_count: 0}
+            - {name: panel b PHMS-1400 SEM and high-resolution view, marker_count: 0}
+            - {name: panel c PHMS-1500 SEM, marker_count: 0}
+            - {name: panel d PHMS-1600 SEM and high-resolution view, marker_count: 0}
+          digitisation: deferred to a figure pass
+      - observation_id: anand2024_text_pore_size_context
+        type: textual_fact
+        locator: {page: 6, published_page: 6, pdf_page_index: 5, section: '3.4. Microstructure evolution'}
+        units: μm
+        values:
+          quantity_as_published: SEM-observed pore size
+          quantity_token: unavailable
+          schema_gap: No quantity token describes the characteristic pore size in these ceramic micrographs.
+          method_class: measured_direct
+          evidence_class: measured_direct
+          phase: polymer-derived SiOC ceramic
+          value_as_printed: 0.5–1 μm
+          condition: PHMS-1600, pyrolyzed at 1600 °C
+          locator: {page: 6, published_page: 6, pdf_page_index: 5, section: '3.4. Microstructure evolution'}

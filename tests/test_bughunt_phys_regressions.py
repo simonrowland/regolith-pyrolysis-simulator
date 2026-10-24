@@ -924,6 +924,102 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     )
 
 
+def _refusal_step_sim() -> PyrolysisSimulator:
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = BatchRecord(snapshots=[])
+    sim._condensation_model = SimpleNamespace(
+        operating_history=[],
+        last_sticking_alpha_provenance_notice={},
+    )
+    sim.runtime_state = {"plain": {"value": 1}}
+    sim.atom_ledger = FakeLedger()
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+    sim._build_chemistry_kernel = lambda: object()
+    return sim
+
+
+def test_successful_step_shares_committed_yield_disposition_rows() -> None:
+    class CommittedRow:
+        def __deepcopy__(self, _memo):
+            raise AssertionError(
+                "committed yield row must stay off the hot deepcopy path"
+            )
+
+    row = CommittedRow()
+    key = (0, "C0", 0)
+    sim = _refusal_step_sim()
+    sim._yield_disposition_ledger_snapshots = {key: row}
+    sim._step_one_hour = lambda: HourSnapshot(hour=4)
+
+    assert sim.step().hour == 4
+    assert sim._yield_disposition_ledger_snapshots[key] is row
+    assert sim.runtime_state == {"plain": {"value": 1}}
+
+
+def test_terminal_refusal_restores_inserted_yield_rows_and_copies_other_roots() -> None:
+    refusal = EvaporationFluxRefusal("terminal", {"reason": "yield-rows"})
+    key = (0, "C0", 0)
+    row = {
+        "gross_events": [
+            {"account": "process.condensation_train", "n": 1},
+        ],
+    }
+    sim = _refusal_step_sim()
+    sim._yield_disposition_ledger_snapshots = {key: row}
+    # A list is not the insert-only dict contract, so rollback must copy it.
+    unlisted = [{"n": 1}]
+    sim._unlisted_yield_shape = unlisted
+
+    def refuse_after_overwrite() -> None:
+        sim.runtime_state["plain"]["value"] = 9
+        sim._unlisted_yield_shape[0]["n"] = 9
+        sim._unlisted_yield_shape.append({"n": 2})
+        sim._yield_disposition_ledger_snapshots[(1, "C5", 0)] = {
+            "gross_events": [],
+        }
+        sim._yield_disposition_ledger_snapshots[key] = {
+            "gross_events": [{"n": 9}],
+        }
+        raise refusal
+
+    sim._step_one_hour = refuse_after_overwrite
+
+    with pytest.raises(EvaporationFluxRefusal) as raised:
+        sim.step()
+
+    assert raised.value is refusal
+    restored = sim._yield_disposition_ledger_snapshots
+    assert isinstance(restored, dict)
+    assert list(restored) == [key]
+    assert restored[key] == {
+        "gross_events": [
+            {"account": "process.condensation_train", "n": 1},
+        ],
+    }
+    assert restored[key] is not row
+    assert restored[key]["gross_events"] is not row["gross_events"]
+    assert sim.runtime_state == {"plain": {"value": 1}}
+    assert sim._unlisted_yield_shape == [{"n": 1}]
+    assert sim._unlisted_yield_shape is not unlisted
+    assert sim._unlisted_yield_shape[0] is not unlisted[0]
+
+
 def test_unsupported_refusal_snapshot_graph_raises_typed_error() -> None:
     sim = object.__new__(PyrolysisSimulator)
     sim.runtime_state = {"unsupported": memoryview(b"not-deepcopyable")}
