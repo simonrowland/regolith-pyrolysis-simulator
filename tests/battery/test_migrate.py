@@ -4680,7 +4680,7 @@ def test_langmuir_migrated_rows_keep_qualified_derived_from() -> None:
     )
     assert observations["potassium_silicate_vacuum"].derived_from == (
         "kems-005-fedkin-2006::context::fedkin_2006_k_yu_langmuir",
-        "kems-005-fedkin-2006::fedkin_2006_k_class_b1",
+        "kems-005-fedkin-2006::context::fedkin_2006_k_class_b1",
     )
     assert observations["iron_olivine_kems"].derived_from is None
 
