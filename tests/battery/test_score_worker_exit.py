@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import signal
 import subprocess
 import sys
 import textwrap
@@ -121,3 +122,80 @@ def test_replacing_idle_score_worker_reaps_old_spawn_before_exit(
 
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert output.read_text(encoding="utf-8") == "replacement output written\n"
+
+
+def test_sigterm_ignoring_score_worker_is_killed_and_reaped(tmp_path: Path) -> None:
+    driver = tmp_path / "score_worker_sigkill.py"
+    output = tmp_path / "sigkill-output.txt"
+    driver.write_text(
+        textwrap.dedent(
+            """
+            import multiprocessing
+            import signal
+            import sys
+            from pathlib import Path
+
+            from simulator.battery.residue import _stop_openimcc_evaluation_process
+
+            def ignore_sigterm(ready, never_release):
+                signal.signal(signal.SIGTERM, signal.SIG_IGN)
+                ready.set()
+                never_release.wait()
+
+            def main():
+                context = multiprocessing.get_context("spawn")
+                ready = context.Event()
+                never_release = context.Event()
+                process = context.Process(
+                    target=ignore_sigterm,
+                    args=(ready, never_release),
+                    daemon=True,
+                )
+                process.start()
+                assert ready.wait(10), "worker did not install SIGTERM handler"
+
+                class Connection:
+                    def send(self, _message):
+                        pass
+
+                    def close(self):
+                        pass
+
+                _stop_openimcc_evaluation_process(process, Connection())
+                assert process.exitcode == -signal.SIGKILL, process.exitcode
+                assert not process.is_alive()
+                Path(sys.argv[1]).write_text("SIGKILL worker reaped\\n")
+                process.close()
+
+            if __name__ == "__main__":
+                main()
+            """
+        ),
+        encoding="utf-8",
+    )
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = str(Path(__file__).resolve().parents[2])
+
+    process = subprocess.Popen(
+        [sys.executable, str(driver), str(output)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env=environment,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=15)
+    except subprocess.TimeoutExpired:
+        # Without the SIGKILL escalation, multiprocessing's interpreter
+        # shutdown waits forever for this daemon. Kill the test process group
+        # so the mutation test itself cannot leave a child behind.
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.communicate()
+        raise
+
+    assert process.returncode == 0, stdout + stderr
+    assert output.read_text(encoding="utf-8") == "SIGKILL worker reaped\n"

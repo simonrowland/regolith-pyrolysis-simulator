@@ -11440,6 +11440,66 @@ def test_petthermotools_spawn_cleanup_escalates_with_bounded_joins():
     ]
 
 
+def test_petthermotools_partial_start_failure_runs_process_cleanup(monkeypatch):
+    endpoints = []
+
+    class Endpoint:
+        def __init__(self):
+            self.closed = False
+            endpoints.append(self)
+
+        def close(self):
+            self.closed = True
+
+    class PartiallyStartedProcess:
+        pid = None
+
+        def __init__(self):
+            self.joins = []
+
+        def start(self):
+            self.pid = 12345
+            raise OSError('spawn failed after child creation')
+
+        def join(self, *, timeout):
+            self.joins.append(timeout)
+
+        def is_alive(self):
+            return False
+
+    process = PartiallyStartedProcess()
+
+    class Context:
+        def Pipe(self, *, duplex):
+            assert duplex
+            return Endpoint(), Endpoint()
+
+        def Process(self, **_kwargs):
+            return process
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.multiprocessing.get_context',
+        lambda _name: Context(),
+    )
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:
+        backend._run_petthermotools_cold(
+            'equilibrate_MELTS',
+            args=(),
+            kwargs={},
+            timeout_s=1.0,
+        )
+
+    assert (
+        excinfo.value.backend_failure_reason_code
+        == ALPHAMELTS_REASON_SUBPROCESS_DIED
+    )
+    assert process.joins == [0.25]
+    assert len(endpoints) == 2
+    assert all(endpoint.closed for endpoint in endpoints)
+
+
 def test_chemical_potential_library_failure_and_missing_components_are_typed():
     from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
 
