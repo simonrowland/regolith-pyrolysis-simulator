@@ -716,6 +716,11 @@ def effusion_regime_unverified(
         }
     )
     if pressure_sum is None:
+        lower_bound = pressure_detail.get("printed_partial_pressure_lower_bound_Pa")
+        if lower_bound is not None and Decimal(str(lower_bound)) > pressure_limit:
+            # A lower bound already above the limit proves the cell is outside
+            # the regime, even though species coverage is incomplete.
+            pressure_detail["printed_partial_pressure_sum_Pa"] = str(lower_bound)
         checks.append(
             GateCheck(
                 "in_cell_partial_pressure_sum",
@@ -954,12 +959,29 @@ def _printed_in_cell_pressure_sum(
             )
     if not printed:
         return None, {"reason": "no admitted printed partial pressures at this exact point"}
+    # Repeated determinations for one species are not distinct gases. The
+    # largest admitted value per species is a conservative lower bound even
+    # when the printed species coverage is incomplete.
+    selected = {
+        species: max(rows, key=lambda row: (row[0], row[1]))
+        for species, rows in printed.items()
+    }
+    pressure_sum = sum((row[0] for row in selected.values()), Decimal(0))
+    sum_detail = {
+        "printed_partial_pressure_lower_bound_Pa": str(pressure_sum),
+        "printed_partial_pressures_Pa": {
+            species: str(row[0]) for species, row in sorted(selected.items())
+        },
+        "included_observation_ids": sorted(row[1] for row in selected.values()),
+        "point_condition_keys": sorted(conditions),
+    }
     expected = _expected_dominant_vapours(composition)
     if expected is None:
         return None, {
             "reason": "composition does not establish which vapour species could dominate",
             "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
             "printed_species": sorted(printed),
+            **sum_detail,
         }
     covered = set()
     for formula in printed:
@@ -974,23 +996,12 @@ def _printed_in_cell_pressure_sum(
             "required_dominant_species": list(expected),
             "printed_species": sorted(printed),
             "missing_species": missing,
+            **sum_detail,
         }
-    # Multiple points for one species are repeated determinations, not distinct
-    # gases. Use the largest printed value to avoid double-counting and keep
-    # the total-pressure bound conservative.
-    selected = {
-        species: max(rows, key=lambda row: (row[0], row[1]))
-        for species, rows in printed.items()
-    }
-    pressure_sum = sum((row[0] for row in selected.values()), Decimal(0))
     return pressure_sum, {
         "printed_partial_pressure_sum_Pa": str(pressure_sum),
-        "printed_partial_pressures_Pa": {
-            species: str(row[0]) for species, row in sorted(selected.items())
-        },
-        "included_observation_ids": sorted(row[1] for row in selected.values()),
-        "point_condition_keys": sorted(conditions),
         "required_dominant_species": list(expected),
+        **sum_detail,
     }
 
 

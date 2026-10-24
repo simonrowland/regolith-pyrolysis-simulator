@@ -3624,6 +3624,96 @@ def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> N
     assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
+def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses() -> None:
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("Na2O", Decimal("0.25")),
+            ("SiO2", Decimal("0.25")),
+            ("Al2O3", Decimal("0.5")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(composition=composition)
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=False
+    )
+    activity = F.observation(
+        "d274-incomplete-over-limit-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    activity = replace(
+        activity,
+        provenance=_comparison_activity_provenance("same_effective_setup_assumed"),
+    )
+    partial_identity = replace(
+        _partial_identity(),
+        temperature_K=identity.temperature_K,
+        fO2_Pa=identity.fO2_Pa,
+        total_pressure_Pa=identity.total_pressure_Pa,
+        composition=State.of(composition),
+    )
+    sodium = F.observation(
+        "d274-incomplete-over-limit-Na",
+        experiment.experiment_id,
+        partial_identity,
+        Decimal("6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    silicon = F.observation(
+        "d274-incomplete-over-limit-Si",
+        experiment.experiment_id,
+        replace(partial_identity, species=Species("Si", Phase.G)),
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    point_observations = (activity, sodium, silicon)
+    gates = run_validity_gates(
+        experiment, activity, point_observations=point_observations
+    )
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
+    assert pressure_check.detail["reason"] == (
+        "incomplete printed species coverage; pressure sum is only a lower bound"
+    )
+    assert pressure_check.detail["missing_species"] == ["Al"]
+    assert pressure_check.detail["printed_partial_pressure_lower_bound_Pa"] == "11"
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+
+    context = _context(
+        F.work(), experiment, *point_observations, review="reviewed"
+    )
+    residual, _ = compile_residual(
+        activity,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={row.observation_id for row in point_observations},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+        point_observations=point_observations,
+    )
+    # d-274 preserves refusal when the printed lower bound alone exceeds the limit.
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and "in_cell_partial_pressure_sum" in notice.reason
+        for notice in residual.notices
+    )
+
+
 def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures() -> None:
     experiment = F.kems_experiment(calibrated=True, kn=None)
     experiment = replace(

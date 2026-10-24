@@ -1229,9 +1229,6 @@ def _missing_apparatus_fact(
         # not an unverified apparatus fact.
         return None
     if name == "in_cell_partial_pressure_sum" and not getattr(check, "passed", True):
-        pressure_detail = detail.get("pressure_sum_detail")
-        if isinstance(pressure_detail, Mapping):
-            detail = pressure_detail
         if detail.get("printed_partial_pressure_sum_Pa") is None:
             return "in_cell_partial_pressure_sum"
         return None
