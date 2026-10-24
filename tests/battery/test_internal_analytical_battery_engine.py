@@ -213,7 +213,7 @@ def test_internal_analytical_scores_guo_2021_mgo_row() -> None:
         source_id="guo-2021-mgo-activity-cmas-slag",
         observation_id=(
             "guo-2021-mgo-activity-cmas-slag::"
-            "guo_2021_table5_mgo_activities_1873k::T=1873:h=32bc4d012e2d"
+            "guo_2021_table5_mgo_activities_1873k::T=1873.00:h=0ff897900a53"
         ),
     )
 
