@@ -7315,13 +7315,99 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
     fields = QUANTITY_SOURCE_FIELDS[Quantity.ISOTOPE_DELTA]
-    assert fields == ("isotope_delta_isotope_delta",)
-    item = {fields[0]: "2.15"}
-    selected = select_declared_source(Quantity.ISOTOPE_DELTA, "per mil", item)
-    assert selected.amount is not None
-    assert _census_expected_point(
-        item, Quantity.ISOTOPE_DELTA.value, "per mil"
-    ) == selected.amount
+    assert fields == (
+        "isotope_delta_isotope_delta",
+        "delta25Mg_permil",
+        "delta26Mg_permil",
+    )
+    for field in fields:
+        item = {field: "2.15"}
+        selected = select_declared_source(Quantity.ISOTOPE_DELTA, "per mil", item)
+        assert selected.amount is not None
+        assert _census_expected_point(
+            item, Quantity.ISOTOPE_DELTA.value, "per mil"
+        ) == selected.amount
+
+
+def test_mendybaev_table2_splits_isotopes_and_refuses_element_fractions() -> None:
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/mendybaev-2021-cai-low-pressure-h2-evap.yaml"
+    )
+    rows = migrator.result.observations.values()
+
+    def source_rows(observation_id: str):
+        return [row for row in rows if f"::{observation_id}::" in row.observation_id]
+
+    for element in ("Mg", "Si"):
+        unavailable = source_rows(f"mendybaev_2021_table2_fraction_{element}_unavailable")
+        assert len(unavailable) == 17
+        for row in unavailable:
+            assert quantity_token(row.identity) is None
+            assert row.value.kind is ValueKind.UNAVAILABLE
+            assert row.locator.published_page == 29
+            assert row.locator.table == "2"
+            reason = row.identity.quantity.reason or ""
+            assert "per_element_fraction_remaining" in reason
+            assert "f=(X/Al)residue/(X/Al)initial" in reason
+            assert row.identity.temperature_K.value == Decimal("1873.15")
+            condition = row.point_conditions["temperature_C"]
+            assert condition.state.value == Decimal("1600")
+            assert condition.locator.published_page == "7-8"
+
+    expected = {
+        "delta25Mg": {
+            "25Mg/24Mg": {
+                "CAI4B2-2": Decimal("-0.97"),
+                "CAI4B2-16": Decimal("0.04"),
+                "CAI4B2-12": Decimal("2.76"),
+                "CAI4B2-3": Decimal("19.70"),
+                "CAI4B2-14": Decimal("7.18"),
+                "CAI4B2-10": Decimal("15.12"),
+                "CAI4B2-1": Decimal("-1.66"),
+                "CAI4B2-25": Decimal("0.87"),
+                "CAI4B2-22": Decimal("2.51"),
+                "CAI4B2-21": Decimal("10.90"),
+                "CAI4B2-23": Decimal("20.90"),
+            }
+        },
+        "delta26Mg": {
+            "26Mg/24Mg": {
+                "CAI4B2-2": Decimal("-1.90"),
+                "CAI4B2-16": Decimal("0.06"),
+                "CAI4B2-12": Decimal("5.42"),
+                "CAI4B2-3": Decimal("38.89"),
+                "CAI4B2-14": Decimal("14.09"),
+                "CAI4B2-10": Decimal("29.81"),
+                "CAI4B2-1": Decimal("-3.21"),
+                "CAI4B2-25": Decimal("1.64"),
+                "CAI4B2-22": Decimal("4.89"),
+                "CAI4B2-21": Decimal("21.42"),
+                "CAI4B2-23": Decimal("41.51"),
+            }
+        },
+    }
+    from simulator.battery.score import rail_for_quantity
+
+    for observation_id, expected_by_ratio in expected.items():
+        isotope_rows = source_rows(f"mendybaev_2021_table2_{observation_id}")
+        assert len(isotope_rows) == 11
+        ratio, values = next(iter(expected_by_ratio.items()))
+        by_sample = {}
+        for row in isotope_rows:
+            assert quantity_token(row.identity) is Quantity.ISOTOPE_DELTA
+            assert row.identity.subtype.value == ratio
+            assert row.locator.published_page == 29
+            assert row.locator.table == "2"
+            assert row.identity.temperature_K.value == Decimal("1873.15")
+            condition = row.point_conditions["temperature_C"]
+            assert condition.state.value == Decimal("1600")
+            assert condition.locator.published_page == "7-8"
+            assert rail_for_quantity(Quantity.ISOTOPE_DELTA) is None
+            sample = row.observation_id.split("row=", 1)[1].split(":", 1)[0].upper()
+            assert row.value.point.as_tuple() == values[sample].as_tuple()
+            by_sample[sample] = row.value.point
+        assert by_sample == values
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:

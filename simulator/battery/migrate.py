@@ -8693,7 +8693,11 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "T_C",
         "T",
     ),
-    Quantity.ISOTOPE_DELTA: ("isotope_delta_isotope_delta",),
+    Quantity.ISOTOPE_DELTA: (
+        "isotope_delta_isotope_delta",
+        "delta25Mg_permil",
+        "delta26Mg_permil",
+    ),
     Quantity.RESIDUE_COMPONENT_COMPOSITION: (
         "residue_ppm",
         "SiO2_wt_pct",
@@ -15416,6 +15420,10 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
+        if q_token is Quantity.ISOTOPE_DELTA:
+            isotope_ratio = values.get("isotope_ratio")
+            if isinstance(isotope_ratio, str) and isotope_ratio.strip():
+                ident_kwargs["subtype"] = State.of(isotope_ratio.strip())
         if q_token is Quantity.VALENCE_RATIO:
             raw_valence_quantity = values.get("quantity")
             try:
