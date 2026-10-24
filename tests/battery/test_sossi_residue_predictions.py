@@ -207,6 +207,7 @@ def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
     )
 
 
+@pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
 def test_sossi_worker_start_failure_is_recorded_as_transport_error(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
