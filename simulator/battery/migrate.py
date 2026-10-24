@@ -8691,6 +8691,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "wagner_interaction_parameter",
         "epsilon",
         "epsilon_P_i",
+        "epsilon_P_Si",
     ),
     Quantity.TRANSITION_TEMPERATURE: (
         "value_K",

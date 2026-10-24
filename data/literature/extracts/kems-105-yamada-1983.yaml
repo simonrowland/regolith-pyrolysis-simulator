@@ -304,7 +304,7 @@ species:
       units: dimensionless epsilon_P^i and e_P^i as published
       values:
         quantity: wagner_interaction_parameter
-        method_class: measured
+        method_class: model_derived
         T_C_as_printed: 1600
         T_K: 1873.0
         T_K_conversion: authors print 1 600 °C; T_K = 1600 + 273
@@ -331,7 +331,7 @@ species:
           epsilon_P_i_as_printed: 4.6±0.7
           epsilon_uncertainty: 0.7
           e_P_i: 0.037
-          method_class: measured
+          method_class: model_derived
           references_as_printed: Present work
           a_Fe_source: Belton and Fruehan, Met. Trans., 1 (1970), 781 (ref 5)
         - solute: Si
@@ -344,7 +344,7 @@ species:
           epsilon_P_i_as_printed: 11.9±0.6
           epsilon_uncertainty: 0.6
           e_P_i: 0.099
-          method_class: measured
+          method_class: model_derived
           references_as_printed: Present work
           a_Fe_source: Chipman, Fulton, Gokcen and Caskey, Acta Met., 2 (1954), 439 (ref 3)
         - solute: Ti
@@ -357,7 +357,7 @@ species:
           epsilon_P_i_as_printed: -8±2
           epsilon_uncertainty: 2.0
           e_P_i: -0.04
-          method_class: measured
+          method_class: model_derived
           references_as_printed: Present work
           a_Fe_source: Furukawa and Kato, Tetsu-to-Hagane, 61 (1975), 3050 (ref 6)
         - solute: V
@@ -370,7 +370,7 @@ species:
           epsilon_P_i_as_printed: -4.9±0.7
           epsilon_uncertainty: 0.7
           e_P_i: -0.024
-          method_class: measured
+          method_class: model_derived
           references_as_printed: Present work
           a_Fe_source: Furukawa and Kato, Trans. ISIJ, 16 (1976), 382 (ref 7)
         - solute: Cr
@@ -383,7 +383,7 @@ species:
           epsilon_P_i_as_printed: -3.8±0.7
           epsilon_uncertainty: 0.7
           e_P_i: -0.018
-          method_class: measured
+          method_class: model_derived
           references_as_printed: Present work
           a_Fe_source: Raoultian a_Fe = N_Fe (Belton and Fruehan ref 5; Gilby and St. Pierre, Trans. Met.
             Soc. AIME, 245 (1969), 1749, ref 8)
@@ -397,7 +397,7 @@ species:
           epsilon_P_i_as_printed: 0.9±0.7
           epsilon_uncertainty: 0.7
           e_P_i: 0.004
-          method_class: measured
+          method_class: model_derived
           references_as_printed: Present work
           a_Fe_source: Hultgren et al., Selected Values of the Thermodynamic Properties of Binary Alloys,
             ASM (1973), 656 and 874 (ref 9)
@@ -411,7 +411,7 @@ species:
           epsilon_P_i_as_printed: 0.7±0.7
           epsilon_uncertainty: 0.7
           e_P_i: 0.003
-          method_class: measured
+          method_class: model_derived
           references_as_printed: Present work
           a_Fe_source: Hultgren et al. (ref 9)
         - solute: Nb
@@ -424,7 +424,7 @@ species:
           epsilon_P_i_as_printed: -5.4±1.2
           epsilon_uncertainty: 1.2
           e_P_i: -0.012
-          method_class: measured
+          method_class: model_derived
           references_as_printed: Present work
           a_Fe_source: a_Fe assumed to obey Raoult's law; no Fe-Nb activity investigation cited
         - solute: Mo
@@ -437,7 +437,7 @@ species:
           epsilon_P_i_as_printed: -0.4±0.7
           epsilon_uncertainty: 0.7
           e_P_i: 0.001
-          method_class: measured
+          method_class: model_derived
           references_as_printed: Present work
           a_Fe_source: Ichise, Maruo, Sasho, Ueshima and Mori, Tetsu-to-Hagane, 66 (1980), 1075 (ref 10)
         e_column_note: Table 2 e_P^i column is printed with the epsilon values; it is the wt% interaction
@@ -481,7 +481,7 @@ species:
       units: dimensionless epsilon as published
       values:
         quantity: wagner_interaction_parameter
-        method_class: measured
+        method_class: model_derived
         epsilon: 4.0
         epsilon_P_Al_as_printed: 4.0±0.7
         T_C: 1600
@@ -507,6 +507,10 @@ species:
         pdf_page_index: 3
         section: 1. The Fe-P-Si System
         note: Same ion-ratio data recomputed with Fruehan a_Fe instead of Chipman a_Fe
+      point_conditions:
+        solute:
+          state: {tag: value, value: Si}
+          locator: {published_page: 53, pdf_page_index: 3, section: '1. The Fe-P-Si System'}
       standard_state: Henrian gamma_P; epsilon_P^Si at 1600 C using Fruehan a_Fe
       units: dimensionless epsilon as published
       values:
