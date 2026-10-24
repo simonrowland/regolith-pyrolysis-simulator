@@ -3873,7 +3873,41 @@ def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
         notice.kind is NoticeKind.ADMISSION_DEFAULTED
         for notice in figure_only.notices
     )
-    report = validate_corpus(works, experiments, observations, residuals=None)
+    referenced_context_ids = set()
+    for observation in observations.values():
+        referenced_context_ids.update(
+            parent
+            for parent in observation.derived_from or ()
+            if "::context::" in parent
+        )
+        if observation.derivation is not None:
+            referenced_context_ids.update(
+                parent
+                for parent in observation.derivation.inputs
+                if "::context::" in parent
+            )
+    referenced_context_ids.update(
+        experiment.equipment_context_id
+        for experiment in experiments.values()
+        if experiment.equipment_context_id is not None
+    )
+    context_rows = {}
+    for work_path in works_dir.glob("*.yaml"):
+        source = work_path.read_text(encoding="utf-8")
+        if not any(context_id in source for context_id in referenced_context_ids):
+            continue
+        payload = yaml.safe_load(source) or {}
+        for row in payload.get("context") or ():
+            context_id = str(row["context_id"])
+            if context_id in referenced_context_ids:
+                context_rows[context_id] = row
+    report = validate_corpus(
+        works,
+        experiments,
+        observations,
+        residuals=None,
+        context_rows=context_rows,
+    )
     # J02 restored C(derived) derived_from+derivation. Unstated ancestry is a
     # hard conditional_field, not a silent pass. The same holds for a row that
     # declares quoted_attributed but states no attribution: the canonical
