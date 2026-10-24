@@ -15792,6 +15792,21 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         for observation in table1
         if quantity_token(observation.identity) is Quantity.P_PARTIAL
     ]
+    ohara_po = [
+        observation
+        for observation in pressures
+        if observation.observation_id.startswith(
+            f"{source_id}::ohara_1987_table1_partial_pressures_1643k::"
+        )
+    ]
+    assert len(ohara_po) == 20
+    assert all(observation.value.kind is ValueKind.UNAVAILABLE for observation in ohara_po)
+    assert all(
+        "multiple gas-specific printed pressure columns" in (
+            observation.value.unavailable_reason or ""
+        )
+        for observation in ohara_po
+    )
     ion_currents = [
         observation
         for observation in table1

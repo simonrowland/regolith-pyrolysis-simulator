@@ -9674,9 +9674,19 @@ def _selection_from_named_field(
                 unit_trail=trail or "identity",
             )
         if q_token is Quantity.P_PARTIAL:
-            for key, scale in _PARTIAL_PRESSURE_HEADER_SCALES.items():
-                if key not in payload:
-                    continue
+            scaled_pressure_keys = [
+                key for key in _PARTIAL_PRESSURE_HEADER_SCALES if key in payload
+            ]
+            if len(scaled_pressure_keys) > 1:
+                return _unavailable_selection(
+                    "multiple gas-specific printed pressure columns are present; "
+                    "cannot identify one partial pressure from this row",
+                    condition_ranges=condition_ranges,
+                    field_name=", ".join(scaled_pressure_keys),
+                )
+            if scaled_pressure_keys:
+                key = scaled_pressure_keys[0]
+                scale = _PARTIAL_PRESSURE_HEADER_SCALES[key]
                 mantissa = _numeric_field(payload, key)
                 if mantissa is None:
                     return _unavailable_selection(
