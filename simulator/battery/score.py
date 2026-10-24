@@ -9027,7 +9027,8 @@ def predict_with_engine(
             requested_composition=requested,
         )
 
-    handle = _open_cached_battery_handle(engine, handles)
+    handle_map = handles if handles is not None else {}
+    handle = _open_cached_battery_handle(engine, handle_map)
     name = str(getattr(handle, "name", engine.value))
     engine_version: str | None = None
     if engine is Engine.OPENIMCC:
@@ -9163,6 +9164,30 @@ def predict_with_engine(
         if isinstance(borrowed, EnginePrediction):
             return borrowed
         po2 = borrowed
+
+    def engine_call_failure(exc: Exception) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                call_evidence=f"equilibrate_cell:{name}:exception",
+            ),
+            authority=Authority.REFUSED,
+            notices=tuple(extra_notices),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+            refusal_detail={
+                "reason": "engine_call_exception",
+                "exception": type(exc).__name__,
+                "detail": str(exc),
+            },
+            identity=identity,
+            requested_composition=requested,
+            version=engine_version,
+        )
+
     if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION and engine in {
         Engine.VAPOROCK,
         Engine.ALPHAMELTS,
@@ -9213,6 +9238,8 @@ def predict_with_engine(
                 requested_composition=requested,
                 version=engine_version,
             )
+        except Exception as exc:
+            return engine_call_failure(exc)
         else:
             solved_notice = {
                 "kind": "fo2_oxygen_balance_effusion_solved",
@@ -9249,6 +9276,22 @@ def predict_with_engine(
                 mode=PO2_COMMANDED,
                 po2_bar=solved_pO2_bar,
             )
+            try:
+                cell = equilibrate_cell(
+                    handle,
+                    pot,
+                    temperature_K=float(T),
+                    po2=po2,
+                    qualification=qualification,
+                    isolated=use_isolated,
+                    arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+                    physical_pressure_bar=pressure_bar,
+                    native_activity_formula=native_activity_formula,
+                )
+            except Exception as exc:
+                return engine_call_failure(exc)
+    else:
+        try:
             cell = equilibrate_cell(
                 handle,
                 pot,
@@ -9260,18 +9303,8 @@ def predict_with_engine(
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
             )
-    else:
-        cell = equilibrate_cell(
-            handle,
-            pot,
-            temperature_K=float(T),
-            po2=po2,
-            qualification=qualification,
-            isolated=use_isolated,
-            arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
-            physical_pressure_bar=pressure_bar,
-            native_activity_formula=native_activity_formula,
-        )
+        except Exception as exc:
+            return engine_call_failure(exc)
     notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
     refusal = getattr(cell, "refusal_reason", None)
