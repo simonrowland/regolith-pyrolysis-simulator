@@ -3228,7 +3228,31 @@ def assess_qualification_gate(
     }
 
 
-def qualification_notice(gate: Mapping[str, Any]) -> dict[str, Any]:
+def qualification_notice(
+    gate: Mapping[str, Any], *, engine_name: str = "alphamelts"
+) -> dict[str, Any]:
+    if engine_name == "alphamelts":
+        run_anyway = bool(gate.get("composition_valid", True))
+        bypassable = [
+            "certified SiO2 and temperature bands (predict-and-flag)"
+        ]
+        not_bypassable = [
+            "AlphaMELTS 14-oxide basis and non-empty silicate composition input checks",
+            "ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C (certified T min; notice+run, not a pre-launch refusal)",
+            "ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR (1 bar inline in _equilibrate_subprocess)",
+            "fe_free_and_imposed_absolute_fo2 (Na2O/K2O-SiO2 family; not _domain_gate)",
+        ]
+    elif engine_name == "thermoengine":
+        run_anyway = True
+        bypassable = [
+            "ThermoEngine domain gate (bypassed during qualification)",
+            "certified SiO2 and temperature bands (predict-and-flag)",
+        ]
+        not_bypassable = [
+            "ThermoEngine transport failures retain their typed outcomes"
+        ]
+    else:
+        raise ValueError(f"unsupported MELTS-family engine {engine_name!r}")
     return {
         "kind": "melts_domain_gate",
         "authority": AUTHORITY_EXTRAPOLATED,
@@ -3240,16 +3264,9 @@ def qualification_notice(gate: Mapping[str, Any]) -> dict[str, Any]:
         "temperature_in_band": bool(gate.get("temperature_in_band")),
         "below_crash_floor": bool(gate.get("below_crash_floor")),
         "sio2_wt_pct": gate.get("sio2_wt_pct"),
-        "run_anyway": bool(gate.get("composition_valid", True)),
-        "bypassable_from_harness": [
-            "certified SiO2 and temperature bands (predict-and-flag)"
-        ],
-        "not_bypassable_from_harness": [
-            "AlphaMELTS 14-oxide basis and non-empty silicate composition input checks",
-            "ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C (certified T min; notice+run, not a pre-launch refusal)",
-            "ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR (1 bar inline in _equilibrate_subprocess)",
-            "fe_free_and_imposed_absolute_fo2 (Na2O/K2O-SiO2 family; not _domain_gate)",
-        ],
+        "run_anyway": run_anyway,
+        "bypassable_from_harness": bypassable,
+        "not_bypassable_from_harness": not_bypassable,
     }
 
 
@@ -3916,7 +3933,7 @@ def equilibrate_cell(
     certified_band: dict[str, Any] | None = None
     if qualification and handle.name in MELTS_FAMILY_ENGINES:
         gate = assess_qualification_gate(pot.composition_wt_pct, temperature_K)
-        notices.append(qualification_notice(gate))
+        notices.append(qualification_notice(gate, engine_name=handle.name))
         authority = AUTHORITY_EXTRAPOLATED
         certified_band = dict(gate["certified_band"])
 
@@ -4071,14 +4088,23 @@ def equilibrate_cell(
                     f"(SiO2={sio2_wt_pct:g} wt%, "
                     f"observed_floor={crash_floor_wt_pct:g} wt%)"
                 )
+        alpha_input_validation_reason = (
+            diagnostics.get("backend_failure_reason_code")
+            or diagnostics.get("backend_status_reason")
+        )
+        alpha_input_validation_refusal = (
+            handle.name == "alphamelts"
+            and refusal in {REFUSAL_OUT_OF_BASIS, REFUSAL_MAJOR_SUM}
+            and alpha_input_validation_reason
+            in {"forbidden_species", "major_sum", "silicate_window"}
+        )
         if (
             qualification
             and status == "refusal"
+            and not alpha_input_validation_refusal
             and refusal not in {
                 REFUSAL_TIMEOUT,
                 REFUSAL_ENGINE_CRASH,
-                REFUSAL_OUT_OF_BASIS,
-                REFUSAL_MAJOR_SUM,
             }
         ):
             gate_name = (

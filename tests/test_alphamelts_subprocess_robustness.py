@@ -132,8 +132,8 @@ def test_sigsegv_alphamelts_returns_composition_and_crash_point(tmp_path):
     assert any('SIGSEGV' in warning for warning in result.warnings)
 
 
-def test_sigabrt_child_stderr_is_preserved_in_typed_refusal(monkeypatch):
-    backend = _backend(Path('/tmp/fake-alphamelts'), timeout_s=1.0)
+def test_sigabrt_child_stderr_is_preserved_in_typed_refusal(monkeypatch, tmp_path):
+    backend = _backend(tmp_path / 'fake-alphamelts', timeout_s=1.0)
 
     def fake_run(*_args, **_kwargs):
         return SimpleNamespace(
@@ -158,8 +158,10 @@ def test_sigabrt_child_stderr_is_preserved_in_typed_refusal(monkeypatch):
     )
 
 
-def test_below_crash_floor_sigabrt_keeps_silica_input_diagnostic(monkeypatch):
-    backend = _backend(Path('/tmp/fake-alphamelts'), timeout_s=1.0)
+def test_below_crash_floor_sigabrt_keeps_silica_input_diagnostic(
+    monkeypatch, tmp_path
+):
+    backend = _backend(tmp_path / 'fake-alphamelts', timeout_s=1.0)
     calls = []
 
     def fake_run(*_args, **_kwargs):

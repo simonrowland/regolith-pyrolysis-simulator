@@ -2008,6 +2008,7 @@ def test_qualification_cell_carries_gate_notice_and_extrapolated_authority() -> 
 )
 def test_alphamelts_qualification_refuses_unsupported_oxide_before_subprocess(
     monkeypatch,
+    tmp_path,
     composition_wt_pct: dict[str, float],
     expected_refusal: str,
 ) -> None:
@@ -2021,7 +2022,7 @@ def test_alphamelts_qualification_refuses_unsupported_oxide_before_subprocess(
     )
     backend = AlphaMELTSBackend()
     backend._mode = "subprocess"
-    backend._binary_path = Path("/unused/alphaMELTS")
+    backend._binary_path = tmp_path / "alphaMELTS"
     subprocess_calls: list[object] = []
 
     def fail_if_subprocess_called(*_args, **_kwargs):
@@ -2049,8 +2050,83 @@ def test_alphamelts_qualification_refuses_unsupported_oxide_before_subprocess(
     assert cell.status == "refusal"
     assert cell.refusal_reason == expected_refusal
     notice = next(n for n in cell.notices if n["kind"] == "melts_domain_gate")
+    assert cell.engine == "alphamelts"
     assert notice["run_anyway"] is False
     assert subprocess_calls == []
+
+
+def test_thermoengine_qualification_notice_matches_transport_execution(
+    monkeypatch,
+) -> None:
+    from engines.alphamelts.thermoengine import ThermoEnginePayload
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    calls: list[dict[str, object]] = []
+
+    class _TransportSpy:
+        engine_version = "fixture-thermoengine"
+
+        def equilibrate(self, **kwargs):
+            calls.append(kwargs)
+            return ThermoEnginePayload(
+                phases_present=("liquid",),
+                phase_masses_kg={"liquid": 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={"SiO2": 69.3, "Al2O3": 29.7},
+                solved_fO2_log=-9.0,
+            )
+
+    backend = ThermoEngineBackend()
+    backend._mode = "thermoengine"
+    backend._engine_version = "fixture-thermoengine"
+    backend._thermoengine_transport = _TransportSpy()
+    monkeypatch.setattr(
+        backend,
+        "_activities_times_antoine_or_fail",
+        lambda *_args, **_kwargs: {},
+    )
+    handle = EngineHandle(
+        name="thermoengine",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="thermoengine_unsupported_alpha_oxide",
+        kato_1993_table4_system=None,
+        why="ThermoEngine qualification keeps its local gate bypass",
+        composition_wt_pct={"SiO2": 69.3, "Al2O3": 29.7, "SrO": 1.0},
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1700.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        qualification=True,
+        isolated=False,
+    )
+
+    notice = next(n for n in cell.notices if n["kind"] == "melts_domain_gate")
+    assert cell.engine == "thermoengine"
+    assert notice["run_anyway"] is True
+    assert any(
+        "ThermoEngine domain gate (bypassed during qualification)" in item
+        for item in notice["bypassable_from_harness"]
+    )
+    assert not any(
+        "AlphaMELTS 14-oxide basis" in item
+        for item in notice["not_bypassable_from_harness"]
+    )
+    assert cell.status == "ok", (
+        cell.refusal_reason,
+        cell.engine_reason,
+        cell.engine_status,
+    )
+    assert len(calls) == 1
+    assert "comp_wt" in calls[0]
 
 
 def test_qualification_temperature_below_and_above_published_band() -> None:
@@ -2070,7 +2146,7 @@ def test_qualification_temperature_below_and_above_published_band() -> None:
     assert 2600.0 > t_max
     assert high["temperature_in_band"] is False
     assert "temperature_range" in high["failed_constraints"]
-    assert qualification_notice(high)["run_anyway"] is True
+    assert qualification_notice(high, engine_name="alphamelts")["run_anyway"] is True
     assert in_band["temperature_in_band"] is True
     # 1100 K (826.85 C) is above the 800 C subprocess min, so the T gate
     # is valid; 1100/1200 K remain requested qualification points below
@@ -2572,6 +2648,49 @@ def test_qualification_inline_adapter_gate_is_gate_refused_in_adapter() -> None:
     assert cell.status == "refusal"
     assert cell.refusal_reason == REFUSAL_GATE_REFUSED_IN_ADAPTER
     assert "fe_free" in (cell.engine_reason or "")
+
+
+def test_thermoengine_generic_domain_refusal_is_gate_refused_in_qualification() -> None:
+    pot = BinaryPot(
+        pot_id="thermoengine_operational_domain_refusal",
+        kato_1993_table4_system=None,
+        why="generic operational refusal",
+        composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
+    )
+
+    class _ThermoEngineOperationalBackend:
+        def equilibrate(self, **kwargs):
+            return SimpleNamespace(
+                status="out_of_domain",
+                diagnostics={
+                    "backend_status_reason": "thermoengine_operational_guard"
+                },
+                warnings=["ThermoEngine operational guard"],
+                activity_coefficients={},
+                vapor_pressures_Pa={},
+                liquid_fraction=None,
+            )
+
+    handle = EngineHandle(
+        name="thermoengine",
+        backend=_ThermoEngineOperationalBackend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1700.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        qualification=True,
+        isolated=False,
+    )
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_GATE_REFUSED_IN_ADAPTER
+    assert cell.engine_reason == "thermoengine_operational_guard"
 
 
 def test_classify_subprocess_died_is_engine_crash() -> None:
