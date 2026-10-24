@@ -39,7 +39,8 @@ worktree, then `python3`. It uses import-spec lookup for the engine's top-level 
 walks from the package source to the Git toplevel, so editable installs are checked where the
 simulator actually loads them. Every `status` and `verify` line prints `RESOLVED=...`. During
 `verify`, a located tree that differs from the `UPSTREAM.pin` `checkout:` path emits a warning
-naming both paths and states that the located tree is the one being verified. If spec lookup
+naming both paths and states that the located tree is the one being verified. Path-valued
+`KEY=value` fields use shell quoting so paths with spaces stay a single value. If spec lookup
 finds nothing, `verify` reports `NOT-LOADED` and keeps its historical fallback selection;
 `UPSTREAM.pin` `checkout:` is not a verification target. Relative `checkout:` paths used for
 the warning are resolved from the main checkout, not a pooled worktree.

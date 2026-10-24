@@ -39,35 +39,18 @@ def _init_git_checkout(path: Path, filename: str, contents: str) -> str:
 
 
 def _reported_path_matches(output: str, key: str, expected: Path) -> bool:
-    # Match the separators used by enginepatch's one-line KEY=value reports.
-    delimiters = {
-        "RESOLVED": (
-            " PYTHON=",
-            " RESOLUTION=",
-            " patches=",
-            " (explicit ",
-            " — ",
-        ),
-        "IMPORTED": (" PIN=",),
-        "PIN": ("; verifying IMPORTED=",),
-    }[key]
-    marker = f"{key}="
     for line in output.splitlines():
-        marker_start = line.find(marker)
-        if marker_start < 0:
-            continue
-        value_start = marker_start + len(marker)
-        end_positions = (
-            line.find(delimiter, value_start) for delimiter in delimiters
-        )
-        value_end = min(
-            (position for position in end_positions if position >= 0),
-            default=len(line),
-        )
         try:
-            return os.path.samefile(line[value_start:value_end], expected)
-        except OSError:
-            return False
+            fields = shlex.split(line)
+        except ValueError:
+            continue
+        for field in fields:
+            field_key, separator, reported = field.partition("=")
+            if separator and field_key == key:
+                try:
+                    return os.path.samefile(reported, expected)
+                except OSError:
+                    return False
     return False
 
 
@@ -90,7 +73,7 @@ def test_reported_path_matches_case_variant_on_case_insensitive_volume(
 def test_reported_path_parser_preserves_spaces_and_trailing_comma(
     tmp_path: Path,
 ) -> None:
-    spaced_checkout = tmp_path / "checkout with spaces"
+    spaced_checkout = tmp_path / "checkout with PYTHON=literal"
     spaced_checkout.mkdir()
     different_checkout = tmp_path / "different"
     different_checkout.mkdir()
@@ -98,15 +81,17 @@ def test_reported_path_parser_preserves_spaces_and_trailing_comma(
     comma_checkout.mkdir()
 
     resolved = (
-        f"vaporock: MATCH RESOLVED={spaced_checkout} "
+        f"vaporock: MATCH RESOLVED={shlex.quote(str(spaced_checkout))} "
         "PYTHON=/usr/bin/python RESOLUTION=located"
     )
     assert _reported_path_matches(resolved, "RESOLVED", spaced_checkout)
     assert not _reported_path_matches(resolved, "RESOLVED", different_checkout)
 
     warning = (
-        f"WARNING: vaporock imported checkout differs; IMPORTED={spaced_checkout} "
-        f"PIN={comma_checkout}; verifying IMPORTED={spaced_checkout}"
+        "WARNING: vaporock imported checkout differs; "
+        f"IMPORTED={shlex.quote(str(spaced_checkout))} "
+        f"PIN={shlex.quote(str(comma_checkout))} ; verifying "
+        f"IMPORTED={shlex.quote(str(spaced_checkout))}"
     )
     assert _reported_path_matches(warning, "IMPORTED", spaced_checkout)
     assert _reported_path_matches(warning, "PIN", comma_checkout)
@@ -155,7 +140,9 @@ def test_enginepatch_refresh_refuses_non_git_dir(tmp_path: Path) -> None:
 def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> None:
     """Verify the imported checkout, including staged drift, not a sibling."""
 
-    main_checkout = tmp_path / "main"
+    scenario_root = tmp_path / "checkout with PYTHON=literal"
+    scenario_root.mkdir()
+    main_checkout = scenario_root / "main"
     _init_git_checkout(main_checkout, "README.md", "main\n")
     project = main_checkout / "worktrees" / "seat"
     _git("worktree", "add", "-q", str(project), "HEAD", cwd=main_checkout)
@@ -163,7 +150,7 @@ def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> 
     script.parent.mkdir(parents=True)
     shutil.copy2(ROOT / "patches" / "scripts" / "enginepatch.sh", script)
 
-    loaded_checkout = tmp_path / "loaded" / "VapoRock"
+    loaded_checkout = scenario_root / "loaded" / "VapoRock"
     package = loaded_checkout / "src" / "vaporock"
     base_sha = _init_git_checkout(
         loaded_checkout,
@@ -173,7 +160,7 @@ def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> 
 
     # This is the checkout the old sibling resolver would inspect. Make its
     # working tree drift so following it would fail verification.
-    stale_sibling = tmp_path / "VapoRock"
+    stale_sibling = scenario_root / "VapoRock"
     _init_git_checkout(stale_sibling, "engine.py", "STALE = True\n")
     (stale_sibling / "engine.py").write_text("STALE = False\n", encoding="utf-8")
 
@@ -259,7 +246,7 @@ def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> 
     assert f"WARNING: vaporock imported checkout differs" in proc.stdout
     assert _reported_path_matches(proc.stdout, "IMPORTED", loaded_checkout)
     assert _reported_path_matches(proc.stdout, "PIN", stale_sibling)
-    assert f"PYTHON={sys.executable}" in proc.stdout
+    assert _reported_path_matches(proc.stdout, "PYTHON", Path(sys.executable))
     assert "RESOLUTION=located" in proc.stdout
 
     (loaded_checkout / "src/vaporock/__init__.py").write_text(
