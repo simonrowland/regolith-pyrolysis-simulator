@@ -136,13 +136,7 @@ def _openimcc_evaluation_worker(connection, evaluate) -> None:
 _OPENIMCC_EVALUATION_WORKER = None
 
 
-def _close_openimcc_evaluation_worker() -> None:
-    global _OPENIMCC_EVALUATION_WORKER
-    worker = _OPENIMCC_EVALUATION_WORKER
-    _OPENIMCC_EVALUATION_WORKER = None
-    if worker is None:
-        return
-    process, connection, _evaluate = worker
+def _stop_openimcc_evaluation_process(process, connection) -> None:
     try:
         if process.is_alive():
             try:
@@ -151,13 +145,29 @@ def _close_openimcc_evaluation_worker() -> None:
                 pass
             process.join(timeout=1.0)
         if process.is_alive():
-            process.terminate()
+            try:
+                process.terminate()
+            except (OSError, ProcessLookupError):
+                pass
             process.join(timeout=1.0)
         if process.is_alive():
-            process.kill()
+            try:
+                process.kill()
+            except (OSError, ProcessLookupError):
+                pass
             process.join(timeout=1.0)
     finally:
         connection.close()
+
+
+def _close_openimcc_evaluation_worker() -> None:
+    global _OPENIMCC_EVALUATION_WORKER
+    worker = _OPENIMCC_EVALUATION_WORKER
+    _OPENIMCC_EVALUATION_WORKER = None
+    if worker is None:
+        return
+    process, connection, _evaluate = worker
+    _stop_openimcc_evaluation_process(process, connection)
 
 
 atexit.register(_close_openimcc_evaluation_worker)
@@ -172,6 +182,8 @@ def _evaluate_openimcc_isolated(
     if worker is not None and (
         not worker[0].is_alive() or worker[2] is not evaluate
     ):
+        # The process waits on its pipe between calls; retire it before the
+        # global handle is reused for a different evaluator or a respawn.
         _close_openimcc_evaluation_worker()
         worker = None
     if worker is None:
@@ -188,18 +200,17 @@ def _evaluate_openimcc_isolated(
         except Exception as exc:
             try:
                 if process.pid is not None:
-                    if process.is_alive():
-                        process.terminate()
-                    process.join()
+                    _stop_openimcc_evaluation_process(process, parent)
+                    process.close()
+                else:
+                    parent.close()
             except (AssertionError, OSError, ValueError):
                 pass
             try:
-                process.close()
-            except (AssertionError, OSError, ValueError):
+                child.close()
+            except OSError:
                 pass
             finally:
-                parent.close()
-                child.close()
                 _OPENIMCC_EVALUATION_WORKER = None
             raise ResidueEngineTransportError(
                 f"OpenIMCC worker failed to start: {exc}"
@@ -234,18 +245,19 @@ def _evaluate_openimcc_isolated(
                 f"unexpected OpenIMCC worker startup response: {startup!r}"
             )
     process, parent, _evaluate = worker
+    response_received = False
     try:
         try:
             parent.send(kwargs)
         except (OSError, TypeError, ValueError) as exc:
             raise ResidueEngineTransportError(str(exc)) from exc
         if not parent.poll(timeout_s):
-            _close_openimcc_evaluation_worker()
             raise TimeoutError(f"OpenIMCC call timed out after {timeout_s:g}s")
         try:
             response = parent.recv()
         except (EOFError, OSError) as exc:
             raise ResidueEngineTransportError(str(exc)) from exc
+        response_received = True
         if response[0]:
             result_kind, payload = response[1:]
             if result_kind == "openimcc_bridge_result":
@@ -265,10 +277,14 @@ def _evaluate_openimcc_isolated(
             raise ResidueEngineNonconvergence("openimcc", str(detail))
         raise RuntimeError(f"isolated OpenIMCC {error_name}: {detail}")
     except BaseException:
-        _close_openimcc_evaluation_worker()
+        if not response_received:
+            # Before a response, the worker's state is unknown. Once it has
+            # answered, engine errors and nonconvergence leave it idle and reusable.
+            _close_openimcc_evaluation_worker()
         raise
     finally:
-        if not process.is_alive():
+        current = _OPENIMCC_EVALUATION_WORKER
+        if not process.is_alive() and current is not None and current[0] is process:
             _close_openimcc_evaluation_worker()
 
 
