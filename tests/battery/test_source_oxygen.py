@@ -118,13 +118,33 @@ def test_conditioning_cell_gases_remain_visible_but_are_not_scored(source_contex
     assert residual.refusal.detail["derivation"]["inputs"]
 
 
-def test_untyped_1996_alternative_oxygen_columns_keep_closure(source_context, monkeypatch):
+def test_typed_1996_source_oxygen_commands_the_reduced_condition(
+    source_context, monkeypatch
+):
     row = _row(source_context, "stolyarova-1996-cao-alumina-silica-kems", "AlO")
-    # The primary lineage is untyped; other columns depend on sample gases.
-    # Multiple raw columns are not multiple independently eligible conditions.
-    assert _resolve(source_context, row).reason is FallbackReason.UNTYPED_LINEAGE
-    notice = _fallback_notice(source_context, monkeypatch, row, source_context.observations.values())
-    assert "source_oxygen_fallback=lineage_untyped" in notice.reason
+    condition = _resolve(source_context, row)
+    assert isinstance(condition, SourceOxygenCondition)
+    assert condition.observation.observation_id in condition.used_observations
+
+    requests, handles = _capture_engine(monkeypatch, row)
+    residual, candidate = compile_residual(
+        row,
+        Engine.OPENIMCC,
+        context=source_context,
+        handles=handles,
+        point_observations=tuple(source_context.observations.values()),
+    )
+    assert len(requests) == 1
+    assert requests[0].mode == battery.PO2_COMMANDED
+    assert requests[0].po2_bar == pytest.approx(
+        float(condition.observation.value.point) / 1.0e5
+    )
+    assert residual.numeric is not None
+    assert candidate is not None
+    assert (
+        candidate.provenance["source_oxygen_condition"]["observation_id"]
+        == condition.observation.observation_id
+    )
 
 
 def test_no_oxygen_in_supplied_point_records_is_reported(source_context, monkeypatch):
