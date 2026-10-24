@@ -14515,10 +14515,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Query the melt backend for phase assemblage, activities,
         # and vapor pressures at the post-source, post-native composition.
         boundary = self._solve_evaporative_oxygen_boundary() if evaporation_campaign else None
+        equilibrium = None
         if boundary is not None:
             self._reaction_pO2_bar = boundary.reaction_pO2_bar
             self._frozen_evaporation_carriers = boundary.payload[2]._frozen_evaporation_carriers
-        equilibrium = self._get_equilibrium()
+            projected_equilibrium = boundary.payload[3]
+            if (not any(boundary.balance_terms)
+                    and self._evaporation_carrier_zero_reason(projected_equilibrium)
+                    and projected_equilibrium.ledger_transition is None):
+                # The proved zero batch changed no inventory or intrinsic
+                # state. Reuse its condensed solve, then run the live status,
+                # vapor and sulfur hooks at the accepted boundary. Repeating
+                # the native solve here doubled the cold-call latency. A
+                # material transition still requires the live backend path.
+                equilibrium = self._record_equilibrium_status(projected_equilibrium)
+        if equilibrium is None:
+            equilibrium = self._get_equilibrium()
         evap_flux = EvaporationFlux()
         capacity_result = None
         if boundary is not None:
