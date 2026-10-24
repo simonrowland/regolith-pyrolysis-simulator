@@ -572,6 +572,7 @@ class SimSession:
 
     def adjust(self, param: str, value: Any, **kw: Any) -> None:
         sim = self._require_sim()
+        refresh_c0_prediction = False
         if param == "stir_factor":
             # 0.5.2 Phase B P1: clamp at the operator boundary so both
             # consumer subsystems (evaporation linear multiplier +
@@ -622,6 +623,7 @@ class SimSession:
                 # Only import locally to avoid a top-level cycle.
                 from simulator.state import Atmosphere
                 sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+            refresh_c0_prediction = sim.melt.campaign == CampaignPhase.C0
         elif param == "c4_max_temp":
             finite_value = _finite_float(value, "c4_max_temp")
             sim.c4_max_temp_C = finite_value
@@ -715,8 +717,15 @@ class SimSession:
                 if new_pO2 > 0.0:
                     from simulator.state import Atmosphere
                     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+            if (
+                campaign_name == CampaignPhase.C0.name
+                and sim.melt.campaign == CampaignPhase.C0
+            ):
+                refresh_c0_prediction = True
         else:
             raise ValueError(f"unsupported session adjustment {param!r}")
+        if refresh_c0_prediction:
+            sim._refresh_c0_exit_prediction()
         sim.melt.validate_melt_pressures()
 
     def pause(self) -> None:

@@ -13040,7 +13040,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # Apply it before forecasting so the predicted exit matches the
             # geometry the first C0 step will use.
             self._get_turbine_spec()
-            self.campaign_mgr.c0_exit_prediction = self._predict_c0_exit()
+            self._refresh_c0_exit_prediction()
 
         # Initialize shuttle inventory when entering C3 phases
         if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
@@ -13084,6 +13084,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Pass C4 max temp to campaign manager
         self.campaign_mgr.c4_max_temp_C = self.c4_max_temp_C
+
+    def _refresh_c0_exit_prediction(self) -> None:
+        """Recompute the stored C0 exit after a live C0 setpoint change."""
+        self.campaign_mgr.c0_exit_prediction = self._predict_c0_exit()
 
     def is_complete(self) -> bool:
         # C4 typed endpoint refusal is a non-resumable terminal latch
