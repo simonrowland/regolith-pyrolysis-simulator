@@ -86,6 +86,40 @@ def test_stebbins_fusion_values_migrate_with_printed_fields_and_conditions() -> 
         assert observation.point_conditions["pressure_bar"].state.value == Decimal("1")
         assert observation.point_conditions["pressure_bar"].locator == observation.locator
 
+    model_derived_points = {
+        observation_id: enthalpy_points[observation_id]
+        for observation_id in model_derived_ids
+    }
+    measured_parents = {
+        "stebbins_1983_diopside_heat_of_fusion_table_7": "stebbins_1983_diopside_calorimetry_measured_tables_1_3",
+        "stebbins_1983_albite_heat_of_fusion_table_7": "stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5",
+        "stebbins_1983_sanidine_heat_of_fusion_table_7": "stebbins_1983_sanidine_calorimetry_measured_table_3",
+        "stebbins_1983_nepheline_heat_of_fusion_table_7": "stebbins_1983_nepheline_calorimetry_measured_table_3",
+    }
+    for observation_id, observation in model_derived_points.items():
+        assert observation.derived_from
+        assert observation.derivation is not None
+        assert "pdf:stebbins-carmichael-weill-1983" in observation.derived_from
+        assert any(
+            parent.endswith(f"::{measured_parents[observation_id]}")
+            for parent in observation.derived_from
+        )
+        assert set(observation.derivation.inputs).issubset(observation.derived_from)
+
+    lineage_issues = [
+        issue
+        for issue in migrator.result.validation.hard_issues
+        if any(
+            observation_id in str(issue)
+            for observation_id in model_derived_ids
+        )
+        and any(
+            field in str(issue).lower()
+            for field in ("lineage", "derived_from", "derivation")
+        )
+    ]
+    assert lineage_issues == []
+
     entropy_ids = {
         "stebbins_1983_diopside_entropy_of_fusion_discussion": Decimal("84.5168"),
         "stebbins_1983_albite_entropy_of_fusion_abstract": Decimal("45.6056"),
