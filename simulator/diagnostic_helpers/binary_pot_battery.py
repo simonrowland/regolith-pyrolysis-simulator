@@ -4060,6 +4060,17 @@ def equilibrate_cell(
         status, refusal, engine_reason = classify_equilibrate_outcome(result)
         diagnostics = dict(getattr(result, "diagnostics", None) or {})
         engine_annotation = crash_floor_engine_annotation(diagnostics)
+        if engine_annotation == ENGINE_ANNOTATION_CRASH_FLOOR:
+            sio2_wt_pct = finite_float(diagnostics.get("sio2_wt_pct"))
+            crash_floor_wt_pct = finite_float(
+                diagnostics.get("sio2_crash_floor_wt_pct")
+            )
+            if sio2_wt_pct is not None and crash_floor_wt_pct is not None:
+                engine_reason = (
+                    f"{engine_reason}; below_commissioning_silica_floor "
+                    f"(SiO2={sio2_wt_pct:g} wt%, "
+                    f"observed_floor={crash_floor_wt_pct:g} wt%)"
+                )
         if (
             qualification
             and status == "refusal"

@@ -2499,6 +2499,7 @@ class _MELTSBackendSupport(MeltBackend):
                 pending.update({
                     'below_crash_floor': True,
                     'sio2_crash_floor_wt_pct': float(crash_floor),
+                    'sio2_wt_pct': float(assessment.sio2_wt_pct),
                 })
         notice = assessment.notice
         if notice is not None:

@@ -158,6 +158,43 @@ def test_sigabrt_child_stderr_is_preserved_in_typed_refusal(monkeypatch):
     )
 
 
+def test_below_crash_floor_sigabrt_keeps_silica_input_diagnostic(monkeypatch):
+    backend = _backend(Path('/tmp/fake-alphamelts'), timeout_s=1.0)
+    calls = []
+
+    def fake_run(*_args, **_kwargs):
+        calls.append(True)
+        return SimpleNamespace(
+            returncode=-6,
+            stdout='last alphaMELTS menu line',
+            stderr='',
+        )
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.2, 'CaO': 0.4, 'Al2O3': 0.4},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+    )
+
+    assert calls == [True]
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == (
+        ALPHAMELTS_REASON_SUBPROCESS_DIED
+    )
+    assert result.diagnostics['below_crash_floor'] is True
+    assert result.diagnostics['sio2_wt_pct'] == pytest.approx(20.0)
+    assert result.diagnostics['engine_reason'] == (
+        'sio2_below_observed_crash_floor'
+    )
+
+
 @pytest.mark.live_engine
 def test_live_alphamelts_cao_sio2_abort_stays_a_typed_refusal():
     backend = AlphaMELTSBackend()

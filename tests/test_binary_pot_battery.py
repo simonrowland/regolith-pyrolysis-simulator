@@ -2603,7 +2603,17 @@ def _subprocess_death_result(*, annotated: bool):
         "subprocess_failure": {"returncode": -6, "signal": "SIGABRT"},
     }
     if annotated:
+        from engines.engine_commissioning import assess_engine_commissioning
+
+        commissioning = assess_engine_commissioning(
+            "alphamelts", sio2_wt_pct=30.0, temperature_K=1700.0
+        )
         diagnostics["engine_reason"] = "sio2_below_observed_crash_floor"
+        diagnostics["below_crash_floor"] = commissioning.below_crash_floor
+        diagnostics["sio2_wt_pct"] = commissioning.sio2_wt_pct
+        diagnostics["sio2_crash_floor_wt_pct"] = (
+            commissioning.spec.sio2_wt_pct.observed_crash_floor_wt_pct
+        )
     return SimpleNamespace(
         status="out_of_domain",
         diagnostics=diagnostics,
@@ -2650,7 +2660,15 @@ def test_annotated_subprocess_death_carries_engine_annotation() -> None:
     cell = _inline_death_cell(annotated=True)
     assert cell.status == "refusal"
     assert cell.refusal_reason == REFUSAL_ENGINE_CRASH
-    assert cell.engine_reason == "subprocess_died"
+    assert cell.engine_reason.startswith("subprocess_died;")
+    assert "below_commissioning_silica_floor" in cell.engine_reason
+    assert "SiO2=30 wt%" in cell.engine_reason
+    from engines.engine_commissioning import engine_commissioning
+
+    crash_floor = engine_commissioning(
+        "alphamelts"
+    ).sio2_wt_pct.observed_crash_floor_wt_pct
+    assert f"observed_floor={crash_floor:g} wt%" in cell.engine_reason
     assert cell.engine_annotation == "sio2_below_observed_crash_floor"
     assert cell.as_payload()["engine_annotation"] == (
         "sio2_below_observed_crash_floor"
