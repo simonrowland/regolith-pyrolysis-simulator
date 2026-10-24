@@ -19511,9 +19511,15 @@ class Migrator:
             admission, row_point_conditions
         ):
             identity = replace(identity, fO2_Pa=oxygen_state)
+        experiment = self.result.experiments.get(experiment_id)
         if (
-            identity.total_pressure_Pa is None
-            or identity.total_pressure_Pa.is_unknown
+            not _knudsen_effusion_chamber_background_not_for_identity(
+                experiment.method if experiment is not None else None
+            )
+            and (
+                identity.total_pressure_Pa is None
+                or identity.total_pressure_Pa.is_unknown
+            )
         ):
             total_pressure = (point_conditions or {}).get("total_pressure_Pa")
             if (
