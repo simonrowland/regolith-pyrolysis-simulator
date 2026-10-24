@@ -16179,7 +16179,14 @@ class Migrator:
         composition_located = _composition_located_from_values(
             values, locator, role_refusal=composition_role_refusal
         )
-        source_composition = obs.get("composition")
+        source_composition = values.get("composition")
+        if source_composition is None:
+            source_point_conditions = obs.get("point_conditions")
+            source_composition = (
+                source_point_conditions.get("composition")
+                if isinstance(source_point_conditions, Mapping)
+                else None
+            )
         source_composition_state = (
             source_composition.get("state")
             if isinstance(source_composition, Mapping)

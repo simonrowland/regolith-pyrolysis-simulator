@@ -489,13 +489,15 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
 
 
 def _assert_kress91_citation_is_unknown(residuals, observations) -> None:
-    """Every Borisov redox residual is UNKNOWN, and the dex pins stay put.
+    """Kress & Carmichael remains unknown; direct rows lack full compositions.
 
     Kress & Carmichael 1991 is not a registered work. regolith-main is
     registering it under kc91-1022, and these source-relation pins are
     re-pinned once that work lands. The numeric predictions are the
     previous attribution split: calibration overlap versus the other
-    printed sources. That split is no longer the source relation.
+    printed sources. That split is no longer the source relation. The 31 direct
+    Table 1 ratios also cannot be scored because the table omits oxides required
+    by the model; the 404 supplementary rows remain numeric.
     """
 
     assert len(residuals) == 435
@@ -508,35 +510,43 @@ def _assert_kress91_citation_is_unknown(residuals, observations) -> None:
     held_all: list[Decimal] = []
     overlap_admitted: list[Decimal] = []
     held_admitted: list[Decimal] = []
+    refused = [residual for residual in residuals if residual.numeric is None]
+    assert len(refused) == 31
+    assert all(
+        residual.reference.rsplit("::", 1)[-1].startswith("borisov_2018_table1_")
+        and residual.refusal is not None
+        and residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+        and residual.refusal.detail
+        == {"reason": "missing_input", "input": "composition"}
+        and "TiO2 and P2O5" in observations[residual.reference].identity.composition.reason
+        for residual in refused
+    )
     for residual in residuals:
         observation = observations[residual.reference]
         overlap = score_module._kc91_calibration_source_overlap(
             observation.evidence.attribution
         )
-        assert residual.numeric is not None
+        if residual.numeric is None:
+            continue
         value = residual.numeric.value
         (overlap_all if overlap else held_all).append(value)
         if score_module._headline_payload_admits(
             residual_to_plain(residual), tier="measured"
         ):
             (overlap_admitted if overlap else held_admitted).append(value)
-    assert (len(overlap_all), len(held_all)) == (223, 212)
-    assert (len(overlap_admitted), len(held_admitted)) == (213, 212)
+    assert (len(overlap_all), len(held_all)) == (223, 181)
+    assert (len(overlap_admitted), len(held_admitted)) == (0, 0)
     assert Decimal(str(score_module._rms(overlap_all))).quantize(
         Decimal("0.00001")
     ) == Decimal("0.11250")
+    assert Decimal(str(score_module._rms(held_all))).quantize(
+        Decimal("0.00001")
+    ) == Decimal("0.10885")
     assert abs(
-        score_module._rms(overlap_admitted)
-        - Decimal("0.1126289501574099044023575236")
+        score_module._median(overlap_all) - Decimal("-0.034867523522288196")
     ) < Decimal("0.00001")
     assert abs(
-        score_module._median(overlap_admitted) - Decimal("-0.04086499066062312")
-    ) < Decimal("0.00001")
-    assert abs(
-        score_module._rms(held_admitted) - Decimal("0.10468")
-    ) < Decimal("0.00001")
-    assert abs(
-        score_module._median(held_admitted) - Decimal("-0.01574")
+        score_module._median(held_all) - Decimal("-0.016561640746814852")
     ) < Decimal("0.00001")
 
 
@@ -563,7 +573,8 @@ def _assert_unknown_redox_headline(records) -> None:
     assert len(measured) == 1
     row = measured[0]
     assert "population" not in row
-    assert (row["n_candidates"], row["n"]) == (425, 425)
+    assert (row["n_candidates"], row["n"]) == (31, 0)
+    assert row["n_refused"] == 31
     assert row["n_score_eligible"] == 0
 
 
@@ -753,37 +764,22 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         and row.get("candidates")
     )
     assert "population" not in measured_unknown
-    assert (measured_unknown["candidates"], measured_unknown["numeric"]) == (435, 435)
-    assert (measured_unknown["certified_numeric"], measured_unknown["flagged_numeric"]) == (425, 10)
-    measured_training = next(
-        row for row in measured_rows
-        if row.get("rail") == Rail.REDOX.value
-        and row.get("source_relation") == "training"
-        and row.get("candidates")
+    assert (measured_unknown["candidates"], measured_unknown["numeric"]) == (
+        435,
+        404,
     )
-    assert measured_training["population"] == "calibration_source_overlap_fit_fidelity"
-    assert (measured_training["candidates"], measured_training["numeric"]) == (223, 223)
-    training_residuals = [
-        residual
-        for residual in residuals
-        if residual.source_relation is score_module.SourceRelation.TRAINING
-    ]
-    assert len(training_residuals) == 223
-    assert sum(
-        "reference_measured_evidence" in residual.exclusions
-        for residual in training_residuals
-    ) == 223
-    assert Decimal(measured_training["metrics"][0]["all_numeric"]["rms"]).quantize(
-        Decimal("0.00001")
-    ) == Decimal("0.11250")
+    assert (
+        measured_unknown["certified_numeric"],
+        measured_unknown["flagged_numeric"],
+    ) == (0, 10)
+    assert not any(
+        row.get("source_relation") == "training" and row.get("candidates")
+        for row in measured_rows
+    )
+    assert Decimal(
+        measured_unknown["metrics"][0]["all_numeric"]["rms"]
+    ).quantize(Decimal("0.00001")) == Decimal("0.11088")
     assert len(residuals) == 435
-    assert all(residual.numeric is not None for residual in training_residuals)
-    assert all(
-        residual.status is not ResidualStatus.REFUSED for residual in training_residuals
-    )
-    assert all(
-        residual.numeric.operation.value == "dex" for residual in training_residuals
-    )
 
     conflicting_fo2 = replace(
         row4,
@@ -925,8 +921,8 @@ def test_borisov_redox_headline_is_unknown_pending_kc91_registration(tmp_path):
         if line.startswith("| redox | internal-analytical | unknown |")
     )
     assert fit_row[2] == "unknown"
-    assert fit_row[3] == fit_row[5] == "425"
-    assert fit_row[6] == "0"
+    assert fit_row[3] == "31"
+    assert fit_row[5] == fit_row[6] == "0"
 
     measured_completed = subprocess.run(
         [
@@ -959,8 +955,12 @@ def test_borisov_redox_headline_is_unknown_pending_kc91_registration(tmp_path):
         and row.get("candidates")
     )
     assert "population" not in measured_unknown
-    assert (measured_unknown["candidates"], measured_unknown["numeric"]) == (435, 435)
-    assert (measured_unknown["certified_numeric"], measured_unknown["flagged_numeric"]) == (425, 10)
+    assert (measured_unknown["candidates"], measured_unknown["numeric"]) == (31, 0)
+    assert measured_unknown["refused"] == 31
+    assert (
+        measured_unknown["certified_numeric"],
+        measured_unknown["flagged_numeric"],
+    ) == (0, 0)
     measured_report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
     assert not any(
         population in line
@@ -974,12 +974,12 @@ def test_borisov_redox_headline_is_unknown_pending_kc91_registration(tmp_path):
     measured_fit = next(
         [part.strip() for part in line.strip("|").split("|")]
         for line in measured_report.splitlines()
-        if line.startswith("| redox | dex / dex | internal-analytical | unknown |")
+        if line.startswith("| redox | — / — | internal-analytical | unknown |")
     )
     assert measured_fit[3] == "unknown"
-    assert measured_fit[4] == measured_fit[5] == "435"
-    assert measured_fit[6] == "425"
-    assert measured_fit[7] == "10"
+    assert measured_fit[4] == "31"
+    assert measured_fit[5] == measured_fit[6] == measured_fit[7] == "0"
+    assert measured_fit[8] == "31"
 
 
 def test_borisov_redox_headline_paths_keep_unknown_source_relation(tmp_path):
@@ -1085,8 +1085,8 @@ def test_borisov_redox_headline_paths_keep_unknown_source_relation(tmp_path):
     }
     assert set(report_rows) == {"unknown"}
     unknown_row = report_rows["unknown"]
-    assert unknown_row[3] == unknown_row[5] == "425"
-    assert unknown_row[6] == "0"
+    assert unknown_row[3] == "31"
+    assert unknown_row[5] == unknown_row[6] == "0"
 
     measured_completed = subprocess.run(
         [
@@ -1115,7 +1115,7 @@ def test_borisov_redox_headline_paths_keep_unknown_source_relation(tmp_path):
         row.get("population")
         for row in measured_summary["records"]
         if row.get("population")
-    } == {"independent_source_accuracy"}
+    } == set()
     assert not any(
         row.get("population") == "calibration_source_overlap_fit_fidelity"
         or row.get("source_relation") == "training"
@@ -1128,12 +1128,12 @@ def test_borisov_redox_headline_paths_keep_unknown_source_relation(tmp_path):
         and row.get("engine") == Engine.INTERNAL_ANALYTICAL.value
     ]
     assert len(measured_redox) == 1
-    measured_independent = measured_redox[0]
-    assert measured_independent["population"] == "independent_source_accuracy"
-    assert measured_independent["source_relation"] == "independent"
-    assert measured_independent["candidates"] == 31
-    assert measured_independent["numeric"] == 0
-    assert measured_independent["refused"] == 31
+    measured_unknown = measured_redox[0]
+    assert "population" not in measured_unknown
+    assert measured_unknown["source_relation"] == "unknown"
+    assert measured_unknown["candidates"] == 31
+    assert measured_unknown["numeric"] == 0
+    assert measured_unknown["refused"] == 31
     measured_report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
     assert "calibration_source_overlap_fit_fidelity" not in measured_report
     measured_rows = [
@@ -1144,7 +1144,7 @@ def test_borisov_redox_headline_paths_keep_unknown_source_relation(tmp_path):
         and len(parts) == 15
     ]
     assert len(measured_rows) == 1
-    assert measured_rows[0][3] == "independent_source_accuracy"
+    assert measured_rows[0][3] == "unknown"
     assert measured_rows[0][4] == "31"
     assert measured_rows[0][5] == "0"
     assert measured_rows[0][8] == "31"
