@@ -143,10 +143,26 @@ def test_ueda_series_refusals_are_not_collapsed(tmp_path: Path) -> None:
     ):
         obs = result.observations[f"kems-095-ueda-1986::{obs_id}"]
         assert set((obs.point_conditions or {}).keys()) == {"temperature_K"}
-    # Table 2 prints each gamma at BOTH 1873 K and 1973 K: no single point route.
-    # The paper's pp. 1083 and 1085 identify separate weighed N-Co charges, so
-    # the per-charge observation identity is intentional rather than collapsed.
-    table2 = result.observations[
+    # Table 2 now has one observation for each gamma cell, so each point routes
+    # its printed temperature while retaining the unprinted oxygen condition.
+    parent_id = (
         "kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_1p0"
+    )
+    table2_points = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(parent_id + "::")
     ]
-    assert not (table2.point_conditions or {}).get("temperature_K")
+    assert len(table2_points) == 4
+    assert [
+        observation.identity.temperature_K.value for observation in table2_points
+    ] == [
+        Decimal("1873.0"), Decimal("1873.0"),
+        Decimal("1973.0"), Decimal("1973.0"),
+    ]
+    for observation in table2_points:
+        temperature = (observation.point_conditions or {}).get("temperature_K")
+        assert temperature is not None and temperature.state.is_value
+        assert temperature.state.value == observation.identity.temperature_K.value
+        assert observation.identity.fO2_Pa is not None
+        assert observation.identity.fO2_Pa.is_unknown

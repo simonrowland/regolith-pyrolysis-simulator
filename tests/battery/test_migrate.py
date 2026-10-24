@@ -16170,6 +16170,112 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
     assert figure3.identity.quantity.is_unknown
 
 
+def test_ueda_1986_table2_gamma_points_migrate_with_path_conditions(
+    tmp_path: Path,
+) -> None:
+    source_id = "kems-095-ueda-1986"
+    result = _migrate_real_extract(
+        tmp_path,
+        f"{source_id}.yaml",
+        write=False,
+        use_repository_index_row=True,
+    )
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source_id
+        and "ueda_1986_gamma_" in observation.observation_id
+        and "table2" in observation.observation_id
+    ]
+    assert len(observations) == 88
+    _assert_no_hard_issues_for_observations(result, observations)
+
+    binary = (
+        "Integrated in the Ti-Co binary system without consideration of the presence "
+        "of oxygen"
+    )
+    ternary = (
+        "Integrated in the Ti-Co-O ternary system with consideration of the presence "
+        "of oxygen"
+    )
+    expected = {
+        ("Ti", "1873.0", binary): (
+            "1.000", "0.979", "0.908", "0.776", "0.475", "0.236",
+            "0.119", "0.059", "0.034", "0.019", "0.011",
+        ),
+        ("Ti", "1873.0", ternary): (
+            "1.000", "0.979", "0.909", "0.779", "0.479", "0.239",
+            "0.121", "0.060", "0.035", "0.020", "0.011",
+        ),
+        ("Ti", "1973.0", binary): (
+            "1.000", "0.985", "0.934", "0.828", "0.531", "0.284",
+            "0.161", "0.085", "0.050", "0.030", "0.021",
+        ),
+        ("Ti", "1973.0", ternary): (
+            "1.000", "0.985", "0.935", "0.830", "0.535", "0.288",
+            "0.163", "0.086", "0.051", "0.030", "0.021",
+        ),
+        ("Co", "1873.0", binary): (
+            "0.014", "0.020", "0.031", "0.049", "0.120", "0.284",
+            "0.497", "0.727", "0.876", "0.970", "1.000",
+        ),
+        ("Co", "1873.0", ternary): (
+            "0.014", "0.021", "0.032", "0.050", "0.121", "0.284",
+            "0.497", "0.727", "0.876", "0.970", "1.000",
+        ),
+        ("Co", "1973.0", binary): (
+            "0.027", "0.036", "0.048", "0.069", "0.153", "0.332",
+            "0.529", "0.747", "0.895", "0.980", "1.000",
+        ),
+        ("Co", "1973.0", ternary): (
+            "0.028", "0.037", "0.049", "0.070", "0.154", "0.332",
+            "0.529", "0.747", "0.895", "0.980", "1.000",
+        ),
+    }
+    seen = set()
+    for observation in observations:
+        assert quantity_token(observation.identity) is Quantity.ACTIVITY_COEFFICIENT
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_value
+        n_co = observation.identity.composition.value.as_map()["Co"]
+        sample_index = int(n_co * 10)
+        temperature = observation.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        temperature_key = str(temperature.value)
+        assert observation.point_conditions is not None
+        path_condition = observation.point_conditions["integration_path"]
+        assert path_condition.state.is_value
+        path = path_condition.state.value
+        key = (observation.identity.species.formula, temperature_key, path)
+        assert key in expected
+        assert observation.value.point == Decimal(expected[key][sample_index])
+        assert path_condition.locator is not None
+        assert path_condition.locator.published_page == 1085
+        assert path_condition.locator.table == "2"
+        temperature_condition = observation.point_conditions["temperature_K"]
+        assert temperature_condition.state.is_value
+        assert temperature_condition.state.value == temperature.value
+        assert temperature_condition.locator is not None
+        assert temperature_condition.locator.published_page == 1085
+        assert temperature_condition.locator.table == "2"
+        assert observation.locator is not None
+        assert observation.locator.published_page == 1085
+        assert observation.locator.table == "2"
+        assert observation.identity.fO2_Pa is not None
+        assert observation.identity.fO2_Pa.is_unknown
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert observation.derived_from == (f"pdf:{source_id}",)
+        assert observation.derivation is not None
+        assert observation.derivation.relation == (
+            "author_integration_of_mass_spectrometric_ion_ratios"
+        )
+        assert observation.derivation.inputs == (f"pdf:{source_id}",)
+        seen.add((key, sample_index))
+    assert len(seen) == 88
+
+
 def test_ohara_1987_sample_swap_mutation_fails(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
