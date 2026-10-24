@@ -1440,6 +1440,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._campaign_start_condensation: Dict[str, float] = {}
         self._campaign_start_electrical_plus_evaporation_energy = 0.0
         self._campaign_start_O2 = 0.0
+        self._c0_start_train_alkali_kg = 0.0
         self._last_campaign_summary: Optional[dict] = None
 
     # ------------------------------------------------------------------
@@ -13042,6 +13043,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.campaign_mgr.c0_remaining_budget_exit = None
             self.campaign_mgr.c0_forecast_adjustment_notices = []
             self._pending_c0_forecast_adjustment_notices = []
+            self._c0_start_train_alkali_kg = (
+                self._c0_nak_mass_kg_from_atom_moles(
+                    self.atom_ledger.atom_moles_by_account(
+                        'process.condensation_train'
+                    )
+                )
+            )
         self.paused_for_decision = False
         self.pending_decision = None
 
@@ -13121,6 +13129,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _refresh_c0_exit_prediction(self) -> None:
         """Recompute the stored C0 exit after a live C0 setpoint change."""
         self.campaign_mgr.c0_exit_prediction = self._predict_c0_exit()
+
+    @staticmethod
+    def _c0_nak_mass_kg_from_atom_moles(
+        atom_moles: Mapping[str, float],
+        *,
+        starting_mass_kg: float = 0.0,
+    ) -> float:
+        mass_kg = float(starting_mass_kg)
+        for element in ('Na', 'K'):
+            mass_kg += (
+                float(atom_moles.get(element, 0.0))
+                * ATOMIC_WEIGHTS_G_PER_MOL[element]
+                / 1000.0
+            )
+        return mass_kg
 
     def _handle_c0_forecast_adjustment(self, adjusted_field: str) -> None:
         if self.melt.campaign != CampaignPhase.C0:
@@ -14029,9 +14052,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         owners. At startup, the accepted point is the highest sampled
         temperature whose capped Na+K source stays inside the configured
         feed-loss budget. Mid-C0, the stored temperature is checked first and
-        retained while it still fits both budgets; otherwise the candidates
-        are searched from highest to lowest. A mid-C0 call also requires its
-        projected hold to fit the remaining C0 hold allowance.
+        retained while prior plus projected train loss and its evacuation
+        window still fit their budgets; otherwise the candidates are searched
+        from highest to lowest. A mid-C0 call also requires its projected
+        hold to fit the remaining C0 hold allowance.
         """
         cfg = self.campaign_mgr._campaign_config(CampaignPhase.C0)
         budget_raw = (
@@ -14087,19 +14111,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         initial_inventory = getattr(
             getattr(self, 'record', None), 'initial_inventory', None
         )
-        gas_mass_kg = initial_c0_gas_inventory_kg(initial_inventory)
+        if remaining_hold_budget_hr is None:
+            gas_species = (
+                getattr(initial_inventory, 'gas_volatiles_kg', {}) or {}
+            )
+            gas_mass_kg = initial_c0_gas_inventory_kg(initial_inventory)
+        else:
+            gas_species = self._overhead_holdup_species_kg()
+            gas_mass_kg = sum(gas_species.values())
         atom_accounts = self.atom_ledger.mol_by_account()
         alkali_feed_mass_kg = 0.0
         for account in atom_accounts:
             if str(account).startswith('reservoir.'):
                 continue
-            atoms = self.atom_ledger.atom_moles_by_account(account)
-            for element in ('Na', 'K'):
-                alkali_feed_mass_kg += (
-                    float(atoms.get(element, 0.0))
-                    * ATOMIC_WEIGHTS_G_PER_MOL[element]
-                    / 1000.0
+            alkali_feed_mass_kg = self._c0_nak_mass_kg_from_atom_moles(
+                self.atom_ledger.atom_moles_by_account(account),
+                starting_mass_kg=alkali_feed_mass_kg,
+            )
+        alkali_already_to_train_kg = max(
+            0.0,
+            self._c0_nak_mass_kg_from_atom_moles(
+                self.atom_ledger.atom_moles_by_account(
+                    'process.condensation_train'
                 )
+            )
+            - float(getattr(self, '_c0_start_train_alkali_kg', 0.0)),
+        )
 
         max_hold_hr = self.campaign_mgr._max_hold_hr(CampaignPhase.C0)
         max_runtime_hr = float(math.ceil(max_hold_hr))
@@ -14133,11 +14170,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             flux = self._calculate_evaporation(equilibrium)
             inlet = self._subsolidus_transport_inlet_flux(flux)
             demand_kg_hr = float(inlet.total_kg_hr)
-            gas_species = getattr(initial_inventory, 'gas_volatiles_kg', {}) or {}
-            # These load-time kg values define the evacuating gas mixture.
-            # A one-hour normalization supplies kg/h to the transport owner's
-            # composition calculation; pipe capacity is independent of the
-            # normalization's magnitude.
+            # The startup map is the load-time mixture; the mid-run map is
+            # the current ledger holdup. A one-hour normalization supplies
+            # kg/h to the transport owner's composition calculation; pipe
+            # capacity is independent of the normalization's magnitude.
             evacuation_flux = EvaporationFlux(
                 species_kg_hr={
                     str(species): float(kg)
@@ -14166,9 +14202,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 (float(temperature_C) - start_temperature_C)
                 / float(ramp_C_per_hr),
             )
-            # Premise: the Stage-0 gas load is fiat-ledgered at batch load and
-            # the live C0 pipe owner supplies its evacuation mass capacity.
-            # Algebra: t_evac = M_C0_gas / C_evac. Units:
+            # Premise: startup uses the fiat Stage-0 load; a mid-C0 forecast
+            # uses the remaining overhead-gas ledger. The live pipe owner
+            # supplies its evacuation mass capacity. Algebra:
+            # t_evac = M_C0_gas / C_evac. Units:
             # kg / (kg/h) = h. Sanity: lunar M_C0_gas is approximately zero,
             # so t_evac is approximately zero and the T_exit term decides.
             t_evac_hr = (
@@ -14177,13 +14214,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 else (0.0 if gas_mass_kg <= 0.0 else math.inf)
             )
             exit_window_hr = max(t_temperature_hr, t_evac_hr)
-            runtime_exit_window_hr = (
-                float(math.ceil(exit_window_hr))
-                if math.isfinite(exit_window_hr)
-                else math.inf
-            )
+            runtime_exit_campaign_hour = None
+            if math.isfinite(exit_window_hr):
+                if remaining_hold_budget_hr is None:
+                    runtime_exit_window_hr = float(math.ceil(exit_window_hr))
+                else:
+                    # Round the absolute deadline so repeated forecasts do
+                    # not restart the fractional-hour ceiling allowance.
+                    absolute_deadline_hr = (
+                        float(self.melt.campaign_hour) + exit_window_hr
+                    )
+                    runtime_exit_campaign_hour = float(
+                        math.ceil(absolute_deadline_hr)
+                    )
+                    runtime_exit_window_hr = (
+                        runtime_exit_campaign_hour
+                        - float(self.melt.campaign_hour)
+                    )
+            else:
+                runtime_exit_window_hr = math.inf
+                if remaining_hold_budget_hr is not None:
+                    runtime_exit_campaign_hour = math.inf
             hold_hr = min(runtime_exit_window_hr, hold_budget_hr)
-            # Estimate the load-time mixture remaining after the capped hold
+            # Estimate the forecast mixture remaining after the capped hold
             # using the candidate-temperature capacity owner. This is notice
             # data only; it does not mutate the ledgered gas inventory.
             evacuated_gas_mass_kg = min(
@@ -14208,17 +14261,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 limited_flux,
                 dt_hr=hold_hr,
             )
-            alkali_to_train_kg = 0.0
+            alkali_to_train_kg = alkali_already_to_train_kg
             for species, rate in integrated.species_kg_hr.items():
                 atom_moles = self._atom_moles_for_kg(
                     species, float(rate) * hold_hr
                 )
-                for element in ('Na', 'K'):
-                    alkali_to_train_kg += (
-                        float(atom_moles.get(element, 0.0))
-                        * ATOMIC_WEIGHTS_G_PER_MOL[element]
-                        / 1000.0
+                alkali_to_train_kg = (
+                    self._c0_nak_mass_kg_from_atom_moles(
+                        atom_moles,
+                        starting_mass_kg=alkali_to_train_kg,
                     )
+                )
             loss_fraction = (
                 alkali_to_train_kg / alkali_feed_mass_kg
                 if alkali_feed_mass_kg > 0.0
@@ -14267,8 +14320,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if remaining_hold_budget_hr is not None:
                 candidate['remaining_hold_budget_hr'] = hold_budget_hr
                 candidate['runtime_exit_campaign_hour'] = (
-                    float(self.melt.campaign_hour)
-                    + runtime_exit_window_hr
+                    runtime_exit_campaign_hour
                 )
             return candidate
 

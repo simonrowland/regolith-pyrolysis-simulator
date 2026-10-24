@@ -11,6 +11,7 @@ import pytest
 import yaml
 
 import simulator.session as session_module
+from simulator.accounting import MaterialLot
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.campaigns import CampaignManager, c0_exit_run_notice
 from simulator.feedstock_guard import is_blocked_feedstock
@@ -21,7 +22,13 @@ from simulator.session import (
     SimSessionConfig,
     drive_auto_apply,
 )
-from simulator.state import CampaignPhase, DecisionPoint, DecisionType, HourSnapshot
+from simulator.state import (
+    CampaignPhase,
+    DecisionPoint,
+    DecisionType,
+    EvaporationFlux,
+    HourSnapshot,
+)
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -676,6 +683,156 @@ def test_c0_feasible_midrun_reforecast_preserves_the_startup_trajectory():
 
     assert baseline_sim.melt.campaign == reforecasted_sim.melt.campaign
     assert baseline_sim.melt.campaign == CampaignPhase.C0B
+
+
+def test_c0_gas_bearing_noop_adjustments_keep_the_startup_exit_deadline():
+    session = SimSession().start(
+        _config(
+            feedstock_id="mars_phyllosilicate_clay",
+            setpoints=_cross_surface_parity_setpoints(),
+        )
+    )
+    sim = session.simulator
+    startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
+    startup_deadline = startup_prediction["runtime_exit_window_hr"]
+    assert startup_prediction["M_C0_gas_kg"] > 0.0
+    assert startup_deadline > 7.0
+    _target_C, ramp_rate = sim.campaign_mgr._configured_temperature_ramp(
+        CampaignPhase.C0
+    )
+
+    for completed_hour in range(1, 8):
+        snapshot = sim.step()
+        assert snapshot.campaign == CampaignPhase.C0
+        assert sim.melt.campaign_hour == completed_hour
+        if completed_hour not in {1, 7}:
+            continue
+
+        session.adjust(
+            "campaign_override",
+            ramp_rate,
+            campaign="C0",
+            field="ramp_rate",
+        )
+        updated_prediction = sim.campaign_mgr.c0_exit_prediction
+        assert updated_prediction["prediction_status"] == "ok"
+        assert updated_prediction["T_exit_C"] == startup_prediction["T_exit_C"]
+        assert updated_prediction["M_C0_gas_kg"] == (
+            sim.atom_ledger.total_kg_by_account("process.overhead_gas")
+        )
+        assert updated_prediction["runtime_exit_campaign_hour"] == (
+            startup_deadline
+        )
+        assert updated_prediction["runtime_exit_window_hr"] == (
+            startup_deadline - completed_hour
+        )
+        assert sim.campaign_mgr.c0_remaining_budget_exit is None
+
+
+def test_c0_reforecast_counts_alkali_already_lost_during_this_hold(
+    monkeypatch,
+):
+    session = SimSession().start(
+        _config(
+            feedstock_id="mars_phyllosilicate_clay",
+            setpoints=_cross_surface_parity_setpoints(),
+        )
+    )
+    sim = session.simulator
+    startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
+    sim.step()
+    assert sim.melt.campaign == CampaignPhase.C0
+    assert sim.melt.campaign_hour == 1
+
+    feed_alkali_kg = startup_prediction["Na_plus_K_feed_mass_kg"]
+    budget_fraction = startup_prediction["alkali_retention_budget_fraction"]
+    projected_future_loss_kg = feed_alkali_kg * budget_fraction * 0.2
+
+    def project_fixed_future_loss(_flux, *, dt_hr=1.0):
+        integrated = EvaporationFlux(
+            species_kg_hr={"Na": projected_future_loss_kg / dt_hr}
+        )
+        integrated.update_totals()
+        return integrated
+
+    monkeypatch.setattr(
+        sim,
+        "_apply_analytic_evaporation_depletion",
+        project_fixed_future_loss,
+    )
+    remaining_hold_hr = (
+        sim.campaign_mgr._max_hold_hr(CampaignPhase.C0)
+        - sim.melt.campaign_hour
+    )
+    future_prediction = sim._predict_c0_exit(
+        remaining_hold_budget_hr=remaining_hold_hr,
+        preferred_exit_temperature_C=startup_prediction["T_exit_C"],
+    )
+    assert future_prediction["prediction_status"] == "ok"
+
+    current_train_alkali_kg = sim._c0_nak_mass_kg_from_atom_moles(
+        sim.atom_ledger.atom_moles_by_account("process.condensation_train")
+    )
+    prior_c0_loss_kg = max(
+        0.0,
+        current_train_alkali_kg - sim._c0_start_train_alkali_kg,
+    )
+    total_projected_loss_kg = (
+        future_prediction["Na_plus_K_to_train_kg"]
+    )
+    projected_future_loss_kg = total_projected_loss_kg - prior_c0_loss_kg
+    assert 0.0 < projected_future_loss_kg < feed_alkali_kg * budget_fraction
+
+    target_prior_loss_kg = (
+        feed_alkali_kg * budget_fraction - projected_future_loss_kg / 2.0
+    )
+    additional_prior_loss_kg = target_prior_loss_kg - prior_c0_loss_kg
+    assert additional_prior_loss_kg > 0.0
+    na_kg_per_na2o_kg = sim._c0_nak_mass_kg_from_atom_moles(
+        sim._atom_moles_for_kg("Na2O", 1.0)
+    )
+    transferred_na2o_kg = additional_prior_loss_kg / na_kg_per_na2o_kg
+    assert transferred_na2o_kg <= sim.atom_ledger.kg_by_account(
+        "process.cleaned_melt"
+    ).get("Na2O", 0.0)
+    sim.atom_ledger.transfer(
+        "test_c0_prior_alkali_transfer_to_train",
+        debits=(
+            MaterialLot(
+                "process.cleaned_melt",
+                {"Na2O": transferred_na2o_kg},
+                source="C0 accumulated-loss budget test",
+            ),
+        ),
+        credits=(
+            MaterialLot(
+                "process.condensation_train",
+                {"Na2O": transferred_na2o_kg},
+                source="C0 accumulated-loss budget test",
+            ),
+        ),
+        reason="record prior C0 alkali loss to the train",
+    )
+    sim._project_cleaned_melt_from_atom_ledger()
+
+    _target_C, ramp_rate = sim.campaign_mgr._configured_temperature_ramp(
+        CampaignPhase.C0
+    )
+    session.adjust(
+        "campaign_override",
+        ramp_rate,
+        campaign="C0",
+        field="ramp_rate",
+    )
+    failed_prediction = sim.campaign_mgr.c0_exit_prediction
+    assert failed_prediction["prediction_status"] == (
+        "no_candidate_fits_remaining_budget"
+    )
+    assert failed_prediction["T_exit_C"] is None
+    assert failed_prediction["Na_plus_K_feed_loss_fraction"] > budget_fraction
+    assert failed_prediction["remaining_budget_exit_reason"] == (
+        "no_candidate_satisfies_alkali_budget"
+    )
 
 
 def test_c0_adjustment_with_no_remaining_hold_candidate_exits_nonterminally():
