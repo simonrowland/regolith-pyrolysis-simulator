@@ -1,21 +1,25 @@
-"""Mol-native free-evaporation inventory integration for residue predictions."""
+"""Mol-native Langmuir and Knudsen inventory integration for residues."""
 
 from __future__ import annotations
 
 import atexit
+import json
 import math
 import multiprocessing
 import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting.formulas import parse_formula
+from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
 from simulator.battery.oxygen_balance import (
+    OxygenBalanceBracketBoundary,
     _VacuumOxygenChannel,
+    _net_evaporation_pressure_Pa,
     _solve_vacuum_oxygen_balance,
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
@@ -284,8 +288,51 @@ class ResidueInventoryResult:
     residue_mol: Mapping[str, float]
     evaporated_mol: Mapping[str, float]
     pO2_bar_by_step: tuple[float | None, ...]
+    pO2_balance_bracket_boundary_by_step: tuple[
+        OxygenBalanceBracketBoundary | None, ...
+    ]
+    pO2_balance_floor_steps: int
+    pO2_balance_floor_first_step: int | None
+    pO2_balance_floor_time_fraction: float
+    pO2_balance_floor_time_s: float
+    pO2_balance_floor_pO2_bar: float | None
     atom_closure_mol: Mapping[str, float]
     buffer_oxygen_exchange_mol: float = 0.0
+
+
+@dataclass(frozen=True)
+class ResidueMassLossPrediction:
+    mass_loss_fraction: float
+    engine_flags: tuple[str, ...]
+    engine_metadata: Mapping[str, str]
+
+
+@dataclass(frozen=True)
+class _HashimotoGeometryIntegration:
+    composition_wt_pct: dict[str, float]
+    pO2_steps: tuple[float, ...]
+    exhaustion_notices: tuple[dict[str, float | int | str], ...]
+    refusal: ResidueEngineNonconvergence | None
+    atom_closure: dict[str, float]
+    inventory_mol: dict[str, float]
+    evaporated_mol: Mapping[str, float]
+    pO2_balance_floor: dict[str, float | int | None]
+
+    def __iter__(self):
+        # Cohort callers unpack six results, with the balance floor last.
+        # len() stays 5 so index 3 is still the refusal for the sequence test.
+        yield self.composition_wt_pct
+        yield self.pO2_steps
+        yield self.exhaustion_notices
+        yield self.refusal
+        yield self.atom_closure
+        yield self.pO2_balance_floor
+
+    def __getitem__(self, index: int | slice) -> object:
+        return tuple(self)[index]
+
+    def __len__(self) -> int:
+        return 5
 
 
 @dataclass(frozen=True)
@@ -320,6 +367,13 @@ class _ChannelTerms:
     parent_oxygen_demand: float
     oxide_per_product_kg: float
     o2_per_product_kg: float
+
+    def is_active(self, inventory: Mapping[str, float]) -> bool:
+        """Parentless oxygen stays active, including the gas pack's '' token."""
+        return (
+            self.parent_moles_per_product == 0.0
+            or inventory.get(self.source.parent_oxide or "", 0.0) > 0.0
+        )
 
 
 def _formula_terms(formula_text: str) -> tuple[dict[str, float], float]:
@@ -451,6 +505,46 @@ def _atom_totals(
     return dict(totals)
 
 
+def _residue_oxygen_channels(
+    terms: Sequence[_ChannelTerms], inventory: Mapping[str, float],
+) -> tuple[_VacuumOxygenChannel, ...]:
+    return tuple(
+        _VacuumOxygenChannel(
+            species=term.source.species,
+            molar_mass_kg_per_mol=term.molar_mass_kg_mol,
+            oxygen_atoms=term.atom_counts.get("O", 0.0),
+            parent_oxygen_demand=term.parent_oxygen_demand,
+            pO2_exponent=(term.atom_counts.get("O", 0.0) - term.parent_oxygen_demand) / 2.0,
+            alpha=float(term.source.alpha),
+            alpha_source=term.source.alpha_source,
+            active=term.is_active(inventory),
+        )
+        for term in terms
+    )
+
+def _check_residue_atom_residual(element, residual, scale, context):
+    """Shared atom-conservation acceptance; callers retain their arithmetic."""
+    if abs(residual) > max(1.0e-15, 5.0e-12 * scale):
+        raise ResidueInventoryRefusal(
+            "residue_atom_balance_failed",
+            f"{element} atom residual {residual:.17g} mol {context}",
+        )
+
+
+def _residue_atom_closure(initial_totals, final_totals, buffer_oxygen_exchange_mol=0.0):
+    """One scale-aware atom-closure check for both residue paths."""
+    closure = {
+        element: initial_totals.get(element, 0.0)
+        - final_totals.get(element, 0.0)
+        + (buffer_oxygen_exchange_mol if element == "O" else 0.0)
+        for element in sorted(set(initial_totals) | set(final_totals))
+    }
+    for element, residual in closure.items():
+        scale = max(abs(initial_totals.get(element, 0.0)), abs(final_totals.get(element, 0.0)), 1.0e-300)
+        _check_residue_atom_residual(element, residual, scale, "exceeds scale-aware tolerance")
+    return closure
+
+
 def _finite_step_fluxes(
     terms: Sequence[_ChannelTerms],
     inventory_mol: Mapping[str, float],
@@ -458,6 +552,8 @@ def _finite_step_fluxes(
     temperature_K: float,
     area_m2: float,
     pressures_Pa: Mapping[str, float],
+    background_pressure_Pa: float = 0.0,
+    include_below_threshold: bool = False,
 ) -> dict[str, float]:
     """Run the authoritative HKL provider at the solved channel pressures."""
     parent_channels = [term for term in terms if term.parent_moles_per_product > 0.0]
@@ -471,10 +567,12 @@ def _finite_step_fluxes(
             species_formula_registry={},
         ),
         temperature_C=temperature_K - 273.15,
-        pressure_bar=0.0,
+        pressure_bar=background_pressure_Pa / 100_000.0,
         control_inputs={
             "vapour_batch_flux_pressures_Pa": {
-                term.source.species: float(pressures_Pa.get(term.source.species, 0.0))
+                term.source.species: _net_evaporation_pressure_Pa(
+                    float(pressures_Pa.get(term.source.species, 0.0)), background_pressure_Pa
+                )
                 for term in parent_channels
             },
             "overhead_partials_Pa": {
@@ -504,8 +602,8 @@ def _finite_step_fluxes(
                 "gas_resistance_enabled": False,
                 "melt_resistance_enabled": False,
             },
-            "overhead_pressure_pa": 0.0,
-            "commanded_pressure_pa": 0.0,
+            "overhead_pressure_pa": background_pressure_Pa,
+            "commanded_pressure_pa": background_pressure_Pa,
             "stir_factor": 0.0,
         },
     )
@@ -521,10 +619,43 @@ def _finite_step_fluxes(
             "missing_evaporation_alpha",
             f"catalog channels have no executable alpha: {sorted(diagnostic['missing_alpha'])}",
         )
-    return {
-        str(species): float(rate) / _SECONDS_PER_HOUR
-        for species, rate in dict(diagnostic.get("evaporation_flux_kg_hr") or {}).items()
-    }
+    rates = dict(diagnostic.get("evaporation_flux_kg_hr") or {})
+    if include_below_threshold:
+        rates.update((diagnostic.get("below_threshold_evaporation_flux") or {}).get("fluxes_kg_hr") or {})
+    return {str(species): float(rate) / _SECONDS_PER_HOUR for species, rate in rates.items()}
+
+
+def _residue_oxygen_balance(
+    terms,
+    inventory,
+    pressure_at,
+    temperature,
+    background_pressure_Pa=0.0,
+    on_accepted_evaluation=None,
+):
+    """The shared channel stoichiometry and pressure-root call for both paths."""
+    try:
+        root_kwargs = {}
+        if background_pressure_Pa:
+            root_kwargs["background_pressure_Pa"] = background_pressure_Pa
+        if on_accepted_evaluation is not None:
+            root_kwargs["on_accepted_evaluation"] = on_accepted_evaluation
+        return _solve_vacuum_oxygen_balance(
+            pressure_at,
+            _residue_oxygen_channels(terms, inventory),
+            temperature_K=temperature,
+            **root_kwargs,
+        )
+    except ResidueInventoryRefusal:
+        raise
+    except ValueError as exc:
+        # The shared root still emits ValueError for this contract violation.
+        # Preserve its distinction without changing that owner's acceptance.
+        if str(exc).startswith("pressure law exponent mismatch for "):
+            raise ResidueInventoryRefusal(
+                "residue_pressure_law_exponent_mismatch", str(exc)
+            ) from exc
+        raise
 
 
 def integrate_residue_inventory(
@@ -536,6 +667,7 @@ def integrate_residue_inventory(
     duration_s: float,
     area_evolution_m2: Sequence[float] | None = None,
     buffered_fO2_log: float | None = None,
+    background_pressure_Pa: float = 0.0,
 ) -> ResidueInventoryResult:
     """Integrate free evaporation with an engine-specific pressure callback.
 
@@ -545,7 +677,9 @@ def integrate_residue_inventory(
     ``log10(pO2 / bar)`` and the shared R1a balance selects the congruent root.
     The builtin HKL provider then evaluates
     ``J_i = alpha_i * (p_i - p_bulk,i) / sqrt(2*pi*M_i*R*T)`` in mol m^-2 s^-1;
-    here ``p_bulk=0`` and the provider receives the declared area, so its
+    the explicit background ceiling is subtracted once in the shared root and
+    HKL driver (zero for existing vacuum callers). The provider receives
+    net driving pressures and the declared area, so its
     returned kg h^-1 is converted at the boundary back to mol s^-1.
 
     For a parent with inventory ``N`` mol and requested parent draw ``r`` mol
@@ -572,6 +706,8 @@ def integrate_residue_inventory(
             "melt_surface_area_evolution_missing",
             "free evaporation requires an explicit per-step area evolution",
         )
+    if not math.isfinite(background_pressure_Pa) or background_pressure_Pa < 0.0:
+        raise ResidueInventoryRefusal("residue_background_pressure_invalid")
     temperature = float(temperature_K)
     duration = float(duration_s)
     if not math.isfinite(temperature) or temperature <= 0.0:
@@ -596,6 +732,7 @@ def integrate_residue_inventory(
     dt_s = duration / len(areas)
     evaporated: defaultdict[str, float] = defaultdict(float)
     pO2_steps: list[float | None] = []
+    bracket_boundary_steps: list[OxygenBalanceBracketBoundary | None] = []
     buffer_oxygen_exchange_mol = 0.0
 
     # Supplied channels define the supported pressure bundle. Root metadata
@@ -610,6 +747,7 @@ def integrate_residue_inventory(
         ]
         if not active_parent_terms:
             pO2_steps.append(None)
+            bracket_boundary_steps.append(None)
             continue
 
         def pressure_at(log10_pO2_bar: float) -> Mapping[str, float]:
@@ -620,33 +758,26 @@ def integrate_residue_inventory(
             }
             return pressure_model(engine_inventory, float(log10_pO2_bar))
 
+        def accepted_pressure_evaluation(log10_pO2_bar: float) -> None:
+            accepted_callback = getattr(
+                pressure_model, "_on_accepted_evaluation", None
+            )
+            if callable(accepted_callback):
+                accepted_callback(float(log10_pO2_bar))
+
         balance = None
         if buffered_logp is None:
             try:
-                balance = _solve_vacuum_oxygen_balance(
-                pressure_at,
-                tuple(
-                    _VacuumOxygenChannel(
-                        species=term.source.species,
-                        molar_mass_kg_per_mol=term.molar_mass_kg_mol,
-                        oxygen_atoms=term.atom_counts.get("O", 0.0),
-                        parent_oxygen_demand=term.parent_oxygen_demand,
-                        pO2_exponent=(
-                            term.atom_counts.get("O", 0.0)
-                            - term.parent_oxygen_demand
-                        )
-                        / 2.0,
-                        alpha=float(term.source.alpha),
-                        alpha_source=term.source.alpha_source,
-                        active=(
-                            term.parent_moles_per_product == 0.0
-                            or inventory.get(term.source.parent_oxide or "", 0.0) > 0.0
-                        ),
-                    )
-                    for term in terms
-                ),
-                temperature_K=temperature,
+                balance = _residue_oxygen_balance(
+                    terms,
+                    inventory,
+                    pressure_at,
+                    temperature,
+                    background_pressure_Pa,
+                    on_accepted_evaluation=accepted_pressure_evaluation,
                 )
+            except ResidueInventoryRefusal:
+                raise
             except ValueError as exc:
                 # No positive parent pressure is the zero-flux limit, not a
                 # fabricated zero oxygen root. Other missing roots remain typed.
@@ -656,11 +787,13 @@ def integrate_residue_inventory(
                     for term in active_parent_terms
                 ):
                     pO2_steps.append(None)
+                    bracket_boundary_steps.append(None)
                     continue
                 raise ResidueInventoryRefusal(
                     "residue_oxygen_balance_failed", str(exc)
                 ) from exc
             pO2_steps.append(balance.pO2_bar)
+            bracket_boundary_steps.append(balance.bracket_boundary)
             pressures = balance.pressures_Pa
         else:
             pressures = pressure_at(buffered_logp)
@@ -676,6 +809,7 @@ def integrate_residue_inventory(
                         f"invalid pressure for {term.source.species!r}",
                     )
             pO2_steps.append(10.0**buffered_logp)
+            bracket_boundary_steps.append(None)
 
         requested_rates_kg_s = _finite_step_fluxes(
             terms,
@@ -683,6 +817,7 @@ def integrate_residue_inventory(
             temperature_K=temperature,
             area_m2=area_m2,
             pressures_Pa=pressures,
+            background_pressure_Pa=background_pressure_Pa,
         )
         requested_product_mol_s = {
             species: rate_kg_s / term_by_species[species].molar_mass_kg_mol
@@ -767,23 +902,31 @@ def integrate_residue_inventory(
 
     initial_totals = _atom_totals(initial_inventory_mol, {})
     final_totals = _atom_totals(inventory, evaporated)
-    closure = {
-        element: initial_totals.get(element, 0.0)
-        - final_totals.get(element, 0.0)
-        + (buffer_oxygen_exchange_mol if element == "O" else 0.0)
-        for element in sorted(set(initial_totals) | set(final_totals))
-    }
-    for element, residual in closure.items():
-        scale = max(abs(initial_totals.get(element, 0.0)), abs(final_totals.get(element, 0.0)), 1.0e-300)
-        if abs(residual) > max(1.0e-15, 5.0e-12 * scale):
-            raise ResidueInventoryRefusal(
-                "residue_atom_balance_failed",
-                f"{element} atom residual {residual:.17g} mol exceeds scale-aware tolerance",
-            )
+    closure = _residue_atom_closure(
+        initial_totals, final_totals, buffer_oxygen_exchange_mol
+    )
+    floor_step_indices = [
+        index
+        for index, boundary in enumerate(bracket_boundary_steps, start=1)
+        if boundary == "lower"
+    ]
+    floor_steps = len(floor_step_indices)
+    floor_time_s = duration * floor_steps / len(areas)
+    first_floor_step = floor_step_indices[0] if floor_step_indices else None
     return ResidueInventoryResult(
         residue_mol=dict(inventory),
         evaporated_mol=dict(evaporated),
         pO2_bar_by_step=tuple(pO2_steps),
+        pO2_balance_bracket_boundary_by_step=tuple(bracket_boundary_steps),
+        pO2_balance_floor_steps=floor_steps,
+        pO2_balance_floor_first_step=first_floor_step,
+        pO2_balance_floor_time_fraction=floor_time_s / duration,
+        pO2_balance_floor_time_s=floor_time_s,
+        pO2_balance_floor_pO2_bar=(
+            pO2_steps[first_floor_step - 1]
+            if first_floor_step is not None
+            else None
+        ),
         atom_closure_mol=closure,
         buffer_oxygen_exchange_mol=buffer_oxygen_exchange_mol,
     )
@@ -792,6 +935,182 @@ def integrate_residue_inventory(
 def _hashimoto_primary_policy() -> tuple[str, str]:
     """Return the predeclared arm and geometry; this policy has no data input."""
     return _HASHIMOTO_PRIMARY_ALPHA_ARM, _HASHIMOTO_PRIMARY_GEOMETRY
+
+
+@dataclass(frozen=True)
+class KnudsenResidueResult:
+    residue_mol: Mapping[str, float]
+    evaporated_mol: Mapping[str, float]
+    retained_oxygen_atoms_mol: float
+    atom_closure_mol: Mapping[str, float]
+    pO2_bar_by_step: tuple[float, ...]
+
+
+def integrate_knudsen_residue_inventory(
+    initial_inventory_mol: Mapping[str, float],
+    channels: Sequence[ResidueChannel],
+    pressure_model: Callable[[Mapping[str, float], float, float], Mapping[str, float]],
+    *,
+    temperature_path: Sequence[tuple[float, float]],
+    measured_mass_loss_fraction: float,
+    near_saturated: bool,
+    source_fO2_log_by_interval: Sequence[float | None],
+    linear_temperature: bool = False,
+) -> KnudsenResidueResult:
+    """Integrate molecular effusion on the measured *total* mass-loss extent.
+
+    Each path pair is (cumulative kg/kg loss, printed step temperature K).
+    Near saturation, q_i = P_i/sqrt(M_i); the common orifice, Clausing and
+    sqrt(2*pi*R*T) factors cancel. All escaping gases, INCLUDING O and O2,
+    contribute to D = sum(M_i*q_i). Then dn_i = m0*q_i/D * dxi, so
+    sum(M_i*dn_i)/m0 = dxi [kg/kg]. For a single volatile gas this reduces
+    exactly to n_lost = m0*xi/M, independent of its pressure or apparatus.
+
+    Oxide moles track cations for the existing pressure/composition callbacks.
+    Oxygen atoms are tracked separately: source-conditioned O/O2 escape need
+    not match the oxygen in those oxide equivalents. No external oxygen
+    supply or stoichiometric replacement of the effusing O flux is assumed.
+    """
+    if not near_saturated:
+        raise ResidueInventoryRefusal("knudsen_near_saturation_invalid")
+    try:
+        target = float(measured_mass_loss_fraction)
+    except (TypeError, ValueError) as exc:
+        raise ResidueInventoryRefusal("measured_mass_loss_fraction_missing_or_invalid") from exc
+    if not math.isfinite(target) or not 0.0 <= target < 1.0:
+        raise ResidueInventoryRefusal("measured_mass_loss_fraction_missing_or_invalid")
+    inventory = {str(k): float(v) for k, v in initial_inventory_mol.items()}
+    if not inventory or any(not math.isfinite(v) or v < 0.0 for v in inventory.values()):
+        raise ResidueInventoryRefusal("initial_composition_invalid")
+    initial_atoms = _atom_totals(inventory, {})
+    m0 = math.fsum(n * _formula_terms(k)[1] for k, n in inventory.items())
+    if m0 <= 0.0:
+        raise ResidueInventoryRefusal("initial_composition_invalid")
+    try:
+        path = tuple((float(x), float(t)) for x, t in temperature_path)
+    except (TypeError, ValueError) as exc:
+        raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid") from exc
+    if (
+        not path or len(path) != len(source_fO2_log_by_interval)
+        or any(not math.isfinite(x) or not math.isfinite(t) or t <= 0.0
+               or x <= 0.0 or x >= 1.0 for x, t in path)
+        or any(b[0] <= a[0] or b[1] < a[1] for a, b in zip(path, path[1:]))
+        or path[-1][0] < target
+    ):
+        raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid")
+    terms = _channel_terms(channels)
+    if any(term.source.alpha != 1.0 for term in terms):
+        raise ResidueInventoryRefusal("knudsen_equilibrium_channels_required")
+    from scipy.integrate import solve_ivp
+
+    parents = tuple(inventory)
+    gases = tuple(term.source.species for term in terms)
+    oxygen_index = len(parents)
+    gas_offset = oxygen_index + 1
+    state = [inventory[k] for k in parents] + [initial_atoms.get("O", 0.0)] + [0.0] * len(gases)
+    pO2_steps: list[float] = []
+    xi = 0.0
+    previous_endpoint, previous_temperature = 0.0, path[0][1]
+    absolute_tolerance = 1e-12 * math.fsum(inventory.values())
+    for (endpoint, temperature), logp in zip(path, source_fO2_log_by_interval):
+        if logp is not None and (not math.isfinite(logp) or logp > 0.0):
+            raise ResidueInventoryRefusal("oxygen_condition_invalid")
+        stop = min(target, endpoint)
+
+        def derivative(extent, amounts):
+            # Adaptive solver trial stages may cross an exhaustion event. Only
+            # nonnegative, active inventories enter the shared pressure path.
+            current = {k: max(0.0, float(v)) for k, v in zip(parents, amounts)}
+            active = {k: v for k, v in current.items() if v > 0.0}
+            current_temperature = temperature
+            if linear_temperature:
+                fraction = (extent - previous_endpoint) / (endpoint - previous_endpoint)
+                current_temperature = previous_temperature + fraction * (temperature - previous_temperature)
+
+            def pressure_at(p):
+                return pressure_model(active, p, current_temperature)
+
+            if logp is None:
+                try:
+                    balance = _residue_oxygen_balance(terms, current, pressure_at, current_temperature)
+                except ResidueInventoryRefusal:
+                    raise
+                except ValueError as exc:
+                    raise ResidueInventoryRefusal("residue_oxygen_balance_failed", str(exc)) from exc
+                pressures = balance.pressures_Pa
+                pO2_steps.append(balance.pO2_bar)
+            else:
+                pressures = pressure_at(logp)
+                pO2_steps.append(10.0**logp)
+            rates = {}
+            for term in terms:
+                species = term.source.species
+                if not term.is_active(current):
+                    rates[species] = 0.0
+                    continue
+                if species not in pressures:
+                    raise ResidueInventoryRefusal("channel_missing", species)
+                pressure = float(pressures[species])
+                if not math.isfinite(pressure) or pressure < 0.0:
+                    raise ResidueInventoryRefusal("residue_pressure_invalid", species)
+                rates[species] = pressure / math.sqrt(term.molar_mass_kg_mol)
+            denominator = math.fsum(term.molar_mass_kg_mol * rates[term.source.species] for term in terms)
+            if not math.isfinite(denominator) or denominator <= 0.0:
+                raise ResidueInventoryRefusal("knudsen_extent_unreachable")
+            products = {k: m0 * q / denominator for k, q in rates.items()}
+            parent_draw: defaultdict[str, float] = defaultdict(float)
+            oxygen_draw = 0.0
+            for term in terms:
+                rate = products[term.source.species]
+                if term.source.parent_oxide is not None:
+                    parent_draw[term.source.parent_oxide] += rate * term.parent_moles_per_product
+                oxygen_draw += rate * term.atom_counts.get("O", 0.0)
+            if amounts[oxygen_index] == 0.0 and oxygen_draw > 0.0:
+                raise ResidueInventoryRefusal("knudsen_near_saturation_oxygen_exhausted", "oxygen absent from the weighed charge")
+            return ([-parent_draw[k] for k in parents] + [-oxygen_draw]
+                    + [products[k] for k in gases])
+
+        while xi < stop:
+            event_indices = [i for i, k in enumerate(parents)
+                             if state[i] > 0.0 and any(term.source.parent_oxide == k for term in terms)]
+            if state[oxygen_index] > 0.0:
+                event_indices.append(oxygen_index)
+            events = []
+            for index in event_indices:
+                def exhausted(extent, amounts, index=index):
+                    return amounts[index]
+                exhausted.terminal = True
+                exhausted.direction = -1
+                events.append(exhausted)
+            solution = solve_ivp(
+                derivative, (xi, stop), state, method="DOP853", events=events,
+                rtol=1e-8, atol=absolute_tolerance,
+            )
+            if not solution.success:
+                raise ResidueInventoryRefusal("knudsen_extent_nonconvergence", solution.message)
+            state = [float(v) for v in solution.y[:, -1]]
+            xi = float(solution.t[-1])
+            for index, hits in zip(event_indices, solution.t_events):
+                if len(hits):
+                    if index == oxygen_index and xi < stop:
+                        raise ResidueInventoryRefusal(
+                            "knudsen_near_saturation_oxygen_exhausted",
+                            "source-conditioned effusion requires more oxygen than the weighed charge contains",
+                        )
+                    state[index] = 0.0
+            if any(v < -absolute_tolerance for v in state):
+                raise ResidueInventoryRefusal("knudsen_inventory_negative")
+            state = [max(0.0, v) for v in state]
+        previous_endpoint, previous_temperature = endpoint, temperature
+        if xi >= target:
+            break
+    inventory = dict(zip(parents, state[:oxygen_index]))
+    oxygen = state[oxygen_index]
+    evaporated = dict(zip(gases, state[gas_offset:]))
+    final_atoms = _atom_totals(inventory, evaporated)
+    final_atoms["O"] = oxygen + _atom_totals({}, evaporated).get("O", 0.0)
+    closure = _residue_atom_closure(initial_atoms, final_atoms)
+    return KnudsenResidueResult(dict(inventory), dict(evaporated), oxygen, closure, tuple(pO2_steps))
 
 
 def _hashimoto_point_value(record: Mapping[str, Any]) -> float:
@@ -808,6 +1127,1206 @@ def _hashimoto_point_value(record: Mapping[str, Any]) -> float:
     if not math.isfinite(numeric):
         raise ResidueInventoryRefusal("hashimoto_printed_input_invalid")
     return numeric
+
+
+def _omission_proof(record: object) -> tuple[float, float] | None:
+    """Return threshold and computed pressure when the record is a real proof."""
+
+    if not isinstance(record, Mapping):
+        return None
+    try:
+        threshold_pa = float(record.get("reporting_threshold_Pa"))
+        computed_pa = float(record.get("computed_pressure_Pa"))
+    except (TypeError, ValueError):
+        return None
+    if (
+        not math.isfinite(threshold_pa)
+        or not math.isfinite(computed_pa)
+        or computed_pa < 0.0
+        or computed_pa > threshold_pa
+    ):
+        return None
+    return threshold_pa, computed_pa
+
+
+def _translate_recorded_pressure_omissions(
+    pressures: dict[str, float],
+    response: object,
+    required: set[str],
+    notices: list[Any],
+    records_out: dict[str, dict[str, Any]],
+    noticed: set[str],
+) -> None:
+    """Turn only provider-recorded below-threshold omissions into zero pressure.
+
+    Any other absent key stays absent, so the caller still refuses it as missing.
+    """
+
+    diagnostic = getattr(response, "diagnostics", None)
+    if not isinstance(diagnostic, Mapping):
+        return
+    vapor = diagnostic.get("vapor_pressure_diagnostic")
+    if not isinstance(vapor, Mapping):
+        return
+    omissions = vapor.get("below_reporting_threshold_omissions")
+    if not isinstance(omissions, Mapping) or not omissions:
+        return
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _gas_formula_for_oxygen_balance,
+    )
+
+    for key, record in omissions.items():
+        proof = _omission_proof(record)
+        if proof is None or not isinstance(record, Mapping):
+            continue
+        if str(record.get("species")) != str(key):
+            continue
+        try:
+            formula = _gas_formula_for_oxygen_balance(key)
+        except _OxygenBalanceRefusal:
+            continue
+        if formula not in required or formula in pressures:
+            continue
+        threshold_pa, computed_pa = proof
+        pressures[formula] = 0.0
+        records_out[formula] = {
+            "species": str(key),
+            "reporting_threshold_Pa": threshold_pa,
+            "computed_pressure_Pa": computed_pa,
+            "field": record.get("field"),
+            "pressure_rail": record.get("pressure_rail"),
+            "provenance": (
+                "BuiltinVaporPressureProvider.below_reporting_threshold_omissions"
+            ),
+        }
+        if formula in noticed:
+            continue
+        noticed.add(formula)
+        notices.append(
+            Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=(
+                    f"{formula} pressure omitted below reporting threshold "
+                    f"{threshold_pa!r} Pa; computed_pressure_Pa={computed_pa!r}; "
+                    f"field={record.get('field')!r}; "
+                    f"pressure_rail={record.get('pressure_rail')!r}; "
+                    "provenance=BuiltinVaporPressureProvider."
+                    "below_reporting_threshold_omissions"
+                ),
+                origin="Knudsen residue pressure adapter",
+            )
+        )
+
+
+def _append_omission_notices(notices: list[Any], callbacks: Mapping[Any, Any]) -> None:
+    for callback in callbacks.values():
+        for notice in getattr(callback, "below_threshold_omission_notices", ()):
+            if notice not in notices:
+                notices.append(notice)
+
+
+def _make_residue_pressure_model(
+    engine: str,
+    gas_channels: Sequence[tuple[str, Sequence[Any]]],
+    gas_pack: object,
+    *,
+    temperature_K: float,
+    total_pressure_Pa: float,
+    engine_metadata: dict[str, str],
+    engine_flags: set[str],
+    missing_channels_reason: str,
+    caller: str,
+    floor_inversion_diagnostics: dict[str, dict[str, object]] | None = None,
+) -> Callable[[Mapping[str, float], float], Mapping[str, float]]:
+    """Build the engine pressure closure shared by the residue cohorts."""
+    pressure_exponents = {
+        str(species): (
+            1.0
+            if str(species) == "O2"
+            else -float(reaction[2]) / float(reaction[1])
+        )
+        for species, reaction in gas_channels
+    }
+    if engine == "openimcc":
+        from openimcc import evaluate_gas
+        from openimcc.kernel import ImccNonconvergenceError
+
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            _ENGINE_OUTER_TIMEOUT_S,
+        )
+        from simulator.melt_backend import openimcc_bridge
+
+        pressure_state_cache: dict[
+            tuple[tuple[str, float], ...], Mapping[str, float]
+        ] = {}
+
+        def pressure_model(
+            inventory: Mapping[str, float], log10_pO2_bar: float
+        ) -> Mapping[str, float]:
+            key = tuple(
+                sorted((str(oxide), float(amount)) for oxide, amount in inventory.items())
+            )
+            base_pressure_bar = pressure_state_cache.get(key)
+            if base_pressure_bar is None:
+                current_composition = {
+                    oxide: amount for oxide, amount in key if amount > 0.0
+                }
+                try:
+                    state = _evaluate_openimcc_isolated(
+                        openimcc_bridge.evaluate,
+                        timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
+                        composition_mol=current_composition,
+                        temperature_K=temperature_K,
+                        allow_extrapolation=True,
+                        allow_out_of_envelope=True,
+                    )
+                except ImccNonconvergenceError as exc:
+                    raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
+                except TimeoutError as exc:
+                    raise ResidueEngineNonconvergence(
+                        "openimcc",
+                        f"{caller} OpenIMCC timeout: {exc}",
+                        reason=f"engine_timeout:openimcc:{caller.lower().replace(' ', '_')}",
+                    ) from exc
+                engine_flags.update(str(flag) for flag in state.flags)
+                if state.extrapolated:
+                    engine_flags.add("openimcc_extrapolated")
+                engine_metadata.update(
+                    {
+                        "model_id": state.pack_model_id,
+                        "datapack_version": state.pack_version,
+                        "pack_digest": state.pack_digest,
+                        "openimcc_version": state.openimcc_version,
+                    }
+                )
+                base_pressure_bar = evaluate_gas(
+                    state.parent_oxide_activities,
+                    temperature_K,
+                    1.0,
+                    gas_pack,
+                    parent_oxides=state.parent_oxides,
+                    allow_extrapolation=True,
+                )
+                pressure_state_cache[key] = base_pressure_bar
+            pO2_bar = 10.0**float(log10_pO2_bar)
+            return {
+                str(species): (
+                    float(base_pressure_bar.get(species, 0.0))
+                    * pO2_bar ** pressure_exponents[str(species)]
+                    * 100_000.0
+                )
+                for species, _reaction in gas_channels
+            }
+
+        return pressure_model
+
+    if engine == "internal-analytical":
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            PO2_COMMANDED,
+            Po2Request,
+            _InternalAnalyticalInputRefusal,
+            _OxygenBalanceRefusal,
+            _gas_formula_for_oxygen_balance,
+            _internal_analytical_vapor_pressure_adapter,
+            _new_internal_analytical_core,
+        )
+        from simulator.chemistry.offgas_fo2 import OffgasFO2Unavailable, _oxygen_atom_partial_pressure_bar
+        from simulator.physical_constants import PA_PER_BAR
+        from simulator.vapour_rail.nasa_cea import NasaCeaError
+
+        analytical_core = _new_internal_analytical_core()
+        accepted_diagnostics_by_logp: dict[
+            float, tuple[dict[str, object], ...]
+        ] = {}
+
+        def accept_pressure_diagnostics(log10_pO2_bar: float) -> None:
+            if floor_inversion_diagnostics is None:
+                return
+            for diagnostic in accepted_diagnostics_by_logp.get(log10_pO2_bar, ()):
+                floor_inversion_diagnostics.setdefault(
+                    str(diagnostic["species"]), diagnostic
+                )
+
+        omission_notices: list[Any] = []
+        omission_records: dict[str, dict[str, Any]] = {}
+        noticed_omissions: set[str] = set()
+
+        def pressure_model(
+            inventory: Mapping[str, float], log10_pO2_bar: float
+        ) -> Mapping[str, float]:
+            try:
+                response = _internal_analytical_vapor_pressure_adapter(
+                    core=analytical_core,
+                    temperature_C=temperature_K - 273.15,
+                    pressure_bar=total_pressure_Pa / 100_000.0,
+                    composition_kg=None,
+                    composition_mol=inventory,
+                    fO2_log=log10_pO2_bar,
+                    po2_request=Po2Request(
+                        mode=PO2_COMMANDED,
+                        po2_bar=10.0**float(log10_pO2_bar),
+                    ),
+                    include_diagnostic_shadows=False,
+                )
+            except _InternalAnalyticalInputRefusal as exc:
+                raise ResidueInventoryRefusal(exc.code, str(exc)) from exc
+            pressures = {}
+            for channel, pressure in response.vapor_pressures_Pa.items():
+                try:
+                    formula = _gas_formula_for_oxygen_balance(channel)
+                except _OxygenBalanceRefusal as exc:
+                    raise ResidueInventoryRefusal(exc.reason_code, str(exc)) from exc
+                if formula in pressures:
+                    raise ResidueInventoryRefusal("residue_pressure_channels_ambiguous", formula)
+                pressures[formula] = float(pressure)
+            required = {str(species) for species, _reaction in gas_channels}
+            pO2_bar = 10.0**float(log10_pO2_bar)
+            if "O2" in required and "O2" not in pressures:
+                pressures["O2"] = pO2_bar * PA_PER_BAR
+            if "O" in required and "O" not in pressures:
+                try:
+                    pressures["O"] = _oxygen_atom_partial_pressure_bar(
+                        temperature_K, pO2_bar,
+                        extract_path=Path(__file__).resolve().parents[2] / "data/literature/extracts/nasa-cea-thermo.yaml",
+                    ) * PA_PER_BAR
+                except (OffgasFO2Unavailable, NasaCeaError, OSError) as exc:
+                    raise ResidueInventoryRefusal("residue_oxygen_pressure_unavailable", str(exc)) from exc
+            _translate_recorded_pressure_omissions(
+                pressures,
+                response,
+                required,
+                omission_notices,
+                omission_records,
+                noticed_omissions,
+            )
+            if floor_inversion_diagnostics is not None:
+                vapor_diagnostic = response.diagnostics.get(
+                    "vapor_pressure_diagnostic"
+                )
+                floor_notices = (
+                    vapor_diagnostic.get("pO2_floor_inversion_notices_by_species")
+                    if isinstance(vapor_diagnostic, Mapping)
+                    else None
+                )
+                evaluation_diagnostics: list[dict[str, object]] = []
+                if isinstance(floor_notices, Mapping):
+                    for species, detail in floor_notices.items():
+                        if not isinstance(detail, Mapping):
+                            continue
+                        evaluation_diagnostics.append(
+                            {
+                                "kind": "floor_inversion",
+                                "species": str(species),
+                                "reason": str(
+                                    detail.get("reason") or "floor_inversion"
+                                ),
+                                "original": detail.get("pO2_bar_used"),
+                                "band": detail.get("certified_band"),
+                                "detail": dict(detail),
+                            }
+                        )
+                accepted_diagnostics_by_logp[float(log10_pO2_bar)] = tuple(
+                    evaluation_diagnostics
+                )
+            missing = [
+                str(species)
+                for species, _reaction in gas_channels
+                if species not in pressures
+            ]
+            if missing:
+                if floor_inversion_diagnostics is None:
+                    detail = ", ".join(missing)
+                else:
+                    detail = json.dumps(
+                        {
+                            "missing_channels": missing,
+                            "engine_floor_inversion_diagnostics": tuple(
+                                floor_inversion_diagnostics.values()
+                            ),
+                        },
+                        sort_keys=True,
+                        default=str,
+                        separators=(",", ":"),
+                    )
+                raise ResidueInventoryRefusal(missing_channels_reason, detail)
+            return {
+                str(species): float(pressures[str(species)])
+                for species, _reaction in gas_channels
+            }
+
+        if floor_inversion_diagnostics is not None:
+            pressure_model._on_accepted_evaluation = accept_pressure_diagnostics
+        pressure_model.below_threshold_omission_notices = omission_notices
+        pressure_model.below_threshold_omission_records = omission_records
+        return pressure_model
+
+    raise ResidueInventoryRefusal(
+        "engine_capability_unsupported",
+        f"engine={engine}; capability=free_evaporation_residue_integrator",
+    )
+
+
+def _located_point(located: object | None) -> float | None:
+    if located is None:
+        return None
+    state = getattr(located, "state", None)
+    if state is None or not getattr(state, "is_value", False):
+        return None
+    value = getattr(state, "value", None)
+    kind = getattr(value, "kind", None)
+    if getattr(kind, "value", kind) != "point":
+        return None
+    try:
+        number = float(value.point)
+    except (AttributeError, TypeError, ValueError, OverflowError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
+    initial = getattr(sample, "initial_composition", None)
+    state = None if initial is None else getattr(initial, "state", None)
+    if state is None or not getattr(state, "is_value", False):
+        raise ResidueInventoryRefusal(
+            "initial_composition_not_stated", "sample.initial_composition"
+        )
+    composition = getattr(state, "value", None)
+    components = getattr(composition, "components", None)
+    if not components:
+        raise ResidueInventoryRefusal(
+            "initial_composition_not_stated", "sample.initial_composition"
+        )
+    raw_basis = getattr(composition, "amount_basis", "")
+    amount_basis = str(getattr(raw_basis, "value", raw_basis))
+    if amount_basis not in {"mole_fraction", "moles", "mole"}:
+        raise ResidueInventoryRefusal(
+            "initial_composition_basis_not_supported", amount_basis
+        )
+    try:
+        amounts = {str(oxide): float(amount) for oxide, amount in components}
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ResidueInventoryRefusal("initial_composition_invalid") from exc
+    if any(not math.isfinite(x) or x < 0.0 for x in amounts.values()):
+        raise ResidueInventoryRefusal("initial_composition_invalid")
+    if not any(amount > 0.0 for amount in amounts.values()):
+        raise ResidueInventoryRefusal("initial_composition_invalid")
+    return _hashimoto_project_oxide_wt_pct(amounts)
+
+
+def _mass_loss_sourced_alphas(
+    experiment: object,
+    source_document: Mapping[str, Any],
+    temperature_K: float,
+) -> dict[str, dict[str, Any]]:
+    """Resolve only the experiment-linked fits in supported extract context."""
+    from simulator.battery.extract_context import iter_extract_context_containers
+
+    experiment_id = str(getattr(experiment, "experiment_id", ""))
+    local_id = experiment_id.rsplit("::", 1)[-1]
+    fits: dict[str, dict[str, Any]] = {}
+    for _formula, rows in iter_extract_context_containers(source_document):
+        for row in rows or ():
+            if not isinstance(row, Mapping):
+                continue
+            applies = row.get("applies_to_experiments") or ()
+            if local_id not in applies and experiment_id not in applies:
+                continue
+            values = row.get("values")
+            if not isinstance(values, Mapping) or "alpha_form" not in values:
+                continue
+            form = values["alpha_form"]
+            try:
+                if form["type"] != "arrhenius" or row["units"] != "dimensionless":
+                    raise ValueError("unsupported alpha fit")
+                species = str(values["gas_species"]).removesuffix("(g)")
+                prefactor = float(form["gamma_o"])
+                energy = float(form["E_J_per_mol"])
+                gas_constant = float(form["R_J_per_mol_K"])
+                low, high = map(float, row["T_range_K"])
+                locator = row["locator"]
+                if (
+                    not species or not row["observation_id"] or not locator
+                    or not all(math.isfinite(x) for x in (
+                        prefactor, energy, gas_constant, low, high, temperature_K
+                    ))
+                    or min(prefactor, gas_constant, low, temperature_K) <= 0.0
+                    or energy < 0.0 or high < low
+                ):
+                    raise ValueError("invalid alpha fit")
+                alpha, _sigma = _evaluate_extracted_arrhenius_alpha({
+                    "gamma_o": prefactor, "E_J_per_mol": energy,
+                    "R_J_per_mol_K": gas_constant,
+                }, temperature_K)
+                if not math.isfinite(alpha) or not 0.0 < alpha <= 1.0:
+                    raise ValueError("alpha outside physical interval")
+            except (KeyError, TypeError, ValueError, OverflowError) as exc:
+                raise ResidueInventoryRefusal(
+                    "evaporation_coefficients_invalid", str(row.get("observation_id"))
+                ) from exc
+            if species in fits:
+                raise ResidueInventoryRefusal(
+                    "evaporation_coefficients_ambiguous", species
+                )
+            fits[species] = {
+                "alpha": alpha,
+                "source_observation_id": row["observation_id"],
+                "locator": dict(locator),
+                "T_range_K": [low, high],
+                "extrapolated": not low <= temperature_K <= high,
+            }
+    if not fits:
+        raise ResidueInventoryRefusal(
+            "evaporation_coefficients_not_sourced",
+            "per-species evaporation coefficients are not sourced for this work",
+        )
+    return fits
+
+
+def _mass_loss_area_inputs(
+    experiment: object, observation: object, source: Mapping[str, Any],
+) -> tuple[float, float, float]:
+    """Read the two printed endpoints and test the approved shape premise."""
+    # Raw table row locators migrate to the observation paragraph; Experiment
+    # Locator has no row field (its raw row is retained only as a note).
+    row_name = getattr(getattr(observation, "locator", None), "paragraph", None)
+    point = getattr(getattr(observation, "value", None), "point", None)
+    if point is None or not 0.0 <= float(point) < 1.0:
+        raise ResidueInventoryRefusal("observed_mass_loss_not_stated")
+    observed_loss = float(point)
+    matches = set()
+    for block in (source.get("species") or {}).values():
+        for row in block.get("observations") or ():
+            surface = (row.get("equipment") or {}).get("sample_surface_area") or {}
+            samples = surface.get("value")
+            if not isinstance(samples, list):
+                continue
+            for sample in samples:
+                if sample.get("sample") != row_name:
+                    continue
+                try:
+                    uncertainty = surface["uncertainty"]
+                    diameter = float(sample["diameter_mm"])
+                    percent = float(uncertainty[
+                        "one_mm_percent" if diameter == 1.0 else "larger_samples_percent"
+                    ])
+                    initial = float(sample["initial_area_mm2"]) * 1.0e-6
+                    final = float(sample["final_area_mm2"]) * 1.0e-6
+                    if not all(math.isfinite(x) and x > 0 for x in (
+                        initial, final, diameter, percent
+                    )) or diameter < 1.0 or not uncertainty.get("locator"):
+                        raise ValueError("invalid area evidence")
+                    matches.add((initial, final, percent / 100.0))
+                except (KeyError, TypeError, ValueError) as exc:
+                    raise ResidueInventoryRefusal("sample_area_uncertainty_not_stated") from exc
+    if len(matches) != 1:
+        raise ResidueInventoryRefusal("sample_area_endpoints_not_stated")
+    initial, final, relative_uncertainty = matches.pop()
+    predicted_final = _self_similar_area_m2(initial, 1.0 - observed_loss, 1.0)
+    if abs(final - predicted_final) > relative_uncertainty * predicted_final:
+        raise ResidueInventoryRefusal("area_shape_not_self_similar", json.dumps({
+            "initial_area_m2": initial, "final_area_m2": final,
+            "self_similar_final_area_m2": predicted_final,
+            "relative_area_uncertainty": relative_uncertainty,
+        }, sort_keys=True))
+    return initial, final, relative_uncertainty
+
+
+def _mass_loss_thermal_segments(
+    experiment: object, temperature_K: float,
+) -> tuple[float, float, tuple[tuple[float, float], ...]]:
+    """Return preheat rectangle and documented (T midpoint K, duration s)."""
+    schedule = getattr(experiment, "thermal_schedule", None)
+    ramps = getattr(schedule, "ramps", None)
+    method = getattr(getattr(schedule, "method", None), "state", None)
+    method_text = str(getattr(method, "value", ""))
+    if not ramps or "about an hour" not in method_text:
+        raise ResidueInventoryRefusal("preheat_bound_not_stated")
+    maximum = _located_point(ramps[0].start_temperature_K)
+    if maximum is None:
+        raise ResidueInventoryRefusal("preheat_maximum_not_stated")
+    holds = {}
+    for hold in getattr(schedule, "setpoints_and_holds", None) or ():
+        at = _located_point(hold.temperature_K)
+        duration = _located_point(hold.hold_duration_s)
+        if at is None or duration is None or duration <= 0.0 or at in holds:
+            raise ResidueInventoryRefusal("thermal_schedule_invalid")
+        holds[at] = duration
+    segments = []
+    last = maximum
+    for ramp in ramps:
+        start = _located_point(ramp.start_temperature_K)
+        end = _located_point(ramp.end_temperature_K)
+        rate = _located_point(ramp.rate_K_s)
+        if start != last or end is None or rate is None or rate <= 0.0 or end <= start:
+            raise ResidueInventoryRefusal("thermal_schedule_invalid")
+        duration = (end - start) / rate
+        steps = max(1, math.ceil(duration / 60.0))
+        for index in range(steps):
+            segments.append((start + (end - start) * (index + 0.5) / steps, duration / steps))
+        if end in holds:
+            segments.append((end, holds.pop(end)))
+        last = end
+    if holds or last != temperature_K:
+        raise ResidueInventoryRefusal("thermal_schedule_invalid")
+    duration = _located_point(schedule.total_duration_s)
+    segments.append((temperature_K, duration))
+    # The source calls the preheat "about an hour". The rectangle uses that
+    # printed approximate duration, never an invented start T or ramp rate.
+    return maximum, _SECONDS_PER_HOUR, tuple(segments)
+
+
+def _mass_loss_bound_gate(
+    bound_kg: float, point_loss_kg: float, uncertainty_kg: float | None,
+    *, channels: Sequence[str], preheat_bound_kg: float,
+) -> dict[str, Any]:
+    # L is the sourced-channel point loss on the documented schedule [kg].
+    # Each unsourced channel uses its alpha=1 worst-pO2-corner flux, including
+    # its stoichiometric oxygen mass. Sourced loss never cancels that envelope.
+    # Their summed parent-oxide removal plus the WHOLE preheat rectangle is
+    # extra loss B [kg], an envelope, not a jointly realizable trajectory.
+    # The gate B/L has units kg/kg. Neither unsourced removal nor preheat
+    # enters L. No unsourced channels and no preheat give B=0; B=L fails.
+    # Physics r2 drops only the uncertainty clause when the source states none.
+    if not all(math.isfinite(x) and x >= 0.0 for x in (bound_kg, point_loss_kg)):
+        raise ResidueInventoryRefusal("mass_loss_fraction_invalid")
+    fraction = (bound_kg / point_loss_kg if point_loss_kg > 0.0
+                else 0.0 if bound_kg == 0.0 else None)
+    fraction_clause_passed = fraction is not None and fraction <= 0.01
+    uncertainty_clause_passed = None if uncertainty_kg is None else bound_kg < uncertainty_kg
+    diagnostics = {
+        "fraction_clause_passed": fraction_clause_passed,
+        "uncertainty_clause_passed": uncertainty_clause_passed,
+        "point_loss_kg": point_loss_kg, "bound_kg": bound_kg, "bound_fraction": fraction,
+        "preheat_bound_kg": preheat_bound_kg, "unsourced_channels": list(channels),
+        "bulk_uncertainty_kg": uncertainty_kg,
+        "uncertainty_clause": (
+            "bulk mass-loss uncertainty not stated by source"
+            if uncertainty_kg is None else "bound must be below stated bulk uncertainty"
+        ),
+    }
+    if not fraction_clause_passed or uncertainty_clause_passed is False:
+        reason = "alpha_not_sourced" if channels else "preheat_bound_not_negligible"
+        raise ResidueInventoryRefusal(reason, json.dumps(diagnostics, sort_keys=True))
+    return diagnostics
+
+
+def _mass_loss_corner_bounds(
+    inventory: Mapping[str, float], channels: Sequence[ResidueChannel],
+    pressure_model: Callable[[Mapping[str, float], float], Mapping[str, float]],
+    *, unsourced: Sequence[str], temperature_K: float, area_m2: float, duration_s: float,
+    include_sourced: bool = False,
+) -> tuple[dict[str, float], dict[str, Any]]:
+    terms = _channel_terms(channels)
+    oxygen_channels = _residue_oxygen_channels(terms, inventory)
+    # At fixed composition P_i is proportional to pO2**nu_i. The closure is
+    # monotone: adding a releaser (nu<0) raises its root; adding a consumer
+    # (nu>0) lowers it. Thus all alpha_i in [0,1] lie between the low corner
+    # (releasers off, consumers on) and high corner (the reverse). Evaluate
+    # each unsourced alpha=1 flux at its maximizing corner: low for nu<0,
+    # high for nu>0, either for nu=0. Sum its OWN parent-oxide kg over dt;
+    # sourced-flux suppression cannot cancel B. This envelope is not a joint
+    # trajectory. The point arm and its original area/inventory remain L.
+    roots = []
+    for low_corner in (True, False):
+        selected = tuple(
+            replace(channel, alpha=(
+                1.0 if channel.pO2_exponent == 0.0
+                or (channel.pO2_exponent > 0.0) == low_corner else 0.0
+            ), alpha_source="alpha<=1 oxygen-corner bound")
+            if channel.species in unsourced else channel
+            for channel in oxygen_channels
+        )
+        try:
+            roots.append(_solve_vacuum_oxygen_balance(
+                lambda logp: pressure_model(inventory, logp), selected,
+                temperature_K=temperature_K,
+            ).pO2_bar)
+        except ValueError as exc:
+            raise ResidueInventoryRefusal("residue_oxygen_balance_failed", str(exc)) from exc
+    low, high = roots
+    if low > high:
+        raise ResidueInventoryRefusal("mass_loss_corner_order_invalid", str(roots))
+    pressures = [pressure_model(inventory, math.log10(root) if root > 0.0 else 0.0)
+                 for root in roots]
+    selected_pressures = {}
+    inventory_caps = {}
+    for term, channel in zip(terms, oxygen_channels):
+        if (term.source.parent_oxide is None or not channel.active
+                or (channel.species not in unsourced and not include_sourced)):
+            continue
+        index = 0 if channel.pO2_exponent <= 0.0 else 1
+        if roots[index] == 0.0 and channel.pO2_exponent < 0.0:
+            # A negative-power pressure diverges at a supplier-free low
+            # corner. Its physical finite-step ceiling is all available
+            # parent, never a zero flux or a clipped logarithmic root.
+            inventory_caps[channel.species] = (
+                float(inventory.get(term.source.parent_oxide, 0.0))
+                * _formula_terms(term.source.parent_oxide)[1]
+            )
+        else:
+            selected_pressures[channel.species] = (
+                0.0 if roots[index] == 0.0 and channel.pO2_exponent > 0.0
+                else pressures[index][channel.species]
+            )
+    bound_terms = tuple(replace(term, source=replace(
+        term.source, alpha=(1.0 if term.source.species in unsourced else term.source.alpha)
+        if term.source.species in selected_pressures else 0.0,
+        alpha_source="worst-corner envelope; sourced alphas retained",
+    )) for term in terms)
+    rates = _finite_step_fluxes(
+        bound_terms, inventory, temperature_K=temperature_K, area_m2=area_m2,
+        pressures_Pa=selected_pressures, include_below_threshold=True,
+    )
+    bounds = {
+        term.source.species: rates.get(term.source.species, 0.0)
+        * duration_s * term.oxide_per_product_kg
+        for term in terms if term.source.species in selected_pressures
+    }
+    bounds.update(inventory_caps)
+    return bounds, {"pO2_low_bar": low, "pO2_high_bar": high,
+                    "inventory_capped_channels": sorted(inventory_caps)}
+
+def predict_knudsen_residue_composition(
+    engine: str, reference, experiment, observations, bench=None,
+) -> dict[str, object]:
+    """Predict a residue at its own printed loss, never at its measured composition."""
+    from dataclasses import replace
+
+    from simulator.battery.enums import AdmissionStatus, MEASURED_EVIDENCE, MethodToken, NoticeKind, Quantity, RegimeClass, ValueKind
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.records import Notice
+    from simulator.battery.source_oxygen import (
+        SourceOxygenCondition, SourceOxygenFallback, _printed_source_oxygen_at_point, resolve_source_oxygen,
+        source_oxygen_closure_notice,
+    )
+    from simulator.battery.validity import effusion_regime_unverified
+
+    if engine not in {"openimcc", "internal-analytical"}:
+        raise ResidueInventoryRefusal("engine_capability_unsupported", engine)
+    if experiment is None or not experiment.method.is_value or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION:
+        raise ResidueInventoryRefusal("knudsen_near_saturation_invalid")
+    environment = experiment.pressure_environment
+    regime = environment.regime
+    rows = tuple(observations)
+    # Reuse the gas-pressure regime owner's printed Kn and p/d routes.
+    # Absence remains the labelled Knudsen-method assumption; contradictory
+    # numeric evidence is a refusal, not a reason to assume saturation.
+    gas_regime = effusion_regime_unverified(
+        experiment, Quantity.P_PARTIAL, observation=reference,
+        point_observations=rows,
+    )
+    contradicted = any(
+        not check.passed and (
+            check.name == "orifice_pressure_to_diameter"
+            or "knudsen_number_orifice" in check.detail
+            or "printed_partial_pressure_sum_Pa" in check.detail
+        ) for check in gas_regime.checks
+    )
+    if (regime.regime_class.is_value and regime.regime_class.value is not RegimeClass.MOLECULAR) or contradicted:
+        raise ResidueInventoryRefusal("knudsen_near_saturation_invalid", "non-molecular orifice regime")
+    wt_pct = _initial_oxide_wt_percent(experiment.sample)
+    # A unit reference mass fixes only the mol normalization; no sample mass
+    # or apparatus scale is inferred from it. xi is invariant to this scale.
+    initial = {oxide: weight / 100.0 / _formula_terms(oxide)[1] for oxide, weight in wt_pct.items()}
+    anchors = {}
+    for row in rows:
+        if (row.experiment_id != reference.experiment_id or row.source_id != reference.source_id
+            or quantity_token(row.identity) is not Quantity.MASS_LOSS_FRACTION
+            or row.engine is not None or row.admission.status is not AdmissionStatus.ADMITTED
+            or row.locator is None
+            or not row.evidence.class_.is_value or row.evidence.class_.value not in MEASURED_EVIDENCE
+            or row.value.kind is not ValueKind.POINT or row.value.point is None):
+            continue
+        temperature = row.identity.temperature_K
+        if temperature is None or not temperature.is_value:
+            continue  # T=0 initial-charge row is not a run temperature.
+        t, x = float(temperature.value), float(row.value.point)
+        if not math.isfinite(x) or not math.isfinite(t) or not 0.0 < x < 1.0 or t <= 0.0:
+            raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid")
+        if t in anchors and anchors[t][0] != x:
+            raise ResidueInventoryRefusal("measured_mass_loss_fraction_ambiguous")
+        anchors[t] = (x, row)
+    temperature = reference.identity.temperature_K
+    if temperature is None or not temperature.is_value:
+        raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid")
+    target_temperature = float(temperature.value)
+    if target_temperature not in anchors:
+        raise ResidueInventoryRefusal("measured_mass_loss_fraction_missing_or_invalid")
+    if any(
+        row.experiment_id == reference.experiment_id
+        and row.source_id == reference.source_id
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and row.engine is None and row.admission.status is AdmissionStatus.ADMITTED
+        and row.identity.temperature_K is not None and row.identity.temperature_K.is_value
+        and 0.0 < float(row.identity.temperature_K.value) <= target_temperature
+        and float(row.identity.temperature_K.value) not in anchors
+        for row in rows
+    ):
+        raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid", "a printed temperature has no measured mass-loss coordinate")
+    path = [(x, t) for t, (x, row) in sorted(anchors.items()) if t <= target_temperature]
+    target = anchors[target_temperature][0]
+    if not path or any(b[0] <= a[0] for a, b in zip(path, path[1:])):
+        raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid")
+    schedule = experiment.thermal_schedule
+    if schedule is None or schedule.method is None or not schedule.method.state.is_value:
+        raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid", "thermal_schedule.method")
+
+    notices = [Notice(
+        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+        affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+        reason="T path is the printed step temperatures held over each mass-loss interval; ramp time between steps not modelled",
+        origin="Knudsen residue extent",
+    ), Notice(
+        kind=NoticeKind.UNVERIFIED_APPARATUS,
+        affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+        reason="near-saturation and molecular effusion assumed from the printed Knudsen method; unprinted geometry cannot verify cell saturation",
+        origin="Knudsen residue extent",
+    )]
+    oxygen_sources, source_logs = [], []
+    for x, t in path:
+        anchor = anchors[t][1]
+        # The current residue row may carry a directly printed oxygen condition;
+        # its composition value is never consumed by the prediction.
+        condition_row = reference if t == target_temperature else anchor
+        printed = _printed_source_oxygen_at_point(condition_row, rows)
+        pressure = printed[0] if isinstance(printed, tuple) else None
+        source = "source_printed"
+        used = printed[1] if isinstance(printed, tuple) else ()
+        if pressure is None:
+            oxygen = printed if isinstance(printed, SourceOxygenFallback) else resolve_source_oxygen(condition_row, rows, bench)
+            if isinstance(oxygen, SourceOxygenCondition):
+                pressure = oxygen.observation.value.point
+                source = "cell_material_gas_ratio" if "cell-metal activity" in oxygen.observation.derivation.relation else "source_printed"
+                used = tuple(sorted(oxygen.used_observations))
+            else:
+                source = "d142_closure"
+                flagged = replace(condition_row, provenance={
+                    **(condition_row.provenance or {}), "source_oxygen_fallback": oxygen.reason.value,
+                })
+                notice = source_oxygen_closure_notice(Quantity.RESIDUE_COMPONENT_COMPOSITION, flagged)
+                notice = replace(notice, reason=notice.reason + "; SC-360: d-142 is about 3 dex (W) / 2.5 dex (Mo) above measured cell pO2; pO2 sets relative volatility via P_i proportional to pO2^-nu")
+                if notice not in notices:
+                    notices.append(notice)
+        source_logs.append(None if pressure is None else math.log10(float(pressure) / 100000.0))
+        oxygen_sources.append({"mass_loss_fraction": x, "temperature_K": t, "source": source, "used_observations": used})
+    provenance = {
+        "measured_mass_loss_fraction": target, "temperature_path": path,
+        "oxygen_sources": oxygen_sources,
+    }
+    pressure_callbacks: dict[float, Callable[..., Mapping[str, float]]] = {}
+    try:
+        try:
+            from openimcc import load_gas_datapack
+        except ImportError as exc:
+            raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
+        from simulator.diagnostic_helpers.binary_pot_battery import _openimcc_gas_channels_and_omission_notices
+
+        gas_pack = load_gas_datapack()
+        gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(tuple(initial), gas_pack)
+        if omissions:
+            raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
+        channels = tuple(ResidueChannel(str(s), str(s), parent, 1.0,
+                        "near-saturated molecular effusion; common orifice factor cancels")
+                         for s, (parent, _, _) in gas_channels)
+        flags, metadata = set(), {}
+
+        def pressure_model(inventory, logp, temperature_K):
+            if temperature_K not in pressure_callbacks:
+                pressure_callbacks[temperature_K] = _make_residue_pressure_model(
+                    engine, gas_channels, gas_pack, temperature_K=temperature_K,
+                    total_pressure_Pa=_located_point(environment.total_pressure_Pa) or 0.0,
+                    engine_metadata=metadata, engine_flags=flags,
+                    missing_channels_reason="residue_pressure_channels_missing",
+                    caller="Knudsen residue prediction",
+                )
+            return pressure_callbacks[temperature_K](inventory, logp)
+
+        kwargs = dict(temperature_path=path, measured_mass_loss_fraction=target,
+                      near_saturated=True, source_fO2_log_by_interval=source_logs)
+        primary = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs)
+        composition = _hashimoto_project_oxide_wt_pct(primary.residue_mol)
+        diagnostic = {}
+        try:
+            linear = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs, linear_temperature=True)
+            linear_composition = _hashimoto_project_oxide_wt_pct(linear.residue_mol)
+            diagnostic = {"composition_wt_pct": linear_composition,
+                          "difference_from_step_hold_wt_pct": {k: linear_composition[k] - v for k, v in composition.items()}}
+        except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+            diagnostic = {"refusal": getattr(exc, "reason", str(exc))}
+        _append_omission_notices(notices, pressure_callbacks)
+        return {
+            "composition_wt_pct": composition, "linear_temperature_diagnostic": diagnostic,
+            "measured_mass_loss_fraction": target, "temperature_path": path,
+            "oxygen_sources": oxygen_sources, "notices": tuple(notices),
+            "retained_oxygen_atoms_mol": primary.retained_oxygen_atoms_mol,
+            "atom_closure_mol": dict(primary.atom_closure_mol),
+            "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / math.fsum(n * _formula_terms(s)[1] for s, n in initial.items()),
+            "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
+        }
+    except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        _append_omission_notices(notices, pressure_callbacks)
+        exc.provenance = provenance
+        exc.notices = tuple(notices)
+        raise
+
+
+def predict_mass_loss_fraction(
+    engine: str,
+    experiment: object,
+    *,
+    temperature_K: float | None,
+    source_document: Mapping[str, Any] | None = None,
+    observation: object | None = None,
+) -> ResidueMassLossPrediction:
+    """Predict one bulk mass-loss point through the existing residue integrator."""
+    if engine not in {"openimcc", "internal-analytical"}:
+        raise ResidueInventoryRefusal(
+            "engine_capability_unsupported",
+            f"engine={engine}; capability=free_evaporation_residue_integrator",
+        )
+
+    sample = getattr(experiment, "sample", None)
+    wt_pct = _initial_oxide_wt_percent(sample)
+    schedule = getattr(experiment, "thermal_schedule", None)
+    duration_s = _located_point(
+        None if schedule is None else getattr(schedule, "total_duration_s", None)
+    )
+    if duration_s is None or duration_s <= 0.0:
+        raise ResidueInventoryRefusal(
+            "duration_not_stated", "thermal_schedule.total_duration_s"
+        )
+    if temperature_K is None or not math.isfinite(float(temperature_K)):
+        raise ResidueInventoryRefusal("temperature_not_stated", "identity.temperature_K")
+    sample_mass_kg = _located_point(getattr(sample, "mass_kg", None))
+    if sample_mass_kg is None or sample_mass_kg <= 0.0:
+        raise ResidueInventoryRefusal("sample_mass_not_stated", "sample.mass_kg point")
+    apparatus = getattr(experiment, "apparatus", None)
+    geometry = None if apparatus is None else getattr(apparatus, "geometry", None)
+    area_m2 = _located_point(
+        None if geometry is None else getattr(geometry, "exposed_area_m2", None)
+    )
+    if area_m2 is None or area_m2 <= 0.0:
+        raise ResidueInventoryRefusal(
+            "sample_geometry_not_stated",
+            "apparatus.geometry.exposed_area_m2 point",
+        )
+
+    method_state = getattr(experiment, "method", None)
+    method = getattr(method_state, "value", None) if getattr(
+        method_state, "is_value", False
+    ) else None
+    if getattr(method, "value", method) != "langmuir_free_evaporation":
+        raise ResidueInventoryRefusal(
+            "residue_method_unsupported",
+            "capability=free_evaporation_residue_integrator; "
+            f"experiment.method={getattr(method, 'value', method)!r}",
+        )
+
+    pressure_environment = getattr(experiment, "pressure_environment", None)
+    total_pressure_Pa = _located_point(
+        None
+        if pressure_environment is None
+        else getattr(pressure_environment, "total_pressure_Pa", None)
+    )
+    pressure_value = getattr(getattr(
+        getattr(pressure_environment, "total_pressure_Pa", None), "state", None
+    ), "value", None)
+    pressure_is_bound = (
+        getattr(getattr(pressure_value, "kind", None), "value", None) == "bound"
+        and getattr(pressure_value, "bound_operator", None) in {"<", "<="}
+    )
+    if pressure_is_bound:
+        total_pressure_Pa = float(pressure_value.bound_value)
+    if engine == "internal-analytical" and total_pressure_Pa is None:
+        raise ResidueInventoryRefusal("total_pressure_not_stated")
+
+    total_wt_pct = math.fsum(wt_pct.values())
+    if (
+        not math.isfinite(total_wt_pct)
+        or total_wt_pct <= 0.0
+        or any(not math.isfinite(value) or value < 0.0 for value in wt_pct.values())
+    ):
+        raise ResidueInventoryRefusal("initial_composition_invalid")
+    # Printed oxide wt% are normalized only for source rounding: each m_i is
+    # m0*w_i/Σw. Dividing kg by kg mol^-1 yields mol on the sample-mass basis.
+    initial_inventory_mol = {
+        oxide: sample_mass_kg * (amount / total_wt_pct)
+        / _formula_terms(oxide)[1]
+        for oxide, amount in wt_pct.items()
+    }
+    try:
+        from openimcc import load_gas_datapack
+    except ImportError as exc:
+        raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _openimcc_gas_channels_and_omission_notices,
+    )
+
+    gas_pack = load_gas_datapack()
+    gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
+        tuple(initial_inventory_mol), gas_pack
+    )
+    if omissions:
+        raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
+    if not gas_channels:
+        raise ResidueInventoryRefusal("residue_gas_channels_missing")
+    fits = _mass_loss_sourced_alphas(
+        experiment, source_document or {}, float(temperature_K)
+    )
+    if total_pressure_Pa is None or not math.isfinite(total_pressure_Pa) or total_pressure_Pa < 0:
+        raise ResidueInventoryRefusal("total_pressure_not_stated")
+    area_m2, final_area_m2, area_uncertainty = _mass_loss_area_inputs(
+        experiment, observation, source_document or {}
+    )
+    preheat_maximum_K, preheat_duration_s, segments = _mass_loss_thermal_segments(
+        experiment, float(temperature_K)
+    )
+    flags: set[str] = set()
+    metadata: dict[str, str] = {}
+    flags.add(
+        "mass_loss_oxygen_escape_assumption: alpha_O=1.0; alpha_O2=1.0; "
+        "declared free-desorption assumption, not independently sourced coefficients; "
+        "sensitivity: oxygen escape changes the shared alpha-weighted pO2 root "
+        "and therefore the sourced-channel loss"
+    )
+    if pressure_is_bound:
+        flags.add(f"mass_loss_pressure_upper_bound: evaluated at {total_pressure_Pa:.17g} Pa; "
+                  "channel bulk partial ceiling; zero-pressure arms are bounds only")
+    flags.add(
+        f"mass_loss_preheat_rectangle: maximum_K={preheat_maximum_K}; "
+        f"duration_s={preheat_duration_s}; approximate printed duration; "
+        "excluded from point loss; rectangle enters B only"
+    )
+    flags.add(
+        f"mass_loss_area_self_similarity: initial_m2={area_m2}; final_m2={final_area_m2}; "
+        f"relative_area_uncertainty={area_uncertainty}"
+    )
+    unsourced = tuple(str(species) for species, (parent, *_rest) in gas_channels
+                      if parent and str(species) not in fits)
+
+    bounds_by_channel = {species: 0.0 for species in unsourced}
+    preheat_bounds_by_channel: defaultdict[str, float] = defaultdict(float)
+    corner_records = []
+    inventory_capped_channels = set()
+    # The shared callback names residue composition for Knudsen and Hashimoto.
+    # This path keeps those notices and retargets only the mass-loss quantity.
+    omission_notices: list[Any] = []
+    omission_records: dict[str, list[dict[str, Any]]] = {}
+
+    def retain_omissions(pressure_model: object) -> None:
+        from simulator.battery.enums import Quantity
+
+        for notice in getattr(pressure_model, "below_threshold_omission_notices", ()) or ():
+            adapted = replace(
+                notice, affected_quantities=(Quantity.MASS_LOSS_FRACTION,)
+            )
+            if adapted not in omission_notices:
+                omission_notices.append(adapted)
+        for formula, record in (
+            getattr(pressure_model, "below_threshold_omission_records", {}) or {}
+        ).items():
+            bucket = omission_records.setdefault(str(formula), [])
+            copied = dict(record)
+            if copied not in bucket:
+                bucket.append(copied)
+
+    def omission_payload() -> str | None:
+        if not omission_notices and not omission_records:
+            return None
+        return json.dumps(
+            {
+                "notices": [
+                    {
+                        "kind": notice.kind.value,
+                        "reason": notice.reason,
+                        "origin": notice.origin,
+                    }
+                    for notice in omission_notices
+                ],
+                "records": omission_records,
+            },
+            sort_keys=True,
+        )
+
+    def attach_omissions(exc: BaseException) -> None:
+        payload = omission_payload()
+        if payload is None:
+            return
+        setattr(exc, "notices", tuple(omission_notices))
+        setattr(exc, "below_threshold_omissions", payload)
+
+    def run_segment(
+        inventory: Mapping[str, float], at_K: float, seconds: float, *,
+        rectangle: bool = False, unsourced_unity: bool = False,
+    ) -> tuple[Mapping[str, float], float]:
+        at_fits = _mass_loss_sourced_alphas(experiment, source_document or {}, at_K)
+        for species, fit in at_fits.items():
+            if fit["extrapolated"]:
+                flags.add(f"alpha_extrapolated:{species}:source_domain_K={fit['T_range_K']}")
+        channels = []
+        for species, (parent, *_rest) in gas_channels:
+            species = str(species)
+            if not parent:
+                alpha, provenance = 1.0, "declared unity oxygen escape; stoichiometric coproduct"
+            elif species in at_fits:
+                alpha = at_fits[species]["alpha"]
+                provenance = at_fits[species]["source_observation_id"]
+            else:
+                alpha = 1.0 if unsourced_unity else 0.0
+                provenance = ("alpha<=1 joint/preheat arm; not sourced coefficient" if unsourced_unity
+                              else "unsourced channel excluded from point loss")
+            channels.append(ResidueChannel(species, species, parent or None, alpha, provenance))
+        pressure_model = _make_residue_pressure_model(
+            engine, gas_channels, gas_pack, temperature_K=at_K,
+            total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,
+            engine_flags=flags, missing_channels_reason="residue_pressure_channels_missing",
+            caller="Mass-loss residue prediction",
+        )
+        def measure(incoming, active_channels, area, duration):
+            bounds, corners = _mass_loss_corner_bounds(
+                incoming, active_channels, pressure_model, unsourced=unsourced,
+                temperature_K=at_K, area_m2=area, duration_s=duration,
+                include_sourced=rectangle,
+            )
+            inventory_capped_channels.update(corners["inventory_capped_channels"])
+            target = preheat_bounds_by_channel if rectangle else bounds_by_channel
+            for species, amount in bounds.items():
+                target[species] += amount
+            if not rectangle:
+                corner_records.append(corners)
+
+        try:
+            result = _hashimoto_integrate_geometry(
+                inventory, channels, pressure_model, temperature_K=at_K,
+                duration_s=seconds, steps=min(_HASHIMOTO_N_CAP, max(1, math.ceil(seconds / 60.0))),
+                geometry_policy_id="sphere_constant" if rectangle else "sphere_shrinking",
+                initial_area_m2=area_m2, initial_sample_mass_kg=sample_mass_kg,
+                background_pressure_Pa=0.0 if unsourced_unity else total_pressure_Pa,
+                **({"on_step": measure} if rectangle or (not unsourced_unity and unsourced) else {}),
+            )
+            if result.refusal is not None:
+                raise result.refusal
+            terms = _channel_terms(channels)
+            parent_loss = {
+                term.source.species: result.evaporated_mol.get(term.source.species, 0.0)
+                * term.parent_moles_per_product * _formula_terms(term.source.parent_oxide)[1]
+                for term in terms if term.source.parent_oxide is not None
+            }
+            return result.inventory_mol, math.fsum(parent_loss.values())
+        finally:
+            retain_omissions(pressure_model)
+
+    # The unknown preheat is an upper rectangle only: do not debit it as a
+    # measured trajectory. All its removal, not just unsourced channels, joins B.
+    try:
+        _unused_inventory, _unused_loss = run_segment(
+            initial_inventory_mol, preheat_maximum_K, preheat_duration_s,
+            rectangle=True, unsourced_unity=True,
+        )
+        inventory = initial_inventory_mol
+        joint_inventory = initial_inventory_mol
+        documented_loss_kg = 0.0
+        joint_loss_kg = 0.0
+        joint_refusal = None
+        for at_K, seconds in segments:
+            inventory, loss = run_segment(
+                inventory, at_K, seconds,
+            )
+            if joint_refusal is None:
+                try:
+                    joint_inventory, joint_loss = run_segment(
+                        joint_inventory, at_K, seconds, unsourced_unity=True,
+                    )
+                    joint_loss_kg += joint_loss
+                except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+                    joint_refusal = {"reason": exc.reason, "detail": exc.detail}
+            documented_loss_kg += loss
+        channel_parents = {str(species): parent for species, (parent, *_rest) in gas_channels if parent}
+        inventory_bounds_by_parent = {}
+        # A divergent channel can remove at most its initial parent mass, ONCE:
+        # splitting time or sharing that parent between gases creates no matter.
+        # Cap the accumulated parent sum, including preheat, rather than shadow-
+        # debiting the point state. This leaves the original trajectories intact.
+        # Proportional attribution preserves B=sum(channels)+preheat; it is not a
+        # physical debit. Two 60 s full-parent claims become m0, never 2*m0.
+        for parent in sorted({channel_parents[species] for species in inventory_capped_channels}):
+            species = [name for name, oxide in channel_parents.items() if oxide == parent]
+            total = math.fsum(mapping.get(name, 0.0)
+                              for mapping in (bounds_by_channel, preheat_bounds_by_channel)
+                              for name in species)
+            ceiling = initial_inventory_mol[parent] * _formula_terms(parent)[1]
+            scale = min(1.0, ceiling / total) if total > 0.0 else 1.0
+            inventory_bounds_by_parent[parent] = {
+                "uncapped_bound_kg": total, "ceiling_kg": ceiling,
+                "applied_bound_kg": min(total, ceiling),
+            }
+            for mapping in (bounds_by_channel, preheat_bounds_by_channel):
+                for name in species:
+                    if name in mapping:
+                        mapping[name] *= scale
+        unsourced_bound_kg = math.fsum(bounds_by_channel.values())
+        preheat_bound_kg = math.fsum(preheat_bounds_by_channel.values())
+        point_loss_kg = documented_loss_kg
+        uncertainty = getattr(observation, "uncertainty", None)
+        uncertainty_kg = None
+        if getattr(getattr(uncertainty, "kind", None), "value", "none") != "none":
+            value = getattr(uncertainty, "value", None)
+            basis = getattr(uncertainty, "basis", None)
+            if value is None or isinstance(value, tuple):
+                raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_not_numeric")
+            if basis in {"absolute", "absolute_fraction_of_initial_mass"}:
+                uncertainty_kg = float(value) * sample_mass_kg
+            elif basis in {"relative", "fraction"}:
+                uncertainty_kg = float(value) * float(observation.value.point) * sample_mass_kg
+            else:
+                raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_basis_not_stated")
+            if not math.isfinite(uncertainty_kg) or uncertainty_kg <= 0.0:
+                raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_invalid")
+        evidence = {
+            "unsourced_bound_kg_by_channel": bounds_by_channel,
+            "joint_arm_loss_kg_non_gating": joint_loss_kg if joint_refusal is None else None,
+            "joint_arm_refusal_non_gating": joint_refusal,
+            "joint_arm_background_pressure_Pa": 0.0,
+            "corner_steps": len(corner_records),
+            "corner_ordering_verified": all(c["pO2_low_bar"] <= c["pO2_high_bar"] for c in corner_records),
+            "pO2_corner_ranges_bar": {
+                name: [min(c[name] for c in corner_records), max(c[name] for c in corner_records)]
+                for name in ("pO2_low_bar", "pO2_high_bar")
+            } if corner_records else {},
+            "inventory_capped_channels": sorted(inventory_capped_channels),
+            "inventory_bound_kg_by_parent": inventory_bounds_by_parent,
+        }
+        try:
+            diagnostics = _mass_loss_bound_gate(
+                unsourced_bound_kg + preheat_bound_kg, point_loss_kg, uncertainty_kg,
+                channels=tuple(species for species, bound in bounds_by_channel.items() if bound > 0.0),
+                preheat_bound_kg=preheat_bound_kg,
+            )
+        except ResidueInventoryRefusal as exc:
+            if exc.reason not in {"alpha_not_sourced", "preheat_bound_not_negligible"}:
+                raise
+            diagnostics = json.loads(exc.detail)
+            diagnostics.update(evidence)
+            raise ResidueInventoryRefusal(exc.reason, json.dumps(diagnostics, sort_keys=True)) from exc
+        diagnostics.update(evidence)
+        flags.add("mass_loss_bound:" + json.dumps(diagnostics, sort_keys=True))
+        metadata["mass_loss_bound"] = json.dumps(diagnostics, sort_keys=True)
+        metadata["sourced_alphas"] = json.dumps(fits, sort_keys=True)
+        metadata["alpha_sources"] = json.dumps([fit["source_observation_id"] for fit in fits.values()])
+        payload = omission_payload()
+        if payload is not None:
+            metadata["below_threshold_omissions"] = payload
+        return ResidueMassLossPrediction(
+            mass_loss_fraction=point_loss_kg / sample_mass_kg,
+            engine_flags=tuple(sorted(flags)), engine_metadata=metadata,
+        )
+    except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        attach_omissions(exc)
+        raise
 
 
 def _hashimoto_table_row(table: Any, key: str, temperature_K: float) -> Mapping[str, Any]:
@@ -906,6 +2425,20 @@ def _hashimoto_project_oxide_wt_pct(inventory_mol: Mapping[str, float]) -> dict[
     }
 
 
+def _self_similar_area_m2(
+    initial_area_m2: float, remaining_mass_kg: float, initial_mass_kg: float
+) -> float:
+    # Constant density and self-similar shape: A=k V^(2/3), V=m/rho,
+    # hence A=A0*(m/m0)^(2/3). m/m0 is dimensionless and A is m2.
+    # Equal masses give equal areas; a sphere with V=4*pi*r^3/3 has
+    # k=(36*pi)^(1/3) and therefore A=4*pi*r^2. For R-11, Af/A0=0.876
+    # implies mf/m0=0.876^1.5=0.820; test the printed endpoints against
+    # the source area uncertainty before applying this shape premise.
+    return initial_area_m2 * (
+        max(0.0, remaining_mass_kg / initial_mass_kg) ** (2.0 / 3.0)
+    )
+
+
 def _hashimoto_integrate_geometry(
     initial_inventory_mol: Mapping[str, float],
     channels: Sequence[ResidueChannel],
@@ -916,19 +2449,19 @@ def _hashimoto_integrate_geometry(
     steps: int,
     geometry_policy_id: str,
     initial_area_m2: float,
-) -> tuple[
-    dict[str, float],
-    tuple[float, ...],
-    tuple[dict[str, float | int | str], ...],
-    ResidueEngineNonconvergence | None,
-    dict[str, float],
-]:
+    initial_sample_mass_kg: float | None = None,
+    background_pressure_Pa: float = 0.0,
+    on_step: Callable[[Mapping[str, float], Sequence[ResidueChannel], float, float], None] | None = None,
+) -> _HashimotoGeometryIntegration:
     inventory = {str(oxide): float(amount) for oxide, amount in initial_inventory_mol.items()}
     sample_total_mol = math.fsum(inventory.values())
     exhaustion_floor_mol = _component_exhaustion_floor_mol(sample_total_mol)
     initial_mass_kg = math.fsum(
         amount * _formula_terms(oxide)[1] for oxide, amount in inventory.items()
     )
+    if initial_sample_mass_kg is not None:
+        # Thermal segments retain the original printed A0/m0 reference.
+        initial_mass_kg = initial_sample_mass_kg
     dt_s = duration_s / steps
     pO2_steps: list[float] = []
     evaporated_mol: defaultdict[str, float] = defaultdict(float)
@@ -936,6 +2469,10 @@ def _hashimoto_integrate_geometry(
     exhaustion_notices: list[dict[str, float | int | str]] = []
     refusal: ResidueEngineNonconvergence | None = None
     elapsed_s = 0.0
+    pO2_balance_floor_steps = 0
+    pO2_balance_floor_first_step: int | None = None
+    pO2_balance_floor_time_s = 0.0
+    pO2_balance_floor_pO2_bar: float | None = None
 
     def remove_exhausted(*, step_number: int, time_s: float, substep: int) -> None:
         for oxide, amount in tuple(inventory.items()):
@@ -965,12 +2502,16 @@ def _hashimoto_integrate_geometry(
             amount * _formula_terms(oxide)[1]
             for oxide, amount in inventory.items()
         )
-        return initial_area_m2 * (
-            max(0.0, remaining_mass_kg / initial_mass_kg) ** (2.0 / 3.0)
+        return _self_similar_area_m2(
+            initial_area_m2, remaining_mass_kg, initial_mass_kg
         )
 
     def advance(duration: float, *, step_number: int, substep: int) -> None:
         nonlocal inventory
+        nonlocal pO2_balance_floor_steps
+        nonlocal pO2_balance_floor_first_step
+        nonlocal pO2_balance_floor_time_s
+        nonlocal pO2_balance_floor_pO2_bar
         remove_exhausted(
             step_number=step_number,
             time_s=elapsed_s,
@@ -982,20 +2523,33 @@ def _hashimoto_integrate_geometry(
             if channel.parent_oxide is None
             or channel.parent_oxide not in exhausted_mol
         )
+        area_m2 = area_for_current_inventory()
         step = integrate_residue_inventory(
             inventory,
             active_channels,
             pressure_model,
             temperature_K=temperature_K,
             duration_s=duration,
-            area_evolution_m2=(area_for_current_inventory(),),
+            area_evolution_m2=(area_m2,),
+            **({"background_pressure_Pa": background_pressure_Pa}
+               if background_pressure_Pa else {}),
         )
+        if on_step is not None:
+            on_step(inventory, active_channels, area_m2, duration)
         inventory = dict(step.residue_mol)
         for species, amount in step.evaporated_mol.items():
             evaporated_mol[str(species)] += float(amount)
         pO2_steps.extend(
             float(value) for value in step.pO2_bar_by_step if value is not None
         )
+        pO2_balance_floor_steps += step.pO2_balance_floor_steps
+        pO2_balance_floor_time_s += step.pO2_balance_floor_time_s
+        if (
+            pO2_balance_floor_first_step is None
+            and step.pO2_balance_floor_first_step is not None
+        ):
+            pO2_balance_floor_first_step = step_number
+            pO2_balance_floor_pO2_bar = step.pO2_balance_floor_pO2_bar
 
     for step_number in range(1, steps + 1):
         try:
@@ -1047,17 +2601,25 @@ def _hashimoto_integrate_geometry(
             abs(final_atoms.get(element, 0.0) + exhausted_atoms.get(element, 0.0)),
             1.0e-300,
         )
-        if abs(residual) > max(1.0e-15, 5.0e-12 * scale):
-            raise ResidueInventoryRefusal(
-                "residue_atom_balance_failed",
-                f"{element} atom residual {residual:.17g} mol after exhaustion projection",
-            )
-    return (
-        _hashimoto_project_oxide_wt_pct(inventory),
-        tuple(pO2_steps),
-        tuple(exhaustion_notices),
-        refusal,
-        closure,
+        _check_residue_atom_residual(element, residual, scale, "after exhaustion projection")
+    pO2_balance_floor = {
+        "steps_at_floor": pO2_balance_floor_steps,
+        "first_step": pO2_balance_floor_first_step,
+        "fraction_of_time_at_floor": (
+            pO2_balance_floor_time_s / elapsed_s if elapsed_s > 0.0 else 0.0
+        ),
+        "time_at_floor_s": pO2_balance_floor_time_s,
+        "pO2_bar": pO2_balance_floor_pO2_bar,
+    }
+    return _HashimotoGeometryIntegration(
+        composition_wt_pct=_hashimoto_project_oxide_wt_pct(inventory),
+        pO2_steps=tuple(pO2_steps),
+        exhaustion_notices=tuple(exhaustion_notices),
+        refusal=refusal,
+        atom_closure=closure,
+        inventory_mol=dict(inventory),
+        evaporated_mol=dict(evaporated_mol),
+        pO2_balance_floor=pO2_balance_floor,
     )
 
 
@@ -1089,9 +2651,8 @@ def _predict_hashimoto_residue_cohort(
 
     try:
         import openimcc
-        from openimcc import evaluate_gas, load_gas_datapack
+        from openimcc import load_gas_datapack
         from openimcc.gas import _default_reactions
-        from openimcc.kernel import ImccNonconvergenceError
     except ImportError as exc:
         raise ResidueInventoryRefusal(
             "openimcc_not_importable", str(exc)
@@ -1137,15 +2698,6 @@ def _predict_hashimoto_residue_cohort(
         )
     if not gas_channels:
         raise ResidueInventoryRefusal("hashimoto_openimcc_channels_missing")
-    gas_pressure_exponents = {
-        str(species): (
-            1.0
-            if str(species) == "O2"
-            else -float(reaction[2]) / float(reaction[1])
-        )
-        for species, reaction in gas_channels
-    }
-
     engine_binding_identity = (
         openimcc_bridge.engine_binding_identity(
             openimcc_bridge._load_pack(
@@ -1334,112 +2886,24 @@ def _predict_hashimoto_residue_cohort(
         if not any(channel.parent_oxide for channel in runtime_channels):
             raise ResidueInventoryRefusal("hashimoto_runtime_alpha_channels_missing")
 
-        pressure_state_cache: dict[
-            tuple[tuple[str, float], ...], Mapping[str, float]
-        ] = {}
+        engine_floor_inversion_diagnostics: dict[str, dict[str, object]] = {}
+        pressure_model = _make_residue_pressure_model(
+            engine,
+            gas_channels,
+            gas_pack,
+            temperature_K=temperature_K,
+            total_pressure_Pa=total_pressure_Pa,
+            engine_metadata=melt_pack_identity,
+            engine_flags=set(),
+            missing_channels_reason="hashimoto_internal_analytical_channels_missing",
+            caller="Hashimoto residue cohort",
+            floor_inversion_diagnostics=(
+                engine_floor_inversion_diagnostics
+                if engine == "internal-analytical"
+                else None
+            ),
+        )
 
-        if engine == "openimcc":
-            from simulator.diagnostic_helpers.binary_pot_battery import (
-                _ENGINE_OUTER_TIMEOUT_S,
-            )
-
-            def pressure_model(
-                inventory: Mapping[str, float], log10_pO2_bar: float
-            ) -> Mapping[str, float]:
-                key = tuple(
-                    sorted((str(oxide), float(amount)) for oxide, amount in inventory.items())
-                )
-                base_pressure_bar = pressure_state_cache.get(key)
-                if base_pressure_bar is None:
-                    current_composition = {
-                        oxide: amount for oxide, amount in key if amount > 0.0
-                    }
-                    try:
-                        state = _evaluate_openimcc_isolated(
-                            openimcc_bridge.evaluate,
-                            timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
-                            composition_mol=current_composition,
-                            temperature_K=temperature_K,
-                            allow_extrapolation=True,
-                            allow_out_of_envelope=True,
-                        )
-                    except ImccNonconvergenceError as exc:
-                        raise ResidueEngineNonconvergence(
-                            "openimcc", str(exc)
-                        ) from exc
-                    except TimeoutError as exc:
-                        raise ResidueEngineNonconvergence(
-                            "openimcc",
-                            f"Hashimoto residue cohort OpenIMCC timeout: {exc}",
-                            reason="engine_timeout:openimcc:hashimoto_residue_cohort",
-                        ) from exc
-                    base_pressure_bar = evaluate_gas(
-                        state.parent_oxide_activities,
-                        temperature_K,
-                        1.0,
-                        gas_pack,
-                        parent_oxides=state.parent_oxides,
-                        allow_extrapolation=True,
-                    )
-                    pressure_state_cache[key] = base_pressure_bar
-                    melt_pack_identity.update(
-                        {
-                            "model_id": state.pack_model_id,
-                            "datapack_version": state.pack_version,
-                            "pack_digest": state.pack_digest,
-                            "openimcc_version": state.openimcc_version,
-                        }
-                    )
-                pO2_bar = 10.0**float(log10_pO2_bar)
-                return {
-                    str(species): (
-                        float(base_pressure_bar.get(species, 0.0))
-                        * pO2_bar ** gas_pressure_exponents[str(species)]
-                        * 100_000.0
-                    )
-                    for species, _reaction in gas_channels
-                }
-        else:
-            from simulator.diagnostic_helpers.binary_pot_battery import (
-                PO2_COMMANDED,
-                Po2Request,
-                _internal_analytical_vapor_pressure_adapter,
-                _new_internal_analytical_core,
-            )
-
-            analytical_core = _new_internal_analytical_core()
-
-            def pressure_model(
-                inventory: Mapping[str, float], log10_pO2_bar: float
-            ) -> Mapping[str, float]:
-                response = _internal_analytical_vapor_pressure_adapter(
-                    core=analytical_core,
-                    temperature_C=temperature_K - 273.15,
-                    pressure_bar=total_pressure_Pa / 100_000.0,
-                    composition_kg=None,
-                    composition_mol=inventory,
-                    fO2_log=log10_pO2_bar,
-                    po2_request=Po2Request(
-                        mode=PO2_COMMANDED,
-                        po2_bar=10.0**float(log10_pO2_bar),
-                    ),
-                    include_diagnostic_shadows=False,
-                )
-                pressures = response.vapor_pressures_Pa
-                missing = [
-                    str(species)
-                    for species, _reaction in gas_channels
-                    if species not in pressures
-                ]
-                if missing:
-                    raise ResidueInventoryRefusal(
-                        "hashimoto_internal_analytical_channels_missing",
-                        ", ".join(missing),
-                    )
-                return {
-                    str(species): float(pressures[str(species)])
-                    for species, _reaction in gas_channels
-                }
 
         arm_channels = (
             ("alpha_common_unity_sensitivity", common_channels, common_alpha_records, "common"),
@@ -1448,6 +2912,9 @@ def _predict_hashimoto_residue_cohort(
         for alpha_arm, channels, alpha_records, row_key in arm_channels:
             geometry_predictions: dict[str, dict[str, float]] = {}
             pO2_ranges: dict[str, list[float] | None] = {}
+            pO2_balance_floor_by_geometry: dict[
+                str, dict[str, float | int | None]
+            ] = {}
             geometry_exhaustions: dict[str, tuple[dict[str, float | int | str], ...]] = {}
             geometry_refusals: dict[str, dict[str, object] | None] = {}
             geometry_atom_closure: dict[str, dict[str, float]] = {}
@@ -1468,20 +2935,26 @@ def _predict_hashimoto_residue_cohort(
                 exhaustions: tuple[dict[str, float | int | str], ...] = ()
                 refusal: ResidueEngineNonconvergence | None = None
                 atom_closure: dict[str, float] = {}
+                pO2_balance_floor: dict[str, float | int | None] = {}
                 refinement_status = "unconverged_at_cap"
                 while True:
                     started_cpu = time.process_time()
-                    values, pO2_steps, exhaustions, refusal, atom_closure = (
-                        _hashimoto_integrate_geometry(
-                            run_initial_mol,
-                            channels,
-                            pressure_model,
-                            temperature_K=temperature_K,
-                            duration_s=duration_s,
-                            steps=steps,
-                            geometry_policy_id=geometry,
-                            initial_area_m2=geometry_areas[geometry],
-                        )
+                    (
+                        values,
+                        pO2_steps,
+                        exhaustions,
+                        refusal,
+                        atom_closure,
+                        pO2_balance_floor,
+                    ) = _hashimoto_integrate_geometry(
+                        run_initial_mol,
+                        channels,
+                        pressure_model,
+                        temperature_K=temperature_K,
+                        duration_s=duration_s,
+                        steps=steps,
+                        geometry_policy_id=geometry,
+                        initial_area_m2=geometry_areas[geometry],
                     )
                     cpu_seconds += time.process_time() - started_cpu
                     tried_steps.append(steps)
@@ -1521,6 +2994,7 @@ def _predict_hashimoto_residue_cohort(
                 refinement_accepted_steps_by_geometry[geometry] = tried_steps[-1]
                 geometry_predictions[geometry] = values
                 geometry_exhaustions[geometry] = exhaustions
+                pO2_balance_floor_by_geometry[geometry] = pO2_balance_floor
                 geometry_refusals[geometry] = (
                     {
                         **refusal.as_record(),
@@ -1533,6 +3007,10 @@ def _predict_hashimoto_residue_cohort(
                 pO2_ranges[geometry] = (
                     [min(pO2_steps), max(pO2_steps)] if pO2_steps else None
                 )
+            for notice in getattr(pressure_model, "below_threshold_omission_notices", ()):
+                row = {"reason": notice.reason, "kind": str(notice.kind.value)}
+                if row not in refinement_notices:
+                    refinement_notices.append(row)
             band = {
                 oxide: (
                     min(values[oxide] for values in geometry_predictions.values()),
@@ -1631,6 +3109,15 @@ def _predict_hashimoto_residue_cohort(
                 "oxygen_boundary": "unbuffered vacuum; fO2 control none",
                 "total_pressure_Pa": total_pressure_Pa,
                 "surface_pO2_bar_range_by_geometry": pO2_ranges,
+                "surface_pO2_balance_floor": pO2_balance_floor_by_geometry[
+                    primary_geometry
+                ],
+                "surface_pO2_balance_floor_by_geometry": (
+                    pO2_balance_floor_by_geometry
+                ),
+                "engine_floor_inversion_diagnostics": tuple(
+                    engine_floor_inversion_diagnostics.values()
+                ),
                 "liquid_rows_used": tuple(active_liquid_rows[row_key]),
                 "d060_pending": True,
                 "openimcc_version": str(getattr(openimcc, "__version__", "unknown")),
@@ -2170,9 +3657,9 @@ def _predict_sossi_residue_cohort(
                         for oxide, amount in current_inventory.items()
                     ) + min(0.0, buffer_exchange) * _formula_terms("O")[1]
                     if geometry == "pt_loop_bead_sphere_shrinking":
-                        area = areas[geometry] * max(
-                            0.0, current_mass / initial_total_mass
-                        ) ** (2.0 / 3.0)
+                        area = _self_similar_area_m2(
+                            areas[geometry], current_mass, initial_total_mass
+                        )
                     else:
                         area = areas[geometry]
                     try:

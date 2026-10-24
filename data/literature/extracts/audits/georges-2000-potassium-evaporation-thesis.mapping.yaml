@@ -1,0 +1,685 @@
+source_id: georges-2000-potassium-evaporation-thesis
+source:
+  citation: Georges, P. (2000), Volatilisation et condensation du potassium dans les silicates fondus, doctoral thesis, Université
+    Henri Poincaré, Nancy I.
+extraction:
+  method: MinerU table draft and mapped emission, with table values checked against 600 dpi renders
+  date: '2026-10-22'
+  worker: fam39-1022
+review_status: draft
+tables:
+- page: 79
+  table_index: 13
+  type: rate_series
+  quantity: residue_component_composition
+  evidence_class: measured_direct
+  unit: wt%
+  phase: l
+  row_predicate:
+    column: 3
+    matches: ^[0-9]
+  temperature:
+    as_printed: 1410
+    unit: C
+    locator:
+      page: 79
+      table: III.3
+  values:
+  - column: 4
+    species: MgO
+  - column: 5
+    species: Al2O3
+  - column: 6
+    species: SiO2
+  - column: 8
+    species: CaO
+  render_verified:
+  - row: 2
+    column: 4
+    text: 10,29 (0,17)
+  - row: 2
+    column: 5
+    text: 12,66 (0,16)
+  - row: 2
+    column: 6
+    text: 51,21 (0,32)
+  - row: 2
+    column: 8
+    text: 13,28 (0,12)
+  - row: 3
+    column: 4
+    text: 10,18 (0,14)
+  - row: 3
+    column: 5
+    text: 12,60 (0,12)
+  - row: 3
+    column: 6
+    text: 51,13 (0,17)
+  - row: 3
+    column: 8
+    text: 13,00 (0,18)
+  - row: 4
+    column: 4
+    text: 9,94 (0,16)
+  - row: 4
+    column: 5
+    text: 12,51 (0,10)
+  - row: 4
+    column: 6
+    text: 50,72 (0,24)
+  - row: 4
+    column: 8
+    text: 12,99 (0,11)
+  - row: 5
+    column: 4
+    text: 11,51 (0,12)
+  - row: 5
+    column: 5
+    text: 14,45 (0,18)
+  - row: 5
+    column: 6
+    text: 56,51 (0,38)
+  - row: 5
+    column: 8
+    text: 14,62 (0,21)
+  - row: 6
+    column: 4
+    text: 10,96 (0,17)
+  - row: 6
+    column: 5
+    text: 13,83 (0,17)
+  - row: 6
+    column: 6
+    text: 53,89 (0,36)
+  - row: 6
+    column: 8
+    text: 13,90 (0,11)
+  - row: 7
+    column: 4
+    text: 10,16 (0,12)
+  - row: 7
+    column: 5
+    text: 12,92 (0,14)
+  - row: 7
+    column: 6
+    text: 50,50 (0,47)
+  - row: 7
+    column: 8
+    text: 13,08 (0,08)
+  - row: 8
+    column: 4
+    text: 10,86 (0,60)
+  - row: 8
+    column: 5
+    text: 14,51 (0,35)
+  - row: 8
+    column: 6
+    text: 54,87 (0,93)
+  - row: 8
+    column: 8
+    text: 14,00 (0,92)
+  - row: 9
+    column: 4
+    text: 10,16 (0,14)
+  - row: 9
+    column: 5
+    text: 13,59 (0,18)
+  - row: 9
+    column: 6
+    text: 49,57 (0,29)
+  - row: 9
+    column: 8
+    text: 13,59 (0,22)
+  - row: 10
+    column: 4
+    text: 10,14 (0,11)
+  - row: 10
+    column: 5
+    text: 13,40 (0,17)
+  - row: 10
+    column: 6
+    text: 50,48 (0,40)
+  - row: 10
+    column: 8
+    text: 13,01 (0,17)
+  - row: 11
+    column: 4
+    text: 9,50 (0,42)
+  - row: 11
+    column: 5
+    text: 15,17 (0,63)
+  - row: 11
+    column: 6
+    text: 48,71 (0,42)
+  - row: 11
+    column: 8
+    text: 13,08 (0,38)
+  - row: 12
+    column: 4
+    text: 12,06 (0,36)
+  - row: 12
+    column: 5
+    text: 13,77 (0,32)
+  - row: 12
+    column: 6
+    text: 48,71 (0,48)
+  - row: 12
+    column: 8
+    text: 16,16 (0,34)
+  - row: 13
+    column: 4
+    text: 11,02 (0,29)
+  - row: 13
+    column: 5
+    text: 13,53 (0,21)
+  - row: 13
+    column: 6
+    text: 51,41 (0,70)
+  - row: 13
+    column: 8
+    text: 13,41 (0,19)
+  - row: 14
+    column: 4
+    text: 10,87 (0,21)
+  - row: 14
+    column: 5
+    text: 12,99 (0,14)
+  - row: 14
+    column: 6
+    text: 49,85 (0,44)
+  - row: 14
+    column: 8
+    text: 13,77 (0,20)
+  - row: 15
+    column: 4
+    text: 11,11 (0,27)
+  - row: 15
+    column: 5
+    text: 13,95 (0,14)
+  - row: 15
+    column: 6
+    text: 55,71 (1,18)
+  - row: 15
+    column: 8
+    text: 14,15 (0,41)
+  - row: 16
+    column: 4
+    text: 10,93 (0,19)
+  - row: 16
+    column: 5
+    text: 13,94 (0,15)
+  - row: 16
+    column: 6
+    text: 52,53 (0,39)
+  - row: 16
+    column: 8
+    text: 13,98 (0,12)
+  - row: 17
+    column: 4
+    text: 11,09 (0,28)
+  - row: 17
+    column: 5
+    text: 13,87 (0,12)
+  - row: 17
+    column: 6
+    text: 51,94 (0,59)
+  - row: 17
+    column: 8
+    text: 13,93 (0,20)
+  - row: 18
+    column: 4
+    text: 10,51 (0,22)
+  - row: 18
+    column: 5
+    text: 13,28 (0,12)
+  - row: 18
+    column: 6
+    text: 51,36 (0,47)
+  - row: 18
+    column: 8
+    text: 13,41 (0,12)
+- page: 86
+  table_index: 16
+  type: rate_series
+  quantity: residue_component_composition
+  evidence_class: measured_direct
+  unit: wt%
+  phase: l
+  row_predicate:
+    column: 3
+    matches: ^[0-9]
+  temperature:
+    as_printed: 1410
+    unit: C
+    locator:
+      page: 86
+      table: III.6
+  values:
+  - column: 4
+    species: MgO
+  - column: 5
+    species: Al2O3
+  - column: 6
+    species: SiO2
+  - column: 8
+    species: CaO
+  render_verified:
+  - row: 2
+    column: 4
+    text: 9,59 (0,74
+  - row: 2
+    column: 5
+    text: 14,83 (0,58)
+  - row: 2
+    column: 6
+    text: 45.79 (0,85)
+  - row: 3
+    column: 4
+    text: 9,45 (0,76)
+  - row: 3
+    column: 5
+    text: 14,45 (0,18)
+  - row: 3
+    column: 6
+    text: 48,28 (1,10)
+  - row: 4
+    column: 4
+    text: 10,61 (0,19)
+  - row: 4
+    column: 5
+    text: 16,09 (0,21)
+  - row: 4
+    column: 6
+    text: 51,47 (0,38)
+  - row: 4
+    column: 8
+    text: 14.71 (0,19)
+  - row: 5
+    column: 4
+    text: 11,24 (0,16)
+  - row: 5
+    column: 5
+    text: 16,81 (0,22)
+  - row: 5
+    column: 6
+    text: 52,31 (0,34)
+  - row: 5
+    column: 8
+    text: 15.37 (0,14)
+  - row: 6
+    column: 4
+    text: 9,85 (0,88)
+  - row: 6
+    column: 5
+    text: 14,08 (0,33)
+  - row: 6
+    column: 6
+    text: 45.88 (1,21)
+  - row: 7
+    column: 4
+    text: 10,69 (0,98)
+  - row: 7
+    column: 5
+    text: 15,52 (0,15)
+  - row: 7
+    column: 6
+    text: 46,85 (1,36)
+  - row: 8
+    column: 4
+    text: 11,37 (0,39)
+  - row: 8
+    column: 5
+    text: 16,14 (0,95)
+  - row: 8
+    column: 6
+    text: 48,35 (0,66)
+  - row: 9
+    column: 4
+    text: 10,69 (0,24)
+  - row: 9
+    column: 5
+    text: 16,55 (0,14)
+  - row: 9
+    column: 6
+    text: 51,66 (0,43)
+  - row: 10
+    column: 4
+    text: 11,20 (0,10)
+  - row: 10
+    column: 5
+    text: 16,89 (0,17)
+- page: 87
+  table_index: 17
+  type: rate_series
+  quantity: residue_component_composition
+  evidence_class: measured_direct
+  unit: wt%
+  phase: l
+  row_predicate:
+    column: 4
+    matches: ^[0-9]
+  temperature:
+    as_printed: 1410
+    unit: C
+    locator:
+      page: 87
+      table: III.7
+  values:
+  - column: 5
+    species: MgO
+  - column: 6
+    species: Al2O3
+  - column: 7
+    species: SiO2
+  - column: 9
+    species: CaO
+  render_verified:
+  - row: 2
+    column: 5
+    text: 11,75 (0,21)
+  - row: 2
+    column: 6
+    text: 14,86 (0,21)
+  - row: 2
+    column: 7
+    text: 46,24 (0,35)
+  - row: 2
+    column: 9
+    text: 14,25 (0,36)
+  - row: 3
+    column: 5
+    text: 11,81 (0,15)
+  - row: 3
+    column: 6
+    text: 15,18 (0,37)
+  - row: 3
+    column: 7
+    text: 48,98 (0,33)
+  - row: 3
+    column: 9
+    text: 14,04 (0,20)
+  - row: 4
+    column: 5
+    text: 11,28 (0,16)
+  - row: 4
+    column: 6
+    text: 15,21 (0,19)
+  - row: 4
+    column: 7
+    text: 48,90 (0,25)
+  - row: 4
+    column: 9
+    text: 13,81 (0,19)
+  - row: 5
+    column: 5
+    text: 10,00 (0,57)
+  - row: 5
+    column: 6
+    text: 14,96 (0,24)
+  - row: 5
+    column: 7
+    text: 46,53 (0,93)
+  - row: 5
+    column: 9
+    text: 13,34 (0,83)
+  - row: 6
+    column: 5
+    text: 10,62 (0,15)
+  - row: 6
+    column: 6
+    text: 15,53 (0,18)
+  - row: 6
+    column: 7
+    text: 50,00 (0,50)
+  - row: 6
+    column: 9
+    text: 14,25 (0,30)
+  - row: 7
+    column: 5
+    text: 10,59 (0,22)
+  - row: 7
+    column: 6
+    text: 16,27 (0,13)
+  - row: 7
+    column: 7
+    text: 50,14 (0,19)
+  - row: 7
+    column: 9
+    text: 14,49 (0,18)
+  - row: 8
+    column: 5
+    text: 10,83 (0,43)
+  - row: 8
+    column: 6
+    text: 16,06 (0,22)
+  - row: 8
+    column: 7
+    text: 49,74 (0,50)
+  - row: 8
+    column: 9
+    text: 14,70 (0,32)
+  - row: 9
+    column: 5
+    text: 11,72 (0,67)
+  - row: 9
+    column: 6
+    text: 16,77 (0,30)
+  - row: 9
+    column: 7
+    text: 48,74 (1,21)
+  - row: 9
+    column: 9
+    text: 15,07 (0,56)
+  - row: 10
+    column: 5
+    text: 11,15 (0,47)
+  - row: 10
+    column: 6
+    text: 14,66 (0,18)
+  - row: 10
+    column: 7
+    text: 45,12 (0,57)
+  - row: 10
+    column: 9
+    text: 13,97 (0,55)
+  - row: 11
+    column: 5
+    text: 10,33 (1,04)
+  - row: 11
+    column: 6
+    text: 15,34 (0,21)
+  - row: 11
+    column: 7
+    text: 46,85 (1,41)
+  - row: 11
+    column: 9
+    text: 12,95 (1,24)
+  - row: 12
+    column: 5
+    text: 11,76 (0,27)
+  - row: 12
+    column: 6
+    text: 16,51 (0,21)
+  - row: 12
+    column: 7
+    text: 50,25 (0,80)
+  - row: 12
+    column: 9
+    text: 14,84 (0,37)
+  - row: 13
+    column: 5
+    text: 11,63 (0,24)
+  - row: 13
+    column: 6
+    text: 16,66 (0,30)
+  - row: 13
+    column: 7
+    text: 49,70 (0,49)
+  - row: 13
+    column: 9
+    text: 14,80 (0,25)
+  - row: 14
+    column: 5
+    text: 10,62 (0,99)
+  - row: 14
+    column: 6
+    text: 14,76 (1,23)
+  - row: 14
+    column: 7
+    text: 44,18 (0,90)
+  - row: 14
+    column: 9
+    text: 13,21 (1,27)
+  - row: 15
+    column: 5
+    text: 11,65 (0,44)
+  - row: 15
+    column: 6
+    text: 16,28 (0,21)
+  - row: 15
+    column: 7
+    text: 49,59 (0,57)
+  - row: 15
+    column: 9
+    text: 14,29 (0,56)
+  - row: 16
+    column: 5
+    text: 11,83 (0,18)
+  - row: 16
+    column: 6
+    text: 16,89 (0,24)
+  - row: 16
+    column: 7
+    text: 49,92 (0,65)
+  - row: 16
+    column: 9
+    text: 14,61 (0,20)
+  - row: 17
+    column: 5
+    text: 12,14 (0,16)
+  - row: 17
+    column: 6
+    text: 16,91 (0,25)
+  - row: 17
+    column: 7
+    text: 49,96 (0,45)
+  - row: 17
+    column: 9
+    text: 15,13 (0,33)
+  - row: 18
+    column: 5
+    text: 9,82 (0,81)
+  - row: 18
+    column: 6
+    text: 14,29 (0,24)
+  - row: 18
+    column: 7
+    text: 46,88 (1,34)
+  - row: 18
+    column: 9
+    text: 12,97 (1,34)
+  - row: 19
+    column: 5
+    text: 10,67 (1,22)
+  - row: 19
+    column: 6
+    text: 15,97 (0,29)
+  - row: 19
+    column: 7
+    text: 48,63 (1,85)
+  - row: 19
+    column: 9
+    text: 14,70 (1,44)
+  - row: 20
+    column: 5
+    text: 11,21 (0,14)
+  - row: 20
+    column: 6
+    text: 16,73 (0,17)
+  - row: 20
+    column: 7
+    text: 52,26 (0,27)
+  - row: 20
+    column: 9
+    text: 14,78 (0,19)
+  - row: 21
+    column: 5
+    text: 11,13 (0,14)
+  - row: 21
+    column: 6
+    text: 17,45 (0,21)
+  - row: 21
+    column: 7
+    text: 52,31 (0,42)
+  - row: 21
+    column: 9
+    text: 15,22 (0,23)
+  - row: 22
+    column: 5
+    text: 11,31 (0,14)
+  - row: 22
+    column: 6
+    text: 17,45 (0,16)
+  - row: 22
+    column: 7
+    text: 52,42 (0,25)
+  - row: 22
+    column: 9
+    text: 15,12 (0,22)
+- page: 203
+  table_index: 48
+  type: rate_series
+  quantity: residue_component_composition
+  evidence_class: measured_direct
+  unit: wt%
+  phase: l
+  row_predicate:
+    column: 6
+    matches: ^[0-9]
+  temperature:
+    as_printed: 1410
+    unit: C
+    locator:
+      page: 202
+      table: Annexe II
+  values:
+  - column: 8
+    species: MgO
+  - column: 9
+    species: Al2O3
+  - column: 10
+    species: SiO2
+  - column: 12
+    species: CaO
+  render_verified: []
+- page: 209
+  table_index: 52
+  type: composition_series
+  quantity: equilibrium_phase_composition
+  evidence_class: measured_direct
+  unit: wt%
+  row_predicate:
+    column: 5
+    matches: ^[0-9]
+  temperature:
+    as_printed: 1410
+    unit: C
+    locator:
+      page: 208
+      table: Annexe III
+  values:
+  - column: 7
+    species: MgO
+  - column: 8
+    species: Al2O3
+  - column: 9
+    species: SiO2
+  - column: 10
+    species: K2O
+  - column: 11
+    species: CaO
+  - column: 12
+    species: K2O
+  render_verified: []
+
+# Table III.4 is omitted: its numeric measurement rows are marked as header rows by MinerU, which the emitter refuses. The extract transcribes all rows from the 600 dpi render.

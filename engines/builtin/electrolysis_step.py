@@ -112,7 +112,6 @@ MRE_CURRENT_PARTITION_SOURCE = (
     "heuristic:activity_exp_FdV_over_RT_SEL-1_not_literature_grounded"
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
-MRE_INVALID_CONTROL_REFUSAL = "invalid_electrolysis_control"
 MRE_INVALID_TARGET_REFUSAL = "invalid_allowed_oxides"
 MRE_INVALID_GAS_FUGACITY_REFUSAL = "invalid_gas_product_fugacity"
 
@@ -286,11 +285,14 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         from simulator.accounting.formulas import resolve_species_formula
         from simulator.electrolysis import (
             ELECTRONS_PER_OXIDE,
+            _faraday_reduced_extent,
             FERRIC_TO_FERROUS_ELECTRONS,
             FERRIC_TO_FERROUS_FEO_PER_FE2O3,
             FERRIC_TO_FERROUS_O2_PER_FE2O3,
             FERRIC_TO_FERROUS_REFERENCE_V,
             FERRIC_TO_FERROUS_REFERENCE_STATUS,
+            MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+            MRE_INVALID_CONTROL_REFUSAL,
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
             MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
             MRE_RAW_MARGIN_REFUSAL,
@@ -303,9 +305,11 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             MRE_NORTH_STAR_POSTURE,
             MRE_OPTIONAL_BANNER,
             CURRENT_EFFICIENCY_MODEL_ID,
+            MREElectrolysisInvalidInput,
             _without_mre_quantities,
             coerce_gas_product_fugacity_bar,
             current_efficiency_diagnostic,
+            mre_control_domain_assessment,
             mre_selectivity_weight,
             uncertified_multi_oxide_partition_targets,
         )
@@ -323,13 +327,30 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             return wrong_intent
 
         controls = unpack_controls(request)
-        validated, invalid_controls = self._validate_controls(request, controls)
+        validated, invalid_controls = self._validate_request_controls(request)
         if invalid_controls:
             return self._invalid_result(
                 request,
                 reason=MRE_INVALID_CONTROL_REFUSAL,
                 invalid=invalid_controls,
             )
+        try:
+            validated_mre_controls, control_notices = (
+                mre_control_domain_assessment(controls)
+            )
+        except MREElectrolysisInvalidInput as exc:
+            invalid = exc.diagnostic.get("invalid_controls", {})
+            return self._invalid_result(
+                request,
+                reason=exc.reason,
+                invalid=invalid if isinstance(invalid, Mapping) else {},
+                energy_kWh=(
+                    0.0
+                    if exc.reason == MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
+                    else None
+                ),
+            )
+        validated.update(validated_mre_controls)
         empty_transition = (
             LedgerTransitionProposal(
                 debits={},
@@ -397,6 +418,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 melt_fO2_log=melt_fO2_log,
                 pressure_bar=request.pressure_bar,
                 transition=empty_transition,
+                control_notices=control_notices,
             )
 
         registry = request.account_view.species_formula_registry
@@ -473,6 +495,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             ),
             "fe2o3_fixed_full_reduction_skipped": True,
         }
+        if control_notices:
+            diagnostic["notices"] = control_notices
 
         if total_kg <= 0.0 or voltage_V <= 0.0 or current_A <= 0.0:
             return IntentResult(
@@ -747,9 +771,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 diagnostic=diagnostic,
             )
 
-        # Faraday integration time. dt_hr -> seconds. Mirrors the
-        # legacy ``t_s = 3600.0`` exactly when dt_hr=1.0, scales for
-        # future tick changes.
+        # Faraday integration time. The shared MRE assessment has already
+        # checked this exact conversion for binary64 overflow.
         t_s = 3600.0 * dt_hr
 
         debits_mol: dict[str, dict[str, float]] = defaultdict(dict)
@@ -784,10 +807,25 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             )
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)
 
-            uncapped_moles_reduced = (
-                I_species * eta_CE * t_s
-            ) / (n_e * FARADAY)
-            kg_oxide_reduced = uncapped_moles_reduced * M_oxide_gmol / 1000.0
+            extent = _faraday_reduced_extent(
+                I_species,
+                eta_CE,
+                t_s,
+                n_e,
+                M_oxide_gmol,
+                faraday=FARADAY,
+            )
+            if extent is None:
+                return self._invalid_result(
+                    request,
+                    reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+                    invalid={
+                        "current_A": "Faraday extent is not finite",
+                        "dt_hr": "Faraday integration exceeds the admitted window",
+                    },
+                    energy_kWh=0.0,
+                )
+            uncapped_moles_reduced, kg_oxide_reduced = extent
 
             # Cap at melt availability. Re-derive mol from the capped
             # kg to keep mol-native bookkeeping consistent with the
@@ -799,7 +837,15 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             moles_reduced = kg_oxide_reduced * 1000.0 / M_oxide_gmol
             species_cap_ratio = 0.0
             if uncapped_moles_reduced > 0.0:
-                species_cap_ratio = min(1.0, moles_reduced / uncapped_moles_reduced)
+                uncapped_ratio = moles_reduced / uncapped_moles_reduced
+                if not math.isfinite(uncapped_ratio):
+                    return self._invalid_result(
+                        request,
+                        reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+                        invalid={"current_A": "Faraday cap ratio is not finite"},
+                        energy_kWh=0.0,
+                    )
+                species_cap_ratio = min(1.0, uncapped_ratio)
             billable_current_A += I_species * species_cap_ratio
 
             if kg_oxide_reduced <= 1e-10:
@@ -921,9 +967,17 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # their full current share. Preserve exact commanded energy when no cap
         # bound.
         energy_current_A = billable_current_A if any_capped else current_A
-        diagnostic["energy_kWh"] = (
+        energy_kWh = (
             voltage_V * energy_current_A * dt_hr / 1000.0
         )
+        if not math.isfinite(energy_kWh):
+            return self._invalid_result(
+                request,
+                reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+                invalid={"voltage_V": "billed electrolysis energy is not finite"},
+                energy_kWh=0.0,
+            )
+        diagnostic["energy_kWh"] = energy_kWh
 
         # Assemble the proposal in mol-native form.
         if not oxide_mol_total:
@@ -1050,37 +1104,19 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         ) / (int(electrons) * faraday) * log_Q
 
     @staticmethod
-    def _validate_controls(
+    def _validate_request_controls(
         request: IntentRequest,
-        controls: Mapping[str, Any],
     ) -> tuple[dict[str, float], dict[str, str]]:
         raw_values = {
-            "voltage_V": (
-                0.0
-                if controls.get("voltage_V") is None
-                else controls.get("voltage_V")
-            ),
-            "current_A": (
-                0.0
-                if controls.get("current_A") is None
-                else controls.get("current_A")
-            ),
-            "dt_hr": controls.get("dt_hr", 1.0),
-            "pO2_bar": controls.get("pO2_bar", 1.0),
             "temperature_C": request.temperature_C,
             "pressure_bar": request.pressure_bar,
         }
         values: dict[str, float] = {}
         invalid: dict[str, str] = {}
         for name, raw in raw_values.items():
-            # Same admission predicate the DTO uses
-            # (`is_declared_real_scalar(..., allow_numeric_str=True)`),
-            # applied here BEFORE float(). The DTO defers these four
-            # electrolysis controls so a typed MRE_INVALID_CONTROL_REFUSAL
-            # can replace a bare TypeError (028791da / RC-05). Skipping that
-            # check without re-applying it admitted np.bool_ and size-1
-            # arrays, which float() coerces (True -> 1.0). None still passes
-            # (absence is not a type error); nan/inf/negative stay below.
+            # Same admission predicate the DTO uses, applied here before
+            # float(). Electrolysis controls are owned by the shared MRE
+            # assessment below; this validates only request environment.
             if raw is not None and not is_declared_real_scalar(
                 raw,
                 allow_numeric_str=True,
@@ -1101,19 +1137,16 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 continue
             values[name] = value
 
-        nonnegative = ("voltage_V", "current_A", "pressure_bar")
+        nonnegative = ("pressure_bar",)
         for name in nonnegative:
             if name in values and values[name] < 0.0:
                 invalid[name] = "must_be_nonnegative"
-        if "dt_hr" in values and values["dt_hr"] < 0.0:
-            invalid["dt_hr"] = "must_be_nonnegative"
-        if "pO2_bar" in values and values["pO2_bar"] <= 0.0:
-            invalid["pO2_bar"] = "must_be_positive"
         if (
             "temperature_C" in values
             and values["temperature_C"] <= -CELSIUS_TO_KELVIN_OFFSET
         ):
             invalid["temperature_C"] = "must_be_above_absolute_zero"
+
         return values, invalid
 
     @staticmethod
@@ -1141,15 +1174,19 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         *,
         reason: str,
         invalid: Mapping[str, str],
+        energy_kWh: float | None = None,
     ) -> IntentResult:
+        diagnostic = {
+            "reason_refused": reason,
+            "invalid_controls": dict(invalid),
+        }
+        if energy_kWh is not None:
+            diagnostic["energy_kWh"] = energy_kWh
         return IntentResult(
             intent=request.intent,
             status="refused",
             transition=None,
-            diagnostic={
-                "reason_refused": reason,
-                "invalid_controls": dict(invalid),
-            },
+            diagnostic=diagnostic,
         )
 
     @staticmethod
@@ -1340,6 +1377,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         cls,
         *,
         diagnostic_skipped: str = "",
+        control_notices: list[dict[str, Any]] | None = None,
         request: "IntentRequest | None" = None,
         applied_anode_fO2_log: float = 0.0,
         melt_fO2_log: float | None = None,
@@ -1383,6 +1421,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             ),
             "fe2o3_fixed_full_reduction_skipped": True,
         }
+        if control_notices:
+            diag["notices"] = control_notices
         if diagnostic_skipped:
             diag["reason_skipped"] = diagnostic_skipped
         return IntentResult(

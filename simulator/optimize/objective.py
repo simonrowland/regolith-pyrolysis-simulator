@@ -25,6 +25,7 @@ from simulator.optimize.canonical import canonical_json_dumps, normalize_canonic
 from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
+    _coating_wall_quantity_unavailable,
     extraction_completeness_report,
     target_species_yield_report,
 )
@@ -3619,6 +3620,39 @@ def product_summary(
     if high_t_activity:
         summary["high_t_melt_activity_fallback_notice"] = high_t_activity
     summary.update(_coating_product_summary(run_execution))
+    # Unavailability comes from the gate verdict. Authority prose, including
+    # an extrapolated-quantity sentence next to a '=refused' carrier token,
+    # must not reclassify a clear or violated verdict.
+    if coating_margin is not None:
+        margin_payload = getattr(coating_margin, "status_payload", {}) or {}
+        verdict = (
+            margin_payload.get("coating_verdict")
+            if isinstance(margin_payload, Mapping)
+            else None
+        )
+        margin_status = str(getattr(coating_margin, "status", ""))
+        if margin_status == "unavailable" or verdict == "unavailable":
+            coating_unavailable_reason = (
+                str(getattr(coating_margin, "status_reason", "") or "")
+                or str(summary.get("coating_unavailable_reason", "") or "")
+                or "coating wall evidence unavailable"
+            )
+            summary["coating_status"] = "unavailable"
+            summary["coating_status_reason"] = coating_unavailable_reason
+            summary["coating_unavailable_reason"] = coating_unavailable_reason
+        elif verdict in {"clear", "violated"}:
+            summary.pop("coating_unavailable_reason", None)
+            if margin_status in {"available", "warning"}:
+                summary["coating_status"] = margin_status
+            else:
+                summary["coating_status"] = "warning"
+            if summary["coating_status"] == "available":
+                summary["coating_status_reason"] = ""
+            else:
+                summary["coating_status_reason"] = str(
+                    getattr(coating_margin, "status_reason", "") or ""
+                )
+    coating_status = str(summary.get("coating_status", ""))
     lifetime, has_positive_fouling = _selection_coating_lifetime(
         coating_margin,
         fallback_campaigns=summary.get("campaigns_to_resinter", math.inf),
@@ -3633,6 +3667,8 @@ def product_summary(
                 lifetime,
                 has_positive_fouling=has_positive_fouling,
                 cost_parameters=cost_parameters,
+                coating_status=coating_status,
+                coating_status_reason=str(summary.get("coating_status_reason", "")),
             )
         )
     return MappingProxyType(summary)
@@ -3685,6 +3721,14 @@ def _selection_coating_lifetime(
     fallback_positive: bool,
 ) -> tuple[Any, bool]:
     payload = getattr(coating_margin, "status_payload", {}) or {}
+    if (
+        str(getattr(coating_margin, "status", "")) == "unavailable"
+        or (
+            isinstance(payload, Mapping)
+            and payload.get("coating_verdict") == "unavailable"
+        )
+    ):
+        return fallback_campaigns, False
     if not isinstance(payload, Mapping):
         return fallback_campaigns, fallback_positive
     if payload.get("coating_constraint_mode") == "no_unqualified_deposition":
@@ -3711,7 +3755,18 @@ def _furnace_amortization_summary(
     *,
     has_positive_fouling: bool,
     cost_parameters: Mapping[str, Any] | CostParameters | None,
+    coating_status: str | None = None,
+    coating_status_reason: str = "",
 ) -> Mapping[str, Any]:
+    if coating_status == "unavailable":
+        return MappingProxyType({
+            "furnace_amortization_status": "unavailable",
+            "furnace_amortization_status_reason": (
+                coating_status_reason or "coating wall evidence unavailable"
+            ),
+            "furnace_amortization_cost_per_run_usd": None,
+            "furnace_amortization_batch_cost_equivalents": None,
+        })
     parameters = (
         cost_parameters
         if isinstance(cost_parameters, CostParameters)
@@ -3833,20 +3888,25 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
         raise ObjectiveComputationError(
             "wall_deposit_by_segment_species_kg trace is not a mapping"
         )
-    by_segment = _wall_deposit_by_segment_species_summary(raw_by_segment)
+    # A null kilogram is unknown. Leave it out of every numeric sum. Do not
+    # price it as zero, and do not abort a quantity the gate has classified.
+    known_by_segment = {
+        key: kg for key, kg in raw_by_segment.items() if kg is not None
+    }
+    by_segment = _wall_deposit_by_segment_species_summary(known_by_segment)
     zone_by_segment = getattr(trace, "wall_zone_by_segment", None)
     if zone_by_segment is None:
         raise ObjectiveComputationError("wall_zone_by_segment trace is missing")
     if not isinstance(zone_by_segment, Mapping):
         raise ObjectiveComputationError("wall_zone_by_segment trace is not a mapping")
     try:
-        by_zone = wall_deposit_kg_by_zone_species(raw_by_segment, zone_by_segment)
+        by_zone = wall_deposit_kg_by_zone_species(known_by_segment, zone_by_segment)
     except (TypeError, ValueError) as exc:
         raise ObjectiveComputationError(str(exc)) from exc
     sim = getattr(run_execution, "simulator", run_execution)
     remobilization = wall_deposit_remobilization_by_segment_species(
         sim,
-        cumulative_deposits_kg=raw_by_segment,
+        cumulative_deposits_kg=known_by_segment,
     )
     authority = _coating_authority_status(raw_by_segment, run_execution)
     return MappingProxyType({
@@ -3863,16 +3923,18 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
             for segment, species_map in remobilization.items()
         }),
         "campaigns_to_resinter": _campaigns_to_resinter(
-            raw_by_segment,
+            known_by_segment,
             campaigns_elapsed=_campaigns_elapsed(run_execution),
         ),
         "aggregate_campaigns_to_resinter": _aggregate_campaigns_to_resinter(
-            raw_by_segment,
+            known_by_segment,
             campaigns_elapsed=_campaigns_elapsed(run_execution),
         ),
-        "has_positive_qualified_fouling": _has_positive_wall_deposit(raw_by_segment),
+        "has_positive_qualified_fouling": _has_positive_wall_deposit(
+            known_by_segment
+        ),
         **_furnace_lifespan_cost_summary_from_raw(
-            raw_by_segment,
+            known_by_segment,
             campaigns_elapsed=_campaigns_elapsed(run_execution),
         ),
         **_coating_authority_summary(authority),
@@ -3901,26 +3963,44 @@ def _has_positive_wall_deposit(
     """Match the coating model's exact positive-rate test; do not add epsilon."""
 
     return any(
-        _finite_float(value, f"wall_deposit[{key!r}]") > 0.0
+        value is not None
+        and _finite_float(value, f"wall_deposit[{key!r}]") > 0.0
         for key, value in wall_deposit_by_segment_species.items()
     )
 
 
 def _coating_authority_summary(authority: Mapping[str, Any]) -> dict[str, Any]:
-    authoritative = _coating_authority_is_authoritative(authority)
-    return {
+    unavailable_reason = _coating_wall_quantity_unavailable(
+        authority,
+        include_coverage_unknown=False,
+    )
+    authoritative = (
+        False if unavailable_reason else _coating_authority_is_authoritative(authority)
+    )
+    summary = {
         "coating_authoritative": authoritative,
         "coating_output_status": str(
             authority.get("output_status", "authoritative")
         ),
-        "coating_status": "available" if authoritative else "warning",
+        "coating_status": (
+            "unavailable"
+            if unavailable_reason
+            else ("available" if authoritative else "warning")
+        ),
         "coating_status_reason": (
-            ""
-            if authoritative
-            else str(authority.get("message", "non-authoritative coating"))
+            unavailable_reason
+            if unavailable_reason
+            else (
+                ""
+                if authoritative
+                else str(authority.get("message", "non-authoritative coating"))
+            )
         ),
         "wall_deposit_sticking_authority": _plain_payload(authority),
     }
+    if unavailable_reason:
+        summary["coating_unavailable_reason"] = unavailable_reason
+    return summary
 
 
 def _coating_authority_is_authoritative(authority: Mapping[str, Any]) -> bool:
@@ -4188,6 +4268,8 @@ def _wall_deposit_by_segment_species_summary(
                 "wall deposit key must be (segment, species)"
             )
         segment, species = str(key[0]), str(key[1])
+        if kg is None:
+            continue
         amount = _finite_float(kg, f"wall_deposit[{segment!r}][{species!r}]")
         if amount < 0.0:
             continue
@@ -4281,6 +4363,8 @@ def _wall_deposit_by_species_summary(
                 "wall deposit key must be (segment, species)"
             )
         species = str(key[1])
+        if kg is None:
+            continue
         amount = _finite_float(kg, f"wall_deposit[{key!r}]")
         if amount > 1e-12:
             by_species[species] = by_species.get(species, 0.0) + amount

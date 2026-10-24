@@ -268,10 +268,62 @@ def test_openimcc_temperature_notice_survives_cell_notices() -> None:
     assert "openimcc_gas_unavailable" in warm_kinds
     assert "openimcc_temperature_extrapolated" not in warm_kinds
     warm_cell_notices = cell_notices(Quantity.ACTIVITY, Engine.OPENIMCC, warm)
+    engine_text_rows = [
+        row
+        for row in warm.notices
+        if row.get("kind") in {"openimcc_flag", "openimcc_notice"}
+    ]
+    engine_caveats = [
+        notice
+        for notice in warm_cell_notices
+        if notice.kind.value == "engine_model_caveat"
+    ]
+    assert engine_text_rows
+    assert [notice.reason for notice in engine_caveats] == [
+        row["reason"] for row in engine_text_rows
+    ]
+    unavailable_reason = next(
+        row["reason"]
+        for row in warm.notices
+        if row.get("kind") == "openimcc_gas_unavailable"
+    )
+    assert any(
+        notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+        and notice.reason == unavailable_reason
+        for notice in warm_cell_notices
+    )
     assert not any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         for notice in warm_cell_notices
     )
+
+
+def test_openimcc_cell_notice_record_kinds_are_classified_separately() -> None:
+    rows = (
+        {"kind": "openimcc_flag", "reason": "liquid_only_model"},
+        {"kind": "openimcc_notice", "reason": "metastable FeO1.5 branch"},
+        {
+            "kind": "openimcc_gas_unavailable",
+            "reason": "openimcc gas datapack unavailable",
+        },
+        {
+            "kind": "openimcc_flag",
+            "authority": AUTHORITY_EXTRAPOLATED,
+            "reason": "T outside openimcc datapack domain",
+        },
+    )
+    scored = cell_notices(
+        Quantity.ACTIVITY,
+        Engine.OPENIMCC,
+        types.SimpleNamespace(notices=rows),
+    )
+
+    assert [(notice.kind.value, notice.reason) for notice in scored] == [
+        ("engine_model_caveat", "liquid_only_model"),
+        ("engine_model_caveat", "metastable FeO1.5 branch"),
+        ("source_disagreement", "openimcc gas datapack unavailable"),
+        ("out_of_certified_band", "T outside openimcc datapack domain"),
+    ]
 
 
 def test_scoring_envelope_uses_cell_flag() -> None:

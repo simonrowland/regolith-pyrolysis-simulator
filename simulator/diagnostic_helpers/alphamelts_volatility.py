@@ -16,7 +16,11 @@ from typing import Any
 import yaml
 from simulator.yaml_cache import load_cached_safe_yaml
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _antoine_skip_notices_for_omitted_species,
+    _append_antoine_skip_notice,
+    _antoine_log10_pressure,
+)
 from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
     canonical_melt_oxide_activity_name,
@@ -166,6 +170,7 @@ def alphamelts_activity_volatility_diagnostic(
 
     grid = []
     vapor_model_limits: dict[str, Any] = {}
+    antoine_skip_notices: list[str] = []
     for pO2_bar in pO2_values:
         computed = _analytical_vapor_pressures_from_activities(
             vapor_pressure_data=vapor_data,
@@ -176,6 +181,16 @@ def alphamelts_activity_volatility_diagnostic(
             vacuum_floor_bar=float(vacuum_floor_bar),
         )
         vapor_model_limits.update(computed["extrapolated_beyond_valid_range_K"])
+        for notice in _antoine_skip_notices_for_omitted_species(
+            computed.get("warnings", ()),
+            {
+                species: payload.get("P_eq_Pa")
+                for species, payload in computed["species"].items()
+                if isinstance(payload, Mapping)
+            },
+        ):
+            if notice not in antoine_skip_notices:
+                antoine_skip_notices.append(notice)
         grid.append(
             {
                 "pO2_bar": pO2_bar,
@@ -228,6 +243,7 @@ def alphamelts_activity_volatility_diagnostic(
             list(domain.get("warnings", ()))
             + list(primary.get("warnings", ()))
             + list(comparison.get("warnings", ()))
+            + antoine_skip_notices
         ),
     }
 
@@ -284,6 +300,7 @@ def _analytical_vapor_pressures_from_activities(
         return {
             "species": {},
             "extrapolated_beyond_valid_range_K": {},
+            "warnings": [],
         }
     pO2 = _finite_positive("pO2_bar", pO2_bar)
     floor_bar = _finite_positive("vacuum_floor_bar", vacuum_floor_bar)
@@ -291,6 +308,8 @@ def _analytical_vapor_pressures_from_activities(
     comp_wt = _finite_positive_mapping(composition_wt_pct)
     by_species: dict[str, dict[str, Any]] = {}
     extrapolations: dict[str, Any] = {}
+    warnings: list[str] = []
+    antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
 
     from simulator.vapour_rail.catalog import compiled_catalog_for
 
@@ -364,6 +383,15 @@ def _analytical_vapor_pressures_from_activities(
         B = float(antoine.get("B", 0.0) or 0.0)
         C = float(antoine.get("C", 0.0) or 0.0)
         if not (A > 0.0 and T_K > 300.0):
+            if not A > 0.0:
+                _append_antoine_skip_notice(
+                    warnings,
+                    antoine_skip_notice_keys,
+                    antoine,
+                    species=species,
+                    site="alphamelts_volatility.metal_antoine",
+                    temperature_K=T_K,
+                )
             continue
         activity = float(activities.get(parent_oxide, 0.0) or 0.0)
         wt_activity = max(0.0, float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0)
@@ -487,6 +515,14 @@ def _analytical_vapor_pressures_from_activities(
         B = float(antoine.get("B", 0.0) or 0.0)
         C = float(antoine.get("C", 0.0) or 0.0)
         if not A > 0.0:
+            _append_antoine_skip_notice(
+                warnings,
+                antoine_skip_notice_keys,
+                antoine,
+                species=species,
+                site="alphamelts_volatility.oxide_vapor_antoine",
+                temperature_K=T_K,
+            )
             continue
         parent_oxide = str(data.get("parent_oxide", "") or "")
         if not parent_oxide:
@@ -569,6 +605,7 @@ def _analytical_vapor_pressures_from_activities(
     return {
         "species": by_species,
         "extrapolated_beyond_valid_range_K": extrapolations,
+        "warnings": warnings,
     }
 
 

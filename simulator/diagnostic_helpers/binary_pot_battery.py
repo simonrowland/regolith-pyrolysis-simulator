@@ -23,7 +23,6 @@ import json
 import math
 import os
 import re
-import selectors
 import signal
 import socket
 import subprocess
@@ -37,6 +36,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
+from simulator.scalar_boundary import finite_float
 from simulator.physical_constants import (
     CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
     CELSIUS_TO_KELVIN_OFFSET,
@@ -49,6 +49,12 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
 )
 from simulator.battery.enums import NoticeKind
+from simulator.engine_pool import (
+    EngineWorkerDied,
+    EngineWorkerRemoteError,
+    EngineWorkerTimeout,
+    WarmEngineWorker,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
@@ -167,20 +173,21 @@ _DEFAULT_PRESSURE_BAR = 1.0e-6
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
-# Outer wall around equilibrate(). Engine workers already have their own
-# call timeouts; this is the battery's hard stop so a wedged call becomes
-# engine_timeout instead of a hang. Values sit a few seconds above the
-# engine's own warm-call wall.
+# Per-cell wall around equilibrate(). ThermoEngine forwards this same budget
+# to its nested warm worker; its 60 s limit covers the measured 54.75 s D3
+# SiO2 maximum. The isolated-cell worker gets a separate 2 s response margin.
 _ENGINE_OUTER_TIMEOUT_S: dict[str, float] = {
     "internal-analytical": 5.0,
     "alphamelts": 30.0,
-    "thermoengine": 10.0,
+    "thermoengine": 60.0,
     "vaporock": 70.0,
     "magemin": 20.0,
     "cached-real": 30.0,
     "openimcc": 15.0,
 }
 
+# MELTS backend construction can outlast the warm-call timeout; initialize it
+# before the isolated-cell request clock starts.
 QUALIFICATION_SIO2_SWEEP_WT_PCT: tuple[float, ...] = (
     20.0,
     25.0,
@@ -197,18 +204,6 @@ QUALIFICATION_TEMPERATURES_K: tuple[float, ...] = (
 )
 QUALIFICATION_SWEEP_T_K = 1700.0
 QUALIFICATION_SOURCE_POT_ID = "feo_mgo_sio2_30_20_50"
-
-_ISOLATED_CELL_BOOTSTRAP = """
-import json
-import sys
-
-from simulator.diagnostic_helpers.binary_pot_battery import (
-    _run_isolated_cell_worker_loop,
-)
-
-_run_isolated_cell_worker_loop()
-"""
-
 
 class BinaryPotBatteryError(RuntimeError):
     """Raised when the pot catalog or residual inputs violate a hard contract."""
@@ -308,6 +303,9 @@ class EquilibrateCell:
     )
     invalid_gas_partial_pressure_components: tuple[str, ...] = ()
     activities_standard_state: dict[str, Any] | None = None
+    # Copied from the equilibrium result. The scorer owns the battery ratio.
+    liquid_composition_wt_pct: dict[str, float] = field(default_factory=dict)
+    fe_redox_split: dict[str, float] = field(default_factory=dict)
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -356,6 +354,8 @@ class EquilibrateCell:
             "exit_signal": self.exit_signal,
             "exit_code": self.exit_code,
             "model_id": self.model_id,
+            "liquid_composition_wt_pct": dict(self.liquid_composition_wt_pct),
+            "fe_redox_split": dict(self.fe_redox_split),
         }
 
     @classmethod
@@ -415,7 +415,7 @@ class EquilibrateCell:
                 if isinstance(payload.get("activities_standard_state"), Mapping)
                 else None
             ),
-            liquid_fraction=_finite_float(payload.get("liquid_fraction")),
+            liquid_fraction=finite_float(payload.get("liquid_fraction")),
             wall_s=float(payload.get("wall_s") or 0.0),
             cpu_s=float(payload.get("cpu_s") or 0.0),
             hostname=str(payload.get("hostname") or ""),
@@ -461,6 +461,10 @@ class EquilibrateCell:
                 if payload.get("model_id") is None
                 else str(payload.get("model_id"))
             ),
+            liquid_composition_wt_pct=_finite_component_map(
+                payload.get("liquid_composition_wt_pct")
+            ),
+            fe_redox_split=_finite_component_map(payload.get("fe_redox_split")),
         )
 
 
@@ -725,7 +729,7 @@ def classify_reported_value(
     exploded Si cell is ~4.5e20 Pa.
     """
 
-    number = _finite_float(value)
+    number = finite_float(value)
     if number is None or number <= 0.0:
         return None
     if quantity != QUANTITY_PRESSURE:
@@ -906,14 +910,18 @@ def pairwise_residuals(
 # ---------------------------------------------------------------------------
 
 
-def _finite_float(value: Any) -> float | None:
-    try:
-        number = float(value)
-    except (TypeError, ValueError):
-        return None
-    if not math.isfinite(number):
-        return None
-    return number
+def _finite_component_map(value: Any) -> dict[str, float]:
+    """Finite component floats. Non-numeric entries are omitted, not clamped."""
+
+    if not isinstance(value, Mapping):
+        return {}
+    copied: dict[str, float] = {}
+    for name, item in value.items():
+        number = finite_float(item)
+        if number is None:
+            continue
+        copied[str(name)] = number
+    return copied
 
 
 def _optional_int(value: Any) -> int | None:
@@ -940,7 +948,7 @@ def extract_reported_quantities(
 
     activities: dict[str, float] = {}
     for name, value in dict(getattr(result, "activity_coefficients", None) or {}).items():
-        number = _finite_float(value)
+        number = finite_float(value)
         if number is not None and number > 0.0:
             activities[str(name)] = number
     raw_pressures = (
@@ -951,7 +959,7 @@ def extract_reported_quantities(
     pressures: dict[str, float] = {}
     invalid_pressure_components: list[str] = []
     for name, value in dict(raw_pressures).items():
-        number = _finite_float(value)
+        number = finite_float(value)
         if number is not None and number > 0.0:
             pressures[str(name)] = number
         elif number is None or number < 0.0:
@@ -976,7 +984,7 @@ def reported_activity_coefficients(result: Any) -> dict[str, float]:
     if not isinstance(source, Mapping):
         return gammas
     for name, value in source.items():
-        number = _finite_float(value)
+        number = finite_float(value)
         if number is not None and number > 0.0:
             gammas[str(name)] = number
     return gammas
@@ -1069,6 +1077,13 @@ def engine_flags_from_result(
         notices.append(copied)
         if authority is None and copied.get("authority"):
             authority = str(copied["authority"])
+        band = copied.get("certified_band")
+        if (
+            certified_band is None
+            and copied.get("kind") == "openimcc_temperature_extrapolated"
+            and isinstance(band, Mapping)
+        ):
+            certified_band = dict(band)
     return notices, authority, certified_band
 
 
@@ -1301,7 +1316,7 @@ def _composition_projected_notice(
         ]
         if fraction is None:
             fraction = projection.get("dropped_mass_fraction")
-    fraction_number = _finite_float(fraction)
+    fraction_number = finite_float(fraction)
     return {
         "dropped_components": dropped,
         "dropped_mass_fraction": fraction_number,
@@ -1339,7 +1354,9 @@ def classify_equilibrate_outcome(
         status_reason = str(getattr(error, "backend_status_reason", "") or "")
         category = str(getattr(error, "backend_failure_category", "") or "")
         message = str(error)
-        if status_reason:
+        if reason_code == "thermoengine_nonfinite_field":
+            engine_reason = f"{reason_code}: {message}"
+        elif status_reason:
             engine_reason = status_reason
         elif reason_code.startswith("imcc_gas_"):
             engine_reason = f"{reason_code}: {message}"
@@ -1408,7 +1425,7 @@ def classify_equilibrate_outcome(
         if assemblage:
             if raw_liquid_fraction is None:
                 return "refusal", "liquid_fraction_missing", engine_reason
-            liquid_fraction = _finite_float(raw_liquid_fraction)
+            liquid_fraction = finite_float(raw_liquid_fraction)
             if legacy_raw_liquid_fraction_is_zero(liquid_fraction):
                 return (
                     "refusal",
@@ -2266,6 +2283,15 @@ class _OpenImccBatteryBackend:
                 openimcc_bridge.imported_openimcc_commit() or "unverified"
             ),
         }
+        domains = self._pack.kernel_datapack.domains
+        self._certified_temperature_domain = (
+            (
+                max(float(domain[0]) for domain in domains),
+                min(float(domain[1]) for domain in domains),
+            )
+            if domains
+            else None
+        )
         self._load_gas()
 
     def _load_gas(self) -> None:
@@ -2342,14 +2368,37 @@ class _OpenImccBatteryBackend:
                 result.parent_oxide_x_star_ratios,
             )
         )
-        if result.extrapolated:
-            notices.append(
-                {
-                    "kind": "openimcc_temperature_extrapolated",
-                    "authority": AUTHORITY_EXTRAPOLATED,
-                    "reason": "T outside openimcc datapack domain; evaluate(allow_extrapolation=True)",
-                }
+        certified_domain = self._certified_temperature_domain
+        outside_certified_domain = bool(
+            certified_domain is not None
+            and not certified_domain[0] <= temperature_K <= certified_domain[1]
+        )
+        if result.extrapolated or outside_certified_domain:
+            certified_band_text = (
+                "unavailable"
+                if certified_domain is None
+                else f"[{certified_domain[0]:g}, {certified_domain[1]:g}] K"
             )
+            extrapolation_notice: dict[str, Any] = {
+                "kind": "openimcc_temperature_extrapolated",
+                "authority": AUTHORITY_EXTRAPOLATED,
+                "reason": (
+                    "T outside openimcc datapack domain at "
+                    f"{temperature_K:g} K; certified band "
+                    f"{certified_band_text}; "
+                    + (
+                        "extrapolated: Delta_r Cp = 0 continuation; "
+                        if result.extrapolated
+                        else ""
+                    )
+                    + "uncertainty band unavailable."
+                ),
+            }
+            if certified_domain is not None:
+                extrapolation_notice["certified_band"] = {
+                    "temperature_K": list(certified_domain)
+                }
+            notices.append(extrapolation_notice)
             authority = AUTHORITY_EXTRAPOLATED
         if result.envelope_status != "inside":
             notices.append(
@@ -2506,7 +2555,7 @@ class _OpenImccBatteryBackend:
                 ]
             notices.append(solved_notice)
             for name, value in gas_pressures.items():
-                number = _finite_float(value)
+                number = finite_float(value)
                 if number is None or number <= 0.0:
                     continue
                 pressures[str(name)] = number * PA_PER_BAR
@@ -2563,7 +2612,7 @@ class _OpenImccBatteryBackend:
                     "provenance_class": dict(gas_result.provenance_class),
                 }
                 for name, value in dict(gas_result).items():
-                    number = _finite_float(value)
+                    number = finite_float(value)
                     if number is None or number <= 0.0:
                         continue
                     pressures[str(name)] = number * PA_PER_BAR
@@ -2678,7 +2727,7 @@ def _internal_analytical_vapor_pressure_adapter(
             "observation carries no usable oxide composition",
         )
 
-    temperature = _finite_float(temperature_C)
+    temperature = finite_float(temperature_C)
     if (
         isinstance(temperature_C, bool)
         or temperature is None
@@ -2689,7 +2738,7 @@ def _internal_analytical_vapor_pressure_adapter(
             "internal_analytical_invalid_temperature",
             f"temperature_C must be finite and above absolute zero; got {temperature_C!r}",
         )
-    pressure = _finite_float(pressure_bar)
+    pressure = finite_float(pressure_bar)
     if isinstance(pressure_bar, bool) or pressure is None or pressure < 0.0:
         raise _InternalAnalyticalInputRefusal(
             2,
@@ -2700,7 +2749,7 @@ def _internal_analytical_vapor_pressure_adapter(
     validated_melt_mass_kg_by_species: dict[str, float] = {}
     if composition_kg:
         for species, raw in composition_kg.items():
-            value = _finite_float(raw)
+            value = finite_float(raw)
             if isinstance(raw, bool) or value is None or value < 0.0:
                 raise _InternalAnalyticalInputRefusal(
                     2,
@@ -2713,7 +2762,7 @@ def _internal_analytical_vapor_pressure_adapter(
         from simulator.accounting.formulas import resolve_species_formula
 
         for species, raw in (composition_mol or {}).items():
-            amount = _finite_float(raw)
+            amount = finite_float(raw)
             if isinstance(raw, bool) or amount is None or amount < 0.0:
                 raise _InternalAnalyticalInputRefusal(
                     2,
@@ -2754,7 +2803,7 @@ def _internal_analytical_vapor_pressure_adapter(
         )
     oxygen_notices: list[dict[str, Any]] = []
     if po2_request.mode == PO2_COMMANDED:
-        po2_bar = _finite_float(po2_request.po2_bar)
+        po2_bar = finite_float(po2_request.po2_bar)
         if (
             isinstance(po2_request.po2_bar, bool)
             or po2_bar is None
@@ -2798,7 +2847,7 @@ def _internal_analytical_vapor_pressure_adapter(
             ),
             None,
         )
-        po2_bar = None if solved is None else _finite_float(solved.get("pO2_bar"))
+        po2_bar = None if solved is None else finite_float(solved.get("pO2_bar"))
         if oxygen_result.status != "ok" or po2_bar is None or po2_bar <= 0.0:
             raise _InternalAnalyticalInputRefusal(
                 1,
@@ -2855,14 +2904,18 @@ def _internal_analytical_vapor_pressure_adapter(
         vapor_pressures_source={},
         liquid_fraction=None,
     )
+    simulation_hour = int(core.melt.hour) + 1
     if include_diagnostic_shadows:
         core._refresh_vapor_pressures_from_kernel(
-            equilibrium, observation_pO2_bar=po2_bar,
+            equilibrium,
+            simulation_hour=simulation_hour,
+            observation_pO2_bar=po2_bar,
         )
     else:
         core._refresh_vapor_pressures_from_kernel(
             equilibrium,
             include_diagnostic_shadows=False,
+            simulation_hour=simulation_hour,
             observation_pO2_bar=po2_bar,
         )
     core_diagnostic = dict(core._last_vapor_pressure_diagnostic)
@@ -3027,6 +3080,19 @@ class _InternalAnalyticalBatteryBackend:
         po2_request: Po2Request | None = None,
         **_unused: object,
     ) -> Any:
+        # One core serves every cell. Certificates, held gammas, the
+        # previous-temperature clock, the fallback-step log and the last
+        # vapour diagnostic are the previous cell's trajectory. Clear them
+        # here, before this cell's own refresh. Below 400 K the refresh
+        # returns without replacing that diagnostic, and the adapter reads
+        # it. Callers that walk one cell's trajectory (the adapter, residue
+        # integration) do not re-enter here between steps, so that history
+        # stays.
+        core = self._core
+        core._last_high_t_melt_activity = {}
+        core._last_high_t_melt_activity_temperature_K = None
+        core._high_t_melt_activity_fallback_steps = []
+        core._last_vapor_pressure_diagnostic = {}
         if (
             po2_request is not None
             and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
@@ -3294,10 +3360,9 @@ def _bypass_melts_domain_gate(backend: Any) -> None:
 def run_isolated_cell_worker(
     payload: Mapping[str, Any],
     *,
-    handles: dict[str, EngineHandle] | None = None,
-    protocol_stdout: Any | None = None,
-) -> None:
-    """Run one isolated cell and write one framed JSON response."""
+    handle: EngineHandle | None = None,
+) -> dict[str, Any]:
+    """Run one isolated cell and return its transport-safe payload."""
 
     simulate = payload.get("simulate_crash")
     if simulate:
@@ -3323,15 +3388,8 @@ def run_isolated_cell_worker(
         cell_material=po2_raw.get("cell_material"),
     )
     engine_name = str(payload["engine"])
-    handle = None if handles is None else handles.get(engine_name)
-    if handle is None:
+    if handle is None or handle.name != engine_name:
         handle = open_battery_engine(engine_name)
-        if (
-            handles is not None
-            and handle.available
-            and handle.backend is not None
-        ):
-            handles[engine_name] = handle
     if (
         bool(payload.get("qualification"))
         and handle.name in MELTS_FAMILY_ENGINES
@@ -3351,7 +3409,7 @@ def run_isolated_cell_worker(
         pot,
         temperature_K=float(payload["temperature_K"]),
         po2=po2,
-        timeout_s=_finite_float(payload.get("timeout_s")),
+        timeout_s=finite_float(payload.get("timeout_s")),
         physical_pressure_bar=(
             None
             if payload.get("physical_pressure_bar") is None
@@ -3361,32 +3419,7 @@ def run_isolated_cell_worker(
         isolated=False,
         arm=str(payload.get("arm") or ARM_HEADLINE),
     )
-    output = protocol_stdout if protocol_stdout is not None else sys.stdout
-    output.write("\x1e")
-    output.write(json.dumps(cell.as_payload(), default=str))
-    output.write("\n")
-    output.flush()
-
-
-def _run_isolated_cell_worker_loop() -> None:
-    protocol_stdout = sys.stdout
-    sys.stdout = sys.stderr
-    handles: dict[str, EngineHandle] = {}
-    try:
-        for line in sys.stdin:
-            run_isolated_cell_worker(
-                json.loads(line),
-                handles=handles,
-                protocol_stdout=protocol_stdout,
-            )
-    finally:
-        for handle in handles.values():
-            close = getattr(handle.backend, "close", None)
-            if callable(close):
-                try:
-                    close()
-                except BaseException:  # noqa: BLE001 - close every engine on exit
-                    pass
+    return cell.as_payload()
 
 
 def _crash_cell_from_returncode(
@@ -3477,168 +3510,87 @@ class _IsolatedCellWorkerFailure(RuntimeError):
         self.detail = detail
 
 
+class _IsolatedCellEngine:
+    """EngineHandle resource closed by the shared warm-worker lifecycle."""
+
+    def __init__(self, handle: EngineHandle) -> None:
+        self.handle = handle
+
+    def close(self) -> None:
+        close = getattr(self.handle.backend, "close", None)
+        if callable(close):
+            close()
+
+
+def _bootstrap_isolated_cell_engine(engine: str) -> tuple[_IsolatedCellEngine, str]:
+    """Resolve the battery engine before WarmEngineWorker signals ready."""
+    return _IsolatedCellEngine(open_battery_engine(engine)), engine
+
+
+def _handle_isolated_cell_request(
+    resource: _IsolatedCellEngine,
+    payload: Mapping[str, Any],
+    _diagnostic_log: Any,
+) -> dict[str, Any]:
+    return run_isolated_cell_worker(payload, handle=resource.handle)
+
+
 class _IsolatedCellWorker:
-    """Persistent engine process; a failed request retires its whole group."""
+    """Battery requests on the shared worker's startup/call deadline split."""
 
     def __init__(self, engine: str) -> None:
         self.engine = str(engine)
-        self.process: subprocess.Popen[bytes] | None = None
-        self.start_count = 0
-        self._stdout_buffer = bytearray()
         self._lock = threading.Lock()
-
-    def _start(self) -> None:
-        env = dict(os.environ)
-        env.setdefault("PYTHONPATH", str(REPO_ROOT))
-        pythonpath = env.get("PYTHONPATH") or ""
-        if str(REPO_ROOT) not in pythonpath.split(os.pathsep):
-            env["PYTHONPATH"] = os.pathsep.join(
-                [str(REPO_ROOT), pythonpath] if pythonpath else [str(REPO_ROOT)]
-            )
-        self.process = subprocess.Popen(
-            [sys.executable, "-c", _ISOLATED_CELL_BOOTSTRAP],
-            cwd=str(REPO_ROOT),
-            env=env,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            bufsize=0,
-            start_new_session=True,
+        self._worker = WarmEngineWorker(
+            name=f"{self.engine} battery cell",
+            bootstrap=_bootstrap_isolated_cell_engine,
+            handler=_handle_isolated_cell_request,
+            bootstrap_args=(self.engine,),
+            startup_timeout_s=(
+                60.0 if self.engine == "thermoengine" else 30.0
+            ),
+            call_timeout_s=_ENGINE_OUTER_TIMEOUT_S.get(self.engine, 30.0) + 2.0,
+            diagnostic_signal=signal.SIGCONT,
+            # ThermoEngine cold start measured 43.99s here; only it needs this
+            # separate READY budget and child-capable worker.
+            daemon=self.engine != "thermoengine",
         )
-        self._stdout_buffer.clear()
-        self.start_count += 1
 
-    def _stop(self, *, kill_group: bool) -> int | None:
-        process = self.process
-        self.process = None
-        if process is None:
-            return None
-        if kill_group:
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except (OSError, ProcessLookupError):
-                if process.poll() is None:
-                    process.kill()
-        elif process.stdin is not None:
-            try:
-                process.stdin.close()
-            except OSError:
-                pass
-        try:
-            try:
-                process.wait(timeout=1.0)
-            except subprocess.TimeoutExpired:
-                try:
-                    os.killpg(process.pid, signal.SIGKILL)
-                except (OSError, ProcessLookupError):
-                    process.kill()
-                try:
-                    process.wait(timeout=1.0)
-                except subprocess.TimeoutExpired:
-                    process.kill()
-                    process.wait()
-        finally:
-            for stream in (process.stdin, process.stdout, process.stderr):
-                if stream is not None:
-                    try:
-                        stream.close()
-                    except OSError:
-                        pass
-        return process.returncode
+    @property
+    def start_count(self) -> int:
+        return self._worker.start_count
 
     def close(self) -> None:
         with self._lock:
-            self._stop(kill_group=False)
+            self._worker.close()
 
     def retire(self) -> None:
         with self._lock:
-            self._stop(kill_group=True)
-
-    def _failed(self, *, timed_out: bool, detail: str) -> None:
-        process = self.process
-        returncode = None if process is None else process.poll()
-        if process is not None and process.stdout is not None:
-            detail = (
-                detail
-                or bytes(self._stdout_buffer[-400:]).decode("utf-8", "replace")
-            )
-        stopped_returncode = self._stop(kill_group=True)
-        if stopped_returncode is not None:
-            returncode = stopped_returncode
-        raise _IsolatedCellWorkerFailure(
-            timed_out=timed_out,
-            returncode=returncode,
-            detail=detail,
-        )
+            self._worker.close()
 
     def request(
         self, payload: Mapping[str, Any], *, timeout_s: float
     ) -> dict[str, Any]:
         with self._lock:
-            if self.process is not None and self.process.poll() is not None:
-                self._stop(kill_group=True)
-            if self.process is None:
-                try:
-                    self._start()
-                except OSError as exc:
-                    raise _IsolatedCellWorkerFailure(detail=str(exc)) from exc
-            process = self.process
-            assert process is not None
-            if process.stdin is None or process.stdout is None:
-                self._failed(timed_out=False, detail="worker pipes unavailable")
-            deadline = time.monotonic() + max(0.001, float(timeout_s))
             try:
-                request_bytes = (json.dumps(payload) + "\n").encode("utf-8")
-                view = memoryview(request_bytes)
-                while view:
-                    written = os.write(process.stdin.fileno(), view)
-                    view = view[written:]
-            except OSError as exc:
-                self._failed(timed_out=False, detail=f"worker request failed: {exc}")
-
-            with selectors.DefaultSelector() as selector:
-                selector.register(process.stdout, selectors.EVENT_READ)
-                while True:
-                    remaining = deadline - time.monotonic()
-                    if remaining <= 0:
-                        self._failed(
-                            timed_out=True,
-                            detail="isolated cell exceeded hard timeout",
-                        )
-                    if not selector.select(remaining):
-                        self._failed(
-                            timed_out=True,
-                            detail="isolated cell exceeded hard timeout",
-                        )
-                    chunk = os.read(process.stdout.fileno(), 65536)
-                    if not chunk:
-                        self._failed(
-                            timed_out=False,
-                            detail=(
-                                "worker exited without a cell result "
-                                f"(returncode={process.poll()})"
-                            ),
-                        )
-                    self._stdout_buffer.extend(chunk)
-                    while b"\n" in self._stdout_buffer:
-                        line, _, remainder = self._stdout_buffer.partition(b"\n")
-                        self._stdout_buffer = bytearray(remainder)
-                        marker = line.rfind(b"\x1e")
-                        if marker < 0:
-                            continue
-                        try:
-                            result = json.loads(line[marker + 1 :])
-                        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-                            self._failed(
-                                timed_out=False,
-                                detail=f"invalid isolated worker response: {exc}",
-                            )
-                        if not isinstance(result, dict):
-                            self._failed(
-                                timed_out=False,
-                                detail="isolated worker response was not an object",
-                            )
-                        return result
+                result = self._worker.call(payload, timeout_s=timeout_s)
+            except EngineWorkerTimeout as exc:
+                raise _IsolatedCellWorkerFailure(
+                    timed_out=True,
+                    detail=str(exc),
+                ) from exc
+            except EngineWorkerDied as exc:
+                raise _IsolatedCellWorkerFailure(
+                    returncode=exc.returncode,
+                    detail=exc.detail,
+                ) from exc
+            except EngineWorkerRemoteError as exc:
+                raise _IsolatedCellWorkerFailure(detail=str(exc)) from exc
+            if not isinstance(result, dict):
+                raise _IsolatedCellWorkerFailure(
+                    detail="isolated worker response was not an object"
+                )
+            return result
 
 
 _ISOLATED_CELL_WORKERS: dict[str, _IsolatedCellWorker] = {}
@@ -3946,6 +3898,7 @@ def equilibrate_cell(
     arm: str | None = None,
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
+    native_activity_formula: str | None = None,
 ) -> EquilibrateCell:
     """One pot × engine × T × pO2 call. Refusals are rows, never exceptions."""
 
@@ -4004,6 +3957,11 @@ def equilibrate_cell(
             simulate_crash
             or (qualification and handle.name in MELTS_FAMILY_ENGINES)
         )
+    # MAGEMin's native-activity fields are carried by its existing bounded
+    # binary call. Keep that request on this process so it does not need a
+    # second private-worker payload shape.
+    if handle.name == "magemin" and native_activity_formula is not None:
+        use_isolated = False
     if use_isolated:
         return _run_cell_in_subprocess(
             handle,
@@ -4062,8 +4020,15 @@ def equilibrate_cell(
         parameters = signature.parameters
     except (TypeError, ValueError):
         parameters = {}
-    if "fO2_log" in parameters:
+    if "fO2_log" in parameters and not (
+        handle.name == "magemin" and fo2_log is None
+    ):
         kwargs["fO2_log"] = fo2_log
+    if po2.mode == PO2_COMMANDED:
+        if "vapor_transport_pO2_bar" in parameters:
+            kwargs["vapor_transport_pO2_bar"] = po2.po2_bar
+        if "vapor_transport_pO2_admission" in parameters:
+            kwargs["vapor_transport_pO2_admission"] = "observation"
     if "redox_mode" in parameters and po2.mode == PO2_NOT_AN_INPUT:
         from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
         from simulator.melt_backend.base import multivalent_components
@@ -4077,6 +4042,8 @@ def equilibrate_cell(
         kwargs["po2_request"] = po2
     if "call_timeout_s" in parameters:
         kwargs["call_timeout_s"] = timeout
+    if "native_activity_formula" in parameters:
+        kwargs["native_activity_formula"] = native_activity_formula
     if handle.name == "alphamelts" or "subprocess_run_mode" in parameters:
         kwargs["subprocess_run_mode"] = "isothermal"
 
@@ -4137,7 +4104,7 @@ def equilibrate_cell(
             melt_activity_coefficient_details=coefficient_details,
             gas_partial_pressures_Pa=pressures,
             invalid_gas_partial_pressure_components=invalid_pressure_components,
-            liquid_fraction=_finite_float(getattr(result, "liquid_fraction", None)),
+            liquid_fraction=finite_float(getattr(result, "liquid_fraction", None)),
             vapor_pressures_source=dict(vapor_authority["vapor_pressures_source"]),
             vapor_pressure_backend_status=vapor_authority[
                 "vapor_pressure_backend_status"
@@ -4154,6 +4121,12 @@ def equilibrate_cell(
             exit_signal=exit_signal,
             exit_code=exit_code,
             model_id=getattr(result, "imcc_model_id", None),
+            liquid_composition_wt_pct=_finite_component_map(
+                getattr(result, "liquid_composition_wt_pct", None)
+            ),
+            fe_redox_split=_finite_component_map(
+                getattr(result, "fe_redox_split", None)
+            ),
         )
     except Exception as exc:  # noqa: BLE001 - typed refusal, never a hang/crash
         status, refusal, engine_reason = classify_equilibrate_outcome(error=exc)

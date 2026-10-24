@@ -154,7 +154,7 @@ campaigns:
       sensors: >
         Stage 0 hot-duct IR: Na 589 nm early, Fe 370 nm mid,
         SiO 230 nm UV dominant >1400 C; plus upstream pressure
-      induction_stirring: "continuous 4-8x acceleration + 50-80 C cycling"
+      induction_stirring: "unsourced engineering placeholder: 4-8x stirring band and 50-80 C cycling; no coil, field, or flow correlation (b-1015); t-1440 replaces these proxies with species-specific liquid-transfer resistance"
     products:
       Na:
         mass_g: [2300, 4000]
@@ -1272,7 +1272,9 @@ endpoint_criteria:
     IR spectroscopy (Stage 0 hot-duct sapphire window)
     + pressure stabilisation + cumulative mass loss.
     Model-predictive or PID with IR + pressure feedback;
-    induction stirring ensures surface renewal.
+    induction stirring surface-renewal assumption (unsourced engineering
+    placeholder; b-1015; t-1440 replaces it with species-specific
+    liquid-transfer resistance).
 
   species_lines:
     Na:
@@ -1313,7 +1315,7 @@ endpoint_criteria:
   control:
     method: "Model-predictive or PID"
     feedback: ["IR_spectroscopy", "pressure"]
-    surface_renewal: "induction stirring (4-8x rate acceleration)"
+    surface_renewal: "unsourced engineering placeholder: induction stirring band 4-8x; no coil, field, or flow correlation (b-1015); t-1440 replaces this proxy with species-specific liquid-transfer resistance"
 
 
 # ============================================================================
@@ -1382,9 +1384,13 @@ furnace:
     function: "drain/injection dual-purpose"
 
   induction_stirring:
+    # The 4-8 ranges below and the 10x frozen-skull ceiling in
+    # simulator/state.py are unsourced engineering placeholders with no
+    # coil, field, or flow correlation (b-1015). Task t-1440 replaces
+    # these proxies with species-specific liquid-transfer resistance.
     rate_acceleration_factor: [4, 8]
     thermal_cycling_C: [50, 80]
-    note: "continuous; ensures surface renewal for evaporation kinetics"
+    note: "unsourced engineering placeholder: continuous surface renewal assumption (b-1015); t-1440 replaces it with species-specific liquid-transfer resistance"
 
   metal_phase_stratification:
     mode: "diagnostic_only_instrument_before_gate"
@@ -1681,8 +1687,11 @@ kinetic_parameters:
   SiO2_strip_duration_h: [4, 8]         # for 50% SiO2 removal (Path A)
 
   induction_stirring:
+    # Unsourced engineering placeholders with no coil, field, or flow
+    # correlation (b-1015); t-1440 replaces these proxies with
+    # species-specific liquid-transfer resistance.
     acceleration_factor: [4, 8]          # vs static melts
-    thermal_cycling_C: [50, 80]          # continuous surface renewal
+    thermal_cycling_C: [50, 80]          # assumed continuous surface renewal
 
   condensation_boiling_points_C:
     K_bp: 759

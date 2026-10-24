@@ -574,10 +574,9 @@ class SimSession:
         sim = self._require_sim()
         adjusted_c0_forecast_field: str | None = None
         if param == "stir_factor":
-            # 0.5.2 Phase B P1: clamp at the operator boundary so both
-            # consumer subsystems (evaporation linear multiplier +
-            # condensation series-resistance Sherwood) see the same
-            # bounded value.
+            # 0.5.2 Phase B P1: clamp at the operator boundary before
+            # the axial value reaches evaporation diagnostics, metal
+            # stratification, and the legacy condensation audit field.
             #
             # 0.5.3 Phase B (2-axis stirring): the legacy scalar
             # ``stir_factor`` writes ONLY the axial axis (operator

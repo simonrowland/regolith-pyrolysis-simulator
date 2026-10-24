@@ -427,6 +427,23 @@ experiments:
         note: >-
           Measured starting glass Na2O 17 / CaO 12 / SiO2 71 wt%; Fig. 6 is
           0.45 wt% Na2CO3 impurity in this glass (caption p.51/PDF57)
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - [Na2O, '17']
+          - [CaO, '12']
+          - [SiO2, '71']
+      locator:
+        page: 18
+        published_page: 18
+        pdf_page_index: 23
+        note: >-
+          Measured starting glass Na2O 17 / CaO 12 / SiO2 71 wt%; Fig. 6 is
+          0.45 wt% Na2CO3 impurity in this glass (caption p.51/PDF57)
 - experiment_id: hastie-1981-measured-soda-lime-glass-kms
   bench_id: hastie-1981-kms
   method: knudsen_effusion

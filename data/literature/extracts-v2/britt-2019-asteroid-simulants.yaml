@@ -376,9 +376,8 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class,
-      total_integrated_mass_loss_wt_pct, temperature_interval_C_as_printed, qualitative_release'
+    kind: point
+    point: '0.143'
     approximate: false
   uncertainty:
     kind: printed
@@ -390,9 +389,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: britt-2019-asteroid-simulants::britt_2019_ci_tg_integrated_mass_loss
   source_id: britt-2019-asteroid-simulants
   locator:
     pdf_page_index: 11
@@ -780,9 +784,8 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class,
-      total_integrated_mass_loss_wt_pct, temperature_interval_C_as_printed, qualitative_release'
+    kind: point
+    point: '0.112'
     approximate: false
   uncertainty:
     kind: printed
@@ -794,9 +797,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: britt-2019-asteroid-simulants::britt_2019_cm_tg_integrated_mass_loss
   source_id: britt-2019-asteroid-simulants
   locator:
     pdf_page_index: 11
@@ -1184,9 +1192,8 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class,
-      total_integrated_mass_loss_wt_pct, temperature_interval_C_as_printed, qualitative_release'
+    kind: point
+    point: '0.032'
     approximate: false
   uncertainty:
     kind: printed
@@ -1198,9 +1205,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: britt-2019-asteroid-simulants::britt_2019_cr_tg_integrated_mass_loss
   source_id: britt-2019-asteroid-simulants
   locator:
     pdf_page_index: 11

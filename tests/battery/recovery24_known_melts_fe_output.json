@@ -1,0 +1,60 @@
+{
+  "provenance": {
+    "captured_on": "2026-10-22",
+    "conditions": {
+      "temperature_C": 1400.0,
+      "pressure_bar": 1.0,
+      "fO2_log": -6.0,
+      "fO2_path": "Absolute",
+      "composition_wt_pct": {
+        "SiO2": 49.0,
+        "TiO2": 1.5,
+        "Al2O3": 14.0,
+        "FeO": 10.0,
+        "Fe2O3": 1.0,
+        "MgO": 9.0,
+        "CaO": 11.0,
+        "Na2O": 2.5,
+        "K2O": 0.8,
+        "Cr2O3": 0.2,
+        "MnO": 0.2,
+        "P2O5": 0.3
+      }
+    },
+    "alphamelts": {
+      "program": "alphaMELTS 2.3.1 (Aug 3 2024 10:01:10)",
+      "binary": "alphamelts2",
+      "calc_mode": "MELTS",
+      "menu": "1, input.melts, 4, superliquidus guess 1, one step",
+      "citation": "Smith and Asimow 2005, as printed by the alphaMELTS front end"
+    },
+    "thermoengine": {
+      "model": "MELTSv1.0.2",
+      "engine_version": "thermoengine MELTS 1.0.2 (liq_mod v1.0) (digest=sha256:e7f3f959424820e0ebe712b95b5d66b7a4e23a29b9869dd1e2a484affe409f74) (adapter=regolith-thermoengine-v2)",
+      "solved_fO2_log": -5.999607820873313
+    }
+  },
+  "alphamelts_stdout": "---> Calculation mode is rhyolite-MELTS (public release v 1.0.2).\n\n*** alphaMELTS 2.3.1 (Aug  3 2024 10:01:10) -- rhyolite-MELTS isobar w/ or w/o liquid ***\n\nThis front end is the work of Paula Antoshechkina (nee Smith) and Paul Asimow and it\nuses the rhyolite-MELTS and pMELTS algorithms developed by Mark Ghiorso & co-workers.\nYou are welcome to use and distribute this program, under the condition that you\nacknowledge all the contributors by citing the appropriate references with any results.\nSee Smith & Asimow (2005), documentation and the GitHub Wiki for details.\n\nUnable to automatically check for updates; check for updates at\nhttps://github.com/magmasource/alphaMELTS\n\nalphaMELTS main menu (enter 'x' when done):\n 1. Read MELTS file to set composition and system properties\n 2. Twiddle starting or continuation parameters\n 3. Single (batch) calculation\n 4. Execute (follow path, mineral isograd or melt contour)\n 5. Set fO2 buffer\n 6. Set H2O (ppm) or aH2O\n 7. Impose isenthalpic, isentropic or isochoric conditions\n 8. Adjust solid phase settings (including fractionation)\n 9. Adjust liquid or fluid settings (including melt extraction)\n10. Turn phase diagram mode on / off (includes wet liquidus)\n11. Turn geothermal, grid or PT-path file mode on / off\n12. Source mixer / Remixer (includes AFC and flux melting)\n13. Update system properties, or I/O settings\n14. Write out one or more MELTS files\n15. Write thermodynamic output for all phases\n16. Calculate integrated melt and output file(s)\n17. Fit parental melt composition with amoeba\n-1. Turn off menu display for options 1-17\n X. QUIT\nYour choice: 1\nMELTS filename: input.melts\nOxide is not calibrated for the Rhyolite-MELTS 1.0.2 model, zeroing composition: CO2\nInput file read. Waiting for command or user input.\n\nalphaMELTS main menu (enter 'x' when done):\n 1. Read MELTS file to set composition and system properties\n 2. Twiddle starting or continuation parameters\n 3. Single (batch) calculation\n 4. Execute (follow path, mineral isograd or melt contour)\n 5. Set fO2 buffer\n 6. Set H2O (ppm) or aH2O\n 7. Impose isenthalpic, isentropic or isochoric conditions\n 8. Adjust solid phase settings (including fractionation)\n 9. Adjust liquid or fluid settings (including melt extraction)\n10. Turn phase diagram mode on / off (includes wet liquidus)\n11. Turn geothermal, grid or PT-path file mode on / off\n12. Source mixer / Remixer (includes AFC and flux melting)\n13. Update system properties, or I/O settings\n14. Write out one or more MELTS files\n15. Write thermodynamic output for all phases\n16. Calculate integrated melt and output file(s)\n17. Fit parental melt composition with amoeba\n-1. Turn off menu display for options 1-17\n X. QUIT\nYour choice: 4\nStarting guess to use (enter 'x' to return):\n0. Norm-calculated subsolidus assemblage\n1. Superliquidus starting guess at current temperature (1400.00 C).\n2. Superliquidus starting guess at liquidus temperature.\n3. Superliquidus starting guess at wet liquidus temperature.\nChoose: 1\nMaximum number of steps to take, or 0 for 'unlimited' (i.e. limited by other criteria);\nenter negative number to limit failed steps instead (e.g. -4 to skip failure 4 times): 1\n...Checking saturation state of potential solids.\n...Projecting equality constraints.\n...Minimizing the thermodynamic potential.\n...Checking saturation state of potential solids.\n<> Stable liquid solid assemblage achieved.\nInitial alphaMELTS calculation at: P 1.000000 (bars), T 1400.000000 (C)\nliquid:    SiO2 TiO2 Al2O3 Fe2O3 Cr2O3  FeO  MnO  MgO  NiO  CoO   CaO Na2O  K2O P2O5  H2O \n99.6013 g 49.20 1.51 14.06  2.02  0.20 9.13 0.20 9.04 0.00 0.00 11.04 2.51 0.80 0.30 0.00 \nActivity of H2O = 0  Melt fraction = 1\n...Checking saturation state of potential solids.\n...Projecting equality constraints.\n...Minimizing the thermodynamic potential.\n...Checking saturation state of potential solids.\n<> Stable liquid solid assemblage achieved.\nCurrent state of the system recorded in _tbl.txt files.\nInitial alphaMELTS calculation at: P 1.000000 (bars), T 1400.000000 (C)\nliquid:    SiO2 TiO2 Al2O3 Fe2O3 Cr2O3  FeO  MnO  MgO  NiO  CoO   CaO Na2O  K2O P2O5  H2O \n99.6013 g 49.20 1.51 14.06  2.02  0.20 9.13 0.20 9.04 0.00 0.00 11.04 2.51 0.80 0.30 0.00 \nActivity of H2O = 0  Melt fraction = 1\nSuccessful return from alphamelts...\n\nalphaMELTS main menu (enter 'x' when done):\n 1. Read MELTS file to set composition and system properties\n 2. Twiddle starting or continuation parameters\n 3. Single (batch) calculation\n 4. Execute (follow path, mineral isograd or melt contour)\n 5. Set fO2 buffer\n 6. Set H2O (ppm) or aH2O\n 7. Impose isenthalpic, isentropic or isochoric conditions\n 8. Adjust solid phase settings (including fractionation)\n 9. Adjust liquid or fluid settings (including melt extraction)\n10. Turn phase diagram mode on / off (includes wet liquidus)\n11. Turn geothermal, grid or PT-path file mode on / off\n12. Source mixer / Remixer (includes AFC and flux melting)\n13. Update system properties, or I/O settings\n14. Write out one or more MELTS files\n15. Write thermodynamic output for all phases\n16. Calculate integrated melt and output file(s)\n17. Fit parental melt composition with amoeba\n-1. Turn off menu display for options 1-17\n X. QUIT\nYour choice: x\n",
+  "alphamelts_system_main": "Title:regolith_pyrolysis_simulator\n\nSystem Thermodynamic Data:\nindex Pressure Temperature mass F phi H S V Cp dVdP*10^6 dVdT*10^6 fO2(absolute) fO2-6.0) rhol rhos viscosity aH2O chisqr\n1 1.00 1400.00 99.601349 1.0000000000000000 1.000000 -1170082.140262 284.706887 37.302451 149.928787 -201.771712 2539.232414 -6.000 0.000 2.670102 0.000000 1.413 n/a n/a\n",
+  "alphamelts_expected_ratio": "0.1990817867134948570084367742",
+  "thermoengine_liquid_composition_wt_pct": {
+    "SiO2": 49.1961043415327,
+    "TiO2": 1.50600319412855,
+    "Al2O3": 14.0560298118665,
+    "Fe2O3": 2.01993785902632,
+    "Cr2O3": 0.200800425883807,
+    "FeO": 9.12587368738913,
+    "MnO": 0.200800425883807,
+    "MgO": 9.03601916477131,
+    "CaO": 11.0440234236094,
+    "Na2O": 2.51000532354759,
+    "K2O": 0.803201703535228,
+    "P2O5": 0.30120063882571
+  },
+  "thermoengine_fe_redox_split": {
+    "FeO_wt_pct": 9.12587368738913,
+    "Fe2O3_wt_pct": 2.01993785902632,
+    "Fe3Fet_Liq": 0.16608687154846474
+  },
+  "thermoengine_expected_ratio": "0.1991656755145057011704168732"
+}

@@ -1,0 +1,1193 @@
+schema_version: literature_extract.v1
+source_id: leister-ehrt-2000-polyvalent-redox
+source:
+  citation: Leister, M. & Ehrt, D. (2000). The influence of high melting temperatures on the behaviour of polyvalent ions
+    in silicate glasses. Glastech. Ber. Glass Sci. Technol. 73 C2 (2000), 194–203; Advances in Fusion & Processing of Glass,
+    6th International Conference.
+  doi: null
+  year: 2000
+extraction:
+  method: Manual transcription from the born-digital pdftotext-layout text, cross-checked cell by cell against 600 dpi renders
+    of PDF pages 5, 7 and 8. No table-tool executable is present in this seat; a manual table mapping/audit is stored under
+    extracts/audits. Figures are recorded for deferred digitisation only.
+  date: '2026-10-22'
+  worker: fam41-1022
+  provenance_path: extracts/leister-ehrt-2000-polyvalent-redox.yaml
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[leister_2000_fe_table1_glass_a].values.points[0].Fe3_over_FeT_percent_as_published
+  value: 80
+  locator:
+    pdf_page_index: 4
+    page: 5
+    published_page: 198
+    table: Tab. 1
+species:
+  Fe:
+    observations:
+    - observation_id: leister_2000_fe_table1_glass_a
+      type: concentration_series
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 198
+        table: Tab. 1
+      phase: glass
+      units: fraction (Fe3+/sum Fe); source prints Fe3+/Fe2+ valence percentages
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_direct
+        analytical_method: optical absorption spectroscopy and ESR; row-specific allocation not stated
+        measurement_stage: post-quench glass
+        post_quench_flag: true
+        quench_provenance: Air comparison glasses were quenched onto a copper block to freeze redox ratios. Ar and H2/N2 glasses
+          were centrifugally cast into a cold graphite mold; preservation of these ratios is not explicitly asserted.
+        points:
+        - sample_id_as_published: Glass A
+          table_row_as_published: 1
+          T_C: 1600
+          Fe3_over_FeT: 0.8
+          Fe3_over_FeT_percent_as_published: 80
+          Fe2_over_FeT_percent_as_published: 20
+          printed_valence_pair: 80/20
+          atmosphere_as_published: Air
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1600
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '1'
+            atmosphere:
+              state:
+                tag: value
+                value: Air
+              locator: &id001
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '1'
+          locator: *id001
+        - sample_id_as_published: Glass A
+          table_row_as_published: 2
+          T_C: 1600
+          Fe3_over_FeT: 0.71
+          Fe3_over_FeT_percent_as_published: 71
+          Fe2_over_FeT_percent_as_published: 29
+          printed_valence_pair: 71/29
+          atmosphere_as_published: Air
+          row_note: Second separately printed 1600 Air row; no distinguishing condition is printed.
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1600
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '2'
+            atmosphere:
+              state:
+                tag: value
+                value: Air
+              locator: &id002
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '2'
+          locator: *id002
+        - sample_id_as_published: Glass A
+          table_row_as_published: 3
+          T_C: 1800
+          Fe3_over_FeT: 0.4
+          Fe3_over_FeT_percent_as_published: 40
+          Fe2_over_FeT_percent_as_published: 60
+          printed_valence_pair: 40/60
+          atmosphere_as_published: Ar
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1800
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '3'
+            atmosphere:
+              state:
+                tag: value
+                value: Ar
+              locator: &id003
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '3'
+          locator: *id003
+        composition_mol:
+          Na2O: '0.33'
+          SiO2: '0.67'
+        composition_mol_as_published:
+          Na2O: 33 mol%
+          SiO2: 67 mol%
+        composition_mol_locator:
+          pdf_page_index: 0
+          page: 1
+          section: Abstract
+        composition_mol_basis: printed_mole_fraction
+      derivation:
+        relation: Optical absorption spectroscopy and ESR determined valence fractions in quenched glass; the table reports
+          the fitted ferric and ferrous fractions.
+        output_unit: dimensionless
+        locator:
+          pdf_page_index: 1
+          page: 2
+          published_page: 195
+          section: Experimental
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            pdf_page_index: 1
+            page: 2
+            published_page: 195
+            section: Experimental
+    - observation_id: leister_2000_fe_table1_glass_b
+      type: concentration_series
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 198
+        table: Tab. 1
+      phase: glass
+      units: fraction (Fe3+/sum Fe); source prints Fe3+/Fe2+ valence percentages
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_direct
+        analytical_method: optical absorption spectroscopy and ESR; row-specific allocation not stated
+        measurement_stage: post-quench glass
+        post_quench_flag: true
+        quench_provenance: Air comparison glasses were quenched onto a copper block to freeze redox ratios. Ar and H2/N2 glasses
+          were centrifugally cast into a cold graphite mold; preservation of these ratios is not explicitly asserted.
+        points:
+        - sample_id_as_published: Glass B
+          table_row_as_published: 1
+          T_C: 1600
+          Fe3_over_FeT: 0.76
+          Fe3_over_FeT_percent_as_published: 76
+          Fe2_over_FeT_percent_as_published: 24
+          printed_valence_pair: 76/24
+          atmosphere_as_published: Air
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1600
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '1'
+            atmosphere:
+              state:
+                tag: value
+                value: Air
+              locator: &id004
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '1'
+          locator: *id004
+        - sample_id_as_published: Glass B
+          table_row_as_published: 2
+          T_C: 1600
+          Fe3_over_FeT: 0.55
+          Fe3_over_FeT_percent_as_published: 55
+          Fe2_over_FeT_percent_as_published: 45
+          printed_valence_pair: 55/45
+          atmosphere_as_published: Air
+          row_note: Second separately printed 1600 Air row; no distinguishing condition is printed.
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1600
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '2'
+            atmosphere:
+              state:
+                tag: value
+                value: Air
+              locator: &id005
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '2'
+          locator: *id005
+        - sample_id_as_published: Glass B
+          table_row_as_published: 3
+          T_C: 1800
+          Fe3_over_FeT: 0.4
+          Fe3_over_FeT_percent_as_published: 40
+          Fe2_over_FeT_percent_as_published: 60
+          printed_valence_pair: 40/60
+          atmosphere_as_published: Ar
+          row_note: The prose on PDF page 3 also prints 40:60 for Glass B at 1800 C in Ar; this table cell is the scored observation.
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1800
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '3'
+            atmosphere:
+              state:
+                tag: value
+                value: Ar
+              locator: &id006
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '3'
+          locator: *id006
+        - sample_id_as_published: Glass B
+          table_row_as_published: 4
+          T_C: 2000
+          Fe3_over_FeT: 0.25
+          Fe3_over_FeT_percent_as_published: 25
+          Fe2_over_FeT_percent_as_published: 75
+          printed_valence_pair: 25/75
+          atmosphere_as_published: Ar
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 2000
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '4'
+            atmosphere:
+              state:
+                tag: value
+                value: Ar
+              locator: &id007
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '4'
+          locator: *id007
+        - sample_id_as_published: Glass B
+          table_row_as_published: 5
+          T_C: 1800
+          Fe3_over_FeT: 0.09
+          Fe3_over_FeT_percent_as_published: 9
+          Fe2_over_FeT_percent_as_published: 91
+          printed_valence_pair: 9/91
+          atmosphere_as_published: H2/N2
+          row_note: Prose on PDF page 3 prints 10:90 for 1800 C in H2/N2; Table 1 prints 9/91 for this cell. Both printed
+            readings are retained.
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1800
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '5'
+            atmosphere:
+              state:
+                tag: value
+                value: H2/N2
+              locator: &id008
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '5'
+          locator: *id008
+        - source_type: prose measurement
+          sample_id_as_published: Glass B
+          T_C: 1500
+          Fe3_over_FeT: 0.83
+          Fe3_over_FeT_percent_as_published: 83
+          Fe2_over_FeT_percent_as_published: 17
+          printed_valence_pair: '83:17'
+          atmosphere_as_published: Air
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1500
+              locator:
+                pdf_page_index: 2
+                page: 3
+                published_page: 196
+                section: Results and Discussion
+                paragraph: Iron
+            atmosphere:
+              state:
+                tag: value
+                value: Air
+              locator:
+                pdf_page_index: 2
+                page: 3
+                published_page: 196
+                section: Results and Discussion
+                paragraph: Iron
+          locator:
+            pdf_page_index: 2
+            page: 3
+            published_page: 196
+            section: Results and Discussion
+            paragraph: Iron
+        composition_mol:
+          Na2O: '0.15'
+          SiO2: '0.85'
+        composition_mol_as_published:
+          Na2O: 15 mol%
+          SiO2: 85 mol%
+        composition_mol_locator:
+          pdf_page_index: 0
+          page: 1
+          section: Abstract
+        composition_mol_basis: printed_mole_fraction
+      derivation:
+        relation: Optical absorption spectroscopy and ESR determined valence fractions in quenched glass; the table reports
+          the fitted ferric and ferrous fractions.
+        output_unit: dimensionless
+        locator:
+          pdf_page_index: 1
+          page: 2
+          published_page: 195
+          section: Experimental
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            pdf_page_index: 1
+            page: 2
+            published_page: 195
+            section: Experimental
+    - observation_id: leister_2000_fe_table1_glass_c
+      type: concentration_series
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 198
+        table: Tab. 1
+      phase: glass
+      units: fraction (Fe3+/sum Fe); source prints Fe3+/Fe2+ valence percentages
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_direct
+        analytical_method: optical absorption spectroscopy and ESR; row-specific allocation not stated
+        measurement_stage: post-quench glass
+        post_quench_flag: true
+        quench_provenance: Air comparison glasses were quenched onto a copper block to freeze redox ratios. Ar and H2/N2 glasses
+          were centrifugally cast into a cold graphite mold; preservation of these ratios is not explicitly asserted.
+        points:
+        - sample_id_as_published: Glass C
+          table_row_as_published: 1
+          T_C: 1600
+          Fe3_over_FeT: 0.87
+          Fe3_over_FeT_percent_as_published: 87
+          Fe2_over_FeT_percent_as_published: 13
+          printed_valence_pair: 87/13
+          atmosphere_as_published: Air
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1600
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '1'
+            atmosphere:
+              state:
+                tag: value
+                value: Air
+              locator: &id009
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '1'
+          locator: *id009
+        - sample_id_as_published: Glass C
+          table_row_as_published: 2
+          T_C: 1600
+          Fe3_over_FeT: 0.81
+          Fe3_over_FeT_percent_as_published: 81
+          Fe2_over_FeT_percent_as_published: 19
+          printed_valence_pair: 81/19
+          atmosphere_as_published: Air
+          row_note: Second separately printed 1600 Air row; no distinguishing condition is printed.
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1600
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '2'
+            atmosphere:
+              state:
+                tag: value
+                value: Air
+              locator: &id010
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '2'
+          locator: *id010
+        - sample_id_as_published: Glass C
+          table_row_as_published: 3
+          T_C: 1800
+          Fe3_over_FeT: 0.78
+          Fe3_over_FeT_percent_as_published: 78
+          Fe2_over_FeT_percent_as_published: 22
+          printed_valence_pair: 78/22
+          atmosphere_as_published: Ar
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1800
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '3'
+            atmosphere:
+              state:
+                tag: value
+                value: Ar
+              locator: &id011
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '3'
+          locator: *id011
+        - sample_id_as_published: Glass C
+          table_row_as_published: 4
+          T_C: 2000
+          Fe3_over_FeT: 0.75
+          Fe3_over_FeT_percent_as_published: 75
+          Fe2_over_FeT_percent_as_published: 25
+          printed_valence_pair: 75/25
+          atmosphere_as_published: Ar
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 2000
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '4'
+            atmosphere:
+              state:
+                tag: value
+                value: Ar
+              locator: &id012
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '4'
+          locator: *id012
+        - sample_id_as_published: Glass C
+          table_row_as_published: 5
+          T_C: 1800
+          Fe3_over_FeT: 0.1
+          Fe3_over_FeT_percent_as_published: 10
+          Fe2_over_FeT_percent_as_published: 90
+          printed_valence_pair: 10/90
+          atmosphere_as_published: H2/N2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1800
+              locator:
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '5'
+            atmosphere:
+              state:
+                tag: value
+                value: H2/N2
+              locator: &id013
+                pdf_page_index: 4
+                page: 5
+                published_page: 198
+                table: Tab. 1
+                row: '5'
+          locator: *id013
+        composition_mol:
+          CaO: '0.10'
+          BaO: '0.10'
+          Al2O3: '0.15'
+          SiO2: '0.65'
+        composition_mol_as_published:
+          CaO: 10 mol%
+          BaO: 10 mol%
+          Al2O3: 15 mol%
+          SiO2: 65 mol%
+        composition_mol_locator:
+          pdf_page_index: 0
+          page: 1
+          section: Abstract
+        composition_mol_basis: printed_mole_fraction
+      derivation:
+        relation: Optical absorption spectroscopy and ESR determined valence fractions in quenched glass; the table reports
+          the fitted ferric and ferrous fractions.
+        output_unit: dimensionless
+        locator:
+          pdf_page_index: 1
+          page: 2
+          published_page: 195
+          section: Experimental
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            pdf_page_index: 1
+            page: 2
+            published_page: 195
+            section: Experimental
+    context:
+    - observation_id: leister_2000_fe_table1_missing_cells
+      type: table_cells_with_no_reported_value
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 198
+        table: Tab. 1
+      units: percent valence distribution as printed
+      values:
+        method_class: measured_tabulated
+        cells:
+        - row: 4
+          sample_id_as_published: Glass A
+          temperature_C: 2000
+          atmosphere_as_published: Ar
+          printed_value: '-'
+          reason: authors provide no numeric cell; not interpreted as zero
+        - row: 5
+          sample_id_as_published: Glass A
+          temperature_C: 1800
+          atmosphere_as_published: H2/N2
+          printed_value: '-'
+          reason: authors provide no numeric cell; not interpreted as zero
+        candidate_quantity_tokens:
+        - fe3_fe2_ratio
+        reason_untyped: The table prints dashes in these cells and no numeric value.
+    - observation_id: leister_2000_fig1_spectra
+      type: figure_record
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 197
+        figure: '1'
+      values:
+        identity:
+          species: Fe
+          phase: glass
+          T_C:
+            state:
+              tag: unknown
+              reason: the figure contains three series at different temperatures, listed in its legend
+        axes:
+          x: wavenumber ν (cm⁻¹); secondary wavelength λ (nm)
+          y: E/d (cm⁻¹); secondary ordinate unlabeled (units not stated)
+        caption: Optical absorption spectra of glass B + 50 ppm Fe, melted under oxidizing, inert and reducing conditions
+        panel: none
+        series:
+        - label: 1500°C, Air
+          marker_count: 0
+        - label: 1800°C, Ar
+          marker_count: 0
+        - label: 1800°C, H2/N2
+          marker_count: 0
+        attribution: this work
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: optical absorption spectrum
+        schema_gap: No existing quantity token represents optical absorption spectra.
+      units: x-axis wavenumber ν (cm⁻¹), secondary wavelength λ (nm); y-axis E/d (cm⁻¹), secondary ordinate unlabeled
+    - observation_id: leister_2000_fig2_fe_ratio
+      type: figure_record
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 197
+        figure: '2'
+      values:
+        identity:
+          species: Fe
+          phase: glass
+          T_C:
+            state:
+              tag: unknown
+              reason: the figure contains three series at different temperatures, listed in its legend
+        axes:
+          x: holding time (min)
+          y: '[Fe2+]/[Fe_ges] (caption describes Fe3+/Fe2+ ratio)'
+        caption: Dependency of the Fe3+/Fe2+ ratio on holding time
+        panel: none
+        series:
+        - label: 1600 C
+          marker_count: 7
+        - label: 1800 C
+          marker_count: 8
+        - label: 2000 C
+          marker_count: 4
+        attribution: this work
+        note: Plotted y-axis is the ferrous fraction while the caption names the Fe3+/Fe2+ ratio; no points extracted.
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: Fe3+/Fe2+ ratio in caption; plotted [Fe2+]/[Fe_ges] fraction on y-axis
+        schema_gap: No token represents the plotted ferrous fraction; fe3_fe2_ratio does not match the plotted axis.
+      units: x-axis holding time (min); y-axis [Fe2+]/[Fe_ges] (caption describes Fe3+/Fe2+ ratio)
+  V:
+    context:
+    - observation_id: leister_2000_v_table2
+      type: valence_distribution_table
+      locator:
+        pdf_page_index: 6
+        page: 7
+        published_page: 200
+        table: Tab. 2
+      units: percent by printed oxidation state
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens:
+        - fe3_fe2_ratio
+        reason_untyped: No existing valence-distribution token represents V5+/V4+/V3+ fractions. The Fe-specific ratio token
+          does not fit; every printed cell is retained below.
+        states_by_glass:
+          A:
+          - V5+
+          - V4+
+          - V3+
+          B:
+          - V5+
+          - V4+
+          - V3+
+          C:
+          - V5+
+          - V4+
+          - V3+
+        points:
+        - T_C: 1600
+          atmosphere_as_published: Air
+          prose_duplicate_locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 198
+            section: Results and Discussion
+            paragraph: Vanadium
+          row_note: Prose also prints V5+/V4+ = 95:5 for Glass A at 1600°C in air; this table cell is the same result.
+          values_percent:
+            A:
+            - 95
+            - 5
+            - 0
+            B:
+            - 84
+            - 16
+            - 0
+            C:
+            - 93
+            - 7
+            - 0
+        - T_C: 1600
+          atmosphere_as_published: Ar
+          values_percent:
+            A:
+            - 89
+            - 11
+            - 0
+            B:
+            - 54
+            - 46
+            - 0
+            C:
+            - 73
+            - 22
+            - 5
+        - T_C: 1800
+          atmosphere_as_published: Ar
+          values_percent:
+            A:
+            - 81
+            - 19
+            - 0
+            B:
+            - 29
+            - 71
+            - 0
+            C:
+            - 66
+            - 28
+            - 6
+        - T_C: 2000
+          atmosphere_as_published: Ar
+          values_percent:
+            A:
+            - 63
+            - 27
+            - 0
+            B:
+            - 22
+            - 78
+            - 0
+            C:
+            - 64
+            - 29
+            - 7
+          prose_duplicate_locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 198
+            section: Results and Discussion
+            paragraph: Vanadium
+          row_note: Prose also prints V5+/V4+ = 22:78 for Glass B at 2000°C in Ar; this table cell is the same result.
+        - T_C: 1600
+          atmosphere_as_published: red.
+          prose_locator:
+            pdf_page_index: 4
+            page: 5
+            published_page: 198
+            section: Results and Discussion
+            paragraph: Vanadium
+          row_note: Prose states V5+ is less than 1% in Glass B under reducing conditions; Table 2 prints <0.5% for that cell, and both printed bounds are retained.
+          values_percent:
+            A:
+            - 52
+            - 48
+            - 0
+            B:
+            - <0.5
+            - 28
+            - 72
+            C:
+            - <2
+            - 28
+            - 72
+    - observation_id: leister_2000_fig3_v_spectrum
+      type: figure_record
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 198
+        figure: '3'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C:
+            state:
+              tag: unknown
+              reason: the figure contains six series at different temperatures, listed in its legend
+        axes:
+          x: wavenumber ν (cm⁻¹); secondary wavelength λ (nm)
+          y: E/d (cm⁻¹)
+        caption: Optical absorption spectra of glass A +5000ppm V
+        panel: none
+        series:
+        - label: 1600°C, red.
+          marker_count: 0
+        - label: 2000°C, Ar
+          marker_count: 0
+        - label: 1800°C, Ar
+          marker_count: 0
+        - label: 1600°C, Ar
+          marker_count: 0
+        - label: 1600°C, Luft
+          marker_count: 0
+        - label: 1300°C, Luft
+          marker_count: 0
+        attribution: this work
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: optical absorption spectrum
+        schema_gap: No existing quantity token represents optical absorption spectra.
+      units: x-axis wavenumber ν (cm⁻¹), secondary wavelength λ (nm); y-axis E/d (cm⁻¹)
+    - observation_id: leister_2000_fig4_v_spectrum
+      type: figure_record
+      locator:
+        pdf_page_index: 5
+        page: 6
+        published_page: 199
+        figure: '4'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C:
+            state:
+              tag: unknown
+              reason: the figure contains five series at different temperatures, listed in its legend
+        axes:
+          x: wavenumber ν (cm⁻¹); secondary wavelength λ (nm)
+          y: E/d (cm⁻¹)
+        caption: Optical absorption spectra of glass B +5000ppm V
+        panel: none
+        series:
+        - label: 1600°C, red.
+          marker_count: 0
+        - label: 2000°C, Ar
+          marker_count: 0
+        - label: 1800°C, Ar
+          marker_count: 0
+        - label: 1600°C, Ar
+          marker_count: 0
+        - label: 1600°C, air
+          marker_count: 0
+        attribution: this work
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: optical absorption spectrum
+        schema_gap: No existing quantity token represents optical absorption spectra.
+      units: x-axis wavenumber ν (cm⁻¹), secondary wavelength λ (nm); y-axis E/d (cm⁻¹)
+    observations: []
+  Cr:
+    context:
+    - observation_id: leister_2000_cr_table3
+      type: valence_distribution_table
+      locator:
+        pdf_page_index: 7
+        page: 8
+        published_page: 201
+        table: Tab. 3
+      units: percent by printed oxidation state
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens:
+        - fe3_fe2_ratio
+        reason_untyped: No existing token represents Cr6+/Cr3+/Cr2+ distributions.
+        states_by_glass:
+          A:
+          - Cr6+
+          - Cr3+
+          B:
+          - Cr6+
+          - Cr3+
+          C:
+          - Cr6+
+          - Cr3+
+          - Cr2+
+        points:
+        - row_as_printed: 1600 (1700, C)
+          A_T_C: 1600
+          B_T_C: 1600
+          C_T_C: 1700
+          atmosphere_as_published: Air
+          values_percent:
+            A:
+            - 40
+            - 60
+            B:
+            - 6
+            - 94
+            C:
+            - 3
+            - 97
+            - 0
+          prose_duplicate_locator:
+            pdf_page_index: 6
+            page: 7
+            published_page: 200
+            section: Results and Discussion
+            paragraph: Chromium
+          row_note: Prose also reports 40% of Cr as Cr6+ in Glass A under oxidizing conditions at 1600°C; this table cell is the same result.
+        - T_C: 1600
+          atmosphere_as_published: Ar
+          values_percent:
+            A:
+            - 10
+            - 90
+            B:
+            - 4
+            - 96
+            C:
+            - <1
+            - '>99'
+            - 0
+        - T_C: 1800
+          atmosphere_as_published: Ar
+          values_percent:
+            A:
+            - 7
+            - 93
+            B:
+            - <1
+            - '>99'
+            C:
+            - 0
+            - 97
+            - 3
+        - T_C: 2000
+          atmosphere_as_published: Ar
+          values_percent:
+            A:
+            - 5
+            - 95
+            B:
+            - <1
+            - '>99'
+            C:
+            - 0
+            - 92
+            - 8
+        - T_C: 1800
+          atmosphere_as_published: H2/N2
+          values_percent:
+            A:
+            - 0
+            - 100
+            B:
+            - 0
+            - 100
+            C:
+            - 0
+            - 62
+            - 38
+    - observation_id: leister_2000_cr_prose_summaries
+      type: valence_distribution_prose_summary
+      locator:
+        pdf_page_index: 6
+        page: 7
+        published_page: 200
+        section: Results and Discussion
+        paragraph: Chromium
+      units: percent by printed oxidation state
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens:
+        - fe3_fe2_ratio
+        reason_untyped: No existing token represents Cr6+/Cr3+/Cr2+ distributions; these prose summaries have no matching token.
+        printed_summaries:
+        - oxidation_state: Cr3+
+          printed_amount: ≥90%
+          printed_statement: With an amount ≥90%, Cr3+ is the main redox state in all investigated glasses under all melting conditions.
+        - oxidation_state: Cr3+
+          printed_amount: nearly 100%
+          approximate: true
+          printed_conditions: reducing conditions
+          printed_statement: Nearly 100% of the chromium is shifted into the Cr3+ redox state under reducing conditions.
+        - printed_conditions: temperatures >1800°C under inert conditions
+          sample_id_as_published: Glass C
+          printed_statement: Cr2+ occurs in Glass C and Cr6+ is no longer detectable.
+    - observation_id: leister_2000_fig5_cr_fit
+      type: figure_record
+      locator:
+        pdf_page_index: 6
+        page: 7
+        published_page: 200
+        figure: '5'
+      values:
+        identity:
+          species: Cr
+          phase: glass
+          T_C: 2000
+          atmosphere_as_published: Ar
+          sample_id_as_published: Glass C
+        axes:
+          x: wavenumber ν (cm⁻¹); secondary wavelength λ (nm)
+          y: E/d (cm⁻¹)
+        caption: Fit of the optical absorption spectrum (glass C +1000ppm Cr (2000°C, Ar))
+        panel: none
+        series:
+        - label: fitted spectrum with labelled Cr3+ and Cr2+ component bands
+          marker_count: 0
+        attribution: this work
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: optical absorption spectrum fit
+        schema_gap: No existing quantity token represents an optical absorption spectrum fit.
+      units: x-axis wavenumber ν (cm⁻¹), secondary wavelength λ (nm); y-axis E/d (cm⁻¹)
+    observations: []
+  Ti:
+    context:
+    - observation_id: leister_2000_ti_table4
+      type: valence_distribution_table
+      locator:
+        pdf_page_index: 7
+        page: 8
+        published_page: 201
+        table: Tab. 4
+      units: percent by printed oxidation state
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens:
+        - fe3_fe2_ratio
+        reason_untyped: No existing token represents Ti4+/Ti3+ distributions.
+        states_by_glass:
+          A:
+          - Ti4+
+          - Ti3+
+          B:
+          - Ti4+
+          - Ti3+
+          C:
+          - Ti4+
+          - Ti3+
+        points:
+        - T_C: 1600
+          atmosphere_as_published: Air
+          values_percent:
+            A:
+            - 100
+            - 0
+            B:
+            - 100
+            - 0
+            C:
+            - 100
+            - 0
+        - T_C: 1600
+          atmosphere_as_published: Ar
+          values_percent:
+            A:
+            - 100
+            - 0
+            B:
+            - 100
+            - 0
+            C:
+            - 100
+            - 0
+        - T_C: 1800
+          atmosphere_as_published: Ar
+          values_percent:
+            A:
+            - 100
+            - 0
+            B:
+            - 100
+            - 0
+            C:
+            - '>99'
+            - <1
+        - T_C: 2000
+          atmosphere_as_published: Ar
+          values_percent:
+            A:
+            - 100
+            - 0
+            B:
+            - '>99'
+            - <1
+            C:
+            - 95
+            - 5
+        - T_C: 1800
+          atmosphere_as_published: H2/N2
+          values_percent:
+            A:
+            - 96
+            - 4
+            B:
+            - 93
+            - 7
+            C:
+            - 89
+            - 11
+    - observation_id: leister_2000_fig6_ti_spectrum
+      type: figure_record
+      locator:
+        pdf_page_index: 8
+        page: 9
+        published_page: 202
+        figure: '6'
+      values:
+        identity:
+          species: Ti
+          phase: glass
+          T_C:
+            state:
+              tag: unknown
+              reason: the figure contains three series at different temperatures, listed in its legend
+        axes:
+          x: wavenumber ν (cm⁻¹); secondary wavelength λ (nm)
+          y: E/d (cm⁻¹); secondary ordinate unlabeled (units not stated)
+        caption: Optical absorption spectra of glass A, + 5000 ppm Ti
+        panel: none
+        series:
+        - label: 1600°C, air
+          marker_count: 0
+        - label: 2000°C, Ar
+          marker_count: 0
+        - label: 1800°C, red.
+          marker_count: 0
+        attribution: this work
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: optical absorption spectrum
+        schema_gap: No existing quantity token represents optical absorption spectra.
+      units: x-axis wavenumber ν (cm⁻¹), secondary wavelength λ (nm); y-axis E/d (cm⁻¹), secondary ordinate unlabeled
+    - observation_id: leister_2000_ti_prose_fraction
+      type: printed_redox_fraction_statement
+      locator:
+        pdf_page_index: 7
+        page: 8
+        published_page: 201
+        section: Results and Discussion
+        paragraph: Titanium
+      units: percent Ti3+ as reported
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens:
+        - fe3_fe2_ratio
+        reason_untyped: No existing quantity token represents Ti4+/Ti3+ fractions; the Fe-specific token does not fit.
+        printed_amount: 1-5%
+        printed_conditions: temperatures >1800 C for glass C and >2000 C for glass B
+    observations: []

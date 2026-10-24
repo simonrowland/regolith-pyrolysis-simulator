@@ -161,6 +161,9 @@ def imported_openimcc_commit() -> str | None:
     return None
 DEFAULT_BACKEND_PACK_NAME = "default"
 
+# Retained domain metadata for typed fallback when the optional package is absent.
+_UNAVAILABLE_TEMPERATURE_DOMAIN_K = (1700.0, 3000.0)
+
 _PACK_RESOURCE_NAMES = {
     "default": None,
     "published-core": "imcc-sf04-v1.0.2.json",
@@ -791,6 +794,15 @@ def _load_pack(pack_name: str) -> Any:
     resource = resources.files("openimcc").joinpath("data", "packs", resource_name)
     with resources.as_file(resource) as path:
         return package.load_datapack(path)
+
+
+def _temperature_domain_K() -> tuple[float, float]:
+    try:
+        _require_openimcc()
+        domains = _load_pack(DEFAULT_BACKEND_PACK_NAME).kernel_datapack.domains
+    except OpenImccUnavailableError:
+        return _UNAVAILABLE_TEMPERATURE_DOMAIN_K
+    return max(low for low, _ in domains), min(high for _, high in domains)
 
 
 def _pack_digest(pack: Any) -> str:

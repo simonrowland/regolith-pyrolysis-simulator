@@ -121,21 +121,15 @@ FARADAY = 96485.3321          # C/mol (for electrolysis)
 GAS_CONSTANT = 8.31446        # J/(mol·K)
 STEFAN_BOLTZMANN = 5.670374e-8  # W/(m²·K⁴)
 
-# Operator-controlled induction-stirring ceiling. See ``MeltState.
-# stir_factor`` doc for the two consumer subsystems (evaporation +
-# condensation). The "melt-flying-out-of-the-pot" upper bound — typical
-# industrial ceiling for 1-tonne crucible induction stirring (the recipe
-# setpoint window is 4-8× per ``data/setpoints.yaml § induction_
-# stirring``; 10× is the empirical ceiling beyond which the melt surface
-# breaks up). All override paths use ``clamp_stir_factor`` so both
-# consumers honour this ceiling.
+# Operator-facing induction-stirring ceiling. The 10× frozen-skull ceiling
+# and 4–8× setpoint band are unsourced engineering placeholders: they have
+# no coil, field, or flow correlation. Tracked as b-1015; t-1440's
+# species-specific liquid-transfer resistance replaces these proxies. All
+# override paths use ``clamp_stir_factor`` to preserve the configured bound.
 #
-# Phase B (0.5.3 2-axis stirring): the same ``MAX_STIR_FACTOR`` ceiling
-# applies PER-AXIS to ``StirState.axial`` and ``StirState.radial``.
-# Industrial multi-coil EM stirrers carry independent budgets on each
-# axis — the melt-surface-breakup ceiling is set by total kinetic
-# energy injected at the worst single axis, not the L2 sum. A
-# component-wise clamp is the right operator-boundary contract.
+# Phase B (0.5.3 2-axis stirring): ``MAX_STIR_FACTOR`` applies per axis
+# to ``StirState.axial`` and ``StirState.radial`` as an input bound. It is
+# not a measured melt-surface-breakup or equipment limit.
 MAX_STIR_FACTOR = 10.0
 
 
@@ -144,14 +138,14 @@ def clamp_stir_factor(value: float) -> float:
     ``[0.0, MAX_STIR_FACTOR]``, mapping non-finite (NaN, +/-inf) inputs
     and ``bool`` to the fail-closed default ``0.0``.
 
-    Two consumer subsystems disagree on the meaning of the lower bound:
+    The axes have distinct consumers:
 
-    - ``engines/builtin/evaporation_flux.py``: linear multiplier on
-      H-K-L evaporation flux. ``stir_factor=0`` is a LEGITIMATE
-      operator signal meaning "halt evaporation" (debug pause, manual
-      hold). Pre-Phase B this halt path was operator-accessible and
-      the simulator preserved it; this helper preserves it too.
-    - ``simulator/condensation.py``: drives the Sherwood-enhancement
+    - ``engines/builtin/evaporation_flux.py``: validates, clamps, and
+      records axial stirring in diagnostics; axial does not alter the
+      evaporation flux.
+    - ``simulator/metal_stratification.py``: axial stirring sets the
+      assumed metal cross-pool relaxation rate.
+    - ``simulator/condensation.py``: radial stirring drives the Sherwood-enhancement
       ``Sh_eff = 3.66 × √stir_factor`` in the series-resistance flux.
       Sherwood physics has its OWN floor at ``Sh = 3.66`` (laminar
       pipe asymptote, BSL Eq 14.4-9); a ``stir_factor=0`` here must
@@ -163,8 +157,7 @@ def clamp_stir_factor(value: float) -> float:
     pre-0.5.2 Phase B):
 
     - Non-finite (NaN, +/-inf) → ``0.0``. An upstream numerical
-      instability poisoning ``melt.stir_factor`` halts evaporation
-      rather than silently propagating NaN into the ledger.
+      instability cannot silently propagate NaN into stirring consumers.
       ``_stirring_enhanced_sherwood`` then floors Sh at the laminar
       baseline, so condensation stays defined.
     - ``bool`` rejected → ``0.0``. ``True`` would coerce to ``1.0``
@@ -207,25 +200,31 @@ _KNOWN_STIR_STATE_KEYS = frozenset(('axial', 'radial'))
 class StirState:
     """Two-axis induction-stirring state (0.5.3 Phase B).
 
-    Industrial multi-coil EM stirrers expose two independent control
-    axes that map to physically distinct mixing modes:
+    The 4–8× setpoint band and 10× per-axis frozen-skull ceiling are
+    unsourced engineering placeholders with no coil, field, or flow
+    correlation (b-1015). Task t-1440 replaces these proxies with
+    species-specific liquid-transfer resistance.
 
-    - ``axial``: vertical EM stirring. Drives bottom-to-surface
-      circulation in the melt → surface renewal → linear H-K-L
-      evaporation-flux multiplier (consumer:
-      ``engines/builtin/evaporation_flux.py``). Default 6.0 preserves
-      the 0.5.2 single-axis C2A setpoint (mid-band of the documented
-      ``data/setpoints.yaml § induction_stirring`` 4-8× window).
-    - ``radial``: horizontal / azimuthal EM stirring. Drives in-plane
-      vortex in the gas just above the melt → gas-side boundary-layer
-      Sherwood enhancement (consumer:
+    The model exposes two input axes with distinct current consumers:
+
+    - ``axial``: vertical stirring command. In the current evaporation
+      provider it is clamped and recorded in diagnostics only. Its live
+      numerical effect is the assumed metal-stratification cross-pool
+      relaxation (``simulator/metal_stratification.py``), anchored at
+      99%/h when axial is 6.0. Default 6.0 preserves the legacy
+      single-axis setpoint; the 4–8× band is an unsourced engineering
+      placeholder (b-1015), replaced by species-specific liquid-transfer
+      resistance in t-1440.
+    - ``radial``: radial stirring input to the gas-side Sherwood
+      enhancement proxy (consumer:
       ``simulator/condensation.py::_stirring_enhanced_sherwood``).
-      Default 1.0 = no-stir laminar baseline (``Sh = 3.66``, BSL
-      Eq 14.4-9). Operator can dial up to 10× per-axis.
+      Default 1.0 = laminar baseline (``Sh = 3.66``, BSL Eq 14.4-9).
+      Operator input is bounded at 10× per axis.
 
-    Per-axis ``MAX_STIR_FACTOR = 10.0`` ceiling. Each axis preserves
-    the scalar 0.5.2 semantics when the other is at its default
-    (axial=1.0 OR radial=1.0 → laminar baseline on that consumer).
+    Per-axis ``MAX_STIR_FACTOR = 10.0`` ceiling. The 10× frozen-skull
+    ceiling is an unsourced engineering placeholder (b-1015), without a
+    coil, field, or flow correlation. Task t-1440 replaces these stirring
+    proxies with species-specific liquid-transfer resistance.
 
     Backward-compat (deprecation cycle, 0.5.3 → 0.5.4):
 
@@ -240,11 +239,8 @@ class StirState:
 
     Design rationale (B1 office-hours, 2026-05-28): axial × radial
     decomposition (option 1) was selected over mean/turbulence (option
-    2) and Re/f_renewal (option 3) because it maps directly to
-    industrial multi-coil EM stirrer design, preserves the scalar
-    interpretation when one axis is at 1.0, and cleanly separates the
-    melt-side surface-renewal effect (evap H-K-L) from the gas-side
-    boundary-layer effect (condensation Sh).
+    2) and Re/f_renewal (option 3). Its current consumer mapping is
+    documented above; the numerical bands remain unsourced placeholders.
     """
 
     axial: float = 6.0
@@ -531,31 +527,34 @@ class MeltState:
 
     # --- Stirring ---
     stir_state: 'StirState' = field(default_factory=StirState)
-    # Induction stirring acceleration factor (4-8×, hard-clamped at
-    # ``MAX_STIR_FACTOR`` per-axis). 0.5.3 Phase B: replaced the
+    # Induction stirring setpoints (4–8×, hard-clamped at
+    # ``MAX_STIR_FACTOR`` per-axis) are unsourced engineering
+    # placeholders, with no coil, field, or flow correlation (b-1015).
+    # Task t-1440 replaces them with species-specific liquid-transfer
+    # resistance. 0.5.3 Phase B: replaced the
     # single-scalar ``stir_factor`` field with a 2-axis ``StirState``
     # dataclass (axial × radial). The legacy ``stir_factor`` attribute
     # is preserved as a property below that aliases to
     # ``stir_state.axial`` for the deprecation cycle. Two subsystems
     # consume the axes:
     #
-    #   1. ``engines/builtin/evaporation_flux.py``: reads ``axial`` as
-    #      the linear multiplier on the Hertz-Knudsen evaporation rate
-    #      (surface renewal + thermal cycling boost from vertical EM
-    #      stirring drives melt-side surface refresh).
-    #   2. ``simulator/condensation.py`` (Phase B 0.5.3 split): reads
-    #      ``radial`` for the stir-enhanced Sherwood number
+    #   1. ``engines/builtin/evaporation_flux.py``: clamps and records
+    #      ``axial`` in diagnostics; it does not change evaporation flux.
+    #   2. ``simulator/metal_stratification.py``: uses ``axial`` for the
+    #      assumed metal cross-pool relaxation rate.
+    #   3. ``simulator/condensation.py``: reads ``radial`` for the
+    #      heuristic Sherwood number
     #      ``Sh = 3.66·√radial`` in the series-resistance
-    #      boundary-layer flux (gas-side in-plane vortex drives bulk-
-    #      to-wall mass transport).
+    #      boundary-layer flux (the configured radial proxy increases
+    #      the gas-side Sherwood number).
     #
-    # Both consumers honour ``MAX_STIR_FACTOR`` per-axis; override paths
+    # All three consumers honour ``MAX_STIR_FACTOR`` per-axis; override paths
     # (``simulator/campaigns.py`` campaign overrides, ``simulator/
     # session.py`` ``session.adjust(...)``) funnel through
     # ``clamp_stir_factor`` (per-axis) and ``clamp_stir_state`` (whole
-    # dataclass) so a bad override cannot inflate either consumer
-    # beyond the documented physical ceiling. Pre-0.5.2 the evaporation
-    # path silently accepted arbitrary multipliers; codex /review
+    # dataclass) so a bad override cannot inflate any consumer
+    # beyond the configured ceiling. Pre-0.5.2 the evaporation
+    # path silently accepted arbitrary values; codex /review
     # concern-diverse subagent flagged the clamp-asymmetry (Phase B
     # P1). 0.5.3 B1 office-hours framing chose option 1 (axial × radial)
     # over options 2 (mean/turbulence) and 3 (Re/f_renewal) — see
@@ -592,10 +591,11 @@ class MeltState:
         operator code, golden fixtures, and legacy callers that read
         ``melt.stir_factor`` keep working through the deprecation
         cycle. The property maps to ``stir_state.axial`` because the
-        scalar value historically drove BOTH consumers; in the 2-axis
-        split the axial axis carries the evaporation H-K-L multiplier
-        (legacy 6.0 default) while the radial axis defaults to 1.0
-        (laminar Sherwood baseline). 0.5.4 may remove this property
+        scalar value historically supplied the stirring input. Today
+        axial is diagnostic-only in evaporation and controls the assumed
+        metal cross-pool relaxation; radial drives gas-side Sherwood
+        enhancement and defaults to 1.0 (laminar baseline). 0.5.4 may
+        remove this property
         once campaigns / operator UIs migrate to ``stir_state``
         directly.
         """
@@ -878,11 +878,11 @@ class EvaporationFlux:
     """
     Evaporation rates from the melt surface for one timestep.
 
-    The source provider combines the intrinsic Hertz-Knudsen interface
-    resistance with gas- and melt-transfer resistances, then integrates the
+    The source provider combines the Hertz-Knudsen interface resistance
+    with configured gas- and melt-transfer resistances, then integrates the
     resulting mass flux over source area and time to populate the kg/hr fields
-    below. Stirring changes the melt-transfer resistance; it is not a direct
-    multiplier on the stored rate.
+    below. Current setpoints disable melt resistance; radial stirring affects
+    the gas-side Sherwood resistance, while axial stirring is diagnostic-only.
     """
     species_kg_hr: Dict[str, float] = field(default_factory=dict)
     # Mass evaporation rate per species (kg/hr)

@@ -1247,10 +1247,10 @@ def test_receiptless_live_fill_computes_without_cache_lookup_or_capture(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from simulator import engine_local_config
+    import simulator.engine_local_config as engine_config
 
     monkeypatch.setattr(
-        engine_local_config,
+        engine_config,
         "config_path",
         lambda: tmp_path / "engines.local.toml",
     )
@@ -1290,10 +1290,10 @@ def test_receiptless_replay_only_refuses_before_cache_lookup(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from simulator import engine_local_config
+    import simulator.engine_local_config as engine_config
 
     monkeypatch.setattr(
-        engine_local_config,
+        engine_config,
         "config_path",
         lambda: tmp_path / "engines.local.toml",
     )
@@ -1592,7 +1592,7 @@ def test_cached_real_live_fill_rejects_engine_upgrade_without_authorization(
         name="alphamelts",
         version=(
             "alphamelts2 2.3.2 (server=macbook) "
-            "(path=/Users/simon/alphamelts-app-2.3.1-macos-arm64/alphamelts2) "
+            "(path=/opt/alphamelts-app-2.3.1-macos-arm64/alphamelts2) "
             "(digest=sha256:stale)"
         ),
     )

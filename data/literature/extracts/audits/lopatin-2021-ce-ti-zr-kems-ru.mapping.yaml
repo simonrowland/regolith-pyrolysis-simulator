@@ -1,0 +1,52 @@
+source_id: lopatin-2021-ce-ti-zr-kems-ru
+source_citation: Lopatin SI, Shugurov SM, Kurapova OYu (2021), Russian Journal of General Chemistry 91(10), 1568–1572
+doi: 10.31857/S0044460X21100127
+extraction:
+  table_tool: MinerU draft returned zero tables for the available page chunk.
+  method: Manual cell mapping from pdftotext-layout and the 600 dpi render of physical PDF page 3.
+  page: 3
+  published_page: 1570
+  pdf_page_index: 2
+tables:
+  - table: '1'
+    title: Activities and activity coefficients of titanium and cerium dioxide in condensed phases at 2250 K
+    type: scalar activity and activity_coefficient observations
+    unit: dimensionless
+    row_count: 4
+    columns:
+      - source_column: TiO2 mole fraction
+        extract_field: point_conditions.composition / values.composition_mol
+      - source_column: CeO2 mole fraction
+        extract_field: point_conditions.composition / values.composition_mol
+      - source_column: ZrO2 mole fraction
+        extract_field: point_conditions.composition / values.composition_mol
+      - source_column: activity TiO2
+        extract_field: species.TiO2.observations[].values.activity
+      - source_column: activity CeO2
+        extract_field: species.CeO2.observations[].values.activity
+      - source_column: activity coefficient TiO2
+        extract_field: species.TiO2.observations[].values.activity_coefficient
+      - source_column: activity coefficient CeO2
+        extract_field: species.CeO2.observations[].values.activity_coefficient
+    row_dispositions:
+      - row: 1
+        composition: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72
+        attribution: This work
+      - row: 2
+        composition: x(TiO2)=–, x(CeO2)=0.18, x(ZrO2)=0.82
+        attribution: 'Table footnote a: data from [6] (Meng, Ren, Wei 2014)'
+      - row: 3
+        composition: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86
+        attribution: This work
+      - row: 4
+        composition: x(TiO2)=–, x(CeO2)=0.09, x(ZrO2)=0.91
+        attribution: 'Table footnote a: data from [6] (Meng, Ren, Wei 2014)'
+  - source_text_record:
+    locator:
+      page: 3
+      published_page: 1570
+      pdf_page_index: 2
+    quantity: ion_intensity_ratio
+    printed_value: 2.0 ± 0.1
+    printed_temperature_range_K: 2060–2160
+    disposition: Typed using the existing ion_intensity_ratio quantity token.

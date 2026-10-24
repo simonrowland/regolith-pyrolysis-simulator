@@ -1,0 +1,2441 @@
+schema_version: literature_extract.v1
+source_id: park-2021-vanadium-thermodynamics-thesis
+source:
+  citation: Park, Donghwi (2021). Investigation of thermodynamic properties of vanadium oxide in CaO-SiO2-VOx
+    slag system. Master's thesis, Korea University, February 2021.
+  doi: 10.23186/korea.000000235645.11009.0001158
+  url: https://doi.org/10.23186/korea.000000235645.11009.0001158
+  year: 2021
+  provenance_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+  note: The title page identifies this as a February 2021 Korea University master's thesis. Chapter 2/Table
+    3 is identified in the thesis as previously published by Park et al. (2019), DOI 10.1016/j.jallcom.2019.02.313;
+    this wave follows the triage target tables 4, 8-12.
+extraction:
+  method: Manual transcription from pdftotext-layout with 600 dpi render checks of each table cell.
+  date: '2026-10-22'
+  worker: codex-fam46-1022
+  note: Table 9 V mole-percent cells are stored as mole fractions with the printed mol% retained. Tables
+    4, 8, and 10-12 are context records with every table row and numeric cell retained. Tables 10-12 are
+    author-calculated and depend on Table 8 V valence fractions, for which this base has no general token;
+    input tables 4, 8, and 9 are retained as untracked CSVs for t-1382. Figures are recorded without digitized
+    values.
+review_status: draft
+fidelity_samples:
+- species: V
+  observation_id: park_2021_table9_csv01_metal_v_mole_fraction
+  field: component_amount
+  value: '0.1458'
+  locator:
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+- species: V
+  observation_id: park_2021_table9_csv08_metal_v_mole_fraction
+  field: component_amount
+  value: '0.0598'
+  locator:
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+- species: V
+  observation_id: park_2021_table9_csv14_metal_v_mole_fraction
+  field: component_amount
+  value: '0.0725'
+  locator:
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+experiments:
+- experiment_id: park_2021_csv01
+  method: melt_equilibration_quench
+  locator: &id001
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id001
+- experiment_id: park_2021_csv02
+  method: melt_equilibration_quench
+  locator: &id002
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id002
+- experiment_id: park_2021_csv03
+  method: melt_equilibration_quench
+  locator: &id003
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id003
+- experiment_id: park_2021_csv04
+  method: melt_equilibration_quench
+  locator: &id004
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id004
+- experiment_id: park_2021_csv05
+  method: melt_equilibration_quench
+  locator: &id005
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id005
+- experiment_id: park_2021_csv06
+  method: melt_equilibration_quench
+  locator: &id006
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id006
+- experiment_id: park_2021_csv07
+  method: melt_equilibration_quench
+  locator: &id007
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id007
+- experiment_id: park_2021_csv08
+  method: melt_equilibration_quench
+  locator: &id008
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id008
+- experiment_id: park_2021_csv09
+  method: melt_equilibration_quench
+  locator: &id009
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id009
+- experiment_id: park_2021_csv10
+  method: melt_equilibration_quench
+  locator: &id010
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id010
+- experiment_id: park_2021_csv11
+  method: melt_equilibration_quench
+  locator: &id011
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id011
+- experiment_id: park_2021_csv12
+  method: melt_equilibration_quench
+  locator: &id012
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id012
+- experiment_id: park_2021_csv13
+  method: melt_equilibration_quench
+  locator: &id013
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator: *id013
+- experiment_id: park_2021_csv14
+  method: melt_equilibration_quench
+  locator: &id014
+    source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+    pdf_page_index: 79
+    page: 80
+    table: '9'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator: *id014
+species:
+  V:
+    observations:
+    - observation_id: park_2021_table9_csv01_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv01
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV01.
+      phase: cr
+      note: Table 9 reports 14.58 mol% V in the fcc Pt-V alloy for CSV01; the stored mole fraction is
+        0.01 times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.1458'
+        component_amount_as_published: 14.58 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.000328495650'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
+        composition_wt_pct:
+          CaO: '50.0'
+          SiO2: '45.0'
+          V2O3: '5.0'
+    - observation_id: park_2021_table9_csv02_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv02
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV02.
+      phase: cr
+      note: Table 9 reports 13.23 mol% V in the fcc Pt-V alloy for CSV02; the stored mole fraction is
+        0.01 times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.1323'
+        component_amount_as_published: 13.23 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.000328495650'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
+        composition_wt_pct:
+          CaO: '47.5'
+          SiO2: '47.5'
+          V2O3: '5.0'
+    - observation_id: park_2021_table9_csv03_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv03
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV03.
+      phase: cr
+      note: Table 9 reports 12.19 mol% V in the fcc Pt-V alloy for CSV03; the stored mole fraction is
+        0.01 times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.1219'
+        component_amount_as_published: 12.19 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.000328495650'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
+        composition_wt_pct:
+          CaO: '45.0'
+          SiO2: '50.0'
+          V2O3: '5.0'
+    - observation_id: park_2021_table9_csv04_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv04
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV04.
+      phase: cr
+      note: Table 9 reports 11.13 mol% V in the fcc Pt-V alloy for CSV04; the stored mole fraction is
+        0.01 times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.1113'
+        component_amount_as_published: 11.13 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.000328495650'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
+        composition_wt_pct:
+          CaO: '42.5'
+          SiO2: '52.5'
+          V2O3: '5.0'
+    - observation_id: park_2021_table9_csv05_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv05
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV05.
+      phase: cr
+      note: Table 9 reports 9.78 mol% V in the fcc Pt-V alloy for CSV05; the stored mole fraction is 0.01
+        times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.0978'
+        component_amount_as_published: 9.78 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.000328495650'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
+        composition_wt_pct:
+          CaO: '40.0'
+          SiO2: '55.0'
+          V2O3: '5.0'
+    - observation_id: park_2021_table9_csv06_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv06
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV06.
+      phase: cr
+      note: Table 9 reports 9.28 mol% V in the fcc Pt-V alloy for CSV06; the stored mole fraction is 0.01
+        times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.0928'
+        component_amount_as_published: 9.28 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.000328495650'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
+        composition_wt_pct:
+          CaO: '46.2'
+          SiO2: '51.3'
+          V2O3: '2.5'
+    - observation_id: park_2021_table9_csv07_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv07
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV07.
+      phase: cr
+      note: Table 9 reports 13.41 mol% V in the fcc Pt-V alloy for CSV07; the stored mole fraction is
+        0.01 times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.1341'
+        component_amount_as_published: 13.41 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.000328495650'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
+        composition_wt_pct:
+          CaO: '43.8'
+          SiO2: '48.7'
+          V2O3: '7.5'
+    - observation_id: park_2021_table9_csv08_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv08
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV08.
+      phase: cr
+      note: Table 9 reports 5.98 mol% V in the fcc Pt-V alloy for CSV08; the stored mole fraction is 0.01
+        times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.0598'
+        component_amount_as_published: 5.98 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.0316539300'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.124 × 10^-7 atm.
+        composition_wt_pct:
+          CaO: '50.0'
+          SiO2: '45.0'
+          V2O3: '5.0'
+    - observation_id: park_2021_table9_csv09_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv09
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV09.
+      phase: cr
+      note: Table 9 reports 5.82 mol% V in the fcc Pt-V alloy for CSV09; the stored mole fraction is 0.01
+        times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.0582'
+        component_amount_as_published: 5.82 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.0316539300'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.124 × 10^-7 atm.
+        composition_wt_pct:
+          CaO: '47.5'
+          SiO2: '47.5'
+          V2O3: '5.0'
+    - observation_id: park_2021_table9_csv10_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv10
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV10.
+      phase: cr
+      note: Table 9 reports 5.83 mol% V in the fcc Pt-V alloy for CSV10; the stored mole fraction is 0.01
+        times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.0583'
+        component_amount_as_published: 5.83 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.0316539300'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.124 × 10^-7 atm.
+        composition_wt_pct:
+          CaO: '45.0'
+          SiO2: '50.0'
+          V2O3: '5.0'
+    - observation_id: park_2021_table9_csv11_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv11
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV11.
+      phase: cr
+      note: Table 9 reports 5.67 mol% V in the fcc Pt-V alloy for CSV11; the stored mole fraction is 0.01
+        times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.0567'
+        component_amount_as_published: 5.67 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.0316539300'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.124 × 10^-7 atm.
+        composition_wt_pct:
+          CaO: '42.5'
+          SiO2: '52.5'
+          V2O3: '5.0'
+    - observation_id: park_2021_table9_csv12_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv12
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV12.
+      phase: cr
+      note: Table 9 reports 5.47 mol% V in the fcc Pt-V alloy for CSV12; the stored mole fraction is 0.01
+        times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1599.85'
+        component_amount: '0.0547'
+        component_amount_as_published: 5.47 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.0316539300'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.124 × 10^-7 atm.
+        composition_wt_pct:
+          CaO: '40.0'
+          SiO2: '55.0'
+          V2O3: '5.0'
+    - observation_id: park_2021_table9_csv13_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv13
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV13.
+      phase: cr
+      note: Table 9 reports 9.28 mol% V in the fcc Pt-V alloy for CSV13; the stored mole fraction is 0.01
+        times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1549.85'
+        component_amount: '0.0928'
+        component_amount_as_published: 9.28 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.000324746625'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.205 × 10^-9 atm.
+        composition_wt_pct:
+          CaO: '45.0'
+          SiO2: '50.0'
+          V2O3: '5.0'
+    - observation_id: park_2021_table9_csv14_metal_v_mole_fraction
+      type: composition_series
+      units: mole fraction (dimensionless); source reports mol%
+      experiment: park_2021_csv14
+      regime: quench_equilibration
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 79
+        page: 80
+        table: '9'
+        note: Table 9 EPMA V mole percent in Pt-V alloy, sample CSV14.
+      phase: cr
+      note: Table 9 reports 7.25 mol% V in the fcc Pt-V alloy for CSV14; the stored mole fraction is 0.01
+        times the printed mol percent. The alloy was equilibrated with the corresponding CaO-SiO2-VOx
+        slag and measured by EPMA.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1499.85'
+        component_amount: '0.0725'
+        component_amount_as_published: 7.25 mol%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          pO2_Pa:
+            state:
+              tag: value
+              value: '0.000316843275'
+            locator:
+              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+              pdf_page_index: 79
+              page: 80
+              table: '9'
+              note: Table 9 prints pO2 = 3.127 × 10^-9 atm.
+        composition_wt_pct:
+          CaO: '45.0'
+          SiO2: '50.0'
+          V2O3: '5.0'
+    context:
+    - observation_id: park_2021_table4_context
+      type: table_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 74
+        page: 75
+        table: '4'
+        note: Nominal slag charge composition and experimental conditions; all printed data rows retained
+          below.
+      units: printed values and units are retained in rows_as_printed
+      values:
+        typed_quantity_as_printed: Nominal slag charge composition and experimental conditions
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Nominal starting compositions are not measured equilibrated-phase compositions;
+          no initial-charge token fits this steelmaking experiment.
+        rows_as_printed:
+        - sample: CSV01
+          CaO_wt_percent: '50.0'
+          SiO2_wt_percent: '45.0'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '1.111'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '263'
+          CO2_ml_min_at_STP: '37'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV02
+          CaO_wt_percent: '47.5'
+          SiO2_wt_percent: '47.5'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '1.000'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '263'
+          CO2_ml_min_at_STP: '37'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV03
+          CaO_wt_percent: '45.0'
+          SiO2_wt_percent: '50.0'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '0.900'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '263'
+          CO2_ml_min_at_STP: '37'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV04
+          CaO_wt_percent: '42.5'
+          SiO2_wt_percent: '52.5'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '0.810'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '263'
+          CO2_ml_min_at_STP: '37'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV05
+          CaO_wt_percent: '40.0'
+          SiO2_wt_percent: '55.0'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '0.727'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '263'
+          CO2_ml_min_at_STP: '37'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV06
+          CaO_wt_percent: '46.2'
+          SiO2_wt_percent: '51.3'
+          V2O3_wt_percent: '2.5'
+          C_over_S_as_printed: '0.900'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '263'
+          CO2_ml_min_at_STP: '37'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV07
+          CaO_wt_percent: '43.8'
+          SiO2_wt_percent: '48.7'
+          V2O3_wt_percent: '7.5'
+          C_over_S_as_printed: '0.900'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '263'
+          CO2_ml_min_at_STP: '37'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV08
+          CaO_wt_percent: '50.0'
+          SiO2_wt_percent: '45.0'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '1.111'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '126'
+          CO2_ml_min_at_STP: '174'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV09
+          CaO_wt_percent: '47.5'
+          SiO2_wt_percent: '47.5'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '1.000'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '126'
+          CO2_ml_min_at_STP: '174'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV10
+          CaO_wt_percent: '45.0'
+          SiO2_wt_percent: '50.0'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '0.900'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '126'
+          CO2_ml_min_at_STP: '174'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV11
+          CaO_wt_percent: '42.5'
+          SiO2_wt_percent: '52.5'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '0.810'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '126'
+          CO2_ml_min_at_STP: '174'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV12
+          CaO_wt_percent: '40.0'
+          SiO2_wt_percent: '55.0'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '0.727'
+          temperature_K: '1873'
+          CO_ml_min_at_STP: '126'
+          CO2_ml_min_at_STP: '174'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV13
+          CaO_wt_percent: '45.0'
+          SiO2_wt_percent: '50.0'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '0.900'
+          temperature_K: '1823'
+          CO_ml_min_at_STP: '244'
+          CO2_ml_min_at_STP: '56'
+          pO2_as_printed: 3.205 × 10^-9 atm
+        - sample: CSV14
+          CaO_wt_percent: '45.0'
+          SiO2_wt_percent: '50.0'
+          V2O3_wt_percent: '5.0'
+          C_over_S_as_printed: '0.900'
+          temperature_K: '1773'
+          CO_ml_min_at_STP: '217'
+          CO2_ml_min_at_STP: '83'
+          pO2_as_printed: 3.127 × 10^-9 atm
+        attribution: present work
+    - observation_id: park_2021_table8_context
+      type: table_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 78
+        page: 79
+        table: '8'
+        note: Post-quench XPS fractions of V2+, V3+, V4+, and V5+ and reported x of VOx; all printed data
+          rows retained below.
+      units: printed values and units are retained in rows_as_printed
+      values:
+        typed_quantity_as_printed: Post-quench XPS fractions of V2+, V3+, V4+, and V5+ and reported x
+          of VOx
+        candidate_tokens:
+        - fe3_fe2_ratio
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: The enum has no general vanadium valence-fraction or VOx stoichiometry
+          token. The printed XPS fits were measured on quenched slag; no V-valence token is added.
+        rows_as_printed:
+        - sample: CSV01
+          C_over_S_mol_percent: '1.04'
+          VOx_mol_percent: '3.92'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0309'
+          V3_plus_fraction: '0.4654'
+          V4_plus_fraction: '0.4046'
+          V5_plus_fraction: '0.0992'
+          x_of_VOx: '1.794'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV02
+          C_over_S_mol_percent: '0.93'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0408'
+          V3_plus_fraction: '0.4738'
+          V4_plus_fraction: '0.3865'
+          V5_plus_fraction: '0.0990'
+          x_of_VOx: '1.779'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV03
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0488'
+          V3_plus_fraction: '0.4811'
+          V4_plus_fraction: '0.3730'
+          V5_plus_fraction: '0.0972'
+          x_of_VOx: '1.730'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV04
+          C_over_S_mol_percent: '0.76'
+          VOx_mol_percent: '3.90'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0584'
+          V3_plus_fraction: '0.4918'
+          V4_plus_fraction: '0.3631'
+          V5_plus_fraction: '0.0866'
+          x_of_VOx: '1.706'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV05
+          C_over_S_mol_percent: '0.68'
+          VOx_mol_percent: '3.89'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0627'
+          V3_plus_fraction: '0.4987'
+          V4_plus_fraction: '0.3458'
+          V5_plus_fraction: '0.0928'
+          x_of_VOx: '1.666'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV06
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '1.94'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0566'
+          V3_plus_fraction: '0.5009'
+          V4_plus_fraction: '0.3589'
+          V5_plus_fraction: '0.0836'
+          x_of_VOx: '1.730'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV07
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '5.90'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0329'
+          V3_plus_fraction: '0.4253'
+          V4_plus_fraction: '0.4129'
+          V5_plus_fraction: '0.1289'
+          x_of_VOx: '1.730'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV08
+          C_over_S_mol_percent: '1.04'
+          VOx_mol_percent: '3.92'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0175'
+          V3_plus_fraction: '0.1907'
+          V4_plus_fraction: '0.5229'
+          V5_plus_fraction: '0.2689'
+          x_of_VOx: '2.026'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV09
+          C_over_S_mol_percent: '0.93'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0286'
+          V3_plus_fraction: '0.2247'
+          V4_plus_fraction: '0.5027'
+          V5_plus_fraction: '0.2440'
+          x_of_VOx: '2.012'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV10
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0127'
+          V3_plus_fraction: '0.2637'
+          V4_plus_fraction: '0.4981'
+          V5_plus_fraction: '0.2256'
+          x_of_VOx: '1.993'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV11
+          C_over_S_mol_percent: '0.76'
+          VOx_mol_percent: '3.90'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0271'
+          V3_plus_fraction: '0.2937'
+          V4_plus_fraction: '0.4720'
+          V5_plus_fraction: '0.2072'
+          x_of_VOx: '1.971'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV12
+          C_over_S_mol_percent: '0.68'
+          VOx_mol_percent: '3.89'
+          temperature_K: '1873'
+          V2_plus_fraction: '0.0283'
+          V3_plus_fraction: '0.3187'
+          V4_plus_fraction: '0.4629'
+          V5_plus_fraction: '0.1901'
+          x_of_VOx: '1.937'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV13
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1823'
+          V2_plus_fraction: '0.0503'
+          V3_plus_fraction: '0.3898'
+          V4_plus_fraction: '0.4002'
+          V5_plus_fraction: '0.1596'
+          x_of_VOx: '1.869'
+          pO2_as_printed: 3.205 × 10^-9 atm
+        attribution: present work
+    - observation_id: park_2021_table10_context
+      type: table_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 80
+        page: 81
+        table: '10'
+        note: Author-calculated activities of V and VOx species; all printed data rows retained below.
+      units: printed values and units are retained in rows_as_printed
+      values:
+        typed_quantity_as_printed: Author-calculated activities of V and VOx species
+        candidate_tokens:
+        - activity
+        - activity_coefficient
+        schema_gap_or_disposition: The activity results depend on Table 8 vanadium valence fractions,
+          which have no store token; derivation pending a corpus table asset (controller, t-1382).
+        rows_as_printed:
+        - sample: CSV01
+          C_over_S_mol_percent: '1.04'
+          VOx_mol_percent: '3.92'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.1458'
+          gamma_V_x_1e5: '6.834'
+          a_V_x_1e6: '9.962'
+          a_VO_x_1e2: '4.447'
+          a_VO1_5_x_10: '1.534'
+          a_VO2_x_10: '3.030'
+          a_VO2_5_x_1e2: '2.918'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV02
+          C_over_S_mol_percent: '0.93'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.1323'
+          gamma_V_x_1e5: '4.955'
+          a_V_x_1e6: '6.555'
+          a_VO_x_1e2: '2.926'
+          a_VO1_5_x_10: '1.009'
+          a_VO2_x_10: '1.994'
+          a_VO2_5_x_1e2: '1.920'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV03
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.1219'
+          gamma_V_x_1e5: '3.871'
+          a_V_x_1e6: '4.719'
+          a_VO_x_1e2: '2.106'
+          a_VO1_5_x_10: '0.726'
+          a_VO2_x_10: '1.435'
+          a_VO2_5_x_1e2: '1.382'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV04
+          C_over_S_mol_percent: '0.76'
+          VOx_mol_percent: '3.90'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.1113'
+          gamma_V_x_1e5: '3.002'
+          a_V_x_1e6: '3.341'
+          a_VO_x_1e2: '1.491'
+          a_VO1_5_x_10: '0.514'
+          a_VO2_x_10: '1.016'
+          a_VO2_5_x_1e2: '0.979'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV05
+          C_over_S_mol_percent: '0.68'
+          VOx_mol_percent: '3.89'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.0978'
+          gamma_V_x_1e5: '2.180'
+          a_V_x_1e6: '2.132'
+          a_VO_x_1e2: '0.952'
+          a_VO1_5_x_10: '0.328'
+          a_VO2_x_10: '0.649'
+          a_VO2_5_x_1e2: '0.625'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV06
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '1.94'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.0928'
+          gamma_V_x_1e5: '1.931'
+          a_V_x_1e6: '1.791'
+          a_VO_x_1e2: '0.800'
+          a_VO1_5_x_10: '0.276'
+          a_VO2_x_10: '0.545'
+          a_VO2_5_x_1e2: '0.525'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV07
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '5.90'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.1341'
+          gamma_V_x_1e5: '5.172'
+          a_V_x_1e6: '6.935'
+          a_VO_x_1e2: '3.069'
+          a_VO1_5_x_10: '1.054'
+          a_VO2_x_10: '2.073'
+          a_VO2_5_x_1e2: '1.988'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV08
+          C_over_S_mol_percent: '1.04'
+          VOx_mol_percent: '3.92'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.0598'
+          gamma_V_x_1e5: '0.880'
+          a_V_x_1e6: '0.526'
+          a_VO_x_1e2: '2.315'
+          a_VO1_5_x_10: '2.506'
+          a_VO2_x_10: '15.545'
+          a_VO2_5_x_1e2: '46.990'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV09
+          C_over_S_mol_percent: '0.93'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.0582'
+          gamma_V_x_1e5: '0.847'
+          a_V_x_1e6: '0.493'
+          a_VO_x_1e2: '2.169'
+          a_VO1_5_x_10: '2.348'
+          a_VO2_x_10: '14.561'
+          a_VO2_5_x_1e2: '44.014'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV10
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.0583'
+          gamma_V_x_1e5: '0.849'
+          a_V_x_1e6: '0.495'
+          a_VO_x_1e2: '2.178'
+          a_VO1_5_x_10: '2.357'
+          a_VO2_x_10: '14.622'
+          a_VO2_5_x_1e2: '44.199'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV11
+          C_over_S_mol_percent: '0.76'
+          VOx_mol_percent: '3.90'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.0567'
+          gamma_V_x_1e5: '0.817'
+          a_V_x_1e6: '0.463'
+          a_VO_x_1e2: '2.037'
+          a_VO1_5_x_10: '2.205'
+          a_VO2_x_10: '13.679'
+          a_VO2_5_x_1e2: '41.350'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV12
+          C_over_S_mol_percent: '0.68'
+          VOx_mol_percent: '3.89'
+          temperature_K: '1873'
+          V_in_PtV_fraction: '0.0547'
+          gamma_V_x_1e5: '0.780'
+          a_V_x_1e6: '0.427'
+          a_VO_x_1e2: '1.879'
+          a_VO1_5_x_10: '2.034'
+          a_VO2_x_10: '12.614'
+          a_VO2_5_x_1e2: '38.130'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV13
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1823'
+          V_in_PtV_fraction: '0.0928'
+          gamma_V_x_1e5: '0.954'
+          a_V_x_1e6: '0.886'
+          a_VO_x_1e2: '0.751'
+          a_VO1_5_x_10: '0.349'
+          a_VO2_x_10: '0.839'
+          a_VO2_5_x_1e2: '0.936'
+          pO2_as_printed: 3.205 × 10^-9 atm
+        attribution: present work
+        printed_column_headers:
+          gamma_V: printed values ×10^-5
+          a_V: printed values ×10^-6
+          a_VO: printed values ×10^-2
+          a_VO1.5: printed values ×10^-1
+          a_VO2: printed values ×10^-1
+          a_VO2.5: printed values ×10^-2
+    - observation_id: park_2021_table11_context
+      type: table_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 81
+        page: 82
+        table: '11'
+        note: Author-calculated natural-log activity coefficients of VO, VO1.5, VO2, and VO2.5; all printed
+          data rows retained below.
+      units: printed values and units are retained in rows_as_printed
+      values:
+        typed_quantity_as_printed: Author-calculated natural-log activity coefficients of VO, VO1.5, VO2,
+          and VO2.5
+        candidate_tokens:
+        - activity_coefficient
+        schema_gap_or_disposition: 'No printed_form: ln encoding exists for activity_coefficient in this
+          base, and the calculation also depends on untyped Table 8 fractions; derivation pending a corpus
+          table asset (controller, t-1382).'
+        rows_as_printed:
+        - sample: CSV01
+          C_over_S_mol_percent: '1.04'
+          VOx_mol_percent: '3.92'
+          temperature_K: '1873'
+          ln_gamma_VO: '3.603'
+          ln_gamma_VO1_5: '2.129'
+          ln_gamma_VO2: '0.647'
+          ln_gamma_VO2_5: '-2.590'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV02
+          C_over_S_mol_percent: '0.93'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          ln_gamma_VO: '2.909'
+          ln_gamma_VO1_5: '1.694'
+          ln_gamma_VO2: '0.276'
+          ln_gamma_VO2_5: '-3.005'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV03
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          ln_gamma_VO: '2.403'
+          ln_gamma_VO1_5: '1.352'
+          ln_gamma_VO2: '-0.015'
+          ln_gamma_VO2_5: '-3.313'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV04
+          C_over_S_mol_percent: '0.76'
+          VOx_mol_percent: '3.90'
+          temperature_K: '1873'
+          ln_gamma_VO: '1.878'
+          ln_gamma_VO1_5: '0.986'
+          ln_gamma_VO2: '-0.332'
+          ln_gamma_VO2_5: '-3.542'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV05
+          C_over_S_mol_percent: '0.68'
+          VOx_mol_percent: '3.89'
+          temperature_K: '1873'
+          ln_gamma_VO: '1.361'
+          ln_gamma_VO1_5: '0.525'
+          ln_gamma_VO2: '-0.731'
+          ln_gamma_VO2_5: '-4.058'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV06
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '1.94'
+          temperature_K: '1873'
+          ln_gamma_VO: '1.984'
+          ln_gamma_VO1_5: '1.041'
+          ln_gamma_VO2: '-0.247'
+          ln_gamma_VO2_5: '-3.433'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV07
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '5.90'
+          temperature_K: '1873'
+          ln_gamma_VO: '2.762'
+          ln_gamma_VO1_5: '1.436'
+          ln_gamma_VO2: '-0.161'
+          ln_gamma_VO2_5: '-3.644'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV08
+          C_over_S_mol_percent: '1.04'
+          VOx_mol_percent: '3.92'
+          temperature_K: '1873'
+          ln_gamma_VO: '3.518'
+          ln_gamma_VO1_5: '3.512'
+          ln_gamma_VO2: '2.026'
+          ln_gamma_VO2_5: '-0.808'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV09
+          C_over_S_mol_percent: '0.93'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          ln_gamma_VO: '2.964'
+          ln_gamma_VO1_5: '3.284'
+          ln_gamma_VO2: '2.001'
+          ln_gamma_VO2_5: '-0.775'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV10
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          ln_gamma_VO: '3.782'
+          ln_gamma_VO1_5: '3.130'
+          ln_gamma_VO2: '2.016'
+          ln_gamma_VO2_5: '-0.690'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV11
+          C_over_S_mol_percent: '0.76'
+          VOx_mol_percent: '3.90'
+          temperature_K: '1873'
+          ln_gamma_VO: '2.960'
+          ln_gamma_VO1_5: '2.957'
+          ln_gamma_VO2: '2.005'
+          ln_gamma_VO2_5: '-0.670'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV12
+          C_over_S_mol_percent: '0.68'
+          VOx_mol_percent: '3.89'
+          temperature_K: '1873'
+          ln_gamma_VO: '2.834'
+          ln_gamma_VO1_5: '2.796'
+          ln_gamma_VO2: '1.946'
+          ln_gamma_VO2_5: '-0.663'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV13
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1823'
+          ln_gamma_VO: '1.340'
+          ln_gamma_VO1_5: '0.830'
+          ln_gamma_VO2: '-0.623'
+          ln_gamma_VO2_5: '-4.199'
+          pO2_as_printed: 3.205 × 10^-9 atm
+        attribution: present work
+    - observation_id: park_2021_table12_context
+      type: table_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 82
+        page: 83
+        table: '12'
+        note: Author-calculated VOx activity and activity coefficient; all printed data rows retained
+          below.
+      units: printed values and units are retained in rows_as_printed
+      values:
+        typed_quantity_as_printed: Author-calculated VOx activity and activity coefficient
+        candidate_tokens:
+        - activity
+        - activity_coefficient
+        schema_gap_or_disposition: These author-calculated values depend on Table 8 vanadium valence fractions,
+          which have no store token; derivation pending a corpus table asset (controller, t-1382).
+        rows_as_printed:
+        - sample: CSV01
+          C_over_S_mol_percent: '1.04'
+          VOx_mol_percent: '3.92'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '4.115'
+          gamma_VOx: '1.049'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV02
+          C_over_S_mol_percent: '0.93'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '2.758'
+          gamma_VOx: '0.704'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV03
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '2.032'
+          gamma_VOx: '0.520'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV04
+          C_over_S_mol_percent: '0.76'
+          VOx_mol_percent: '3.90'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '1.543'
+          gamma_VOx: '0.396'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV05
+          C_over_S_mol_percent: '0.68'
+          VOx_mol_percent: '3.89'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '0.969'
+          gamma_VOx: '0.249'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV06
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '1.94'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '0.851'
+          gamma_VOx: '0.438'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV07
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '5.90'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '2.303'
+          gamma_VOx: '0.391'
+          pO2_as_printed: 3.242 × 10^-9 atm
+        - sample: CSV08
+          C_over_S_mol_percent: '1.04'
+          VOx_mol_percent: '3.92'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '6.427'
+          gamma_VOx: '1.639'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV09
+          C_over_S_mol_percent: '0.93'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '6.537'
+          gamma_VOx: '1.670'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV10
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '7.352'
+          gamma_VOx: '1.881'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV11
+          C_over_S_mol_percent: '0.76'
+          VOx_mol_percent: '3.90'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '7.239'
+          gamma_VOx: '1.856'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV12
+          C_over_S_mol_percent: '0.68'
+          VOx_mol_percent: '3.89'
+          temperature_K: '1873'
+          a_VOx_x_1e2: '7.156'
+          gamma_VOx: '1.837'
+          pO2_as_printed: 3.124 × 10^-7 atm
+        - sample: CSV13
+          C_over_S_mol_percent: '0.84'
+          VOx_mol_percent: '3.91'
+          temperature_K: '1823'
+          a_VOx_x_1e2: '0.710'
+          gamma_VOx: '0.182'
+          pO2_as_printed: 3.205 × 10^-9 atm
+        attribution: present work
+        printed_column_headers:
+          a_VOx: printed values ×10^-2
+    - observation_id: park_2021_figure_1_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 16
+        page: 17
+        figure: '1'
+        note: Figure 1 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: vanadium-industry price history; outside the simulator's typed quantities
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: V-bearing Pt-V alloy
+        phase: vanadium-industry price history; outside the simulator's typed quantities
+        T_K: not stated in caption
+        axes_as_printed: none (chart axes not captured)
+        caption_as_printed: Price history chart of vanadium raw materials
+        panels:
+        - single
+        series: []
+        marker_count_per_series: {}
+        attribution: present work
+        schema_gap_or_disposition: figure data are background price history and have no applicable store
+          token
+    - observation_id: park_2021_figure_2_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 24
+        page: 25
+        figure: '2'
+        note: Figure 2 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: apparatus schematic
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: V-bearing Pt-V alloy
+        phase: apparatus schematic
+        T_K: not stated in caption
+        axes_as_printed: none (schematic)
+        caption_as_printed: Schematic illustration of experimental apparatus for equilibrium between Pt-V
+          alloy and V2O3 powder
+        panels:
+        - single
+        series: []
+        marker_count_per_series: {}
+        attribution: present work
+        schema_gap_or_disposition: apparatus schematic; no plotted measurement
+    - observation_id: park_2021_figure_3_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 25
+        page: 26
+        figure: '3'
+        note: Figure 3 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: equilibrium_phase_composition
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: V-bearing Pt-V alloy
+        phase: fcc Pt-V alloy
+        T_K: not stated in caption
+        axes_as_printed: 'x: distance across Pt-V alloy; y: V concentration'
+        caption_as_printed: Line analysis results of Pt-V alloys measured by EPMA equilibrated with pure
+          V2O3 powder
+        panels:
+        - single
+        series:
+        - EPMA line scan
+        marker_count_per_series:
+          EPMA line scan: 0
+        attribution: Park et al. (2019), DOI 10.1016/j.jallcom.2019.02.313
+        schema_gap_or_disposition: prior published chapter data; numeric figure values deferred
+        quantity: equilibrium_phase_composition
+    - observation_id: park_2021_figure_4_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 26
+        page: 27
+        figure: '4'
+        note: Figure 4 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity_coefficient
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: V-bearing Pt-V alloy
+        phase: fcc Pt-V alloy
+        T_K: not stated in caption
+        axes_as_printed: 'x: V mole fraction; y: activity coefficient of V'
+        caption_as_printed: Activity coefficient for vanadium in Pt-V alloy with standard-deviation error
+          bars versus vanadium mole fraction
+        panels:
+        - single
+        series:
+        - 1773 K
+        - 1798 K
+        - 1823 K
+        - 1848 K
+        - 1873 K
+        marker_count_per_series:
+          1773 K: 5
+          1798 K: 5
+          1823 K: 5
+          1848 K: 5
+          1873 K: 5
+        attribution: Park et al. (2019), DOI 10.1016/j.jallcom.2019.02.313
+        schema_gap_or_disposition: prior published chapter data; numeric figure values deferred
+        quantity: activity_coefficient
+    - observation_id: park_2021_figure_5_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 27
+        page: 28
+        figure: '5'
+        note: Figure 5 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity_coefficient_temperature_fit
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: V-bearing Pt-V alloy
+        phase: fcc Pt-V alloy
+        T_K: not stated in caption
+        axes_as_printed: 'x: inverse temperature; y: ln gamma V at infinite dilution (a), epsilon VV (b)'
+        caption_as_printed: Effect of inverse temperature on activity coefficient of V at infinite dilution
+          and interaction parameter in Pt-V alloy
+        panels:
+        - a
+        - b
+        series:
+        - 'panel a: ln gamma V at infinite dilution'
+        - 'panel b: epsilon VV'
+        marker_count_per_series:
+          'panel a: ln gamma V at infinite dilution': 0
+          'panel b: epsilon VV': 0
+        attribution: Park et al. (2019), DOI 10.1016/j.jallcom.2019.02.313
+        schema_gap_or_disposition: author-fit curves; model-derived, no numeric points digitized
+        quantity: activity_coefficient_temperature_fit
+    - observation_id: park_2021_figure_6_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 28
+        page: 29
+        figure: '6'
+        note: Figure 6 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity_coefficient
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: V-bearing Pt-V alloy
+        phase: fcc Pt-V alloy
+        T_K: not stated in caption
+        axes_as_printed: 'x: V mole fraction; y: activity coefficient of V'
+        caption_as_printed: Comparison of measured activity coefficient values in Pt-V alloy versus V
+          mole fraction
+        panels:
+        - single
+        series:
+        - present work
+        - Pretorius and Muan (1773 K)
+        - Wang et al. (1773-1873 K; calculated curves)
+        marker_count_per_series:
+          present work: 25
+          Pretorius and Muan (1773 K): 2
+          Wang et al. (1773-1873 K; calculated curves): 0
+        attribution: Park et al. (2019), DOI 10.1016/j.jallcom.2019.02.313
+        schema_gap_or_disposition: comparison figure; numeric points deferred
+        quantity: activity_coefficient
+    - observation_id: park_2021_figure_7_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 30
+        page: 31
+        figure: '7'
+        note: Figure 7 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: V-bearing Pt-V alloy
+        phase: fcc Pt-V alloy
+        T_K: not stated in caption
+        axes_as_printed: 'x: V mole fraction; y: excess Gibbs energy (a,b), V activity (c)'
+        caption_as_printed: Excess Gibbs energy curves for fcc Pt-V and V activity versus V mole fraction
+        panels:
+        - a
+        - b
+        series:
+        - 'panel a: XV 0-1'
+        - 'panel b: XV 0.05-0.2'
+        - 'panel c: V activity'
+        marker_count_per_series:
+          'panel a: XV 0-1': 0
+          'panel b: XV 0.05-0.2': 0
+          'panel c: V activity': 0
+        attribution: Park et al. (2019), DOI 10.1016/j.jallcom.2019.02.313
+        schema_gap_or_disposition: author model and fitted curves; numeric points deferred
+        quantity: activity
+    - observation_id: park_2021_figure_8_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 45
+        page: 46
+        figure: '8'
+        note: Figure 8 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: apparatus schematic
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: apparatus schematic
+        T_K: not stated in caption
+        axes_as_printed: none (schematic)
+        caption_as_printed: Schematic illustration of experimental apparatus for equilibrium between Pt-V
+          alloy and CaO-SiO2-VOx slag
+        panels:
+        - single
+        series: []
+        marker_count_per_series: {}
+        attribution: present work
+        schema_gap_or_disposition: apparatus schematic; no plotted measurement
+    - observation_id: park_2021_figure_9_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 46
+        page: 47
+        figure: '9'
+        note: Figure 9 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: quenched CaO-SiO2-VOx slag
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: quenched CaO-SiO2-VOx slag
+        T_K: not stated in caption
+        axes_as_printed: 'x: 2 theta; y: intensity'
+        caption_as_printed: XRD patterns of slag samples CSV01-CSV13
+        panels:
+        - single
+        series:
+        - CSV01-CSV13 XRD patterns
+        marker_count_per_series:
+          CSV01-CSV13 XRD patterns: 0
+        attribution: present work
+        schema_gap_or_disposition: measured diffraction traces; no numeric points digitized
+    - observation_id: park_2021_figure_10_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 47
+        page: 48
+        figure: '10'
+        note: Figure 10 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: quenched CaO-SiO2-VOx slag
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: quenched CaO-SiO2-VOx slag
+        T_K: not stated in caption
+        axes_as_printed: 'x: 2 theta; y: intensity'
+        caption_as_printed: XRD pattern of slag sample CSV14
+        panels:
+        - single
+        series:
+        - CSV14 XRD pattern
+        - CaO
+        - SiO2
+        - VO
+        - VO1.5
+        - VO2
+        - VO2.5 reference peaks
+        marker_count_per_series:
+          CSV14 XRD pattern: 0
+          CaO: 0
+          SiO2: 0
+          VO: 0
+          VO1.5: 0
+          VO2: 0
+          VO2.5: 0
+        attribution: present work
+        schema_gap_or_disposition: measured diffraction trace and reference peaks; no numeric points digitized
+    - observation_id: park_2021_figure_11_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 48
+        page: 49
+        figure: '11'
+        note: Figure 11 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: quenched CaO-SiO2-VOx slag
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: quenched CaO-SiO2-VOx slag
+        T_K: not stated in caption
+        axes_as_printed: 'x: binding energy; y: intensity'
+        caption_as_printed: Typical XPS survey scan of slag sample CSV03
+        panels:
+        - single
+        series:
+        - CSV03 XPS survey scan
+        marker_count_per_series:
+          CSV03 XPS survey scan: 0
+        attribution: present work
+        schema_gap_or_disposition: spectral trace; no numeric points digitized
+    - observation_id: park_2021_figure_12_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 55
+        page: 56
+        figure: '12'
+        note: Figure 12 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: quenched CaO-SiO2-VOx slag
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: quenched CaO-SiO2-VOx slag
+        T_K: not stated in caption
+        axes_as_printed: 'x: binding energy; y: intensity'
+        caption_as_printed: XPS spectrum of the V 2p3/2 peak for slag samples CSV01-CSV13
+        panels:
+        - single
+        series:
+        - CSV01-CSV13 XPS spectra, panels a-m
+        marker_count_per_series:
+          CSV01-CSV13 XPS spectra, panels a-m: 0
+        attribution: present work
+        schema_gap_or_disposition: spectral fits; Table 8 carries printed valence fractions, figure reads
+          deferred
+    - observation_id: park_2021_figure_13_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 56
+        page: 57
+        figure: '13'
+        note: Figure 13 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: equilibrium_phase_composition
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: fcc Pt-V alloy
+        T_K: not stated in caption
+        axes_as_printed: 'x: equilibration time; y: V concentration'
+        caption_as_printed: Typical change of vanadium concentration in Pt-V alloy versus experimental
+          equilibration time
+        panels:
+        - single
+        series:
+        - V concentration in Pt-V alloy
+        marker_count_per_series:
+          V concentration in Pt-V alloy: 0
+        attribution: present work
+        schema_gap_or_disposition: kinetic/equilibration trace; no numeric points digitized
+        quantity: equilibrium_phase_composition
+    - observation_id: park_2021_figure_14_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 57
+        page: 58
+        figure: '14'
+        note: Figure 14 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: equilibrium_phase_composition
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: fcc Pt-V alloy
+        T_K: not stated in caption
+        axes_as_printed: 'x: distance across alloy; y: V concentration'
+        caption_as_printed: EPMA line analyses of Pt-V alloys equilibrated with CaO-SiO2-VOx slag
+        panels:
+        - single
+        series:
+        - EPMA line analyses
+        marker_count_per_series:
+          EPMA line analyses: 0
+        attribution: present work
+        schema_gap_or_disposition: measured line scans; Table 9 carries printed alloy composition, figure
+          values deferred
+        quantity: equilibrium_phase_composition
+    - observation_id: park_2021_figure_15_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 58
+        page: 59
+        figure: '15'
+        note: Figure 15 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: V valence-state fractions
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag; quenched for XPS
+        T_K: 1873
+        axes_as_printed: 'x: VOx concentration (mol%); y: fraction of total V'
+        caption_as_printed: Mixed-valence state fractions versus VOx concentration at 1873 K, basicity
+          0.84, pO2 3.2×10^-9 atm
+        panels:
+        - single
+        series:
+        - V2+/ΣVn+
+        - V3+/ΣVn+
+        - V4+/ΣVn+
+        - V5+/ΣVn+
+        marker_count_per_series:
+          V2+/ΣVn+: 3
+          V3+/ΣVn+: 3
+          V4+/ΣVn+: 3
+          V5+/ΣVn+: 3
+        attribution: present work
+        schema_gap_or_disposition: no general vanadium valence-fraction token; Table 8 values retained
+          in context
+    - observation_id: park_2021_figure_16_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 59
+        page: 60
+        figure: '16'
+        note: Figure 16 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: V valence-state fractions
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag; quenched for XPS
+        T_K: 1873
+        axes_as_printed: 'x: basicity (C/S); y: fraction of total V'
+        caption_as_printed: Effect of basicity on mixed-valence state at 1873 K, 5 wt% VOx, pO2 3.2×10^-9
+          atm
+        panels:
+        - single
+        series:
+        - V2+/ΣVn+
+        - V3+/ΣVn+
+        - V4+/ΣVn+
+        - V5+/ΣVn+
+        marker_count_per_series:
+          V2+/ΣVn+: 5
+          V3+/ΣVn+: 5
+          V4+/ΣVn+: 5
+          V5+/ΣVn+: 5
+        attribution: present work
+        schema_gap_or_disposition: no general vanadium valence-fraction token; Table 8 values retained
+          in context
+    - observation_id: park_2021_figure_17_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 60
+        page: 61
+        figure: '17'
+        note: Figure 17 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: V valence-state fractions
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag; quenched for XPS
+        T_K: 1873
+        axes_as_printed: 'x: basicity (C/S); y: fraction of total V'
+        caption_as_printed: Effect of basicity on mixed-valence state at 1873 K, 5 wt% VOx, pO2 3.1×10^-7
+          atm
+        panels:
+        - single
+        series:
+        - V2+/ΣVn+
+        - V3+/ΣVn+
+        - V4+/ΣVn+
+        - V5+/ΣVn+
+        marker_count_per_series:
+          V2+/ΣVn+: 5
+          V3+/ΣVn+: 5
+          V4+/ΣVn+: 5
+          V5+/ΣVn+: 5
+        attribution: present work
+        schema_gap_or_disposition: no general vanadium valence-fraction token; Table 8 values retained
+          in context
+    - observation_id: park_2021_figure_18_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 61
+        page: 62
+        figure: '18'
+        note: Figure 18 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: V valence-state fractions
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag; quenched for XPS
+        T_K: 1823-1873
+        axes_as_printed: 'x: temperature (K); y: fraction of total V'
+        caption_as_printed: Mixed-valence state fractions versus temperature at basicity 0.84, 5 wt% VOx,
+          pO2 3.162×10^-9 atm
+        panels:
+        - single
+        series:
+        - V2+/ΣVn+
+        - V3+/ΣVn+
+        - V4+/ΣVn+
+        - V5+/ΣVn+
+        marker_count_per_series:
+          V2+/ΣVn+: 2
+          V3+/ΣVn+: 2
+          V4+/ΣVn+: 2
+          V5+/ΣVn+: 2
+        attribution: present work
+        schema_gap_or_disposition: no general vanadium valence-fraction token; Table 8 values retained
+          in context
+    - observation_id: park_2021_figure_19_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 62
+        page: 63
+        figure: '19'
+        note: Figure 19 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag
+        T_K: 1873
+        axes_as_printed: 'x: VOx concentration (mol%); y: activity'
+        caption_as_printed: Activity of VO, VO1.5, VO2, and VO2.5 versus VOx concentration at 1873 K,
+          basicity 0.84, pO2 3.2×10^-9 atm
+        panels:
+        - single
+        series:
+        - aVO
+        - aVO1.5
+        - aVO2
+        - aVO2.5
+        marker_count_per_series:
+          aVO: 3
+          aVO1.5: 3
+          aVO2: 3
+          aVO2.5: 3
+        attribution: present work
+        schema_gap_or_disposition: calculated values in Table 10 depend on untyped Table 8 fractions;
+          figure read deferred
+        quantity: activity
+    - observation_id: park_2021_figure_20_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 63
+        page: 64
+        figure: '20'
+        note: Figure 20 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag
+        T_K: 1873
+        axes_as_printed: 'x: basicity (C/S); y: activity'
+        caption_as_printed: Effect of basicity on VO, VO1.5, VO2, and VO2.5 activities at 1873 K, 5 wt%
+          VOx, pO2 3.2×10^-9 atm
+        panels:
+        - single
+        series:
+        - aVO
+        - aVO1.5
+        - aVO2
+        - aVO2.5
+        marker_count_per_series:
+          aVO: 5
+          aVO1.5: 5
+          aVO2: 5
+          aVO2.5: 5
+        attribution: present work
+        schema_gap_or_disposition: calculated values in Table 10 depend on untyped Table 8 fractions;
+          figure read deferred
+        quantity: activity
+    - observation_id: park_2021_figure_21_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 65
+        page: 66
+        figure: '21'
+        note: Figure 21 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag
+        T_K: 1873
+        axes_as_printed: 'x: basicity (C/S); y: activity'
+        caption_as_printed: Effect of basicity on VO, VO1.5, VO2, and VO2.5 activities at 1873 K, 5 wt%
+          VOx, pO2 3.1×10^-7 atm
+        panels:
+        - single
+        series:
+        - aVO
+        - aVO1.5
+        - aVO2
+        - aVO2.5
+        marker_count_per_series:
+          aVO: 5
+          aVO1.5: 5
+          aVO2: 5
+          aVO2.5: 5
+        attribution: present work
+        schema_gap_or_disposition: calculated values in Table 10 depend on untyped Table 8 fractions;
+          figure read deferred
+        quantity: activity
+    - observation_id: park_2021_figure_22_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 66
+        page: 67
+        figure: '22'
+        note: Figure 22 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag
+        T_K: 1823-1873
+        axes_as_printed: 'x: temperature (K); y: activity'
+        caption_as_printed: Activity of VO, VO1.5, VO2, and VO2.5 versus temperature at basicity 0.84,
+          5 wt% VOx, pO2 3.162×10^-9 atm
+        panels:
+        - single
+        series:
+        - aVO
+        - aVO1.5
+        - aVO2
+        - aVO2.5
+        marker_count_per_series:
+          aVO: 2
+          aVO1.5: 2
+          aVO2: 2
+          aVO2.5: 2
+        attribution: present work
+        schema_gap_or_disposition: calculated values in Table 10 depend on untyped Table 8 fractions;
+          figure read deferred
+        quantity: activity
+    - observation_id: park_2021_figure_23_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 67
+        page: 68
+        figure: '23'
+        note: Figure 23 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity_coefficient
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag
+        T_K: 1873
+        axes_as_printed: 'x: VOx concentration (mol%); y: activity coefficient'
+        caption_as_printed: Activity coefficient of VO, VO1.5, VO2, and VO2.5 versus VOx concentration
+          at 1873 K, basicity 0.84, pO2 3.2×10^-9 atm
+        panels:
+        - single
+        series:
+        - gammaVO
+        - gammaVO1.5
+        - gammaVO2
+        - gammaVO2.5
+        marker_count_per_series:
+          gammaVO: 3
+          gammaVO1.5: 3
+          gammaVO2: 3
+          gammaVO2.5: 3
+        attribution: present work
+        schema_gap_or_disposition: calculated values in Table 11 are ln gamma and lack a printed-form
+          token; figure read deferred
+        quantity: activity_coefficient
+    - observation_id: park_2021_figure_24_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 68
+        page: 69
+        figure: '24'
+        note: Figure 24 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity_coefficient
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag
+        T_K: 1873
+        axes_as_printed: 'x: basicity (C/S); y: activity coefficient'
+        caption_as_printed: Effect of basicity on activity coefficients of VO, VO1.5, VO2, and VO2.5 at
+          1873 K, 5 wt% VOx, pO2 3.2×10^-9 atm
+        panels:
+        - single
+        series:
+        - gammaVO
+        - gammaVO1.5
+        - gammaVO2
+        - gammaVO2.5
+        marker_count_per_series:
+          gammaVO: 5
+          gammaVO1.5: 5
+          gammaVO2: 5
+          gammaVO2.5: 5
+        attribution: present work
+        schema_gap_or_disposition: calculated values in Table 11 are ln gamma and lack a printed-form
+          token; figure read deferred
+        quantity: activity_coefficient
+    - observation_id: park_2021_figure_25_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 69
+        page: 70
+        figure: '25'
+        note: Figure 25 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity_coefficient
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag
+        T_K: 1873
+        axes_as_printed: 'x: basicity (C/S); y: activity coefficient'
+        caption_as_printed: Effect of basicity on activity coefficients of VO, VO1.5, VO2, and VO2.5 at
+          1873 K, 5 wt% VOx, pO2 3.1×10^-7 atm
+        panels:
+        - single
+        series:
+        - gammaVO
+        - gammaVO1.5
+        - gammaVO2
+        - gammaVO2.5
+        marker_count_per_series:
+          gammaVO: 5
+          gammaVO1.5: 5
+          gammaVO2: 5
+          gammaVO2.5: 5
+        attribution: present work
+        schema_gap_or_disposition: calculated values in Table 11 are ln gamma and lack a printed-form
+          token; figure read deferred
+        quantity: activity_coefficient
+    - observation_id: park_2021_figure_26_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 70
+        page: 71
+        figure: '26'
+        note: Figure 26 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity_coefficient
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag
+        T_K: 1823-1873
+        axes_as_printed: 'x: temperature (K); y: activity coefficient'
+        caption_as_printed: Activity coefficients of VO, VO1.5, VO2, and VO2.5 versus temperature at basicity
+          0.84, 5 wt% VOx, pO2 3.162×10^-9 atm
+        panels:
+        - single
+        series:
+        - gammaVO
+        - gammaVO1.5
+        - gammaVO2
+        - gammaVO2.5
+        marker_count_per_series:
+          gammaVO: 2
+          gammaVO1.5: 2
+          gammaVO2: 2
+          gammaVO2.5: 2
+        attribution: present work
+        schema_gap_or_disposition: calculated values in Table 11 are ln gamma and lack a printed-form
+          token; figure read deferred
+        quantity: activity_coefficient
+    - observation_id: park_2021_figure_27_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 71
+        page: 72
+        figure: '27'
+        note: Figure 27 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity and activity_coefficient
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag
+        T_K: 1873
+        axes_as_printed: 'x: VOx concentration (mol%); y: activity (a), activity coefficient (b)'
+        caption_as_printed: VOx activity and activity coefficient versus VOx concentration at 1873 K,
+          basicity 0.84, pO2 3.2×10^-9 atm
+        panels:
+        - a
+        - b
+        series:
+        - 'panel a: aVOx'
+        - 'panel b: gammaVOx'
+        marker_count_per_series:
+          'panel a: aVOx': 3
+          'panel b: gammaVOx': 3
+        attribution: present work
+        schema_gap_or_disposition: calculated values in Table 12 depend on untyped Table 8 fractions;
+          figure read deferred
+    - observation_id: park_2021_figure_28_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 72
+        page: 73
+        figure: '28'
+        note: Figure 28 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity and activity_coefficient
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag
+        T_K: 1873
+        axes_as_printed: 'x: basicity (C/S); y: activity (a), activity coefficient (b)'
+        caption_as_printed: Effect of basicity on VOx activity and activity coefficient at 1873 K, 5 wt%
+          VOx, two pO2 values
+        panels:
+        - a
+        - b
+        series:
+        - 'panel a, low pO2: aVOx'
+        - 'panel a, high pO2: aVOx'
+        - 'panel b, low pO2: gammaVOx'
+        - 'panel b, high pO2: gammaVOx'
+        marker_count_per_series:
+          'panel a, low pO2: aVOx': 5
+          'panel a, high pO2: aVOx': 5
+          'panel b, low pO2: gammaVOx': 5
+          'panel b, high pO2: gammaVOx': 5
+        attribution: present work
+        schema_gap_or_disposition: calculated values in Table 12 depend on untyped Table 8 fractions;
+          figure read deferred
+    - observation_id: park_2021_figure_29_context
+      type: figure_context
+      locator:
+        source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
+        pdf_page_index: 73
+        page: 74
+        figure: '29'
+        note: Figure 29 data not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: activity and activity_coefficient
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-SiO2-VOx
+        phase: CaO-SiO2-VOx liquid slag
+        T_K: 1823-1873
+        axes_as_printed: 'x: temperature (K); y: activity (a), activity coefficient (b)'
+        caption_as_printed: VOx activity and activity coefficient versus temperature at basicity 0.84,
+          5 wt% VOx, pO2 3.162×10^-9 atm
+        panels:
+        - a
+        - b
+        series:
+        - 'panel a: aVOx'
+        - 'panel b: gammaVOx'
+        marker_count_per_series:
+          'panel a: aVOx': 2
+          'panel b: gammaVOx': 2
+        attribution: present work
+        schema_gap_or_disposition: calculated values in Table 12 depend on untyped Table 8 fractions;
+          figure read deferred

@@ -622,13 +622,13 @@ def test_export_host_path_redaction_resists_encoding_and_case_bypass() -> None:
     from simulator.optimize.save_bundle import _sanitize_manifest_for_export
 
     redacted = {
-        "upper_uri": "FILE:///Users/simon/secret",
-        "mixed_uri": "File:/Users/simon/secret",
-        "encoded_uri": "file:%2FUsers%2Fsimon%2Fsecret",
-        "encoded_abs": "%2FUsers%2Fsimon%2Fsecret",
-        "double_encoded_abs": "%252FUsers%252Fsimon%252Fsecret%252Fseed.json",
-        "unicode_solidus": "／Users／simon／secret",
-        "plain_abs": "/Users/simon/secret",
+        "upper_uri": "FILE:///opt/probe/secret",
+        "mixed_uri": "File:/opt/probe/secret",
+        "encoded_uri": "file:%2Fopt%2Fprobe%2Fsecret",
+        "encoded_abs": "%2Fopt%2Fprobe%2Fsecret",
+        "double_encoded_abs": "%252Fopt%252Fprobe%252Fsecret%252Fseed.json",
+        "unicode_solidus": "／opt／probe／secret",
+        "plain_abs": "/opt/probe/secret",
         "win_drive": "C:\\Users\\simon\\secret\\seed.json",
         "win_drive_encoded": "C:%5CUsers%5Csimon%5Csecret",
         "backslash_root": "\\work\\prior\\pareto.json",
@@ -5322,6 +5322,9 @@ def test_physics_policy_version_is_excluded_from_eval_cache_key(
         changed_version
     )
 
+    # PHYSICS_GATE_VERSION is a label. Green excludes it from the eval cache
+    # key; corpus_version is the cache lever. A version-string edit must not
+    # change physics_constraints_digest.
     assert current_digest == changed_digest
     assert current_cache_key == changed_cache_key
     assert current_recipe_id == changed_recipe_id

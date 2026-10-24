@@ -22,6 +22,7 @@ from simulator.battery.enums import AmountBasis, NoticeKind
 from simulator.battery.identity import _composition_is_fixed_valence
 from simulator.battery.migrate import (
     _catalogue_composition_located_from_values,
+    REPO_ROOT,
     migrate,
     sample_from_equipment,
 )
@@ -141,6 +142,113 @@ def test_unknown_composition_role_is_queued_not_stamped(tmp_path) -> None:
         "composition_role 'initial_charge' is not one of" in entry.why
         for entry in result.queue
     )
+
+
+def test_unknown_values_composition_role_is_queued_for_plante_row(tmp_path) -> None:
+    import yaml
+
+    source = "kems-042-plante-1979.yaml"
+    document = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / source).read_text(
+            encoding="utf-8"
+        )
+    )
+    row_id = "plante1979_table2_s1104_r001_quoted"
+    values = next(
+        observation["values"]
+        for species in document["species"].values()
+        for observation in species.get("observations", [])
+        if observation.get("observation_id") == row_id
+    )
+    values["composition_role"] = "not_a_role"
+
+    result = _migrate_real_extract(tmp_path, source, extract_doc=document)
+    observation = next(
+        row
+        for observation_id, row in result.observations.items()
+        if observation_id.endswith(row_id)
+    )
+
+    assert "composition" not in (observation.point_conditions or {})
+    assert any(
+        entry.observation_id == observation.observation_id
+        and "composition_role 'not_a_role' is not one of" in entry.why
+        for entry in result.queue
+    )
+
+
+def test_unknown_basu_feo_row_role_is_queued_without_composition(tmp_path) -> None:
+    """A refused role on Basu Table II solution 1 stays untyped.
+
+    The Plante quoted row repeats the declared sample map, so it never
+    reaches the observation-attach fallback. This row prints its own slag
+    analysis. Dropping ``and not composition_role_refusal`` stamps a
+    mole-fraction composition (proxy None) and keeps the queue entry.
+    """
+
+    import yaml
+
+    source = "basu-2008-feo-steelmaking.yaml"
+    document = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / source).read_text(
+            encoding="utf-8"
+        )
+    )
+    row_id = "basu_2008_tii_s01_a_feo_1873k"
+    values = next(
+        observation["values"]
+        for species in document["species"].values()
+        for observation in species.get("observations", [])
+        if observation.get("observation_id") == row_id
+    )
+    values["composition_role"] = "not_a_role"
+
+    result = _migrate_real_extract(tmp_path, source, extract_doc=document)
+    observation = next(
+        row
+        for observation_id, row in result.observations.items()
+        if observation_id.endswith(row_id)
+    )
+    point = observation.point_conditions or {}
+    assert "composition" not in point
+    assert any(
+        entry.observation_id == observation.observation_id
+        and "composition_role 'not_a_role' is not one of" in entry.why
+        for entry in result.queue
+    )
+
+
+def test_unknown_hastie_values_composition_role_is_queued_once(tmp_path) -> None:
+    import yaml
+
+    source = "kems-020-hastie-1981-nbsir.yaml"
+    document = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / source).read_text(
+            encoding="utf-8"
+        )
+    )
+    row_id = "hastie_1981_fig11_k1_slag_k2o_gamma_digitized"
+    values = next(
+        observation["values"]
+        for species in document["species"].values()
+        for observation in species.get("observations", [])
+        if observation.get("observation_id") == row_id
+    )
+    values["composition_role"] = "not_a_role"
+
+    result = _migrate_real_extract(tmp_path, source, extract_doc=document)
+    observation = next(
+        row
+        for observation_id, row in result.observations.items()
+        if f"::{row_id}::T=" in observation_id
+    )
+    entries = [
+        entry
+        for entry in result.queue
+        if entry.observation_id == observation.observation_id
+        and "composition_role 'not_a_role' is not one of" in entry.why
+    ]
+    assert len(entries) == 1
 
 
 def test_markova_1983_initial_sample_points_are_stamped(tmp_path) -> None:

@@ -300,6 +300,7 @@ def _handle_magemin_subprocess_request(backend, request, _errlog):
         pressure_kbar=request['pressure_kbar'],
         fO2_log=request['fO2_log'],
         call_timeout_s=request.get('call_timeout_s'),
+        capture_native_activities=bool(request.get('capture_native_activities')),
     )
 
 
@@ -788,6 +789,90 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
         polymorph='sillimanite',
         bulk_wt_pct={'SiO2': 37.0780, 'Al2O3': 62.9220},
     ),
+    # (a) rows the ig accessor can reach. wt% are the ds636 Comp vector
+    # (TC_endmembers.c arr_em_db_tc_ds636) times oxide_info molar masses
+    # (TC_init_database.c: SiO2 60.08, Al2O3 101.96, CaO 56.08, MgO 40.30,
+    # Na2O 61.98, TiO2 79.88), 4 d.p. half-up. Comp atom count equals the
+    # literature formula, so formula_divisor is 1. Hosts are igneous_db
+    # pure phases (TC_init_database.c) or a G_SS_ig_* EM_tmp symbol
+    # (tc_gss_function.c). A ds636 name that is neither is not entered.
+    # gr/py: half-up sums to 99.9999 / 100.0001; the 0.0001 wt% remainder
+    # is on the oxide with the largest |remainder| (CaO, MgO).
+    'an': _MAGEMinPurePhaseSpec(
+        host_phase='fsp',
+        endmember='an',
+        formula='CaAl2Si2O8',
+        formula_basis='per 1 mol CaAl2Si2O8 (ds636 Comp line 10283, atoms 13)',
+        formula_divisor=1.0,
+        polymorph='anorthite',
+        bulk_wt_pct={'SiO2': 43.1919, 'Al2O3': 36.6499, 'CaO': 20.1582},
+    ),
+    'ru': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='ru',
+        formula='TiO2',
+        formula_basis='per 1 mol TiO2 (ds636 Comp line 10539, atoms 3)',
+        formula_divisor=1.0,
+        # igneous_db lists ru and does not name it. Unset, so rutile and
+        # anatase stay unresolved.
+        polymorph='',
+        bulk_wt_pct={'SiO2': 1.0e-6, 'TiO2': 100.0},
+    ),
+    'sph': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='sph',
+        formula='CaTiSiO5',
+        formula_basis='per 1 mol CaTiSiO5 (ds636 Comp line 9603, atoms 8)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 30.6468, 'CaO': 28.6064, 'TiO2': 40.7468},
+    ),
+    'cats': _MAGEMinPurePhaseSpec(
+        host_phase='cpx',
+        endmember='cats',
+        formula='CaAl2SiO6',
+        formula_basis='per 1 mol CaAl2SiO6 (ds636 Comp line 9747, atoms 10)',
+        formula_divisor=1.0,
+        # Holland–Powell name on this endmember. Not ca_al_pyroxene.
+        polymorph='ca_tschermak_pyroxene',
+        bulk_wt_pct={'SiO2': 27.5445, 'Al2O3': 46.7449, 'CaO': 25.7106},
+    ),
+    'gr': _MAGEMinPurePhaseSpec(
+        host_phase='g',
+        endmember='gr',
+        formula='Ca3Al2Si3O12',
+        formula_basis='per 1 mol Ca3Al2Si3O12 (ds636 Comp line 9251, atoms 20)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 40.0142, 'Al2O3': 22.6356, 'CaO': 37.3502},
+    ),
+    'py': _MAGEMinPurePhaseSpec(
+        host_phase='g',
+        endmember='py',
+        formula='Mg3Al2Si3O12',
+        formula_basis='per 1 mol Mg3Al2Si3O12 (ds636 Comp line 9227, atoms 20)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 44.7135, 'Al2O3': 25.2940, 'MgO': 29.9925},
+    ),
+    'jd': _MAGEMinPurePhaseSpec(
+        host_phase='cpx',
+        endmember='jd',
+        formula='NaAlSi2O6',
+        formula_basis='per 1 mol NaAlSi2O6 (ds636 Comp line 9715, atoms 10)',
+        formula_divisor=1.0,
+        polymorph='jadeite',
+        bulk_wt_pct={'SiO2': 59.4469, 'Al2O3': 25.2214, 'Na2O': 15.3317},
+    ),
+    'mont': _MAGEMinPurePhaseSpec(
+        host_phase='ol',
+        endmember='mont',
+        formula='CaMgSiO4',
+        formula_basis='per 1 mol CaMgSiO4 (ds636 Comp line 9091, atoms 7)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 38.3996, 'CaO': 35.8430, 'MgO': 25.7574},
+    ),
 }
 
 _MAGEMIN_PP_GBASE_RE = re.compile(
@@ -1226,6 +1311,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         species_formula_registry: Optional[Mapping[str, Any]] = None,
         call_timeout_s: Optional[float] = None,
         projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
+        native_activity_formula: Optional[str] = None,
     ) -> EquilibriumResult:
         """
         Minimize Gibbs energy via MAGEMin.
@@ -1412,6 +1498,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
+                capture_native_activities=native_activity_formula is not None,
                 composition_mol=composition_mol,
             )
         except EngineWorkerTimeout:
@@ -1542,6 +1629,65 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     warnings=[*all_warnings, message],
                     diagnostics=result_diagnostics,
                 )
+        native_activities: Dict[str, float] = {}
+        if native_activity_formula is not None:
+            from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+            native = raw.get('native_activities') if isinstance(raw, Mapping) else None
+            solver_status = raw.get('solver_status') if isinstance(raw, Mapping) else None
+            raw_activity = (
+                native.get(native_activity_formula)
+                if isinstance(native, Mapping)
+                else None
+            )
+            result_diagnostics.update({
+                'magemin_native_formula': native_activity_formula,
+                'magemin_solver_status': solver_status,
+                'magemin_native_phase': (
+                    raw.get('native_phase') if isinstance(raw, Mapping) else None
+                ),
+                'magemin_native_mode': (
+                    raw.get('native_mode') if isinstance(raw, Mapping) else None
+                ),
+                'magemin_iterations': (
+                    raw.get('iterations') if isinstance(raw, Mapping) else None
+                ),
+            })
+            try:
+                activity_value = float(raw_activity)
+            except (TypeError, ValueError, OverflowError):
+                activity_value = math.nan
+            if (
+                native_activity_formula not in MAGEMIN_NATIVE_MELT_ACTIVITIES
+                or solver_status not in {0, 1, 2}
+                or not math.isfinite(activity_value)
+                or activity_value <= 0.0
+            ):
+                result_diagnostics.update({
+                    'backend_status': 'not_converged',
+                    'backend_status_reason': 'engine_not_converged',
+                    'magemin_native_activity_invalid': True,
+                })
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=result_fO2_log,
+                    status='not_converged',
+                    warnings=[
+                        *all_warnings,
+                        'MAGEMin native activity unavailable or solver failed: '
+                        f'formula={native_activity_formula}, status={solver_status}, '
+                        f'activity={raw_activity!r}',
+                    ],
+                    diagnostics=result_diagnostics,
+                )
+            for formula, (field, _polymorph) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
+                try:
+                    value = float(native.get(formula))
+                except (TypeError, ValueError, OverflowError):
+                    continue
+                if math.isfinite(value) and value > 0.0:
+                    native_activities[formula] = value
         (
             phases_present,
             phase_masses_kg,
@@ -1558,6 +1704,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             phase_compositions=phase_compositions,
             liquid_fraction=liquid_fraction,
             liquid_composition_wt_pct=liquid_composition_wt_pct,
+            activity_coefficients=native_activities,
             status=result_status,
             warnings=all_warnings,
             diagnostics=result_diagnostics,
@@ -2315,6 +2462,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         pressure_bar: float,
         fO2_log: float,
         call_timeout_s: Optional[float] = None,
+        capture_native_activities: bool = False,
         composition_mol: Optional[Mapping[str, float]] = None,
     ) -> Any:
         """
@@ -2448,7 +2596,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'python_bridge="julia"'
             )
 
-        if self._bridge == 'subprocess':
+        if self._bridge == 'subprocess' or capture_native_activities:
             if self._subprocess_pool is not None:
                 timeout_s = (
                     float(self._config.get(
@@ -2487,6 +2635,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         # This subprocess wall is secondary containment for
                         # platforms without process-group cleanup.
                         'call_timeout_s': timeout_s + 0.5,
+                        'capture_native_activities': capture_native_activities,
                     }, timeout_s=timeout_s)
                     try:
                         return future.result(timeout=future_timeout_s)
@@ -2594,6 +2743,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
+                capture_native_activities=capture_native_activities,
             )
 
         raise RuntimeError(
@@ -2687,6 +2837,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         pressure_kbar: float,
         fO2_log: float,
         call_timeout_s: Optional[float] = None,
+        capture_native_activities: bool = False,
     ) -> Dict[str, Any]:
         """
         Drive the compiled MAGEMin binary for one single-point call.
@@ -2748,6 +2899,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_status_reason': 'clamped_operating_point',
             })
 
+        if capture_native_activities:
+            # Same argv owner as the Verb=0 golden. Native activities only
+            # raise verbosity and request the matlab dump the parser reads.
+            args = [
+                '--Verb=1' if item == '--Verb=0' else item
+                for item in args
+            ]
+            args.append('--out_matlab=1')
         configured_timeout_s = float(self._config.get('timeout_s', 60.0))
         if call_timeout_s is None:
             timeout_s = configured_timeout_s
@@ -2762,6 +2921,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
             timeout_s = min(configured_timeout_s, remaining)
         call_started = time.monotonic()
+        matlab_text = ''
         with _magemin_subprocess_slot(timeout_s):
             remaining_timeout_s = timeout_s - max(
                 0.0, time.monotonic() - call_started
@@ -2781,6 +2941,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         timeout=remaining_timeout_s,
                         check=False,
                     )
+                    if capture_native_activities:
+                        matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
+                        matlab_text = (
+                            matlab_path.read_text()
+                            if matlab_path.exists()
+                            else ''
+                        )
                 except subprocess.TimeoutExpired as exc:
                     raise _MAGEMinEngineCallError(
                         type(exc).__name__, f'MAGEMin binary timed out after '
@@ -2800,8 +2967,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 f'{stderr or "no stderr"}',
             )
 
+        stdout_metadata: Dict[str, Any] = {}
         try:
-            phases = self._parse_subprocess_stdout(completed.stdout or '')
+            if capture_native_activities:
+                phases = self._parse_subprocess_stdout(
+                    completed.stdout or '', metadata=stdout_metadata
+                )
+            else:
+                phases = self._parse_subprocess_stdout(completed.stdout or '')
         except _MAGEMinModeVectorMassDeficit as exc:
             return {
                 'mode_vector_mass_deficit': {
@@ -2822,11 +2995,30 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             _raise_magemin_output_invalid(
                 'MAGEMin binary produced no parseable Phase/Mode block'
             )
-        return {
+        result = {
             'phases': phases,
             'buffer_warnings': buffer_warnings,
             'operating_point_diagnostics': operating_point_diagnostics,
         }
+        if capture_native_activities:
+            from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+            native_fields = self._parse_subprocess_native_activities(matlab_text)
+            result.update({
+                'native_activities': {
+                    formula: native_fields[field]
+                    for formula, (field, _polymorph)
+                    in MAGEMIN_NATIVE_MELT_ACTIVITIES.items()
+                    if field in native_fields
+                },
+                'solver_status': stdout_metadata.get('solver_status'),
+                'native_phase': stdout_metadata.get('phase_names'),
+                'native_mode': stdout_metadata.get('mode_fractions'),
+                'iterations': self._parse_subprocess_iterations(
+                    completed.stdout or ''
+                ),
+            })
+        return result
 
     def _build_ig_bulk_vector(
         self, composition_wt_pct: Mapping[str, float]
@@ -3040,7 +3232,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         return 'qfm', buffer_n, warnings_out
 
     @staticmethod
-    def _parse_subprocess_stdout(stdout: str) -> Dict[str, Dict[str, float]]:
+    def _parse_subprocess_stdout(
+        stdout: str, *, metadata: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Dict[str, float]]:
         """
         Parse the compact MAGEMin ``--Verb=0`` ``Phase :`` / ``Mode :``
         block.
@@ -3074,6 +3268,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         values = mode_line.split()
         if not names or len(names) != len(values):
             return {}
+
+        if metadata is not None:
+            metadata['phase_names'] = tuple(names)
+            metadata['solver_status'] = _parse_magemin_solver_status(stdout)
+            metadata['mode_fractions'] = {
+                name: float(raw) for name, raw in zip(names, values)
+            }
 
         parsed_modes: list[tuple[str, float]] = []
         for name, raw in zip(names, values):
@@ -3112,6 +3313,29 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             phases.setdefault(name, {'mass_kg': 0.0})['mass_kg'] += fraction
         return phases
 
+    @staticmethod
+    def _parse_subprocess_native_activities(matlab_text: str) -> Dict[str, float]:
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        parsed: Dict[str, float] = {}
+        for field, _polymorph in MAGEMIN_NATIVE_MELT_ACTIVITIES.values():
+            match = re.search(
+                rf'^\s*{re.escape(field)}\s+([^\s,;]+)',
+                matlab_text,
+                re.MULTILINE,
+            )
+            if match is not None:
+                try:
+                    parsed[field] = float(match.group(1))
+                except ValueError:
+                    parsed[field] = math.nan
+        return parsed
+
+    @staticmethod
+    def _parse_subprocess_iterations(stdout: str) -> Optional[int]:
+        matches = re.findall(r'\((\d+) iterations,', stdout)
+        return int(matches[-1]) if matches else None
+
     # ------------------------------------------------------------------
     # Pure-phase standard-state properties (diagnostic accessor)
     # ------------------------------------------------------------------
@@ -3143,8 +3367,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         ``phase_id`` is an ig-database symbol: ``fo`` (olivine endmember),
         ``per`` (ferropericlase endmember), ``en`` (orthopyroxene endmember,
-        Mg2Si2O6 basis), or the pure phases ``q`` / ``crst`` / ``trd`` /
-        ``cor`` / ``and`` / ``ky`` / ``sill``. There is no plain spinel id.
+        Mg2Si2O6 basis), the pure phases ``q`` / ``crst`` / ``trd`` /
+        ``cor`` / ``and`` / ``ky`` / ``sill`` / ``ru`` / ``sph``, or the
+        solution endmembers ``an`` (fsp), ``cats`` / ``jd`` (cpx),
+        ``gr`` / ``py`` (g), and ``mont`` (ol). There is no plain spinel id.
         Cold subprocess: same binary and slot discipline as the production
         subprocess bridge; equilibrate() is untouched.
         """

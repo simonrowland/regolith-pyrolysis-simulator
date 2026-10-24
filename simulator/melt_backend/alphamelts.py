@@ -1055,13 +1055,14 @@ class _MELTSBackendSupport(MeltBackend):
         self._vapor_pressure_table: Optional[dict] = None
         self._subprocess_vapor_pressure_provider = None
         self._vapor_transport_pO2_bar = DEFAULT_VACUUM_FLOOR_BAR
+        self._vapor_transport_pO2_admission = 'environment'
         self._configured_vapor_transport_pO2_bar = self._vapor_transport_pO2_bar
         self._vapor_transport_floor_bar = vacuum_floor_bar_for_environment()
         self._configured_vapor_transport_floor_bar = self._vapor_transport_floor_bar
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
 
     def _set_vapor_transport_pO2_bar(
-        self, value: object, *, floor_bar: object,
+        self, value: object, *, floor_bar: object, admission: str = 'environment',
     ) -> None:
         from engines.builtin._common import (
             resolve_request_vacuum_floor_bar,
@@ -1070,13 +1071,18 @@ class _MELTSBackendSupport(MeltBackend):
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
+        if admission not in ('environment', 'observation'):
+            raise ValueError(f'unsupported vapor_transport_pO2_admission={admission!r}')
         request = IntentRequest(
             intent=ChemistryIntent.VAPOR_PRESSURE,
             account_view=ProviderAccountView(
                 accounts={}, species_formula_registry={},
             ),
             temperature_C=0.0, pressure_bar=0.0, fO2_log=None,
-            control_inputs={'pO2_bar': float(value), 'vacuum_floor_bar': floor_bar},
+            control_inputs={
+                'pO2_bar': float(value), 'vacuum_floor_bar': floor_bar,
+                'pO2_admission': admission,
+            },
         )
         try:
             resolved_floor = resolve_request_vacuum_floor_bar(request)
@@ -1088,6 +1094,7 @@ class _MELTSBackendSupport(MeltBackend):
             ) from exc
         self._vapor_transport_pO2_bar = resolved_pO2
         self._vapor_transport_floor_bar = resolved_floor
+        self._vapor_transport_pO2_admission = admission
 
     def _initialize_vapor_transport(self, config: Mapping[str, object]) -> None:
         self._set_vapor_transport_pO2_bar(config.get(
@@ -1479,8 +1486,10 @@ class _MELTSBackendSupport(MeltBackend):
                     species_formula_registry: Optional[Mapping[str, object]] = None,
                     redox_mode: Optional[str] = None,
                     subprocess_run_mode: AlphaMELTSSubprocessRunMode | str | None = None,
+                    call_timeout_s: Optional[float] = None,
                     vapor_transport_pO2_bar: Optional[float] = None,
                     vapor_transport_floor_bar: Optional[float] = None,
+                    vapor_transport_pO2_admission: str = 'environment',
                     ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium.
@@ -1489,6 +1498,8 @@ class _MELTSBackendSupport(MeltBackend):
         ``vapor_transport_pO2_bar`` overrides the configured gas environment
         for this call only; it does not change the intrinsic melt fO2.
         ``vapor_transport_floor_bar`` carries the environment owner's floor.
+        ``vapor_transport_pO2_admission='observation'`` admits measured positive
+        gas oxygen independently of that floor, through the shared resolver.
         """
         self._set_vapor_transport_pO2_bar(
             self._configured_vapor_transport_pO2_bar
@@ -1497,6 +1508,7 @@ class _MELTSBackendSupport(MeltBackend):
                 self._configured_vapor_transport_floor_bar
                 if vapor_transport_floor_bar is None else vapor_transport_floor_bar
             ),
+            admission=vapor_transport_pO2_admission,
         )
         if redox_mode not in (None, REDOX_MODE_NOT_AN_INPUT):
             raise ValueError(f'unsupported redox_mode={redox_mode!r}')
@@ -1628,17 +1640,20 @@ class _MELTSBackendSupport(MeltBackend):
         warnings = list(self._last_normalization_warnings)
         warnings.extend(commissioning_warnings)
 
-        return self._equilibrate_prepared(
-            temperature_C=temperature_C,
-            comp_wt=comp_wt,
-            fO2_log=fO2_log,
-            pressure_bar=pressure_bar,
-            warnings=warnings,
-            total_input_kg=total_input_kg,
-            crash_diagnostics=crash_diagnostics,
-            redox_mode=redox_mode,
-            subprocess_run_mode=subprocess_run_mode,
-        )
+        prepared_kwargs: dict[str, Any] = {
+            'temperature_C': temperature_C,
+            'comp_wt': comp_wt,
+            'fO2_log': fO2_log,
+            'pressure_bar': pressure_bar,
+            'warnings': warnings,
+            'total_input_kg': total_input_kg,
+            'crash_diagnostics': crash_diagnostics,
+            'subprocess_run_mode': subprocess_run_mode,
+            'redox_mode': redox_mode,
+        }
+        if call_timeout_s is not None and self.backend_name == 'thermoengine':
+            prepared_kwargs['call_timeout_s'] = float(call_timeout_s)
+        return self._equilibrate_prepared(**prepared_kwargs)
 
     def _equilibrate_prepared(
         self,
@@ -5403,6 +5418,7 @@ class _MELTSBackendSupport(MeltBackend):
                 # or configured diagnostic fallback, independently of melt fO2.
                 'pO2_bar': self._vapor_transport_pO2_bar,
                 'vacuum_floor_bar': self._vapor_transport_floor_bar,
+                'pO2_admission': self._vapor_transport_pO2_admission,
                 'intrinsic_fO2_log': gas_fO2_log,
             },
         )
@@ -5565,6 +5581,7 @@ class _MELTSBackendSupport(MeltBackend):
             control_inputs={
                 'pO2_bar': self._vapor_transport_pO2_bar,
                 'vacuum_floor_bar': self._vapor_transport_floor_bar,
+                'pO2_admission': self._vapor_transport_pO2_admission,
             },
         ))
 

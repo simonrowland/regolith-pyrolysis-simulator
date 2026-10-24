@@ -21,7 +21,10 @@ from engines.builtin.vapor_pressure import (
     VaporPressureNumericalOverflowError,
     VaporPressureRangeError,
 )
-from simulator.furnace_materials import setpoints_furnace_ceiling_C
+from simulator.furnace_materials import (
+    resolve_furnace_temperature_caps,
+    setpoints_furnace_ceiling_C,
+)
 from simulator.thermal_window import resolve_thermal_preheat_interval
 from simulator.accounting import OverdraftError, resolve_species_formula
 from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
@@ -94,12 +97,15 @@ from simulator.optimize.objective import (
     product_summary,
 )
 from simulator.optimize.physics import (
+    COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN,
     CoatingFeasibilityReportError,
     GATE_ORDER,
     FeasibilityResult,
     GateMargin,
     PhysicsConstraintSet,
     ThresholdSpec,
+    _coating_runtime_diagnostics,
+    _coating_wall_refused_species,
     physics_constraints_digest,
 )
 from simulator.optimize.profiles import (
@@ -711,6 +717,10 @@ class EvaluationInputError(ValueError):
     """Raised when optimizer evaluation inputs or config references are invalid."""
 
 
+class _CandidateAdmissionError(EvaluationInputError):
+    """Raised when a candidate violates a pre-run admission limit."""
+
+
 def evaluate(
     patch: RecipePatch,
     feedstock_id: str,
@@ -731,14 +741,7 @@ def evaluate(
     try:
         validated_patch = patch.validated(active_schema)
     except RecipeValidationError as exc:
-        return ScoredResult(
-            candidate_id=candidate_id,
-            eval_spec=None,
-            cache_key=None,
-            feasible=False,
-            failure_category=FailureCategory.INVALID_PATCH,
-            notes=(str(exc),),
-        )
+        return _invalid_patch_result(candidate_id, str(exc))
 
     try:
         active_constraints = _composition_target_constraints(
@@ -761,6 +764,8 @@ def evaluate(
         if _is_stale_profile_refusal(exc):
             return _stale_profile_result(candidate_id, str(exc))
         raise
+    except _CandidateAdmissionError as exc:
+        return _invalid_patch_result(candidate_id, str(exc))
     except EvaluationInputError as exc:
         if _is_zero_input_basis_breach_message(str(exc)):
             return _zero_input_basis_result(candidate_id, str(exc))
@@ -1092,7 +1097,11 @@ def evaluate(
     try:
         feasibility = _evaluate_physics_constraints(
             active_constraints,
-            _trace_with_optimizer_coating_report(run_execution, active_constraints),
+            _trace_with_optimizer_coating_report(
+                run_execution,
+                active_constraints,
+                spec=spec,
+            ),
             spec=spec,
             profile=profile,
             run_config=run_config,
@@ -1650,6 +1659,8 @@ def _evaluate_physics_constraints(
 def _trace_with_optimizer_coating_report(
     run_execution: Any,
     constraints: PhysicsConstraintSet | None,
+    *,
+    spec: EvalSpec | None = None,
 ) -> Any:
     trace = getattr(run_execution, "trace", None)
     if constraints is not None and "coating" not in getattr(
@@ -1675,11 +1686,17 @@ def _trace_with_optimizer_coating_report(
         )
     normalized_deposit: dict[tuple[str, str], float] = {}
     by_species: dict[str, float] = {}
+    null_deposit_species: list[str] = []
     for key, raw_kg in raw_deposit.items():
         if not isinstance(key, tuple) or len(key) != 2:
             raise CoatingFeasibilityReportError(
                 "wall deposit key must be (segment, species)"
             )
+        if raw_kg is None:
+            # b-808: a null kilogram is unknown. Leave it out of the numeric
+            # sum; do not price it as a measured zero.
+            null_deposit_species.append(str(key[1]))
+            continue
         try:
             kg = float(raw_kg)
         except (TypeError, ValueError) as exc:
@@ -1693,6 +1710,19 @@ def _trace_with_optimizer_coating_report(
         normalized_kg = kg / campaigns_elapsed
         normalized_deposit[(str(key[0]), str(key[1]))] = normalized_kg
         by_species[str(key[1])] = by_species.get(str(key[1]), 0.0) + normalized_kg
+    charge_mass_kg = _optimizer_feedstock_charge_mass(run_execution, spec)
+    wall_authority = getattr(trace, "wall_deposit_sticking_authority", {}) or {}
+    refusal_sources = [wall_authority]
+    if isinstance(wall_authority, MappingABC):
+        nested_authority = wall_authority.get("sticking_alpha_authority")
+        if isinstance(nested_authority, MappingABC):
+            refusal_sources.append(nested_authority)
+    refused_species = _coating_wall_refused_species(*refusal_sources)
+    refused_flux_bounds = _optimizer_refused_flux_bounds(
+        getattr(run_execution, "snapshots", ()),
+        refused_species,
+        campaigns_elapsed=campaigns_elapsed,
+    )
     from simulator.runner import _wall_fouling_report
 
     runner_report = _wall_fouling_report(
@@ -1733,25 +1763,84 @@ def _trace_with_optimizer_coating_report(
         output_status = "non-authoritative-threshold"
         status_reason = "resinter threshold is not grounded"
     report = dict(runner_report)
+    if null_deposit_species:
+        report["wall_quantity_unavailable"] = True
+        report["wall_quantity_unavailable_species"] = sorted(
+            null_deposit_species
+        )
     report.update(
         campaigns_to_resinter_worst_segment=campaigns,
         campaigns_to_resinter_total=aggregate_campaigns,
         authoritative_for_resinter=authoritative,
         output_status=output_status,
         status_reason=status_reason,
+        upstream_wall_deposit_records=[
+            {
+                "scope": "upstream",
+                "segment": segment,
+                "species": species,
+                "deposit_kg_per_campaign": float(kg),
+            }
+            for (segment, species), kg in sorted(normalized_deposit.items())
+            if float(kg) > COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+        ],
+        coating_diagnostics=_coating_runtime_diagnostics(run_execution),
     )
-    if threshold_parametric:
+    if isinstance(wall_authority, MappingABC):
+        refusal_payload = dict(
+            report.get("sticking_alpha_authority", {})
+            if isinstance(report.get("sticking_alpha_authority"), MappingABC)
+            else {}
+        )
+        for key in (
+            "code",
+            "wall_saturation_pressure_refused_species",
+            "wall_saturation_pressure_refusals_by_species",
+            "wall_quantity_unavailable",
+        ):
+            if key == "code" and not (
+                "wall_saturation_pressure_refused_species" in wall_authority
+                or "wall_saturation_pressure_refusals_by_species" in wall_authority
+                or "wall_saturation_pressure_refused" in str(
+                    wall_authority.get("code", "")
+                )
+            ):
+                continue
+            if key in wall_authority:
+                refusal_payload[key] = wall_authority[key]
+        if refusal_payload:
+            report["sticking_alpha_authority"] = refusal_payload
+    if charge_mass_kg is not None:
         report.update(
-            coating_constraint_mode="no_unqualified_deposition",
+            feedstock_charge_mass_kg=charge_mass_kg,
+            coating_constraint_mode="upstream_deposit_fraction",
             coating_constraint_authoritative=True,
             coating_constraint_reason=(
-                "without a finite material damage capacity, no positive "
-                "continuous deposition rate has a qualified liner lifespan"
-            ),
-            unqualified_deposition_rate_kg_per_campaign=float(
-                runner_report.get("wall_deposit_kg_per_campaign", 0.0) or 0.0
+                "d-045 upstream wall deposit fraction per campaign"
             ),
         )
+    if refused_species:
+        report[
+            "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+        ] = refused_flux_bounds
+    if threshold_parametric:
+        raw_rate = runner_report.get("wall_deposit_kg_per_campaign", 0.0)
+        if raw_rate is None:
+            # A null campaign total is unavailable, not a measured zero.
+            report["wall_quantity_unavailable"] = True
+        else:
+            report["unqualified_deposition_rate_kg_per_campaign"] = float(
+                raw_rate
+            )
+        if charge_mass_kg is None:
+            report.update(
+                coating_constraint_mode="no_unqualified_deposition",
+                coating_constraint_authoritative=True,
+                coating_constraint_reason=(
+                    "without a finite material damage capacity, no positive "
+                    "continuous deposition rate has a qualified liner lifespan"
+                ),
+            )
     if not authoritative:
         report.update(
             authoritative=False,
@@ -1760,6 +1849,90 @@ def _trace_with_optimizer_coating_report(
             verdict="non-authoritative",
         )
     return _TraceAttributeOverlay(trace, {"wall_fouling_report": report})
+
+
+def _optimizer_feedstock_charge_mass(
+    run_execution: Any,
+    spec: EvalSpec | None,
+) -> float | None:
+    raw = getattr(spec, "mass_kg", None) if spec is not None else None
+    if raw is None:
+        record = getattr(getattr(run_execution, "simulator", None), "record", None)
+        raw = getattr(record, "batch_mass_kg", None)
+    if raw is None:
+        return None
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        raise CoatingFeasibilityReportError(
+            "optimizer feedstock charge mass must be numeric"
+        )
+    mass = float(raw)
+    if not math.isfinite(mass) or mass <= 0.0:
+        raise CoatingFeasibilityReportError(
+            "optimizer feedstock charge mass must be finite and positive"
+        )
+    return mass
+
+
+def _optimizer_refused_flux_bounds(
+    snapshots: Any,
+    refused_species: tuple[str, ...],
+    *,
+    campaigns_elapsed: float = 1.0,
+) -> dict[str, float]:
+    """Bound refused wall deposits by all observed vapour flux in the campaign.
+
+    A wall deposit is downstream of the source vapour. Summing each refused
+    species' non-negative kg/hr flux over snapshot duration therefore gives an
+    upper bound for every segment, even when the wall saturation quantity was
+    refused. Missing species/rate evidence remains missing, never zero.
+    """
+
+    if not refused_species:
+        return {}
+    if not math.isfinite(campaigns_elapsed) or campaigns_elapsed <= 0.0:
+        raise CoatingFeasibilityReportError(
+            "campaigns_elapsed must be finite and positive for refused flux "
+            "bounds"
+        )
+    totals = {species: 0.0 for species in refused_species}
+    observed: set[str] = set()
+    for snapshot in tuple(snapshots or ()):
+        flux = getattr(snapshot, "evap_flux", None)
+        rates = getattr(flux, "species_kg_hr", None)
+        if not isinstance(rates, MappingABC):
+            continue
+        raw_duration = getattr(snapshot, "duration_h", 1.0)
+        if isinstance(raw_duration, bool) or not isinstance(raw_duration, int | float):
+            raise CoatingFeasibilityReportError(
+                "snapshot duration_h must be numeric for refused flux bounds"
+            )
+        duration_h = float(raw_duration)
+        if not math.isfinite(duration_h) or duration_h < 0.0:
+            raise CoatingFeasibilityReportError(
+                "snapshot duration_h must be finite and non-negative for "
+                "refused flux bounds"
+            )
+        for species in refused_species:
+            if species not in rates:
+                continue
+            raw_rate = rates[species]
+            if isinstance(raw_rate, bool) or not isinstance(raw_rate, int | float):
+                raise CoatingFeasibilityReportError(
+                    f"vapour flux for refused species {species!r} must be numeric"
+                )
+            rate = float(raw_rate)
+            if not math.isfinite(rate) or rate < 0.0:
+                raise CoatingFeasibilityReportError(
+                    f"vapour flux for refused species {species!r} must be finite "
+                    "and non-negative"
+                )
+            totals[species] += rate * duration_h
+            observed.add(species)
+    return {
+        species: float(totals[species] / campaigns_elapsed)
+        for species in refused_species
+        if species in observed
+    }
 
 
 def _knudsen_summary_from_eval_inputs(
@@ -3501,7 +3674,7 @@ def _profile_lab_schedule(
         for point in schedule["melt_temperature_C"]
     )
     if scheduled_peak > ceiling_C:
-        raise EvaluationInputError(
+        raise _CandidateAdmissionError(
             f"lab_schedule_temperature_exceeds_{ceiling_bound}: "
             f"{scheduled_peak:g} C > {ceiling_C:g} C"
         )
@@ -3597,7 +3770,7 @@ def _profile_thermal_window_schedule(
         recipe_patch=recipe_patch,
     )
     if high_C > ceiling_C:
-        raise EvaluationInputError(
+        raise _CandidateAdmissionError(
             f"{campaign}.temp_range_C high {high_C:g} C exceeds "
             f"{ceiling_bound} {ceiling_C:g} C"
         )
@@ -3620,7 +3793,7 @@ def _profile_thermal_window_schedule(
         recipe_patch=recipe_patch,
     )
     if max_hold_hr is not None and float(total_hours) > max_hold_hr:
-        raise EvaluationInputError(
+        raise _CandidateAdmissionError(
             f"{campaign} thermal_window_{max_hold_bound} refusal: "
             f"requires {total_hours:g} h "
             f"(preheat {preheat_hours:g} h + hold {duration_h:g} h) but "
@@ -3694,33 +3867,81 @@ def _furnace_ceiling_C(
         campaign,
         recipe_patch=recipe_patch,
     )
-    # Was float(setpoints.get("furnace_max_T_C", 1800.0)): a hardcoded ceiling
-    # that never consulted the pipe material, so an unpatched evaluation
-    # scheduled against 1800 C on a vessel the catalog rates to 2200 C. The
-    # .get() default also fired only on an ABSENT key, so the explicit
-    # `furnace_max_T_C: null` that spells "inherit" reached float(None) (b-329).
-    hardware_ceiling_C = setpoints_furnace_ceiling_C(setpoints)
+    # Keep the requested ceiling for existing precedence, then resolve the
+    # material-applied ceiling separately so admission cannot exceed it.
+    try:
+        hardware_ceiling_C = setpoints_furnace_ceiling_C(setpoints)
+    except (TypeError, ValueError) as exc:
+        raise EvaluationInputError(
+            f"invalid furnace temperature ceiling: {exc}"
+        ) from exc
+    material = setpoints.get("furnace_material")
+    material_caps = None
+    if material:
+        requested_ceiling_C = (
+            recipe_patch.values[FURNACE_MAX_T_C_PATH]
+            if recipe_patch is not None
+            and FURNACE_MAX_T_C_PATH in recipe_patch.values
+            else setpoints.get("furnace_max_T_C")
+        )
+        try:
+            material_caps = resolve_furnace_temperature_caps(
+                str(material),
+                requested_ceiling_C,
+            )
+        except ValueError as exc:
+            raise EvaluationInputError(
+                f"invalid applied furnace ceiling for {material!r}: {exc}"
+            ) from exc
     if constraints is None:
         if local_ceiling is not None:
-            return local_ceiling[0], "recipe_local_furnace_max_T_C"
-        return hardware_ceiling_C, "profile_default_furnace_max_T_C"
-    threshold = getattr(constraints, "furnace_T_max_C", None)
-    value = getattr(threshold, "value", None)
-    if local_ceiling is not None:
-        if value is None or _is_default_furnace_threshold(threshold):
-            return local_ceiling[0], "recipe_local_furnace_max_T_C"
-        if float(value) <= local_ceiling[0]:
-            return float(value), str(
+            ceiling_C = local_ceiling[0]
+            ceiling_bound = "recipe_local_furnace_max_T_C"
+        else:
+            ceiling_C = hardware_ceiling_C
+            ceiling_bound = "profile_default_furnace_max_T_C"
+    else:
+        threshold = getattr(constraints, "furnace_T_max_C", None)
+        value = getattr(threshold, "value", None)
+        if local_ceiling is not None:
+            if value is None or _is_default_furnace_threshold(threshold):
+                ceiling_C = local_ceiling[0]
+                ceiling_bound = "recipe_local_furnace_max_T_C"
+            elif float(value) <= local_ceiling[0]:
+                ceiling_C = float(value)
+                ceiling_bound = str(
+                    getattr(threshold, "id", None) or "furnace_T_max_C"
+                )
+            else:
+                ceiling_C = local_ceiling[0]
+                ceiling_bound = "recipe_local_furnace_max_T_C"
+        elif value is None:
+            ceiling_C = hardware_ceiling_C
+            ceiling_bound = "profile_default_furnace_max_T_C"
+        elif _is_default_furnace_threshold(threshold):
+            ceiling_C = float(value)
+            ceiling_bound = "profile_default_furnace_max_T_C"
+        else:
+            ceiling_C = float(value)
+            ceiling_bound = str(
                 getattr(threshold, "id", None) or "furnace_T_max_C"
             )
-        return local_ceiling[0], "recipe_local_furnace_max_T_C"
-    if value is None:
-        return hardware_ceiling_C, "profile_default_furnace_max_T_C"
-    if _is_default_furnace_threshold(threshold):
-        return float(value), "profile_default_furnace_max_T_C"
-    return float(value), str(
-        getattr(threshold, "id", None) or "furnace_T_max_C"
-    )
+
+    if material_caps is not None:
+        applied_ceiling_C = material_caps["effective_applied_ceiling_T_C"]
+        if applied_ceiling_C < ceiling_C:
+            if (
+                material_caps["requested_ceiling_T_C"]
+                >= material_caps["service_rating_T_C"]
+            ):
+                ceiling_bound = (
+                    f"furnace_material[{material}]."
+                    "effective_applied_ceiling_T_C"
+                )
+            else:
+                ceiling_bound = "profile_default_furnace_max_T_C"
+            return applied_ceiling_C, ceiling_bound
+    return ceiling_C, ceiling_bound
 
 
 def _recipe_local_furnace_ceiling_C(
@@ -4734,7 +4955,11 @@ def _out_of_domain_result(
     if assessment.earned:
         feasibility = _evaluate_physics_constraints(
             constraints,
-            _trace_with_optimizer_coating_report(run_execution, constraints),
+            _trace_with_optimizer_coating_report(
+                run_execution,
+                constraints,
+                spec=spec,
+            ),
             spec=spec,
             profile=profile,
         )
@@ -5588,6 +5813,20 @@ def _stale_profile_result(
         cache_key=None,
         feasible=False,
         failure_category=FailureCategory.STALE_PROFILE,
+        notes=(error_message,),
+    )
+
+
+def _invalid_patch_result(
+    candidate_id: str | None,
+    error_message: str,
+) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=False,
+        failure_category=FailureCategory.INVALID_PATCH,
         notes=(error_message,),
     )
 

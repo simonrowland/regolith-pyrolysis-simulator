@@ -1,0 +1,3262 @@
+schema_version: literature_extract.v1
+source_id: park-min-2004-carbide-capacity-fluoride-soda-slags
+source:
+  citation: 'Park, J.-H., and Min, D.-J. (2004), “Carbide Capacity of CaO–SiO2–CaF2(–Na2O) Slags at 1 773 K,” ISIJ
+    International 44(2):223–228. DOI: 10.2355/isijinternational.44.223.'
+  doi: 10.2355/isijinternational.44.223
+  year: 2004
+extraction:
+  method: Table 1 manually transcribed from the born-digital PDF and checked cell by cell against the 600 dpi page
+    2 render; figures recorded without digitisation.
+  date: '2026-10-22'
+  worker: fam44-1022
+  provenance_path: corpus/raw/park-min-2004-carbide-capacity-fluoride-soda-slags/park-min-2004-carbide-capacity-fluoride-soda-slags.pdf
+review_status: draft
+experiments:
+- experiment_id: t1-F-1
+  method: quench_equilibration
+  locator: &id001
+    table: '1'
+    page: 2
+    published_page: 224
+    pdf_page_index: 1
+    note: Table 1 caption prints 1,733 K (physical PDF p. 2, checked at 600 dpi); title (physical PDF p. 1), body
+      text (physical PDF p. 2), and Fig. 1 caption (physical PDF p. 2) print 1,773 K; typed at 1773 K.
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: &id002
+        page: 2
+        published_page: 224
+        pdf_page_index: 1
+        section: Experimental
+        note: 10 g slag in a graphite crucible under a CO atmosphere; equilibrated 12–18 h; quenched by Ar gas blowing
+          and crushed for chemical analysis.
+- experiment_id: t1-F-2
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-3
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-4
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-5
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-6
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-7
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-8
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-9
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-10
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-11
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-12
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-13
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-14
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-15
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-16
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-17
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-18
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-19
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-20
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-F-21
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-1
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-2
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-3
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-4
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-5
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-6
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-7
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-8
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-9
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-10
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-11
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+- experiment_id: t1-N-12
+  method: quench_equilibration
+  locator: *id001
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: After equilibration, sample quenched by Ar gas blowing and crushed for chemical analysis.
+      locator: *id002
+fidelity_samples:
+- path: species.CaO.observations[t1-f1-cao].values.component_amount
+  value: '20.1'
+  locator:
+    table: '1'
+    page: 2
+    published_page: 224
+    pdf_page_index: 1
+- path: species.CaF2.observations[t1-f1-caf2].values.component_amount
+  value: '65.6'
+  locator:
+    table: '1'
+    page: 2
+    published_page: 224
+    pdf_page_index: 1
+- path: species.SiO2.observations[t1-f1-sio2].values.component_amount
+  value: '0.0'
+  locator:
+    table: '1'
+    page: 2
+    published_page: 224
+    pdf_page_index: 1
+- path: species.Na2O.observations[t1-n12-na2o].values.component_amount
+  value: '1.8'
+  locator:
+    table: '1'
+    page: 2
+    published_page: 224
+    pdf_page_index: 1
+species:
+  CaO:
+    observations:
+    - observation_id: t1-f1-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-1
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-1
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '20.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f2-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-2
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-2
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '38.8'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f3-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-3
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-3
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '40.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f4-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-4
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-4
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '51.4'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f5-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-5
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-5
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '64.3'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f6-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-6
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-6
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '61.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f7-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-7
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-7
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '47.4'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f8-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-8
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-8
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '38.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f9-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-9
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-9
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '30.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f10-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-10
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-10
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '24.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f11-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-11
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-11
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '31.2'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f12-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-12
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-12
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '36.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f13-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-13
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-13
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '49.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f14-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-14
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-14
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '49.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f15-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-15
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-15
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '34.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f16-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-16
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-16
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '32.6'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f17-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-17
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-17
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '33.2'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f18-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-18
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-18
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '30.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f19-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-19
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-19
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '29.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f20-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-20
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-20
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '20.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f21-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-21
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-21
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '7.4'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n1-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-1
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-1
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '62.2'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n2-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-2
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-2
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '62.4'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n3-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-3
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-3
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '62.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n4-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-4
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-4
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '63.6'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n5-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-5
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-5
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '63.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n6-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-6
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-6
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '64.6'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n7-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-7
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-7
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '50.2'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n8-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-8
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-8
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '51.4'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n9-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-9
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-9
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '52.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n10-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-10
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-10
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '54.6'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n11-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-11
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-11
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '57.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n12-cao
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-12
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-12
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '59.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+  CaF2:
+    observations:
+    - observation_id: t1-f1-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-1
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-1
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '65.6'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f2-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-2
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-2
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '45.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f3-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-3
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-3
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '41.8'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f4-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-4
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-4
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '33.6'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f5-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-5
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-5
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '17.8'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f6-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-6
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-6
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '17.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f7-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-7
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-7
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '23.8'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f8-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-8
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-8
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '35.3'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f9-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-9
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-9
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '32.3'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f10-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-10
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-10
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '38.3'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f11-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-11
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-11
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '37.2'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f12-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-12
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-12
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '30.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f13-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-13
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-13
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '19.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f14-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-14
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-14
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '11.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f15-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-15
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-15
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '25.6'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f16-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-16
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-16
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '28.4'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f17-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-17
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-17
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '28.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f18-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-18
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-18
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '31.4'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f19-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-19
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-19
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '29.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f20-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-20
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-20
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '37.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f21-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-21
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-21
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '42.6'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n1-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-1
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-1
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '16.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n2-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-2
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-2
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '12.7'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n3-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-3
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-3
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '14.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n4-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-4
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-4
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '14.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n5-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-5
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-5
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '14.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n6-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-6
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-6
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '13.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n7-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-7
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-7
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '15.6'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n8-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-8
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-8
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '14.7'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n9-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-9
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-9
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '13.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n10-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-10
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-10
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '11.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n11-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-11
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-11
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '9.3'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n12-caf2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-12
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-12
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '7.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+  SiO2:
+    observations:
+    - observation_id: t1-f1-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-1
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-1
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '0.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f2-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-2
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-2
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '16.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f3-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-3
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-3
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '18.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f4-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-4
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-4
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '14.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f5-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-5
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-5
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '17.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f6-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-6
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-6
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '21.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f7-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-7
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-7
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '28.8'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f8-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-8
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-8
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '25.8'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f9-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-9
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-9
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '37.2'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f10-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-10
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-10
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '37.6'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f11-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-11
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-11
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '31.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f12-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-12
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-12
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '33.6'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f13-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-13
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-13
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '31.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f14-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-14
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-14
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '39.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f15-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-15
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-15
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '39.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f16-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-16
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-16
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '39.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f17-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-17
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-17
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '37.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f18-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-18
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-18
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '38.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f19-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-19
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-19
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '41.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f20-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-20
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-20
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '42.4'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-f21-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-F-21
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: F-21
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '50.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n1-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-1
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-1
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '21.2'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n2-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-2
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-2
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '24.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n3-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-3
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-3
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '22.4'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n4-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-4
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-4
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '22.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n5-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-5
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-5
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '21.3'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n6-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-6
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-6
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '21.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n7-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-7
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-7
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '33.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n8-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-8
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-8
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '33.4'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n9-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-9
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-9
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '32.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n10-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-10
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-10
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '33.3'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n11-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-11
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-11
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '32.8'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n12-sio2
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-12
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-12
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '32.3'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    context:
+    - observation_id: park-min-table1-carbide-capacity-no-token
+      type: measured_table_without_store_token
+      locator: *id001
+      units: dimensionless log10 C_carbide
+      candidate_tokens:
+      - sulfide_capacity
+      - chloride_capacity
+      reason: The paper prints log carbide capacity, but this schema has no carbide-capacity token; sulfide_capacity
+        and chloride_capacity name different quantities.
+      values:
+        quantity_as_published: log C_carbide
+        defining_equation_as_published: Carbide capacity is defined from the carbide dissolution reaction in equation
+          (1), with the capacity expression in equation (2).
+        temperature_as_published: '1773 K (Table 1 caption outlier: 1733 K; see each typed composition row note).'
+        Na2O_blank_cells: The %Na2O column is blank for F-1 through F-21; no zero is inferred.
+        samples:
+        - sample_name_as_printed: F-1
+          log_C_carbide_as_printed: '-8.17'
+        - sample_name_as_printed: F-2
+          log_C_carbide_as_printed: '-8.17'
+        - sample_name_as_printed: F-3
+          log_C_carbide_as_printed: '-8.24'
+        - sample_name_as_printed: F-4
+          log_C_carbide_as_printed: '-8.32'
+        - sample_name_as_printed: F-5
+          log_C_carbide_as_printed: '-8.51'
+        - sample_name_as_printed: F-6
+          log_C_carbide_as_printed: '-8.52'
+        - sample_name_as_printed: F-7
+          log_C_carbide_as_printed: '-8.49'
+        - sample_name_as_printed: F-8
+          log_C_carbide_as_printed: '-8.77'
+        - sample_name_as_printed: F-9
+          log_C_carbide_as_printed: '-8.94'
+        - sample_name_as_printed: F-10
+          log_C_carbide_as_printed: '-9.16'
+        - sample_name_as_printed: F-11
+          log_C_carbide_as_printed: '-9.35'
+        - sample_name_as_printed: F-12
+          log_C_carbide_as_printed: '-9.28'
+        - sample_name_as_printed: F-13
+          log_C_carbide_as_printed: '-8.93'
+        - sample_name_as_printed: F-14
+          log_C_carbide_as_printed: '-9.03'
+        - sample_name_as_printed: F-15
+          log_C_carbide_as_printed: '-9.40'
+        - sample_name_as_printed: F-16
+          log_C_carbide_as_printed: '-9.39'
+        - sample_name_as_printed: F-17
+          log_C_carbide_as_printed: '-9.34'
+        - sample_name_as_printed: F-18
+          log_C_carbide_as_printed: '-9.41'
+        - sample_name_as_printed: F-19
+          log_C_carbide_as_printed: '-9.48'
+        - sample_name_as_printed: F-20
+          log_C_carbide_as_printed: '-9.59'
+        - sample_name_as_printed: F-21
+          log_C_carbide_as_printed: '-9.49'
+        - sample_name_as_printed: N-1
+          log_C_carbide_as_printed: '-8.56'
+        - sample_name_as_printed: N-2
+          log_C_carbide_as_printed: '-8.66'
+        - sample_name_as_printed: N-3
+          log_C_carbide_as_printed: '-8.56'
+        - sample_name_as_printed: N-4
+          log_C_carbide_as_printed: '-8.63'
+        - sample_name_as_printed: N-5
+          log_C_carbide_as_printed: '-8.61'
+        - sample_name_as_printed: N-6
+          log_C_carbide_as_printed: '-8.60'
+        - sample_name_as_printed: N-7
+          log_C_carbide_as_printed: '-9.07'
+        - sample_name_as_printed: N-8
+          log_C_carbide_as_printed: '-9.03'
+        - sample_name_as_printed: N-9
+          log_C_carbide_as_printed: '-9.10'
+        - sample_name_as_printed: N-10
+          log_C_carbide_as_printed: '-9.13'
+        - sample_name_as_printed: N-11
+          log_C_carbide_as_printed: '-9.22'
+        - sample_name_as_printed: N-12
+          log_C_carbide_as_printed: '-9.22'
+    - observation_id: park-min-figure-1-carbide-capacity
+      type: figure_only
+      locator:
+        figure: '1'
+        page: 2
+        published_page: 224
+        pdf_page_index: 1
+      units: log capacity plotted against the printed x-axis; no plotted values digitised
+      values:
+        quantity_as_published: carbide capacity (log C_C2−)
+        candidate_tokens:
+        - sulfide_capacity
+        - chloride_capacity
+        schema_gap: No carbide-capacity quantity token exists; figure values are deferred and not digitised.
+        axes_as_printed:
+          x: Content of CaF2 (mass%)
+          y: log C_C2−
+        identity:
+          species_as_published: CaO–SiO2–CaF2 slag
+          phase: l
+          phase_role: slag
+          temperature_K_as_printed: '1773'
+        caption: Carbide capacity of the CaO-saturated–SiO2–CaF2 system as a function of CaF2 content at 1 773 K.
+        panel: single panel
+        series:
+        - label: CaO-saturated–SiO2–CaF2, present work
+          marker: filled square
+          marker_count: 5
+          attribution: this study
+        - label: CaO-saturated–Al2O3–CaF2
+          marker: open square
+          marker_count: 6
+          attribution: Park et al. [6]
+        digitisation: deferred to a figure pass
+    - observation_id: park-min-figure-2-carbide-capacity-and-nbo-si
+      type: figure_only
+      locator:
+        figure: '2'
+        page: 3
+        published_page: 225
+        pdf_page_index: 2
+      units: log capacity plotted against the printed x-axis; no plotted values digitised
+      values:
+        quantity_as_published: carbide capacity (log C_C2−)
+        candidate_tokens:
+        - sulfide_capacity
+        - chloride_capacity
+        schema_gap: No carbide-capacity quantity token exists; figure values are deferred and not digitised.
+        axes_as_printed:
+          x: Content of CaF2 (mass%)
+          y_left: log C_C2−
+          y_right: Fraction of [SiO4] tetrahedra with NBO/Si=3+4
+        identity:
+          species_as_published: CaO–SiO2–CaF2 slag saturated with Ca2SiO4
+          phase: l
+          phase_role: slag
+          temperature_K_as_printed: '1773'
+        caption: Dependence of carbide capacity of the CaO–SiO2–CaF2 slag saturated with Ca2SiO4 on the content
+          of CaF2 at 1 773 K.
+        panel: single panel
+        series:
+        - label: Carbide capacity, present work
+          marker: filled square
+          marker_count: 3
+          attribution: this study
+        - label: NBO/Si=3+4
+          marker: open square
+          marker_count: 3
+          attribution: Park et al. [10]
+        digitisation: deferred to a figure pass
+        additional_quantity_without_token: NBO/Si structural-unit fraction
+        additional_quantity_schema_gap: NBO/Si is a printed structural-unit ratio; no matching store token was identified.
+    - observation_id: park-min-figure-3-carbide-capacity
+      type: figure_only
+      locator:
+        figure: '3'
+        page: 3
+        published_page: 225
+        pdf_page_index: 2
+      units: log capacity plotted against the printed x-axis; no plotted values digitised
+      values:
+        quantity_as_published: carbide capacity (log C_C2−)
+        candidate_tokens:
+        - sulfide_capacity
+        - chloride_capacity
+        schema_gap: No carbide-capacity quantity token exists; figure values are deferred and not digitised.
+        axes_as_printed:
+          x: (%CaF2)/(%SiO2) ratio
+          y: log C_C2−
+        identity:
+          species_as_published: CaO–SiO2–CaF2 slags
+          phase: l
+          phase_role: slag
+          temperature_K_as_printed: '1773'
+        caption: Relationship between log C_C2− and (%CaF2)/(%SiO2) ratio at fixed CaO contents in the slags at
+          1 773 K.
+        panel: single panel
+        series:
+        - label: 49.2 mass% CaO
+          marker: filled square
+          marker_count: 4
+          attribution: this study
+        - label: 33.7 mass% CaO
+          marker: open square
+          marker_count: 5
+          attribution: this study
+        digitisation: deferred to a figure pass
+    - observation_id: park-min-figure-4-carbide-capacity
+      type: figure_only
+      locator:
+        figure: '4'
+        page: 3
+        published_page: 225
+        pdf_page_index: 2
+      units: log capacity plotted against the printed x-axis; no plotted values digitised
+      values:
+        quantity_as_published: carbide capacity (log C_C2−)
+        candidate_tokens:
+        - sulfide_capacity
+        - chloride_capacity
+        schema_gap: No carbide-capacity quantity token exists; figure values are deferred and not digitised.
+        axes_as_printed:
+          x: log a_CaO
+          y: log C_C2−
+        identity:
+          species_as_published: CaO–SiO2–CaF2 slags
+          phase: l
+          phase_role: slag
+          temperature_K_as_printed: '1773'
+        caption: Relationship between carbide capacity of the slags containing 49.2 and 33.7% CaO and the activity
+          of CaO at 1 773 K.
+        panel: single panel
+        series:
+        - label: 49.2 mass% CaO
+          marker: filled square
+          marker_count: 5
+          attribution: this study
+        - label: 33.7 mass% CaO
+          marker: open square
+          marker_count: 5
+          attribution: this study
+        digitisation: deferred to a figure pass
+    - observation_id: park-min-figure-5-carbide-capacity
+      type: figure_only
+      locator:
+        figure: '5'
+        page: 4
+        published_page: 226
+        pdf_page_index: 3
+      units: log capacity plotted against the printed x-axis; no plotted values digitised
+      values:
+        quantity_as_published: carbide capacity (log C_C2−)
+        candidate_tokens:
+        - sulfide_capacity
+        - chloride_capacity
+        schema_gap: No carbide-capacity quantity token exists; figure values are deferred and not digitised.
+        axes_as_printed:
+          x: (%CaO)/(%SiO2) or (%CaO)/(%Al2O3)
+          y: log C_C2−
+        identity:
+          species_as_published: CaO–SiO2–30.5 mass% CaF2 and CaO–Al2O3–27.5 mass% CaF2 slags
+          phase: l
+          phase_role: slag
+          temperature_K_as_printed: '1773'
+        caption: Effect of (%CaO)/(%SiO2) ratio on the carbide capacity of the slags at a fixed CaF2 content at
+          1 773 K.
+        panel: single panel
+        series:
+        - label: CaO–SiO2–30.5 mass% CaF2
+          marker: filled square
+          marker_count: not separable in the clustered plotted points
+          attribution: this study
+        - label: CaO–Al2O3–27.5 mass% CaF2
+          marker: open square
+          marker_count: not separable in the clustered plotted points
+          attribution: Park et al. [6]
+        digitisation: deferred to a figure pass
+    - observation_id: park-min-figure-6-carbide-capacity
+      type: figure_only
+      locator:
+        figure: '6'
+        page: 4
+        published_page: 226
+        pdf_page_index: 3
+      units: log capacity plotted against the printed x-axis; no plotted values digitised
+      values:
+        quantity_as_published: carbide capacity (log C_C2−)
+        candidate_tokens:
+        - sulfide_capacity
+        - chloride_capacity
+        schema_gap: No carbide-capacity quantity token exists; figure values are deferred and not digitised.
+        axes_as_printed:
+          x: log a_CaO
+          y: log C_C2−
+        identity:
+          species_as_published: CaO–SiO2–30.5 mass% CaF2 and CaO–Al2O3–27.5 mass% CaF2 slags
+          phase: l
+          phase_role: slag
+          temperature_K_as_printed: '1773'
+        caption: Relationship between the carbide capacity of the slags containing 30.5% CaF2 and the activity of
+          CaO at 1 773 K.
+        panel: single panel
+        series:
+        - label: CaO–SiO2–30.5 mass% CaF2
+          marker: filled square
+          marker_count: not separable in the clustered plotted points
+          attribution: this study
+        - label: CaO–Al2O3–27.5 mass% CaF2
+          marker: open square
+          marker_count: not separable in the clustered plotted points
+          attribution: Park et al. [6]
+        digitisation: deferred to a figure pass
+    - observation_id: park-min-figure-7-iso-carbide-capacity
+      type: figure_only
+      locator:
+        figure: '7'
+        page: 4
+        published_page: 226
+        pdf_page_index: 3
+      units: log capacity plotted against the printed x-axis; no plotted values digitised
+      values:
+        quantity_as_published: carbide capacity (log C_C2−)
+        candidate_tokens:
+        - sulfide_capacity
+        - chloride_capacity
+        schema_gap: No carbide-capacity quantity token exists; figure values are deferred and not digitised.
+        axes_as_printed:
+          x: Content of CaF2 (mass%)
+          y: basicity B
+        identity:
+          species_as_published: CaO–SiO2–CaF2–Na2O slags
+          phase: l
+          phase_role: slag
+          temperature_K_as_printed: '1773'
+        caption: Iso-carbide-capacity line of the CaO- and Ca2SiO4-saturated systems at 1 773 K with basicity B
+          and CaF2 content as dependent parameters.
+        panel: single panel
+        series:
+        - label: log C_carbide = −8.6(±0.1), CaO-saturated system
+          marker: filled square
+          marker_count: not separable in the CaF2/basicity clusters
+          attribution: this study; iso-capacity construction
+        - label: log C_carbide = −9.1(±0.1), Ca2SiO4-saturated system
+          marker: open square
+          marker_count: not separable in the CaF2/basicity clusters
+          attribution: this study; iso-capacity construction
+        digitisation: deferred to a figure pass
+        method_class: model_derived
+    - observation_id: park-min-figure-8-carbide-capacity
+      type: figure_only
+      locator:
+        figure: '8'
+        page: 5
+        published_page: 227
+        pdf_page_index: 4
+      units: log capacity plotted against the printed x-axis; no plotted values digitised
+      values:
+        quantity_as_published: carbide capacity (log C_C2−)
+        candidate_tokens:
+        - sulfide_capacity
+        - chloride_capacity
+        schema_gap: No carbide-capacity quantity token exists; figure values are deferred and not digitised.
+        axes_as_printed:
+          x: B = {(%CaO)+(%Na2O)}/(%SiO2)
+          y: log C_C2−
+        identity:
+          species_as_published: CaO–SiO2–CaF2–Na2O slags
+          phase: l
+          phase_role: slag
+          temperature_K_as_printed: '1773'
+        caption: Carbide capacity of the CaO–SiO2–CaF2–Na2O slags as a function of basicity B at 1 773 K.
+        panel: single panel
+        series:
+        - label: 8 mass% CaF2
+          marker: filled square
+          marker_count: 2
+        - label: 10 mass% CaF2
+          marker: open square
+          marker_count: 2
+        - label: 12 mass% CaF2
+          marker: filled circle
+          marker_count: 2
+        - label: 14 mass% CaF2
+          marker: open circle
+          marker_count: 2
+        - label: 16 mass% CaF2
+          marker: filled triangle
+          marker_count: 2
+        digitisation: deferred to a figure pass
+    - observation_id: park-min-figure-9-carbide-capacity
+      type: figure_only
+      locator:
+        figure: '9'
+        page: 5
+        published_page: 227
+        pdf_page_index: 4
+      units: log capacity plotted against the printed x-axis; no plotted values digitised
+      values:
+        quantity_as_published: carbide capacity (log C_C2−)
+        candidate_tokens:
+        - sulfide_capacity
+        - chloride_capacity
+        schema_gap: No carbide-capacity quantity token exists; figure values are deferred and not digitised.
+        axes_as_printed:
+          x: Optical basicity
+          y: log C_C2−
+        identity:
+          species_as_published: CaO–SiO2–CaF2–Na2O slags; cited CaO–Al2O3–CaF2 data also plotted
+          phase: l
+          phase_role: slag
+          temperature_K_as_printed: '1773'
+        caption: Carbide capacity of the CaO–SiO2–CaF2–Na2O slags as a function of optical basicity at 1 773 K (ΛCaO=1.0,
+          ΛSiO2=0.48, ΛCaF2=0.67, ΛNa2O=1.15, ΛAl2O3=0.61).
+        panel: single panel
+        series:
+        - label: CaO–SiO2–CaF2–Na2O slags
+          marker: filled square
+          marker_count: not separable in the overprinted group
+        - label: CaO–Al2O3–CaF2 slags
+          marker: open square
+          marker_count: not separable in the overprinted group
+          attribution: Park et al. [6]
+        digitisation: deferred to a figure pass
+    - observation_id: park-min-figure-10-carbide-capacity
+      type: figure_only
+      locator:
+        figure: '10'
+        page: 5
+        published_page: 227
+        pdf_page_index: 4
+      units: log capacity plotted against the printed x-axis; no plotted values digitised
+      values:
+        quantity_as_published: carbide capacity (log C_C2−)
+        candidate_tokens:
+        - sulfide_capacity
+        - chloride_capacity
+        schema_gap: No carbide-capacity quantity token exists; figure values are deferred and not digitised.
+        axes_as_printed:
+          x: log a_CaO
+          y: log C_C2−
+        identity:
+          species_as_published: CaO–SiO2–CaF2–Na2O slags; cited CaO–Al2O3–CaF2 data also plotted
+          phase: l
+          phase_role: slag
+          temperature_K_as_printed: '1773'
+        caption: Carbide capacity of the CaO–SiO2–CaF2–Na2O slags as a function of CaO activity at 1 773 K.
+        panel: single panel
+        series:
+        - label: CaO–SiO2–CaF2–Na2O slags
+          marker: filled square
+          marker_count: not separable in the overprinted group
+        - label: CaO–Al2O3–CaF2 slags
+          marker: open square
+          marker_count: not separable in the overprinted group
+          attribution: Park et al. [6]
+        digitisation: deferred to a figure pass
+    - observation_id: park-min-equation-11-carbide-capacity-fit-no-token
+      type: model_fit_without_store_token
+      locator:
+        equation: '11'
+        page: 5
+        published_page: 227
+        pdf_page_index: 4
+      units: dimensionless logarithms
+      candidate_tokens:
+      - sulfide_capacity
+      - chloride_capacity
+      reason: Equation (11) is a regression for carbide capacity and CaO activity; no carbide-capacity or regression
+        token fits it.
+      method_class: model_derived
+      values:
+        equation_as_published: log C_C2− = −8.44 + 0.30 log a_CaO (r² = 0.82)
+        intercept: '-8.44'
+        slope: '0.30'
+        r_squared: '0.82'
+  Na2O:
+    observations:
+    - observation_id: t1-n1-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-1
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-1
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '1.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n2-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-2
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-2
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '0.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n3-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-3
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-3
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '1.7'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n4-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-4
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-4
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '0.8'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n5-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-5
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-5
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '0.9'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n6-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-6
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-6
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '1.1'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n7-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-7
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-7
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '0.7'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n8-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-8
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-8
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '1.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n9-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-9
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-9
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '1.5'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n10-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-10
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-10
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '1.4'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n11-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-11
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-11
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '2.0'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002
+    - observation_id: t1-n12-na2o
+      type: composition_series
+      units: wt.%
+      regime: quench_equilibration
+      experiment: t1-N-12
+      locator: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: slag
+        phase: l
+        basis: wt_percent
+        T_C: '1499.85'
+        sample_name_as_printed: N-12
+        method_class: measured_direct
+        admission_status: admitted
+        component_amount: '1.8'
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: CO atmosphere
+            locator: *id002

@@ -1,0 +1,45 @@
+source_id: feng-2025-fe-si-ca-v-ti-phase-diagrams
+source:
+  citation: "Feng, G., Gao, J., Lan, X., Guo, L. & Guo, Z. (2025), \"Phase Diagrams of ‘FeO’–SiO2–CaO–V2O3–TiO2 System and Phase Transformation of Vanadium-enriched Phases\", ISIJ International 65(12):1850–1859."
+  doi: 10.2355/isijinternational.ISIJINT-2025-086
+extraction:
+  method: mineru_table_draft emit; Table 3 liquid rows only, converted to d-223 component rows
+  date: '2026-10-22'
+  worker: Codex
+review_status: draft
+tables:
+  - page: 5
+    table_index: 1
+    type: gibbs_table
+    quantity: equilibrium_phase_composition
+    unit: mass%
+    evidence_class: measured_direct
+    row_predicate:
+      column: 2
+      equals: Liquid
+    temperature:
+      as_printed: 1400
+      unit: C
+      column_header: Table 3 caption
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1854
+        table: '3'
+    conditions:
+      - key: pO2_Pa
+        state:
+          tag: value
+          value: '1.01325e-5'
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 1854
+          table: '3'
+    published_page: 1854
+    values:
+      - {column: 3, species: FeO, quantity: equilibrium_phase_composition, unit: mass%, evidence_class: measured_direct}
+      - {column: 4, species: SiO2, quantity: equilibrium_phase_composition, unit: mass%, evidence_class: measured_direct}
+      - {column: 5, species: CaO, quantity: equilibrium_phase_composition, unit: mass%, evidence_class: measured_direct}
+      - {column: 6, species: V2O3, quantity: equilibrium_phase_composition, unit: mass%, evidence_class: measured_direct}
+      - {column: 7, species: TiO2, quantity: equilibrium_phase_composition, unit: mass%, evidence_class: measured_direct}

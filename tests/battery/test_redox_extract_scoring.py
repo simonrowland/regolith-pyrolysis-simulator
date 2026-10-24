@@ -1,23 +1,37 @@
+import hashlib
 import json
+import math
 import shutil
 import subprocess
 import sys
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 import simulator.battery.score as score_module
 from simulator.battery.enums import (
+    AmountBasis,
     Authority,
     Engine,
+    MetricOperation,
     NoticeKind,
+    Phase,
+    Quantity,
+    QuenchState,
     Rail,
     RefusalReason,
     ResidualStatus,
 )
-from simulator.battery.migrate import load_yaml, write_outputs
+from simulator.battery.migrate import (
+    Migrator,
+    fe3_fe2_ratio_from_ferric_fraction,
+    fe3_fe2_ratio_from_oxide_wt_pct,
+    load_yaml,
+    write_outputs,
+)
 from simulator.battery.score import (
     ScoreContext,
     comparison_candidates,
@@ -25,9 +39,506 @@ from simulator.battery.score import (
     score_store,
     SCORE_ENGINE_SET,
 )
-from simulator.battery.records import State, Value
+from simulator.battery.records import Composition, Located, Locator, State, Value
 from simulator.battery.score import headline_payload_records, residual_to_plain
 from tests.battery.factories import migrate_one_extract
+
+
+_AITHALA_REDOX_EXPERIMENTS = {
+    "aithala-2026-1800-30",
+    "aithala-2026-1900-30",
+    "aithala-2026-2000-10",
+    "aithala-2026-2000-30",
+    "aithala-2026-2000-120",
+    "aithala-2026-2100-30",
+}
+
+
+def _sossi_aithala_redox_context():
+    root = Path(__file__).resolve().parents[2]
+    source_paths = (
+        root / "data/literature/extracts/sossi-2020-magma-ocean-redox.yaml",
+        root / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml",
+    )
+    migrator = Migrator(root)
+    for path in source_paths:
+        migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+    observations = {
+        observation_id: observation
+        for observation_id, observation in result.observations.items()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value.value == "fe3_fe2_ratio"
+        and (
+            observation.source_id == "sossi-2020-magma-ocean-redox"
+            or (
+                observation.source_id
+                == "aithala-2026-magmatic-iron-redox-to-2100c"
+                and observation.experiment_id.rsplit("::", 1)[-1]
+                in _AITHALA_REDOX_EXPERIMENTS
+            )
+        )
+    }
+    assert len(observations) == 18
+    origins = {
+        observation_id: next(
+            path.name
+            for path in source_paths
+            if observation_id.startswith(f"{path.stem}::")
+        )
+        for observation_id in observations
+    }
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        observations,
+        origins=origins,
+        benches=result.benches,
+    )
+    return context, observations
+
+
+def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    context, observations = _sossi_aithala_redox_context()
+    observation_id = (
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    )
+    observation = observations[observation_id]
+    calls = []
+    original_evaluate_redox = openimcc.evaluate_redox
+
+    def capture_redox_call(*args, **kwargs):
+        calls.append((args, kwargs))
+        return original_evaluate_redox(*args, **kwargs)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_call)
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.refusal_reason is None
+    assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
+    assert prediction.authority is Authority.BRIDGE
+    assert len(calls) == 1
+    args, kwargs = calls[0]
+    assert args[0]["Fe"] > 0.0
+    assert args[0]["Mg"] > 0.0
+    assert args[2] == "imposed"
+    assert args[1] == float(observation.identity.temperature_K.value)
+    assert kwargs["lambda_imposed"] == pytest.approx(
+        float(observation.point_conditions["fO2_log"].state.value) * math.log(10.0),
+        rel=1e-15,
+    )
+    direct = original_evaluate_redox(*args, **kwargs)
+    direct_ratio = direct.ferric_fe_mol / direct.ferrous_fe_mol
+    assert abs(float(prediction.value) / direct_ratio - 1.0) <= 1e-9
+
+    row_context = replace(
+        context,
+        observations={observation_id: observation},
+        origins={observation_id: context.origins[observation_id]},
+    )
+    residuals, _ = score_store(
+        row_context, engines=(Engine.OPENIMCC,), rail=Rail.REDOX
+    )
+    assert len(residuals) == 1
+    assert residuals[0].numeric is not None
+    assert residuals[0].numeric.operation is MetricOperation.DEX
+    assert residuals[0].status is ResidualStatus.NO_BAND
+    assert residuals[0].refusal is not None
+    assert residuals[0].refusal.reason is RefusalReason.DECISION_RULE_MISSING
+
+
+def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    _context, observations = _sossi_aithala_redox_context()
+    results = []
+    original_evaluate_redox = openimcc.evaluate_redox
+
+    def capture_redox_result(*args, **kwargs):
+        result = original_evaluate_redox(*args, **kwargs)
+        results.append(result)
+        return result
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_result)
+    total_flags = 0
+    for observation_id, observation in sorted(observations.items()):
+        calls_before = len(results)
+        prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+        assert prediction.value is not None, (observation_id, prediction.refusal_detail)
+        assert prediction.authority is Authority.BRIDGE
+        assert len(results) == calls_before + 1
+        flags = tuple(results[-1].flags)
+        flag_notices = tuple(
+            notice
+            for notice in prediction.notices
+            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        )
+        assert flags
+        assert tuple(notice.reason for notice in flag_notices) == flags
+        assert all(
+            notice.origin == "openimcc.evaluate_redox"
+            and notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
+            for notice in flag_notices
+        )
+        assert not any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            for notice in prediction.notices
+        )
+        total_flags += len(flags)
+
+    assert len(results) == 18
+    assert total_flags == 130
+
+
+def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
+    pytest.importorskip("openimcc")
+    context, _observations = _sossi_aithala_redox_context()
+    residuals, _ = score_store(
+        context, engines=(Engine.OPENIMCC,), rail=Rail.REDOX
+    )
+    values = [
+        float(residual.numeric.value).hex()
+        for residual in residuals
+        if residual.numeric is not None
+    ]
+    assert len(values) == 18
+    encoded = json.dumps(values, separators=(",", ":"), ensure_ascii=False).encode()
+    # Recorded OpenIMCC pin e1423d82237486f58dc8ffbb1f8c295f54f169c0.
+    # The previous digest 12100581851275f0... was e975edd229b7653ceac5dbac9558d0156e51c2f6.
+    # Measured inputs are unchanged. Two residuals move by one ulp:
+    # aithala_2026_2000_30_xanes 0.01757368426967503 -> 0.01757368426967494
+    # sossi_2020_per_ts2_xanes -0.08377464894838026 -> -0.08377464894838044
+    assert hashlib.sha256(encoded).hexdigest() == (
+        "c79971dce81ac423bf34a04525b3da956a437f83e6dbe1fa601d24c1627b8f44"
+    )
+    for backlog in (
+        score_module.notice_backlog(residuals),
+        score_module.notice_backlog_payloads(
+            [residual_to_plain(residual) for residual in residuals]
+        ),
+    ):
+        assert backlog.get(NoticeKind.SOURCE_DISAGREEMENT.value, 0) == 0
+        assert backlog["engine_model_caveat"] == 130
+        assert backlog["admission_defaulted"] == 18
+        assert backlog["total_iron_reported_as_feo"] == 18
+    assert all(
+        not score_module.flagged_strata(residual.notices) for residual in residuals
+    )
+    assert not any(residual.score_eligible for residual in residuals)
+
+
+def test_openimcc_redox_without_printed_fo2_still_refuses():
+    pytest.importorskip("openimcc")
+    _context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    conditions = dict(observation.point_conditions or {})
+    conditions.pop("fO2_log", None)
+    conditions.pop("fO2_Pa", None)
+    missing_fo2 = replace(
+        observation,
+        point_conditions=conditions,
+        identity=replace(observation.identity, fO2_Pa=None),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, missing_fo2)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "printed_fO2",
+    }
+
+
+def _openimcc_row_with_mass_composition(components):
+    """Sossi redox row with a replacement mass-percent composition."""
+
+    _context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    printed = observation.identity.composition
+    assert printed is not None and printed.is_value
+    composition = Composition(
+        basis=printed.value.basis,
+        components=components,
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+    return replace(
+        observation,
+        identity=replace(observation.identity, composition=State.of(composition)),
+    )
+
+
+def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
+    """Fe3O4 is iron for OpenIMCC and not a Kress FeOt component.
+
+    The merged helper refused ``total_iron`` from the Kress basis before
+    printed fO2 and before ``evaluate_redox``. Offer 20 converts weights,
+    reads printed fO2, then counts Fe atoms. OpenIMCC must not equilibrate.
+    """
+
+    row = _openimcc_row_with_mass_composition(
+        (("SiO2", Decimal("90")), ("Fe3O4", Decimal("10")))
+    )
+
+    def _boom(*_args, **_kwargs):
+        raise AssertionError("OpenIMCC redox must not open or equilibrate a cell")
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _boom,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _boom,
+    )
+    calls = []
+    try:
+        import openimcc
+    except ImportError:
+        openimcc = None
+    else:
+        original_evaluate_redox = openimcc.evaluate_redox
+
+        def capture_redox_call(*args, **kwargs):
+            calls.append((args, kwargs))
+            return original_evaluate_redox(*args, **kwargs)
+
+        monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_call)
+
+    prediction = predict_with_engine(Engine.OPENIMCC, row)
+
+    assert prediction.refusal_detail != {
+        "reason": "missing_input",
+        "input": "total_iron",
+    }
+    if openimcc is None:
+        assert prediction.refusal_reason is RefusalReason.OPENIMCC_NOT_IMPORTABLE
+        return
+    assert calls, prediction.refusal_detail
+    args, kwargs = calls[0]
+    assert args[0].get("Fe", 0.0) > 0.0
+    assert args[2] == "imposed"
+    assert kwargs["lambda_imposed"] == pytest.approx(
+        float(row.point_conditions["fO2_log"].state.value) * math.log(10.0),
+        rel=1e-15,
+    )
+
+
+def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
+    """Silica with no fO2 is a printed-oxygen refusal, not a Kress FeOt refusal."""
+
+    row = _openimcc_row_with_mass_composition((("SiO2", Decimal("100")),))
+    conditions = dict(row.point_conditions or {})
+    conditions.pop("fO2_log", None)
+    conditions.pop("fO2_Pa", None)
+    missing_fo2 = replace(
+        row,
+        point_conditions=conditions,
+        identity=replace(row.identity, fO2_Pa=None),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, missing_fo2)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "printed_fO2",
+    }
+    assert prediction.coefficient_sources == ()
+
+
+def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
+    """Borisov row 4 on OpenIMCC is the train parent's produced ratio.
+
+    ``b1a7c34db`` ``predict_with_engine(OPENIMCC, row4)`` returns this
+    Decimal from ``openimcc.evaluate_redox`` on the printed mole-fraction
+    composition. The row is not a mass-percent stand-in. OpenIMCC must
+    not open or equilibrate a cell. The pack digest is the digest on the
+    result the scorer just stamped, not a host-specific literal.
+    """
+
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    row4 = _borisov_row4()
+
+    def _boom(*_args, **_kwargs):
+        raise AssertionError("OpenIMCC redox must not open or equilibrate a cell")
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _boom,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _boom,
+    )
+    redox_results = []
+    original_evaluate_redox = openimcc.evaluate_redox
+
+    def capture_redox_result(*args, **kwargs):
+        result = original_evaluate_redox(*args, **kwargs)
+        redox_results.append(result)
+        return result
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_result)
+    prediction = predict_with_engine(Engine.OPENIMCC, row4)
+
+    assert prediction.refusal_reason is None
+    assert prediction.value == Decimal("1.6414352204105178")
+    assert prediction.unit == "dimensionless"
+    assert prediction.authority is Authority.BRIDGE
+    assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
+    assert prediction.version == "openimcc-redox"
+    assert len(redox_results) == 1
+    digest = redox_results[0].redox_pack_digest
+    assert len(digest) == 64 and all(char in "0123456789abcdef" for char in digest)
+    assert prediction.coefficient_sources == (
+        f"openimcc-redox-pack:sha256:{digest}",
+    )
+
+
+def test_openimcc_redox_predicts_and_flags_temperature_extrapolation():
+    pytest.importorskip("openimcc")
+    _context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    low_temperature = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            temperature_K=State.of(Decimal("1600")),
+        ),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, low_temperature)
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.authority is Authority.EXTRAPOLATED
+    notice = next(
+        item
+        for item in prediction.notices
+        if item.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert "FeO(l)" in notice.reason
+
+
+def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical():
+    context, _observations = _sossi_aithala_redox_context()
+    residuals, _ = score_store(
+        context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
+    )
+    encoded = json.dumps(
+        [residual_to_plain(residual) for residual in residuals],
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode()
+
+    # Combined-base pin. The payload still includes t-1279's six joined-Aithala
+    # FeOT notices. Quench4 adds quench_state not_stated and the glass-to-melt
+    # identity compare, so the identity_equal conjunct passes. Printed
+    # uncertainty with an unmapped unit is printed_uncertainty_unit_unmapped
+    # and carries the source unit text.
+    # b-979 / d-053: source_relation on all 18 residuals moves from
+    # independent to unknown. Kress attribution stays UNKNOWN unless both
+    # walks are complete. No numeric field moved.
+    assert hashlib.sha256(encoded).hexdigest() == (
+        "08afbc44bd2416437d91f351d908e4f02a30c507804f147e1d7f8aaad390ef19"
+    )
+
+
+def _assert_kress91_citation_is_unknown(residuals, observations) -> None:
+    """Every Borisov redox residual is UNKNOWN, and the dex pins stay put.
+
+    Kress & Carmichael 1991 is not a registered work. regolith-main is
+    registering it under kc91-1022, and these source-relation pins are
+    re-pinned once that work lands. The numeric predictions are the
+    previous attribution split: calibration overlap versus the other
+    printed sources. That split is no longer the source relation.
+    """
+
+    assert len(residuals) == 435
+    assert all(
+        residual.source_relation is score_module.SourceRelation.UNKNOWN
+        for residual in residuals
+    )
+    assert all(not residual.score_eligible for residual in residuals)
+    overlap_all: list[Decimal] = []
+    held_all: list[Decimal] = []
+    overlap_admitted: list[Decimal] = []
+    held_admitted: list[Decimal] = []
+    for residual in residuals:
+        observation = observations[residual.reference]
+        overlap = score_module._kc91_calibration_source_overlap(
+            observation.evidence.attribution
+        )
+        assert residual.numeric is not None
+        value = residual.numeric.value
+        (overlap_all if overlap else held_all).append(value)
+        if score_module._headline_payload_admits(
+            residual_to_plain(residual), tier="measured"
+        ):
+            (overlap_admitted if overlap else held_admitted).append(value)
+    assert (len(overlap_all), len(held_all)) == (223, 212)
+    assert (len(overlap_admitted), len(held_admitted)) == (213, 212)
+    assert Decimal(str(score_module._rms(overlap_all))).quantize(
+        Decimal("0.00001")
+    ) == Decimal("0.11250")
+    assert abs(
+        score_module._rms(overlap_admitted)
+        - Decimal("0.1126289501574099044023575236")
+    ) < Decimal("0.00001")
+    assert abs(
+        score_module._median(overlap_admitted) - Decimal("-0.04086499066062312")
+    ) < Decimal("0.00001")
+    assert abs(
+        score_module._rms(held_admitted) - Decimal("0.10468")
+    ) < Decimal("0.00001")
+    assert abs(
+        score_module._median(held_admitted) - Decimal("-0.01574")
+    ) < Decimal("0.00001")
+
+
+def _assert_unknown_redox_headline(records) -> None:
+    """The redox headline is one UNKNOWN row, not the retired split."""
+
+    retired = {
+        "calibration_source_overlap_fit_fidelity",
+        "independent_source_accuracy",
+    }
+    redox = [
+        record
+        for record in records
+        if record.get("rail") == Rail.REDOX.value
+        and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+    ]
+    assert not any(record.get("population") in retired for record in redox)
+    measured = [
+        record
+        for record in redox
+        if record.get("tier") == "measured"
+        and record.get("source_relation") == "unknown"
+    ]
+    assert len(measured) == 1
+    row = measured[0]
+    assert "population" not in row
+    assert (row["n_candidates"], row["n"]) == (425, 425)
+    assert row["n_score_eligible"] == 0
 
 
 def test_borisov_2018_rows_reach_redox_scoring_population():
@@ -87,6 +598,43 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert abs(prediction155.value - Decimal("3.277000246")) < Decimal("1e-9")
     assert prediction4.refusal_reason is None
     assert prediction155.refusal_reason is None
+
+    glass_row = replace(
+        row4,
+        observation_id="borisov_2018_glass_fe3_fe2_fixture",
+        identity=replace(
+            row4.identity,
+            species=replace(row4.identity.species, phase=Phase.GLASS),
+        ),
+        point_conditions={
+            **(row4.point_conditions or {}),
+            "quench_state": Located(
+                State.of(QuenchState.ASSERTED_PRESERVED),
+                locator=row4.locator or Locator(page=2),
+            ),
+        },
+    )
+    glass_context = replace(
+        context,
+        observations={glass_row.observation_id: glass_row},
+        origins={glass_row.observation_id: extract.name},
+    )
+    glass_residuals, glass_candidates = score_store(
+        glass_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    assert len(glass_residuals) == 1
+    glass_residual = glass_residuals[0]
+    assert glass_residual.numeric is not None
+    assert glass_residual.refusal is None
+    assert glass_residual.quench_state is QuenchState.ASSERTED_PRESERVED
+    assert glass_residual.candidate in glass_candidates
+    assert (
+        glass_candidates[glass_residual.candidate].identity.species.phase.value
+        is Phase.L
+    )
+
     out_of_band_source = next(
         row for row in source_rows if float(row["values"]["T_C"]) > 1630.0
     )
@@ -118,7 +666,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         "input": "printed_fO2",
     }
 
-    unsupported = predict_with_engine(Engine.ALPHAMELTS, row4)
+    unsupported = predict_with_engine(Engine.MAGEMIN, row4)
     assert unsupported.value is None
     assert unsupported.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
 
@@ -127,28 +675,23 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         engines=(Engine.INTERNAL_ANALYTICAL,),
         rail=Rail.REDOX,
     )
-    relation_counts = {
-        relation.value: sum(residual.source_relation is relation for residual in residuals)
-        for relation in (score_module.SourceRelation.TRAINING, score_module.SourceRelation.INDEPENDENT)
-    }
-    assert relation_counts == {"training": 223, "independent": 212}
+    # Kress & Carmichael 1991 is not a registered work. regolith-main is
+    # registering it under kc91-1022, and these pins are re-pinned once it lands.
+    _assert_kress91_citation_is_unknown(residuals, result.observations)
     measured_rows = score_module.measured_engine_rail_records(
         [residual_to_plain(residual) for residual in residuals],
         context=context,
         engines=(Engine.INTERNAL_ANALYTICAL,),
     )
-    measured_training = next(
+    measured_unknown = next(
         row for row in measured_rows
         if row.get("rail") == Rail.REDOX.value
-        and row.get("source_relation") == "training"
+        and row.get("source_relation") == "unknown"
         and row.get("candidates")
     )
-    assert measured_training["population"] == "calibration_source_overlap_fit_fidelity"
-    assert (measured_training["candidates"], measured_training["numeric"]) == (223, 223)
-    assert (measured_training["certified_numeric"], measured_training["flagged_numeric"]) == (213, 10)
-    assert Decimal(measured_training["metrics"][0]["all_numeric"]["rms"]).quantize(
-        Decimal("0.00001")
-    ) == Decimal("0.11250")
+    assert "population" not in measured_unknown
+    assert (measured_unknown["candidates"], measured_unknown["numeric"]) == (435, 435)
+    assert (measured_unknown["certified_numeric"], measured_unknown["flagged_numeric"]) == (425, 10)
     assert len(residuals) == 435
     assert all(residual.numeric is not None for residual in residuals)
     assert all(residual.status is not ResidualStatus.REFUSED for residual in residuals)
@@ -189,7 +732,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert zero_residuals[0].refusal.reason is RefusalReason.METRIC_DOMAIN
 
 
-def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_path):
+def test_borisov_redox_headline_is_unknown_pending_kc91_registration(tmp_path):
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
     migrator = migrate_one_extract(root, extract)
@@ -207,48 +750,16 @@ def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_pat
         engines=(Engine.INTERNAL_ANALYTICAL,),
         rail=Rail.REDOX,
     )
+    # Kress & Carmichael 1991 is not a registered work. regolith-main is
+    # registering it under kc91-1022, and these pins are re-pinned once it lands.
+    _assert_kress91_citation_is_unknown(residuals, result.observations)
     records = headline_payload_records(
         [residual_to_plain(residual) for residual in residuals],
         engines=(Engine.INTERNAL_ANALYTICAL,),
         observations=result.observations,
         origins={key: extract.name for key in result.observations},
     )
-    split = {
-        record["population"]: record
-        for record in records
-        if record.get("rail") == Rail.REDOX.value
-        and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-        and record.get("population")
-    }
-    assert set(split) == {
-        "calibration_source_overlap_fit_fidelity",
-        "independent_source_accuracy",
-    }
-    assert split["calibration_source_overlap_fit_fidelity"]["n"] == 213
-    assert split["independent_source_accuracy"]["n"] == 212
-    assert abs(
-        Decimal(split["calibration_source_overlap_fit_fidelity"]["rms_dex"])
-        - Decimal("0.1126289501574099044023575236")
-    ) < Decimal("0.00001")
-    assert abs(
-        Decimal(split["calibration_source_overlap_fit_fidelity"]["median_dex"])
-        - Decimal("-0.04086499066062312")
-    ) < Decimal("0.00001")
-    assert abs(
-        Decimal(split["independent_source_accuracy"]["rms_dex"])
-        - Decimal("0.10468")
-    ) < Decimal("0.00001")
-    assert abs(
-        Decimal(split["independent_source_accuracy"]["median_dex"])
-        - Decimal("-0.01574")
-    ) < Decimal("0.00001")
-    assert not any(
-        record.get("tier") == "measured"
-        and record.get("rail") == Rail.REDOX.value
-        and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-        and not record.get("population")
-        for record in records
-    )
+    _assert_unknown_redox_headline(records)
 
     object_records = score_module.headline_records(
         residuals,
@@ -262,25 +773,7 @@ def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_pat
         accumulator.add(score_module.residual_to_plain(residual))
     accumulator_records = accumulator.headline_records()
     for headline in (object_records, accumulator_records):
-        split = {
-            record["population"]: record
-            for record in headline
-            if record.get("tier") == "measured"
-            and record.get("rail") == Rail.REDOX.value
-            and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-            and record.get("population")
-        }
-        assert split["calibration_source_overlap_fit_fidelity"]["n"] == 213
-        assert split["independent_source_accuracy"]["n"] == 212
-        assert split["calibration_source_overlap_fit_fidelity"]["source_relation"] == "training"
-        assert split["independent_source_accuracy"]["source_relation"] == "independent"
-        assert not any(
-            record.get("rail") == Rail.REDOX.value
-            and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-            and record.get("tier") == "measured"
-            and not record.get("population")
-            for record in headline
-        )
+        _assert_unknown_redox_headline(headline)
 
     fixture_extract = tmp_path / "data/literature/extracts" / extract.name
     fixture_extract.parent.mkdir(parents=True)
@@ -326,42 +819,26 @@ def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_pat
     summary = json.loads(
         (tmp_path / "data/battery/score-summary.json").read_text(encoding="utf-8")
     )
-    production_rows = {
-        row["population"]: row
-        for row in summary["records"]
-        if row.get("tier") == "measured"
-        and row.get("rail") == Rail.REDOX.value
-        and row.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-        and row.get("population")
-    }
-    assert production_rows["calibration_source_overlap_fit_fidelity"]["n"] == 213
-    assert production_rows["independent_source_accuracy"]["n"] == 212
-    assert production_rows["calibration_source_overlap_fit_fidelity"]["source_relation"] == "training"
-    assert production_rows["independent_source_accuracy"]["source_relation"] == "independent"
-    assert abs(
-        Decimal(production_rows["calibration_source_overlap_fit_fidelity"]["rms_dex"])
-        - Decimal("0.1126289501574099044023575236")
-    ) < Decimal("0.00001")
-    assert abs(
-        Decimal(production_rows["independent_source_accuracy"]["rms_dex"])
-        - Decimal("0.10468")
-    ) < Decimal("0.00001")
+    _assert_unknown_redox_headline(summary["records"])
     report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
-    report_rows = {
-        parts[2]: parts
+    retired = (
+        "calibration_source_overlap_fit_fidelity",
+        "independent_source_accuracy",
+    )
+    assert not any(
+        population in line
         for line in report.splitlines()
-        if line.startswith("| redox | internal-analytical | ")
-        if (parts := [part.strip() for part in line.strip("|").split("|")])
-        and len(parts) == 15
-    }
-    fit_row = report_rows["calibration_source_overlap_fit_fidelity"]
-    independent_row = report_rows["independent_source_accuracy"]
-    assert fit_row[3] == fit_row[5] == "213"
-    assert independent_row[3] == independent_row[5] == "212"
-    assert abs(
-        Decimal(fit_row[8]) - Decimal("0.1126289501574099044023575236")
-    ) < Decimal("0.00001")
-    assert abs(Decimal(independent_row[8]) - Decimal("0.10468")) < Decimal("0.00001")
+        if line.startswith("| redox |")
+        for population in retired
+    )
+    fit_row = next(
+        [part.strip() for part in line.strip("|").split("|")]
+        for line in report.splitlines()
+        if line.startswith("| redox | internal-analytical | unknown |")
+    )
+    assert fit_row[2] == "unknown"
+    assert fit_row[3] == fit_row[5] == "425"
+    assert fit_row[6] == "0"
 
     measured_completed = subprocess.run(
         [
@@ -386,22 +863,35 @@ def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_pat
     measured_summary = json.loads(
         (tmp_path / "data/battery/score-summary.json").read_text(encoding="utf-8")
     )
-    measured_training = next(
+    measured_unknown = next(
         row for row in measured_summary["records"]
         if row.get("rail") == Rail.REDOX.value
         and row.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-        and row.get("source_relation") == "training"
+        and row.get("source_relation") == "unknown"
         and row.get("candidates")
     )
-    assert measured_training["population"] == "calibration_source_overlap_fit_fidelity"
-    assert (measured_training["candidates"], measured_training["certified_numeric"]) == (223, 213)
+    assert "population" not in measured_unknown
+    assert (measured_unknown["candidates"], measured_unknown["numeric"]) == (435, 435)
+    assert (measured_unknown["certified_numeric"], measured_unknown["flagged_numeric"]) == (425, 10)
     measured_report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
+    assert not any(
+        population in line
+        for line in measured_report.splitlines()
+        if line.startswith("| redox |")
+        for population in (
+            "calibration_source_overlap_fit_fidelity",
+            "independent_source_accuracy",
+        )
+    )
     measured_fit = next(
         [part.strip() for part in line.strip("|").split("|")]
         for line in measured_report.splitlines()
-        if line.startswith("| redox | dex / dex | internal-analytical | calibration_source_overlap_fit_fidelity |")
+        if line.startswith("| redox | dex / dex | internal-analytical | unknown |")
     )
-    assert measured_fit[3] == "calibration_source_overlap_fit_fidelity"
+    assert measured_fit[3] == "unknown"
+    assert measured_fit[4] == measured_fit[5] == "435"
+    assert measured_fit[6] == "425"
+    assert measured_fit[7] == "10"
 
 
 def test_kress91_redox_flags_oxide_outside_its_converter_domain():
@@ -521,7 +1011,7 @@ def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, 
     assert residuals[0].refusal.reason is RefusalReason.IDENTITY_MISMATCH
 
 
-def test_existing_sixteen_redox_rows_are_refused_for_unprinted_composition():
+def test_aithala_redox_rows_score_only_when_composition_is_printed():
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
     migrator = migrate_one_extract(root, extract)
@@ -534,6 +1024,13 @@ def test_existing_sixteen_redox_rows_are_refused_for_unprinted_composition():
         and row.identity.quantity.value.value == "fe3_fe2_ratio"
     ]
     assert len(redox_rows) == 16
+    projected_ids = {
+        row.observation_id
+        for row in redox_rows
+        if row.experiment_id.rsplit("::", 1)[-1]
+        in _AITHALA_REDOX_EXPERIMENTS
+    }
+    assert len(projected_ids) == 6
     context = ScoreContext(
         result.works,
         result.experiments,
@@ -544,16 +1041,310 @@ def test_existing_sixteen_redox_rows_are_refused_for_unprinted_composition():
     residuals, _ = score_store(context, engines=SCORE_ENGINE_SET, rail=Rail.REDOX)
     assert len(residuals) == 16 * len(SCORE_ENGINE_SET)
     for residual in residuals:
-        assert residual.numeric is None
-        assert residual.refusal is not None
-        if residual.key.endswith("internal-analytical"):
-            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+        observation_id = residual.key.split(":T=", 1)[0]
+        engine = residual.key.rsplit("::", 1)[-1]
+        if observation_id in projected_ids and engine in {
+            "internal-analytical",
+            "openimcc",
+        }:
+            assert residual.numeric is not None
+            assert residual.refusal is not None
+            assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+        elif observation_id in projected_ids and engine in {
+            "alphamelts",
+            "thermoengine",
+        }:
+            # Composition is printed, so these engines attempt a ferric split.
+            # The unsupported-engine refusal is the one from before that path.
+            if (
+                residual.refusal is not None
+                and residual.refusal.reason
+                is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
+            ):
+                assert residual.refusal.detail.get("detail") != (
+                    "no fixed-T/fO2/composition ferric output without "
+                    "phase-equilibrium execution"
+                )
+        elif engine in {
+            "internal-analytical",
+            "openimcc",
+            "alphamelts",
+            "thermoengine",
+        }:
+            assert residual.numeric is None
+            assert residual.refusal is not None
             assert residual.refusal.detail == {
                 "reason": "missing_input",
                 "input": "composition",
             }
+            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
         else:
+            assert residual.numeric is None
+            assert residual.refusal is not None
             assert (
                 residual.refusal.reason
                 is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
             )
+
+
+def _borisov_row4():
+    root = Path(__file__).resolve().parents[2]
+    extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
+    migrator = migrate_one_extract(root, extract)
+    migrator.finalize()
+    return next(
+        row
+        for row in migrator.result.observations.values()
+        if row.observation_id.endswith("borisov_2018_table2_row_4")
+    )
+
+
+def _without_printed_fo2(observation):
+    conditions = dict(observation.point_conditions or {})
+    conditions.pop("fO2_log", None)
+    conditions.pop("fO2_Pa", None)
+    return replace(
+        observation,
+        point_conditions=conditions,
+        identity=replace(observation.identity, fO2_Pa=None),
+    )
+
+
+def _patch_melts_cell(monkeypatch, cell_for):
+    calls = []
+
+    def _open(name):
+        return SimpleNamespace(
+            name=name,
+            available=True,
+            unavailable_reason=None,
+            backend=object(),
+            supports_intrinsic_fo2=(name == "thermoengine"),
+        )
+
+    def _cell(handle, pot, **kwargs):
+        calls.append({"handle": handle, "pot": pot, **kwargs})
+        return cell_for(handle)
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    return calls
+
+
+def _ok_cell(**fields):
+    payload = {
+        "status": "ok",
+        "refusal_reason": None,
+        "hostname": "test",
+        "exit_code": 0,
+        "exit_signal": None,
+        "model_id": None,
+        "notices": [],
+        "authority": None,
+        "certified_band": None,
+        "liquid_composition_wt_pct": {},
+        "fe_redox_split": {},
+    }
+    payload.update(fields)
+    return SimpleNamespace(**payload)
+
+
+def test_melts_fe_redox_uses_recorded_engine_oxide_weights(monkeypatch):
+    """9 wt% FeO and 1 wt% Fe2O3 is the recorded ThermoEngine split shape.
+
+    The battery ratio is the production oxide-weight converter. Split weights
+    win over a different liquid pair and over Fe3Fet_Liq.
+    """
+
+    row4 = _borisov_row4()
+    expected = fe3_fe2_ratio_from_oxide_wt_pct(Decimal("1.0"), Decimal("9.0"))
+    assert expected is not None
+    other_liquid = fe3_fe2_ratio_from_oxide_wt_pct(Decimal("1.0"), Decimal("100.0"))
+    other_fraction = fe3_fe2_ratio_from_ferric_fraction(Decimal("0.9"))
+    assert expected != other_liquid
+    assert expected != other_fraction
+
+    def cell_for(handle):
+        if handle.name == "thermoengine":
+            return _ok_cell(
+                fe_redox_split={
+                    "FeO_wt_pct": 9.0,
+                    "Fe2O3_wt_pct": 1.0,
+                    "Fe3Fet_Liq": 0.9,
+                },
+                liquid_composition_wt_pct={"FeO": 100.0, "Fe2O3": 1.0},
+            )
+        return _ok_cell(
+            liquid_composition_wt_pct={"SiO2": 50.0, "FeO": 9.0, "Fe2O3": 1.0},
+        )
+
+    calls = _patch_melts_cell(monkeypatch, cell_for)
+    printed = score_module._printed_fe_redox_fo2_log(row4, row4.identity)
+    assert printed is not None
+    for engine in (Engine.THERMOENGINE, Engine.ALPHAMELTS):
+        prediction = predict_with_engine(engine, row4, isolated=False)
+        assert prediction.value == expected
+        assert prediction.refusal_reason is None
+        assert prediction.unit == "dimensionless"
+        assert prediction.coefficient_sources == (engine.value,)
+    assert len(calls) == 2
+    for call in calls:
+        assert call["qualification"] is False
+        assert call["physical_pressure_bar"] == pytest.approx(1.01325)
+        assert call["po2"].mode == "commanded"
+        assert call["po2"].po2_bar == pytest.approx(10 ** float(printed))
+
+
+def test_melts_fe_redox_uses_ferric_fraction_only_without_weights(monkeypatch):
+    row4 = _borisov_row4()
+    calls = _patch_melts_cell(
+        monkeypatch,
+        lambda _handle: _ok_cell(fe_redox_split={"Fe3Fet_Liq": 0.5}),
+    )
+    prediction = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)
+    assert prediction.value == fe3_fe2_ratio_from_ferric_fraction(Decimal("0.5"))
+    assert prediction.value == Decimal(1)
+    assert len(calls) == 1
+
+
+def test_melts_fe_redox_nonpositive_weights_do_not_fall_through(monkeypatch):
+    row4 = _borisov_row4()
+    _patch_melts_cell(
+        monkeypatch,
+        lambda _handle: _ok_cell(
+            fe_redox_split={
+                "FeO_wt_pct": 0.0,
+                "Fe2O3_wt_pct": 1.0,
+                "Fe3Fet_Liq": 0.5,
+            }
+        ),
+    )
+    prediction = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail == {
+        "reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite",
+    }
+
+
+def test_melts_fe_redox_without_a_split_stays_refused(monkeypatch):
+    row4 = _borisov_row4()
+    _patch_melts_cell(monkeypatch, lambda _handle: _ok_cell())
+    prediction = predict_with_engine(Engine.ALPHAMELTS, row4, isolated=False)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
+
+
+def test_melts_fe_redox_honours_intrinsic_fo2_and_requires_printed_otherwise(monkeypatch):
+    row4 = _without_printed_fo2(_borisov_row4())
+    calls = _patch_melts_cell(
+        monkeypatch,
+        lambda _handle: _ok_cell(
+            liquid_composition_wt_pct={"FeO": 9.0, "Fe2O3": 1.0},
+        ),
+    )
+    alphamelts = predict_with_engine(Engine.ALPHAMELTS, row4, isolated=False)
+    assert alphamelts.value is None
+    assert alphamelts.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert alphamelts.refusal_detail == {
+        "reason": "missing_input",
+        "input": "printed_fO2",
+    }
+    assert calls == []
+
+    thermoengine = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)
+    assert thermoengine.value == fe3_fe2_ratio_from_oxide_wt_pct(
+        Decimal("1.0"), Decimal("9.0")
+    )
+    assert thermoengine.identity is not None
+    assert thermoengine.identity.fO2_Pa is None
+    assert len(calls) == 1
+    assert calls[0]["po2"].mode == "engine_default"
+    assert calls[0]["po2"].po2_bar is None
+    assert calls[0]["physical_pressure_bar"] == pytest.approx(1.01325)
+
+
+def test_melts_fe_redox_commissioning_notice_is_the_only_extrapolated_flag(monkeypatch):
+    row4 = _borisov_row4()
+    _patch_melts_cell(
+        monkeypatch,
+        lambda _handle: _ok_cell(
+            fe_redox_split={"FeO_wt_pct": 9.0, "Fe2O3_wt_pct": 1.0},
+            authority="extrapolated",
+            certified_band={"temperature_K": [1473.15, 1903.15]},
+            notices=[
+                {
+                    "kind": "out_of_certified_band",
+                    "authority": "extrapolated",
+                    "reason": "melts above the certified band",
+                    "certified_band": {"temperature_K": [1473.15, 1903.15]},
+                }
+            ],
+        ),
+    )
+    prediction = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)
+    assert prediction.value is not None
+    assert prediction.authority is Authority.EXTRAPOLATED
+    extrapolated = [
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    ]
+    assert len(extrapolated) == 1
+    assert len(prediction.notices) == 1
+
+
+def test_melts_fe_redox_timeout_is_attempted_unavailable(monkeypatch):
+    row4 = _borisov_row4()
+    _patch_melts_cell(
+        monkeypatch,
+        lambda _handle: _ok_cell(
+            status="refusal",
+            refusal_reason="engine_timeout",
+            engine_reason="equilibrate exceeded hard timeout",
+        ),
+    )
+    prediction = predict_with_engine(Engine.ALPHAMELTS, row4, isolated=False)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["refusal_reason"] == "engine_timeout"
+
+
+def test_engines_without_a_ferric_split_do_not_equilibrate(monkeypatch):
+    row4 = _borisov_row4()
+
+    def _boom(*_args, **_kwargs):
+        raise AssertionError("fe redox must not open or equilibrate this engine")
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _boom,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _boom,
+    )
+    for engine in (Engine.MAGEMIN, Engine.VAPOROCK):
+        prediction = predict_with_engine(engine, row4)
+        assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
+        assert prediction.coefficient_sources == (
+            "Kress and Carmichael 1991, doi:10.1007/BF00307328",
+        )
+        assert prediction.refusal_detail == {
+            "reason": "engine_does_not_report_fe_redox",
+            "engine": engine.value,
+            "detail": (
+                "no fixed-T/fO2/composition ferric output without "
+                "phase-equilibrium execution"
+            ),
+        }
+    kress = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row4)
+    assert kress.refusal_reason is None
+    assert kress.value is not None

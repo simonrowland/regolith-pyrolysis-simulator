@@ -6521,6 +6521,19 @@ observations:
     section: 6 Conclusions
     note: pdf_page=25
   read_from: pdf:wimpenny-2019-zn-isotope-evaporation-extreme-t
+  derivation:
+    relation: Rayleigh isotope-fractionation reduction from measured Zn isotope ratios and Zn remaining fraction
+    inputs: []
+    parameters: []
+    output_unit: dimensionless alpha
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        published_page: 24
+        section: 6 Conclusions
+        note: pdf_page=25
 - observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_zn_kinetic_theory_and_pressure_model
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
