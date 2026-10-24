@@ -407,13 +407,22 @@ species:
       uncertainty:
         note: authors print 'around 1.37 %'; they then say the comparison to 1.05 % would be invalid because
           the model is closed-system equilibrium
+      point_conditions:
+        total_pressure_Pa:
+          state: {tag: value, value: 1000}
+          locator:
+            published_page: 11
+            pdf_page_index: 12
+            section: '4.3'
+            note: HSC thermodynamic simulation at 10 mbar; normalized from the printed pressure
       values:
         quantity: equilibrium_molecular_oxygen_yield
-        method_class: quoted_attributed
+        method_class: model_derived
         attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
-        admission_status: model_output_not_measurement
+        admission_status: admitted
         gas_species: O2
         mass_yield_percent_about: 1.37
+        approximate: true
         T_C: 1800
         P_mbar_as_printed: 10
         code: HSC Chemistry version 10

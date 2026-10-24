@@ -13120,6 +13120,7 @@ def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -
         for o in result.observations.values()
         if o.source_id == "kems-044-robinot-2026"
         and quantity_token(o.identity) in {Quantity.YIELD_FRACTION, Quantity.O2_YIELD}
+        and "hsc_expected_1p37_model" not in o.observation_id
     ]
     tokens = {quantity_token(o.identity) for o in robinot}
     assert Quantity.YIELD_FRACTION in tokens
@@ -13153,6 +13154,8 @@ def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -
     cardiff_vals = {float(o.value.point) for o in cardiff}
     assert 0.101 in cardiff_vals
     assert 0.16 in cardiff_vals
+
+
     assert 0.37 in cardiff_vals
     matchett = [
         o
@@ -13178,6 +13181,30 @@ def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -
         }
     }
     assert not forbidden
+
+
+def test_robinot_hsc_model_yield_maps_with_printed_conditions() -> None:
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/kems-044-robinot-2026.yaml"
+    )
+    observation = next(
+        row
+        for row in migrator.result.observations.values()
+        if "hsc_expected_1p37_model" in row.observation_id
+    )
+
+    assert quantity_token(observation.identity) is Quantity.YIELD_FRACTION
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.0137")
+    assert observation.value.approximate is True
+    assert observation.identity.temperature_K.value == Decimal("2073.15")
+    pressure = observation.point_conditions["total_pressure_Pa"]
+    assert pressure.state.value == Decimal("1000")
+    assert pressure.locator.published_page == 11
+    assert observation.identity.species.formula == "O2"
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert observation.admission.status is AdmissionStatus.ADMITTED
 
 
 def test_robinot_peak_about_is_not_invented_as_point_t(tmp_path: Path) -> None:

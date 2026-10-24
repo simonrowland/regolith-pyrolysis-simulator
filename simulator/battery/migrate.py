@@ -493,6 +493,7 @@ QUANTITY_ALIASES = {
     "evaporation_coefficient_gamma_equals_alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "evaporation_coefficient_gamma_Si": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "o2_yield": Quantity.O2_YIELD,
+    "equilibrium_molecular_oxygen_yield": Quantity.YIELD_FRACTION,
     "mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
     "assembly_mass_loss_relative_to_initial_mass": Quantity.MASS_LOSS_FRACTION,
     "bulk_mass_loss_wt_pct": Quantity.MASS_LOSS_FRACTION,
@@ -5874,7 +5875,7 @@ def _rekey_ordinal_point_observation_id(
 
 def _percent_named_fraction_field(key: str, units: str | None) -> bool:
     lowered = str(key or "").strip().lower()
-    if lowered.endswith(("_pct", "_percent", "_wt_pct")):
+    if lowered.endswith(("_pct", "_percent", "_wt_pct", "_percent_about")):
         return True
     unit = str(units or "").strip().lower().replace(" ", "")
     return unit in _PERCENT_FRACTION_UNITS
@@ -8680,6 +8681,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.YIELD_FRACTION: (
         "yield_fraction",
         "mass_yield_percent",
+        "mass_yield_percent_about",
     ),
     Quantity.EVOLVED_GAS_YIELD: ("yield_ug_g",),
     Quantity.INTERACTION_PARAMETER: ("wagner_interaction_parameter", "epsilon"),
