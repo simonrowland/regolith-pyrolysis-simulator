@@ -14131,13 +14131,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'vapour_rail_catalog',
         }
         memo = {id(self): self if state_receiver is None else state_receiver}
-        if state_receiver is not None and 'feedstocks' in self.__dict__:
-            # The read-only pressure projection never loads or edits feedstock
-            # inputs. Share that large table and its aliases instead of copying
-            # every feedstock on each residual evaluation. Whole-hour rollback
+        if state_receiver is not None:
+            # Pressure trials read these run inputs without editing them. The
+            # tables share source/provenance objects: preserving just one root
+            # lets another table copy the same graph on every residual call.
+            # Share all three roots and their aliases. Whole-hour rollback
             # retains its original detached mutable-input contract.
-            preserved_names.add('feedstocks')
-            memo[id(self.feedstocks)] = self.feedstocks
+            for name in ('feedstocks', 'vapor_pressure_catalog_data', 'vapor_pressures'):
+                if name in self.__dict__:
+                    preserved_names.add(name)
+                    memo[id(self.__dict__[name])] = self.__dict__[name]
         record = getattr(self, 'record', None)
         record_snapshots = getattr(record, 'snapshots', None)
         if (
