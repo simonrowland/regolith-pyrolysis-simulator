@@ -307,16 +307,27 @@ def fix(issues: list[AuditIssue]) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--fix", action="store_true")
+    parser.add_argument(
+        "--refresh",
+        "--fix",
+        dest="refresh",
+        action="store_true",
+        help="rewrite stale line hints from resolved symbol spans",
+    )
     parser.add_argument("--tolerance", type=int, default=DEFAULT_TOLERANCE)
     args = parser.parse_args(argv)
 
     issues, anchor_count = audit(tolerance=args.tolerance)
-    if args.fix:
+    if args.refresh:
         fixed = fix(issues)
         if fixed:
             issues, anchor_count = audit(tolerance=args.tolerance)
-        print(f"doc anchor audit: fixed {fixed} drifted line hint(s)")
+        print(f"doc anchor audit: refreshed {fixed} drifted line hint(s)")
+    elif any(issue.corrected_line is not None for issue in issues):
+        print(
+            "Refresh stale line hints with: "
+            "python3 scripts/audit_doc_anchors.py --refresh"
+        )
 
     if issues:
         print(f"doc anchor audit: FAIL ({len(issues)} issue(s), {anchor_count} anchor(s))")
