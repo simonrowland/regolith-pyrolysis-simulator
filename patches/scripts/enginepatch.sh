@@ -70,7 +70,11 @@ engine_fallback() {
   esac
 }
 
-report_path() { printf '%q' "$1"; }
+# Reports are line-oriented; paths containing newlines are out of scope.
+report_path() {
+  local s=${1//\'/\'\\\'\'}
+  printf "'%s'" "$s"
+}
 
 pin_checkout() {
   local e="$1" raw parent base top
@@ -358,10 +362,10 @@ cmd_verify() {
     fi
     if ! validate_checkout "$e"; then
       if [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "fallback" ]; then
-        echo "$e: NOT-LOADED ($PYTHON) RESOLUTION=fallback FALLBACK=$CHECKOUT_STATUS RESOLVED=$(report_path "${RESOLVED_PATH:-unresolved}")"
+        echo "$e: NOT-LOADED PYTHON=$(report_path "$PYTHON") RESOLUTION=fallback FALLBACK=$CHECKOUT_STATUS RESOLVED=$(report_path "${RESOLVED_PATH:-unresolved}")"
         rc=1
       elif [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "not-loaded" ]; then
-        echo "$e: NOT-LOADED ($PYTHON) RESOLUTION=$RESOLUTION_KIND FALLBACK=UNRESOLVED RESOLVED=$(report_path "${RESOLVED_PATH:-unresolved}") — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
+        echo "$e: NOT-LOADED PYTHON=$(report_path "$PYTHON") RESOLUTION=$RESOLUTION_KIND FALLBACK=UNRESOLVED RESOLVED=$(report_path "${RESOLVED_PATH:-unresolved}") — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
         if [ "$ALLOW_NOT_LOADED" -ne 1 ]; then
           rc=1
         fi
@@ -373,7 +377,7 @@ cmd_verify() {
     fi
     compare_patchset "$e"
     if [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "fallback" ]; then
-      echo "$e: NOT-LOADED ($PYTHON) RESOLUTION=fallback FALLBACK=$PATCH_STATE RESOLVED=$(report_path "$RESOLVED_PATH")"
+      echo "$e: NOT-LOADED PYTHON=$(report_path "$PYTHON") RESOLUTION=fallback FALLBACK=$PATCH_STATE RESOLVED=$(report_path "$RESOLVED_PATH")"
       if [ "$PATCH_STATE" != "MATCH" ] || [ "$ALLOW_NOT_LOADED" -ne 1 ]; then
         rc=1
       fi

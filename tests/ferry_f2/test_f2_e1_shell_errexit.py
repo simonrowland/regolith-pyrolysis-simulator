@@ -97,6 +97,81 @@ def test_reported_path_parser_preserves_spaces_and_trailing_comma(
     assert _reported_path_matches(warning, "PIN", comma_checkout)
 
 
+def test_enginepatch_path_values_round_trip_in_c_and_utf8_locales(
+    tmp_path: Path,
+) -> None:
+    special_root = tmp_path / "paths with PYTHON=literal ' café 研究,"
+    special_root.mkdir()
+    checkout = special_root / "checkout"
+    base_sha = _init_git_checkout(checkout, "README.md", "base\n")
+
+    project = tmp_path / "project"
+    script = project / "patches" / "scripts" / "enginepatch.sh"
+    script.parent.mkdir(parents=True)
+    shutil.copy2(ROOT / "patches" / "scripts" / "enginepatch.sh", script)
+    patch_dir = project / "patches" / "vaporock"
+    patch_dir.mkdir()
+    (patch_dir / "UPSTREAM.pin").write_text(
+        f"base_sha: {base_sha}\n", encoding="utf-8"
+    )
+    (patch_dir / "0001-test.patch").write_text("", encoding="utf-8")
+
+    python = special_root / "python 'runner'"
+    python.write_text(
+        f"#!/bin/sh\nexec {shlex.quote(sys.executable)} -S \"$@\"\n",
+        encoding="utf-8",
+    )
+    python.chmod(0o755)
+
+    locale_output = subprocess.run(
+        ["locale", "-a"], capture_output=True, text=True, check=False
+    )
+    utf8_locale = next(
+        (
+            locale_name.strip()
+            for locale_name in locale_output.stdout.splitlines()
+            if "utf-8" in locale_name.lower() or "utf8" in locale_name.lower()
+        ),
+        None,
+    )
+    if locale_output.returncode != 0 or utf8_locale is None:
+        pytest.skip("a UTF-8 locale is required for the path-report pin")
+
+    env = {
+        **os.environ,
+        "PYTHONPATH": "",
+        "VAPOROCK_CHECKOUT": str(checkout),
+    }
+    command = [
+        "bash",
+        str(script),
+        "--python",
+        str(python),
+        "--allow-asserted",
+        "verify",
+        "vaporock",
+    ]
+    for locale_name in ("C", utf8_locale):
+        proc = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=False,
+            env={**env, "LC_ALL": locale_name, "LANG": locale_name},
+        )
+
+        assert proc.returncode == 0, proc.stdout + proc.stderr
+        fields = [
+            field
+            for line in proc.stdout.splitlines()
+            for field in shlex.split(line)
+        ]
+        assert f"RESOLVED={checkout}" in fields
+        assert f"PYTHON={python}" in fields
+        assert _reported_path_matches(proc.stdout, "RESOLVED", checkout)
+        assert _reported_path_matches(proc.stdout, "PYTHON", python)
+
+
 def test_collect_recipe_db_exits_nonzero_when_zero_studies() -> None:
     script = ROOT / "scripts" / "collect_recipe_db.sh"
     with tempfile.TemporaryDirectory() as tmp:
@@ -325,7 +400,8 @@ def test_enginepatch_verify_does_not_match_unloaded_sulfliq_fallback(
     )
 
     assert proc.returncode != 0
-    assert f"sulfliq: NOT-LOADED ({no_import_python})" in proc.stdout
+    assert "sulfliq: NOT-LOADED" in proc.stdout
+    assert _reported_path_matches(proc.stdout, "PYTHON", no_import_python)
     assert "RESOLUTION=fallback" in proc.stdout
     assert "FALLBACK=MATCH" in proc.stdout
     assert "sulfliq: MATCH" not in proc.stdout
@@ -539,10 +615,15 @@ def test_enginepatch_verify_spec_miss_ignores_drifted_pin(
     )
 
     assert proc.returncode == 0, proc.stdout + proc.stderr
-    assert f"vaporock: NOT-LOADED ({no_site_python})" in proc.stdout
+    assert "vaporock: NOT-LOADED" in proc.stdout
+    assert _reported_path_matches(proc.stdout, "PYTHON", no_site_python)
     assert "RESOLUTION=not-loaded" in proc.stdout
     assert "FALLBACK=UNRESOLVED" in proc.stdout
-    assert "RESOLVED=unresolved" in proc.stdout
+    assert any(
+        field == "RESOLVED=unresolved"
+        for line in proc.stdout.splitlines()
+        for field in shlex.split(line)
+    )
     assert not _reported_path_matches(proc.stdout, "RESOLVED", pin_tree)
     assert "FALLBACK=DRIFT" not in proc.stdout
 
