@@ -3363,9 +3363,10 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
     Mg-001 at 1366.104 K is the reference-state gas: published H−H298 is
     169.298, which includes vaporization. Mg-005 at that node is 22.198.
     That enthalpy still refuses. B1259 magnesium S at 298.15 K declares
-    101325 Pa, so S refuses on pressure and the detail carries both
-    pressures. B1452 magnesium S at 1361 K declares 100000 Pa, so S
-    answers the gas table even though the elemental zero is the crystal.
+    101325 Pa, so S answers the gas table after conversion to the
+    observation's printed pressure. B1452 magnesium S at 1361 K declares
+    100000 Pa, so S answers the gas table even though the elemental zero
+    is the crystal.
     B1452 SiO has no elemental ideal-gas enthalpy reference; Cp and S
     still answer O-012, and H−H298 refuses. B1259 and B1452 oxygen are
     the ideal gas at 298.15 K, so those rows return the printed O-029
@@ -3376,7 +3377,10 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
 
     pytest.importorskip("vaporock.equil")
 
-    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
+    from simulator.battery.generators.janaf import (
+        STANDARD_PRESSURE_PA as janaf_pressure,
+        janaf_tabulated_gas_thermo,
+    )
     from simulator.battery.generators.usgs_b1259 import (
         STANDARD_PRESSURE_PA as b1259_pressure,
     )
@@ -3421,20 +3425,20 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
         ),
     )
     robie_attempt = predict_thermo_attempt(Engine.VAPOROCK, robie)
-    assert robie_attempt.value is None
-    assert robie_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert (
-        robie_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    printed_magnesium_entropy = _printed_janaf_node(
+        "Mg-005", Decimal("298.15"), "entropy"
     )
-    assert robie_attempt.refusal_detail["gas_table"] == "Mg-005"
-    assert robie_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
-    assert robie_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
-    assert robie_attempt.refusal_detail["coefficient_interval"] == "outside"
-    assert robie_attempt.refusal_detail["branch"] == "table"
-    assert (
-        robie_attempt.refusal_detail["observation_table"]
-        == "b1259-ht-0027-magnesium-reference-state"
+    expected_magnesium_entropy = printed_magnesium_entropy + (
+        ideal_gas_entropy_pressure_shift_J_per_mol_K(janaf_pressure, b1259_pressure)
     )
+    assert robie_attempt.refusal_reason is None
+    assert robie_attempt.value is not None
+    assert abs(robie_attempt.value - expected_magnesium_entropy) <= Decimal("0.001")
+    assert robie_attempt.authority is Authority.BRIDGE
+    assert len(robie_attempt.notices) == 1
+    assert robie_attempt.notices[0].kind is NoticeKind.DERIVATION_USES_COMPILATION
+    assert robie_attempt.notices[0].affected_quantities == (Quantity.S,)
+    assert "branch=table" in robie_attempt.call_evidence
 
     assert b1452_ideal_gas("Mg") is False
     near_boiling = replace(
