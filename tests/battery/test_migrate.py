@@ -3878,11 +3878,17 @@ def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
     # hard conditional_field, not a silent pass. The same holds for a row that
     # declares quoted_attributed but states no attribution: the canonical
     # token now maps to its class, so the missing field is reported instead of
-    # the row falling to unknown. Other reasons must stay zero.
-    lineage_fields = (".derived_from", ".derivation", ".attribution")
+    # the row falling to unknown. The model_derived raw_inputs guard also
+    # reports invalid declarations; other reasons must stay zero.
+    expected_conditional_fields = (
+        ".derived_from",
+        ".derivation",
+        ".attribution",
+        ".raw_inputs",
+    )
     for issue in report.hard_issues:
         assert issue.reason.value == "conditional_field", issue
-        assert issue.path.endswith(lineage_fields), issue
+        assert issue.path.endswith(expected_conditional_fields), issue
     assert extracts_v2.is_dir() or obs_dir.is_dir()
 
 
