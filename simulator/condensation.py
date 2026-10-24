@@ -5333,7 +5333,7 @@ def antoine_dew_temperature_diagnostic(
     try:
         p_low = _antoine_psat_pa(species, low, vapor_pressure_data=vapor_pressure_data)
         p_high = _antoine_psat_pa(species, high, vapor_pressure_data=vapor_pressure_data)
-    except (KeyError, ValueError) as exc:
+    except (KeyError, ValueError, WallSaturationPressureRefusal) as exc:
         return {
             "status": "refused_outside_certified_surface",
             "temperature_K": None,
@@ -5342,7 +5342,7 @@ def antoine_dew_temperature_diagnostic(
             "provenance": "existing_condensation_antoine_surface",
             "routing_authority": False,
         }
-    if p_low is None or p_high is None or not min(p_low, p_high) <= target <= max(p_low, p_high):
+    if p_low is None or p_high is None:
         return {
             "status": "refused_pressure_outside_certified_range",
             "temperature_K": None,
@@ -5352,6 +5352,58 @@ def antoine_dew_temperature_diagnostic(
             "routing_authority": False,
         }
     increasing = p_high > p_low
+    extrapolated = not min(p_low, p_high) <= target <= max(p_low, p_high)
+    if extrapolated:
+        # Keep the certified interval as the initial bracket and extend only the
+        # side needed to reach the printed pressure. The Antoine owner already
+        # records out-of-band evaluation as extrapolated; this diagnostic does
+        # not grant routing authority to the result.
+        bracket_temperature = high if (target > max(p_low, p_high)) == increasing else low
+        bracket_pressure = p_high if bracket_temperature == high else p_low
+        for _ in range(80):
+            extending_high_temperature = bracket_temperature == high
+            needs_extension = (
+                bracket_pressure < target
+                if increasing == extending_high_temperature
+                else bracket_pressure > target
+            )
+            if needs_extension:
+                next_temperature = bracket_temperature * 2.0 if bracket_temperature == high else bracket_temperature / 2.0
+            else:
+                break
+            if not math.isfinite(next_temperature) or next_temperature <= 0.0:
+                break
+            try:
+                next_pressure = _antoine_psat_pa(
+                    species,
+                    next_temperature,
+                    vapor_pressure_data=vapor_pressure_data,
+                )
+            except (KeyError, ValueError, WallSaturationPressureRefusal):
+                next_pressure = None
+            if next_pressure is None or not math.isfinite(next_pressure) or next_pressure <= 0.0:
+                break
+            if (next_pressure < target) != (bracket_pressure < target):
+                if bracket_temperature == high:
+                    low, high = sorted((bracket_temperature, next_temperature))
+                else:
+                    low, high = sorted((next_temperature, bracket_temperature))
+                p_low = _antoine_psat_pa(species, low, vapor_pressure_data=vapor_pressure_data)
+                p_high = _antoine_psat_pa(species, high, vapor_pressure_data=vapor_pressure_data)
+                break
+            bracket_temperature = next_temperature
+            bracket_pressure = next_pressure
+        else:
+            p_low = p_high = None
+        if p_low is None or p_high is None or not min(p_low, p_high) <= target <= max(p_low, p_high):
+            return {
+                "status": "refused_pressure_outside_certified_range",
+                "temperature_K": None,
+                "partial_pressure_Pa": target,
+                "valid_range_K": [low, high],
+                "provenance": "existing_condensation_antoine_surface",
+                "routing_authority": False,
+            }
     for _ in range(80):
         midpoint = (low + high) / 2.0
         pressure = _antoine_psat_pa(
@@ -5365,8 +5417,12 @@ def antoine_dew_temperature_diagnostic(
             low = midpoint
         else:
             high = midpoint
+    # Premise: the same Antoine surface maps saturation temperature to pressure.
+    # Algebra: solve P_sat(T_dew) = p_i by bisection over its pressure bracket.
+    # Units: both sides are Pa and the returned root is K. Sanity: feeding
+    # P_sat(800 K) returns 800 K to the inverse tolerance.
     return {
-        "status": "diagnostic_only",
+        "status": "extrapolated" if extrapolated else "diagnostic_only",
         "temperature_K": (low + high) / 2.0,
         "partial_pressure_Pa": target,
         "valid_range_K": [min(item[0] for item in candidate_ranges), max(item[1] for item in candidate_ranges)],
@@ -7258,6 +7314,146 @@ def _knudsen_regime_factor(knudsen_number: float) -> float:
         return 0.0
     factor = knudsen_number / (knudsen_number + CONTINUUM_BUFFER_KN)
     return max(0.0, min(1.0, factor))
+
+
+def _wall_deposition_flux_diagnostic(
+    *,
+    species: str,
+    local_partial_pressure_pa: float,
+    wall_temperature_K: float,
+    gas_temperature_K: float,
+    total_pressure_pa: float,
+    pipe_diameter_m: float,
+    segment_length_m: float,
+    wall_area_m2: float,
+    wall_material: str,
+    wall_location: str,
+    carrier_gas: str,
+    formula_registry: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Predict local wall flux and expose the owner model's limits."""
+
+    segment = PipeSegment(
+        name=str(wall_location),
+        upstream_stage="local-pressure-input",
+        downstream_stage=str(wall_location),
+        wall_temperature_C=float(wall_temperature_K) - CELSIUS_TO_KELVIN_OFFSET,
+        length_m=float(segment_length_m),
+        inner_diameter_m=float(pipe_diameter_m),
+        declared_area_m2=float(wall_area_m2),
+        liner_material=str(wall_material),
+    )
+    alpha_record = _wall_alpha_record(
+        species,
+        MATERIALS_DATA,
+        segment=segment,
+        T_K=float(wall_temperature_K),
+    )
+    try:
+        alpha_s = _required_record_alpha_s(
+            alpha_record,
+            species=species,
+            site="battery_wall_deposition_flux_prediction",
+        )
+        knudsen_number = _knudsen_number(
+            total_pressure_pa,
+            gas_temperature_K,
+            pipe_diameter_m,
+            carrier_gas=carrier_gas,
+        )
+        regime = classify_knudsen_regime(knudsen_number)
+        saturation_diagnostic: dict[str, Any] = {}
+        extrapolations: dict[str, dict[str, Any]] = {}
+        extrapolation_warnings: list[str] = []
+        molar_flux = _series_resistance_deposition_flux_mol_m2_s(
+            species,
+            local_partial_pressure_pa,
+            wall_temperature_K,
+            alpha_s,
+            pipe_diameter_m=pipe_diameter_m,
+            regime_factor=_knudsen_regime_factor(knudsen_number),
+            T_gas_K=gas_temperature_K,
+            overhead_pressure_pa=total_pressure_pa,
+            carrier_gas=carrier_gas,
+            radial_stir_factor=1.0,
+            vapor_pressure_data=VAPOR_PRESSURE_DATA,
+            reactive_product_backstop=False,
+            antoine_extrapolations=extrapolations,
+            antoine_extrapolation_warnings=extrapolation_warnings,
+            diagnostic_out=saturation_diagnostic,
+        )
+    except WallSaturationPressureRefusal as exc:
+        return {
+            "status": "refused",
+            "reason": "no_certified_wall_p_sat",
+            "species": species,
+            "refusal": str(exc),
+        }
+    except DepositionInputRefusal as exc:
+        return {
+            "status": "refused",
+            "reason": "wall_flux_input_refused",
+            "parameter": exc.parameter,
+            "refusal": str(exc),
+        }
+    if saturation_diagnostic.get("wall_saturation_pressure_refused"):
+        return {
+            "status": "refused",
+            "reason": "no_certified_wall_p_sat",
+            "species": species,
+            "refusal": saturation_diagnostic.get(
+                "wall_saturation_pressure_refusal_reason"
+            ),
+            "refusal_type": saturation_diagnostic.get(
+                "wall_saturation_pressure_refusal_type"
+            ),
+        }
+
+    from simulator.wall_deposition import (
+        SECONDS_PER_HOUR,
+        _wall_deposition_flux_budget_kg_hr,
+    )
+
+    # Premise: the series-resistance owner returns J in mol/m²/s and the
+    # production accounting converter applies M from the species registry.
+    # Algebra: J_mass = [J×1 m²×M×3600 s/h]/[1 m²×3600 s/h].
+    # Units: (mol/m²/s)(m²)(kg/mol) = kg/s; A=1 m² gives kg/m²/s.
+    # Sanity: Na at 1e-4
+    # mol/m²/s gives 2.298976928e-6 kg/m²/s.
+    mass_flux_kg_m2_s = _wall_deposition_flux_budget_kg_hr(
+        species=species,
+        flux_mol_m2_s=float(molar_flux),
+        surface_area_m2=1.0,
+        formula_registry=formula_registry,
+    ) / SECONDS_PER_HOUR
+    flags = [
+        f"local_regime={regime.value}; Kn={knudsen_number:.6g}",
+        "poiseuille_only_pipe_capacity",
+        (
+            "alpha_s_source="
+            f"{alpha_record.get('source')}; alpha_s={alpha_s:.6g}; "
+            f"status={alpha_record.get('status') or alpha_record.get('qualification_status')}"
+        ),
+        "continuous_coating_rate_open",
+    ]
+    if regime is KnudsenRegime.TRANSITIONAL:
+        flags.append("transitional_wall_smooth_interpolation")
+    if regime is KnudsenRegime.FREE_MOLECULAR:
+        flags.extend(
+            ("free_molecular_line_of_sight_area_proxy", "full_ballistic_regime_open")
+        )
+    return {
+        "status": "produced",
+        "molar_flux_mol_m2_s": float(molar_flux),
+        "mass_flux_kg_m2_s": mass_flux_kg_m2_s,
+        "regime": regime.value,
+        "knudsen_number": knudsen_number,
+        "alpha_s_record": alpha_record,
+        "approximation_flags": flags,
+        "wall_saturation_pressure_notice": saturation_diagnostic.get(
+            "wall_saturation_pressure_notice"
+        ),
+    }
 
 
 def _invalid_pipe_diameter_diagnostic(
