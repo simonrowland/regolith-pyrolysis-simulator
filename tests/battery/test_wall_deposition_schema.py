@@ -218,6 +218,38 @@ def test_d275_nonoxygen_melt_source_does_not_require_fugacity():
     assert wall_deposition_input_gate(identity, conditions, experiment).passed
 
 
+def test_d275_parenthesized_melt_vapour_formula_requires_fugacity():
+    identity, conditions, experiment = _complete_mass_inputs()
+    identity = replace(
+        identity,
+        species=replace(identity.species, formula="Ca3(PO4)2"),
+        fO2_Pa=None,
+    )
+
+    outcome = wall_deposition_input_gate(identity, conditions, experiment)
+
+    assert not outcome.passed
+    assert outcome.primary_check == "identity.fO2_Pa"
+    not_applicable = replace(identity, fO2_Pa=State.not_applicable("not printed"))
+    assert validate_quantity_profile(not_applicable).kind is IdentityEqualKind.INVALID_IDENTITY
+
+
+def test_d275_unparseable_melt_vapour_formula_refuses_without_raising():
+    identity, conditions, experiment = _complete_mass_inputs()
+    identity = replace(
+        identity,
+        species=replace(identity.species, formula="glass"),
+        fO2_Pa=None,
+    )
+
+    profile_for(identity)
+    outcome = wall_deposition_input_gate(identity, conditions, experiment)
+
+    assert not outcome.passed
+    assert outcome.reason.value == "underdetermined_apparatus"
+    assert outcome.primary_check == "identity.species.formula"
+
+
 @pytest.mark.parametrize(
     "geometry_field",
     ["pipe_inner_diameter_m", "segment_position_m", "flow_orientation"],

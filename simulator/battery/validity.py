@@ -50,7 +50,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
-    _wall_deposition_requires_fO2,
+    _wall_deposition_oxygen_status,
     log10K_from_delta_fG_kJ_mol,
     quantity_token,
 )
@@ -1300,9 +1300,10 @@ def wall_deposition_input_gate(
                 state = getattr(identity, field)
                 if state is None or not state.is_value or state.value is None:
                     missing.append(f"identity.{field}")
-            if _wall_deposition_requires_fO2(identity) and not positive_state(
-                identity.fO2_Pa
-            ):
+            oxygen_status = _wall_deposition_oxygen_status(identity)
+            if oxygen_status is None:
+                missing.append("identity.species.formula")
+            elif oxygen_status and not positive_state(identity.fO2_Pa):
                 missing.append("identity.fO2_Pa")
         elif source_kind == "upstream_partial_pressure":
             condition("source_partial_pressure_Pa", positive=True)
