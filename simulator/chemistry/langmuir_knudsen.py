@@ -579,6 +579,7 @@ def _solve_surface_oxygen_balance(
     evaluate: Callable[[float], _SurfaceOxygenEvaluation],
     *,
     source_free_zero: _SurfaceOxygenEvaluation | None = None,
+    bulk_exchange_flux_mol_m2_s: float = 0.0,
     bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
 ) -> _SurfaceOxygenEvaluation:
     """Close the current signed source/storage against series O/O2 escape.
@@ -624,11 +625,28 @@ def _solve_surface_oxygen_balance(
     if not low < root < high:
         raise OxygenClosureNonconvergence('oxygen root reached a bracket endpoint')
     achieved = evaluate(10.0 ** root)
+    source_free = False
+    if achieved.bulk_pO2_bar > 0.0 and not any(achieved.balance_terms[1:]):
+        # With every source, ferric, atomic-O and storage term individually
+        # zero, signed transport closes at p_surface = p_bulk. Re-evaluate
+        # there exactly, retaining that state's finite-settlement payload.
+        at_bulk = evaluate(achieved.bulk_pO2_bar)
+        if not any(at_bulk.balance_terms[1:]):
+            achieved = at_bulk
+            source_free = True
     # A coordinate root across a gate/cutoff jump is not a closed balance.
     # sqrt(binary64 epsilon) is a numerical relative residual criterion,
     # scaled by gross flux rather than a cancellation-small net; it carries
     # no pressure units and cannot set the physical oxygen coordinate.
     scale = math.fsum(abs(term) for term in achieved.balance_terms)
+    if source_free:
+        # At equal pressures the net flux and gross balance traffic vanish.
+        # The one-way HK exchange J_bulk = alpha*p_bulk/sqrt(2*pi*M*R*T)
+        # remains a physical flux scale: Pa/sqrt((kg/mol)(J/mol)) gives
+        # mol/(m² s). As p_bulk -> 0 this scale also vanishes; no pressure
+        # floor is introduced. Nonzero-source states retain the gross-only
+        # jump guard, regardless of the bulk exchange magnitude.
+        scale = max(scale, bulk_exchange_flux_mol_m2_s)
     if abs(achieved.residual) > math.sqrt(math.ulp(1.0)) * scale:
         raise OxygenClosureNonconvergence('oxygen coordinate converged without closing signed flux')
     return achieved

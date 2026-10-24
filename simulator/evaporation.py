@@ -4029,7 +4029,7 @@ class EvaporationMixin:
     def _solve_evaporative_oxygen_boundary(self, equilibrium=None, *, overhead_partials_override_Pa=None):
         from simulator.chemistry.langmuir_knudsen import (
             OxygenClosureNonconvergence, _SurfaceOxygenEvaluation,
-            _solve_surface_oxygen_balance,
+            _solve_surface_oxygen_balance, langmuir_molar_flux,
         )
         from simulator.transport_regime import series_evaporation_flux
 
@@ -4140,6 +4140,9 @@ class EvaporationMixin:
                     zero = candidate
             solved = _solve_surface_oxygen_balance(
                 evaluate, source_free_zero=zero,
+                bulk_exchange_flux_mol_m2_s=langmuir_molar_flux(
+                    self.melt.temperature_C + 273.15, bulk * 100000.0, 0.0, 1.0,
+                    molar_mass_kg_mol=mass),
                 bracket_log10_pO2_bar=(-12.0, 0.0))
             audit = self._detached_evaporation_projection()
             audit._frozen_evaporation_carriers = None

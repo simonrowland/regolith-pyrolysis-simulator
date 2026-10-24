@@ -34,6 +34,18 @@ def test_proved_source_free_zero_is_exact():
                                         source_free_zero=zero) is zero
 
 
+@pytest.mark.parametrize('bulk', (1.0365655169846737e-27, 3.73282716125e-21))
+def test_source_free_positive_bulk_is_exact(bulk):
+    def evaluate(surface):
+        return _SurfaceOxygenEvaluation(
+            surface, bulk, 0.1 * (surface - bulk), 0.0, {}, 0.0, 0.0, 0.0,
+            bulk_pO2_bar=bulk,
+        )
+    solved = _solve_surface_oxygen_balance(evaluate)
+    assert solved.reaction_pO2_bar == solved.gas_face_pO2_bar == bulk
+    assert solved.oxygen_flux_mol_m2_s == solved.residual == 0.0
+
+
 def test_positive_source_expands_below_original_bracket():
     solved = _solve_surface_oxygen_balance(
         lambda x: evaluation(x, source=2e-45, ferric=0.0, other=0.0, storage=0.0))
@@ -51,7 +63,7 @@ def test_coordinate_convergence_across_a_jump_is_not_flux_convergence():
         return _SurfaceOxygenEvaluation(x, 0.0, 1.0 if x >= 1e-6 else 0.0,
                                         0.0, {'source': 0.5}, 0.0, 0.0, 0.0)
     with pytest.raises(OxygenClosureNonconvergence, match='without closing'):
-        _solve_surface_oxygen_balance(jump)
+        _solve_surface_oxygen_balance(jump, bulk_exchange_flux_mol_m2_s=1e30)
 
 
 def test_runtime_source_free_zero():
@@ -64,6 +76,26 @@ def test_runtime_source_free_zero():
         solved = sim._solve_evaporative_oxygen_boundary(sim._get_equilibrium())
         assert solved.reaction_pO2_bar == solved.gas_face_pO2_bar == 0.0
         assert solved.residual == 0.0
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
+def test_runtime_cold_mars_source_free_positive_bulk():
+    from simulator.config import load_config_bundle
+    from simulator.state import CampaignPhase
+    from tests.chemistry.conftest import _build_sim
+    bundle = load_config_bundle()
+    sim = _build_sim('mars_basalt', bundle.vapor_pressures, bundle.feedstocks,
+                     bundle.setpoints, additives_kg={'C': 60.0})
+    try:
+        sim.start_campaign(CampaignPhase.C0)
+        sim.step()
+        closure = sim._last_surface_oxygen_diagnostic
+        assert closure['bulk_pO2_bar'] > 0.0
+        assert closure['reaction_pO2_bar'] == closure['gas_face_pO2_bar'] == closure['bulk_pO2_bar']
+        assert closure['oxygen_flux_mol_m2_s'] == closure['relative_residual'] == 0.0
+        assert not any(closure['source_terms_mol_m2_s'].values())
+        assert closure['ferric_rate_mol_m2_s'] == closure['other_oxygen_mol_m2_s'] == closure['storage_mol_m2_s'] == 0.0
     finally:
         close_test_owned_magemin_backend(sim)
 
