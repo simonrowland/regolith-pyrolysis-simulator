@@ -146,6 +146,19 @@ observations:
   derived_from:
   - stebbins-carmichael-weill-1983::stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5
   - pdf:stebbins-carmichael-weill-1983
+  derivation:
+    relation: Delta H_f(T) = H_liquid(T) - H_crystal(T), combining the stable-liquid and disordered-crystal heat-content functions
+      with heat-of-vitrification and heat-capacity corrections (Equations 3-4).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 723
+        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_robie_table_7_fusion_quote
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -269,6 +282,19 @@ observations:
     page: PDF p. 6 / printed p. 722
     table: '4'
   read_from: pdf:stebbins-carmichael-weill-1983
+  derivation:
+    relation: Table 4 reprints heat-content functions based on the earlier albite glass and liquid calorimetry, not a Table
+      3 albite series in this paper
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: PDF p. 6 / printed p. 722
+        table: '4'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_table_6_vitrification_quotes
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -761,6 +787,19 @@ observations:
   derived_from:
   - stebbins-carmichael-weill-1983::stebbins_1983_diopside_calorimetry_measured_tables_1_3
   - pdf:stebbins-carmichael-weill-1983
+  derivation:
+    relation: Delta H_f(T) = H_liquid(T) - H_crystal(T); the paper combines liquid and crystal heat contents, heat of vitrification,
+      and heat-capacity integrations as in Equations 3-4.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 723
+        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_robie_table_7_fusion_quote
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -1159,6 +1198,19 @@ observations:
   derived_from:
   - stebbins-carmichael-weill-1983::stebbins_1983_nepheline_calorimetry_measured_table_3
   - pdf:stebbins-carmichael-weill-1983
+  derivation:
+    relation: Delta H_f(T) = H_liquid(T) - H_crystal(T) at the estimated metastable γ-nepheline temperature; the authors use
+      β-nepheline heat of vitrification at 985 K and the reported zero β-to-γ transition enthalpy.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 723
+        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_table_4_fit
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -1384,6 +1436,19 @@ observations:
   derived_from:
   - stebbins-carmichael-weill-1983::stebbins_1983_sanidine_calorimetry_measured_table_3
   - pdf:stebbins-carmichael-weill-1983
+  derivation:
+    relation: Delta H_f(T) = H_liquid(T) - H_crystal(T) at the hypothetical metastable 1473 K reference; the paper combines
+      liquid and crystal heat contents, heat of vitrification, and heat-capacity corrections as in Equations 3-4.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 723
+        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_robie_table_7_fusion_quote
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -1509,6 +1574,18 @@ observations:
   read_from: pdf:stebbins-carmichael-weill-1983
   derived_from:
   - stebbins-carmichael-weill-1983::stebbins_1983_sanidine_calorimetry_measured_table_3
+  derivation:
+    relation: H(T)-H(300 K) glass and stable-liquid functions fitted to Table 3 heat contents, with cited DSC glass Cp data
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: PDF p. 6 / printed p. 722
+        table: '4'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_table_6_vitrification_quotes
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:

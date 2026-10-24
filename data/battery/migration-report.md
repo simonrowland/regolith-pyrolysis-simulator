@@ -4,11 +4,11 @@ rows in: 72789
 records out (observations): 151944
 works: 440
 experiments: 5606
-queue size: 110094
+queue size: 110079
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 439
-hard issues: 3278
+hard issues: 3617
 
 ## Spec vs measured
 
@@ -18006,7 +18006,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/borisov-2018-compilation.yaml` | 435 | 435 | 1305 |
 | `data/literature/extracts/borisov-borisovskiy-2024-ti-zircon.yaml` | 198 | 198 | 198 |
 | `data/literature/extracts/borisov-veksler-2021-k-fe-supplement.yaml` | 10092 | 10092 | 11447 |
-| `data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml` | 9 | 9 | 46 |
+| `data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml` | 9 | 9 | 44 |
 | `data/literature/extracts/boulliung-wood-2022-so2-solubility-silicate-melts.yaml` | 3 | 3 | 14 |
 | `data/literature/extracts/brillo-2025-al-ti-thermophysical.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/britt-2019-asteroid-simulants.yaml` | 9 | 9 | 35 |
@@ -18068,7 +18068,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/iapws-95-psat-liquid.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/inoue-suito-1982-vanadium-mgo-saturated-slag.yaml` | 549 | 549 | 0 |
 | `data/literature/extracts/itoh-hino-banya-1997-mg-deoxidation.yaml` | 3 | 39 | 89 |
-| `data/literature/extracts/itoh-hino-banya-1998-spinel.yaml` | 10 | 10 | 46 |
+| `data/literature/extracts/itoh-hino-banya-1998-spinel.yaml` | 10 | 10 | 44 |
 | `data/literature/extracts/iupac-o2-solid-psat.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/ivanova-2018-spinel-rich-cai-evaporation.yaml` | 1 | 32 | 1 |
 | `data/literature/extracts/ivtan-cro2-g.yaml` | 4 | 64 | 131 |
@@ -18323,7 +18323,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2013-potassium-silicate-thermodynamics.yaml` | 27 | 27 | 30 |
 | `data/literature/extracts/shornikov-2014-ca-al-evaporation-coefficients.yaml` | 12 | 12 | 12 |
 | `data/literature/extracts/shornikov-2014-sodium-silicate-model.yaml` | 17 | 17 | 34 |
-| `data/literature/extracts/shornikov-2017-spinel-evaporation.yaml` | 25 | 144 | 52 |
+| `data/literature/extracts/shornikov-2017-spinel-evaporation.yaml` | 25 | 144 | 48 |
 | `data/literature/extracts/shornikov-2018-spinel-solid-solutions.yaml` | 14 | 168 | 0 |
 | `data/literature/extracts/shornikov-2019-lunar-meteorite-evaporation-model.yaml` | 113 | 113 | 113 |
 | `data/literature/extracts/shornikov-2019-perovskite-evaporation.yaml` | 7 | 76 | 0 |
@@ -18347,7 +18347,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml` | 75 | 101 | 298 |
 | `data/literature/extracts/sossi-2020-magma-ocean-redox.yaml` | 12 | 12 | 12 |
 | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` | 1 | 1 | 5 |
-| `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` | 24 | 24 | 145 |
+| `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` | 24 | 24 | 139 |
 | `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` | 9 | 29 | 103 |
 | `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 11 | 49 |
 | `data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml` | 12 | 56 | 30 |
@@ -18395,7 +18395,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 6 |
 | `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 65 |
 | `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 64 |
-| `data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml` | 41 | 60 | 86 |
+| `data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml` | 41 | 60 | 85 |
 | `data/literature/extracts/woermann-1969-mg-fe-ti-oxides.yaml` | 17 | 17 | 3 |
 | `data/literature/extracts/xiao-reuter-holappa-2000-chromium-slag-oxidation-review.yaml` | 84 | 84 | 0 |
 | `data/literature/extracts/xu-2026-excess-oxygen-magma.yaml` | 1462 | 1462 | 1463 |
@@ -18417,14 +18417,15 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3278
+hard issues: 3617
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 2131 |
-| `conditional_field:derivation` | 1143 |
+| `conditional_field:derived_from` | 2145 |
+| `conditional_field:derivation` | 1189 |
+| `conditional_field:inputs` | 279 |
 | `invalid_source:initial_composition` | 4 |
 
 ## Hard issues (first 50)

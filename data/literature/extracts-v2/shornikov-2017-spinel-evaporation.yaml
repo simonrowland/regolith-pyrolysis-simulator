@@ -16080,9 +16080,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -16094,6 +16093,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000114'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -16105,6 +16131,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq14::T=1859:h=a86509bcec5e
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -16286,9 +16322,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -16300,6 +16335,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000139'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -16311,6 +16373,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq14::T=1914:h=d8dfd2bdf63c
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -16492,9 +16564,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -16506,6 +16577,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000412'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -16517,6 +16615,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq14::T=1938:h=740e0d39413e
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -16698,9 +16806,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -16712,6 +16819,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000558'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -16723,6 +16857,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq14::T=1950:h=7692f8bcbe24
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -16904,9 +17048,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -16918,6 +17061,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000739'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -16929,6 +17099,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq14::T=1950:h=e622aeaa5143
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -17110,9 +17290,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -17124,6 +17303,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000748'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -17135,6 +17341,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq14::T=1992:h=30247a97dc03
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -17316,9 +17532,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -17330,6 +17545,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000142'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -17341,6 +17583,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq14::T=2005:h=e60f4841a3aa
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -17522,9 +17774,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -17536,6 +17787,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000161'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -17547,6 +17825,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq14::T=2044:h=733672c5dc25
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -17728,9 +18016,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -17742,6 +18029,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000316'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -17753,6 +18067,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq14::T=2047:h=33a1d80a07d7
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -17934,9 +18258,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -17948,6 +18271,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000327'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -17959,6 +18309,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq14::T=2047:h=c0af063b3044
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -18140,9 +18500,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -18154,6 +18513,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000333'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -18165,6 +18551,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq14::T=2089:h=beefa1f81a46
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -18346,9 +18742,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2047:h=8bf4600a5ae2
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_mg_partial_pressure::T=2089:h=98b6cd0084f8
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (14).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -18360,6 +18755,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (14)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000705'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (14)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -18371,6 +18793,16 @@ observations:
           table: '3'
           equation: (14)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (14)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=1851:h=180c7fbba508
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -18552,9 +18984,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -18566,6 +18997,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000124'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -18577,6 +19035,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=1859:h=758161640170
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -18758,9 +19226,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -18772,6 +19239,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000157'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -18783,6 +19277,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=1914:h=a9ecaaf871e7
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -18964,9 +19468,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -18978,6 +19481,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000349'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -18989,6 +19519,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=1938:h=b93aab275b3b
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -19170,9 +19710,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -19184,6 +19723,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000064'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -19195,6 +19761,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=1950:h=3bcfb22819d5
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -19376,9 +19952,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -19390,6 +19965,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000596'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -19401,6 +20003,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=1950:h=56536c30e1d3
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -19582,9 +20194,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -19596,6 +20207,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000717'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -19607,6 +20245,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=1992:h=e898d9184cc0
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -19788,9 +20436,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -19802,6 +20449,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000134'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -19813,6 +20487,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=2005:h=971f2476c1ac
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -19994,9 +20678,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -20008,6 +20691,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000152'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -20019,6 +20729,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=2044:h=e35753d9a867
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -20200,9 +20920,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -20214,6 +20933,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000361'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -20225,6 +20971,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=2047:h=4964a84cfa6c
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -20406,9 +21162,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -20420,6 +21175,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000374'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -20431,6 +21213,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=2047:h=978baf65f602
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -20612,9 +21404,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -20626,6 +21417,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000358'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -20637,6 +21455,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq15::T=2089:h=5b9869ec2fd8
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -20818,9 +21646,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (15).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -20832,6 +21659,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (15)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000703'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (15)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -20843,6 +21697,16 @@ observations:
           table: '3'
           equation: (15)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (15)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16::T=1914:h=f487ae130107
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -21022,9 +21886,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (16).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -21036,6 +21899,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (16)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000393'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -21047,6 +21937,16 @@ observations:
           table: '3'
           equation: (16)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (16)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16::T=1938:h=02bb68e1836b
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -21226,9 +22126,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (16).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -21240,6 +22139,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (16)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000561'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -21251,6 +22177,16 @@ observations:
           table: '3'
           equation: (16)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (16)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16::T=1950:h=6ae018aebec4
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -21430,9 +22366,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (16).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -21444,6 +22379,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (16)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000616'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -21455,6 +22417,16 @@ observations:
           table: '3'
           equation: (16)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (16)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16::T=1950:h=dbfb46ecc06a
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -21634,9 +22606,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (16).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -21648,6 +22619,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (16)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000689'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -21659,6 +22657,16 @@ observations:
           table: '3'
           equation: (16)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (16)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16::T=1992:h=dd3b6d0ce2d7
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -21838,9 +22846,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (16).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -21852,6 +22859,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (16)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000147'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -21863,6 +22897,16 @@ observations:
           table: '3'
           equation: (16)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (16)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16::T=2005:h=526dea7346a4
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -22042,9 +23086,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (16).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -22056,6 +23099,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (16)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000196'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -22067,6 +23137,16 @@ observations:
           table: '3'
           equation: (16)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (16)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16::T=2044:h=dea742e83b1a
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -22246,9 +23326,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (16).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -22260,6 +23339,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (16)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000303'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -22271,6 +23377,16 @@ observations:
           table: '3'
           equation: (16)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (16)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16::T=2047:h=01cce98aba09
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -22450,9 +23566,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (16).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -22464,6 +23579,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (16)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000344'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -22475,6 +23617,16 @@ observations:
           table: '3'
           equation: (16)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (16)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16::T=2047:h=9e47b0facb0d
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -22654,9 +23806,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (16).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -22668,6 +23819,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (16)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000034'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -22679,6 +23857,16 @@ observations:
           table: '3'
           equation: (16)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (16)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16::T=2089:h=b6cbf756365c
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -22858,9 +24046,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (16).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -22872,6 +24059,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (16)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000637'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (16)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -22883,6 +24097,16 @@ observations:
           table: '3'
           equation: (16)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (16)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16_not_reported_1851
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -23056,12 +24280,24 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: identity.reference_state=ideal-gas O(g) at 1 bar from source-declared partial pressure; identity.reservoir=source
-      condensed parent MgAl2O4(cr)
+    relation: Eq. (16) has no numeric output at 1851 K because the required pAl2O input is not detected.; identity.reference_state=ideal-gas
+      O(g) at 1 bar from source-declared partial pressure; identity.reservoir=source condensed parent MgAl2O4(cr)
     inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al2o_not_detected_1851
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1851:h=1c36dbc95fa5
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1859:h=408f181b3af7
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1914:h=32c61640a004
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1938:h=b5ad22b9d613
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1950:h=ac5c25a938bd
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1950:h=1a290643573f
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1992:h=c9657b808c01
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2005:h=9e674982807b
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2044:h=5de268f929b7
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=2164d5df169a
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
     parameters: []
-    output_unit: Pa
+    output_unit: atm
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16_not_reported_1859
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -23235,12 +24471,24 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
   derivation:
-    relation: identity.reference_state=ideal-gas O(g) at 1 bar from source-declared partial pressure; identity.reservoir=source
-      condensed parent MgAl2O4(cr)
+    relation: Eq. (16) has no numeric output at 1859 K because the required pAl2O input is not detected.; identity.reference_state=ideal-gas
+      O(g) at 1 bar from source-declared partial pressure; identity.reservoir=source condensed parent MgAl2O4(cr)
     inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al2o_not_detected_1859
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1851:h=1c36dbc95fa5
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1859:h=408f181b3af7
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1914:h=32c61640a004
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1938:h=b5ad22b9d613
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1950:h=ac5c25a938bd
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1950:h=1a290643573f
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=1992:h=c9657b808c01
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2005:h=9e674982807b
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2044:h=5de268f929b7
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=2164d5df169a
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2047:h=4a826f7945ef
+    - shornikov-2017-spinel-evaporation::shornikov_2017_table2_al_partial_pressure::T=2089:h=0605ff5303d1
     parameters: []
-    output_unit: Pa
+    output_unit: atm
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=1851:h=7c92eeb4f4e4
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -23410,9 +24658,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -23424,6 +24671,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000111'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -23435,6 +24709,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=1859:h=ffc9e30a6670
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -23604,9 +24888,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -23618,6 +24901,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000152'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -23629,6 +24939,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=1914:h=924c64fca898
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -23798,9 +25118,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -23812,6 +25131,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000437'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -23823,6 +25169,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=1938:h=e28f5a26645b
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -23992,9 +25348,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -24006,6 +25361,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000056'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -24017,6 +25399,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=1950:h=0c47c0974df9
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -24186,9 +25578,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -24200,6 +25591,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000802'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -24211,6 +25629,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=1950:h=8402483a8fcf
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -24380,9 +25808,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -24394,6 +25821,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000078'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -24405,6 +25859,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=1992:h=85248020197d
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -24574,9 +26038,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -24588,6 +26051,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000138'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -24599,6 +26089,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=2005:h=f51fd4273ce5
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -24768,9 +26268,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -24782,6 +26281,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000171'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -24793,6 +26319,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=2044:h=6b6e5a616f7d
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -24962,9 +26498,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -24976,6 +26511,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000304'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -24987,6 +26549,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=2047:h=1ec2d282f70d
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -25156,9 +26728,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -25170,6 +26741,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000397'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -25181,6 +26779,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=2047:h=21f69b15ac3d
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -25350,9 +26958,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -25364,6 +26971,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000382'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -25375,6 +27009,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq17::T=2089:h=4d9a8a5e51fc
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
@@ -25544,9 +27188,8 @@ observations:
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2047:h=7a44870ad0cc
   - shornikov-2017-spinel-evaporation::shornikov_2017_table2_o2_partial_pressure::T=2089:h=aad9287bf2a3
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shornikov-2017-spinel-evaporation
+    relation: Atomic oxygen partial pressure calculated by Eq. (17).
+    inputs: []
     parameters:
     - - original
       - state:
@@ -25558,6 +27201,33 @@ observations:
           pdf_page_index: 3
           table: '3'
           equation: (17)
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000653'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 4
+                published_page: 13
+                pdf_page_index: 3
+                table: '3'
+                equation: (17)
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -25569,6 +27239,16 @@ observations:
           table: '3'
           equation: (17)
     output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        page: 4
+        published_page: 13
+        pdf_page_index: 3
+        table: '3'
+        equation: (17)
 - observation_id: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq8_9::T=1851:h=1c86546d813e
   experiment_id: 10.1134/s0036024417010241::experiment::shornikov_2017_spinel_molybdenum_series
   identity:
