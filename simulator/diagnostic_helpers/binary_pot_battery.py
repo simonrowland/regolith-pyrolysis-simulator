@@ -2880,6 +2880,7 @@ def _internal_analytical_vapor_pressure_adapter(
         vapor_pressures_Pa={},
         vapor_pressures_source={},
         liquid_fraction=None,
+        warnings=[],
     )
     simulation_hour = int(core.melt.hour) + 1
     if include_diagnostic_shadows:
@@ -3024,7 +3025,7 @@ def _internal_analytical_vapor_pressure_adapter(
     return SimpleNamespace(
         status="ok",
         diagnostics=diagnostics,
-        warnings=[],
+        warnings=list(equilibrium.warnings),
         # This core diagnostic is an activity map (a_i), despite the
         # historical EquilibriumResult field name; gamma lives separately.
         activity_coefficients=activities,

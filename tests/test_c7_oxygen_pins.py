@@ -124,6 +124,23 @@ def test_d142_hex(engine, alpha):
     assert d142_receipt(engine, alpha) == expected("d142", f"{engine}:{alpha}")
 
 
+def test_battery_adapter_preserves_intrinsic_oxygen_notice():
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _internal_analytical_vapor_pressure_adapter, _new_internal_analytical_core,
+        PO2_COMMANDED, Po2Request,
+    )
+    temperature, pressure, composition = _hashimoto_start()
+    result = _internal_analytical_vapor_pressure_adapter(
+        core=_new_internal_analytical_core(), temperature_C=temperature - 273.15,
+        pressure_bar=pressure, composition_kg=composition, composition_mol=None,
+        fO2_log=-9.0, po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1e-5),
+        include_diagnostic_shadows=False,
+    )
+    notice = 'no gas-side closure; published intrinsic melt oxygen potential used'
+    assert notice in result.warnings
+    assert notice in result.diagnostics['vapor_pressure_diagnostic']['kernel_vapor_pressure_warnings']
+
+
 @pytest.mark.parametrize("material", ["Al2O3", "CaO", "MgO", "SiO2", "TiO2"])
 @pytest.mark.parametrize("mode", ["self_buffered", "imposed"])
 def test_refractory_hex(material, mode):
