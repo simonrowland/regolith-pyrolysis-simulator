@@ -221,7 +221,7 @@ def test_simulation_tick_payload_renders_operator_dom_readouts(
     assert rendered["text"]["status-mass"] == (
         f"Melt: {payload['melt_mass_kg']:.0f} kg"
     )
-    assert rendered["text"]["status-atmosphere"] == "Atmosphere: Hard vacuum"
+    assert rendered["text"]["status-atmosphere"] == "Atmosphere: Argon flow"
     assert rendered["text"]["energy-cumulative"] == (
         f"{payload['energy_electrical_plus_evaporation_cumulative_kWh']:.1f} kWh"
     )
