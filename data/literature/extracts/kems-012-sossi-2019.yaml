@@ -7,12 +7,12 @@ source:
   doi: 10.1016/j.gca.2019.06.021
   year: 2019
 extraction:
-  method: OCR-artifact transcription (prior MinerU of byte-identical PDF; 2026-08-03 spool failed; retry1
+  method: OCR-artifact transcription (prior MinerU of byte-identical PDF; 2026-08-03 spool failed; retry1; validated in an internal review, 2026-08-26, ocr-artifacts; values OCR-repaired in a private pass, 2026-08-27; verified against the PDF page
     still in errors on s2 — no supersede) + phase-2 geometry extract + 2026-08-26 remine of Tables
     1–6 residue/logK*/γ_i (Mn primary; open-furnace residue typed as residue, not alpha)
   date: '2026-08-26'
   worker: tp3-sossi-remine
-  provenance_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/
+  provenance_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
 review_status: draft
 benches:
 - id: gero-open-furnace
@@ -5336,7 +5336,7 @@ species:
     - observation_id: sossi_2019_na_alpha_e_gamma_derived_range
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         section: 4.6 Evaporation coefficients
         line_range: 300-302
         note: α_e,NaO0.5 from eq.6 using literature γ_NaO0.5 at 1400 °C
@@ -5387,13 +5387,13 @@ species:
           note: 'Source: "surface areas (≈ 2×10^{-5} m)" (OCR units m; interpreted as m² for bead surface).
             Thermocouple bead radius 10^{-4} m given same paragraph.'
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m) than the thermocouple bead
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -5401,13 +5401,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_na_alpha_e_authors_adopted_unity
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         section: 4.6 Evaporation coefficients
         line_range: '306'
         note: authors set α_e=1 after concluding coefficients close to unity within ×2–3
@@ -5447,7 +5447,7 @@ species:
     - observation_id: sossi_2019_na_logKstar_table3
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: Results — Na / Table 3
         paragraph: log K* Na = -4.25±0.10 at 1400 °C (1673.15 K); n=1; reaction NaO0.5(l)=Na(g)+1/4 O2
@@ -5498,7 +5498,7 @@ species:
     - observation_id: sossi_2019_na_pure_system_LH_table5
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: Table 5 pure-system thermodynamic data
         paragraph: Na* pure system ΔS°=0.128 kJ/molK, ΔH°=255.0 kJ; Source 2 = Lamoreaux & Hildenbrand
@@ -5533,7 +5533,7 @@ species:
     - observation_id: sossi_2019_na_class_and_transport_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         section: 4.6 Evaporation coefficients
         line_range: 300-306
       T_range_K:
@@ -5588,26 +5588,26 @@ species:
           value: 2.0e-05
           units: m2
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: surface areas ≈ 2e-5 m
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt otherwise (not Knudsen)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: metal wire loop
             line_range: '67'
         chamber_pressure:
           value: 1.0
           units: bar
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_na_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         line_range: '1112-1118'
@@ -5671,13 +5671,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -5685,7 +5685,7 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
 
@@ -5952,7 +5952,7 @@ species:
     - observation_id: sossi_2019_k_open_furnace_alpha_e_context
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         line_range: 302-306
       T_range_K:
       - 1573.15
@@ -5981,19 +5981,19 @@ species:
           value: 2.0e-05
           units: m2
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: surface areas ≈ 2×10^-5 m
             line_range: '71'
         cell_material:
           value: Re/Pt wire loops
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: metal wire loop
             line_range: '67'
     - observation_id: sossi_2019_k_class_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         section: '4.6'
         line_range: 302-306
       T_range_K:
@@ -6029,23 +6029,23 @@ species:
           value: 2.0e-05
           units: m2
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             line_range: '71'
         cell_material:
           value: Re/Pt wire loops
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             line_range: '67'
         chamber_pressure:
           value: 1.0
           units: bar
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             line_range: '408'
     - observation_id: sossi_2019_k_logKstar_table3
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -6120,13 +6120,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -6134,13 +6134,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_k_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         line_range: '1112-1118'
@@ -6204,13 +6204,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -6218,13 +6218,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_k_table5_experimental
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: 'Table 5 pure-system / experimental thermodynamic data'
         line_range: '1121-1127'
@@ -6505,7 +6505,7 @@ species:
     - observation_id: sossi_2019_mn_table2_open_furnace_residue_ppm
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '2'
         section: '4.0 Results / Table 2'
         line_range: '1104-1108'
@@ -6906,13 +6906,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -6920,13 +6920,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_mn_table5_pure_system_not_experimental
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: 'Table 5 pure-system / experimental thermodynamic data'
         line_range: '1121-1127'
@@ -6965,7 +6965,7 @@ species:
     - observation_id: sossi_2019_mn_table6_te1_pure_system_derived
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '6'
         section: '5.1 Equilibrium evaporation / Table 6'
         line_range: '1130'
@@ -10229,7 +10229,7 @@ species:
     - observation_id: sossi_2019_ti_table2_open_furnace_residue_ppm
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '2'
         section: '4.0 Results / Table 2'
         line_range: '1104-1108'
@@ -10630,13 +10630,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -10644,7 +10644,7 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906
@@ -13658,7 +13658,7 @@ species:
     - observation_id: sossi_2019_sc_table1_2_nonvolatile_residue
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '1'
         section: '4.5 Data fitting'
         line_range: '1100, 236'
@@ -13706,13 +13706,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -13720,7 +13720,7 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906
@@ -14411,7 +14411,7 @@ species:
     - observation_id: sossi_2019_v_table1_2_nonvolatile_residue
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '1'
         section: '4.5 Data fitting'
         line_range: '1100, 236'
@@ -14459,13 +14459,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -14473,7 +14473,7 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906
@@ -15164,7 +15164,7 @@ species:
     - observation_id: sossi_2019_zr_table1_2_nonvolatile_residue
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '1'
         section: '4.5 Data fitting'
         line_range: '1100, 236'
@@ -15212,13 +15212,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -15226,7 +15226,7 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906
@@ -15917,7 +15917,7 @@ species:
     - observation_id: sossi_2019_la_table1_2_nonvolatile_residue
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '1'
         section: '4.5 Data fitting'
         line_range: '1100, 236'
@@ -15965,13 +15965,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -15979,7 +15979,7 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906
@@ -16670,7 +16670,7 @@ species:
     - observation_id: sossi_2019_gd_table1_2_nonvolatile_residue
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '1'
         section: '4.5 Data fitting'
         line_range: '1100, 236'
@@ -16718,13 +16718,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -16732,7 +16732,7 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906
@@ -17423,7 +17423,7 @@ species:
     - observation_id: sossi_2019_yb_table1_2_nonvolatile_residue
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '1'
         section: '4.5 Data fitting'
         line_range: '1100, 236'
@@ -17471,13 +17471,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -17485,7 +17485,7 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906
@@ -18176,7 +18176,7 @@ species:
     - observation_id: sossi_2019_li_logKstar_table3_Li_g
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -18245,13 +18245,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -18259,13 +18259,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_li_logKstar_table3_LiO_g
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -18334,13 +18334,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -18348,13 +18348,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_li_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         line_range: '1112-1118'
@@ -18413,13 +18413,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -18427,13 +18427,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_li_table5_experimental_Li_g
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: 'Table 5 pure-system / experimental thermodynamic data'
         line_range: '1121-1127'
@@ -18662,7 +18662,7 @@ species:
     - observation_id: sossi_2019_rb_logKstar_table3
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -18741,13 +18741,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -18755,13 +18755,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_rb_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         page: 57
@@ -18831,13 +18831,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -18845,13 +18845,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_rb_table5_experimental
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: 'Table 5 pure-system / experimental thermodynamic data'
         line_range: '1121-1127'
@@ -19083,7 +19083,7 @@ species:
     - observation_id: sossi_2019_cu_logKstar_table3
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -19163,13 +19163,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -19177,13 +19177,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_cu_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         page: 57
@@ -19262,13 +19262,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -19276,13 +19276,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_cu_table5_experimental
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: 'Table 5 pure-system / experimental thermodynamic data'
         line_range: '1121-1127'
@@ -19550,7 +19550,7 @@ species:
     - observation_id: sossi_2019_ag_logKstar_table3
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -19617,13 +19617,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -19631,13 +19631,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_ag_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         line_range: '1112-1118'
@@ -19695,13 +19695,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -19709,7 +19709,7 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_ag_logKstar_table3_quoted_20260906
@@ -19793,7 +19793,7 @@ species:
     - observation_id: sossi_2019_zn_logKstar_table3
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -19873,13 +19873,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -19887,13 +19887,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_zn_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         page: 57
@@ -19966,13 +19966,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -19980,13 +19980,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_zn_table5_experimental
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: 'Table 5 pure-system / experimental thermodynamic data'
         line_range: '1121-1127'
@@ -20243,7 +20243,7 @@ species:
     - observation_id: sossi_2019_ge_logKstar_table3
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -20323,13 +20323,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -20337,13 +20337,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_ge_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         page: 57
@@ -20415,13 +20415,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -20429,13 +20429,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_ge_table5_experimental
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: 'Table 5 pure-system / experimental thermodynamic data'
         line_range: '1121-1127'
@@ -20692,7 +20692,7 @@ species:
     - observation_id: sossi_2019_cd_logKstar_table3
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -20757,13 +20757,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -20771,13 +20771,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_cd_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         line_range: '1112-1118'
@@ -20834,13 +20834,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -20848,7 +20848,7 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_cd_logKstar_table3_quoted_20260906
@@ -20932,7 +20932,7 @@ species:
     - observation_id: sossi_2019_ga_logKstar_table3_Ga_g
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -21008,13 +21008,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -21022,13 +21022,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_ga_logKstar_table3_GaO_g
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -21104,13 +21104,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -21118,13 +21118,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_ga_table5_experimental_Ga_g
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: 'Table 5 pure-system / experimental thermodynamic data'
         line_range: '1121-1127'
@@ -21353,7 +21353,7 @@ species:
     - observation_id: sossi_2019_pb_logKstar_table3_PbO_g
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -21423,13 +21423,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -21437,13 +21437,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_pb_logKstar_table3_Pb_g
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -21512,13 +21512,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -21526,13 +21526,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_pb_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         page: 57
@@ -21610,13 +21610,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -21624,13 +21624,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_pb_table5_experimental_PbO_g
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: 'Table 5 pure-system / experimental thermodynamic data'
         line_range: '1121-1127'
@@ -21903,7 +21903,7 @@ species:
     - observation_id: sossi_2019_mo_logKstar_table3_MoO3_congruent
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -21983,13 +21983,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -21997,13 +21997,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_mo_logKstar_table3_MoO2_ox
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -22082,13 +22082,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -22096,13 +22096,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_mo_table5_experimental_MoO3
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: 'Table 5 pure-system / experimental thermodynamic data'
         line_range: '1121-1127'
@@ -22337,7 +22337,7 @@ species:
     - observation_id: sossi_2019_cr_logKstar_table3_CrO_ox
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '3'
         section: 'Results / Table 3'
         line_range: '1108-1112'
@@ -22410,13 +22410,13 @@ species:
           units: m2
           form: glass_bead_on_wire_loop
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
             line_range: '71'
         cell_material:
           value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: loaded onto a metal wire loop; Re used where possible
             line_range: '67'
         chamber_pressure:
@@ -22424,13 +22424,13 @@ species:
           units: bar
           note: 1-atm vertical tube gas-mixing furnace (GERO)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_cr_table5_experimental_CrO_ox
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
         table: '5'
         section: 'Table 5 pure-system / experimental thermodynamic data'
         line_range: '1121-1127'
@@ -22585,7 +22585,7 @@ fidelity_samples:
   - 0.3
   - 1.7
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     paragraph: α_e,NaO0.5 between 0.3 – 1.7 for our experiments at 1400 °C
     line_range: '302'
 - species: Na
@@ -22594,14 +22594,14 @@ fidelity_samples:
   field: alpha
   value: 1.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     paragraph: evaporation coefficients are close to unity (within a factor of 2-3); α_e is set to 1
     line_range: '306'
 - path: species.Na.observations[sossi_2019_na_alpha_e_gamma_derived_range].equipment.sample_surface_area.value
   value: 2.0e-05
   note: stated sample surface area ≈ 2e-5 m2
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     paragraph: surface areas (≈ 2×10^{-5} m)
     line_range: '71'
 - species: Na
@@ -22610,7 +22610,7 @@ fidelity_samples:
   field: log10_K_star
   value: -4.25
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     note: logK* Na = -4.25±0.10 @1673.15 K
 - species: Na
@@ -22619,7 +22619,7 @@ fidelity_samples:
   field: Delta_H_std_kJ_mol
   value: 255.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     note: pure-system ΔH° = 255.0 kJ (Source 2 = L&H 1984)
 - species: Na
@@ -22628,7 +22628,7 @@ fidelity_samples:
   field: alpha
   value: 1.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     section: '4.6'
     line_range: '306'
 - species: K
@@ -22637,7 +22637,7 @@ fidelity_samples:
   field: alpha
   value: 1.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     section: '4.6'
 - species: Na
   observable: activity_coefficient
@@ -22645,7 +22645,7 @@ fidelity_samples:
   field: gamma
   value: 0.001
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '4'
     line_range: '1112-1118'
 - species: K
@@ -22654,7 +22654,7 @@ fidelity_samples:
   field: log10_K_star
   value: -3.95
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: K
@@ -22663,7 +22663,7 @@ fidelity_samples:
   field: gamma
   value: 0.00022
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '4'
     line_range: '1112-1118'
 - species: K
@@ -22672,7 +22672,7 @@ fidelity_samples:
   field: Delta_H_star_kJ_mol
   value: 209.5
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     line_range: '1121-1127'
 - species: Mn
@@ -22681,7 +22681,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 690.2
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '2'
     line_range: '1104-1108'
 - species: Mn
@@ -22690,7 +22690,7 @@ fidelity_samples:
   field: Delta_H_std_kJ_mol
   value: 606.3
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     line_range: '1121-1127'
 - species: Mn
@@ -22699,7 +22699,7 @@ fidelity_samples:
   field: Te1_K_logfO2_m10
   value: 1974
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '6'
     line_range: '1130'
 - species: Ti
@@ -22708,7 +22708,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 1045.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '2'
     line_range: '1104-1108'
 - species: Sc
@@ -22717,7 +22717,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 850.8
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '1'
     line_range: '1100'
 - species: V
@@ -22726,7 +22726,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 1024.6
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '1'
     line_range: '1100'
 - species: Zr
@@ -22735,7 +22735,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 1118.1
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '1'
     line_range: '1100'
 - species: La
@@ -22744,7 +22744,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 969.8
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '1'
     line_range: '1100'
 - species: Gd
@@ -22753,7 +22753,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 1060.6
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '1'
     line_range: '1100'
 - species: Yb
@@ -22762,7 +22762,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 1111.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '1'
     line_range: '1100'
 - species: Li
@@ -22771,7 +22771,7 @@ fidelity_samples:
   field: log10_K_star
   value: -5.36
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Li
@@ -22780,7 +22780,7 @@ fidelity_samples:
   field: log10_K_star
   value: -3.39
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Li
@@ -22789,7 +22789,7 @@ fidelity_samples:
   field: gamma
   value: 15.4
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '4'
     line_range: '1112-1118'
 - species: Li
@@ -22798,7 +22798,7 @@ fidelity_samples:
   field: Delta_H_star_kJ_mol
   value: 413.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     line_range: '1121-1127'
 - species: Rb
@@ -22807,7 +22807,7 @@ fidelity_samples:
   field: log10_K_star
   value: -3.12
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Rb
@@ -22816,7 +22816,7 @@ fidelity_samples:
   field: gamma
   value: 0.00013
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '4'
     line_range: '1112-1118'
 - species: Rb
@@ -22825,7 +22825,7 @@ fidelity_samples:
   field: Delta_H_star_kJ_mol
   value: 306.4
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     line_range: '1121-1127'
 - species: Cu
@@ -22834,7 +22834,7 @@ fidelity_samples:
   field: log10_K_star
   value: -3.7
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Cu
@@ -22843,7 +22843,7 @@ fidelity_samples:
   field: gamma
   value: 11.8
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '4'
     line_range: '1112-1118'
 - species: Cu
@@ -22852,7 +22852,7 @@ fidelity_samples:
   field: Delta_H_star_kJ_mol
   value: 264.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     line_range: '1121-1127'
 - species: Ag
@@ -22861,7 +22861,7 @@ fidelity_samples:
   field: log10_K_star
   value: -2.23
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Ag
@@ -22870,7 +22870,7 @@ fidelity_samples:
   field: gamma
   value: 0.67
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '4'
     line_range: '1112-1118'
 - species: Zn
@@ -22879,7 +22879,7 @@ fidelity_samples:
   field: log10_K_star
   value: -3.96
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Zn
@@ -22888,7 +22888,7 @@ fidelity_samples:
   field: gamma
   value: 0.51
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '4'
     line_range: '1112-1118'
 - species: Zn
@@ -22897,7 +22897,7 @@ fidelity_samples:
   field: Delta_H_star_kJ_mol
   value: 548.6
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     line_range: '1121-1127'
 - species: Ge
@@ -22906,7 +22906,7 @@ fidelity_samples:
   field: log10_K_star
   value: -3.7
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Ge
@@ -22915,7 +22915,7 @@ fidelity_samples:
   field: gamma
   value: 0.11
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '4'
     line_range: '1112-1118'
 - species: Ge
@@ -22924,7 +22924,7 @@ fidelity_samples:
   field: Delta_H_star_kJ_mol
   value: 612.7
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     line_range: '1121-1127'
 - species: Cd
@@ -22933,7 +22933,7 @@ fidelity_samples:
   field: log10_K_star
   value: -2.48
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Cd
@@ -22942,7 +22942,7 @@ fidelity_samples:
   field: gamma
   value: 0.15
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '4'
     line_range: '1112-1118'
 - species: Ga
@@ -22951,7 +22951,7 @@ fidelity_samples:
   field: log10_K_star
   value: -9.92
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Ga
@@ -22960,7 +22960,7 @@ fidelity_samples:
   field: log10_K_star
   value: -5.1
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Ga
@@ -22969,7 +22969,7 @@ fidelity_samples:
   field: Delta_H_star_kJ_mol
   value: 885.9
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     line_range: '1121-1127'
 - species: Pb
@@ -22978,7 +22978,7 @@ fidelity_samples:
   field: log10_K_star
   value: -2.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Pb
@@ -22987,7 +22987,7 @@ fidelity_samples:
   field: log10_K_star
   value: -3.49
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Pb
@@ -22996,7 +22996,7 @@ fidelity_samples:
   field: gamma
   value: 0.17
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '4'
     line_range: '1112-1118'
 - species: Pb
@@ -23005,7 +23005,7 @@ fidelity_samples:
   field: Delta_H_star_kJ_mol
   value: 452.1
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     line_range: '1121-1127'
 - species: Mo
@@ -23014,7 +23014,7 @@ fidelity_samples:
   field: log10_K_star
   value: -4.34
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Mo
@@ -23023,7 +23023,7 @@ fidelity_samples:
   field: log10_K_star
   value: -2.86
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Mo
@@ -23032,7 +23032,7 @@ fidelity_samples:
   field: Delta_H_star_kJ_mol
   value: 332.4
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     line_range: '1121-1127'
 - species: Cr
@@ -23041,7 +23041,7 @@ fidelity_samples:
   field: log10_K_star
   value: -2.7
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
 - species: Cr
@@ -23050,7 +23050,7 @@ fidelity_samples:
   field: Delta_H_star_kJ_mol
   value: 163.1
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
     table: '5'
     line_range: '1121-1127'
 - species: Na

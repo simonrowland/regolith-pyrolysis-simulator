@@ -543,7 +543,8 @@ def test_pin_reactive_re_cell_implicit_predictor_keeps_notice(monkeypatch) -> No
     from tests.battery import test_silent_fills as sf
 
     sf._capture_cell(monkeypatch)
-    # Default _kems_partial has no printed fO2 → expect typed missing_fO2 refusal.
+    # Default _kems_partial has no printed fO2. An unmodelled Re cell cannot
+    # close, so the row stays a typed missing-fO2 refusal.
     observation, experiment = sf._kems_partial(cell_material=None)
     bench = sf._cell_material_bench((CellMaterial.RE,))
     experiment = replace(experiment, bench_id=bench.id)
@@ -566,6 +567,10 @@ def test_pin_reactive_re_cell_implicit_predictor_keeps_notice(monkeypatch) -> No
     if residual.status is ResidualStatus.REFUSED:
         detail = dict(residual.refusal.detail) if residual.refusal is not None else {}
         reason = str(detail.get("reason") or detail.get("missing_input") or "")
+        assert reason not in {
+            "oxygen_balance_effusion_unsupported_engine",
+            "reactive_cell_oxygen_reservoir",
+        }, detail
         assert "fO2" in reason or reason == "missing_fO2", detail
     else:
         assert residual.numeric is not None

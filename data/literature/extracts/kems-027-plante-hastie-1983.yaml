@@ -19,9 +19,10 @@ extraction:
     the 2026-08-03 OCR extract retained without rewriting values. Printed
     plate numbers for Figs 5 and 7 are swapped vs §8 captions (noted on
     locators).
+    validated in an internal review, 2026-09-06, hunts
   date: '2026-09-06'
   worker: hunt-RH-48
-  provenance_path: docs-private/research/2026-09-06-hunts/RH-48/kems-027-plante-hastie-1983/
+  provenance_path: raw/kems-027-plante-hastie-1983/kems-027-plante-hastie-1983.pdf
 review_status: draft
 fidelity_samples:
 - species: Na
@@ -30,7 +31,7 @@ fidelity_samples:
   field: cell_od_cm
   value: 0.80
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+    source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
     paragraph: 0.80 cm o.d. by 1.90 cm high
     line_range: '163'
 - species: Na
@@ -451,7 +452,7 @@ species:
       experiment: kms-vacuum-glass-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+        source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
         paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
         line_range: '145-163'
         figure: '2'
@@ -486,13 +487,13 @@ species:
               C appears in m_i / (Δt) = P_i C a √(M_i/(2πRT)) form; numeric Clausing for this
               orifice not given — partial observation only.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+            source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
             paragraph: C the Clausing factor, a the orifice area
             line_range: '145'
         cell_material:
           value: Pt (0.025 cm sheet welded; lid 0.015 cm Pt sheet)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+            source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
             paragraph: Knudsen cell was made of 0.025 cm Pt sheet
             line_range: '163'
     - observation_id: plante_hastie_1983_table1_snw_glass_composition

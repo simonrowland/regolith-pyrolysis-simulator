@@ -7,7 +7,7 @@ source:
   url: https://ui.adsabs.harvard.edu/abs/1984LPSC...15..509M
   year: 1984
 extraction:
-  method: Corpus PDF is a 2009 Acrobat Paper Capture scan of the LPI/ADS LPSC XV abstract (2 letter pages,
+  method: Corpus PDF is a 2009 Acrobat Paper Capture scan of the LPI/ADS LPSC XV abstract (2 letter pages,; validated in an internal review, 2026-09-12, kems-extracts
     published pp. 509–510). pdftotext -layout and MinerU are noisy OCR layers and were not used as data.
     Tables 1–2 transcribed from a 400 dpi pdftoppm PNG of PDF page 2; page-1 method numbers transcribed
     from the same-resolution render of PDF page 1. Where MinerU/tesseract and the render disagree, the
@@ -21,7 +21,7 @@ extraction:
     a corrections entry. Unreadable Table 1 cells are omitted, not guessed.
   date: '2026-09-12'
   worker: extract-kems-026
-  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+  provenance_path: raw/kems-026-markova-1984/kems-026-markova-1984.pdf
 review_status: draft
 corrections:
 - observation_id: markova_1984_table2_residual_melt_VI_lherzolite

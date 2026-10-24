@@ -153,8 +153,11 @@ CEA_ELEMENT_ALLOTROPE_ALIASES: dict[tuple[str, str], Polymorph] = {
 # map: these names already identify a mineral or a previously stored token.
 POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "alpha": Polymorph.ALPHA,
+    "α": Polymorph.ALPHA,
     "beta": Polymorph.BETA,
+    "β": Polymorph.BETA,
     "gamma": Polymorph.GAMMA,
+    "γ": Polymorph.GAMMA,
     "delta": Polymorph.DELTA,
     "kappa": Polymorph.KAPPA,
     "i": Polymorph.I,

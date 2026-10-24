@@ -7,10 +7,10 @@ source:
   url: https://doi.org/10.1007/s11661-012-1464-2
   year: 2013
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + phase-2 theory/geometry extract
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 theory/geometry extract; validated in an internal review, 2026-08-03, ocr-artifacts
   date: '2026-08-03'
   worker: ocr-phase2b-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/
+  provenance_path: raw/kems-009-safarian-2013/kems-009-safarian-2013.pdf
 review_status: draft
 species:
   Si:
@@ -18,8 +18,8 @@ species:
     - observation_id: safarian_2013_si_pure_langmuir_theory
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
-        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-009-safarian-2013/tables.md
+        source_path: text/kems-009-safarian-2013/mineru/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+        repaired_table_path: text/kems-009-safarian-2013/ocr-repair/kems-009-safarian-2013.md
         section: Hertz-Knudsen / Schrage / vapor velocity / flux (theory review)
         page: '747'
         line_range: 112-245
@@ -61,13 +61,13 @@ species:
               ≲ half mean free path in equilibrium vapor (cited)
             numeric_m2: null
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+            source_path: text/kems-009-safarian-2013/mineru/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
             paragraph: characteristic dimension of the surface is less than about half the mean-free path
             line_range: '243'
     - observation_id: safarian_2013_si_pure_liquid_alpha_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+        source_path: text/kems-009-safarian-2013/mineru/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
         paragraph: liquid metal evaporation; 0.844 n_Max intensive vacuum limit
       T_range_K:
       - 1687.0
@@ -106,7 +106,7 @@ fidelity_samples:
   field: weak_evaporation_eta
   value: 1.66
   locator:
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-009-safarian-2013/tables.md
+    source_path: text/kems-009-safarian-2013/ocr-repair/kems-009-safarian-2013.md
     page: '747'
     paragraph: Hertz-Knudsen evaporation coefficient (weak evaporation, stated) = 1.66
 - species: Si
@@ -115,7 +115,7 @@ fidelity_samples:
   field: p_eff_over_p_sat_at_eta_1
   value: 0.193
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+    source_path: text/kems-009-safarian-2013/mineru/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
     paragraph: η as unity yields p_eff = 0.193 p°
     line_range: '229'
 - species: Si
@@ -124,5 +124,5 @@ fidelity_samples:
   field: alpha
   value: 1.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+    source_path: text/kems-009-safarian-2013/mineru/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
     note: pure Si liquid α≈1

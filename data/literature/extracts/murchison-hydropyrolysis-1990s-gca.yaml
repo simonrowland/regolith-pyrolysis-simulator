@@ -9,7 +9,7 @@ source:
   url: https://doi.org/10.1016/j.gca.2003.08.019
   year: 2004
 extraction:
-  method: 'Corpus PDF raw/murchison-hydropyrolysis-1990s-gca/murchison-hydropyrolysis-1990s-gca.pdf. Born-digital
+  method: 'Corpus PDF raw/murchison-hydropyrolysis-1990s-gca/murchison-hydropyrolysis-1990s-gca.pdf. Born-digital; validated in an internal review, 2026-09-12, ocr-artifacts
     Elsevier GCA. pdftotext -layout used only to locate tables; not data. Tables 1-3 transcribed from
     a 400 dpi pdftoppm render (docs-private/research/ocr-artifacts/murchison-hydropyrolysis-1990s-gca/p-5.png
     and p-6.png). Printed units retained (wt%, ppm, permil, deg C, MPa) before converting T to K as T_K
@@ -19,7 +19,7 @@ extraction:
     with reason em_dash_not_printed. Not vacuum: 15 MPa H2 open-system hydropyrolysis with dry-ice trap.'
   date: '2026-09-12'
   worker: extract-pyro-meteorite
-  provenance_path: docs-private/research/ocr-artifacts/murchison-hydropyrolysis-1990s-gca/
+  provenance_path: raw/murchison-hydropyrolysis-1990s-gca/murchison-hydropyrolysis-1990s-gca.pdf
 review_status: draft
 benches:
 - id: h2-pyrolysis-reactor

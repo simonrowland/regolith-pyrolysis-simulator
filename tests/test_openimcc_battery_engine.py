@@ -1636,7 +1636,7 @@ binary_pot_residual, binary_pot_candidate = next(
 )
 assert binary_pot_residual.key == (
     "kems-042-plante-1979::plante1979_table2_s1104_r001_quoted:"
-    "T=1302::p_partial::vapour::openimcc"
+    "T=1302::p_partial::vapour::openimcc::fo2_mode=shared_ladder"
 )
 assert binary_pot_residual.candidate == binary_pot_candidate.observation_id
 assert {
@@ -2476,6 +2476,318 @@ def test_allibert_single_phase_table_ii_refuses_without_in_cell_pressures() -> N
         and residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
         and residual.refusal.detail["primary_check"] == "in_cell_partial_pressure_sum"
         for residual in residuals
+    )
+
+
+def _fe2o3_partial_observation():
+    """Si partial pressure over a melt that still carries Fe2O3."""
+
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("SiO2", Decimal("0.75")),
+            ("FeO", Decimal("0.15")),
+            ("Fe2O3", Decimal("0.10")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(
+        formula="SiO2",
+        component_basis="SiO2",
+        composition=composition,
+        T_K=Decimal("1673.15"),
+        fO2_Pa=Decimal("1e-4"),
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Si", Phase.G),
+    )
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "openimcc-fe2o3-si-gas",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+    )
+    return experiment, observation
+
+
+def test_openimcc_fe2o3_battery_row_predicts_with_fold_notice() -> None:
+    _require_openimcc()
+    experiment, observation = _fe2o3_partial_observation()
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+    assert prediction.value is not None
+    assert math.isfinite(float(prediction.value))
+    assert prediction.value > 0
+    assert prediction.refusal_reason is None
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "ferric folded to FeOt"
+        for notice in prediction.notices
+    )
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "ferric component collapsed until d-072"
+        for notice in prediction.notices
+    )
+
+    work = F.work()
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+        extract_review={"": None, observation.source_id: "reviewed"},
+        hostname="test",
+    )
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.OPENIMCC,
+        context=context,
+        comparison_ids={observation.observation_id},
+    )
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "ferric folded to FeOt"
+        for notice in residual.notices
+    )
+
+
+def test_openimcc_battery_fe2o3_fold_conserves_iron_moles(monkeypatch) -> None:
+    _require_openimcc()
+    # Hand count, not a call to feot_equivalent_moles.
+    # n(FeO) = 1 mol and n(Fe2O3) = 0.25 mol.
+    # Each Fe2O3 formula unit carries two Fe atoms, so
+    # n(FeOt) = n(FeO) + 2 * n(Fe2O3) = 1 + 2 * 0.25 = 1.5 mol.
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.state import MOLAR_MASS
+
+    composition_mol = {"SiO2": 2.0, "FeO": 1.0, "Fe2O3": 0.25}
+    expected_feot = 1.0 + 2.0 * 0.25
+    assert expected_feot == 1.5
+
+    original_evaluate = openimcc_bridge.evaluate
+    observed: list[dict[str, object]] = []
+
+    def capture(**kwargs):
+        observed.append(dict(kwargs))
+        return original_evaluate(**kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", capture)
+    backend = _OpenImccBatteryBackend("openimcc")
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_mol=composition_mol,
+    )
+    sent = observed[-1]["composition_mol"]
+    assert sent["FeO"] == expected_feot
+    assert "Fe2O3" not in sent
+    assert sent["SiO2"] == 2.0
+    assert composition_mol["Fe2O3"] == 0.25
+    fold_rows = [
+        row
+        for row in result.diagnostics["imcc_notices"]
+        if row.get("code") == "openimcc_fe2o3_fold"
+    ]
+    assert len(fold_rows) == 1
+    assert fold_rows[0]["kind"] == "openimcc_notice"
+    assert fold_rows[0]["authority"] is None
+    assert fold_rows[0]["reason"] == "ferric folded to FeOt"
+    assert fold_rows[0]["basis"] == "Fe_atoms"
+    assert any(
+        row.get("code") == "openimcc_ferric_component_collapsed"
+        and row.get("message") == "ferric component collapsed until d-072"
+        for row in result.diagnostics["imcc_notices"]
+    )
+    assert result.status == "ok"
+
+    # kg-only input is a 1 kg batch: wt% = kg * 100, n_i = (wt%/100) * 1000 / M_i.
+    # n(FeOt) = n(FeO) + 2 * n(Fe2O3) on that vector.
+    composition_kg = {"SiO2": 0.60, "FeO": 0.20, "Fe2O3": 0.20}
+    n_feo = (0.20 * 100.0 / 100.0) * 1000.0 / float(MOLAR_MASS["FeO"])
+    n_fe2o3 = (0.20 * 100.0 / 100.0) * 1000.0 / float(MOLAR_MASS["Fe2O3"])
+    expected_kg_feot = n_feo + 2.0 * n_fe2o3
+    backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg=composition_kg,
+    )
+    assert "composition_kg" not in observed[-1]
+    sent_kg = observed[-1]["composition_mol"]
+    assert sent_kg["FeO"] == expected_kg_feot
+    assert "Fe2O3" not in sent_kg
+
+
+def test_openimcc_battery_without_fe2o3_is_bit_identical(monkeypatch) -> None:
+    _require_openimcc()
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+    from simulator.melt_backend import openimcc_bridge
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    original_evaluate = openimcc_bridge.evaluate
+    observed: list[dict[str, object]] = []
+
+    def capture(**kwargs):
+        observed.append(dict(kwargs))
+        return original_evaluate(**kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", capture)
+    composition_mol = {"K2O": 0.5, "SiO2": 0.5}
+    composition_kg = {"K2O": 0.07, "SiO2": 0.93}
+    backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_mol=composition_mol,
+        composition_kg={"K2O": 0.0470978, "SiO2": 0.0300415},
+    )
+    assert observed[-1]["composition_mol"] is composition_mol
+    assert "composition_kg" not in observed[-1]
+
+    wt_result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_kg=composition_kg,
+    )
+    assert observed[-1]["composition_kg"] is composition_kg
+    assert "composition_mol" not in observed[-1]
+    direct = original_evaluate(
+        composition_kg=composition_kg,
+        temperature_K=1800.0,
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    assert wt_result.activity_coefficients == dict(direct.parent_oxide_activities)
+    assert wt_result.activity_coefficient_details == {
+        str(name): dict(row) for name, row in direct.activity_coefficients.items()
+    }
+
+    zero_ferric = {"SiO2": 1.0, "Fe2O3": 0.0}
+    folded, fold_notices = openimcc_bridge.fold_ferric_to_feot(zero_ferric)
+    assert folded is zero_ferric
+    assert fold_notices == ()
+
+    po2 = Po2Request(mode="commanded", po2_bar=1.0e-9)
+    handle = open_battery_engine("openimcc")
+    with_fold = equilibrate_cell(
+        handle,
+        _binary_probe(),
+        temperature_K=1800.0,
+        po2=po2,
+        isolated=False,
+    )
+    real_fold = openimcc_bridge.fold_ferric_to_feot
+
+    def passthrough(composition):
+        return composition, ()
+
+    monkeypatch.setattr(openimcc_bridge, "fold_ferric_to_feot", passthrough)
+    bypassed = equilibrate_cell(
+        handle,
+        _binary_probe(),
+        temperature_K=1800.0,
+        po2=po2,
+        isolated=False,
+    )
+    assert with_fold.status == "ok"
+    assert bypassed.status == "ok"
+    assert with_fold.melt_activities == bypassed.melt_activities
+    assert with_fold.gas_partial_pressures_Pa == bypassed.gas_partial_pressures_Pa
+    assert with_fold.notices == bypassed.notices
+    assert not any(
+        row.get("code") == "openimcc_fe2o3_fold" for row in with_fold.notices
+    )
+
+    experiment = F.tabulation_experiment()
+    identity = F.activity_identity(
+        formula="SiO2",
+        component_basis="SiO2",
+        composition=Composition(
+            basis="ordered_complete_mole_inventory",
+            components=(
+                ("SiO2", Decimal("0.8")),
+                ("K2O", Decimal("0.2")),
+            ),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        ),
+        T_K=Decimal("1800"),
+        fO2_Pa=Decimal("1e-4"),
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Si", Phase.G),
+    )
+    observation = F.observation(
+        "openimcc-no-fe2o3-si-gas",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+    )
+    work = F.work()
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+        extract_review={"": None, observation.source_id: "reviewed"},
+        hostname="test",
+    )
+    # The passthrough is installed above, so this residual is the bypass.
+    bypass_residual, _candidate = compile_residual(
+        observation,
+        Engine.OPENIMCC,
+        context=context,
+        comparison_ids={observation.observation_id},
+    )
+    monkeypatch.setattr(openimcc_bridge, "fold_ferric_to_feot", real_fold)
+    folded_residual, _candidate = compile_residual(
+        observation,
+        Engine.OPENIMCC,
+        context=context,
+        comparison_ids={observation.observation_id},
+    )
+    assert folded_residual == bypass_residual
+
+
+def test_bypassing_fe2o3_fold_restores_openimcc_refusal(monkeypatch) -> None:
+    _require_openimcc()
+    from simulator.melt_backend import openimcc_bridge
+
+    def passthrough(composition):
+        return composition, ()
+
+    monkeypatch.setattr(openimcc_bridge, "fold_ferric_to_feot", passthrough)
+    pot = BinaryPot(
+        pot_id="openimcc-fe2o3-refusal",
+        kato_1993_table4_system=None,
+        why="mutation: raw Fe2O3 must be refused again",
+        composition_wt_pct={"SiO2": 60.0, "FeO": 20.0, "Fe2O3": 20.0},
+    )
+    cell = equilibrate_cell(
+        open_battery_engine("openimcc"),
+        pot,
+        temperature_K=1673.15,
+        po2=Po2Request(mode="commanded", po2_bar=1.0e-9),
+        isolated=False,
+    )
+    assert cell.status == "refusal"
+    assert "imcc_ferric_input_unsupported" in str(cell.engine_reason)
+
+    _experiment, observation = _fe2o3_partial_observation()
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert "imcc_ferric_input_unsupported" in str(
+        prediction.refusal_detail.get("engine_reason")
     )
 
 

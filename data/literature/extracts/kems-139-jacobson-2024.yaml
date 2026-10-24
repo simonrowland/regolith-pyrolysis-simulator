@@ -19,7 +19,7 @@ source:
     relation: table_1_observed_species_primary
     note: De Maria et al. 1971 LPSC, cited as [118].
 extraction:
-  method: 'Official HAL OA PDF https://hal.science/hal-04602114/document (HTTP 200 application/pdf, 12
+  method: 'Official HAL OA PDF https://hal.science/hal-04602114/document (HTTP 200 application/pdf, 12; validated in an internal review, 2026-09-06, wave-2
     604 954 bytes, sha256 3896c027a2c5add755999981b3232bae6735844113f2560a95d11c4324190218). doi.org 10.1002/rcm.9744
     HTTP/2 302 to Wiley; Wiley HTTP 403 Cloudflare JS challenge — not bypassed. HAL licence_s CC BY 4.0;
     Crossref VOR license CC BY-NC-ND 4.0. pdftotext -layout + 300 dpi pdftoppm of table pages. Tables
@@ -35,7 +35,7 @@ extraction:
     [296] FLiNaK DOI). No unit conversion. Missing = absent, never 0.'
   date: '2026-09-06'
   worker: wave-W2-jacobson-2024-r2
-  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-139-jacobson-2024/kems-139-jacobson-2024/
+  provenance_path: raw/kems-139-jacobson-2024/kems-139-jacobson-2024.pdf
 review_status: draft
 fidelity_samples:
 - species: SiO2

@@ -64,7 +64,9 @@ def main(argv=None):
             if args.consumer == "engine_point":
                 results = engine_point_requests(inputs)
             elif args.consumer == "melt_activity":
-                results = melt_activity_requests(inputs)
+                results = melt_activity_requests(
+                    inputs, experiment=experiment, bench=bench, observation=observation,
+                )
             elif args.consumer == "kems":
                 results = (kems_case(inputs),)
             else:

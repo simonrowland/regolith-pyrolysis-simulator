@@ -2134,5 +2134,7 @@ def consumer_readiness(experiment: Experiment, bench: Bench, observation: Observ
 
     inputs = collect_consumer_inputs(experiment, bench, observation)
     generated = (kems_case(inputs), vacuum_pyrolysis_preset(inputs, modelling_inputs=modelling_inputs),
-                 *engine_point_requests(inputs), *melt_activity_requests(inputs))
+                 *engine_point_requests(inputs), *melt_activity_requests(
+                     inputs, experiment=experiment, bench=bench, observation=observation,
+                 ))
     return tuple(item.readiness for item in generated)

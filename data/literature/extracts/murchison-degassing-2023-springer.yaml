@@ -10,7 +10,7 @@ source:
   url: https://doi.org/10.1134/S0038094623050064
   year: 2023
 extraction:
-  method: Corpus PDF is the Russian Astronomicheskii Vestnik original (raw/murchison-degassing-2023-springer/murchison-degassing-2023-springer.pdf).
+  method: Corpus PDF is the Russian Astronomicheskii Vestnik original (raw/murchison-degassing-2023-springer/murchison-degassing-2023-springer.pdf).; validated in an internal review, 2026-09-12, ocr-artifacts
     Born-digital. pdftotext -layout and MinerU were used only to locate tables; they are not data. Tables
     1, 2 and 4 transcribed from a 400 dpi pdftoppm PNG render (docs-private/research/ocr-artifacts/murchison-degassing-2023-springer/p-06.png
     and p-10.png). Printed units retained (mkg/g, deg C, bar) before converting T to K as T_K = t_C +
@@ -22,7 +22,7 @@ extraction:
     table.
   date: '2026-09-12'
   worker: extract-pyro-meteorite
-  provenance_path: docs-private/research/ocr-artifacts/murchison-degassing-2023-springer/
+  provenance_path: raw/murchison-degassing-2023-springer/murchison-degassing-2023-springer.pdf
 review_status: draft
 benches:
 - id: quartz-helium-degassing-rig

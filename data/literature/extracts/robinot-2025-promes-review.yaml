@@ -8,13 +8,13 @@ source:
   url: https://hal.science/hal-05061241/document
   year: 2025
 extraction:
-  method: official HAL OA PDF (https://hal.science/hal-05061241/document, HTTP 200 application/pdf); pdftotext
+  method: official HAL OA PDF (https://hal.science/hal-05061241/document, HTTP 200 application/pdf); pdftotext; validated in an internal review, 2026-09-06, wave-B
     -layout for Tables 1, 3, 4; Table 2 digitised from 300 dpi pdftoppm render of published p.247 (PDF
     p.7). MinerU table HTML used only as a hint and rejected where it would replace the render. ScienceDirect
     PII/PDF HTTP 403 Cloudflare not bypassed.
   date: '2026-09-06'
   worker: wave-WB-1
-  provenance_path: docs-private/research/2026-09-06-wave-B/WB-1/robinot-2025-promes-review/
+  provenance_path: raw/robinot-2025-promes-review/robinot-2025-promes-review.pdf
 review_status: draft
 fidelity_samples:
 - species: SiO2
