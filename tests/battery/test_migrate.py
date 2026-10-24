@@ -13316,6 +13316,8 @@ def test_robinot_hsc_model_yield_maps_with_printed_conditions() -> None:
     pressure = observation.point_conditions["total_pressure_Pa"]
     assert pressure.state.value == Decimal("1000")
     assert pressure.locator.published_page == 11
+    assert pressure.locator.pdf_page_index == 11
+    assert observation.locator.pdf_page_index == 11
     assert observation.identity.species.formula == "O2"
     assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     assert observation.admission.status is AdmissionStatus.ADMITTED
