@@ -36,6 +36,48 @@ def _init_git_checkout(path: Path, filename: str, contents: str) -> str:
     return _git("rev-parse", "HEAD", cwd=path)
 
 
+def _reported_path_matches(output: str, key: str, expected: Path) -> bool:
+    prefix = f"{key}="
+    reported = next(
+        (
+            token[len(prefix) :].rstrip(";,")
+            for token in output.split()
+            if token.startswith(prefix)
+        ),
+        None,
+    )
+    if reported is None:
+        return False
+    try:
+        return os.path.samefile(reported, expected)
+    except OSError:
+        return False
+
+
+def test_reported_path_matches_filesystem_identity(tmp_path: Path, monkeypatch) -> None:
+    checkout = tmp_path / "Checkout"
+    checkout.mkdir()
+    different = tmp_path / "different"
+    different.mkdir()
+    case_variant = tmp_path / "checkout"
+    real_samefile = os.path.samefile
+
+    def case_insensitive_samefile(first, second):
+        try:
+            return real_samefile(first, second)
+        except FileNotFoundError:
+            return (
+                os.path.realpath(first).casefold()
+                == os.path.realpath(second).casefold()
+            )
+
+    monkeypatch.setattr(os.path, "samefile", case_insensitive_samefile)
+
+    output = f"RESOLVED={case_variant}\n"
+    assert _reported_path_matches(output, "RESOLVED", checkout)
+    assert not _reported_path_matches(output, "RESOLVED", different)
+
+
 def test_collect_recipe_db_exits_nonzero_when_zero_studies() -> None:
     script = ROOT / "scripts" / "collect_recipe_db.sh"
     with tempfile.TemporaryDirectory() as tmp:
@@ -166,7 +208,7 @@ def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> 
         env=env,
     )
     assert unfixed.returncode != 0
-    assert f"RESOLVED={stale_sibling}" in unfixed.stdout
+    assert _reported_path_matches(unfixed.stdout, "RESOLVED", stale_sibling)
 
     script.write_text(fixed_script, encoding="utf-8")
     proc = subprocess.run(
@@ -179,10 +221,10 @@ def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> 
 
     assert proc.returncode == 0, proc.stdout + proc.stderr
     assert "vaporock: MATCH" in proc.stdout
-    assert f"RESOLVED={loaded_checkout}" in proc.stdout
+    assert _reported_path_matches(proc.stdout, "RESOLVED", loaded_checkout)
     assert f"WARNING: vaporock imported checkout differs" in proc.stdout
-    assert f"IMPORTED={loaded_checkout}" in proc.stdout
-    assert f"PIN={stale_sibling}" in proc.stdout
+    assert _reported_path_matches(proc.stdout, "IMPORTED", loaded_checkout)
+    assert _reported_path_matches(proc.stdout, "PIN", stale_sibling)
     assert f"PYTHON={sys.executable}" in proc.stdout
     assert "RESOLUTION=located" in proc.stdout
 
@@ -266,7 +308,7 @@ def test_enginepatch_verify_does_not_match_unloaded_sulfliq_fallback(
     assert "RESOLUTION=fallback" in proc.stdout
     assert "FALLBACK=MATCH" in proc.stdout
     assert "sulfliq: MATCH" not in proc.stdout
-    assert f"RESOLVED={fallback}" in proc.stdout
+    assert _reported_path_matches(proc.stdout, "RESOLVED", fallback)
 
     allowed = subprocess.run(
         ["bash", str(script), "--allow-not-loaded", *verify[2:]],
@@ -290,7 +332,7 @@ def test_enginepatch_verify_does_not_match_unloaded_sulfliq_fallback(
     )
     assert hidden_fallback.returncode != 0
     assert "FALLBACK=DRIFT" in hidden_fallback.stdout
-    assert f"RESOLVED={fallback}" in hidden_fallback.stdout
+    assert _reported_path_matches(hidden_fallback.stdout, "RESOLVED", fallback)
 
     (patch_dir / "UPSTREAM.pin").write_text(
         f"base_sha: {base_sha}\n", encoding="utf-8"
@@ -306,10 +348,11 @@ def test_enginepatch_verify_does_not_match_unloaded_sulfliq_fallback(
     )
     assert overridden.returncode != 0
     assert (
-        f"sulfliq: ASSERTED PATCH=MATCH RESOLVED={fallback} "
-        "(explicit SULFLIQ_CHECKOUT override; not import-verified)"
+        "sulfliq: ASSERTED PATCH=MATCH" in overridden.stdout
+        and "(explicit SULFLIQ_CHECKOUT override; not import-verified)"
         in overridden.stdout
     )
+    assert _reported_path_matches(overridden.stdout, "RESOLVED", fallback)
 
     asserted_allowed = subprocess.run(
         ["bash", str(script), "--allow-asserted", *verify[2:]],
@@ -395,11 +438,11 @@ def test_enginepatch_verify_keeps_located_tree_when_import_raises(
     )
 
     assert proc.returncode != 0
-    assert f"RESOLVED={loaded_checkout}" in proc.stdout
+    assert _reported_path_matches(proc.stdout, "RESOLVED", loaded_checkout)
     assert "vaporock: DRIFT" in proc.stdout
     assert "RESOLUTION=located" in proc.stdout
     assert "NOT-LOADED" not in proc.stdout
-    assert f"RESOLVED={stale_sibling}" not in proc.stdout
+    assert not _reported_path_matches(proc.stdout, "RESOLVED", stale_sibling)
 
     mutated_script = fixed_script.replace(
         'source="$(python_import_root "$package" 2>/dev/null)"',
@@ -416,8 +459,8 @@ def test_enginepatch_verify_keeps_located_tree_when_import_raises(
         env=env,
     )
     assert mutated.returncode != 0
-    assert f"RESOLVED={stale_sibling}" in mutated.stdout
-    assert f"RESOLVED={loaded_checkout}" not in mutated.stdout
+    assert _reported_path_matches(mutated.stdout, "RESOLVED", stale_sibling)
+    assert not _reported_path_matches(mutated.stdout, "RESOLVED", loaded_checkout)
 
 
 def test_enginepatch_verify_spec_miss_ignores_drifted_pin(
@@ -479,7 +522,7 @@ def test_enginepatch_verify_spec_miss_ignores_drifted_pin(
     assert "RESOLUTION=not-loaded" in proc.stdout
     assert "FALLBACK=UNRESOLVED" in proc.stdout
     assert "RESOLVED=unresolved" in proc.stdout
-    assert f"RESOLVED={pin_tree}" not in proc.stdout
+    assert not _reported_path_matches(proc.stdout, "RESOLVED", pin_tree)
     assert "FALLBACK=DRIFT" not in proc.stdout
 
 
