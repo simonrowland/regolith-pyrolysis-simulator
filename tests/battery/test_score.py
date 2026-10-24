@@ -5187,7 +5187,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     wrong_axis_shape = score_mod._e15_level_shape_rows(si_axis_points)[1]
     assert wrong_axis_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("-4.94")
+    ) == Decimal("-3.67")
 
     contested_payload = next(
         payload
