@@ -14131,6 +14131,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'vapour_rail_catalog',
         }
         memo = {id(self): self if state_receiver is None else state_receiver}
+        if state_receiver is not None and 'feedstocks' in self.__dict__:
+            # The read-only pressure projection never loads or edits feedstock
+            # inputs. Share that large table and its aliases instead of copying
+            # every feedstock on each residual evaluation. Whole-hour rollback
+            # retains its original detached mutable-input contract.
+            preserved_names.add('feedstocks')
+            memo[id(self.feedstocks)] = self.feedstocks
         record = getattr(self, 'record', None)
         record_snapshots = getattr(record, 'snapshots', None)
         if (
