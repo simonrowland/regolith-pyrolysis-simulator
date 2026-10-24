@@ -5318,11 +5318,14 @@ def antoine_dew_temperature_diagnostic(
         low, high = float(valid[0]), float(valid[1])
     except (KeyError, TypeError, ValueError, IndexError):
         low = high = math.nan
-    if (
-        (wall_coefficient_block == "pure_component_antoine" and not wall_coefficients)
-        or not math.isfinite(low)
-        or not math.isfinite(high)
-        or not 0.0 < low < high
+    has_certified_range = (
+        math.isfinite(low)
+        and math.isfinite(high)
+        and 0.0 < low < high
+    )
+    if not wall_coefficients and (
+        wall_coefficient_block == "pure_component_antoine"
+        or not has_certified_range
     ):
         return {
             "status": "unavailable_no_certified_antoine_range",
@@ -5332,7 +5335,14 @@ def antoine_dew_temperature_diagnostic(
             "routing_authority": False,
         }
 
-    certified_range = [low, high]
+    if has_certified_range:
+        certified_range = [low, high]
+    else:
+        # Numerical seeds only: Fe's pure-component Antoine sidecar has no
+        # certified range. This interval starts finite positive-pressure
+        # bracketing; it is never reported as a certified band.
+        low, high = 300.0, 600.0
+        certified_range = None
     try:
         p_low = _antoine_psat_pa(species, low, vapor_pressure_data=vapor_pressure_data)
         p_high = _antoine_psat_pa(species, high, vapor_pressure_data=vapor_pressure_data)
@@ -5355,12 +5365,14 @@ def antoine_dew_temperature_diagnostic(
             "routing_authority": False,
         }
     increasing = p_high > p_low
-    extrapolated = not min(p_low, p_high) <= target <= max(p_low, p_high)
+    extrapolated = (
+        not has_certified_range
+        or not min(p_low, p_high) <= target <= max(p_low, p_high)
+    )
     if extrapolated:
-        # Keep the certified interval as the initial bracket and extend only the
-        # side needed to reach the printed pressure. The Antoine owner already
-        # records out-of-band evaluation as extrapolated; this diagnostic does
-        # not grant routing authority to the result.
+        # Extend only the side needed to reach the printed pressure. The Antoine
+        # owner records out-of-band evaluation as extrapolated; this diagnostic
+        # does not grant routing authority to the result.
         bracket_temperature = high if (target > max(p_low, p_high)) == increasing else low
         bracket_pressure = p_high if bracket_temperature == high else p_low
         extending_high_temperature = bracket_temperature == high
@@ -5902,7 +5914,7 @@ def _record_antoine_extrapolation(
     *,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
     antoine_extrapolation_warnings: list[str] | None,
-) -> None:
+) -> dict[str, Any]:
     from engines.builtin.vapor_pressure import vapor_pressure_valid_range_K
 
     valid_range = vapor_pressure_valid_range_K(
@@ -5910,27 +5922,35 @@ def _record_antoine_extrapolation(
         coefficient_block,
         temperature_K=T_K,
     )
-    if not (isinstance(valid_range, (list, tuple)) and len(valid_range) == 2):
-        return
-    try:
-        valid_low = float(valid_range[0])
-        valid_high = float(valid_range[1])
-    except (TypeError, ValueError):
-        return
-    if not (
+    valid_low = valid_high = math.nan
+    if isinstance(valid_range, (list, tuple)) and len(valid_range) == 2:
+        try:
+            valid_low, valid_high = float(valid_range[0]), float(valid_range[1])
+        except (TypeError, ValueError):
+            pass
+    has_finite_range = (
         math.isfinite(valid_low)
         and math.isfinite(valid_high)
         and valid_low <= valid_high
-    ):
-        return
-    if valid_low <= T_K <= valid_high:
-        return
-
+    )
+    resolved_range = (valid_low, valid_high) if has_finite_range else None
+    if has_finite_range and valid_low <= T_K <= valid_high:
+        return {
+            'temperature_K': T_K,
+            'valid_range_K': resolved_range,
+            'authority_level': 'certified',
+            'reason': None,
+            'status': 'certified',
+        }
     record = {
         'temperature_K': T_K,
-        'valid_range_K': (valid_low, valid_high),
+        'valid_range_K': resolved_range,
         'authority_level': 'extrapolated',
-        'reason': 'wall_saturation_pressure_out_of_validated_range',
+        'reason': (
+            'wall_saturation_pressure_out_of_validated_range'
+            if has_finite_range
+            else 'wall_saturation_pressure_has_no_finite_valid_range'
+        ),
         'status': 'extrapolated',
     }
     if antoine_extrapolations is not None:
@@ -5950,12 +5970,14 @@ def _record_antoine_extrapolation(
     if antoine_extrapolation_warnings is not None:
         temperature_text = f"{T_K:.3f}".rstrip('0').rstrip('.')
         warning = (
-            f"{species} metal Antoine fit extrapolated beyond "
-            f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
-            f"{temperature_text} K"
+            f"{species} wall Antoine fit extrapolated beyond valid_range_K "
+            f"[{valid_low:g}, {valid_high:g}] at {temperature_text} K"
+            if has_finite_range
+            else f"{species} wall Antoine fit has no finite valid_range_K at {temperature_text} K"
         )
         if warning not in antoine_extrapolation_warnings:
             antoine_extrapolation_warnings.append(warning)
+    return record
 
 
 def _antoine_psat_pa(

@@ -249,6 +249,10 @@ def test_pure_species_dew_inverse_recovers_wall_saturation_pressure():
 
     temperature_K = 1000.0
     partial_pressure_Pa = condensation._antoine_psat_pa("Na", temperature_K)
+    diagnostic = condensation.antoine_dew_temperature_diagnostic(
+        "Na",
+        partial_pressure_Pa,
+    )
     observation, _ = _wall_row(
         Quantity.WALL_DEW_TEMPERATURE,
         local_pressure_Pa=Decimal(str(partial_pressure_Pa)),
@@ -256,6 +260,8 @@ def test_pure_species_dew_inverse_recovers_wall_saturation_pressure():
 
     prediction = predict_with_engine(Engine.MAGEMIN, observation)
 
+    assert diagnostic["valid_range_K"] == [924.0, 1118.0]
+    assert diagnostic["status"] == "diagnostic_only"
     assert prediction.execution.state is ExecutionState.PRODUCED
     assert 924.0 <= float(prediction.value) <= 1118.0
     assert prediction.authority is Authority.CERTIFIED
@@ -273,6 +279,10 @@ def test_high_pressure_dew_bracket_continues_until_target_is_bracketed():
     import simulator.condensation as condensation
 
     target_pressure = 10.0 * condensation._antoine_psat_pa("Na", 1600.0)
+    diagnostic = condensation.antoine_dew_temperature_diagnostic(
+        "Na",
+        target_pressure,
+    )
     observation, _ = _wall_row(
         Quantity.WALL_DEW_TEMPERATURE,
         local_pressure_Pa=Decimal(str(target_pressure)),
@@ -280,6 +290,8 @@ def test_high_pressure_dew_bracket_continues_until_target_is_bracketed():
 
     prediction = predict_with_engine(Engine.MAGEMIN, observation)
 
+    assert diagnostic["valid_range_K"] == [924.0, 1118.0]
+    assert diagnostic["status"] == "extrapolated"
     assert prediction.execution.state is ExecutionState.PRODUCED
     dew_temperature = float(prediction.value)
     assert dew_temperature > 1600.0
@@ -314,6 +326,61 @@ def test_dew_prediction_flags_root_outside_pure_component_wall_band():
     assert prediction.execution.state is ExecutionState.PRODUCED
     assert prediction.authority is Authority.EXTRAPOLATED
     assert authority_allowed(Quantity.WALL_DEW_TEMPERATURE, prediction.authority)
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in prediction.notices
+    )
+
+
+@pytest.mark.parametrize("temperature_K", [1500.0, 2000.0])
+def test_fe_dew_without_finite_wall_range_predicts_and_flags(temperature_K):
+    import simulator.condensation as condensation
+
+    target_pressure = condensation._antoine_psat_pa("Fe", temperature_K)
+    diagnostic = condensation.antoine_dew_temperature_diagnostic(
+        "Fe",
+        target_pressure,
+    )
+    observation, _ = _wall_row(
+        Quantity.WALL_DEW_TEMPERATURE,
+        formula="Fe",
+        local_pressure_Pa=Decimal(str(target_pressure)),
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert diagnostic.get("valid_range_K") is None
+    assert diagnostic["status"] == "extrapolated"
+    assert diagnostic["temperature_K"] == pytest.approx(temperature_K, abs=1e-8)
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert float(prediction.value) == pytest.approx(temperature_K, abs=1e-8)
+    assert condensation._antoine_psat_pa("Fe", float(prediction.value)) == pytest.approx(
+        target_pressure,
+        rel=1e-10,
+    )
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in prediction.notices
+    )
+
+
+@pytest.mark.parametrize("temperature_K", [1500.0, 2000.0])
+def test_fe_flux_without_finite_wall_range_is_extrapolated_and_flagged(temperature_K):
+    observation, experiment = _wall_row(
+        Quantity.WALL_DEPOSITION_FLUX,
+        formula="Fe",
+        wall_temperature_K=Decimal(str(temperature_K)),
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.authority is Authority.EXTRAPOLATED
     assert any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         for notice in prediction.notices
@@ -367,10 +434,11 @@ def test_out_of_band_dew_is_extrapolated_and_flagged(pressure_scale):
 
 
 @pytest.mark.parametrize("engine", [Engine.ALPHAMELTS, Engine.MAGEMIN])
-def test_species_without_wall_psat_refuses_with_typed_reason(engine):
+@pytest.mark.parametrize("species", ["SiO", "Na2SO4"])
+def test_species_without_wall_psat_refuses_with_typed_reason(engine, species):
     observation, _ = _wall_row(
         Quantity.WALL_DEW_TEMPERATURE,
-        formula="Na2SO4",
+        formula=species,
     )
 
     prediction = predict_with_engine(engine, observation)
@@ -381,10 +449,11 @@ def test_species_without_wall_psat_refuses_with_typed_reason(engine):
 
 
 @pytest.mark.parametrize("engine", [Engine.ALPHAMELTS, Engine.MAGEMIN])
-def test_reactive_product_flux_refuses_without_certified_wall_psat(engine):
+@pytest.mark.parametrize("species", ["SiO", "Na2SO4"])
+def test_reactive_product_flux_refuses_without_certified_wall_psat(engine, species):
     observation, experiment = _wall_row(
         Quantity.WALL_DEPOSITION_FLUX,
-        formula="Na2SO4",
+        formula=species,
     )
 
     prediction = predict_with_engine(engine, observation, experiment=experiment)
