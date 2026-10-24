@@ -5985,13 +5985,12 @@ def _record_antoine_extrapolation(
                     suffix += 1
                 key = f'{species}#{suffix}'
             antoine_extrapolations[key] = record
-    if antoine_extrapolation_warnings is not None:
+    if antoine_extrapolation_warnings is not None and has_finite_range:
         temperature_text = f"{T_K:.3f}".rstrip('0').rstrip('.')
         warning = (
-            f"{species} wall Antoine fit extrapolated beyond valid_range_K "
-            f"[{valid_low:g}, {valid_high:g}] at {temperature_text} K"
-            if has_finite_range
-            else f"{species} wall Antoine fit has no finite valid_range_K at {temperature_text} K"
+            f"{species} metal Antoine fit extrapolated beyond "
+            f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+            f"{temperature_text} K"
         )
         if warning not in antoine_extrapolation_warnings:
             antoine_extrapolation_warnings.append(warning)

@@ -53,6 +53,8 @@ from simulator.accounting.formulas import resolve_species_formula
 from simulator.condensation import (
     C4B_WALL_ROUTE_ORDER,
     CondensationRouteResult,
+    _record_antoine_extrapolation,
+    _species_vapor_data,
     _wall_route_species_order,
 )
 from simulator.diagnostics import wall_deposit_sticking_authority_status
@@ -1560,10 +1562,27 @@ def test_evaporation_caller_counts_condensation_degraded_path_engagement(
     assert summary["transport_d_ab_proxy"]["total_count"] == 2
 
 
-def test_evaporation_caller_deduplicates_record_backed_antoine_warning(
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "valid_range_K", "expected_warning"),
+    [
+        (
+            "Ca",
+            1900.0,
+            [1254.0, 1712.0],
+            "Ca metal Antoine fit extrapolated beyond valid_range_K "
+            "[1254, 1712] at 1900 K",
+        ),
+        ("Fe", 1500.0, None, None),
+    ],
+)
+def test_evaporation_caller_counts_each_wall_antoine_record_once(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    species,
+    temperature_K,
+    valid_range_K,
+    expected_warning,
 ):
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -1572,23 +1591,36 @@ def test_evaporation_caller_deduplicates_record_backed_antoine_warning(
         setpoints_data,
     )
     rate_kg_hr = 1e-6
+    antoine_extrapolations = {}
+    antoine_warnings = []
+    _record_antoine_extrapolation(
+        species,
+        temperature_K,
+        _species_vapor_data(
+            species,
+            vapor_pressure_data=vapor_pressure_data,
+        ),
+        "pure_component_antoine",
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_warnings,
+    )
+    assert len(antoine_extrapolations) == 1
+    assert next(iter(antoine_extrapolations.values()))["valid_range_K"] == (
+        None if valid_range_K is None else tuple(valid_range_K)
+    )
+    if expected_warning is None:
+        assert antoine_warnings == []
+    else:
+        assert antoine_warnings == [expected_warning]
     sim.condensation_model.route = lambda evap_flux, melt: CondensationRouteResult(
-        remaining_by_species={"Na": rate_kg_hr},
-        antoine_extrapolations={
-            "Na:stage-1": {
-                "temperature_K": 900.0,
-                "valid_range_K": [1800.0, 3100.0],
-            }
-        },
-        antoine_extrapolation_warnings=[
-            "Na metal Antoine fit extrapolated beyond "
-            "valid_range_K [1800, 3100] at 900 K"
-        ],
+        remaining_by_species={species: rate_kg_hr},
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_warnings,
     )
 
     sim._route_to_condensation(
         EvaporationFlux(
-            species_kg_hr={"Na": rate_kg_hr},
+            species_kg_hr={species: rate_kg_hr},
             total_kg_hr=rate_kg_hr,
         )
     )
