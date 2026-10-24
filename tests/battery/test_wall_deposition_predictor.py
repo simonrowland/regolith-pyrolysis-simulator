@@ -237,7 +237,7 @@ def test_beerkens_rate_checks_production_molar_to_mass_flux_conversion():
 def test_pure_species_dew_inverse_recovers_wall_saturation_pressure():
     import simulator.condensation as condensation
 
-    temperature_K = 800.0
+    temperature_K = 1000.0
     partial_pressure_Pa = condensation._antoine_psat_pa("Na", temperature_K)
     observation, _ = _wall_row(
         Quantity.WALL_DEW_TEMPERATURE,
@@ -247,6 +247,11 @@ def test_pure_species_dew_inverse_recovers_wall_saturation_pressure():
     prediction = predict_with_engine(Engine.MAGEMIN, observation)
 
     assert prediction.execution.state is ExecutionState.PRODUCED
+    assert 924.0 <= float(prediction.value) <= 1118.0
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in prediction.notices
+    )
     assert prediction.value == pytest.approx(Decimal(str(temperature_K)), abs=1e-8)
     predicted_pressure = condensation._antoine_psat_pa("Na", float(prediction.value))
     assert predicted_pressure == pytest.approx(partial_pressure_Pa, rel=1e-10)
@@ -270,6 +275,31 @@ def test_high_pressure_dew_bracket_continues_until_target_is_bracketed():
         target_pressure,
         rel=1e-10,
     )
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in prediction.notices
+    )
+
+
+def test_dew_prediction_flags_root_outside_pure_component_wall_band():
+    import simulator.condensation as condensation
+
+    target_pressure = condensation._antoine_psat_pa("Na", 1200.0)
+    diagnostic = condensation.antoine_dew_temperature_diagnostic(
+        "Na",
+        target_pressure,
+    )
+    observation, _ = _wall_row(
+        Quantity.WALL_DEW_TEMPERATURE,
+        local_pressure_Pa=Decimal(str(target_pressure)),
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert diagnostic["valid_range_K"] == [924.0, 1118.0]
+    assert diagnostic["status"] == "extrapolated"
+    assert diagnostic["temperature_K"] == pytest.approx(1200.0, abs=1e-8)
+    assert prediction.execution.state is ExecutionState.PRODUCED
     assert any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         for notice in prediction.notices
