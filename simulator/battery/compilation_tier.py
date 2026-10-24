@@ -1631,10 +1631,20 @@ def _tabulated_gas_basis_matches(
         # monatomic gas)", and prints H°−H°298 = 0 at 298 K
         # (source p041-p080.md:873-876), so that row has the K-005 gas zero.
         # The combined K(c,l,g) table-0095 retains the condensed 298 K zero.
+        # The generic migrator leaves table_index as locator note metadata;
+        # confirm table-0096 from both the parent id and its source record path.
+        locator = observation.locator
+        source_path = (
+            ""
+            if locator is None or locator.source_path is None
+            else str(locator.source_path).replace("\\", "/")
+        )
+        parent_id = parent_observation_id(observation.observation_id)
         return (
             formula == "K"
             and table_id == "K-005"
-            and _locator_table_id(observation) == "table-0096"
+            and parent_id.startswith(f"{source_id}:table-0096:")
+            and source_path.endswith("/records/table-0096.json")
         )
     return False
 

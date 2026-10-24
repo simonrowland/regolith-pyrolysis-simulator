@@ -19637,8 +19637,6 @@ class Migrator:
         phase, _unmapped = map_phase(compilation_phase_text(doc))
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
-        if locator.table is None and locator.record is None:
-            locator = replace(locator, record=record_id)
         if not locator.source_path:
             locator = replace(locator, source_path=rel)
         t = _compilation_temperature_state(doc)
