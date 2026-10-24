@@ -9599,6 +9599,27 @@ def _selection_from_named_field(
             field_name=field_name,
         )
     if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
+        expression = payload.get("expression")
+        validity = payload.get("temperature_range_as_printed")
+        if isinstance(expression, str) and isinstance(validity, str) and validity:
+            return SourceSelection(
+                value=Value(
+                    ValueKind.EXPRESSION,
+                    expression_text=expression,
+                    expression_domain=json.dumps(
+                        {
+                            "temperature_range_as_printed": validity,
+                            "units_as_printed": units,
+                        },
+                        ensure_ascii=False,
+                        separators=(",", ":"),
+                    ),
+                ),
+                field_name="expression",
+                unit_trail=units,
+                condition_ranges=condition_ranges,
+            )
+    if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
         for key, unit in _PRESSURE_SERIES_KEYS:
             if key not in payload:
                 continue

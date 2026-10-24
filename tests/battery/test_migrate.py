@@ -16309,6 +16309,57 @@ def test_kambayashi_printed_compositions_and_conditions_reach_observations(
         assert "bound_not_point_ordering" in observation.locator.note
 
 
+def test_visscher_formula_fields_reach_modelled_pressure_expressions(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "visscher-fegley-2013-debris-disks.yaml", write=False
+    )
+    expected = {
+        "visscher_2013_sio2_pure_melt_vapor_pressure_fit": (
+            Quantity.P_SAT,
+            "log P_vap (SiO2, liq) = 8.203 − 25898.9/T",
+            "up to 6000 K (as stated before equation 2)",
+            "2",
+        ),
+        "visscher_2013_sio_partial_pressure_equilibrium": (
+            Quantity.P_PARTIAL,
+            "P_SiO = K4 * a_SiO2 * fO2^(-0.5)",
+            "2000-4000 K (model calculation range)",
+            "5",
+        ),
+        "visscher_2013_total_vapor_pressure_sum": (
+            Quantity.P_SAT,
+            "P_T = ΣP_i",
+            "2000-4000 K (model calculation range)",
+            "3",
+        ),
+        "visscher_2013_bse_total_vapor_pressure_fit": (
+            Quantity.P_SAT,
+            "log P_vap (BSE) ≈ −51.17 − 1048.8/T + 14.60 log T",
+            "2000-4000 K",
+            "6",
+        ),
+        "visscher_2013_bsm_total_vapor_pressure_fit": (
+            Quantity.P_SAT,
+            "log P_vap (BSM) ≈ −41.45 − 4052.3/T + 14.90 log T",
+            "2000-4000 K",
+            "7",
+        ),
+    }
+    for observation_id, (quantity, formula, validity, equation) in expected.items():
+        observation = result.observations[
+            f"visscher-fegley-2013-debris-disks::{observation_id}"
+        ]
+        assert quantity_token(observation.identity) is quantity
+        assert observation.value.kind is ValueKind.EXPRESSION
+        assert observation.value.expression_text == formula
+        assert validity in observation.value.expression_domain
+        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert observation.locator is not None
+        assert observation.locator.equation == equation
+
+
 @pytest.mark.parametrize(
     ("filename", "observation_ids", "expected_class", "expected_count"),
     [

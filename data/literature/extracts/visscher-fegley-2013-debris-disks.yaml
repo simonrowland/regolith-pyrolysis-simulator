@@ -50,9 +50,10 @@ species:
       units: P in bar; T in K
       values:
         quantity: p_sat
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), quoting Fegley and Schaefer 2012 MAGMA calculation
-        expression: log10(P_vap_bar) = 8.203 - 25898.9/T_K
+        expression: 'log P_vap (SiO2, liq) = 8.203 − 25898.9/T'
+        temperature_range_as_printed: up to 6000 K (as stated before equation 2)
         coefficients: {intercept: 8.203, inverse_T_coefficient_K: -25898.9}
       uncertainty: no model uncertainty reported
   SiO:
@@ -66,9 +67,10 @@ species:
       units: partial pressure in bar; fO2 in bar; T dependence through K4
       values:
         quantity: p_partial
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation using IMCC activities
         expression: P_SiO = K4 * a_SiO2 * fO2^(-0.5)
+        temperature_range_as_printed: 2000-4000 K (model calculation range)
         terms: {equilibrium_constant: K4, melt_activity: a_SiO2, oxygen_fugacity: fO2}
       uncertainty: no model uncertainty reported
   Na:
@@ -82,7 +84,7 @@ species:
       units: temperature K; qualitative model trend
       values:
         quantity: evolved_gas_yield
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         lower_temperature_dominant_species: [Na, Zn, O2]
         lower_temperature_regime: below 3000 K generally; transition is composition-dependent
@@ -146,9 +148,10 @@ species:
       units: pressure in bar
       values:
         quantity: p_sat
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
-        expression: P_T = sum(P_i)
+        expression: P_T = ΣP_i
+        temperature_range_as_printed: 2000-4000 K (model calculation range)
         species_scope: all gas species in equilibrium with the multicomponent melt
     - observation_id: visscher_2013_bse_total_vapor_pressure_fit
       quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
@@ -159,9 +162,10 @@ species:
       units: P in bar; T in K
       values:
         quantity: p_sat
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
-        expression: log10(P_vap_bar) approximately equals -51.17 - 1048.8/T_K + 14.60*log10(T_K)
+        expression: 'log P_vap (BSE) ≈ −51.17 − 1048.8/T + 14.60 log T'
+        temperature_range_as_printed: 2000-4000 K
         composition: BSE
       uncertainty: no model uncertainty reported
     - observation_id: visscher_2013_bsm_total_vapor_pressure_fit
@@ -173,9 +177,10 @@ species:
       units: P in bar; T in K
       values:
         quantity: p_sat
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
-        expression: log10(P_vap_bar) approximately equals -41.45 - 4052.3/T_K + 14.90*log10(T_K)
+        expression: 'log P_vap (BSM) ≈ −41.45 − 4052.3/T + 14.90 log T'
+        temperature_range_as_printed: 2000-4000 K
         composition: BSM
       uncertainty: no model uncertainty reported
     - observation_id: visscher_2013_figure2_vapor_species_trends
