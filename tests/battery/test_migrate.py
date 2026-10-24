@@ -7381,9 +7381,13 @@ def test_equal_temperature_range_is_a_point_but_true_range_is_not() -> None:
 
 
 def test_bencze_2016_reference_temperature_is_bound(tmp_path: Path) -> None:
-    result = _migrate_real_extract(tmp_path, "bencze-yazhenskikh-2016.yaml")
+    result = _migrate_real_extract(
+        tmp_path,
+        "bencze-yazhenskikh-2016.yaml",
+        use_repository_index_row=True,
+    )
     observations = list(result.observations.values())
-    assert len(observations) == 70
+    assert len(observations) == 130
     assert all(
         observation.identity.temperature_K is not None
         and observation.identity.temperature_K.is_value
@@ -16558,3 +16562,73 @@ def test_jacobson_2024_predicted_partial_pressures_migrate_as_p_partial(
         assert observation.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
         temperature_value = observation.identity.temperature_K.value
         assert source_enthalpy_by_temperature[temperature_value] == Decimal(enthalpy)
+
+def test_bencze_2016_printed_pressures_reach_migrated_observations(
+    tmp_path: Path,
+) -> None:
+    source_id = "bencze-yazhenskikh-2016"
+    result = _migrate_real_extract(
+        tmp_path,
+        f"{source_id}.yaml",
+        write=False,
+        use_repository_index_row=True,
+    )
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source_id
+        and observation.locator is not None
+        and observation.locator.table in {"S-I", "S-II"}
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and observation.value.kind is ValueKind.POINT
+    ]
+
+    assert len(observations) == 130
+    _assert_no_hard_issues_for_observations(result, observations)
+    k_table1 = [
+        observation
+        for observation in observations
+        if observation.locator.table == "S-I"
+        and observation.identity.species.formula == "K"
+    ]
+    assert len(k_table1) == 61
+    assert k_table1[0].value.point == Decimal("5.52e-4")
+    assert k_table1[-1].value.point == Decimal("2.31e-2")
+    for observation in observations:
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert observation.derived_from == (f"pdf:{source_id}",)
+        assert observation.derivation is not None
+        assert observation.derivation.inputs == (f"pdf:{source_id}",)
+        assert observation.derivation.relation == (
+            "author_mean_of_selected_kems_pressure_fits"
+            if observation.locator.table == "S-II"
+            else "author_kems_pressure_fit"
+        )
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.value == Decimal("1273")
+        assert observation.point_conditions is not None
+        temperature = observation.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == Decimal("1273")
+        assert temperature.locator is not None
+        assert temperature.locator.table == observation.locator.table
+
+    first_na = next(
+        observation
+        for observation in observations
+        if "bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=db6e6e110926"
+        in observation.observation_id
+    )
+    assert first_na.identity.species.formula == "Na"
+    assert first_na.value.point == Decimal("0.0170")
+
+    first_mean = next(
+        observation
+        for observation in observations
+        if observation.locator.table == "S-II"
+        and observation.identity.species.formula == "Na"
+    )
+    assert first_mean.value.point == Decimal("0.0545")
+    assert first_mean.uncertainty.kind.value == "printed"
+    assert first_mean.uncertainty.verbatim["sigma"] == Decimal("0.0061")

@@ -711,15 +711,42 @@ def _dec_str(value: Decimal) -> str:
     return text or "0"
 
 
-def _as_dec_or_none(value: object) -> Decimal | None:
-    if value is None or value == "":
-        return None
-    if isinstance(value, bool):
+def _parse_source_decimal_amount(
+    value: object,
+) -> tuple[Decimal, Decimal | None] | None:
+    if value is None or value == "" or isinstance(value, bool):
         return None
     try:
-        return as_decimal(value)
+        return as_decimal(value), None
+    except (TypeError, ValueError, ArithmeticError):
+        if not isinstance(value, str):
+            return None
+    coefficient = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)"
+    printed_product = re.fullmatch(
+        rf"\s*(?:\(\s*(?P<parenthesized>{coefficient})"
+        rf"(?:\s*±\s*(?P<uncertainty>{coefficient}))?\s*\)"
+        rf"|(?P<plain>{coefficient}))\s*·\s*10\s*"
+        rf"(?P<exponent>[+-]?\d+)\s*",
+        value,
+    )
+    if printed_product is None:
+        return None
+    try:
+        exponent = int(printed_product.group("exponent"))
+        scale = Decimal(10) ** exponent
+        central = as_decimal(
+            printed_product.group("parenthesized") or printed_product.group("plain")
+        ) * scale
+        uncertainty = printed_product.group("uncertainty")
+        sigma = None if uncertainty is None else as_decimal(uncertainty) * scale
+        return central, sigma
     except (TypeError, ValueError, ArithmeticError):
         return None
+
+
+def _as_dec_or_none(value: object) -> Decimal | None:
+    parsed = _parse_source_decimal_amount(value)
+    return None if parsed is None else parsed[0]
 
 
 def _printed_composition_amount(value: object) -> Decimal | None:
@@ -8575,7 +8602,14 @@ _ANCILLARY_SERIES_KEYS = (
     "delta_IW",
 )
 
-_PARTIAL_PRESSURE_FIELDS = ("partial_pressure_pa", "p_Ga_Pa", "p_In_Pa", "p_O2_calc_Pa")
+_PARTIAL_PRESSURE_FIELDS = (
+    "partial_pressure_pa",
+    "p_Ga_Pa",
+    "p_In_Pa",
+    "p_O2_calc_Pa",
+    "p_Na_at_1273_K_Pa",
+    "p_K_at_1273_K_Pa",
+)
 
 QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.ACTIVITY: ("activity",),
@@ -17341,6 +17375,12 @@ class Migrator:
                     observation_id=point_id,
                 )
             extra_unc = raw_item.get("sigma") or raw_item.get("gamma_SD")
+            if extra_unc is None and value_sel.field_name is not None:
+                parsed_source_amount = _parse_source_decimal_amount(
+                    raw_item.get(value_sel.field_name)
+                )
+                if parsed_source_amount is not None:
+                    extra_unc = parsed_source_amount[1]
             if extra_unc is None and _WIMPENNY_DELTA_2SIGMA_FIELD in raw_item:
                 extra_unc = raw_item.get(_WIMPENNY_DELTA_2SIGMA_FIELD)
                 if extra_unc not in (None, ""):
