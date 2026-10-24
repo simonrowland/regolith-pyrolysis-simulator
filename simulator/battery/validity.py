@@ -968,12 +968,14 @@ def _printed_in_cell_pressure_sum(
     }
     pressure_sum = sum((row[0] for row in selected.values()), Decimal(0))
     sum_detail = {
-        "printed_partial_pressure_lower_bound_Pa": str(pressure_sum),
         "printed_partial_pressures_Pa": {
             species: str(row[0]) for species, row in sorted(selected.items())
         },
         "included_observation_ids": sorted(row[1] for row in selected.values()),
         "point_condition_keys": sorted(conditions),
+    }
+    lower_bound_detail = {
+        "printed_partial_pressure_lower_bound_Pa": str(pressure_sum)
     }
     expected = _expected_dominant_vapours(composition)
     if expected is None:
@@ -981,6 +983,7 @@ def _printed_in_cell_pressure_sum(
             "reason": "composition does not establish which vapour species could dominate",
             "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
             "printed_species": sorted(printed),
+            **lower_bound_detail,
             **sum_detail,
         }
     covered = set()
@@ -996,6 +999,7 @@ def _printed_in_cell_pressure_sum(
             "required_dominant_species": list(expected),
             "printed_species": sorted(printed),
             "missing_species": missing,
+            **lower_bound_detail,
             **sum_detail,
         }
     return pressure_sum, {

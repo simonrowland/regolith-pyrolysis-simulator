@@ -3574,6 +3574,7 @@ def test_mf_f04_calibrated_cell_falls_through_to_printed_pressure_sum() -> None:
         point_observations=pressures,
     )
 
+    # d-274 uses the printed in-cell sum when the calibrated route lacks geometry.
     assert result.passed
     assert not any(check.name == "orifice_knudsen" for check in result.checks)
     pressure_check = next(

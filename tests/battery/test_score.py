@@ -646,23 +646,26 @@ def test_p_partial_without_composition_still_refuses_identity() -> None:
 
 
 @pytest.mark.parametrize(
-    ("typed_not_printed", "expected_reason"),
+    ("typed_not_printed", "expected_reason", "expected_record_status"),
     (
         (
             False,
             "calibration_not_grounded: No calibration entry has been recorded yet. "
             "(KEMS pressure requires a recorded calibration)",
+            "not_recorded",
         ),
         (
             True,
             "calibration_not_grounded: The source record says the calibration was "
             "not printed. (KEMS pressure requires a recorded calibration)",
+            "not_printed",
         ),
     ),
 )
 def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     typed_not_printed: bool,
     expected_reason: str,
+    expected_record_status: str,
 ) -> None:
     from simulator.battery.validity import run_validity_gates
     from simulator.battery.score import (
@@ -702,6 +705,14 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
         "incomplete printed species coverage; pressure sum is only a lower bound"
     )
     assert pressure_check.detail["pressure_limit_Pa"]
+    calibration_check = next(
+        check for check in gates.checks if check.name == "kems_calibration"
+    )
+    assert calibration_check.passed
+    assert (
+        calibration_check.detail["calibration_record_status"]
+        == expected_record_status
+    )
     residual, _ = compile_residual(
         reference,
         Engine.INTERNAL_ANALYTICAL,
@@ -709,6 +720,7 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
         prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
     )
 
+    # d-274 keeps uncomputable in-cell sums scoreable with a flagged tier.
     assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
     assert residual.score_eligible is False
@@ -786,6 +798,7 @@ def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> 
     assert openimcc.numeric.decision_band is None
     assert internal_analytical.numeric is not None
     assert internal_analytical.numeric.decision_band is None
+    # d-274 preserves both the calibration and in-cell apparatus flags per engine.
     assert flagged_strata(openimcc.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
@@ -3714,6 +3727,48 @@ def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses()
     )
 
 
+def test_d274_uncalibrated_kems_psat_missing_sum_keeps_calibration_refusal() -> None:
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    reference = F.observation(
+        "d274-uncalibrated-psat-without-sum",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-uncalibrated-psat",
+    )
+    reference = replace(
+        reference,
+        evidence=replace(
+            reference.evidence,
+            original_method_class="measured_direct",
+        ),
+    )
+    gates = run_validity_gates(experiment, reference)
+    calibration_check = next(
+        check for check in gates.checks if check.name == "kems_calibration"
+    )
+    assert calibration_check.passed is False
+    assert calibration_check.detail["reason"] == (
+        "KEMS pressure requires a recorded calibration"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+    )
+    # d-274 does not let an in-cell notice waive the failed P_SAT calibration check.
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
 def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures() -> None:
     experiment = F.kems_experiment(calibrated=True, kn=None)
     experiment = replace(
@@ -3755,6 +3810,7 @@ def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures(
         context=context,
         prediction=prediction,
     )
+    # d-274 scores an uncomputable printed sum with an apparatus notice.
     assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
     assert residual.score_eligible is False

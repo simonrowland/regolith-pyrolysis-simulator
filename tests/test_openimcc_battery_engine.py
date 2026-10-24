@@ -2426,7 +2426,7 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
 
 
 def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures() -> None:
-    """Rows pass the effusion gate when other inputs let them be scored."""
+    """The 14 Allibert rows include seven numeric, flagged OpenIMCC results."""
 
     import tempfile
     from pathlib import Path
@@ -2469,13 +2469,26 @@ def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures
         include_diagnostics=True,
     )
     assert len(residuals) == 14
+    # d-274 keeps the 14-row cohort out of effusion refusals and headlines.
     assert not any(
         residual.refusal is not None
         and residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
         for residual in residuals
     )
     scored = [residual for residual in residuals if residual.numeric is not None]
-    assert scored
+    assert len(scored) == 7
+    assert {residual.reference for residual in scored} == {
+        observation.observation_id
+        for observation in rows
+        if observation.identity.species.formula == "Al2O3"
+    }
+    unscored = [residual for residual in residuals if residual.numeric is None]
+    assert len(unscored) == 7
+    assert {residual.reference for residual in unscored} == {
+        observation.observation_id
+        for observation in rows
+        if observation.identity.species.formula == "CaO"
+    }
     assert all(
         residual.score_eligible is False
         and any(

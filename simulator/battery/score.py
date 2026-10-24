@@ -1215,8 +1215,6 @@ def _missing_apparatus_fact(
         and allow_unknown_method
     ):
         return "method_unknown"
-    if name == "kems_calibration" and allow_calibration:
-        return "calibration"
     if name == "background_pressure_stated" and not getattr(check, "passed", True):
         return "background_pressure"
     if name == "orifice_knudsen" and not getattr(check, "passed", True):
