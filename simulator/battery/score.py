@@ -7524,12 +7524,20 @@ def _predict_transition_temperature(
             {"reason": "liquidus_finder_not_available", "engine": engine.value},
             execution=ExecutionState.UNSUPPORTED,
         )
+    finder_kwargs: dict[str, object] = {
+        "composition_kg": _composition_kg_from_wt_pct(composition_wt),
+        "pressure_bar": pressure_bar,
+    }
+    if fO2_log is None:
+        if engine is not Engine.MAGEMIN:
+            finder_kwargs.update(
+                fO2_log=None,
+                redox_mode="not_an_input",
+            )
+    else:
+        finder_kwargs["fO2_log"] = fO2_log
     try:
-        result = finder(
-            composition_kg=_composition_kg_from_wt_pct(composition_wt),
-            pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
-        )
+        result = finder(**finder_kwargs)
     except Exception as exc:  # noqa: BLE001 - optional engine boundary
         return refused(
             RefusalReason.ATTEMPTED_UNAVAILABLE,

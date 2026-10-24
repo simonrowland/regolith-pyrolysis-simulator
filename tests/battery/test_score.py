@@ -13694,6 +13694,11 @@ def _transition_finder_handle(monkeypatch, engine, result, calls):
 
     class FinderBackend:
         def find_liquidus_solidus(self, **kwargs):
+            if kwargs.get("fO2_log") is None:
+                if engine is Engine.MAGEMIN:
+                    assert "fO2_log" not in kwargs
+                else:
+                    assert kwargs.get("redox_mode") == "not_an_input"
             calls.append((engine.value, kwargs))
             return result
 
@@ -13742,7 +13747,11 @@ def test_transition_liquidus_uses_each_engine_finder_at_printed_composition(
     assert len(calls) == 1
     assert calls[0][0] == engine.value
     assert calls[0][1]["pressure_bar"] == pytest.approx(1.01325)
-    assert calls[0][1]["fO2_log"] is None
+    if engine is Engine.MAGEMIN:
+        assert "fO2_log" not in calls[0][1]
+    else:
+        assert calls[0][1]["fO2_log"] is None
+        assert calls[0][1]["redox_mode"] == "not_an_input"
     expected_wt = score_mod.composition_wt_pct(observation.identity.composition.value)
     composition_kg = calls[0][1]["composition_kg"]
     assert tuple((name, mass.hex()) for name, mass in composition_kg.items()) == (

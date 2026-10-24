@@ -1767,7 +1767,7 @@ class _MELTSBackendSupport(MeltBackend):
 
     def find_liquidus_solidus(self,
                               composition_kg: Optional[Dict[str, float]] = None,
-                              fO2_log: float = -9.0,
+                              fO2_log: float | None = -9.0,
                               pressure_bar: float = 1e-6,
                               *,
                               composition_mol: Optional[Dict[str, float]] = None,
@@ -1782,9 +1782,13 @@ class _MELTSBackendSupport(MeltBackend):
                               scan_step_C: float = 50.0,
                               tolerance_C: float = 2.0,
                               redox_state: RedoxState | None = None,
+                              redox_mode: str | None = None,
                               ) -> LiquidusSolidusResult:
         """Find solidus/liquidus when a liquid-fraction transport is live."""
         fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
+        redox_kwargs = (
+            {"redox_mode": redox_mode} if redox_mode is not None else {}
+        )
         if (
             self._mode in {'python_api', 'subprocess'}
             and redox_state is not None
@@ -1832,6 +1836,7 @@ class _MELTSBackendSupport(MeltBackend):
                 subprocess_run_mode=(
                     AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER
                 ),
+                **redox_kwargs,
             )
             liquidus_C = result.liquidus_T_C
             if liquidus_C is None and result.status == 'ok':
@@ -1938,6 +1943,7 @@ class _MELTSBackendSupport(MeltBackend):
                     composition_mol=composition_mol,
                     composition_mol_by_account=composition_mol_by_account,
                     species_formula_registry=species_formula_registry,
+                    **redox_kwargs,
                 )
             except Exception as exc:
                 typed_failure = liquidus_sample_error_from_exception(exc)
@@ -3086,7 +3092,7 @@ class _MELTSBackendSupport(MeltBackend):
         composition_mol_by_account: Optional[Mapping[str, Mapping[str, float]]],
         species_formula_registry: Optional[Mapping[str, object]],
         pressure_bar: float,
-        fO2_log: float,
+        fO2_log: float | None,
         min_T_C: float,
     ) -> dict | LiquidusSolidusResult:
         if composition_mol_by_account is not None:
