@@ -488,10 +488,6 @@ class WarmEngineWorker:
                 cancelled = True
             else:
                 cancelled = False
-                try:
-                    self._pending_reap.remove(process)
-                except ValueError:
-                    pass
         if cancelled:
             self._stop_pair(
                 process,
@@ -592,6 +588,10 @@ class WarmEngineWorker:
                 raise RuntimeError(f'{self.name} worker is disabled')
             self.ready_payload = message[1]
             self.start_count += 1
+            try:
+                self._pending_reap.remove(process)
+            except ValueError:
+                pass
             return self.ready_payload
 
     def call(self, request: Any, *, timeout_s: Optional[float] = None) -> Any:
@@ -901,6 +901,23 @@ class WarmEngineWorker:
                     connection.close()
                 except OSError:
                     pass
+        if process is not None:
+            try:
+                pid = _process_pid(process)
+                alive = pid is not None and process.is_alive()
+            except (AssertionError, OSError, ValueError):
+                alive = True
+            with self._state_lock:
+                if alive:
+                    if process not in self._pending_reap:
+                        # Keep a retry owner when the bounded group-kill joins
+                        # have not reaped this setsid child yet.
+                        self._pending_reap.append(process)
+                else:
+                    try:
+                        self._pending_reap.remove(process)
+                    except ValueError:
+                        pass
 
     def close(self) -> None:
         """Idempotently stop the worker and release its pipe."""
@@ -909,6 +926,8 @@ class WarmEngineWorker:
             self.process = None
             self.connection = None
             self.ready_payload = None
+            if process is not None and process not in self._pending_reap:
+                self._pending_reap.append(process)
         try:
             if connection is not None:
                 try:
@@ -1229,10 +1248,20 @@ class EngineWorkerPool:
                 f'pool[{worker.name}#{index}]: start FAILED '
                 f'{type(exc).__name__}: {str(exc)[:120]}'
             )
-            ready.put((index, exc))
+            try:
+                worker.close()
+            finally:
+                ready.put((index, exc))
             return
         ready.put((index, None))
-        self._consume(worker)
+        try:
+            self._consume(worker)
+        finally:
+            # This thread owns the spawned process until it exits. If the
+            # consumer aborts unexpectedly, dropping its last pool reference
+            # would leave the setsid child idle on its pipe for multiprocessing
+            # atexit to join forever.
+            worker.close()
 
     def _consume(self, worker: WarmEngineWorker) -> None:
         while True:

@@ -11406,6 +11406,40 @@ def test_cold_worker_missing_loader_is_typed_absence(monkeypatch):
         backend._run_petthermotools_isolated('equilibrate_MELTS')
 
 
+def test_petthermotools_spawn_cleanup_escalates_with_bounded_joins():
+    events = []
+
+    class StuckProcess:
+        pid = 12345
+
+        def __init__(self):
+            self.alive = True
+
+        def join(self, *, timeout):
+            events.append(('join', timeout))
+
+        def is_alive(self):
+            return self.alive
+
+        def terminate(self):
+            events.append('terminate')
+
+        def kill(self):
+            events.append('kill')
+            self.alive = False
+
+    process = StuckProcess()
+    alphamelts_module._stop_petthermotools_process(process)
+
+    assert events == [
+        ('join', 0.25),
+        'terminate',
+        ('join', 0.25),
+        'kill',
+        ('join', 1.0),
+    ]
+
+
 def test_chemical_potential_library_failure_and_missing_components_are_typed():
     from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
 
