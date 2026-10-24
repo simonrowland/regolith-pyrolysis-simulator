@@ -38,6 +38,21 @@ def _sim(setpoints=None):
     )
 
 
+@pytest.mark.parametrize("missing", [
+    ("stage3_product_purity",), ("stage3_instantaneous_purity",),
+    ("stage3_product_purity", "stage3_instantaneous_purity"),
+])
+def test_partial_constructor_names_missing_collection_purity(missing):
+    from simulator.recipe_errors import MalformedRecipeError
+    setpoints = load_config_bundle().setpoints
+    for field in missing:
+        del setpoints["condensation_train"][field]
+    with pytest.raises(MalformedRecipeError) as caught:
+        _sim(setpoints)
+    assert str(caught.value) == "missing required purity fields: " + ", ".join(
+        f"condensation_train.{field}" for field in sorted(missing))
+
+
 def test_divert_excludes_silica_from_stages_budget_walls_supply_and_sampling(monkeypatch):
     import simulator.condensation as owner
     model = _model()

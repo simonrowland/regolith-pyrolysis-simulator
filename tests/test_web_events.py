@@ -23,6 +23,7 @@ from simulator.electrolysis import (
 )
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.core import PyrolysisSimulator
+from simulator.config import load_config_bundle
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.recipe_io import load_recipe_patch, read_recipe_metadata, write_recipe_patch
 from simulator.runner import PyrolysisRun, build_per_hour_summary
@@ -232,9 +233,11 @@ def _assert_recipe_defining_marker(source: str, element_id: str) -> None:
 def _sim_with_mass_balance_snapshot(error_pct, category=None):
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    setpoints = load_config_bundle().setpoints
+    setpoints["campaigns"] = {}
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        setpoints,
         {
             "s_type": {
                 "label": "S type",
@@ -4453,27 +4456,7 @@ def test_loop_projection_and_emit_failures_stop_current_run(
 
 
 def test_completion_payload_exposes_final_mass_reconciliation():
-    backend = InternalAnalyticalBackend()
-    backend.initialize({})
-    sim = PyrolysisSimulator(
-        backend,
-        {"campaigns": {}},
-        {
-            "s_type": {
-                "label": "S type",
-                "composition_wt_pct": {
-                    "SiO2": 51.5,
-                    "FeO": 13.0,
-                    "MgO": 34.0,
-                },
-                "bulk_additions": {
-                    "metallic_FeNi_wt_pct": 15.0,
-                },
-            }
-        },
-        {"metals": {}, "oxide_vapors": {}},
-    )
-    sim.load_batch("s_type")
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
 
     payload = _completion_payload(sim)
 
@@ -4621,29 +4604,8 @@ def test_completion_ceramic_panel_classifies_product_story_refractory_slice(
 def test_web_payloads_preserve_full_precision_mass_balance_error(
     monkeypatch,
 ):
-    backend = InternalAnalyticalBackend()
-    backend.initialize({})
-    sim = PyrolysisSimulator(
-        backend,
-        {"campaigns": {}},
-        {
-            "s_type": {
-                "label": "S type",
-                "composition_wt_pct": {
-                    "SiO2": 51.5,
-                    "FeO": 13.0,
-                    "MgO": 34.0,
-                },
-                "bulk_additions": {
-                    "metallic_FeNi_wt_pct": 15.0,
-                },
-            }
-        },
-        {"metals": {}, "oxide_vapors": {}},
-    )
-    sim.load_batch("s_type")
-    snapshot = sim._make_snapshot()
-    snapshot.mass_balance_error_pct = 6.25e-12
+    sim, snapshot = _sim_with_mass_balance_snapshot(6.25e-12)
+
     monkeypatch.setattr(sim, "_make_snapshot", lambda: snapshot)
 
     tick_payload = _tick_payload(
@@ -4921,34 +4883,9 @@ def test_web_mass_balance_non_finite_error_fails_closed(error_pct):
 def test_completion_payload_exposes_mass_balance_category_when_pct_none(
     monkeypatch,
 ):
-    backend = InternalAnalyticalBackend()
-    backend.initialize({})
-    sim = PyrolysisSimulator(
-        backend,
-        {"campaigns": {}},
-        {
-            "s_type": {
-                "label": "S type",
-                "composition_wt_pct": {
-                    "SiO2": 51.5,
-                    "FeO": 13.0,
-                    "MgO": 34.0,
-                },
-                "bulk_additions": {
-                    "metallic_FeNi_wt_pct": 15.0,
-                },
-            }
-        },
-        {"metals": {}, "oxide_vapors": {}},
-    )
-    sim.load_batch("s_type")
-    snapshot = sim._make_snapshot()
-    snapshot.mass_balance_error_pct = None
-    setattr(
-        snapshot,
-        "mass_balance_error_category",
-        "zero_input_basis_breach",
-    )
+    sim, snapshot = _sim_with_mass_balance_snapshot(
+        None, category="zero_input_basis_breach")
+
     monkeypatch.setattr(sim, "_make_snapshot", lambda: snapshot)
 
     payload = _completion_payload(sim)
@@ -5658,9 +5595,11 @@ class RaisingCleanedMeltLedger:
 def _cleaned_melt_test_sim():
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    setpoints = load_config_bundle().setpoints
+    setpoints["campaigns"] = {}
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        setpoints,
         {
             "s_type": {
                 "label": "S type",

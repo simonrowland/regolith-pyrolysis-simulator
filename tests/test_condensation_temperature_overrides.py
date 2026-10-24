@@ -448,22 +448,21 @@ def test_pyrolysis_simulator_uses_instance_isolation_not_module_mutation():
     Tcond values keep their values independently."""
     from simulator.core import PyrolysisSimulator
     from simulator.melt_backend.base import InternalAnalyticalBackend
+    from simulator.config import load_config_bundle
 
     pre_module_dict = dict(CONDENSATION_TEMPS_C)
 
     def _build(sio_override: float) -> PyrolysisSimulator:
         b = InternalAnalyticalBackend()
         b.initialize({})
+        setpoints = load_config_bundle().setpoints
+        setpoints["campaigns"] = {}
+        setpoints["condensation_train"]["condensation_temperatures_C"] = {
+            "SiO": sio_override,
+        }
         return PyrolysisSimulator(
             b,
-            {
-                'campaigns': {},
-                'condensation_train': {
-                    'condensation_temperatures_C': {
-                        'SiO': sio_override,
-                    },
-                },
-            },
+            setpoints,
             {'x': {'label': 'X', 'composition_wt_pct': {'SiO2': 100}}},
             {'metals': {}, 'oxide_vapors': {}},
         )
@@ -491,14 +490,12 @@ def test_simulator_construction_applies_setpoints_overrides():
     ``CONDENSATION_TEMPS_C['SiO']``."""
     from simulator.core import PyrolysisSimulator
     from simulator.melt_backend.base import InternalAnalyticalBackend
+    from simulator.config import load_config_bundle
 
-    custom_setpoints = {
-        'campaigns': {},
-        'condensation_train': {
-            'condensation_temperatures_C': {
-                'SiO': 980.0,  # cold-baffle override
-            },
-        },
+    custom_setpoints = load_config_bundle().setpoints
+    custom_setpoints["campaigns"] = {}
+    custom_setpoints["condensation_train"]["condensation_temperatures_C"] = {
+        "SiO": 980.0,  # cold-baffle override
     }
     backend = InternalAnalyticalBackend()
     backend.initialize({})
