@@ -12,37 +12,18 @@ from simulator.core import (
     CampaignPhase,
     PyrolysisSimulator,
 )
+from simulator.environment import cover_gas_partial_pressures
+from simulator.overhead import OverheadGasModel
 from simulator.campaigns import c0_exit_record, c0_exit_run_notice
 from simulator.accounting.ledger import snapshot_atom_ledger
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.reduced_real_determinism import PT0DeterminismStore
 from simulator.runner import build_per_hour_summary
+from simulator.state import CondensationTrain, EvaporationFlux
 
 
-C0_SETPOINTS = {
-    "temp_range_C": [20, 950],
-    "dT_dt_C_per_hr": 200,
-    "max_hold_hr": 25,
-    "carrier_gas": "Ar",
-    "p_total_mbar_default": 1.0,
-    "pO2_mbar_default": 0.0,
-    "alkali_retention_budget_fraction": 1.0e-3,
-}
-
-
-C0_ENDPOINT_SETPOINTS = {
-    "temp_range_C": [20, 950],
-    "dT_dt_C_per_hr": 50,
-    "max_hold_hr": 25,
-    "soft_endpoint": {
-        "min_hold_hr": 10,
-        "temperature_min_C": 940,
-    },
-}
-
-
-def _sim(feedstocks, *, finite_headspace=False, c0_setpoints=None):
+def _sim(feedstocks, *, finite_headspace=False):
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     # Stepping crosses the strict VR-11 vapour boundary even though these tests
@@ -51,11 +32,14 @@ def _sim(feedstocks, *, finite_headspace=False, c0_setpoints=None):
     vapor_pressures = yaml.safe_load(
         (Path(__file__).parent.parent / "data" / "vapor_pressures.yaml").read_text()
     )
+    production_setpoints = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "setpoints.yaml").read_text()
+    )
     return PyrolysisSimulator(
         backend,
         {
             "campaigns": {
-                "C0": deepcopy(c0_setpoints or C0_SETPOINTS)
+                "C0": deepcopy(production_setpoints["campaigns"]["C0"])
             },
             "overhead_headspace": {
                 "enabled": finite_headspace,
@@ -64,6 +48,18 @@ def _sim(feedstocks, *, finite_headspace=False, c0_setpoints=None):
         },
         feedstocks,
         vapor_pressures,
+    )
+
+
+def _project_overhead_atmosphere(melt, *, finite_headspace=False):
+    model = OverheadGasModel({
+        "enabled": finite_headspace,
+        "volume_m3": 1.0,
+    })
+    return model.update(
+        EvaporationFlux(),
+        melt,
+        CondensationTrain.create_default(),
     )
 
 
@@ -81,18 +77,19 @@ def test_stage0_lunar_feedstock_uses_configured_argon_cover():
     assert sim.melt.pO2_mbar == 0.0
 
 
-def test_stage0_lunar_feedstock_uses_hard_vacuum():
+def test_stage0_lunar_feedstock_hard_vacuum_overhead_projection():
     sim = _sim(
         {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}},
-        c0_setpoints=C0_ENDPOINT_SETPOINTS,
     )
 
     sim.load_batch("lunar")
-    sim.start_campaign(CampaignPhase.C0)
+    gas = _project_overhead_atmosphere(sim.melt)
 
     assert sim.melt.atmosphere is Atmosphere.HARD_VACUUM
     assert sim.melt.p_total_mbar == 0.0
     assert sim.melt.pO2_mbar == 0.0
+    assert gas.pressure_mbar == 0.0
+    assert gas.composition == {}
 
 
 def test_c0_start_predicts_exit_from_live_flux_and_caps_the_ramp():
@@ -609,7 +606,7 @@ def test_stage0_mars_feedstock_uses_configured_argon_cover():
 
 
 @pytest.mark.parametrize("finite_headspace", [False, True])
-def test_stage0_mars_feedstock_uses_surface_co2_backpressure(finite_headspace):
+def test_mars_surface_co2_backpressure_projects_to_overhead(finite_headspace):
     sim = _sim(
         {
             "mars": {
@@ -620,20 +617,25 @@ def test_stage0_mars_feedstock_uses_surface_co2_backpressure(finite_headspace):
             }
         },
         finite_headspace=finite_headspace,
-        c0_setpoints=C0_ENDPOINT_SETPOINTS,
     )
 
     sim.load_batch("mars")
-    sim.start_campaign(CampaignPhase.C0)
-    snapshot = sim.step()
+    # Exercise the ambient CO2 boundary at the overhead owner directly. C0
+    # deliberately replaces this environment with its configured Ar cover.
+    sim.melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
+    sim.melt.p_total_mbar = sim.melt.ambient_pressure_mbar
+    gas = _project_overhead_atmosphere(
+        sim.melt,
+        finite_headspace=finite_headspace,
+    )
 
     assert sim.melt.atmosphere is Atmosphere.CO2_BACKPRESSURE
     assert sim.melt.p_total_mbar == 6.0
     assert sim.melt.pO2_mbar == 0.0
-    assert snapshot.overhead.pressure_mbar == 6.0
-    assert snapshot.overhead.composition["CO2"] == 5.76
+    assert gas.pressure_mbar == 6.0
+    assert gas.composition["CO2"] == 5.76
     # Pin both overhead implementations before consolidating the cover-gas rule.
-    assert snapshot.overhead.composition["CO2"].hex() == (5.76).hex()
+    assert gas.composition["CO2"].hex() == (5.76).hex()
 
 
 def test_all_builtin_mars_feedstocks_define_co2_environment():
@@ -675,17 +677,34 @@ def test_controlled_background_pressure_pin_before_owner_reuse(finite_headspace)
 
 
 @pytest.mark.parametrize('finite_headspace', [False, True])
-def test_stage0_air_projects_oxygen_fraction_without_assuming_co2(finite_headspace):
+def test_air_atmosphere_projects_oxygen_fraction_without_assuming_co2(
+    finite_headspace,
+):
     sim = _sim({'earth': {
         'composition_wt_pct': {'SiO2': 100.0},
         'body': 'earth',
         'environment': {'surface_pressure_mbar': 1000.0, 'atmosphere': 'air'},
     }}, finite_headspace=finite_headspace)
     sim.load_batch('earth')
-    sim.start_campaign(CampaignPhase.C0)
-    snapshot = sim.step()
-    assert snapshot.overhead.composition['O2'] == 210.0
-    assert snapshot.overhead.composition['N2'] == 790.0
-    assert 'CO2' not in snapshot.overhead.composition
+    partial_pressures = cover_gas_partial_pressures(
+        sim.melt.ambient_atmosphere,
+        sim.melt.ambient_pressure_mbar,
+    )
+    assert partial_pressures['O2'] == 210.0
+    assert partial_pressures['N2'] == 790.0
+    assert 'CO2' not in partial_pressures
+    projection_melt = deepcopy(sim.melt)
+    projection_melt.atmosphere = Atmosphere.CONTROLLED_O2
+    projection_melt.p_total_mbar = sim.melt.ambient_pressure_mbar
+    projection_melt.pO2_mbar = partial_pressures['O2']
+    projection_melt.background_gas_species = 'N2'
+    projection_melt.background_gas_mole_fraction = 1.0
+    gas = _project_overhead_atmosphere(
+        projection_melt,
+        finite_headspace=finite_headspace,
+    )
+    assert gas.composition['O2'] == partial_pressures['O2']
+    assert gas.composition['N2'] == partial_pressures['N2']
+    assert 'CO2' not in gas.composition
     assert sim._headspace_transport_pO2_bar_from_ledger(0.0) == pytest.approx(0.21)
     assert sim._commanded_pO2_bar() == pytest.approx(0.21)
