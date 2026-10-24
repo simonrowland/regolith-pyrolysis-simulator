@@ -1786,6 +1786,7 @@ def test_alphamelts_subprocess_liquidus_finder_selects_native_mode():
             assert kwargs['subprocess_run_mode'] is (
                 AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER
             )
+            assert kwargs['redox_mode'] == 'not_an_input'
             return EquilibriumResult(
                 temperature_C=1300.0,
                 pressure_bar=float(kwargs.get('pressure_bar', 1e-6)),
@@ -1806,6 +1807,7 @@ def test_alphamelts_subprocess_liquidus_finder_selects_native_mode():
         max_T_C=1500.0,
         scan_step_C=100.0,
         tolerance_C=1.0,
+        redox_mode='not_an_input',
     )
 
     assert result.status == 'ok'
