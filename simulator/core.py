@@ -117,17 +117,21 @@ class _RefusalSnapshotHistoryPrefix:
         memo.clear()
 
 
-def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
-    """Replace an internal history-prefix view with its rollback list."""
+def _materialize_refusal_snapshot_history(
+    state: Mapping[str, Any], *, copy_committed_rows: bool = True,
+) -> None:
+    """Own the history containers; rollback also detaches committed rows.
 
-    record = state.get('record')
-    history = getattr(record, 'snapshots', None)
-    if isinstance(history, _RefusalSnapshotHistoryPrefix):
-        record.snapshots = history.materialize()
-    model = state.get('_condensation_model')
-    history = getattr(model, 'operating_history', None)
-    if isinstance(history, _RefusalSnapshotHistoryPrefix):
-        model.operating_history = history.materialize()
+    Read-only pressure projections share committed rows and retain the
+    snapshot owner's copied mutable tail, then release the rollback memo.
+    """
+    for owner, field in ((state.get('record'), 'snapshots'),
+                         (state.get('_condensation_model'), 'operating_history')):
+        history = getattr(owner, field, None)
+        if isinstance(history, _RefusalSnapshotHistoryPrefix):
+            setattr(owner, field, history.materialize() if copy_committed_rows else list(history))
+            if not copy_committed_rows:
+                history.release()
 
 
 _REFUSAL_MISSING = object()
@@ -14117,11 +14121,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             '_base_species_formula_registry',
             'species_formula_registry',
             '_chem_registry',
-            # Immutable runtime compilation cache. Copying the full catalog
-            # into every hourly rollback snapshot is unnecessary and grows
-            # with each analytical carrier family; preserve object identity
-            # like the registry and kernel that consume it.
-            'vapour_rail_catalog',
             'atom_ledger',
             '_chem_kernel',
             'cost_ledger',
@@ -14210,6 +14209,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 for name, value in self.cost_ledger.__dict__.items()
             }
+        if defer_committed_history and state_receiver is not None:
+            _materialize_refusal_snapshot_history(state, copy_committed_rows=False)
         return state, ledger, cost_state
 
     def _restore_terminal_refusal_hour_state(
