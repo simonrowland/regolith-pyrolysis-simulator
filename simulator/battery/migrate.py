@@ -9613,20 +9613,22 @@ def _selection_from_named_field(
         a = _as_dec_or_none(payload.get("A"))
         b = _as_dec_or_none(payload.get("B"))
         validity = payload.get("temperature_range_as_printed")
-        if a is not None and b is not None and isinstance(validity, str) and validity:
+        if a is not None and b is not None:
+            domain = {"units_as_printed": units}
+            if isinstance(validity, str) and validity:
+                domain["temperature_range_as_printed"] = validity
             return SourceSelection(
-                value=Value(
-                    ValueKind.EXPRESSION,
-                    expression_text="log10 K = A + B/T",
-                    expression_parameters=(("A", a), ("B", b)),
-                    expression_domain=json.dumps(
-                        {
-                            "temperature_range_as_printed": validity,
-                            "units_as_printed": units,
-                        },
-                        ensure_ascii=False,
-                        separators=(",", ":"),
-                    ),
+                value=_value_from_plain(
+                    {
+                        "kind": ValueKind.EXPRESSION.value,
+                        "expression_text": "log10_K = A + B/T",
+                        "expression_parameters": (("A", a), ("B", b)),
+                        "expression_domain": json.dumps(
+                            domain,
+                            ensure_ascii=False,
+                            separators=(",", ":"),
+                        ),
+                    }
                 ),
                 field_name="A/B",
                 unit_trail=units,

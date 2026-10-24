@@ -16410,7 +16410,7 @@ def test_visscher_formula_fields_reach_modelled_pressure_expressions(
         assert observation.locator.equation == equation
 
 
-def test_no27_log_equilibrium_fits_keep_coefficients_and_model_domain(
+def test_no27_log_equilibrium_fits_keep_printed_coefficients_without_invented_domain(
     tmp_path: Path,
 ) -> None:
     source_id = "no27-fegley-cameron-1987-epsl"
@@ -16427,7 +16427,7 @@ def test_no27_log_equilibrium_fits_keep_coefficients_and_model_domain(
     tables = (
         ("fegley_cameron_1987_table1_pure_liquid_oxide_vaporization", "1", EvidenceClass.COMPILATION_ASSESSED),
         ("fegley_cameron_1987_table2_gas_formation_data", "2", EvidenceClass.COMPILATION_ASSESSED),
-        ("fegley_cameron_1987_table3_imcc_pseudo_species", "3", EvidenceClass.MODEL_DERIVED),
+        ("fegley_cameron_1987_table3_imcc_pseudo_species", "3", EvidenceClass.AUTHOR_ESTIMATE),
     )
     for observation_id, table, evidence_class in tables:
         rows = source_observations[observation_id]["values"]["rows"]
@@ -16441,18 +16441,23 @@ def test_no27_log_equilibrium_fits_keep_coefficients_and_model_domain(
         for observation, row in zip(migrated, rows, strict=True):
             assert quantity_token(observation.identity) is Quantity.LOG10_KF
             assert observation.value.kind is ValueKind.EXPRESSION
-            assert observation.value.expression_text == "log10 K = A + B/T"
+            assert observation.value.expression_text == "log10_K = A + B/T"
             assert dict(observation.value.expression_parameters) == {
                 "A": Decimal(str(row["A"])),
                 "B": Decimal(str(row["B"])),
             }
-            assert "2500-3500 K" in observation.value.expression_domain
+            assert "temperature_range_as_printed" not in observation.value.expression_domain
             assert "log10_K = A + B/T; T in K" in observation.value.expression_domain
             assert observation.identity.temperature_K is not None
             assert observation.identity.temperature_K.is_unknown
             assert observation.evidence.class_.value is evidence_class
             assert observation.locator is not None
             assert observation.locator.table == table
+            if table == "1" and row["reaction"] == "SiO2(liq) = Si(g) + 2O(g)":
+                assert dict(observation.value.expression_parameters) == {
+                    "A": Decimal("22.13"),
+                    "B": Decimal("-94311"),
+                }
 
 
 @pytest.mark.parametrize(

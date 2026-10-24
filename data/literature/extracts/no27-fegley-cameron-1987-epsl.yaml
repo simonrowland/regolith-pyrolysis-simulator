@@ -51,7 +51,6 @@ species:
       units: log10_K = A + B/T; T in K
       values:
         quantity: log10_Kf
-        temperature_range_as_printed: 2500-3500 K (model calculation range stated p.209)
         evidence_class: compilation_assessed
         method_class: compilation_calculated_table
         source_generators: [JANAF Tables and Supplements, Glushko et al. thermodynamic properties, Oetting et al. actinide thermodynamics]
@@ -76,9 +75,8 @@ species:
       units: log10_K = A + B/T; T in K
       values:
         quantity: log10_Kf
-        temperature_range_as_printed: 2500-3500 K (model calculation range stated p.209)
-        evidence_class: model_derived
-        method_class: model_derived
+        evidence_class: author_estimate
+        method_class: author_estimate
         model_generator: IMCC ideal mixing of complex components model; coefficients compiled, extrapolated, or estimated as detailed in Appendix 1
         rows:
         - {reaction: '2MgO + SiO2 = Mg2SiO4', A: -0.94, B: 7434}
@@ -126,7 +124,6 @@ species:
       units: log10_K = A + B/T; T in K
       values:
         quantity: log10_Kf
-        temperature_range_as_printed: 2500-3500 K (model calculation range stated p.209)
         evidence_class: compilation_assessed
         method_class: compilation_calculated_table
         source_generators: [JANAF Tables and Supplements, Glushko et al. thermodynamic properties, Oetting et al. actinide thermodynamics]
