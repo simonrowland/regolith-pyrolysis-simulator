@@ -5,6 +5,7 @@ from decimal import Decimal
 
 import pytest
 
+import simulator.battery.score as score_module
 from engines.builtin.evaporation_flux import _series_resistance_evaporation_flux_kg_m2_s
 from simulator.accounting.formulas import parse_formula
 from simulator.battery.enums import (
@@ -20,7 +21,7 @@ from simulator.battery.enums import (
     Quantity,
     RefusalReason,
 )
-from simulator.battery.identity import Exposure, Identity
+from simulator.battery.identity import Exposure, Identity, SweepIdentity
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
@@ -185,6 +186,50 @@ def test_score_compiler_routes_non_alkali_rate_without_headline_rail():
     assert residual.rail is None
     assert residual.refusal is not None
     assert residual.refusal.detail["reason"] == "alpha_loo_insufficient_sources"
+
+
+def test_areal_rate_compiles_with_two_other_alpha_sources(monkeypatch):
+    row = _kinetic_row("Mg")
+    row = replace(
+        row,
+        identity=replace(
+            row.identity,
+            reservoir=State.of(Species("Mg", Phase.L)),
+            sweep_gas=State.of(SweepIdentity(
+                species="none",
+                flow_sccm=State.of(Decimal("0")),
+                partial_pressure_Pa=State.of(Decimal("0")),
+            )),
+        ),
+    )
+    experiment = replace(
+        F.tabulation_experiment(
+            "kinetic-experiment", method=MethodToken.LANGMUIR_FREE_EVAPORATION
+        ),
+        apparatus=Apparatus(
+            geometry=ApparatusGeometry(
+                exposed_area_m2=Located(State.of(Decimal("0.02")))
+            )
+        ),
+    )
+    context = ScoreContext(
+        works={},
+        experiments={experiment.experiment_id: experiment},
+        observations={row.observation_id: row},
+        _evaporation_alpha_observations=(
+            _alpha("alpha-paper-b", "Mg", 0.1),
+            _alpha("alpha-paper-c", "Mg", 0.3),
+        ),
+    )
+    monkeypatch.setattr(score_module, "predict_with_engine", _pressure_prediction)
+
+    residual, _candidate = compile_residual(
+        row, Engine.INTERNAL_ANALYTICAL, context=context
+    )
+
+    assert residual.refusal is None
+    assert residual.numeric is not None
+    assert float(residual.numeric.value) == pytest.approx(964617.9376026904)
 
 
 def test_alpha_collection_rejects_unmeasured_context_forms():

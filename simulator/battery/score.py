@@ -10451,6 +10451,14 @@ def compile_residual(
         )
 
     expected_unit = QUANTITY_UNITS[quantity]
+    if (
+        quantity is Quantity.EVAPORATION_RATE
+        and isinstance(identity, Identity)
+        and identity.per is not None
+        and identity.per.is_value
+        and identity.per.value is PerBasis.AREA_TIME
+    ):
+        expected_unit = "kg_per_m2_s"
     if prediction.unit != expected_unit:
         return _refused(
             RefusalReason.UNSUPPORTED,
