@@ -16192,14 +16192,12 @@ class Migrator:
             if isinstance(source_composition, Mapping)
             else None
         )
-        if (
-            composition_located is None
-            and isinstance(source_composition_state, Mapping)
+        source_composition_located = (
+            _composition_located_from_plain(source_composition)
+            if isinstance(source_composition_state, Mapping)
             and source_composition_state.get("tag") == StateTag.UNKNOWN.value
-        ):
-            composition_located = _composition_located_from_plain(
-                source_composition
-            )
+            else None
+        )
         if composition_role_refusal:
             self.result.add_queue(
                 work.work_id,
@@ -16726,7 +16724,12 @@ class Migrator:
                 read_from,
                 source_derivation,
             )
-        if malformed_composition_amount is not None:
+        if source_composition_located is not None:
+            # A source-declared point-condition composition is authoritative.
+            # In particular, a typed refusal here cannot be replaced by a
+            # secondary supplementary mole-fraction table on the same row.
+            ident_kwargs["composition"] = source_composition_located.state
+        elif malformed_composition_amount is not None:
             ident_kwargs["composition"] = State.unknown(malformed_composition_amount)
         elif omitted_components:
             ident_kwargs["composition"] = State.unknown(
