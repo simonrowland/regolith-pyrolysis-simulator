@@ -13039,6 +13039,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if campaign == CampaignPhase.C0:
             self.campaign_mgr.c0_exit_prediction = None
             self.campaign_mgr.last_c0_exit = None
+            self.campaign_mgr.c0_remaining_budget_exit = None
             self.campaign_mgr.c0_forecast_adjustment_notices = []
             self._pending_c0_forecast_adjustment_notices = []
         self.paused_for_decision = False
@@ -13130,9 +13131,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if campaign_hour == 0:
             self._refresh_c0_exit_prediction()
             return
+        remaining_hold_budget_hr = max(
+            0.0,
+            self.campaign_mgr._max_hold_hr(CampaignPhase.C0)
+            - campaign_hour,
+        )
+        prediction = self._predict_c0_exit(
+            remaining_hold_budget_hr=remaining_hold_budget_hr,
+        )
+        self.campaign_mgr.c0_remaining_budget_exit = None
+        prediction_status = prediction.get("prediction_status")
+        forecast_applied = prediction_status in {
+            "ok",
+            "no_candidate_fits_remaining_budget",
+        }
+        if forecast_applied:
+            self.campaign_mgr.c0_exit_prediction = prediction
+        if prediction_status == "no_candidate_fits_remaining_budget":
+            self.campaign_mgr.record_c0_remaining_budget_exit(
+                prediction,
+                campaign_hour=campaign_hour,
+                remaining_budget_hr=remaining_hold_budget_hr,
+            )
         notice = self.campaign_mgr.record_c0_forecast_adjustment(
             adjusted_field,
             campaign_hour,
+            loss_budget_re_evaluated=forecast_applied,
         )
         self._pending_c0_forecast_adjustment_notices.append(notice)
 
@@ -13814,6 +13838,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         alkali_retention_budget_fraction: float | None = None,
         p_total_mbar: float | None = None,
         pO2_mbar: float | None = None,
+        remaining_hold_budget_hr: float | None = None,
     ) -> dict[str, Any]:
         """Predict C0 exit in a detached simulator context."""
         context, unavailable_status = self._build_c0_forecast_context()
@@ -13846,6 +13871,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'release_curves': 'uncertified (t-1417)',
                 'prediction_status': prediction_status,
                 **(
+                    {'remaining_hold_budget_hr': float(remaining_hold_budget_hr)}
+                    if remaining_hold_budget_hr is not None
+                    else {}
+                ),
+                **(
                     {'forecast_context_refusal_detail': refusal_detail}
                     if refusal_detail is not None
                     else {}
@@ -13857,6 +13887,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             p_total_mbar=p_total_mbar,
             pO2_mbar=pO2_mbar,
+            remaining_hold_budget_hr=remaining_hold_budget_hr,
         )
         forecast_engine = getattr(context, '_c0_forecast_engine', None)
         if forecast_engine is not None:
@@ -13979,13 +14010,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         alkali_retention_budget_fraction: float | None = None,
         p_total_mbar: float | None = None,
         pO2_mbar: float | None = None,
+        remaining_hold_budget_hr: float | None = None,
     ) -> dict[str, Any]:
         """Evaluate C0 temperature and evacuation bounds on private owners.
 
         Each integer ramp temperature is evaluated with the analytical
         equilibrium, evaporation, finite-parent depletion, and C0 pipe-cap
         owners. The accepted point is the highest sampled temperature whose
-        capped Na+K source stays inside the configured feed-loss budget.
+        capped Na+K source stays inside the configured feed-loss budget. A
+        mid-C0 call also requires its projected hold to fit the remaining
+        C0 hold allowance.
         """
         cfg = self.campaign_mgr._campaign_config(CampaignPhase.C0)
         budget_raw = (
@@ -14057,6 +14091,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         max_hold_hr = self.campaign_mgr._max_hold_hr(CampaignPhase.C0)
         max_runtime_hr = float(math.ceil(max_hold_hr))
+        hold_budget_hr = max_runtime_hr
+        if remaining_hold_budget_hr is not None:
+            remaining_hold_budget_hr = float(remaining_hold_budget_hr)
+            if (
+                not math.isfinite(remaining_hold_budget_hr)
+                or remaining_hold_budget_hr < 0.0
+            ):
+                raise ValueError(
+                    'C0 remaining hold budget must be finite and non-negative'
+                )
+            hold_budget_hr = min(max_runtime_hr, remaining_hold_budget_hr)
         self.melt.atmosphere = Atmosphere.ARGON_FLOW
         self.melt.background_gas_species = 'Ar'
         self.melt.p_total_mbar = total_pressure_mbar
@@ -14125,7 +14170,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if math.isfinite(exit_window_hr)
                 else math.inf
             )
-            hold_hr = min(runtime_exit_window_hr, max_runtime_hr)
+            hold_hr = min(runtime_exit_window_hr, hold_budget_hr)
             # Estimate the load-time mixture remaining after the capped hold
             # using the candidate-temperature capacity owner. This is notice
             # data only; it does not mutate the ledgered gas inventory.
@@ -14167,7 +14212,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if alkali_feed_mass_kg > 0.0
                 else None
             )
-            return {
+            candidate = {
                 'T_exit_C': float(temperature_C),
                 'T_exit_reached_hr': t_temperature_hr,
                 't_evac_hr': t_evac_hr,
@@ -14207,6 +14252,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'phase_state_ticket': 't-1460',
                 'release_curves': 'uncertified (t-1417)',
             }
+            if remaining_hold_budget_hr is not None:
+                candidate['remaining_hold_budget_hr'] = hold_budget_hr
+                candidate['runtime_exit_campaign_hour'] = (
+                    float(self.melt.campaign_hour)
+                    + runtime_exit_window_hr
+                )
+            return candidate
 
         try:
             self.melt.campaign = CampaignPhase.C0
@@ -14225,13 +14277,133 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             first_C = int(math.floor(high_C))
             last_C = int(math.ceil(max(low_C, start_temperature_C)))
             selected = None
+            best_alkali_candidate = None
+            best_hold_candidate = None
+            best_hold_shortfall_hr = math.inf
             for temperature_C in range(first_C, last_C - 1, -1):
                 candidate = evaluate(float(temperature_C))
                 loss_fraction = candidate['Na_plus_K_feed_loss_fraction']
-                if loss_fraction is not None and loss_fraction <= budget:
-                    selected = candidate
-                    break
+                if loss_fraction is None:
+                    continue
+                if (
+                    best_alkali_candidate is None
+                    or loss_fraction
+                    < best_alkali_candidate['Na_plus_K_feed_loss_fraction']
+                ):
+                    best_alkali_candidate = candidate
+                if loss_fraction <= budget:
+                    if (
+                        remaining_hold_budget_hr is None
+                        or candidate['runtime_exit_window_hr']
+                        <= hold_budget_hr
+                    ):
+                        selected = candidate
+                        break
+                    hold_shortfall_hr = max(
+                        0.0,
+                        float(candidate['runtime_exit_window_hr'])
+                        - hold_budget_hr,
+                    )
+                    if (
+                        best_hold_candidate is None
+                        or hold_shortfall_hr < best_hold_shortfall_hr
+                    ):
+                        best_hold_candidate = candidate
+                        best_hold_shortfall_hr = hold_shortfall_hr
             if selected is None:
+                if remaining_hold_budget_hr is not None:
+                    if best_hold_candidate is not None:
+                        best_candidate = best_hold_candidate
+                        exit_reason = 'no_candidate_fits_remaining_hold'
+                        hold_shortfall = best_hold_shortfall_hr
+                        alkali_shortfall = 0.0
+                    elif best_alkali_candidate is not None:
+                        best_candidate = best_alkali_candidate
+                        exit_reason = 'no_candidate_satisfies_alkali_budget'
+                        hold_shortfall = max(
+                            0.0,
+                            float(best_candidate['runtime_exit_window_hr'])
+                            - hold_budget_hr,
+                        )
+                        alkali_shortfall = max(
+                            0.0,
+                            float(
+                                best_candidate[
+                                    'Na_plus_K_feed_loss_fraction'
+                                ]
+                            )
+                            - budget,
+                        )
+                    else:
+                        best_candidate = None
+                        exit_reason = 'forecast_unavailable'
+                        hold_shortfall = None
+                        alkali_shortfall = None
+                    return {
+                        'T_exit_C': None,
+                        't_evac_hr': None,
+                        'M_C0_gas_kg': gas_mass_kg,
+                        'C_evac_kg_hr': (
+                            best_candidate['C_evac_kg_hr']
+                            if best_candidate is not None
+                            else None
+                        ),
+                        'requested_exit_window_hr': (
+                            best_candidate['requested_exit_window_hr']
+                            if best_candidate is not None
+                            else None
+                        ),
+                        'runtime_exit_window_hr': (
+                            best_candidate['runtime_exit_window_hr']
+                            if best_candidate is not None
+                            else None
+                        ),
+                        'remaining_hold_budget_hr': hold_budget_hr,
+                        'best_candidate_temperature_C': (
+                            best_candidate['T_exit_C']
+                            if best_candidate is not None
+                            else None
+                        ),
+                        'best_candidate_required_hold_hr': (
+                            best_candidate['runtime_exit_window_hr']
+                            if best_candidate is not None
+                            else None
+                        ),
+                        'best_candidate_hold_shortfall_hr': hold_shortfall,
+                        'best_candidate_alkali_shortfall_fraction': (
+                            alkali_shortfall
+                        ),
+                        'remaining_budget_exit_reason': exit_reason,
+                        'Na_plus_K_to_train_kg': (
+                            best_candidate['Na_plus_K_to_train_kg']
+                            if best_candidate is not None
+                            else None
+                        ),
+                        'Na_plus_K_feed_mass_kg': alkali_feed_mass_kg,
+                        'Na_plus_K_feed_loss_fraction': (
+                            best_candidate[
+                                'Na_plus_K_feed_loss_fraction'
+                            ]
+                            if best_candidate is not None
+                            else None
+                        ),
+                        'alkali_retention_budget_fraction': budget,
+                        'budget_authority': 'owner:d-244',
+                        'budget_provenance': 'owner d-244, purity limit',
+                        'cover': {
+                            'carrier_gas': 'Ar',
+                            'p_total_mbar': total_pressure_mbar,
+                            'pO2_mbar': oxygen_pressure_mbar,
+                        },
+                        'phase_state': (
+                            'unknown; analytical liquid-law extrapolated'
+                        ),
+                        'phase_state_ticket': 't-1460',
+                        'release_curves': 'uncertified (t-1417)',
+                        'prediction_status': (
+                            'no_candidate_fits_remaining_budget'
+                        ),
+                    }
                 return {
                     'T_exit_C': None,
                     't_evac_hr': None,

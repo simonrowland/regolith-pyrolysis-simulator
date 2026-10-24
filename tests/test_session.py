@@ -12,7 +12,7 @@ import yaml
 
 import simulator.session as session_module
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
-from simulator.campaigns import CampaignManager
+from simulator.campaigns import CampaignManager, c0_exit_run_notice
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.session import (
@@ -629,15 +629,64 @@ def test_c0_forecast_reacts_to_web_ordered_ramp_override():
     )
 
 
-def test_c0_forecast_adjustment_after_completed_hour_is_flagged():
+def test_c0_feasible_midrun_reforecast_preserves_the_startup_trajectory():
+    config = _config(setpoints=_cross_surface_parity_setpoints())
+    baseline = SimSession().start(config)
+    reforecasted = SimSession().start(_config(
+        setpoints=_cross_surface_parity_setpoints()
+    ))
+    baseline_sim = baseline.simulator
+    reforecasted_sim = reforecasted.simulator
+    startup_prediction = deepcopy(
+        reforecasted_sim.campaign_mgr.c0_exit_prediction
+    )
+
+    assert baseline_sim.step().temperature_C == reforecasted_sim.step().temperature_C
+    reforecasted.adjust(
+        "campaign_override",
+        200.0,
+        campaign="C0",
+        field="ramp_rate",
+    )
+
+    updated_prediction = reforecasted_sim.campaign_mgr.c0_exit_prediction
+    assert updated_prediction["prediction_status"] == "ok"
+    assert updated_prediction["T_exit_C"] == startup_prediction["T_exit_C"]
+    assert updated_prediction["runtime_exit_window_hr"] <= (
+        updated_prediction["remaining_hold_budget_hr"]
+    )
+    assert updated_prediction["runtime_exit_campaign_hour"] == (
+        updated_prediction["runtime_exit_window_hr"] + 1.0
+    )
+    assert reforecasted_sim.campaign_mgr.c0_remaining_budget_exit is None
+
+    while (
+        baseline_sim.melt.campaign == CampaignPhase.C0
+        and reforecasted_sim.melt.campaign == CampaignPhase.C0
+    ):
+        baseline_snapshot = baseline_sim.step()
+        reforecasted_snapshot = reforecasted_sim.step()
+        assert baseline_snapshot.temperature_C == reforecasted_snapshot.temperature_C
+        assert baseline_snapshot.evap_flux.species_kg_hr == (
+            reforecasted_snapshot.evap_flux.species_kg_hr
+        )
+        assert baseline_sim.atom_ledger.mol_by_account() == (
+            reforecasted_sim.atom_ledger.mol_by_account()
+        )
+
+    assert baseline_sim.melt.campaign == reforecasted_sim.melt.campaign
+    assert baseline_sim.melt.campaign == CampaignPhase.C0B
+
+
+def test_c0_adjustment_with_no_remaining_hold_candidate_exits_nonterminally():
     session = SimSession().start(
         _config(
+            feedstock_id="mars_phyllosilicate_clay",
             setpoints=_cross_surface_parity_setpoints(),
-            runtime_campaign_overrides={"C0": {"max_hours": 2.0}},
         )
     )
     sim = session.simulator
-    startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
+    assert sim.campaign_mgr.c0_exit_prediction["runtime_exit_window_hr"] <= 25.0
 
     first_hour = sim.step()
     assert first_hour.campaign == CampaignPhase.C0
@@ -646,28 +695,56 @@ def test_c0_forecast_adjustment_after_completed_hour_is_flagged():
 
     session.adjust(
         "campaign_override",
-        2000.0,
+        1.5,
         campaign="C0",
-        field="ramp_rate",
+        field="max_hours",
     )
-    assert sim.campaign_mgr.c0_exit_prediction == startup_prediction
+    failed_prediction = sim.campaign_mgr.c0_exit_prediction
+    assert failed_prediction["prediction_status"] == (
+        "no_candidate_fits_remaining_budget"
+    )
+    assert failed_prediction["T_exit_C"] is None
+    assert failed_prediction["best_candidate_hold_shortfall_hr"] > 0.0
+    assert sim.campaign_mgr.c0_remaining_budget_exit["reason"] == (
+        "no_candidate_fits_remaining_hold"
+    )
+    assert sim.campaign_mgr.c0_remaining_budget_exit["remaining_budget_hr"] == 0.5
+    target, _ramp = sim.campaign_mgr.get_temp_target(
+        CampaignPhase.C0,
+        sim.melt.campaign_hour,
+        sim.melt,
+    )
+    assert target == sim.melt.temperature_C
 
     second_hour = sim.step()
     expected_notice = {
         "type": "c0_forecast_predates_adjustment",
-        "adjusted_fields": ["C0.ramp_rate"],
+        "adjusted_fields": ["C0.max_hours"],
         "campaign_hour": 1,
-        "loss_budget_re_evaluated": False,
+        "loss_budget_re_evaluated": True,
     }
     assert second_hour.subsolidus_bakeout_diagnostic[
         "forecast_adjustment_notices"
     ] == [expected_notice]
-    assert sim.campaign_mgr.last_c0_exit[
-        "forecast_adjustment_notices"
-    ] == [expected_notice]
+    assert sim.campaign_mgr.last_c0_exit["forecast_adjustment_notices"] == [
+        expected_notice
+    ]
+    assert sim.campaign_mgr.last_c0_exit["backstop"] == "remaining_budget"
+    assert sim.campaign_mgr.last_c0_exit["remaining_budget_exit"] == (
+        sim.campaign_mgr.c0_remaining_budget_exit
+    )
+    assert sim.campaign_mgr.last_c0_exit["remaining_budget_exit"][
+        "best_candidate_shortfall_unit"
+    ] == "hold_hr"
+    assert sim.campaign_mgr.last_c0_exit["remaining_budget_exit"][
+        "best_candidate_shortfall"
+    ] == failed_prediction["best_candidate_hold_shortfall_hr"]
+    assert c0_exit_run_notice(sim) == sim.campaign_mgr.last_c0_exit
+    assert sim.melt.campaign == CampaignPhase.C0B
+    assert sim.is_complete() is False
 
 
-def test_c0_post_step_pressure_adjustment_cannot_clear_computed_cap(
+def test_c0_post_step_pressure_adjustment_reforecasts_without_losing_cap(
     monkeypatch,
 ):
     session = SimSession().start(
@@ -684,15 +761,24 @@ def test_c0_post_step_pressure_adjustment_cannot_clear_computed_cap(
 
     calls = []
 
-    def no_acceptable_candidate():
-        calls.append(True)
-        return {**startup_prediction, "T_exit_C": None}
+    def no_acceptable_candidate(**kwargs):
+        calls.append(kwargs)
+        return {
+            **startup_prediction,
+            "T_exit_C": None,
+            "prediction_status": "no_candidate_fits_remaining_budget",
+            "remaining_budget_exit_reason": "no_candidate_fits_remaining_hold",
+            "best_candidate_temperature_C": startup_cap,
+            "best_candidate_required_hold_hr": 30.0,
+            "best_candidate_hold_shortfall_hr": 6.0,
+        }
 
     monkeypatch.setattr(sim, "_predict_c0_exit", no_acceptable_candidate)
     session.adjust("pO2_mbar", 0.5)
 
-    assert calls == []
-    assert sim.campaign_mgr.c0_exit_prediction == startup_prediction
+    assert calls == [{"remaining_hold_budget_hr": 24.0}]
+    assert sim.campaign_mgr.c0_exit_prediction["T_exit_C"] is None
+    assert sim.campaign_mgr.c0_remaining_budget_exit is not None
     target_C, _ramp_rate = sim.campaign_mgr.get_temp_target(
         CampaignPhase.C0,
         sim.melt.campaign_hour,
