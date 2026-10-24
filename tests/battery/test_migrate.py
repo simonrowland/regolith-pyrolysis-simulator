@@ -16369,19 +16369,19 @@ def test_visscher_formula_fields_reach_modelled_pressure_expressions(
         "visscher_2013_sio2_pure_melt_vapor_pressure_fit": (
             Quantity.P_SAT,
             "log P_vap (SiO2, liq) = 8.203 − 25898.9/T",
-            "up to 6000 K (as stated before equation 2)",
+            "up to 6000 K",
             "2",
         ),
         "visscher_2013_sio_partial_pressure_equilibrium": (
             Quantity.P_PARTIAL,
             "P_SiO = K4 * a_SiO2 * fO2^(-0.5)",
-            "2000-4000 K (model calculation range)",
+            None,
             "5",
         ),
         "visscher_2013_total_vapor_pressure_sum": (
             Quantity.P_SAT,
             "P_T = ΣP_i",
-            "2000-4000 K (model calculation range)",
+            None,
             "3",
         ),
         "visscher_2013_bse_total_vapor_pressure_fit": (
@@ -16404,10 +16404,16 @@ def test_visscher_formula_fields_reach_modelled_pressure_expressions(
         assert quantity_token(observation.identity) is quantity
         assert observation.value.kind is ValueKind.EXPRESSION
         assert observation.value.expression_text == formula
-        assert validity in observation.value.expression_domain
+        if validity is None:
+            assert "temperature_range_as_printed" not in observation.value.expression_domain
+        else:
+            assert validity in observation.value.expression_domain
         assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
         assert observation.locator is not None
         assert observation.locator.equation == equation
+        # Published p. 4, equations (2), (3), (5), (6), and (7) contain the
+        # formulas; only the adjacent text before eq. (2) and after eqs. (6)-(7)
+        # prints the temperature ranges retained above.
 
 
 def test_no27_log_equilibrium_fits_keep_printed_coefficients_without_invented_domain(

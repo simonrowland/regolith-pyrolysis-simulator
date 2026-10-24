@@ -9637,19 +9637,21 @@ def _selection_from_named_field(
     if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
         expression = payload.get("expression")
         validity = payload.get("temperature_range_as_printed")
-        if isinstance(expression, str) and isinstance(validity, str) and validity:
+        if isinstance(expression, str) and expression:
+            domain = {"units_as_printed": units}
+            if isinstance(validity, str) and validity:
+                domain["temperature_range_as_printed"] = validity
             return SourceSelection(
-                value=Value(
-                    ValueKind.EXPRESSION,
-                    expression_text=expression,
-                    expression_domain=json.dumps(
-                        {
-                            "temperature_range_as_printed": validity,
-                            "units_as_printed": units,
-                        },
-                        ensure_ascii=False,
-                        separators=(",", ":"),
-                    ),
+                value=_value_from_plain(
+                    {
+                        "kind": ValueKind.EXPRESSION.value,
+                        "expression_text": expression,
+                        "expression_domain": json.dumps(
+                            domain,
+                            ensure_ascii=False,
+                            separators=(",", ":"),
+                        ),
+                    }
                 ),
                 field_name="expression",
                 unit_trail=units,
