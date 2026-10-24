@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -43,6 +44,17 @@ def _config(**overrides) -> SimSessionConfig:
     }
     values.update(overrides)
     return SimSessionConfig(**values)
+
+
+def _cross_surface_parity_setpoints() -> dict:
+    setpoints = _load_yaml("setpoints.yaml")
+    kernel = dict(setpoints.get("chemistry_kernel", {}) or {})
+    kernel["allow_unmeasured_alpha_fallback"] = True
+    series = dict(kernel.get("evaporation_series_resistance", {}) or {})
+    series["gas_resistance_enabled"] = False
+    kernel["evaporation_series_resistance"] = series
+    setpoints["chemistry_kernel"] = kernel
+    return setpoints
 
 
 def _pt0_store_state_bytes(store) -> bytes:
@@ -574,19 +586,7 @@ def test_campaign_transition_zero_po2_override_leaves_atmosphere_at_default():
 
 
 def test_c0_forecast_reacts_to_web_ordered_ramp_override():
-    def parity_setpoints():
-        setpoints = _load_yaml("setpoints.yaml")
-        kernel = dict(setpoints.get("chemistry_kernel", {}) or {})
-        kernel["allow_unmeasured_alpha_fallback"] = True
-        series = dict(
-            kernel.get("evaporation_series_resistance", {}) or {}
-        )
-        series["gas_resistance_enabled"] = False
-        kernel["evaporation_series_resistance"] = series
-        setpoints["chemistry_kernel"] = kernel
-        return setpoints
-
-    setpoints = parity_setpoints()
+    setpoints = _cross_surface_parity_setpoints()
     configured_before_start = SimSession().start(
         _config(
             setpoints=setpoints,
@@ -627,6 +627,79 @@ def test_c0_forecast_reacts_to_web_ordered_ramp_override():
     assert ledger_after_c0(configured_before_start) == ledger_after_c0(
         started_before_adjustment
     )
+
+
+def test_c0_forecast_adjustment_after_completed_hour_is_flagged():
+    session = SimSession().start(
+        _config(
+            setpoints=_cross_surface_parity_setpoints(),
+            runtime_campaign_overrides={"C0": {"max_hours": 2.0}},
+        )
+    )
+    sim = session.simulator
+    startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
+
+    first_hour = sim.step()
+    assert first_hour.campaign == CampaignPhase.C0
+    assert sim.melt.campaign == CampaignPhase.C0
+    assert sim.melt.campaign_hour == 1
+
+    session.adjust(
+        "campaign_override",
+        2000.0,
+        campaign="C0",
+        field="ramp_rate",
+    )
+    assert sim.campaign_mgr.c0_exit_prediction == startup_prediction
+
+    second_hour = sim.step()
+    expected_notice = {
+        "type": "c0_forecast_predates_adjustment",
+        "adjusted_fields": ["C0.ramp_rate"],
+        "campaign_hour": 1,
+        "loss_budget_re_evaluated": False,
+    }
+    assert second_hour.subsolidus_bakeout_diagnostic[
+        "forecast_adjustment_notices"
+    ] == [expected_notice]
+    assert sim.campaign_mgr.last_c0_exit[
+        "forecast_adjustment_notices"
+    ] == [expected_notice]
+
+
+def test_c0_post_step_pressure_adjustment_cannot_clear_computed_cap(
+    monkeypatch,
+):
+    session = SimSession().start(
+        _config(setpoints=_cross_surface_parity_setpoints())
+    )
+    sim = session.simulator
+    startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
+    startup_cap = startup_prediction["T_exit_C"]
+    assert startup_cap is not None
+
+    sim.step()
+    assert sim.melt.campaign == CampaignPhase.C0
+    assert sim.melt.campaign_hour == 1
+
+    calls = []
+
+    def no_acceptable_candidate():
+        calls.append(True)
+        return {**startup_prediction, "T_exit_C": None}
+
+    monkeypatch.setattr(sim, "_predict_c0_exit", no_acceptable_candidate)
+    session.adjust("pO2_mbar", 0.5)
+
+    assert calls == []
+    assert sim.campaign_mgr.c0_exit_prediction == startup_prediction
+    target_C, _ramp_rate = sim.campaign_mgr.get_temp_target(
+        CampaignPhase.C0,
+        sim.melt.campaign_hour,
+        sim.melt,
+    )
+    assert target_C is not None
+    assert target_C <= startup_cap
 
 
 def test_session_adjust_stir_state_writes_canonical_2_axis_state():
