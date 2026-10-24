@@ -623,6 +623,41 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 1370.3125,
                 ((918.75, 0.0), (1370.3125, 1.0)),
             ),
+            (
+                'C2A_STAGED',
+                'kress91_liquid_calibration_floor',
+                1200.0,
+                1200.000001,
+                ((1200.0, 0.0), (1200.000001, 1.0)),
+            ),
+            (
+                'C2A_STAGED',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                1042.1875,
+                1375.0,
+                ((1042.1875, 0.0), (1375.0, 1.0)),
+            ),
+            (
+                'C2A_STAGED',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                1040.625,
+                1375.0,
+                ((1040.625, 0.0), (1375.0, 1.0)),
+            ),
+            (
+                'C3_NA',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                1040.625,
+                1375.0,
+                ((1040.625, 0.0), (1375.0, 1.0)),
+            ),
+            (
+                'C3_NA',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                1040.625,
+                1375.0,
+                ((1040.625, 0.0), (1375.0, 1.0)),
+            ),
         ],
         'mars_basalt_C2A_12h': [
             (
@@ -652,6 +687,10 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
 
     def record_curve(sim, *args, **kwargs):
         record = original_record(sim, *args, **kwargs)
+        if getattr(sim, '_c0_forecast_context', False):
+            # The detached forecast is real, but it is not runner output;
+            # including it made a second C0 tuple look like a live curve.
+            return record
         curve = record['curve']
         observed.setdefault(current_scenario[0], []).append((
             sim.melt.campaign.name,

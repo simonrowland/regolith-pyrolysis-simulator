@@ -92,8 +92,9 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # from the runner JSON because its public envelope does not include raw flux maps.
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
-        "flux_maps_sha256": "afada329092a6480dfca8eae25880231bd76c3d95711456fc6d0b7145a4c44aa",
-        "ledger_sha256": "7cc5144f6f9e90caa10e106e4227673954c7b3091d1affddf659fd836c4b8104",
+        # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
+        "flux_maps_sha256": "6f6b8e6f2137ffb369ec3079cd7305324325713cad87be2e6d609fe9911b6267",
+        "ledger_sha256": "fabe87d7c89cd5622ab3b77734e2ef1f307f3b7af48e5175723c14d93a4dea3e",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
