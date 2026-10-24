@@ -41,6 +41,7 @@ from simulator.battery.score import (
 )
 from simulator.battery.records import Located, Locator, State, Value
 from simulator.battery.score import headline_payload_records, residual_to_plain
+from simulator.melt_backend.base import EquilibriumResult
 from tests.battery.factories import migrate_one_extract
 
 
@@ -129,6 +130,43 @@ def _as_stored_fe_valence_fraction(observation):
     return replace(observation, identity=identity)
 
 
+@pytest.fixture(scope="module")
+def borisov_fe_redox_row():
+    root = Path(__file__).resolve().parents[2]
+    extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
+    migrator = migrate_one_extract(root, extract)
+    migrator.finalize()
+    return migrator.result.observations[
+        f"{extract.stem}::borisov_2018_table2_row_4"
+    ]
+
+
+@pytest.fixture(
+    params=(Engine.ALPHAMELTS, Engine.THERMOENGINE),
+    ids=("alphamelts", "thermoengine"),
+)
+def melts_fe_redox_fixture(request):
+    engine = request.param
+    oxide_split = {
+        "FeO_wt_pct": Decimal("7.1844"),
+        "Fe2O3_wt_pct": Decimal("15.9687"),
+    }
+    result = EquilibriumResult(
+        phases_present=["liquid"],
+        phase_masses_kg={"liquid": 1.0},
+        liquid_fraction=1.0,
+        diagnostics={"engine_version": "fixture"},
+        liquid_composition_wt_pct=(
+            {"SiO2": 76.8469, "FeO": 7.1844, "Fe2O3": 15.9687}
+            if engine is Engine.ALPHAMELTS
+            else {}
+        ),
+    )
+    if engine is Engine.THERMOENGINE:
+        result.fe_redox_split = oxide_split
+    return engine, result
+
+
 @pytest.mark.parametrize(
     "engine", (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
 )
@@ -151,7 +189,13 @@ def test_stored_fe3_total_iron_fraction_uses_fe_redox_prediction(engine):
 
 
 @pytest.mark.parametrize(
-    "engine", (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
+    "engine",
+    (
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+        Engine.ALPHAMELTS,
+        Engine.THERMOENGINE,
+    ),
 )
 def test_stored_fe_valence_fraction_without_printed_fo2_refuses(engine):
     if engine is Engine.OPENIMCC:
@@ -181,6 +225,79 @@ def test_stored_fe_valence_fraction_without_printed_fo2_refuses(engine):
         "reason": "missing_input",
         "input": "printed_fO2",
     }
+
+
+@pytest.mark.parametrize(
+    "quantity,expected",
+    ((Quantity.FE3_FE2_RATIO, Decimal("2")), (Quantity.VALENCE_RATIO, Decimal(2) / 3)),
+)
+def test_melts_redox_outputs_use_printed_conditions_and_valence_identity(
+    quantity,
+    expected,
+    melts_fe_redox_fixture,
+    borisov_fe_redox_row,
+    monkeypatch,
+):
+    engine, result = melts_fe_redox_fixture
+    observation = (
+        borisov_fe_redox_row
+        if quantity is Quantity.FE3_FE2_RATIO
+        else _as_stored_fe_valence_fraction(borisov_fe_redox_row)
+    )
+    calls = []
+
+    def equilibrate(engine_arg, **kwargs):
+        calls.append((engine_arg, kwargs))
+        return result
+
+    monkeypatch.setattr(score_module, "_equilibrate_phase_assemblage", equilibrate)
+    prediction = predict_with_engine(engine, observation)
+
+    assert prediction.value == expected
+    assert prediction.refusal_reason is None
+    assert prediction.execution.state.value == "produced"
+    assert len(calls) == 1
+    called_engine, inputs = calls[0]
+    assert called_engine is engine
+    assert inputs["temperature_C"] == float(
+        score_module.temperature_of(observation.identity) - Decimal("273.15")
+    )
+    printed_fO2 = observation.point_conditions["fO2_log"].state.value
+    if isinstance(printed_fO2, Value):
+        printed_fO2 = printed_fO2.point
+    assert inputs["fO2_log"] == float(printed_fO2)
+    expected_wt = score_module.composition_wt_pct(
+        observation.identity.composition.value
+    )
+    assert inputs["composition_kg"] == {
+        oxide: amount / 1000.0 for oxide, amount in expected_wt.items()
+    }
+    assert inputs["pressure_bar"] == 1.01325
+
+
+def test_melts_redox_out_of_domain_is_predicted_and_flagged(
+    melts_fe_redox_fixture,
+    borisov_fe_redox_row,
+    monkeypatch,
+):
+    engine, result = melts_fe_redox_fixture
+    result.status = "out_of_domain"
+    result.diagnostics["backend_status_reason"] = "fixture_domain_gate"
+    monkeypatch.setattr(
+        score_module,
+        "_equilibrate_phase_assemblage",
+        lambda _engine, **_kwargs: result,
+    )
+
+    prediction = predict_with_engine(engine, borisov_fe_redox_row)
+
+    assert prediction.value == Decimal("2")
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and "fixture_domain_gate" in notice.reason
+        for notice in prediction.notices
+    )
 
 
 def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
@@ -392,7 +509,7 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     )
 
 
-def test_borisov_2018_rows_reach_redox_scoring_population():
+def test_borisov_2018_rows_reach_redox_scoring_population(monkeypatch):
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
     source = load_yaml(extract)
@@ -526,9 +643,16 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         "input": "printed_fO2",
     }
 
-    unsupported = predict_with_engine(Engine.ALPHAMELTS, row4)
-    assert unsupported.value is None
-    assert unsupported.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
+    def unavailable_backend(*_args, **_kwargs):
+        raise RuntimeError("fixture backend unavailable")
+
+    monkeypatch.setattr(
+        score_module, "_equilibrate_phase_assemblage", unavailable_backend
+    )
+    unavailable = predict_with_engine(Engine.ALPHAMELTS, row4)
+    assert unavailable.value is None
+    assert unavailable.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert unavailable.refusal_detail["reason"] == "fe_redox_engine_unavailable"
 
     residuals, _ = score_store(
         context,
@@ -595,6 +719,55 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert zero_residuals[0].numeric is None
     assert zero_residuals[0].refusal is not None
     assert zero_residuals[0].refusal.reason is RefusalReason.METRIC_DOMAIN
+
+
+def test_kress91_valence_calibration_rows_are_fit_fidelity():
+    root = Path(__file__).resolve().parents[2]
+    extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
+    migrator = migrate_one_extract(root, extract)
+    migrator.finalize()
+    result = migrator.result
+    row = next(
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.value is Quantity.FE3_FE2_RATIO
+        and observation.identity.species.formula == "Fe"
+        and score_module._kc91_calibration_source_overlap(
+            None
+            if observation.evidence is None
+            else observation.evidence.attribution
+        )
+    )
+    valence_row = _as_stored_fe_valence_fraction(row)
+    valence_row = replace(
+        valence_row,
+        value=Value.point_of(Decimal("0.5")),
+    )
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        {valence_row.observation_id: valence_row},
+        origins={valence_row.observation_id: extract.name},
+        benches=result.benches,
+    )
+
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+
+    assert len(residuals) == 1
+    assert residuals[0].source_relation is score_module.SourceRelation.TRAINING
+    records = score_module.measured_engine_rail_records(
+        [residual_to_plain(residuals[0])],
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    populated = [record for record in records if record.get("candidates")]
+    assert len(populated) == 1
+    assert populated[0]["source_relation"] == "training"
+    assert populated[0]["population"] == "calibration_source_overlap_fit_fidelity"
 
 
 def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_path):
@@ -929,7 +1102,7 @@ def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, 
     assert residuals[0].refusal.reason is RefusalReason.IDENTITY_MISMATCH
 
 
-def test_aithala_redox_rows_score_only_when_composition_is_printed():
+def test_aithala_redox_rows_score_only_when_composition_is_printed(monkeypatch):
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
     migrator = migrate_one_extract(root, extract)
@@ -956,6 +1129,13 @@ def test_aithala_redox_rows_score_only_when_composition_is_printed():
         origins={key: extract.name for key in result.observations},
         benches=result.benches,
     )
+
+    def unavailable_backend(*_args, **_kwargs):
+        raise RuntimeError("fixture backend unavailable")
+
+    monkeypatch.setattr(
+        score_module, "_equilibrate_phase_assemblage", unavailable_backend
+    )
     residuals, _ = score_store(context, engines=SCORE_ENGINE_SET, rail=Rail.REDOX)
     assert len(residuals) == 16 * len(SCORE_ENGINE_SET)
     for residual in residuals:
@@ -976,10 +1156,22 @@ def test_aithala_redox_rows_score_only_when_composition_is_printed():
                 "input": "composition",
             }
             assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-        else:
+        elif engine in {Engine.MAGEMIN.value, Engine.VAPOROCK.value}:
             assert residual.numeric is None
             assert residual.refusal is not None
             assert (
                 residual.refusal.reason
                 is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
             )
+        else:
+            assert residual.numeric is None
+            assert residual.refusal is not None
+            assert residual.refusal.reason in {
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                RefusalReason.IDENTITY_INCOMPLETE,
+            }
+            if residual.refusal.reason is RefusalReason.ATTEMPTED_UNAVAILABLE:
+                assert (
+                    residual.refusal.detail["reason"]
+                    == "fe_redox_engine_unavailable"
+                )
