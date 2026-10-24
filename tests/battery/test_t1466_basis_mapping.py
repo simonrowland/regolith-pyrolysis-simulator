@@ -181,10 +181,14 @@ def test_b677_potassium_gas_uses_printed_ideal_gas_basis(tmp_path: Path) -> None
         Engine.VAPOROCK, _cell_at(mismatched_enthalpy, "1600")
     )
     assert refused_enthalpy.value is None
-    assert refused_enthalpy.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert refused_enthalpy.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
-    assert refused_enthalpy.refusal_detail["observation_table"] == "table-0095"
-    assert refused_enthalpy.refusal_detail["gas_table"] == "K-005"
+    phase = mismatched_enthalpy.identity.species.phase
+    assert phase.is_unknown
+    assert phase.reason == (
+        "phase string '(c,1,g)' is not in the closed automatic map"
+    )
+    assert refused_enthalpy.refusal_reason is RefusalReason.UNSUPPORTED
+    assert refused_enthalpy.refusal_detail["reason"] == "engine-thermo-does-not-emit"
+    assert refused_enthalpy.refusal_detail["quantity"] == "H_minus_H298"
 
     restored = _identity_from_plain(to_plain(heat_capacity.identity))
     assert restored.per.reason == heat_capacity.identity.per.reason
