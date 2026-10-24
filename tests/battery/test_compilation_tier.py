@@ -3617,7 +3617,12 @@ def test_vaporock_gas_entropy_shifts_one_atmosphere_against_janaf() -> None:
     assert attempt.value is not None
     assert abs(attempt.value - expected_entropy) <= Decimal("0.001")
     assert attempt.authority is Authority.BRIDGE
-    assert attempt.notices == ()
+    assert len(attempt.notices) == 1
+    notice = attempt.notices[0]
+    assert notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+    assert notice.affected_quantities == (Quantity.S,)
+    assert notice.authority is Authority.BRIDGE
+    assert "branch=table" in attempt.call_evidence
 
     printed_cp = _printed_janaf_node("O-029", Decimal("500"), "heat_capacity")
     heat_capacity = replace(
@@ -3845,16 +3850,15 @@ def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
         ),
     )
     atmosphere_attempt = predict_thermo_attempt(Engine.VAPOROCK, one_atmosphere)
-    printed_potassium_entropy = _printed_janaf_node(
-        "K-005", Decimal("1200"), "entropy"
-    )
     assert atmosphere_attempt.refusal_reason is None
     assert atmosphere_attempt.value is not None
-    assert abs(
-        atmosphere_attempt.value - (printed_potassium_entropy + pressure_shift)
-    ) <= Decimal("0.001")
+    # In-band K S is a Shomate fit; its printed-table fidelity is checked
+    # separately with the existing 0.3 J/(mol·K) bound.
+    assert atmosphere_attempt.value == potassium_attempt.value + pressure_shift
     assert atmosphere_attempt.authority is Authority.BRIDGE
     assert atmosphere_attempt.notices == ()
+    assert "coefficient_interval=inside" in atmosphere_attempt.call_evidence
+    assert "branch=shomate" in atmosphere_attempt.call_evidence
 
     cobalt_enthalpy = _same_table_gas(
         "co-unverified-enthalpy",
