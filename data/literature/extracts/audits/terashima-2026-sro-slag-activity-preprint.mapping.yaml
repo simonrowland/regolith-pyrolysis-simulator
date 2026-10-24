@@ -1,0 +1,137 @@
+source_id: terashima-2026-sro-slag-activity-preprint
+source:
+  citation: 'Terashima, D., Urata, K., Kobayashi, Y., Irisawa, E., Amano, M., and Kikuchi, T. (2026), “Measurement of the Activity Coefficient of SrO in Molten CaO-SiO2-Al2O3-MgO-MnO Slag at 1873 K,” SSRN preprint 7065037.'
+  doi: 10.2139/ssrn.7065037
+  year: 2026
+  url: https://ssrn.com/abstract=7065037
+extraction:
+  method: MinerU table draft and table mapping; typed records were reconciled with the 600 dpi page renders.
+  date: '2026-10-22'
+  worker: codex-resume-12624-1792656507
+review_status: draft
+tables:
+  - page: 13
+    table_index: 4
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    unit: mole_fraction
+    phase: metal
+    rows: [2, 3, 4, 5, 6, 7, 8]
+    values:
+      - column: 5
+        species: Sr
+        evidence_class: quoted_attributed
+        attribution: Ueda et al. [14]
+  - page: 13
+    table_index: 4
+    type: activity_coefficient
+    quantity: activity_coefficient
+    unit: dimensionless
+    phase: metal
+    rows: [2, 3, 4, 5, 6, 7, 8]
+    values:
+      - column: 4
+        species: Sr
+        quantity: activity
+        evidence_class: quoted_attributed
+        attribution: Ueda et al. [14]
+      - column: 6
+        species: Sr
+        evidence_class: quoted_attributed
+        attribution: Ueda et al. [14]
+  - page: 13
+    table_index: 4
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    unit: mole_fraction
+    phase: metal
+    rows: [9]
+    values:
+      - column: 5
+        species: Sr
+        evidence_class: measured_tabulated
+  - page: 13
+    table_index: 4
+    type: activity_coefficient
+    quantity: activity_coefficient
+    unit: dimensionless
+    phase: metal
+    rows: [9]
+    values:
+      - column: 4
+        species: Sr
+        quantity: activity
+        evidence_class: measured_tabulated
+      - column: 6
+        species: Sr
+        evidence_class: measured_tabulated
+  - page: 15
+    table_index: 6
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_tabulated
+    unit: mole_fraction
+    phase: metal
+    values:
+      - column: 2
+        species: Si
+        evidence_class: measured_direct
+      - column: 5
+        species: Sr
+        evidence_class: measured_tabulated
+  - page: 18
+    table_index: 7
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: wt_percent
+    phase: slag
+    values:
+      - column: 2
+        species: SiO2
+      - column: 3
+        species: CaO
+      - column: 4
+        species: Al2O3
+      - column: 5
+        species: SrO
+      - column: 6
+        species: MgO
+        evidence_class: author_estimate
+      - column: 7
+        species: MnO
+        evidence_class: author_estimate
+  - page: 19
+    table_index: 8
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: mole_fraction
+    phase: metal
+    values:
+      - column: 3
+        species: Cu
+      - column: 4
+        species: Si
+      - column: 5
+        species: Mn
+  - page: 20
+    table_index: 9
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    unit: mole_fraction
+    phase: metal
+    values:
+      - column: 2
+        species: Sr
+        evidence_class: measured_tabulated
+  - page: 20
+    table_index: 9
+    type: activity_coefficient
+    quantity: activity_coefficient
+    unit: dimensionless
+    phase: slag
+    values:
+      - column: 4
+        species: SrO
+        evidence_class: measured_tabulated

@@ -10,10 +10,14 @@ from tests.helpers.corpus_paths import regolith_corpus_root
 REPO_ROOT = Path(__file__).resolve().parents[1]
 # The corpus checkout to compare against. REGOLITH_CORPUS_ROOT lets a gate point at a
 # specific clone (the controller's, or a CI-provisioned one) instead of the default path.
+# A missing checkout skips; it is not a failure.
 CORPUS_ROOT = regolith_corpus_root()
 
 
-@pytest.mark.skipif(not CORPUS_ROOT.is_dir(), reason="regolith-corpus checkout is absent")
+@pytest.mark.skipif(
+    CORPUS_ROOT is None or not CORPUS_ROOT.is_dir(),
+    reason="regolith-corpus checkout is absent",
+)
 def test_corpus_extracts_are_byte_identical_in_simulator_mirror() -> None:
     src_dir = CORPUS_ROOT / "extracts"
     dest_dir = REPO_ROOT / "data" / "literature" / "extracts"
@@ -27,7 +31,10 @@ def test_corpus_extracts_are_byte_identical_in_simulator_mirror() -> None:
         assert dest.read_bytes() == src.read_bytes(), f"simulator mirror diverged: {src.name}"
 
 
-@pytest.mark.skipif(not CORPUS_ROOT.is_dir(), reason="regolith-corpus checkout is absent")
+@pytest.mark.skipif(
+    CORPUS_ROOT is None or not CORPUS_ROOT.is_dir(),
+    reason="regolith-corpus checkout is absent",
+)
 def test_simulator_extracts_are_byte_identical_in_corpus_mirror() -> None:
     src_dir = REPO_ROOT / "data" / "literature" / "extracts"
     dest_dir = CORPUS_ROOT / "extracts"

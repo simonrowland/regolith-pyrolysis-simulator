@@ -140,6 +140,15 @@ JANAF_TRANSITION_ALIASES: dict[tuple[str, Polymorph], Polymorph] = {
     ("SiO2", Polymorph.II): Polymorph.BETA,
 }
 
+# CEA thermo.inp and BURCAT print Zr(a) / Zr(b) for the JANAF alpha / beta
+# standard states (Chase 1998: alpha through 1135 K, beta 1135–2125 K).
+# The letter is that element's card suffix. It is not a second allotrope
+# and it is not an alias for any other formula.
+CEA_ELEMENT_ALLOTROPE_ALIASES: dict[tuple[str, str], Polymorph] = {
+    ("Zr", "a"): Polymorph.ALPHA,
+    ("Zr", "b"): Polymorph.BETA,
+}
+
 # Printed names / legacy free-form strings → closed token. Not a qualifier-only
 # map: these names already identify a mineral or a previously stored token.
 POLYMORPH_ALIASES: dict[str, Polymorph] = {
@@ -367,6 +376,29 @@ def canonicalize_janaf_transition(formula: str, token: Polymorph) -> Polymorph:
     """Map a JANAF transition-label token through the formula-keyed alias table."""
 
     return JANAF_TRANSITION_ALIASES.get((formula, token), token)
+
+
+def canonical_element_allotrope(formula: str, token: str | None) -> str | None:
+    """One allotrope identity for an elemental token.
+
+    Formula-scoped CEA letters are applied first. Other printed names use
+    ``POLYMORPH_ALIASES``. An unrecognised token stays itself, so two
+    distinct labels still compare as distinct. ``None`` is an omitted
+    allotrope.
+    """
+
+    if token is None:
+        return None
+    key = token.strip().lower()
+    if not key:
+        return None
+    aliased = CEA_ELEMENT_ALLOTROPE_ALIASES.get((formula, key))
+    if aliased is not None:
+        return aliased.value
+    named = POLYMORPH_ALIASES.get(key)
+    if named is not None:
+        return named.value
+    return key
 
 
 def lookup_janaf_crystal(formula: str, qualifier: str) -> Polymorph | None:

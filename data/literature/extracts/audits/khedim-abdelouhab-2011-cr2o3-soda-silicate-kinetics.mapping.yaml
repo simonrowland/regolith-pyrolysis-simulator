@@ -1,0 +1,96 @@
+source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+source_identity:
+  doi: 10.1016/j.jnoncrysol.2010.10.012
+  title: Kinetic and equilibrium factors affecting saturation of chromium oxide in soda-silicate melts
+  venue: Journal of Non-Crystalline Solids 357(1), 31-42 (2011)
+table_tool:
+  result: no tables emitted from the available MinerU page fragments
+  source_pages: [8, 9, 30, 43, 44]
+  disposition: Tables 1-3 transcribed from the born-digital pdftotext layout and checked cell by cell against 600 dpi renders.
+manual_tables:
+- table: '1'
+  locator:
+    page: 24
+    pdf_page_index: 23
+  disposition: context-only starting-glass compositions
+  reason: The compositions are starting materials, not equilibrated phase compositions. Dashes remain unreported, not zero.
+  captured_fields:
+  - six glass formula rows
+  - theoretical Na2O and SiO2 atomic percentages
+  - all EPMA Na2O and SiO2 means and parenthetical widths
+  - all printed chemical-analysis Na2O and SiO2 means and parenthetical widths
+  - all six printed dashes in the chemical-analysis columns
+  cell_audit:
+    machine_text: pdftotext-layout.txt, physical PDF page 24
+    render: 600 dpi physical PDF page 24
+    checked: all 48 numeric cells, six dash cells, and row/column assignments
+- table: '2'
+  locator:
+    page: 25
+    pdf_page_index: 24
+  disposition: context-only EPMA program comparison and starting-glass analyses
+  reason: The table compares electron-beam conditions on starting glass; its elemental at.% and oxide wt.% results do not
+    represent a reported equilibrated melt composition vector.
+  captured_fields:
+  - all nine P1 and P2 beam-setting pairs
+  - all six elemental at.% means and parenthetical standard deviations
+  - all six oxide wt.% means and parenthetical standard deviations
+  cell_audit:
+    machine_text: pdftotext-layout.txt, physical PDF page 25
+    render: 600 dpi physical PDF page 25
+    checked: all 42 numeric cells, program headings, units, and row/column assignments
+- table: '3'
+  locator:
+    page: 26
+    pdf_page_index: 25
+  disposition: context-only dissolved-Cr concentration rates
+  reason: The table reports a concentration-versus-time slope in (Cr2O3 wt.%/s) × 10^5; it is not a total mass-loss rate
+    in kg/s.
+  captured_fields:
+  - four printed temperature headings
+  - all four volatilisation-rate values and parenthetical widths
+  cell_audit:
+    machine_text: pdftotext-layout.txt, physical PDF page 26
+    render: 600 dpi physical PDF page 26
+    checked: all 12 numeric cells, exponent 10^5 in the heading, and row/column assignments
+figures:
+  figures: '1-18'
+  locators:
+    pdf_pages: [27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
+  disposition: figure records only; digitisation deferred
+  cell_audit:
+    render: 600 dpi physical PDF pages 27-44
+    checked: all captions, axes, panels, series labels, and per-series marker counts; no plotted coordinates were read
+prose_values:
+- locator:
+    page: 10
+    pdf_page_index: 9
+    paragraph: chromium oxide crystal volatilisation mass balance
+  observation_id: khedim_abdelouhab_2011_reference3_chromia_saturation
+  disposition: typed as quoted_attributed equilibrium_phase_composition
+  value: 8.15 wt.% Cr2O3 in Na2O-1.5SiO2 at 1300°C, attributed to reference [3]
+  note: The cited prior-work atmosphere and total pressure are not stated in the 2011 passage; the quote is a separate observation from the present experiment.
+- locator:
+    page: 10
+    pdf_page_index: 9
+    equation: '8'
+  observation_id: khedim_abdelouhab_2011_crvi_mass_balance
+  disposition: context; mass_loss_fraction candidate held pending a corpus table asset under controller ruling t-1382
+  source_inputs: .agent-scratch/f45b-tables/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics/text-equation-8-inputs.csv
+  checked: equation inputs 40, 10, and 16 wt.% and the printed 14 wt.% result against the text
+- locators:
+    - {page: 9, pdf_page_index: 8, figure: '4'}
+    - {page: 16, pdf_page_index: 15}
+  observation_ids:
+    - khedim_abdelouhab_2011_figure4_printed_regression
+    - khedim_abdelouhab_2011_chromia_pyroxene_transition_temperature
+  disposition: activation energy retained as model-derived context; composition-specific transition estimate retained as context because transition_temperature identity cannot retain melt composition
+  checked: printed 108 kJ mol-1 and 1160(±15)°C against the prose and figure caption
+- locators:
+    - {page: 13, pdf_page_index: 12}
+    - {page: 14, pdf_page_index: 13}
+    - {page: 15, pdf_page_index: 14}
+    - {page: 16, pdf_page_index: 15}
+    - {page: 17, pdf_page_index: 16}
+  disposition: numeric timing bounds, crystal-size findings, and run conditions retained in context because no existing quantity token fits them
+  checked: page-local text verified with pdftotext -f N -l N -layout
