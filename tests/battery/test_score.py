@@ -13852,7 +13852,7 @@ def test_score_store_attempts_all_owned_handle_closes(
     with pytest.raises(RuntimeError, match="close probe"):
         score_store(
             context,
-            engines=(Engine.VAPOROCK, Engine.MAGEMIN),
+            engines=(Engine.VAPOROCK, Engine.INTERNAL_ANALYTICAL),
             include_diagnostics=False,
         )
 
