@@ -13,7 +13,7 @@ def oxygen_transport(bulk, delta, *, film=False, stagnant=False):
     return series_evaporation_flux(
         'O2', (bulk + delta) * 1e5, bulk * 1e5, 1253.15, 0.031998, 1.0,
         pressure_excess_pa=delta * 1e5, signed=True,
-        gas_resistance_enabled=film, overhead_pressure_pa=max(1000.0, bulk * 1e5),
+        gas_resistance_enabled=film, overhead_pressure_pa=max(900.0, bulk * 1e5),
         melt_surface_area_m2=0.2,
         surface_flow=(SurfaceFlow('stagnant_disk', 0.0, 'test', 'pool', 'stagnant')
                       if stagnant else None),

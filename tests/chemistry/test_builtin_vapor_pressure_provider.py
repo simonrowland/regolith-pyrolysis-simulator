@@ -1264,7 +1264,7 @@ def test_phosphorus_hot_train_scope_survives_compatibility_projection(
     assert retired["hot_train_applicability"] == "not_applicable"
 
 
-def test_compiled_p_carrier_provenance_records_intrinsic_melt_fo2(
+def test_compiled_p_carrier_provenance_records_reaction_plane_oxygen(
     vapor_pressure_data,
 ):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data.catalog_payload)
@@ -1289,7 +1289,7 @@ def test_compiled_p_carrier_provenance_records_intrinsic_melt_fo2(
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["PO"]
 
     assert result.status == "ok"
-    assert provenance["pO2_bar"] == pytest.approx(1e-11)
+    assert provenance["pO2_bar"] == pytest.approx(1e-2)
     assert provenance["oxygen_fugacity_channel"] == "intrinsic_melt"
 
 
@@ -1557,7 +1557,8 @@ def test_metal_vapor_activity_gamma_is_linear_for_alkalis_and_refractory_species
         "MELT_OXIDE_ACTIVITY_COEFFICIENTS",
         MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     )
-    ti_grounded = provider.dispatch(ti_request).diagnostic["vapor_pressures_Pa"]
+    ti_diagnostic = provider.dispatch(ti_request).diagnostic
+    ti_grounded = ti_diagnostic["vapor_pressures_Pa"]
     monkeypatch.setattr(
         melt_activity,
         "MELT_OXIDE_ACTIVITY_COEFFICIENTS",
@@ -1565,7 +1566,7 @@ def test_metal_vapor_activity_gamma_is_linear_for_alkalis_and_refractory_species
     )
     ti_ideal = provider.dispatch(ti_request).diagnostic["vapor_pressures_Pa"]
     assert ti_grounded["Ti"] / ti_ideal["Ti"] == pytest.approx(
-        grounded_provenance["Ti"]["melt_oxide_effective_gamma"],
+        ti_diagnostic["vapor_pressure_numerator_provenance"]["Ti"]["melt_oxide_effective_gamma"],
         rel=1e-9,
     )
 
@@ -3560,10 +3561,11 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
 def test_provider_matches_legacy_internal_analytical_for_known_lunar_composition(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Direct unit-level parity: build a simulator, advance into a campaign
-    where the melt has been heated above the 400 K early-exit, then assert
-    every species emitted by the legacy path is reproduced by the kernel
-    within tolerance."""
+    """Compare an emitting lunar state and retain the stage-0 P-rail audit.
+
+    The hot state provides a solved positive reaction boundary. The explicit
+    stage-0 provider probe also exercises its additive phosphorus channels.
+    """
 
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -3571,24 +3573,9 @@ def test_provider_matches_legacy_internal_analytical_for_known_lunar_composition
         feedstocks_data,
         setpoints_data,
     )
-    sim.start_campaign(CampaignPhase.C0)
-    # Step a few hours to heat the melt; both paths short-circuit below
-    # 400 K, so an exact match before the ramp is uninteresting.
-    decision_choice = {
-        DecisionType.ROOT_BRANCH: "pyrolysis",
-        DecisionType.PATH_AB: "A",
-        DecisionType.BRANCH_ONE_TWO: "two",
-        DecisionType.C6_PROCEED: "yes",
-    }
-    while sim.melt.temperature_C < 600.0:
-        if sim.paused_for_decision:
-            decision = sim.pending_decision
-            choice = decision_choice.get(decision.decision_type)
-            if choice not in (decision.options or []):
-                choice = (decision.options or [None])[0]
-            sim.apply_decision(decision.decision_type, choice)
-            continue
-        sim.step()
+    sim.start_campaign(CampaignPhase.C2A)
+    sim.melt.temperature_C = 1600.0
+    sim.step()
 
     legacy_result = sim._internal_analytical_equilibrium()
     kernel_result = sim._chem_kernel.dispatch(
@@ -3596,9 +3583,11 @@ def test_provider_matches_legacy_internal_analytical_for_known_lunar_composition
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
         control_inputs={
-            "pO2_bar": sim._headspace_transport_pO2_bar(),
-            "intrinsic_fO2_log": sim.melt.melt_fO2_log,
+            "pO2_bar": sim._vapor_pressure_dispatch_pO2_bar(),
+            "intrinsic_fO2_log": sim._intrinsic_oxygen_publication()['published_intrinsic_fO2_log'],
             "process_phase": "stage0",
+            "pO2_admission": "surface_closure",
+            "_frozen_carriers": tuple(sorted(sim._frozen_evaporation_carriers)),
         },
     )
     kernel_vp = dict(
@@ -3705,6 +3694,15 @@ def test_shadow_parity_across_short_simulation_run(
         if T_C + 273.15 < 400:
             continue
         legacy_result = sim._internal_analytical_equilibrium()
+        if sim._vapor_pressure_dispatch_pO2_bar() == 0.0:
+            # An independently proved source-free boundary has no gas
+            # pressure request: negative mass-action powers at zero oxygen
+            # are undefined. Assert the exact production zero and its proof.
+            assert sim._evaporation_carrier_zero_reason(legacy_result)
+            assert legacy_result.vapor_pressures_Pa == {}
+            assert sim._get_equilibrium().vapor_pressures_Pa == {}
+            assert sim._last_surface_oxygen_diagnostic['oxygen_flux_mol_m2_s'] == 0.0
+            continue
         kernel_result = sim._chem_kernel.dispatch(
             ChemistryIntent.VAPOR_PRESSURE,
             temperature_C=T_C,
@@ -3712,6 +3710,9 @@ def test_shadow_parity_across_short_simulation_run(
             control_inputs={
                 "pO2_bar": sim._vapor_pressure_dispatch_pO2_bar(),
                 "intrinsic_fO2_log": sim._intrinsic_oxygen_publication()['published_intrinsic_fO2_log'],
+                "pO2_admission": "surface_closure",
+                "_frozen_carriers": tuple(sorted(sim._frozen_evaporation_carriers)),
+                "process_phase": "stage0" if sim.melt.campaign.name in {'C0', 'C0B'} else "hot_train",
             },
         )
         kernel_vp = dict(
@@ -3770,22 +3771,9 @@ def test_get_equilibrium_returns_kernel_vapor_pressures(
         feedstocks_data,
         setpoints_data,
     )
-    sim.start_campaign(CampaignPhase.C0)
-    decision_choice = {
-        DecisionType.ROOT_BRANCH: "pyrolysis",
-        DecisionType.PATH_AB: "A",
-        DecisionType.BRANCH_ONE_TWO: "two",
-        DecisionType.C6_PROCEED: "yes",
-    }
-    while sim.melt.temperature_C < 700.0:
-        if sim.paused_for_decision:
-            decision = sim.pending_decision
-            choice = decision_choice.get(decision.decision_type)
-            if choice not in (decision.options or []):
-                choice = (decision.options or [None])[0]
-            sim.apply_decision(decision.decision_type, choice)
-            continue
-        sim.step()
+    sim.start_campaign(CampaignPhase.C2A)
+    sim.melt.temperature_C = 1600.0
+    sim.step()
 
     result = sim._get_equilibrium()
     kernel_dispatch = sim._chem_kernel.dispatch(
@@ -3793,9 +3781,11 @@ def test_get_equilibrium_returns_kernel_vapor_pressures(
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
         control_inputs={
-            "pO2_bar": sim._headspace_transport_pO2_bar(),
-            "intrinsic_fO2_log": sim.melt.melt_fO2_log,
-            "process_phase": "stage0",
+            "pO2_bar": sim._vapor_pressure_dispatch_pO2_bar(),
+            "intrinsic_fO2_log": sim._intrinsic_oxygen_publication()['published_intrinsic_fO2_log'],
+            "process_phase": "hot_train",
+            "pO2_admission": "surface_closure",
+            "_frozen_carriers": tuple(sorted(sim._frozen_evaporation_carriers)),
         },
     )
     kernel_vp = dict(
