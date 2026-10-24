@@ -13136,8 +13136,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.campaign_mgr._max_hold_hr(CampaignPhase.C0)
             - campaign_hour,
         )
+        stored_prediction = self.campaign_mgr.c0_exit_prediction
+        preferred_exit_temperature_C = (
+            stored_prediction.get('T_exit_C')
+            if isinstance(stored_prediction, Mapping)
+            else None
+        )
         prediction = self._predict_c0_exit(
             remaining_hold_budget_hr=remaining_hold_budget_hr,
+            preferred_exit_temperature_C=preferred_exit_temperature_C,
         )
         self.campaign_mgr.c0_remaining_budget_exit = None
         prediction_status = prediction.get("prediction_status")
@@ -13839,6 +13846,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         p_total_mbar: float | None = None,
         pO2_mbar: float | None = None,
         remaining_hold_budget_hr: float | None = None,
+        preferred_exit_temperature_C: float | None = None,
     ) -> dict[str, Any]:
         """Predict C0 exit in a detached simulator context."""
         context, unavailable_status = self._build_c0_forecast_context()
@@ -13888,6 +13896,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             p_total_mbar=p_total_mbar,
             pO2_mbar=pO2_mbar,
             remaining_hold_budget_hr=remaining_hold_budget_hr,
+            preferred_exit_temperature_C=preferred_exit_temperature_C,
         )
         forecast_engine = getattr(context, '_c0_forecast_engine', None)
         if forecast_engine is not None:
@@ -14011,15 +14020,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         p_total_mbar: float | None = None,
         pO2_mbar: float | None = None,
         remaining_hold_budget_hr: float | None = None,
+        preferred_exit_temperature_C: float | None = None,
     ) -> dict[str, Any]:
         """Evaluate C0 temperature and evacuation bounds on private owners.
 
         Each integer ramp temperature is evaluated with the analytical
         equilibrium, evaporation, finite-parent depletion, and C0 pipe-cap
-        owners. The accepted point is the highest sampled temperature whose
-        capped Na+K source stays inside the configured feed-loss budget. A
-        mid-C0 call also requires its projected hold to fit the remaining
-        C0 hold allowance.
+        owners. At startup, the accepted point is the highest sampled
+        temperature whose capped Na+K source stays inside the configured
+        feed-loss budget. Mid-C0, the stored temperature is checked first and
+        retained while it still fits both budgets; otherwise the candidates
+        are searched from highest to lowest. A mid-C0 call also requires its
+        projected hold to fit the remaining C0 hold allowance.
         """
         cfg = self.campaign_mgr._campaign_config(CampaignPhase.C0)
         budget_raw = (
@@ -14280,7 +14292,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             best_alkali_candidate = None
             best_hold_candidate = None
             best_hold_shortfall_hr = math.inf
-            for temperature_C in range(first_C, last_C - 1, -1):
+            candidate_temperatures = list(
+                range(first_C, last_C - 1, -1)
+            )
+            if (
+                remaining_hold_budget_hr is not None
+                and preferred_exit_temperature_C is not None
+            ):
+                preferred_temperature = float(
+                    preferred_exit_temperature_C
+                )
+                if (
+                    math.isfinite(preferred_temperature)
+                    and preferred_temperature.is_integer()
+                    and first_C >= preferred_temperature >= last_C
+                ):
+                    preferred_temperature_C = int(preferred_temperature)
+                    candidate_temperatures = [
+                        preferred_temperature_C,
+                        *(
+                            temperature_C
+                            for temperature_C in candidate_temperatures
+                            if temperature_C != preferred_temperature_C
+                        ),
+                    ]
+            for temperature_C in candidate_temperatures:
                 candidate = evaluate(float(temperature_C))
                 loss_fraction = candidate['Na_plus_K_feed_loss_fraction']
                 if loss_fraction is None:

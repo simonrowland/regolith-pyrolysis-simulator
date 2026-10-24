@@ -776,7 +776,12 @@ def test_c0_post_step_pressure_adjustment_reforecasts_without_losing_cap(
     monkeypatch.setattr(sim, "_predict_c0_exit", no_acceptable_candidate)
     session.adjust("pO2_mbar", 0.5)
 
-    assert calls == [{"remaining_hold_budget_hr": 24.0}]
+    assert calls == [
+        {
+            "remaining_hold_budget_hr": 24.0,
+            "preferred_exit_temperature_C": startup_cap,
+        }
+    ]
     assert sim.campaign_mgr.c0_exit_prediction["T_exit_C"] is None
     assert sim.campaign_mgr.c0_remaining_budget_exit is not None
     target_C, _ramp_rate = sim.campaign_mgr.get_temp_target(
