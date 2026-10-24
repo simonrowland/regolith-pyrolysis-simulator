@@ -28,7 +28,7 @@ _COSTA = (
 _STOLYAROVA = (
     "kems-053-stolyarova-1991::"
     "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation"
-    "::T=1993.00:h=08c6923d0233"
+    "::T=1993.00:h=152b6c6f5a56"
 )
 # value, solved pO2 bar. Captured from 6f90106c6's score.py, except the
 # Costa internal-analytical species pressure: offer 20 r8's vapour route
