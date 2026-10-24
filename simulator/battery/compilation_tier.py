@@ -1624,9 +1624,11 @@ def _tabulated_gas_basis_matches(
     if source_id == b1452_source:
         return b1452_ideal_gas(formula)
     if source_id == "pankratz-1984-usbm-b677":
-        # B677 defines H°−H°298 from T0=298.15 K and says H°298
-        # "refers to the pure elements or compounds stable or assumed to be
-        # stable at 298.15 K" (Bulletin 677, source p001-p040.md:223,259).
+        # B677 defines H°T−H°298° = ∫298^T Cp°dT, with 298.15 K as the
+        # integration baseline, and says the standard state is "the state of
+        # pure elements and pure compounds in their stable states at 1 atm of
+        # pressure"; H°298° "refers to the pure elements or compounds stable
+        # or assumed to be stable at 298.15 K" (source p001-p040.md:223,255,259).
         # Its separate table-0096 is headed K(g), "Potassium (ideal
         # monatomic gas)", and prints H°−H°298 = 0 at 298 K
         # (source p041-p080.md:873-876), so that row has the K-005 gas zero.
