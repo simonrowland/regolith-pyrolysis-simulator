@@ -3577,6 +3577,11 @@ def _recipe_runtime_overrides_from_controls(
             try:
                 value = parse_campaign_override_value(field_name, raw_value, label)
             except (TypeError, ValueError) as exc:
+                message = str(exc)
+                if message.startswith(f'{field_name} '):
+                    raise BadRequest(
+                        f'{label}{message[len(field_name):]}'
+                    ) from exc
                 raise BadRequest(f'{label} must be a finite non-negative number') from exc
             if isinstance(value, float):
                 value = _recipe_non_negative_number(value, label)

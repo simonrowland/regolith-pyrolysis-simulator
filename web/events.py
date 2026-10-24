@@ -2053,7 +2053,10 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float | str
             try:
                 clean_value = parse_campaign_override_value(field_key, field_value, label)
             except (TypeError, ValueError) as exc:
-                raise InputValidationError(str(exc)) from exc
+                message = str(exc)
+                if message.startswith(f'{field_key} '):
+                    message = f'{label}{message[len(field_key):]}'
+                raise InputValidationError(message) from exc
             if field_key == 'pO2_mbar' and clean_value < 0.0:
                 raise InputValidationError(
                     f'runtime_campaign_overrides.{campaign_name}.{field_key} '

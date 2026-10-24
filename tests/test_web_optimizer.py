@@ -2347,6 +2347,41 @@ def test_recipe_runtime_override_numeric_error_pin(value, field):
     )
 
 
+@pytest.mark.parametrize("field", ["stage3_product_purity", "stage3_instantaneous_purity"])
+@pytest.mark.parametrize(
+    ("value", "message"),
+    [
+        (0, "must be in (0, 1]"),
+        (1.0000001, "must be in (0, 1]"),
+        (1.5, "must be in (0, 1]"),
+        (True, "must be numeric"),
+        (float("nan"), "must be finite"),
+        ("not-a-number", "must be numeric"),
+    ],
+)
+def test_recipe_runtime_override_purity_refusal_is_qualified(field, value, message):
+    from web.routes import _recipe_inputs_from_controls
+    from werkzeug.exceptions import BadRequest
+
+    with pytest.raises(BadRequest) as caught:
+        _recipe_inputs_from_controls({"runtime_campaign_overrides": {
+            "C4": {field: value},
+        }})
+    assert caught.value.description == (
+        f"controls.runtime_campaign_overrides.C4.{field} {message}"
+    )
+
+
+@pytest.mark.parametrize("field", ["stage3_product_purity", "stage3_instantaneous_purity"])
+@pytest.mark.parametrize("value", [0.0001, 1.0])
+def test_recipe_runtime_override_purity_accepts_open_lower_and_closed_upper_end(field, value):
+    from web.routes import _recipe_inputs_from_controls
+
+    assert _recipe_inputs_from_controls({"runtime_campaign_overrides": {
+        "C4": {field: value},
+    }}) == {"runtime_campaign_overrides": {"C4": {field: value}}}
+
+
 @pytest.mark.parametrize("route", ["divert", "through", "garbage"])
 def test_recipe_capture_stage3_route(client, tmp_path, monkeypatch, route):
     from web import events as web_events
@@ -2363,7 +2398,10 @@ def test_recipe_capture_stage3_route(client, tmp_path, monkeypatch, route):
     })
     if route == "garbage":
         assert response.status_code == 400
-        assert "stage3_route" in response.get_json()["error"]
+        assert response.get_json()["error"] == (
+            "controls.runtime_campaign_overrides.C2A_staged.stage3_route "
+            "must be divert or through"
+        )
         return
     assert response.status_code == 200, response.get_json()
     loaded = client.post("/recipes/load", json={"name": "route-recipe"})

@@ -77,6 +77,32 @@ def test_runtime_override_numeric_error_pin(value, suffix):
     assert str(caught.value) == f"runtime_campaign_overrides.C4.pO2_mbar {suffix}"
 
 
+@pytest.mark.parametrize("field", ["stage3_product_purity", "stage3_instantaneous_purity"])
+@pytest.mark.parametrize(
+    ("value", "message"),
+    [
+        (0, "must be in (0, 1]"),
+        (1.0000001, "must be in (0, 1]"),
+        (1.5, "must be in (0, 1]"),
+        (True, "must be numeric"),
+        (float("nan"), "must be finite"),
+        ("not-a-number", "must be numeric"),
+    ],
+)
+def test_runtime_override_purity_refusal_is_qualified(field, value, message):
+    with pytest.raises(web_events.InputValidationError) as caught:
+        web_events._coerce_runtime_campaign_overrides({"C4": {field: value}})
+    assert str(caught.value) == f"runtime_campaign_overrides.C4.{field} {message}"
+
+
+@pytest.mark.parametrize("field", ["stage3_product_purity", "stage3_instantaneous_purity"])
+@pytest.mark.parametrize("value", [0.0001, 1.0])
+def test_runtime_override_purity_accepts_open_lower_and_closed_upper_end(field, value):
+    assert web_events._coerce_runtime_campaign_overrides({"C4": {field: value}}) == {
+        "C4": {field: value},
+    }
+
+
 @pytest.mark.parametrize("route", ["divert", "through", "garbage"])
 def test_web_start_and_replay_stage3_route(monkeypatch, route):
     _force_socketio_internal_analytical(monkeypatch)
@@ -97,7 +123,10 @@ def test_web_start_and_replay_stage3_route(monkeypatch, route):
             assert statuses
             if route == "garbage":
                 assert statuses[-1]["status"] == "error"
-                assert "stage3_route must be divert or through" in statuses[-1]["message"]
+                assert statuses[-1]["message"] == (
+                    "runtime_campaign_overrides.C2A_staged.stage3_route "
+                    "must be divert or through"
+                )
                 assert set(_simulations) == before
             else:
                 assert statuses[-1]["status"] == "started", statuses
