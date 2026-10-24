@@ -1249,7 +1249,7 @@ def _alphamelts_phase_properties(
             if phase_name != "liquid":
                 continue
         elif phase_name == "liquid" or (
-            polymorph and phase_name != normalized_name(polymorph)
+            polymorph and not _same_mineral(phase_name, polymorph)
         ):
             continue
 

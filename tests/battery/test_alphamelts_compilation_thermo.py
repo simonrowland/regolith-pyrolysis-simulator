@@ -37,7 +37,7 @@ def _observation(
     formula: str = _FORMULA,
     phase: Phase = Phase.CR,
     temperature_K: str = "298.15",
-    polymorph: Polymorph | None = Polymorph.QUARTZ,
+    polymorph: Polymorph | None = Polymorph.ALPHA,
 ):
     identity = F.o2_identity(Decimal(temperature_K))
     identity = replace(
@@ -73,22 +73,23 @@ def _observation(
 def _quartz_result(
     enthalpy_J: float,
     *,
+    phase_name: str = "quartz",
     diagnostics: dict[str, object] | None = None,
 ) -> SimpleNamespace:
     return SimpleNamespace(
         status="ok",
         diagnostics=diagnostics or {},
         phase_thermo={
-            "quartz": {
+            phase_name: {
                 "enthalpy_J": enthalpy_J,
                 "entropy_J_K": 2.0 * 41.463,
                 "heat_capacity_J_K": 2.0 * 44.589,
                 "reference_mass_kg": _TWO_FORMULA_MASS_KG,
             }
         },
-        phase_compositions={"quartz": {"SiO2": 100.0}},
+        phase_compositions={phase_name: {"SiO2": 100.0}},
         phase_instances=[
-            {"phase": "quartz", "formula_or_endmember_token": "SiO2"}
+            {"phase": phase_name, "formula_or_endmember_token": "SiO2"}
         ],
     )
 
@@ -99,13 +100,20 @@ def quartz_phase_result() -> SimpleNamespace:
 
 
 @pytest.mark.parametrize(
-    ("quantity", "expected"),
-    [(Quantity.S, 41.463), (Quantity.CP, 44.589)],
+    ("quantity", "expected", "polymorph"),
+    [
+        (Quantity.S, 41.463, Polymorph.ALPHA),
+        (Quantity.S, 41.463, Polymorph.BETA),
+        (Quantity.CP, 44.589, Polymorph.ALPHA),
+    ],
 )
 def test_alpha_phase_extensive_values_normalize_to_formula_moles(
-    quantity: Quantity, expected: float, quartz_phase_result: SimpleNamespace
+    quantity: Quantity,
+    expected: float,
+    polymorph: Polymorph,
+    quartz_phase_result: SimpleNamespace,
 ) -> None:
-    observation = _observation(quantity)
+    observation = _observation(quantity, polymorph=polymorph)
 
     attempt = predict_thermo_attempt(
         Engine.ALPHAMELTS,
@@ -117,6 +125,25 @@ def test_alpha_phase_extensive_values_normalize_to_formula_moles(
     assert float(attempt.value) == pytest.approx(expected)
     assert attempt.unit == QUANTITY_UNITS[quantity]
     # JANAF O-037, quartz at 298.15 K: S=41.463 and Cp=44.589 J/(mol K).
+
+
+def test_alpha_quartz_phase_refuses_a_different_polymorph() -> None:
+    observation = _observation(Quantity.S, polymorph=Polymorph.ALPHA)
+
+    attempt = predict_thermo_attempt(
+        Engine.ALPHAMELTS,
+        observation,
+        pure_phase=lambda *_args: _quartz_result(0.0, phase_name="tridymite"),
+    )
+
+    assert attempt.value is None
+    assert (
+        attempt.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
+    )
+    assert attempt.refusal_detail["reason"] == (
+        "alphamelts-engine-does-not-report-phase-thermo"
+    )
 
 
 def test_alpha_enthalpy_increment_uses_same_quartz_at_t_and_h298() -> None:
