@@ -15841,6 +15841,20 @@ def _assert_jacobson_table1_predictions_migrated(result) -> None:
         assert observation.value.kind is ValueKind.UNAVAILABLE
 
 
+def _assert_no_hard_issues_for_observations(result, observations) -> None:
+    assert result.validation is not None
+    paths = tuple(
+        f"observation[{observation.observation_id}]"
+        for observation in observations
+    )
+    issues = [
+        issue
+        for issue in result.validation.hard_issues
+        if issue.path.startswith(paths)
+    ]
+    assert issues == [], issues
+
+
 def test_ohara_1987_printed_compositions_reach_migrated_observations(
     tmp_path: Path,
 ) -> None:
@@ -15850,7 +15864,12 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
     from simulator.battery.stable_ids import series_row_extra
 
     source_id = "kems-058-ohara-1987"
-    result = _migrate_real_extract(tmp_path, f"{source_id}.yaml", write=False)
+    result = _migrate_real_extract(
+        tmp_path,
+        f"{source_id}.yaml",
+        write=False,
+        use_repository_index_row=True,
+    )
     rows = [
         observation
         for observation in result.observations.values()
@@ -15933,6 +15952,55 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         for observation in rows
         if observation.locator is not None and observation.locator.table == "2"
     ]
+    expected_activities = (
+        "2.5e-17",
+        "4.8e-17",
+        "8.4e-17",
+        "6.3e-17",
+        "4.6e-17",
+        "4.8e-17",
+        "5.9e-17",
+        "7.8e-17",
+        "2.0e-17",
+        "5.8e-17",
+        "6.8e-17",
+        "8.2e-17",
+        "9.7e-17",
+        "3.3e-17",
+        "8.2e-17",
+        "7.8e-17",
+        "1.10e-16",
+        "3.3e-17",
+        "6.1e-17",
+    )
+    activity_rows = [
+        observation
+        for observation in table2
+        if quantity_token(observation.identity) is Quantity.ACTIVITY
+    ]
+    assert len(activity_rows) == len(expected_activities)
+    _assert_no_hard_issues_for_observations(result, activity_rows)
+    for observation in activity_rows:
+        sample_number = int(observation.observation_id.rsplit("_sample_", 1)[1])
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == Decimal(
+            expected_activities[sample_number - 1]
+        )
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.value == Decimal("1643.0")
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_value
+        assert observation.locator is not None
+        assert observation.locator.published_page == 1339
+        assert observation.locator.table == "2"
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert observation.derived_from == (f"pdf:{source_id}",)
+        assert observation.derivation is not None
+        assert observation.derivation.relation == (
+            "author_mass_spectrometric_activity_reduction"
+        )
+        assert observation.derivation.inputs == (f"pdf:{source_id}",)
     assert all(
         observation.identity.composition is not None
         and observation.identity.composition.is_value
@@ -16127,6 +16195,21 @@ def test_ohara_1987_sample_swap_mutation_fails(
     extract_dir.mkdir(parents=True)
     (extract_dir / name).write_text(
         yaml.safe_dump(mutated, sort_keys=False), encoding="utf-8"
+    )
+    repository_index = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "INDEX.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    index_row = next(
+        row for row in repository_index["sources"] if row["source_id"] == source_id
+    )
+    (mutation_root / "data" / "literature" / "INDEX.yaml").write_text(
+        yaml.safe_dump(
+            {"schema_version": "literature_index.v1", "sources": [index_row]},
+            sort_keys=False,
+        ),
+        encoding="utf-8",
     )
     monkeypatch.setattr(sys.modules[__name__], "REPO_ROOT", mutation_root)
 
