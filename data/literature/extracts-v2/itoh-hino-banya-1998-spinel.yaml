@@ -413,6 +413,20 @@ observations:
   read_from: pdf:itoh-hino-banya-1998-spinel
   derived_from:
   - itoh-hino-banya-1998-spinel::itoh_1998_dolomite_MgO_CaO_phase_observations
+  derivation:
+    relation: substitution and combination of printed equilibrium relations (Eqs. 12-18 and 21-24)
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        published_page: 88
+        note: Printed equations and evaluated 1873 K values; do not treat these author calculations as direct measurements.;
+          equations=12-18, 21-24
+        source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_spinel_interaction_parameters
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
   identity:
@@ -474,6 +488,21 @@ observations:
         source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   derived_from:
   - itoh-hino-banya-1998-spinel::itoh_1998_dolomite_MgO_CaO_phase_observations
+  derivation:
+    relation: regular-solution interaction-parameter slope/intercept expansion of Eq. 7
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: printed_unresolved
+      locator:
+        published_page: 88
+        figure: '4'
+        note: Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; Figure
+          4 and Eq. 19 print r_O^(Mg,Al) = -150, not gamma.; equations=7-20
+        source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_spinel_thresholds
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
   identity:

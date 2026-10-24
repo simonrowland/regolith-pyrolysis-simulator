@@ -591,7 +591,7 @@ observations:
         pdf_page_index: 6
         section: Experiments
         note: SiO2 induction-heating feasibility runs at 2650 K; apparatus Fig. 3 p. 129
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=088dd8f83da9
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::T=2000.0:row=sio2(g):h=227bc76ce4fa
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
@@ -615,8 +615,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '2000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -647,8 +647,13 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - SiO2
+          - '1'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -668,8 +673,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    kind: point
+    point: '0.02559789473684210526315789473'
     approximate: false
   uncertainty:
     kind: printed
@@ -682,17 +687,82 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::T=2000.0:row=sio2(g):h=227bc76ce4fa
   source_id: steurer-1985-vapor-phase-pyrolysis
   locator:
     published_page: 126
     pdf_page_index: 4
     table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+    note: row=SiO2(g); column=2000 K
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=0c18507bc432
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 126
+        pdf_page_index: 4
+        table: '1'
+  derived_from:
+  - pdf:steurer-1985-vapor-phase-pyrolysis
+  derivation:
+    relation: Authors solved the stated oxide vaporization equilibria using JANAF thermodynamic data.
+    inputs:
+    - pdf:steurer-1985-vapor-phase-pyrolysis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000192'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO2(g); column=2000 K
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000192'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO2(g); column=2000 K
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO2(g); column=2000 K
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO2(g); column=2000 K
+    output_unit: Pa
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::T=2500.0:row=sio2(g):h=d9337ca02a06
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
@@ -716,8 +786,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '2500'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -748,8 +818,13 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - SiO2
+          - '1'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -769,8 +844,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    kind: point
+    point: '23.59805921052631578947368421'
     approximate: false
   uncertainty:
     kind: printed
@@ -783,17 +858,82 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::T=2500.0:row=sio2(g):h=d9337ca02a06
   source_id: steurer-1985-vapor-phase-pyrolysis
   locator:
     published_page: 126
     pdf_page_index: 4
     table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+    note: row=SiO2(g); column=2500 K
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=3cf0f7f22403
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        published_page: 126
+        pdf_page_index: 4
+        table: '1'
+  derived_from:
+  - pdf:steurer-1985-vapor-phase-pyrolysis
+  derivation:
+    relation: Authors solved the stated oxide vaporization equilibria using JANAF thermodynamic data.
+    inputs:
+    - pdf:steurer-1985-vapor-phase-pyrolysis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.177'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO2(g); column=2500 K
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.177'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO2(g); column=2500 K
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO2(g); column=2500 K
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO2(g); column=2500 K
+    output_unit: Pa
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::T=3000.0:row=sio2(g):h=cf20608a1158
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
@@ -817,8 +957,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '3000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -849,8 +989,13 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - SiO2
+          - '1'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -870,8 +1015,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    kind: point
+    point: '2039.832236842105263157894737'
     approximate: false
   uncertainty:
     kind: printed
@@ -884,24 +1029,89 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::T=3000.0:row=sio2(g):h=cf20608a1158
   source_id: steurer-1985-vapor-phase-pyrolysis
   locator:
     published_page: 126
     pdf_page_index: 4
     table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+    note: row=SiO2(g); column=3000 K
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=3db818677697
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3000'
+      locator:
+        published_page: 126
+        pdf_page_index: 4
+        table: '1'
+  derived_from:
+  - pdf:steurer-1985-vapor-phase-pyrolysis
+  derivation:
+    relation: Authors solved the stated oxide vaporization equilibria using JANAF thermodynamic data.
+    inputs:
+    - pdf:steurer-1985-vapor-phase-pyrolysis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '15.3'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO2(g); column=3000 K
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '15.3'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO2(g); column=3000 K
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO2(g); column=3000 K
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO2(g); column=3000 K
+    output_unit: Pa
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_sio_psat::T=2000.0:row=sio(g):h=f7d6a8b687ed
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
       tag: value
       value: p_partial
     species:
-      formula: SiO2
+      formula: SiO
       phase:
         tag: value
         value: g
@@ -918,8 +1128,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '2000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -934,7 +1144,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: SiO2
+          formula: SiO
           phase:
             tag: value
             value: g
@@ -944,14 +1154,19 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: SiO2
+        component_basis: SiO
         reference_pressure_bar: '1'
     reservoir:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - SiO2
+          - '1'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -971,8 +1186,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    kind: point
+    point: '0.9505884868421052631578947367'
     approximate: false
   uncertainty:
     kind: printed
@@ -985,24 +1200,89 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_sio_psat::T=2000.0:row=sio(g):h=f7d6a8b687ed
   source_id: steurer-1985-vapor-phase-pyrolysis
   locator:
     published_page: 126
     pdf_page_index: 4
     table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+    note: row=SiO(g); column=2000 K
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=63c600355a18
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 126
+        pdf_page_index: 4
+        table: '1'
+  derived_from:
+  - pdf:steurer-1985-vapor-phase-pyrolysis
+  derivation:
+    relation: Authors solved the stated oxide vaporization equilibria using JANAF thermodynamic data.
+    inputs:
+    - pdf:steurer-1985-vapor-phase-pyrolysis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00713'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO(g); column=2000 K
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00713'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO(g); column=2000 K
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO(g); column=2000 K
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO(g); column=2000 K
+    output_unit: Pa
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_sio_psat::T=2500.0:row=sio(g):h=f7a5d5a9339f
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
       tag: value
       value: p_partial
     species:
-      formula: SiO2
+      formula: SiO
       phase:
         tag: value
         value: g
@@ -1019,8 +1299,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '2500'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1035,7 +1315,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: SiO2
+          formula: SiO
           phase:
             tag: value
             value: g
@@ -1045,14 +1325,19 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: SiO2
+        component_basis: SiO
         reference_pressure_bar: '1'
     reservoir:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - SiO2
+          - '1'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1072,8 +1357,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    kind: point
+    point: '434.630921052631578947368421'
     approximate: false
   uncertainty:
     kind: printed
@@ -1086,24 +1371,89 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_sio_psat::T=2500.0:row=sio(g):h=f7a5d5a9339f
   source_id: steurer-1985-vapor-phase-pyrolysis
   locator:
     published_page: 126
     pdf_page_index: 4
     table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+    note: row=SiO(g); column=2500 K
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=650e74deff62
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        published_page: 126
+        pdf_page_index: 4
+        table: '1'
+  derived_from:
+  - pdf:steurer-1985-vapor-phase-pyrolysis
+  derivation:
+    relation: Authors solved the stated oxide vaporization equilibria using JANAF thermodynamic data.
+    inputs:
+    - pdf:steurer-1985-vapor-phase-pyrolysis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '3.26'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO(g); column=2500 K
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '3.26'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO(g); column=2500 K
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO(g); column=2500 K
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO(g); column=2500 K
+    output_unit: Pa
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_sio_psat::T=3000.0:row=sio(g):h=377f06ee0c71
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
       tag: value
       value: p_partial
     species:
-      formula: SiO2
+      formula: SiO
       phase:
         tag: value
         value: g
@@ -1120,8 +1470,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '3000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1136,7 +1486,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: SiO2
+          formula: SiO
           phase:
             tag: value
             value: g
@@ -1146,14 +1496,19 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: SiO2
+        component_basis: SiO
         reference_pressure_bar: '1'
     reservoir:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - SiO2
+          - '1'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1173,8 +1528,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    kind: point
+    point: '23998.02631578947368421052631'
     approximate: false
   uncertainty:
     kind: printed
@@ -1187,623 +1542,82 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_sio_psat::T=3000.0:row=sio(g):h=377f06ee0c71
   source_id: steurer-1985-vapor-phase-pyrolysis
   locator:
     published_page: 126
     pdf_page_index: 4
     table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+    note: row=SiO(g); column=3000 K
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=663a878abd1d
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: SiO2
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
+  point_conditions:
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SiO2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SiO2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed; values are calculated from JANAF free energies
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 126
-    pdf_page_index: 4
-    table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=7490877bfd4c
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: SiO2
-      phase:
+      state:
         tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SiO2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SiO2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed; values are calculated from JANAF free energies
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 126
-    pdf_page_index: 4
-    table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=7bd6207737c4
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: SiO2
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SiO2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SiO2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed; values are calculated from JANAF free energies
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 126
-    pdf_page_index: 4
-    table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=8d329234af4b
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: SiO2
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SiO2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SiO2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed; values are calculated from JANAF free energies
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 126
-    pdf_page_index: 4
-    table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=aa430516b617
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: SiO2
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SiO2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SiO2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed; values are calculated from JANAF free energies
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 126
-    pdf_page_index: 4
-    table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=af7595db49ee
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: SiO2
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SiO2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SiO2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed; values are calculated from JANAF free energies
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 126
-    pdf_page_index: 4
-    table: '1'
-    note: Table 1 vapor pressure of oxide dissociation species vs temperature
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=0709eb58b2d3
+        value: '3000'
+      locator:
+        published_page: 126
+        pdf_page_index: 4
+        table: '1'
+  derived_from:
+  - pdf:steurer-1985-vapor-phase-pyrolysis
+  derivation:
+    relation: Authors solved the stated oxide vaporization equilibria using JANAF thermodynamic data.
+    inputs:
+    - pdf:steurer-1985-vapor-phase-pyrolysis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '180'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO(g); column=3000 K
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '180'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO(g); column=3000 K
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 126
+                pdf_page_index: 4
+                table: '1'
+                note: row=SiO(g); column=3000 K
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 126
+          pdf_page_index: 4
+          table: '1'
+          note: row=SiO(g); column=3000 K
+    output_unit: Pa
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::T=2000.0:row=o2(g):h=c4cbff33113f
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
@@ -1827,8 +1641,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '2000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1891,8 +1705,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
+    kind: point
+    point: '0.32424'
     approximate: false
   uncertainty:
     kind: printed
@@ -1905,17 +1719,181 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::T=2000.0:row=o2(g):h=c4cbff33113f
   source_id: steurer-1985-vapor-phase-pyrolysis
   locator:
     published_page: 127
     pdf_page_index: 5
     table: '2'
-    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+    note: row=O2(g); column=2000 K
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=0b9faee1ca99
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1012859355409274971736609261'
+          - - SiO2
+            - '0.5729364260977871867940321665'
+          - - TiO2
+            - '0.0862048188549010143220330174'
+          - - FeO
+            - '0.2395728195063843017102738897'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 127
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        output_unit: mole_fraction
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 127
+        pdf_page_index: 5
+        table: '2'
+  derived_from:
+  - pdf:steurer-1985-vapor-phase-pyrolysis
+  derivation:
+    relation: Authors solved nine equilibrium equations for the stated oxide mixture using JANAF thermodynamic data.
+    inputs:
+    - pdf:steurer-1985-vapor-phase-pyrolysis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000032'
+        locator:
+          published_page: 127
+          pdf_page_index: 5
+          table: '2'
+          note: row=O2(g); column=2000 K
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000032'
+              locator:
+                published_page: 127
+                pdf_page_index: 5
+                table: '2'
+                note: row=O2(g); column=2000 K
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 127
+                pdf_page_index: 5
+                table: '2'
+                note: row=O2(g); column=2000 K
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 127
+          pdf_page_index: 5
+          table: '2'
+          note: row=O2(g); column=2000 K
+    output_unit: Pa
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::T=2500.0:row=o2(g):h=ff63c976f644
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
@@ -1939,8 +1917,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '2500'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -2003,8 +1981,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
+    kind: point
+    point: '151.9875'
     approximate: false
   uncertainty:
     kind: printed
@@ -2017,17 +1995,181 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::T=2500.0:row=o2(g):h=ff63c976f644
   source_id: steurer-1985-vapor-phase-pyrolysis
   locator:
     published_page: 127
     pdf_page_index: 5
     table: '2'
-    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+    note: row=O2(g); column=2500 K
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=14794d7246a9
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1012859355409274971736609261'
+          - - SiO2
+            - '0.5729364260977871867940321665'
+          - - TiO2
+            - '0.0862048188549010143220330174'
+          - - FeO
+            - '0.2395728195063843017102738897'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 127
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        output_unit: mole_fraction
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        published_page: 127
+        pdf_page_index: 5
+        table: '2'
+  derived_from:
+  - pdf:steurer-1985-vapor-phase-pyrolysis
+  derivation:
+    relation: Authors solved nine equilibrium equations for the stated oxide mixture using JANAF thermodynamic data.
+    inputs:
+    - pdf:steurer-1985-vapor-phase-pyrolysis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0015'
+        locator:
+          published_page: 127
+          pdf_page_index: 5
+          table: '2'
+          note: row=O2(g); column=2500 K
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0015'
+              locator:
+                published_page: 127
+                pdf_page_index: 5
+                table: '2'
+                note: row=O2(g); column=2500 K
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 127
+                pdf_page_index: 5
+                table: '2'
+                note: row=O2(g); column=2500 K
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 127
+          pdf_page_index: 5
+          table: '2'
+          note: row=O2(g); column=2500 K
+    output_unit: Pa
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::T=3000.0:row=o2(g):h=943d0b9a92f3
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
@@ -2051,8 +2193,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '3000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -2115,8 +2257,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
+    kind: point
+    point: '8207.325'
     approximate: false
   uncertainty:
     kind: printed
@@ -2129,800 +2271,180 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::T=3000.0:row=o2(g):h=943d0b9a92f3
   source_id: steurer-1985-vapor-phase-pyrolysis
   locator:
     published_page: 127
     pdf_page_index: 5
     table: '2'
-    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+    note: row=O2(g); column=3000 K
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=8b76e5891654
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: O2
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: O2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+  point_conditions:
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - Al2O3
-          - '0.1012859355409274971736609261'
-        - - SiO2
-          - '0.5729364260977871867940321665'
-        - - TiO2
-          - '0.0862048188549010143220330174'
-        - - FeO
-          - '0.2395728195063843017102738897'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 127
-    pdf_page_index: 5
-    table: '2'
-    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=8f72350044a9
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: O2
-      phase:
+      state:
         tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1012859355409274971736609261'
+          - - SiO2
+            - '0.5729364260977871867940321665'
+          - - TiO2
+            - '0.0862048188549010143220330174'
+          - - FeO
+            - '0.2395728195063843017102738897'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 127
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 127
+              pdf_page_index: 5
+              table: '2'
+              note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+        output_unit: mole_fraction
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: O2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - Al2O3
-          - '0.1012859355409274971736609261'
-        - - SiO2
-          - '0.5729364260977871867940321665'
-        - - TiO2
-          - '0.0862048188549010143220330174'
-        - - FeO
-          - '0.2395728195063843017102738897'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 127
-    pdf_page_index: 5
-    table: '2'
-    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=a1e4de1aafb1
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: O2
-      phase:
+      state:
         tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: O2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - Al2O3
-          - '0.1012859355409274971736609261'
-        - - SiO2
-          - '0.5729364260977871867940321665'
-        - - TiO2
-          - '0.0862048188549010143220330174'
-        - - FeO
-          - '0.2395728195063843017102738897'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 127
-    pdf_page_index: 5
-    table: '2'
-    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=b038d7511379
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: O2
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: O2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - Al2O3
-          - '0.1012859355409274971736609261'
-        - - SiO2
-          - '0.5729364260977871867940321665'
-        - - TiO2
-          - '0.0862048188549010143220330174'
-        - - FeO
-          - '0.2395728195063843017102738897'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 127
-    pdf_page_index: 5
-    table: '2'
-    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=bd9124886c6c
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: O2
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: O2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - Al2O3
-          - '0.1012859355409274971736609261'
-        - - SiO2
-          - '0.5729364260977871867940321665'
-        - - TiO2
-          - '0.0862048188549010143220330174'
-        - - FeO
-          - '0.2395728195063843017102738897'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 127
-    pdf_page_index: 5
-    table: '2'
-    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=d4f34c7c14de
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: O2
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: O2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - Al2O3
-          - '0.1012859355409274971736609261'
-        - - SiO2
-          - '0.5729364260977871867940321665'
-        - - TiO2
-          - '0.0862048188549010143220330174'
-        - - FeO
-          - '0.2395728195063843017102738897'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 127
-    pdf_page_index: 5
-    table: '2'
-    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=ec7f61012f6e
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: O2
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: O2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - Al2O3
-          - '0.1012859355409274971736609261'
-        - - SiO2
-          - '0.5729364260977871867940321665'
-        - - TiO2
-          - '0.0862048188549010143220330174'
-        - - FeO
-          - '0.2395728195063843017102738897'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: steurer-1985-vapor-phase-pyrolysis
-  locator:
-    published_page: 127
-    pdf_page_index: 5
-    table: '2'
-    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
-  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+        value: '3000'
+      locator:
+        published_page: 127
+        pdf_page_index: 5
+        table: '2'
+  derived_from:
+  - pdf:steurer-1985-vapor-phase-pyrolysis
+  derivation:
+    relation: Authors solved nine equilibrium equations for the stated oxide mixture using JANAF thermodynamic data.
+    inputs:
+    - pdf:steurer-1985-vapor-phase-pyrolysis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.081'
+        locator:
+          published_page: 127
+          pdf_page_index: 5
+          table: '2'
+          note: row=O2(g); column=3000 K
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.081'
+              locator:
+                published_page: 127
+                pdf_page_index: 5
+                table: '2'
+                note: row=O2(g); column=3000 K
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 127
+                pdf_page_index: 5
+                table: '2'
+                note: row=O2(g); column=3000 K
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 127
+          pdf_page_index: 5
+          table: '2'
+          note: row=O2(g); column=3000 K
+    output_unit: Pa
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table3_o2_yield_wt_pct::rows:h=13b3f78a97a6
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
