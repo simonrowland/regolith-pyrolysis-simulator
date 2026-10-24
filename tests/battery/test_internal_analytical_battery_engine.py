@@ -210,14 +210,34 @@ def _assert_internal_activity_residual_matches_production(
 
 def test_internal_analytical_scores_guo_2021_mgo_row() -> None:
     # d3285901c restores Table 5 measured activities and 2f342093c restores
-    # their printed slag compositions. Table 5 p. 2728's a(MgO)=0.5121 row
-    # now has the composition-qualified full-store identity below.
+    # their printed slag compositions. Table 5 p. 2728 row 2 has a(MgO)=0.5121
+    # and the printed MgO slag composition below.
+    source_id = "guo-2021-mgo-activity-cmas-slag"
+    root = Path(__file__).resolve().parents[2]
+    context = battery_score.load_score_context(root, sources=(source_id,))
+    expected_composition = {
+        "CaO": Decimal("0.404508756338"),
+        "SiO2": Decimal("0.330114102073"),
+        "MgO": Decimal("0.145390940259"),
+        "Al2O3": Decimal("0.119986201331"),
+    }
+    matches = [
+        observation
+        for observation in context.observations.values()
+        if observation.source_id == source_id
+        and observation.locator is not None
+        and observation.locator.table == "5"
+        and observation.identity.species.formula == "MgO"
+        and observation.identity.composition is not None
+        and observation.identity.composition.is_value
+        and observation.identity.composition.value.as_map() == expected_composition
+    ]
+    assert len(matches) == 1
+    observation = matches[0]
+    assert observation.value.point == Decimal("0.5121")
     _assert_internal_activity_residual_matches_production(
-        source_id="guo-2021-mgo-activity-cmas-slag",
-        observation_id=(
-            "guo-2021-mgo-activity-cmas-slag::"
-            "guo_2021_table5_mgo_activities_1873k::T=1873:h=3c1cc249e132"
-        ),
+        source_id=source_id,
+        observation_id=observation.observation_id,
     )
 
 
