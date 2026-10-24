@@ -299,15 +299,25 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
 
     assert primary.experiment_id == "hashimoto-1983-run-17c3-2"
     assert primary.primary_geometry_policy_id == "sphere_shrinking"
+    # Regression snapshot under openimcc
+    # 2064476238c3a05cd17983161747bf73cb6adea6. d-265 and its Hashimoto
+    # addendum cover this move. Measured row: Hashimoto 1983 table 3,
+    # sample C3 (2), run 17c3-2, 1973.15 K. Locator: published page 116,
+    # pdf page index 6, table 3
+    # (kems-015-hashimoto-1983::hashimoto_1983_table3_residue_composition_series_quoted__run_17c3-2,
+    # T=1973.15:row=c3-(2)). Measured wt%: FeO 27.92, MgO 26.32, SiO2 39.09,
+    # Al2O3 3.57, CaO 3.09. Pinned wt%: SiO2 45.5396, Al2O3 4.5686,
+    # FeO 14.0625, MgO 32.1717, CaO 3.6577. Every oxide is farther from
+    # that measured row than the previous snapshot.
     assert {
         oxide: value.hex()
         for oxide, value in primary.primary_oxide_wt_pct.items()
     } == {
-        "SiO2": "0x1.5f0cdac992197p+5",
-        "Al2O3": "0x1.1b3cb0566fbffp+2",
-        "FeO": "0x1.10ec3b5604051p+4",
-        "MgO": "0x1.f179bb173dc7fp+4",
-        "CaO": "0x1.c5893f4ff0809p+1",
+        "SiO2": "0x1.6c510af0c11dep+5",
+        "Al2O3": "0x1.246349a736487p+2",
+        "FeO": "0x1.c1ffa7d75a267p+3",
+        "MgO": "0x1.015f9fa928ef4p+5",
+        "CaO": "0x1.d43023b58a02bp+1",
     }
 
 
