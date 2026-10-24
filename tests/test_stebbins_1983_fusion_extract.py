@@ -145,4 +145,3 @@ def test_stebbins_fusion_values_migrate_with_printed_fields_and_conditions() -> 
 
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     assert check_all_fidelity_samples_match(document, label=str(EXTRACT)) == []
-
