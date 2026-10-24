@@ -16430,6 +16430,15 @@ def test_visscher_formula_fields_reach_modelled_pressure_expressions(
         # formulas; only the adjacent text before eq. (2) and after eqs. (6)-(7)
         # prints the temperature ranges retained above.
 
+    oxygen_fugacity = result.observations[
+        "visscher-fegley-2013-debris-disks::visscher_2013_saturated_vapor_oxygen_fugacity"
+    ]
+    assert quantity_token(oxygen_fugacity.identity) is Quantity.P_PARTIAL
+    assert oxygen_fugacity.value.kind is ValueKind.UNAVAILABLE
+    assert "defines oxygen fugacity" in (
+        oxygen_fugacity.value.unavailable_reason or ""
+    )
+
 
 def test_no27_log_equilibrium_fits_keep_printed_coefficients_without_invented_domain(
     tmp_path: Path,

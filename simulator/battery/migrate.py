@@ -9637,6 +9637,16 @@ def _selection_from_named_field(
     if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
         expression = payload.get("expression")
         validity = payload.get("temperature_range_as_printed")
+        if (
+            q_token is Quantity.P_PARTIAL
+            and isinstance(expression, str)
+            and expression.lstrip().startswith("fO2 =")
+        ):
+            return _unavailable_selection(
+                "printed expression defines oxygen fugacity, not partial pressure",
+                condition_ranges=condition_ranges,
+                field_name="expression",
+            )
         if isinstance(expression, str) and expression:
             domain = {"units_as_printed": units}
             if isinstance(validity, str) and validity:
