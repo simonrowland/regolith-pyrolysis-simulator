@@ -8685,11 +8685,11 @@ def _partial_pressure_point_condition(
     return located_value(total.value, locator)
 
 
-def _phase_row_printed_total_pressure_pa(
+def _source_point_condition_total_pressure_pa(
     values: Mapping[str, Any],
     obs: Mapping[str, Any],
 ) -> Decimal | None:
-    """Printed point-condition total, already in pascals. Unknown stays absent."""
+    """Read a numeric total pressure from a row or exploded point condition."""
 
     for raw in (obs.get("point_conditions"), values.get("point_conditions")):
         if not isinstance(raw, Mapping) or "total_pressure_Pa" not in raw:
@@ -16779,7 +16779,9 @@ class Migrator:
                 basis = str(values.get("basis") or "").strip()
                 if basis in PHASE_BASIS_TOKENS:
                     ident_kwargs["subtype"] = State.of(basis)
-                    printed_total = _phase_row_printed_total_pressure_pa(values, obs)
+                    printed_total = _source_point_condition_total_pressure_pa(
+                        values, obs
+                    )
                     existing_total = ident_kwargs.get("total_pressure_Pa")
                     if printed_total is not None and (
                         existing_total is None
@@ -16897,6 +16899,8 @@ class Migrator:
             p_amt = _as_dec_or_none(
                 values.get("pressure_basis_Pa") or values.get("target_pressure_Pa")
             )
+            if p_amt is None:
+                p_amt = _source_point_condition_total_pressure_pa(values, obs)
             if p_amt is not None:
                 ident_kwargs["total_pressure_Pa"] = State.of(p_amt)
             else:
@@ -18811,6 +18815,13 @@ class Migrator:
                 )
             ):
                 ident_kwargs["composition"] = located_composition.state
+        if (
+            q_token is Quantity.TRANSITION_TEMPERATURE
+            and isinstance(raw_item, Mapping)
+        ):
+            point_pressure = _source_point_condition_total_pressure_pa(raw_item, {})
+            if point_pressure is not None:
+                ident_kwargs["total_pressure_Pa"] = State.of(point_pressure)
         if coord is not None:
             ident_kwargs["temperature_K"] = State.of(coord)
         else:
