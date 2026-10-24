@@ -10,6 +10,15 @@ source:
   year: 2017
   corpus_asset: raw/he-2017-karrooite-ordering-heat-capacity/he-2017-karrooite-ordering-heat-capacity.pdf
   corpus_sha256: 9d60b405b98cd3f3bef3e95e527e48c38d563a8752b0915d236985a67323cf25
+source_files:
+  corpus_repo: regolith-corpus
+  files:
+  - asset_id: tables:he-2017-karrooite-ordering-heat-capacity
+    role: table_csv
+    path: tables/he-2017-karrooite-ordering-heat-capacity/table-5.csv
+    sha256:
+      tag: value
+      value: 4bab0d321e007289328d4a68b0302bbb48fc86ac5dd81791b824fa7bbc4d5ec4
 extraction:
   method: >-
     Born-digital pdftotext-layout transcription. The MinerU table tool found no
