@@ -4029,7 +4029,7 @@ class EvaporationMixin:
     def _solve_evaporative_oxygen_boundary(self, equilibrium=None, *, overhead_partials_override_Pa=None):
         from simulator.chemistry.langmuir_knudsen import (
             OxygenClosureNonconvergence, _SurfaceOxygenEvaluation,
-            _solve_surface_oxygen_balance, langmuir_molar_flux,
+            _solve_surface_oxygen_balance,
         )
         from simulator.transport_regime import series_evaporation_flux
 
@@ -4082,7 +4082,8 @@ class EvaporationMixin:
         config = controls['evaporation_series_resistance']
         empty_request = not self.vapour_rail_catalog.build_request(self.atom_ledger.mol_by_account())
 
-        def evaluate(oxygen):
+        def evaluate(excess):
+            oxygen = bulk + excess
             trial = self._detached_evaporation_projection()
             trial._reaction_pO2_bar = oxygen
             result = copy.deepcopy(equilibrium)
@@ -4107,6 +4108,7 @@ class EvaporationMixin:
                 gas_resistance_enabled=bool(config.get('gas_resistance_enabled', True)),
                 melt_surface_area_m2=controls['melt_surface_area_m2'],
                 surface_flow=controls['surface_flow'], signed=True,
+                pressure_excess_pa=excess * 100000.0,
                 stir_diagnostic=dict(axial_stir_applied=0.0, radial_stir_applied=0.0,
                     axial_stir_clamped=False, radial_stir_clamped=False,
                     frozen_skull_stir_clamped=False, frozen_skull_stir_ceiling='not applicable to oxygen'),
@@ -4139,10 +4141,7 @@ class EvaporationMixin:
                 if not any(candidate.balance_terms):
                     zero = candidate
             solved = _solve_surface_oxygen_balance(
-                evaluate, source_free_zero=zero,
-                bulk_exchange_flux_mol_m2_s=langmuir_molar_flux(
-                    self.melt.temperature_C + 273.15, bulk * 100000.0, 0.0, 1.0,
-                    molar_mass_kg_mol=mass),
+                evaluate, bulk_pO2_bar=bulk, source_free_zero=zero,
                 bracket_log10_pO2_bar=(-12.0, 0.0))
             audit = self._detached_evaporation_projection()
             audit._frozen_evaporation_carriers = None

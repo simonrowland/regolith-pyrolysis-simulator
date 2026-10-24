@@ -36,12 +36,12 @@ def test_proved_source_free_zero_is_exact():
 
 @pytest.mark.parametrize('bulk', (1.0365655169846737e-27, 3.73282716125e-21))
 def test_source_free_positive_bulk_is_exact(bulk):
-    def evaluate(surface):
+    def evaluate(excess):
         return _SurfaceOxygenEvaluation(
-            surface, bulk, 0.1 * (surface - bulk), 0.0, {}, 0.0, 0.0, 0.0,
+            bulk + excess, bulk, 0.1 * excess, 0.0, {}, 0.0, 0.0, 0.0,
             bulk_pO2_bar=bulk,
         )
-    solved = _solve_surface_oxygen_balance(evaluate)
+    solved = _solve_surface_oxygen_balance(evaluate, bulk_pO2_bar=bulk)
     assert solved.reaction_pO2_bar == solved.gas_face_pO2_bar == bulk
     assert solved.oxygen_flux_mol_m2_s == solved.residual == 0.0
 
@@ -63,7 +63,7 @@ def test_coordinate_convergence_across_a_jump_is_not_flux_convergence():
         return _SurfaceOxygenEvaluation(x, 0.0, 1.0 if x >= 1e-6 else 0.0,
                                         0.0, {'source': 0.5}, 0.0, 0.0, 0.0)
     with pytest.raises(OxygenClosureNonconvergence, match='without closing'):
-        _solve_surface_oxygen_balance(jump, bulk_exchange_flux_mol_m2_s=1e30)
+        _solve_surface_oxygen_balance(jump)
 
 
 def test_runtime_source_free_zero():

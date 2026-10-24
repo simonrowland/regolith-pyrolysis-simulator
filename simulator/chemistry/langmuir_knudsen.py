@@ -578,75 +578,91 @@ def _log_oxygen_root(residual, low, high):
 def _solve_surface_oxygen_balance(
     evaluate: Callable[[float], _SurfaceOxygenEvaluation],
     *,
+    bulk_pO2_bar: float = 0.0,
     source_free_zero: _SurfaceOxygenEvaluation | None = None,
-    bulk_exchange_flux_mol_m2_s: float = 0.0,
     bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
 ) -> _SurfaceOxygenEvaluation:
-    """Close the current signed source/storage against series O/O2 escape.
+    """Close signed source/storage with an independently represented excess.
 
-    The caller owns thermodynamics and finite settlement. Only a proved zero
-    source/storage state may bypass the log coordinate. Positive-source roots
-    must be interior; representability limits never become physical oxygen.
+    Premise: transport responds to Delta = p_surface - p_bulk, which can be
+    much smaller than an ulp of p_bulk. Subtracting rounded absolute pressures
+    destroys that drive. Instead solve u = asinh(Delta / p_scale), and pass
+    Delta = p_scale*sinh(u) directly to the transport owner: J = Delta/R.
+    Only thermodynamic consumers reconstruct p_surface = p_bulk + Delta.
+    Delta and p_scale are bar, u is dimensionless; the transport boundary
+    converts bar to Pa, so Pa/(Pa m² s/kg) is kg/(m² s). Delta -> 0 gives
+    exactly zero flux, with surface = bulk, including source-free states.
+    Delta >> bulk recovers the vacuum drive; asinh spans decades without
+    losing the sign or small excess. The bulk (or the existing bracket's
+    coordinate anchor at vacuum) sets p_scale, never a physical pressure floor.
     """
     if source_free_zero is not None:
         zero = source_free_zero
         if zero.reaction_pO2_bar != 0.0 or any(zero.balance_terms):
             raise ValueError('source-free zero requires individually zero balance terms')
         return zero
-    low, high = map(float, bracket_log10_pO2_bar)
-    if not math.isfinite(low) or not math.isfinite(high) or low >= high:
+    low_log, high_log = map(float, bracket_log10_pO2_bar)
+    bulk = float(bulk_pO2_bar)
+    if not math.isfinite(bulk) or bulk < 0.0:
+        raise ValueError('bulk oxygen must be finite and nonnegative')
+    if not math.isfinite(low_log) or not math.isfinite(high_log) or low_log >= high_log:
         raise ValueError('oxygen bracket must be finite and increasing')
+    pressure_scale = bulk if bulk > 0.0 else 10.0 ** low_log
 
-    def residual(logp):
-        result = evaluate(10.0 ** logp)
+    def checked(delta):
+        result = evaluate(delta)
         if not all(math.isfinite(value) for value in result.balance_terms):
             raise OxygenClosureNonconvergence('nonfinite signed oxygen balance')
-        return result.residual
+        return result
 
-    f_low, f_high = residual(low), residual(high)
-    # Expand toward representable pressures, never manufacture an endpoint
-    # solution. 1 bar is a coordinate anchor, not a pressure limit or floor.
-    while not f_low < 0.0 < f_high and (low > -300.0 or high < 3.0):
-        if f_low >= 0.0 and low > -300.0:
-            low = max(-300.0, low - 30.0)
+    def residual(u):
+        return checked(pressure_scale * math.sinh(u)).residual
+
+    if bulk > 0.0:
+        at_bulk = checked(0.0)
+        if at_bulk.residual == 0.0:
+            return at_bulk
+        # Positive-source states bracket upward from exactly bulk. For a
+        # consuming balance, approach the physical zero-surface boundary
+        # from inside; the coordinate must never imply negative pressure.
+        low = (0.0 if at_bulk.residual < 0.0 else
+               math.nextafter(math.asinh(-1.0), 0.0))
+    else:
+        low = math.asinh(10.0 ** low_log / pressure_scale)
+    high = math.asinh(10.0 ** high_log / pressure_scale)
+    f_low = at_bulk.residual if bulk > 0.0 and low == 0.0 else residual(low)
+    f_high = residual(high)
+    # These are representability bounds, not physical pressure limits: large
+    # sources may require an excess above the initial one-bar search anchor.
+    while not f_low < 0.0 < f_high and (low_log > -300.0 or high_log < 300.0):
+        if f_low >= 0.0 and bulk == 0.0 and low_log > -300.0:
+            low_log = max(-300.0, low_log - 30.0)
+            low = math.asinh(10.0 ** low_log / pressure_scale)
             f_low = residual(low)
-        elif high < 3.0:
-            high = min(3.0, high + 1.0)
+        elif f_high <= 0.0 and high_log < 300.0:
+            high_log = min(300.0, high_log + 1.0)
+            high = math.asinh(10.0 ** high_log / pressure_scale)
             f_high = residual(high)
         else:
             break
     if not f_low < 0.0 < f_high:
         raise OxygenClosureNonconvergence(
-            f'no interior oxygen root: log bracket {(low, high)}, residuals {(f_low, f_high)}')
+            f'no interior oxygen root: excess bracket {(low, high)}, residuals {(f_low, f_high)}')
     try:
-        root = _log_oxygen_root(residual, low, high)
+        # A fixed absolute u tolerance would erase tiny Delta/bulk. Use the
+        # smallest representable positive tolerance and binary64's relative
+        # limit; acceptance below remains the strict signed-flux criterion.
+        root = brentq(residual, low, high, xtol=math.ulp(0.0),
+                      rtol=4.0 * math.ulp(1.0), maxiter=1000)
     except (RuntimeError, ValueError) as exc:
         raise OxygenClosureNonconvergence('oxygen root did not converge') from exc
     if not low < root < high:
         raise OxygenClosureNonconvergence('oxygen root reached a bracket endpoint')
-    achieved = evaluate(10.0 ** root)
-    source_free = False
-    if achieved.bulk_pO2_bar > 0.0 and not any(achieved.balance_terms[1:]):
-        # With every source, ferric, atomic-O and storage term individually
-        # zero, signed transport closes at p_surface = p_bulk. Re-evaluate
-        # there exactly, retaining that state's finite-settlement payload.
-        at_bulk = evaluate(achieved.bulk_pO2_bar)
-        if not any(at_bulk.balance_terms[1:]):
-            achieved = at_bulk
-            source_free = True
+    achieved = checked(pressure_scale * math.sinh(root))
     # A coordinate root across a gate/cutoff jump is not a closed balance.
-    # sqrt(binary64 epsilon) is a numerical relative residual criterion,
-    # scaled by gross flux rather than a cancellation-small net; it carries
-    # no pressure units and cannot set the physical oxygen coordinate.
+    # Gross signed traffic, not bulk exchange or a cancellation-small net,
+    # sets the same sqrt(binary64 epsilon) criterion for every nonzero source.
     scale = math.fsum(abs(term) for term in achieved.balance_terms)
-    if source_free:
-        # At equal pressures the net flux and gross balance traffic vanish.
-        # The one-way HK exchange J_bulk = alpha*p_bulk/sqrt(2*pi*M*R*T)
-        # remains a physical flux scale: Pa/sqrt((kg/mol)(J/mol)) gives
-        # mol/(m² s). As p_bulk -> 0 this scale also vanishes; no pressure
-        # floor is introduced. Nonzero-source states retain the gross-only
-        # jump guard, regardless of the bulk exchange magnitude.
-        scale = max(scale, bulk_exchange_flux_mol_m2_s)
     if abs(achieved.residual) > math.sqrt(math.ulp(1.0)) * scale:
         raise OxygenClosureNonconvergence('oxygen coordinate converged without closing signed flux')
     return achieved

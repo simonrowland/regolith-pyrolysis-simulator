@@ -2058,7 +2058,7 @@ def surface_gas_film(*, area_m2, flow, temperature_K, pressure_pa, carrier, diff
                 geometry_parameters=parameters)
 
 
-def _binary_stefan_series_flux(eq, bulk, total, kinetic_resistance, dilute_gas_resistance):
+def _binary_stefan_series_flux(delta, bulk, total, kinetic_resistance, dilute_gas_resistance):
     """Solve J=P/Rg0*ln[(1-yb)/(1-ys)], ps=peq-J*Rhk, without a second alpha.
 
     P/Rg0 has units kg/(m² s). Signed HK drive (peq-pbulk)/Rhk brackets
@@ -2067,34 +2067,43 @@ def _binary_stefan_series_flux(eq, bulk, total, kinetic_resistance, dilute_gas_r
     log difference -> (ps-pbulk)/P and
     the dilute series returns. As Rg0->0, the unique HK limit returns.
     """
-    drive = (eq - bulk) / kinetic_resistance
-    low = max(min(0.0, drive), (eq - total) / kinetic_resistance)
+    drive = delta / kinetic_resistance
+    carrier_pressure = total - bulk
+    low = max(min(0.0, drive), (delta - carrier_pressure) / kinetic_resistance)
     high = max(0.0, drive)
     for _ in range(80):
         trial = (low + high) * 0.5
-        ps = eq - trial * kinetic_resistance
-        if ps >= total:
+        gas_excess = delta - trial * kinetic_resistance
+        if gas_excess >= carrier_pressure:
             low = trial
             continue
-        jgas = total / dilute_gas_resistance * (math.log1p(-bulk / total) - math.log1p(-ps / total))
+        # ln[(P-pb)/(P-ps)] = -log1p(-(ps-pb)/(P-pb)). Carry
+        # ps-pb = Delta-J*Ri directly, preserving tiny signed drives.
+        jgas = -total / dilute_gas_resistance * math.log1p(-gas_excess / carrier_pressure)
         if jgas > trial:
             low = trial
         else:
             high = trial
     flux = (low + high) * 0.5
-    return (flux, max(0.0, (eq - flux * kinetic_resistance - bulk) / flux)) if flux != 0 else (0.0, dilute_gas_resistance)
+    if flux == 0.0:
+        return 0.0, dilute_gas_resistance
+    # Rg = (ps-pb)/J = Rg0*(P-pb)/P * x/-log1p(-x), where
+    # x=(ps-pb)/(P-pb). Units remain Pa*m²*s/kg; x -> 0 gives the
+    # finite differential film resistance without subtracting absolutes.
+    x = (delta - flux * kinetic_resistance) / carrier_pressure
+    ratio = x / -math.log1p(-x) if x != 0.0 else 1.0
+    return flux, dilute_gas_resistance * (carrier_pressure / total) * ratio
 
 
-def _surface_film_series_flux(film, diffusion, length, tg, mass, ri, eq, bulk, pressure, *, signed=False):
+def _surface_film_series_flux(film, diffusion, length, tg, mass, ri, delta, bulk, pressure):
     """Evaluate one film and the same HK interface; retain its Stefan diagnostics."""
-    delta = eq - bulk if signed else max(0.0, eq - bulk)
     k_mt = film_pressure_conductance(film['Sh'], diffusion, length, tg) * mass
     rg = 1.0 / k_mt
     denominator = ri + rg
     dilute_flux = delta * (1.0 / denominator)
     flux = dilute_flux
     if rg > 0:
-        gas_face = eq - flux * ri
+        gas_face = bulk + (delta - flux * ri)
         film['stefan_model'] = 'dilute_passive_scalar'
         if max(gas_face, bulk) / pressure >= 0.1:
             film['domain_flags'].append('high vapour fraction/blowing: dilute prediction; coupled Stefan-Maxwell unresolved')
@@ -2103,12 +2112,12 @@ def _surface_film_series_flux(film, diffusion, length, tg, mass, ri, eq, bulk, p
             # unforced binary disk uses this closure; forced flow retains
             # the study's dilute passive-scalar law (no validated blowing fit).
             old_rg = rg
-            flux, rg = _binary_stefan_series_flux(eq, bulk, pressure, ri, rg)
+            flux, rg = _binary_stefan_series_flux(delta, bulk, pressure, ri, rg)
             k_mt = 1.0 / rg
             film['stefan_model'] = 'binary_stagnant_carrier_logarithmic'
             film['stefan_conductance_multiplier'] = old_rg / rg
-        film['gas_face_partial_pressure_pa'] = eq - flux * ri
-        film['gas_face_vapour_fraction'] = (eq - flux * ri) / pressure
+        film['gas_face_partial_pressure_pa'] = bulk + flux * rg
+        film['gas_face_vapour_fraction'] = (bulk + flux * rg) / pressure
         film['dilute_flux_kg_s_m2'] = dilute_flux
         film['binary_approximation'] = 'independent dilute species; not coupled multicomponent certification'
     return flux, rg, k_mt
@@ -2128,6 +2137,7 @@ def series_evaporation_flux(
     stir_diagnostic: Mapping[str, object], melt_surface_area_m2: float | None = None,
     surface_flow: SurfaceFlow | None = None,
     signed: bool = False,
+    pressure_excess_pa: float | None = None,
 ) -> SeriesEvaporationFlux:
     """One HK interface and one geometry film; melt transport stays disabled.
 
@@ -2149,7 +2159,14 @@ def series_evaporation_flux(
         return _zero_series_evaporation_flux(alpha_intrinsic=alpha, **stir_diagnostic)
     k_hk = hertz_knudsen_mass_conductance(mass, ts)
     ri = 1.0 / (alpha * k_hk)
-    delta = eq - bulk if signed else max(0.0, eq - bulk)
+    # Closure callers already own the signed pressure excess. Reconstructing
+    # it from two rounded absolutes would discard sub-ulp physical sources.
+    if pressure_excess_pa is None:
+        delta = eq - bulk if signed else max(0.0, eq - bulk)
+    else:
+        delta = float(pressure_excess_pa)
+        if not signed or not math.isfinite(delta):
+            raise EvaporationFluxConfigurationError('pressure_excess_pa requires finite signed transport')
     if delta == 0.0:
         # Saturation proves zero net evaporation without requiring a transport
         # model, hardware declaration or diffusion row for an inactive species.
@@ -2193,7 +2210,7 @@ def series_evaporation_flux(
             raise EvaporationFluxConfigurationError('gas resistance requires positive overhead_pressure_pa')
         weight = 1.0
         flux, rg, k_mt = _surface_film_series_flux(
-            film, diffusion, length, tg, mass, ri, eq, bulk, pressure, signed=signed,
+            film, diffusion, length, tg, mass, ri, delta, bulk, pressure,
         )
     else:
         flux = delta * (1.0 / ri)
@@ -2206,7 +2223,7 @@ def series_evaporation_flux(
             diffusivity_m2_s=diffusion,
         )
         still_flux, _, _ = _surface_film_series_flux(
-            still, diffusion, still['length_m'], tg, mass, ri, eq, bulk, pressure, signed=signed,
+            still, diffusion, still['length_m'], tg, mass, ri, delta, bulk, pressure,
         )
         # Equal partials, alpha and pool area make the flux ratio the rate
         # ratio (kg/(m^2 s) cancels). Identical still flow gives 1; zero
