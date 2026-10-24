@@ -143,7 +143,7 @@ def _assert_cell_matches_reader(
 
 
 def test_b677_potassium_gas_uses_printed_ideal_gas_basis(tmp_path: Path) -> None:
-    result = _migrate_record(tmp_path, B677, "table-0096.json")
+    result = _migrate_record(tmp_path / "ideal-gas-reference", B677, "table-0096.json")
     heat_capacity = _observation(result, B677, "table-0096", Quantity.CP)
     entropy = _observation(result, B677, "table-0096", Quantity.S)
     enthalpy = _observation(result, B677, "table-0096", Quantity.H_MINUS_H298)
@@ -167,6 +167,25 @@ def test_b677_potassium_gas_uses_printed_ideal_gas_basis(tmp_path: Path) -> None
     _assert_cell_matches_reader(
         enthalpy, document, Quantity.H_MINUS_H298, "1600", printed_token="6.469", column=3
     )
+    admitted_enthalpy = _attempt(Engine.VAPOROCK, _cell_at(enthalpy, "1600"))
+    assert admitted_enthalpy.refusal_reason is None
+    assert admitted_enthalpy.value is not None
+
+    condensed_reference = _migrate_record(
+        tmp_path / "condensed-reference", B677, "table-0095.json"
+    )
+    mismatched_enthalpy = _observation(
+        condensed_reference, B677, "table-0095", Quantity.H_MINUS_H298
+    )
+    refused_enthalpy = _attempt(
+        Engine.VAPOROCK, _cell_at(mismatched_enthalpy, "1600")
+    )
+    assert refused_enthalpy.value is None
+    assert refused_enthalpy.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert refused_enthalpy.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    assert refused_enthalpy.refusal_detail["observation_table"] == "table-0095"
+    assert refused_enthalpy.refusal_detail["gas_table"] == "K-005"
+
     restored = _identity_from_plain(to_plain(heat_capacity.identity))
     assert restored.per.reason == heat_capacity.identity.per.reason
     assert restored.standard_pressure_Pa.value == atm_to_pa(1)
