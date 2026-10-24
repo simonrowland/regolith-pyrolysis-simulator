@@ -13171,13 +13171,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self.campaign_mgr.c0_remaining_budget_exit = None
         prediction_status = prediction.get("prediction_status")
+        unexpected_evaluation_failure = (
+            isinstance(prediction_status, str)
+            and prediction_status.startswith("unavailable:")
+        )
         forecast_applied = prediction_status in {
             "ok",
             "no_candidate_fits_remaining_budget",
         }
-        if forecast_applied:
+        if forecast_applied or unexpected_evaluation_failure:
             self.campaign_mgr.c0_exit_prediction = prediction
-        if prediction_status == "no_candidate_fits_remaining_budget":
+        if (
+            prediction_status == "no_candidate_fits_remaining_budget"
+            or unexpected_evaluation_failure
+        ):
             self.campaign_mgr.record_c0_remaining_budget_exit(
                 prediction,
                 campaign_hour=campaign_hour,
@@ -14111,14 +14118,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         initial_inventory = getattr(
             getattr(self, 'record', None), 'initial_inventory', None
         )
-        if remaining_hold_budget_hr is None:
-            gas_species = (
-                getattr(initial_inventory, 'gas_volatiles_kg', {}) or {}
-            )
-            gas_mass_kg = initial_c0_gas_inventory_kg(initial_inventory)
-        else:
-            gas_species = self._overhead_holdup_species_kg()
-            gas_mass_kg = sum(gas_species.values())
+        gas_species = (
+            getattr(initial_inventory, 'gas_volatiles_kg', {}) or {}
+        )
+        gas_mass_kg = initial_c0_gas_inventory_kg(initial_inventory)
         atom_accounts = self.atom_ledger.mol_by_account()
         alkali_feed_mass_kg = 0.0
         for account in atom_accounts:
@@ -14170,10 +14173,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             flux = self._calculate_evaporation(equilibrium)
             inlet = self._subsolidus_transport_inlet_flux(flux)
             demand_kg_hr = float(inlet.total_kg_hr)
-            # The startup map is the load-time mixture; the mid-run map is
-            # the current ledger holdup. A one-hour normalization supplies
-            # kg/h to the transport owner's composition calculation; pipe
-            # capacity is independent of the normalization's magnitude.
+            # Use the load-time mixture at startup and mid-run: the ledger has
+            # no evacuated load-gas progress measure. A one-hour normalization
+            # supplies kg/h to the transport owner's composition calculation;
+            # pipe capacity is independent of the normalization's magnitude.
             evacuation_flux = EvaporationFlux(
                 species_kg_hr={
                     str(species): float(kg)
@@ -14213,6 +14216,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if capacity_kg_hr > 0.0
                 else (0.0 if gas_mass_kg <= 0.0 else math.inf)
             )
+            campaign_elapsed_hr = 0.0
+            if remaining_hold_budget_hr is not None:
+                campaign_elapsed_hr = float(self.melt.campaign_hour)
+                # The fiat Stage-0 gas is recorded as terminal offgas and
+                # C0 does not ledger evacuation progress. Keep its duration
+                # anchored to campaign start instead of restarting it.
+                t_evac_hr = max(0.0, t_evac_hr - campaign_elapsed_hr)
             exit_window_hr = max(t_temperature_hr, t_evac_hr)
             runtime_exit_campaign_hour = None
             if math.isfinite(exit_window_hr):
@@ -14222,14 +14232,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     # Round the absolute deadline so repeated forecasts do
                     # not restart the fractional-hour ceiling allowance.
                     absolute_deadline_hr = (
-                        float(self.melt.campaign_hour) + exit_window_hr
+                        campaign_elapsed_hr + exit_window_hr
                     )
                     runtime_exit_campaign_hour = float(
                         math.ceil(absolute_deadline_hr)
                     )
                     runtime_exit_window_hr = (
                         runtime_exit_campaign_hour
-                        - float(self.melt.campaign_hour)
+                        - campaign_elapsed_hr
                     )
             else:
                 runtime_exit_window_hr = math.inf
@@ -14241,7 +14251,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # data only; it does not mutate the ledgered gas inventory.
             evacuated_gas_mass_kg = min(
                 gas_mass_kg,
-                capacity_kg_hr * hold_hr,
+                capacity_kg_hr * (campaign_elapsed_hr + hold_hr),
             )
             unreleased_gas_mass_kg = max(
                 0.0,
@@ -14257,9 +14267,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 for species, kg in gas_species.items()
                 if float(kg) > 0.0 and unreleased_gas_fraction > 0.0
             }
-            integrated = self._apply_analytic_evaporation_depletion(
-                limited_flux,
-                dt_hr=hold_hr,
+            integrated = (
+                EvaporationFlux()
+                if (
+                    remaining_hold_budget_hr is not None
+                    and hold_hr <= 0.0
+                )
+                else self._apply_analytic_evaporation_depletion(
+                    limited_flux,
+                    dt_hr=hold_hr,
+                )
             )
             alkali_to_train_kg = alkali_already_to_train_kg
             for species, rate in integrated.species_kg_hr.items():
