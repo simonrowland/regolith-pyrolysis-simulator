@@ -975,6 +975,27 @@ def validate_observation(
     path: str = "observation",
     source_owners: Mapping[str, str] | None = None,
 ) -> list[ValidationIssue]:
+    return _validate_observation(
+        observation,
+        experiments,
+        observations,
+        works,
+        path,
+        source_owners,
+        context_ids=frozenset(),
+    )
+
+
+def _validate_observation(
+    observation: Observation,
+    experiments: Mapping[str, Experiment],
+    observations: Mapping[str, Observation],
+    works: Mapping[str, Work] | None = None,
+    path: str = "observation",
+    source_owners: Mapping[str, str] | None = None,
+    *,
+    context_ids: frozenset[str],
+) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     experiment = experiments.get(observation.experiment_id)
     if experiment is None:
@@ -1249,7 +1270,7 @@ def validate_observation(
                     )
                 )
         has_resolved_lineage = any(
-            parent in observations or parent in asset_ids
+            parent in observations or parent in asset_ids or parent in context_ids
             for parent in observation.derived_from or ()
         )
         raw_inputs_supply_lineage = (
@@ -1289,7 +1310,11 @@ def validate_observation(
                 )
     if observation.derived_from:
         for parent in observation.derived_from:
-            if parent not in observations and parent not in asset_ids:
+            if (
+                parent not in observations
+                and parent not in asset_ids
+                and parent not in context_ids
+            ):
                 issues.append(
                     _issue(
                         f"{path}.derived_from",
@@ -1299,7 +1324,11 @@ def validate_observation(
                 )
     if observation.derivation is not None:
         for inp in observation.derivation.inputs:
-            if inp not in observations and inp not in asset_ids:
+            if (
+                inp not in observations
+                and inp not in asset_ids
+                and inp not in context_ids
+            ):
                 issues.append(
                     _issue(
                         f"{path}.derivation.inputs",
@@ -2316,15 +2345,17 @@ def validate_corpus(
             )
         )
     source_owners = _source_owners(work_map)
+    context_ids = frozenset(context_map or ())
     for observation in obs_map.values():
         issues.extend(
-            validate_observation(
+            _validate_observation(
                 observation,
                 exp_map,
                 obs_map,
                 work_map,
                 f"observation[{observation.observation_id}]",
                 source_owners,
+                context_ids=context_ids,
             )
         )
     admitted_transition_points = [
