@@ -450,6 +450,15 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert prediction4.refusal_reason is None
     assert prediction155.refusal_reason is None
 
+    printed_pressure_row = replace(
+        row4,
+        identity=replace(row4.identity, total_pressure_Pa=State.of(Decimal("101325"))),
+    )
+    printed_pressure_prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, printed_pressure_row
+    )
+    assert printed_pressure_prediction.value == prediction4.value
+
     glass_row = replace(
         row4,
         observation_id="borisov_2018_glass_fe3_fe2_fixture",
