@@ -826,7 +826,13 @@ def test_real_sample_volume_and_unadopted_fugacity_are_preserved():
 
 
 def test_non_oxygen_fugacity_is_refused_before_opening_an_engine(monkeypatch):
-    from simulator.battery.enums import Engine, Phase, RefusalReason, SourceRelation
+    from simulator.battery.enums import (
+        Engine,
+        MetricOperation,
+        Phase,
+        RefusalReason,
+        SourceRelation,
+    )
     from simulator.battery.records import Species, State
     from simulator.battery.score import SCORE_ENGINE_SET, ScoreContext, populate_numeric, predict_with_engine, score_store
 
@@ -849,10 +855,18 @@ def test_non_oxygen_fugacity_is_refused_before_opening_an_engine(monkeypatch):
         }
     residuals, _ = score_store(context, engines=(Engine.MAGEMIN,), include_diagnostics=False)
     assert residuals and all(not r.score_eligible and r.numeric is None for r in residuals)
-    numeric, reason, _ = populate_numeric(quantity=Quantity.FUGACITY, candidate=Decimal("33.7"),
-                                           reference=Decimal("33.7"), source_relation=SourceRelation.INDEPENDENT)
-    assert numeric is None
-    assert reason.value == "metric_domain"
+    numeric, reason, _ = populate_numeric(
+        quantity=Quantity.FUGACITY,
+        candidate=Decimal("1e-7"),
+        reference=Decimal("1e-8"),
+        source_relation=SourceRelation.INDEPENDENT,
+    )
+    assert reason is None
+    assert numeric is not None
+    assert numeric.operation is MetricOperation.DEX
+    assert numeric.value == Decimal("1.0")
+    assert numeric.unit == "dimensionless"
+    assert numeric.decision_band is None
 
 
 def test_geometry_context_keeps_original_source_record():

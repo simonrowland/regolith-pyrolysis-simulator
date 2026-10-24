@@ -302,6 +302,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.P_SAT: MetricOperation.DEX,
     Quantity.P_PARTIAL: MetricOperation.DEX,
     Quantity.P_REFERENCE: MetricOperation.DEX,
+    Quantity.FUGACITY: MetricOperation.DEX,
     Quantity.ACTIVITY: MetricOperation.DEX,
     Quantity.ACTIVITY_COEFFICIENT: MetricOperation.DEX,
     Quantity.DELTA_FG: MetricOperation.ABSOLUTE,
