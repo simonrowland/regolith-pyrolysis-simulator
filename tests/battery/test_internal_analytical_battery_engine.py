@@ -209,11 +209,14 @@ def _assert_internal_activity_residual_matches_production(
 
 
 def test_internal_analytical_scores_guo_2021_mgo_row() -> None:
+    # d3285901c restores Table 5 measured activities and 2f342093c restores
+    # their printed slag compositions. Table 5 p. 2728's a(MgO)=0.5121 row
+    # now has the composition-qualified full-store identity below.
     _assert_internal_activity_residual_matches_production(
         source_id="guo-2021-mgo-activity-cmas-slag",
         observation_id=(
             "guo-2021-mgo-activity-cmas-slag::"
-            "guo_2021_table5_mgo_activities_1873k::T=1873.00:h=0ff897900a53"
+            "guo_2021_table5_mgo_activities_1873k::T=1873:h=3c1cc249e132"
         ),
     )
 
