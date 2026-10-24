@@ -5440,12 +5440,18 @@ def _comparison_identity(
         quantity_token(identity) in MELT_ACTIVITY_QUANTITIES
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
+    ambient_pressure_assumed = any(
+        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and notice.reason == "ambient pressure assumed, not printed"
+        for notice in prediction.notices
+    )
     if (
         not resolved_oxygen
         and not comparison_activity
         and not redox
         and melt_identity is identity
         and not fusion_polymorph_flag
+        and not ambient_pressure_assumed
     ):
         return identity
     updates: dict[str, State] = {}
@@ -5490,6 +5496,8 @@ def _comparison_identity(
             bar, _notice, invalid = total_pressure_bar_for_score(identity, quantity)
             if invalid is None:
                 updates["total_pressure_Pa"] = State.of(Decimal(str(bar)) * Decimal("1e5"))
+    if ambient_pressure_assumed:
+        updates["total_pressure_Pa"] = State.of(PA_PER_BAR_DEC)
     if not updates:
         return identity
     return replace(identity, **updates)
