@@ -205,6 +205,27 @@ def test_pressure_projections_share_committed_history_and_copy_mutable_frontier(
         close_test_owned_magemin_backend(sim)
 
 
+def test_pressure_projection_shares_read_only_feedstocks_but_rollback_detaches_them():
+    class ReadOnlyFeedstocks(dict):
+        def __deepcopy__(self, _memo):
+            raise AssertionError('pressure trials must not copy unused feedstock input tables')
+
+    sim = simulation()
+    try:
+        sim.feedstocks = ReadOnlyFeedstocks(sim.feedstocks)
+        trial = sim._detached_evaporation_projection()
+        assert trial.feedstocks is sim.feedstocks
+        assert trial.melt is not sim.melt
+        assert trial.atom_ledger is not sim.atom_ledger
+        # Whole-hour rollback keeps its original mutable-input contract.
+        sim.feedstocks = {'sample': {'density_kg_m3': 1000.0}}
+        state, _, _ = sim._snapshot_terminal_refusal_hour_state()
+        sim.feedstocks['sample']['density_kg_m3'] = 2000.0
+        assert state['feedstocks']['sample']['density_kg_m3'] == 1000.0
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
 @pytest.mark.parametrize('finite_capacity', (False, True))
 def test_real_hour_closes_current_sources_and_preserves_oxygen_atoms(monkeypatch, finite_capacity):
     sim = simulation()
