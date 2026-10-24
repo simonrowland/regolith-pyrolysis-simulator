@@ -3939,7 +3939,19 @@ class EvaporationMixin:
         from simulator.chemistry.kernel import ChemistryKernel
 
         trial = copy.copy(self)
-        state, ledger, cost_state = self._snapshot_terminal_refusal_hour_state(state_receiver=trial)
+        state, ledger, cost_state = self._snapshot_terminal_refusal_hour_state(
+            defer_committed_history=True, state_receiver=trial)
+        # The snapshot owner shares committed rows and copies the mutable
+        # frontier. Trials need ordinary, independently mutable containers,
+        # but never modify committed rows: copy the containers, not the full
+        # hourly history on every pressure evaluation. Nested trials use the
+        # same owner; release its rollback-only memo after the copy finishes.
+        for owner, field in ((state.get('record'), 'snapshots'),
+                             (state.get('_condensation_model'), 'operating_history')):
+            history = getattr(owner, field, None)
+            if history is not None and not isinstance(history, list):
+                setattr(owner, field, list(history))
+                history.release()
         trial.__dict__ = dict(self.__dict__)
         trial.__dict__.update({key: value for key, value in state.items()
                                if key != '_terminal_refusal_chem_registry_tables'})
