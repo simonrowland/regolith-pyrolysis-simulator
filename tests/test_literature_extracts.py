@@ -5257,7 +5257,7 @@ def test_matzen_experimental_average_composition_joins_redox_rows():
         "Na2O": Decimal("0.06"),
         "NiO": Decimal("0.33"),
     }
-    by_id = {row.observation_id.rsplit("::", 1)[-1]: row for row in rows}
+    by_id = {row.observation_id.split("::")[1]: row for row in rows}
     pinned_rows = {
         "matzen_2022_run_11_method_a",
         "matzen_2022_run_30_method_b",
@@ -5281,6 +5281,63 @@ def test_matzen_experimental_average_composition_joins_redox_rows():
                 params[f"original_{oxide}_wt_pct"].locator.page == 38
                 for oxide in ("SiO2", "FeOT", "NiO")
             )
+
+
+def test_jayasuriya_d60_pressure_reaches_only_its_redox_rows():
+    """The 11 kbar D60 experiment binds without filling gas-mixing pressure."""
+    path = EXTRACTS / "jayasuriya-2004-iron-mossbauer.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    rows = _migrate_redox_extract(path)
+    axes = ("composition", "total_pressure_Pa", "fO2_Pa", "temperature_K")
+
+    assert len(rows) == 38
+    assert {
+        axis: sum(getattr(row.identity, axis).is_value for row in rows)
+        for axis in axes
+    } == {
+        "composition": 38,
+        "total_pressure_Pa": 2,
+        "fO2_Pa": 38,
+        "temperature_K": 38,
+    }
+
+    by_id = {row.observation_id.split("::")[1]: row for row in rows}
+    d60_ids = {"jayasuriya_2004_rt_d60", "jayasuriya_2004_42k_d60"}
+    assert d60_ids <= by_id.keys()
+    for observation_id in d60_ids:
+        row = by_id[observation_id]
+        assert row.experiment_id.endswith("::experiment::jayasuriya_2004_adeu_d60_11kbar")
+        assert row.identity.total_pressure_Pa.value == Decimal("1100000000")
+        assert row.identity.temperature_K.value == Decimal("1673.15")
+        assert row.identity.fO2_Pa.value == Decimal("6309573444.801932494343601366")
+        assert row.identity.composition.is_value
+
+    source_experiment = next(
+        experiment
+        for experiment in doc["experiments"]
+        if experiment["experiment_id"] == "jayasuriya_2004_adeu_d60_11kbar"
+    )
+    pressure = source_experiment["pressure_environment"]["total_pressure_Pa"]
+    assert pressure["state"]["value"]["point"] == "1100000000"
+    assert pressure["locator"]["page"] == 2
+    assert "11 kbar" in pressure["locator"]["note"]
+
+    for observation in doc["species"]["Fe"]["observations"]:
+        if observation["observation_id"] not in d60_ids:
+            continue
+        point = observation["values"]["points"][0]
+        assert point["sample_as_published"] == "D60"
+        assert point["T_C"] == 1400
+        assert point["Fe3_over_sum_Fe"] == 1.00
+        assert point["log_fO2_as_published"] == "+4.8"
+        assert point["locator"]["page"] == 6
+        assert point["point_conditions"]["fO2_log"]["locator"]["page"] == 2
+
+    assert all(
+        row.identity.total_pressure_Pa.is_unknown
+        for row in rows
+        if row.observation_id.split("::")[1] not in d60_ids
+    )
 
 
 def test_matzen_observations_resolve_printed_log_fo2():

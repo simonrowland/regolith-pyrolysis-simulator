@@ -29,14 +29,30 @@ experiments:
   conditions:
     composition: {state: {tag: value, value: 'ADeu: nominally 42 wt% CaAl2Si2O8 + 58 wt% CaMgSi2O6; ~1 wt% Fe2O3 added'}, locator: {page: 2, published_page: 1598, section: Experimental Methods}}
     temperature_C: {state: {tag: value, value: 1409}, locator: {page: 2, published_page: 1598, table: '1', note: 'D60 is 1400 °C nominal.'}}
+  pressure_environment:
     total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 1598, table: '1', note: 'Uncertainty is stated as 0.02 bar; no setpoint is printed for gas-mixing runs.'}}
+    sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 1598, section: Experimental Methods}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
 - experiment_id: jayasuriya_2004_adeu_high_fe
   series: ADeu with added Fe2O3; measured FeOT series
   locator: {page: 7, published_page: 1603, table: '4'}
   conditions:
     composition: {state: {tag: value, value: 'ADeu; FeOT varies per Table 4 row'}, locator: {page: 7, published_page: 1603, table: '4'}}
     temperature_C: {state: {tag: value, value: 1409}, locator: {page: 2, published_page: 1598, table: '1'}}
+  pressure_environment:
     total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 1598, table: '1', note: 'Uncertainty is stated as 0.02 bar; no setpoint is printed for gas-mixing runs.'}}
+    sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 1598, section: Experimental Methods}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- experiment_id: jayasuriya_2004_adeu_d60_11kbar
+  series: ADeu D60 sealed Pt capsule run
+  locator: {page: 6, published_page: 1602, table: '3'}
+  conditions:
+    composition: {state: {tag: value, value: 'ADeu: nominally 42 wt% CaAl2Si2O8 + 58 wt% CaMgSi2O6; ~1 wt% Fe2O3 added'}, locator: {page: 2, published_page: 1598, section: Experimental Methods}}
+    temperature_C: {state: {tag: value, value: 1400}, locator: {page: 6, published_page: 1602, table: '3'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1100000000'}}, locator: {page: 2, published_page: 1598, section: Experimental Methods, note: 'D60 was prepared at 11 kbar; the sealed Pt capsule oxygen pressure equaled confining pressure. Converted using 1 kbar = 100000000 Pa.'}}
+    sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 6, published_page: 1602, table: '3', note: 'D60 used a sealed Pt capsule; no flowing sweep gas is printed.'}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
 species:
   Fe:
     observations:
@@ -72,7 +88,24 @@ species:
         - {T_C: 1409, Fe3_over_sum_Fe: 0.784, log_fO2_as_published: '-1.01', sample_as_published: FeV14, gas_mix_as_printed: 'CO2 45.0 × 200 SCCM + O2 100.0 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-1.01'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
         - {T_C: 1409, Fe3_over_sum_Fe: 0.807, log_fO2_as_published: '-0.69', sample_as_published: FeV1, gas_mix_as_printed: air, locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.69'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
         - {T_C: 1409, Fe3_over_sum_Fe: 0.851, log_fO2_as_published: '-0.01', sample_as_published: FeV9, gas_mix_as_printed: 'O2 100.0 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.01'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
-        - {T_C: 1400, Fe3_over_sum_Fe: 1.00, log_fO2_as_published: '+4.8', sample_as_published: D60, pressure_kbar_as_published: 11, gas_mix_as_printed: 'O2 at 11 kbar', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '+4.8'}, locator: {page: 2, published_page: 1598, table: '1'}}, total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1100000000'}}, locator: {page: 2, published_page: 1598, table: '1', note: '11 kbar as printed; represented in Pa for the battery identity.'}}}}
+
+    - observation_id: jayasuriya_2004_rt_d60
+      experiment: jayasuriya_2004_adeu_d60_11kbar
+      type: concentration_series
+      locator: {page: 6, published_page: 1602, table: '3'}
+      phase: glass
+      units: fraction (Fe3+/sum Fe)
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_direct
+        analytical_method: Mössbauer spectroscopy, fitting method A, room temperature
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        reduction_note: Existing FE3_FE2_RATIO migration reduces printed fraction r to Fe3+/Fe2+ = r/(1-r); original fractions are retained per point.
+        uncertainty: '±0.01 (1σ) estimated precision for Fe3+/ΣFe, as stated in the abstract.'
+        composition_wt_pct: {SiO2: 50.47, Al2O3: 15.12, MgO: 10.46, CaO: 23.94, Fe2O3: 1.0}
+        composition_derivation: 'Fe-free microprobe basis from p. 2 renormalized to 100 wt%; nominal ~1 wt% Fe2O3 added as printed.'
+        points:
+        - {T_C: 1400, Fe3_over_sum_Fe: 1.00, log_fO2_as_published: '+4.8', sample_as_published: D60, pressure_kbar_as_published: 11, gas_mix_as_printed: 'O2 at 11 kbar', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '+4.8'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
     - observation_id: jayasuriya_2004_42k_1pct
       experiment: jayasuriya_2004_adeu_1pct
       type: concentration_series
@@ -94,7 +127,24 @@ species:
         - {T_C: 1409, analysis_temperature_K_as_published: 4.2, Fe3_over_sum_Fe: 0.389, log_fO2_as_published: '-3.91', sample_as_published: FeV15, gas_mix_as_printed: 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-3.91'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
         - {T_C: 1409, analysis_temperature_K_as_published: 4.2, Fe3_over_sum_Fe: 0.657, log_fO2_as_published: '-1.98', sample_as_published: FeV11, gas_mix_as_printed: 'CO2 98.0 × 200 SCCM + O2 20.0 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-1.98'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
         - {T_C: 1409, analysis_temperature_K_as_published: 4.2, Fe3_over_sum_Fe: 0.849, log_fO2_as_published: '-0.01', sample_as_published: FeV9, gas_mix_as_printed: 'O2 100.0 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.01'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
-        - {T_C: 1400, analysis_temperature_K_as_published: 4.2, Fe3_over_sum_Fe: 1.00, log_fO2_as_published: '+4.8', sample_as_published: D60, gas_mix_as_printed: 'O2 at 11 kbar', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '+4.8'}, locator: {page: 2, published_page: 1598, table: '1'}}, total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1100000000'}}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+
+    - observation_id: jayasuriya_2004_42k_d60
+      experiment: jayasuriya_2004_adeu_d60_11kbar
+      type: concentration_series
+      locator: {page: 6, published_page: 1602, table: '3'}
+      phase: glass
+      units: fraction (Fe3+/sum Fe)
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_direct
+        analytical_method: Mössbauer spectroscopy, fitting method A at 4.2 K
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        reduction_note: Existing FE3_FE2_RATIO migration reduces printed fraction r to Fe3+/Fe2+ = r/(1-r); original fractions are retained per point.
+        uncertainty: '±0.01 (1σ) estimated precision for Fe3+/ΣFe, as stated in the abstract.'
+        composition_wt_pct: {SiO2: 50.47, Al2O3: 15.12, MgO: 10.46, CaO: 23.94, Fe2O3: 1.0}
+        composition_derivation: 'Fe-free microprobe basis from p. 2 renormalized to 100 wt%; nominal ~1 wt% Fe2O3 added as printed.'
+        points:
+        - {T_C: 1400, analysis_temperature_K_as_published: 4.2, Fe3_over_sum_Fe: 1.00, log_fO2_as_published: '+4.8', sample_as_published: D60, gas_mix_as_printed: 'O2 at 11 kbar', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '+4.8'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
     - observation_id: jayasuriya_2004_rt_high_fe
       experiment: jayasuriya_2004_adeu_high_fe
       type: concentration_series
