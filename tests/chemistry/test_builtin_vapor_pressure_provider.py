@@ -3695,12 +3695,15 @@ def test_shadow_parity_across_short_simulation_run(
             continue
         legacy_result = sim._internal_analytical_equilibrium()
         if sim._vapor_pressure_dispatch_pO2_bar() == 0.0:
-            # An independently proved source-free boundary has no gas
-            # pressure request: negative mass-action powers at zero oxygen
-            # are undefined. Assert the exact production zero and its proof.
+            # Consuming channels stop at zero oxygen; neutral vapor remains.
+            # Both projections delegate this boundary to the pressure owner.
             assert sim._evaporation_carrier_zero_reason(legacy_result)
-            assert legacy_result.vapor_pressures_Pa == {}
-            assert sim._get_equilibrium().vapor_pressures_Pa == {}
+            assert legacy_result.vapor_pressures_Pa == sim._get_equilibrium().vapor_pressures_Pa
+            for species, pressure in legacy_result.vapor_pressures_Pa.items():
+                evaluator = sim.vapour_rail_catalog.evaluator_for_hot_train(
+                    species, process_phase='stage0' if sim.melt.campaign.name in {'C0', 'C0B'} else 'hot_train')
+                assert evaluator.pO2_exponent == 0.0
+                assert pressure > 0.0
             assert sim._last_surface_oxygen_diagnostic['oxygen_flux_mol_m2_s'] == 0.0
             continue
         kernel_result = sim._chem_kernel.dispatch(

@@ -1117,7 +1117,9 @@ class CompiledPressureEvaluator:
         # pressure interval: activity depletion drives trace carriers below the
         # minimum, while far-above-window Stage-0 correlations can exceed the
         # maximum. Premise: P=10^logP Pa. Clamp only at the numerical endpoints so
-        # the first case tends to zero and the second retains the limiting
+        # positive oxygen powers tend to zero. Preserve the historical source/
+        # activity continuation for neutral/inverse channels; it cannot invent
+        # a consuming oxygen sink. The upper endpoint retains the limiting
         # escape direction without returning inf. Units remain Pa. Sanity: every
         # representable pressure is bit-for-bit unchanged; both cases remain typed
         # non-certifying continuations.
@@ -1125,8 +1127,11 @@ class CompiledPressureEvaluator:
         maximum_finite_pa = math.nextafter(sys.float_info.max, 0.0)
         numerical_underflow = log10_pressure < math.log10(minimum_positive_pa)
         numerical_overflow = log10_pressure > math.log10(maximum_finite_pa)
+        oxygen_underflow = numerical_underflow and self.pO2_exponent > 0.0
         pressure_pa = (
             0.0
+            if oxygen_underflow
+            else minimum_positive_pa
             if numerical_underflow
             else maximum_finite_pa
             if numerical_overflow
@@ -1145,6 +1150,8 @@ class CompiledPressureEvaluator:
                 self.out_of_range_status
                 if out_of_range
                 else "numerical_underflow_zero"
+                if oxygen_underflow
+                else "numerical_underflow_floor"
                 if numerical_underflow
                 else "numerical_overflow_ceiling"
                 if numerical_overflow

@@ -461,10 +461,15 @@ class EquilibriumMixin:
         if getattr(self, '_reaction_pO2_bar', None) == 0.0:
             zero_reason = self._evaporation_carrier_zero_reason()
             if zero_reason:
-                return EquilibriumResult(temperature_C=self.melt.temperature_C,
+                result = EquilibriumResult(temperature_C=self.melt.temperature_C,
                     pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
                     liquid_fraction=None, phase_assemblage_available=False,
                     status='ok', diagnostics={'vapor_pressure_zero_reason': zero_reason})
+                if zero_reason == 'frozen_consuming_carriers_at_zero_oxygen':
+                    # The pressure owner supplies the exact consuming zeros
+                    # and finite neutral rails; no legacy inverse law sees 0.
+                    self._refresh_vapor_pressures_from_kernel(result, include_diagnostic_shadows=False)
+                return result
         if T_K < 400:
             # Reached only after the control guard: T_K is finite and > 0 K,
             # p_total_mbar is finite and >= 0. On this cold path the
