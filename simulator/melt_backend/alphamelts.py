@@ -2544,6 +2544,7 @@ class _MELTSBackendSupport(MeltBackend):
                 pending.update({
                     'below_crash_floor': True,
                     'sio2_crash_floor_wt_pct': float(crash_floor),
+                    'sio2_wt_pct': float(assessment.sio2_wt_pct),
                 })
         notice = assessment.notice
         if notice is not None:
@@ -3570,6 +3571,10 @@ class _MELTSBackendSupport(MeltBackend):
 
             if result.returncode < 0:
                 signal_name = _signal_name(result.returncode)
+                stderr_tail = (result.stderr or '').strip()[-2000:]
+                detail = f'{signal_name} (returncode {result.returncode})'
+                if stderr_tail:
+                    detail += f'; child stderr tail: {stderr_tail}'
                 return self._subprocess_operational_failure_result(
                     temperature_C=requested_temperature_C,
                     pressure_bar=requested_pressure_bar,
@@ -3583,7 +3588,7 @@ class _MELTSBackendSupport(MeltBackend):
                         'returncode': result.returncode,
                         'signal': signal_name,
                     },
-                    detail=f'{signal_name} (returncode {result.returncode})',
+                    detail=detail,
                 )
             if result.returncode > 0:
                 raise _alphamelts_backend_failure_error(
