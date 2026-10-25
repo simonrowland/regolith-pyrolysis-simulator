@@ -5340,6 +5340,67 @@ def test_jayasuriya_d60_pressure_reaches_only_its_redox_rows():
     )
 
 
+def test_leister_fe_rows_keep_pressure_unknown_and_note_glass_b_dopant():
+    """The Figure 1 dopant is not a total-iron value or a pressure setpoint."""
+    path = EXTRACTS / "leister-ehrt-2000-polyvalent-redox.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    rows = _migrate_redox_extract(path)
+
+    assert len(rows) == 14
+    assert {
+        axis: sum(getattr(row.identity, axis).is_value for row in rows)
+        for axis in ("composition", "total_pressure_Pa", "fO2_Pa", "temperature_K")
+    } == {
+        "composition": 14,
+        "total_pressure_Pa": 0,
+        "fO2_Pa": 0,
+        "temperature_K": 14,
+    }
+    assert all(row.identity.total_pressure_Pa.is_unknown for row in rows)
+    assert all(row.identity.fO2_Pa.is_unknown for row in rows)
+
+    source_observations = doc["species"]["Fe"]["observations"]
+    table_observations = [
+        observation
+        for observation in source_observations
+        if observation["observation_id"].startswith("leister_2000_fe_table1_glass_")
+    ]
+    points = [point for observation in table_observations for point in observation["values"]["points"]]
+    assert len(points) == 14
+    for point in points:
+        pressure = point["point_conditions"]["total_pressure_Pa"]
+        assert pressure["state"] == {"tag": "unknown", "reason": "not_published"}
+        assert pressure["locator"]["page"] == point["locator"]["page"]
+        assert "ambient pressure is not inferred" in pressure["locator"]["note"]
+        if "table_row_as_published" in point:
+            assert pressure["locator"]["row"] == str(point["table_row_as_published"])
+        else:
+            assert pressure["locator"]["section"] == "Results and Discussion"
+
+    glass_b = next(
+        observation
+        for observation in table_observations
+        if observation["observation_id"] == "leister_2000_fe_table1_glass_b"
+    )
+    expected_table_cells = {1: (76, "76/24"), 2: (55, "55/45"), 3: (40, "40/60")}
+    glass_b_rows = {
+        point["table_row_as_published"]: point
+        for point in glass_b["values"]["points"]
+        if "table_row_as_published" in point
+    }
+    for row_number, (ferric_pct, pair) in expected_table_cells.items():
+        point = glass_b_rows[row_number]
+        assert point["Fe3_over_FeT_percent_as_published"] == ferric_pct
+        assert point["printed_valence_pair"] == pair
+        assert point["locator"]["page"] == 5
+        assert point["locator"]["table"] == "Tab. 1"
+
+    dopant_note = '"glass B + 50 ppm Fe, melted under oxidizing, inert and reducing conditions"'
+    for point in glass_b["values"]["points"]:
+        assert dopant_note in point["row_note"]
+        assert "PDF page 4, published page 197" in point["row_note"]
+
+
 def test_matzen_observations_resolve_printed_log_fo2():
     """Each Table 2 log fO2 lands on its observation and routes as printed."""
     from decimal import Decimal
