@@ -35,11 +35,15 @@ def generated_runner_sections(tmp_path_factory):
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
-def test_runner_byte_roundtrip_on_current_fixture(scenario, generated_runner_sections):
+def test_runner_byte_roundtrip_on_current_fixture(
+    scenario, generated_runner_sections, runner_golden_loader,
+):
     path = f"tests/fixtures/runner/{scenario['fixture']}"
     current = (ROOT / path).read_bytes()
     generated_current, directory = generated_runner_sections[scenario["name"]]
     assert generated_current == current
+    actual, _, expected_text = runner_golden_loader(scenario)
+    assert current == expected_text.encode() == json_bytes(actual)
     files = read_sections(directory)
     assert partition(load_json(current)) == files
     assert reassemble(files) == current
