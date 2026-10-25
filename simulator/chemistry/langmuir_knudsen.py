@@ -652,7 +652,10 @@ def _solve_surface_oxygen_balance(
             # With no bulk supply its only balance may be the physical zero
             # endpoint. Accept only individually zero signed terms, never a
             # finite unfunded sink or a small positive bracket residual.
-            zero = checked(0.0)
+            try:
+                zero = checked(0.0)
+            except ValueError as exc:
+                raise OxygenClosureNonconvergence(f'zero endpoint unavailable: {exc}') from exc
             if not any(zero.balance_terms):
                 return zero
         raise OxygenClosureNonconvergence(
