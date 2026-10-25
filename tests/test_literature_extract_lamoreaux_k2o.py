@@ -30,10 +30,15 @@ def test_lamoreaux_k2o_rows_match_render_and_preserve_printed_row_counts():
     assert len(gas_gef["values"]["segments"]) == 3
 
     solid_increment = rows["LH84_K2O_s_enthalpy_increment"]
+    liquid_increment = rows["LH84_K2O_l_enthalpy_increment"]
     gas_increment = rows["LH84_K2O_g_enthalpy_increment"]
     assert len(solid_increment["values"]["segments"]) == 3
+    assert len(liquid_increment["values"]["segments"]) == 1
     assert len(gas_increment["values"]["segments"]) == 2
-    assert gas_increment["locator"]["published_page"] == 155
+    for row in (solid_increment, liquid_increment, gas_increment):
+        assert row["locator"]["page"] == 4
+        assert row["locator"]["published_page"] == 156
+        assert row["locator"]["pdf_page_index"] == 3
     assert gas_increment["values"]["segments"][0]["a"] == -1.05
 
     solid_thermo = rows["LH84_K2O_s_formation"]
