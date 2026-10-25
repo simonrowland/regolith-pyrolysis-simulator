@@ -1101,10 +1101,6 @@ class OverheadGasModel:
                 p_downstream_bar=downstream_pressure_Pa / 1.0e5,
                 species_kg_for_M_avg=evap_flux.species_kg_hr,
             )
-            if allowed_pressure_Pa > 0.0 and total_evap_kg_hr <= pipe_conductance_kg_hr:
-                # The forward law proves this request achievable. Its numeric
-                # inverse cannot demand more pressure than that known bound.
-                vapor_pressure_mbar = min(vapor_pressure_mbar, allowed_pressure_mbar)
             if allowed_pressure_Pa == 0.0:
                 allowed_pressure_Pa = vapor_pressure_mbar * 100.0
                 if total_evap_kg_hr > 0.0 and allowed_pressure_Pa <= downstream_pressure_Pa:

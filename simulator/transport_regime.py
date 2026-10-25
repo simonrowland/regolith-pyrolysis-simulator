@@ -1292,7 +1292,11 @@ def pipe_pressure_pa_for_mass_flow(d, L, M_avg, eta, T_K, F_kg_s, p_downstream_P
             low = middle
         else:
             high = middle
-    return low + (high - low) / 2.0
+    # F(low) <= requested flow <= F(high). Return the admissible side,
+    # not a midpoint which may round to high. For an achievable pressure
+    # request P, monotonicity gives low <= root <= P (all in Pa).
+    # Zero flow recovers the downstream endpoint without an excess.
+    return low
 
 
 def pipe_downstream_pressure_pa_for_flow_fraction(d, L, M_avg, eta, T_K, p_upstream_Pa, fraction):
