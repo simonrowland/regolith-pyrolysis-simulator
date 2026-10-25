@@ -744,6 +744,45 @@ def _run_petthermotools_worker(
         connection.close()
 
 
+def _stop_petthermotools_process(process) -> None:
+    """Bound cleanup for the per-call spawn, including partial start failures."""
+    try:
+        if process.pid is None:
+            return
+    except (AssertionError, OSError, ValueError):
+        return
+    try:
+        process.join(timeout=0.25)
+    except (AssertionError, OSError, ValueError):
+        pass
+    try:
+        alive = process.is_alive()
+    except (AssertionError, OSError, ValueError):
+        return
+    if alive:
+        try:
+            process.terminate()
+        except (OSError, ValueError):
+            pass
+        try:
+            process.join(timeout=0.25)
+        except (AssertionError, OSError, ValueError):
+            pass
+        try:
+            alive = process.is_alive()
+        except (AssertionError, OSError, ValueError):
+            return
+        if alive:
+            try:
+                process.kill()
+            except (OSError, ValueError):
+                pass
+            try:
+                process.join(timeout=1.0)
+            except (AssertionError, OSError, ValueError):
+                pass
+
+
 def _bootstrap_petthermotools_worker(model_code: int):
     """Import PetThermoTools and retain the ``MELTSdynamic`` loader.
 
@@ -3012,6 +3051,7 @@ class _MELTSBackendSupport(MeltBackend):
         except Exception as exc:
             child.close()
             parent.close()
+            _stop_petthermotools_process(process)
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_SUBPROCESS_DIED,
                 f'PetThermoTools {operation} worker failed to start: {exc}',
@@ -3033,13 +3073,7 @@ class _MELTSBackendSupport(MeltBackend):
                 ) from exc
         finally:
             parent.close()
-            process.join(timeout=0.25)
-            if process.is_alive():
-                process.terminate()
-                process.join(timeout=0.25)
-            if process.is_alive():
-                process.kill()
-                process.join(timeout=1.0)
+            _stop_petthermotools_process(process)
         if message[0] == 'ok':
             return message[1]
         _tag, exc_name, detail, child_traceback = message

@@ -1,10 +1,12 @@
 import gc
 import multiprocessing
 import os
+import signal
 import shutil
 import subprocess
 import sys
 import tempfile
+import textwrap
 import threading
 import time
 import weakref
@@ -224,6 +226,99 @@ def test_spawn_child_atexit_reaps_child_local_pool():
     child.join(timeout=ENGINE_POOL_AUTOMATIC_TOTAL_BUDGET_S + 5.0)
 
     assert child.exitcode == 0
+    with pytest.raises(ProcessLookupError):
+        os.kill(worker_pid, 0)
+
+
+def test_idle_setsid_worker_is_closed_when_pool_consumer_exits(
+    tmp_path: Path,
+) -> None:
+    driver = tmp_path / "engine_pool_consumer_exit.py"
+    pid_file = tmp_path / "worker.pid"
+    output_file = tmp_path / "score-output.txt"
+    driver.write_text(
+        textwrap.dedent(
+            """
+            import gc
+            import sys
+            import time
+            from pathlib import Path
+
+            import simulator.engine_pool as engine_pool
+            from simulator.engine_pool import EngineWorkerPool, WarmEngineWorker
+
+            HELD_CONNECTION = None
+
+            def bootstrap():
+                import os
+                Path(os.environ["REGOLITH_TEST_ENGINE_PID_FILE"]).write_text(
+                    str(os.getpid())
+                )
+                return None, "ready"
+
+            def handler(_resource, request, _log):
+                return request
+
+            def fail_consumer(_self, _worker):
+                raise RuntimeError("synthetic consumer exit after READY")
+
+            def main():
+                global HELD_CONNECTION
+                EngineWorkerPool._consume = fail_consumer
+                pool = EngineWorkerPool(
+                    lambda _index: WarmEngineWorker(
+                        name="idle-exit-test",
+                        bootstrap=bootstrap,
+                        handler=handler,
+                        daemon=False,
+                    ),
+                    size=1,
+                )
+                worker_pid = int(Path(sys.argv[1]).read_text())
+                HELD_CONNECTION = pool.workers[0].connection
+                thread = pool._threads[0]
+                deadline = time.monotonic() + 5.0
+                while thread.is_alive() and time.monotonic() < deadline:
+                    time.sleep(0.01)
+                assert not thread.is_alive(), "synthetic consumer did not exit"
+                # Model collection of the weakly registered pool after its
+                # consumer thread drops the last strong reference.
+                engine_pool._LIVE_ENGINE_POOLS.discard(pool)
+                del pool
+                gc.collect()
+                Path(sys.argv[2]).write_text("score output written\\n")
+
+            if __name__ == "__main__":
+                main()
+            """
+        ),
+        encoding="utf-8",
+    )
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = str(Path(__file__).resolve().parents[1])
+    environment["REGOLITH_TEST_ENGINE_PID_FILE"] = str(pid_file)
+
+    try:
+        completed = subprocess.run(
+            [sys.executable, str(driver), str(pid_file), str(output_file)],
+            capture_output=True,
+            text=True,
+            env=environment,
+            timeout=25,
+            check=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        if pid_file.is_file():
+            worker_pid = int(pid_file.read_text(encoding="utf-8"))
+            try:
+                os.killpg(worker_pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        pytest.fail(f"scorer process hung at interpreter exit: {exc}")
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert output_file.read_text(encoding="utf-8") == "score output written\n"
+    worker_pid = int(pid_file.read_text(encoding="utf-8"))
     with pytest.raises(ProcessLookupError):
         os.kill(worker_pid, 0)
 

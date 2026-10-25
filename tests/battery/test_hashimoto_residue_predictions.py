@@ -51,6 +51,12 @@ def _second_openimcc_engine(**_kwargs):
     return "second evaluator"
 
 
+def _nonconverging_openimcc_engine(**_kwargs):
+    from openimcc.kernel import ImccNonconvergenceError
+
+    raise ImccNonconvergenceError("fixture nonconvergence", {})
+
+
 def _slow_starting_openimcc_worker(connection, evaluate):
     import time
 
@@ -184,6 +190,24 @@ def test_isolated_openimcc_worker_restarts_for_a_different_evaluator() -> None:
     assert _evaluate_openimcc_isolated(
         _second_openimcc_engine, timeout_s=5.0
     ) == "second evaluator"
+
+
+def test_nonconvergence_response_keeps_idle_openimcc_worker_reusable() -> None:
+    import simulator.battery.residue as residue
+
+    pytest.importorskip("openimcc")
+    original_pid = None
+    for _ in range(2):
+        with pytest.raises(residue.ResidueEngineNonconvergence):
+            residue._evaluate_openimcc_isolated(
+                _nonconverging_openimcc_engine, timeout_s=5.0
+            )
+        process = residue._OPENIMCC_EVALUATION_WORKER[0]
+        assert process.is_alive()
+        if original_pid is None:
+            original_pid = process.pid
+        else:
+            assert process.pid == original_pid
 
 
 def test_isolated_openimcc_worker_start_failure_is_typed_and_recoverable(
