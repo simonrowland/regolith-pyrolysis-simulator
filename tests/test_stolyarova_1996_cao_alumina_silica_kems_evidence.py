@@ -39,9 +39,9 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
     assert "Mann" in method
     assert "not printed" in method
     assert [observation["values"]["method_class"] for observation in observations] == [
-        "quoted_attributed",
-        "quoted_attributed",
-        "quoted_attributed",
+        "model_derived",
+        "model_derived",
+        "model_derived",
     ]
     assert all(
         "row ion currents and numerical constants are not printed"
@@ -158,7 +158,7 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
     }
     for observation in oxygen_rows:
         assert observation.evidence.class_.is_value
-        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
         assert observation.identity.reaction is not None
         assert observation.identity.reaction.is_value
         assert {
