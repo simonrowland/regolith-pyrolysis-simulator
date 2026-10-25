@@ -27,13 +27,6 @@ reason = "Required hot-wall SiO saturation fit is unavailable."
 since = "7dd268c6f"
 
 [[test]]
-node = "tests/test_coating_rate.py::test_coating_diagnostic_default_output_is_byte_identical_to_golden"
-ticket = "b-807"
-tier = "pr"
-reason = "Host-dependent coating diagnostic digest differs from its golden."
-since = "7dd268c6f"
-
-[[test]]
 node = "tests/test_fail_loud_h2_h3.py::test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite"
 ticket = "b-813"
 tier = "pr"

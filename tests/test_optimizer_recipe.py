@@ -97,12 +97,24 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # changed, no values. Paths: campaigns.C2A_continuous.adaptive_control.
     # induction_stirring; endpoint_criteria.control.surface_renewal;
     # endpoint_criteria.general; furnace.induction_stirring.note.
-    # Config-ownership move: add the existing runtime Stage-6/7 bands to YAML.
-    # Removing exactly those two temp_range_C fields from resolved setpoints
-    # recovers 6e96c06b...; every other serialized input is unchanged. Numeric
-    # train/route pins and the bounds digest below remain unchanged.
+    # Recomputed 2026-10-25 for t-1457 + b154. Relative to b154's normalized
+    # resolved setpoints, the C0 leaves differ as follows: label and notes
+    # changed; dT_dt_C_per_hr 50 -> 200; atmosphere=hard_vacuum and
+    # pO2_mbar=null were removed; carrier_gas=Ar, p_total_mbar_default=1,
+    # pO2_mbar_default=0, and alkali_retention_budget_fraction=0.001 were
+    # added; endpoint.type changed from ir_signal_decay to
+    # computed_alkali_and_evacuation_exit; endpoint.threshold=0.05 and
+    # soft_endpoint.type=temperature_min_after_min_hold,
+    # soft_endpoint.min_hold_hr=10, and soft_endpoint.temperature_min_C=940
+    # were removed. Restoring these C0 leaves to b154 while retaining b154's
+    # condensation_train.stage_6_turbine_compressor.temp_range_C [50, 200]
+    # and condensation_train.stage_7_accumulator.temp_range_C [20, 50]
+    # recovers b154's resolved digest
+    # 2584074346931c132b487ffb6ce56511d26f76805d63bcfa14eb996d1fe5ea57.
+    # The combined t-1457 C0 contract and b154 Stage-6/7 bands produce the
+    # resolved digest below.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "08f98535b114ef24ff437b7e7a89ab15753632351905ce445cfcd836424a6a13"
+        "911f820f280e2141010189a727b3a8dcbce5c65826a1960f25f9d26465926b4a"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
