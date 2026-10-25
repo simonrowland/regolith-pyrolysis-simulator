@@ -10,6 +10,7 @@ import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
+from multiprocessing.util import Finalize
 from pathlib import Path
 from statistics import median
 from typing import Any
@@ -371,6 +372,10 @@ class ResidueEngineTransportError(ResidueEngineNonconvergence):
 
 
 _OPENIMCC_EVALUATION_WORKER_STARTUP_TIMEOUT_S = 120.0
+# Each step of worker teardown waits this long. The ladder is sentinel,
+# SIGTERM, then SIGKILL. An unbounded join here deadlocks interpreter
+# exit when the child ignores SIGTERM and stays in recv.
+_OPENIMCC_WORKER_SHUTDOWN_JOIN_S = 1.0
 
 
 def _openimcc_evaluation_worker(connection, evaluate) -> None:
@@ -403,28 +408,67 @@ def _openimcc_evaluation_worker(connection, evaluate) -> None:
 _OPENIMCC_EVALUATION_WORKER = None
 
 
-def _stop_openimcc_evaluation_process(process, connection) -> None:
+def _openimcc_process_pid(process: Any) -> int | None:
     try:
-        if process.is_alive():
-            try:
-                connection.send(None)
-            except (BrokenPipeError, EOFError, OSError):
-                pass
-            process.join(timeout=1.0)
-        if process.is_alive():
-            try:
-                process.terminate()
-            except (OSError, ProcessLookupError):
-                pass
-            process.join(timeout=1.0)
-        if process.is_alive():
-            try:
-                process.kill()
-            except (OSError, ProcessLookupError):
-                pass
-            process.join(timeout=1.0)
-    finally:
-        connection.close()
+        pid = process.pid
+    except (AssertionError, AttributeError, ValueError):
+        return None
+    if pid is None:
+        return None
+    return int(pid)
+
+
+def _openimcc_process_alive(process: Any) -> bool:
+    if _openimcc_process_pid(process) is None:
+        return False
+    try:
+        return bool(process.is_alive())
+    except (AssertionError, ValueError, OSError):
+        return False
+
+
+def _join_openimcc_process(process: Any, timeout_s: float) -> None:
+    if _openimcc_process_pid(process) is None:
+        return
+    try:
+        process.join(timeout=timeout_s)
+    except (AssertionError, ValueError, OSError):
+        return
+
+
+def _shutdown_openimcc_worker(
+    process: Any,
+    connection: Any = None,
+    *,
+    join_timeout_s: float = _OPENIMCC_WORKER_SHUTDOWN_JOIN_S,
+) -> None:
+    """Reap one OpenIMCC worker. Every wait is bounded.
+
+    SIGTERM is not enough to finish the child: it can mask or ignore the
+    signal and remain blocked in ``connection.recv``. The following
+    ``join()`` with no timeout then never returns, including from atexit.
+    multiprocessing's own exit handler also ``join()``s whatever is still
+    alive, so this must return only after the child is dead or the last
+    bounded wait has elapsed.
+    """
+    if _openimcc_process_alive(process) and connection is not None:
+        try:
+            connection.send(None)
+        except (BrokenPipeError, EOFError, OSError):
+            pass
+    _join_openimcc_process(process, join_timeout_s)
+    if _openimcc_process_alive(process):
+        try:
+            process.terminate()
+        except (AttributeError, OSError, ValueError):
+            pass
+        _join_openimcc_process(process, join_timeout_s)
+    if _openimcc_process_alive(process):
+        try:
+            process.kill()
+        except (AttributeError, OSError, ValueError):
+            pass
+        _join_openimcc_process(process, join_timeout_s)
 
 
 def _close_openimcc_evaluation_worker() -> None:
@@ -434,10 +478,17 @@ def _close_openimcc_evaluation_worker() -> None:
     if worker is None:
         return
     process, connection, _evaluate = worker
-    _stop_openimcc_evaluation_process(process, connection)
+    try:
+        _shutdown_openimcc_worker(process, connection)
+    finally:
+        connection.close()
 
 
 atexit.register(_close_openimcc_evaluation_worker)
+# Runs inside multiprocessing's exit handler, before that handler's
+# unbounded join, even when get_logger() has moved that handler ahead of
+# the atexit registration above.
+Finalize(None, _close_openimcc_evaluation_worker, exitpriority=10)
 
 
 def _evaluate_openimcc_isolated(
@@ -466,12 +517,16 @@ def _evaluate_openimcc_isolated(
             process.start()
         except Exception as exc:
             try:
-                if process.pid is not None:
-                    _stop_openimcc_evaluation_process(process, parent)
-                    process.close()
-                else:
-                    parent.close()
+                _shutdown_openimcc_worker(process, parent)
             except (AssertionError, OSError, ValueError):
+                pass
+            try:
+                process.close()
+            except (AssertionError, OSError, ValueError):
+                pass
+            try:
+                parent.close()
+            except OSError:
                 pass
             try:
                 child.close()

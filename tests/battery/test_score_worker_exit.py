@@ -135,8 +135,6 @@ def test_sigterm_ignoring_score_worker_is_killed_and_reaped(tmp_path: Path) -> N
             import sys
             from pathlib import Path
 
-            from simulator.battery.residue import _stop_openimcc_evaluation_process
-
             def ignore_sigterm(ready, never_release):
                 signal.signal(signal.SIGTERM, signal.SIG_IGN)
                 ready.set()
@@ -153,6 +151,7 @@ def test_sigterm_ignoring_score_worker_is_killed_and_reaped(tmp_path: Path) -> N
                 )
                 process.start()
                 assert ready.wait(10), "worker did not install SIGTERM handler"
+                from simulator.battery.residue import _shutdown_openimcc_worker
 
                 class Connection:
                     def send(self, _message):
@@ -161,7 +160,7 @@ def test_sigterm_ignoring_score_worker_is_killed_and_reaped(tmp_path: Path) -> N
                     def close(self):
                         pass
 
-                _stop_openimcc_evaluation_process(process, Connection())
+                _shutdown_openimcc_worker(process, Connection())
                 assert process.exitcode == -signal.SIGKILL, process.exitcode
                 assert not process.is_alive()
                 Path(sys.argv[1]).write_text("SIGKILL worker reaped\\n")
@@ -185,7 +184,10 @@ def test_sigterm_ignoring_score_worker_is_killed_and_reaped(tmp_path: Path) -> N
         start_new_session=True,
     )
     try:
-        stdout, stderr = process.communicate(timeout=15)
+        # A fresh subprocess imports the residue/scoring package before the
+        # worker starts; keep that bounded without mistaking cold startup for
+        # a shutdown hang.
+        stdout, stderr = process.communicate(timeout=60)
     except subprocess.TimeoutExpired:
         # Without the SIGKILL escalation, multiprocessing's interpreter
         # shutdown waits forever for this daemon. Kill the test process group

@@ -1422,13 +1422,13 @@ def _terminate_pool_process(process: Any, *, extra_pids: Sequence[int] = ()) -> 
         except OSError:
             pass
         else:
-            process.join()
+            process.join(_WORKER_TERMINATE_GRACE_SECONDS)
             return
     process.terminate()
     process.join(_WORKER_TERMINATE_GRACE_SECONDS)
     if process.is_alive():
         process.kill()
-        process.join()
+        process.join(_WORKER_TERMINATE_GRACE_SECONDS)
     _signal_pids(tuple(extra_pids), signal.SIGKILL)
 
 

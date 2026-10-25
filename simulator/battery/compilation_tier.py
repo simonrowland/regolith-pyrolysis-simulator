@@ -76,7 +76,9 @@ from simulator.battery.records import (
 )
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_FIT_SEGMENTS,
+    ELLINGHAM_OUTSIDE_SEGMENT_REASON,
     EllinghamFitSegment,
+    ellingham_same_phase_extension,
     ellingham_segment_for_temperature,
 )
 
@@ -634,11 +636,16 @@ def _outside_segment_refusal(
     origin: str,
     call_evidence: str,
 ) -> ThermoAttempt:
-    """A clamped neighbour is a different reaction, not an extrapolated ΔfG."""
+    """Refuse a clamp that is not a same-phase extension.
+
+    The caller answers a same-phase extension before this helper. What
+    remains is a phase crossing, an ambiguous neighbour, or a copied-liquid
+    label read outside its range.
+    """
 
     return _refuse(
         RefusalReason.UNSUPPORTED,
-        "ellingham-formation-outside-segment",
+        ELLINGHAM_OUTSIDE_SEGMENT_REASON,
         quantity=quantity,
         origin=origin,
         extra={
@@ -701,12 +708,7 @@ def _element_reference_refusal(
     alpha / beta are one allotrope.
     """
 
-    reaction_state = identity.reaction
-    reaction = (
-        reaction_state.value
-        if isinstance(reaction_state, State) and reaction_state.is_value
-        else None
-    )
+    reaction = _explicit_reaction(identity)
     if reaction is None:
         return None, ()
     segment_bases = _segment_element_bases(segment)
@@ -865,6 +867,49 @@ def _refuse(
     )
 
 
+def _explicit_reaction(identity: Identity):
+    reaction_state = identity.reaction
+    if isinstance(reaction_state, State) and reaction_state.is_value:
+        return reaction_state.value
+    return None
+
+
+def _element_reference_phase_mismatch(
+    segment: EllinghamFitSegment,
+    reaction,
+) -> dict[str, object] | None:
+    """First requested product phase that is not the phase on this segment.
+
+    An extension compares the oxide even at the fit pressure: that request
+    is a different reaction. Reactant phase and allotrope belong to
+    ``_element_reference_refusal``, which resolves REFERENCE before comparing.
+    O2 is the shared gas. An unknown product phase is left to the pressure
+    transform; a known mismatch is not hidden by an unknown sibling.
+    """
+
+    segment_phases = {
+        formula: _product_phase(token)[0]
+        for formula, token in _PHASED_SPECIES_RE.findall(segment.phase_basis)
+        if formula != "O2"
+    }
+    for term in reaction.terms:
+        if term.coefficient <= 0 or term.species.formula == "O2":
+            continue
+        cell_phase = phase_token(term.species)
+        if cell_phase is None:
+            continue
+        segment_phase = segment_phases.get(term.species.formula)
+        if segment_phase is not cell_phase:
+            return {
+                "element": term.species.formula,
+                "cell_phase": cell_phase.value,
+                "segment_phase": (
+                    None if segment_phase is None else segment_phase.value
+                ),
+            }
+    return None
+
+
 def _ellingham_attempt(
     identity: Identity,
     quantity: Quantity,
@@ -879,8 +924,11 @@ def _ellingham_attempt(
     named on that segment. Dividing by n_ox is the oxide formation value
     only while those phases are the standard states, which is the
     segment's own temperature range. Outside that range the selector
-    clamps to a neighbouring reaction. That number is not ΔfG and is
-    refused, not scored as an extrapolated formation value.
+    clamps to a neighbouring reaction. The owner evaluates that reaction
+    only when T is still in the nearest segment's metal and oxide phase
+    fields, and the battery flags the value as extrapolated. Crossing a
+    phase transition stays refused: that number is a different reference
+    state.
 
     Unit check: (kJ/mol O2) / (mol oxide / mol O2) = kJ/mol oxide.
     log10 Kf = −ΔfG / (R T ln 10) with ΔfG in kJ/mol and R in kJ/(mol·K)
@@ -892,7 +940,10 @@ def _ellingham_attempt(
     ΔfG = −7.4056 / 2 = −3.7028 kJ/mol. Residual +0.183 kJ/mol, inside
     the segment's 0.442 kJ/mol O2 construction bound (0.221 kJ/mol oxide).
     log10 Kf from −3.7028 kJ/mol is 0.0879, 0.004 from the printed 0.092.
-    K2O at 298.15 K is outside the 1100 K K(g) segment and is refused.
+    K2O at 298.15 K is below the potassium boiling point, so the K(g)
+    segment is a different phase and stays refused. CaO at 3200 K is the
+    JANAF crystal-to-liquid point, outside the solid field, and stays
+    refused.
 
     The segment's element basis is the reactant phase and allotrope printed
     on ``phase_basis``. A generic solid's allotrope is the one the element's
@@ -1003,14 +1054,19 @@ def _ellingham_attempt(
         )
     metal, segment, product, extrapolated = matches[0]
     call = _ellingham_call(metal, product, temperature_K)
+    extension = None
     if extrapolated:
-        return _outside_segment_refusal(
-            segment,
-            temperature_K,
-            quantity=quantity,
-            origin=origin,
-            call_evidence=call + ":outside-segment",
-        )
+        # The selector clamps. A same-phase neighbour is flagged as
+        # extrapolated. A phase crossing stays the outside-segment refusal.
+        extension = ellingham_same_phase_extension(metal, temperature)
+        if extension is None or extension["segment"] is not segment:
+            return _outside_segment_refusal(
+                segment,
+                temperature_K,
+                quantity=quantity,
+                origin=origin,
+                call_evidence=call + ":outside-segment",
+            )
 
     basis_refusal, basis_notices = _element_reference_refusal(
         identity,
@@ -1022,6 +1078,23 @@ def _ellingham_attempt(
     )
     if basis_refusal is not None:
         return basis_refusal
+    if extension is not None:
+        # Reactant phase and allotrope were compared above. The oxide is
+        # not a reactant. At the fit pressure the transform below does not
+        # run, so the extension still has to be the reaction that was asked
+        # for. An unknown sibling must not hide a known oxide mismatch.
+        reaction = _explicit_reaction(identity)
+        if reaction is not None:
+            mismatch = _element_reference_phase_mismatch(segment, reaction)
+            if mismatch is not None:
+                return _refuse(
+                    RefusalReason.IDENTITY_MISMATCH,
+                    "identity-mismatch-element-reference-phase",
+                    quantity=quantity,
+                    origin=origin,
+                    extra=mismatch,
+                    call_evidence=call,
+                )
 
     # dG is kJ/mol O2. mol-species divides by n_ox (mol oxide per mol O2).
     dG = Decimal(str(segment.delta_g_kJ_per_mol_O2(temperature)))
@@ -1052,12 +1125,7 @@ def _ellingham_attempt(
                     quantity=quantity,
                     origin=origin,
                 )
-            reaction_state = identity.reaction
-            reaction = (
-                reaction_state.value
-                if isinstance(reaction_state, State) and reaction_state.is_value
-                else None
-            )
+            reaction = _explicit_reaction(identity)
             reaction_phases = (
                 tuple(phase_token(term.species) for term in reaction.terms)
                 if reaction is not None
@@ -1140,6 +1208,18 @@ def _ellingham_attempt(
                 ),
                 origin=origin,
                 band=str(segment.range_K),
+            )
+        )
+    if extension is not None:
+        authority = Authority.EXTRAPOLATED
+        notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason=extension["notice_reason"],
+                origin=origin,
+                band=str(extension["segment_range_K"]),
+                authority=Authority.EXTRAPOLATED,
             )
         )
     return ThermoAttempt(
@@ -2301,7 +2381,7 @@ def _openimcc_fusion_attempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],
         authority=Authority.BRIDGE,
-        notices=(),
+        notices=_unrequested_phase_notices(props, second, quantity, origin),
         refusal_reason=None,
         refusal_detail={},
         call_evidence=(
@@ -2309,6 +2389,40 @@ def _openimcc_fusion_attempt(
             f"T={temperature_K}"
         ),
         coefficient_sources=(solid.source_row_id, liquid.source_row_id),
+    )
+
+
+def _unrequested_phase_notices(
+    props: object,
+    second: object | None,
+    quantity: Quantity,
+    origin: str,
+) -> tuple[Notice, ...]:
+    """Carry ignored-token diagnostics onto the attempt.
+
+    The parser owns the sentence. Stencil, status, and lambda warnings
+    stay on the property result and are not scoring notices. The enthalpy
+    anchor is a second property read; its diagnostics are included.
+    """
+
+    from simulator.melt_backend.magemin import _unrelated_gbase_nonfinite_notes
+
+    texts: list[str] = []
+    for source in (props, second):
+        if source is None:
+            continue
+        warnings = getattr(source, "warnings", ()) or ()
+        for text in _unrelated_gbase_nonfinite_notes(tuple(warnings)):
+            if text not in texts:
+                texts.append(text)
+    return tuple(
+        Notice(
+            kind=NoticeKind.UNREQUESTED_PHASE_NONFINITE,
+            affected_quantities=(quantity,),
+            reason=text,
+            origin=origin,
+        )
+        for text in texts
     )
 
 

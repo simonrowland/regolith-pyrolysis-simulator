@@ -56,11 +56,15 @@ from simulator.battery.score import (
     compile_residual,
     comparison_candidates,
     decision_band_for,
+    flagged_strata,
     headline_rows,
     predict_with_engine,
     render_score_report,
 )
-from simulator.chemistry.ellingham_thermo import ELLINGHAM_FIT_SEGMENTS
+from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_FIT_SEGMENTS,
+    ellingham_same_phase_extension,
+)
 from simulator.physical_constants import GAS_CONSTANT
 from tests.battery import factories as F
 from tests.engine_availability import (
@@ -2678,6 +2682,102 @@ def test_pure_phase_enthalpy_increment_uses_injected_accessor() -> None:
     assert calls == []
 
 
+def test_unrequested_phase_nan_reaches_the_scored_residual(monkeypatch) -> None:
+    """The ignored-token sentence is a scoring notice, including the anchor."""
+    from simulator.battery import compilation_tier
+
+    diagnostic = (
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase bi, field tbi, raw token 'nan'"
+    )
+    anchor_diagnostic = (
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase bi, field eas, raw token 'nan'"
+    )
+    stencil = (
+        "S/Cp/H are central differences of the pure-endmember gbase "
+        "(delta=10 K)"
+    )
+
+    class _Props:
+        def __init__(self, enthalpy, warnings):
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = 40.0
+            self.S_J_K_mol = 30.0
+            self.absences = ()
+            self.warnings = warnings
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        if abs(temperature_K - 298.15) < 1e-6:
+            return _Props(1000.0, (anchor_diagnostic, stencil))
+        return _Props(5000.0, (diagnostic, stencil))
+
+    monkeypatch.setattr(compilation_tier, "default_pure_phase", pure_phase)
+
+    cp_identity = _pure_phase_identity()
+    cp_observation = F.observation(
+        "mgo-cp-unrequested-nan",
+        "exp-1",
+        cp_identity,
+        Decimal("40"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    cp_attempt = predict_thermo_attempt(Engine.MAGEMIN, cp_observation)
+    assert cp_attempt.value is not None
+    assert [notice.reason for notice in cp_attempt.notices] == [diagnostic]
+    assert cp_attempt.notices[0].kind is NoticeKind.UNREQUESTED_PHASE_NONFINITE
+    assert flagged_strata(cp_attempt.notices) == ()
+    cp_residual, _ = compile_residual(
+        cp_observation,
+        Engine.MAGEMIN,
+        context=_context(cp_observation),
+        comparison_ids=set(),
+    )
+    assert cp_residual.refusal is None
+    assert cp_residual.numeric is not None
+    assert any(
+        notice.kind is NoticeKind.UNREQUESTED_PHASE_NONFINITE
+        and notice.reason == diagnostic
+        for notice in cp_residual.notices
+    )
+    assert all(stencil not in notice.reason for notice in cp_residual.notices)
+
+    enthalpy_identity = replace(
+        _pure_phase_identity(Quantity.H_MINUS_H298),
+        subtype=State.of("H(T)-H(298.15 K)"),
+    )
+    enthalpy_observation = F.observation(
+        "mgo-h-unrequested-nan",
+        "exp-1",
+        enthalpy_identity,
+        Decimal("4"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    enthalpy_attempt = predict_thermo_attempt(Engine.MAGEMIN, enthalpy_observation)
+    assert enthalpy_attempt.value is not None
+    assert [notice.reason for notice in enthalpy_attempt.notices] == [
+        diagnostic,
+        anchor_diagnostic,
+    ]
+    enthalpy_residual, _ = compile_residual(
+        enthalpy_observation,
+        Engine.MAGEMIN,
+        context=_context(enthalpy_observation),
+        comparison_ids=set(),
+    )
+    assert enthalpy_residual.refusal is None
+    assert enthalpy_residual.numeric is not None
+    reasons = [
+        notice.reason
+        for notice in enthalpy_residual.notices
+        if notice.kind is NoticeKind.UNREQUESTED_PHASE_NONFINITE
+    ]
+    assert reasons == [diagnostic, anchor_diagnostic]
+
+
 def test_thermoengine_import_failure_is_typed_in_score_and_census(monkeypatch) -> None:
     from simulator.battery import compilation_tier
 
@@ -4410,6 +4510,351 @@ def test_out_of_range_reaction_is_not_formation_gibbs() -> None:
     )
     assert past_end.value is None
     assert past_end.refusal_detail["reason"] == "ellingham-formation-outside-segment"
+
+
+# t-1468. same_phase rows are a same-phase continuation of the nearest
+# segment and predict-and-flag. The others cross a transition, or sit on
+# the CaO melting endpoint, and stay refused.
+_OUTSIDE_SEGMENT_PIN = (
+    # formula, phase, T, polymorph, metal, range, phase fragment, same_phase
+    ("CaO", Phase.CR, "1000", None, "Ca", (1100.0, 1115.0), "Ca(s)", True),
+    ("CaO", Phase.CR, "3100", None, "Ca", (2400.0, 2600.0), "Ca(g)", True),
+    ("CaO", Phase.CR, "800", None, "Ca", (1100.0, 1115.0), "Ca(s)", True),
+    ("Al2O3", Phase.CR, "1000", "alpha", "Al", (1100.0, 2100.0), "Al(l)", True),
+    ("Al2O3", Phase.L, "2700", None, "Al", (2327.0, 2600.0), "Al2O3(l)", True),
+    ("FeO", Phase.L, "3100", None, "Fe", (1809.0, 2600.0), "Fe(l)", True),
+    ("MgO", Phase.CR, "1000", None, "Mg", (1100.0, 1300.0), "Mg(l)", True),
+    ("MgO", Phase.CR, "3100", None, "Mg", (2000.0, 2600.0), "Mg(g)", True),
+    ("TiO2", Phase.CR, "1000", "rutile", "Ti", (1100.0, 1166.0), "Ti(alpha)", True),
+    ("TiO2", Phase.L, "3600", None, "Ti", (2130.0, 2600.0), "TiO2(l)", True),
+    ("SiO2", Phase.L, "3500", None, "Si", (2500.0, 2600.0), "Si(l)", True),
+    ("Na2O", Phase.L, "3000", None, "Na", (2200.0, 2600.0), "Na(g)", True),
+    ("Cr2O3", Phase.CR, "400", None, "Cr", (1100.0, 2130.0), "Cr(s)", True),
+    ("NiO", Phase.CR, "700", None, "Ni", (1100.0, 1728.0), "Ni(s)", True),
+    ("MnO", Phase.CR, "1000", None, "Mn", (1100.0, 1360.0), "Mn(beta,s)", True),
+    # Crossing a transition, or the CaO melting endpoint, stays refused.
+    ("CaO", Phase.CR, "3200", None, "Ca", (2400.0, 2600.0), "Ca(g)", False),
+    ("CaO", Phase.CR, "700", None, "Ca", (1100.0, 1115.0), "Ca(s)", False),
+    ("Al2O3", Phase.CR, "900", "alpha", "Al", (1100.0, 2100.0), "Al(l)", False),
+    ("Al2O3", Phase.L, "2800", None, "Al", (2327.0, 2600.0), "Al2O3(l)", False),
+    ("FeO", Phase.CR, "1000", None, "Fe", (1100.0, 1184.0), "Fe(alpha)", False),
+    ("MgO", Phase.CR, "900", None, "Mg", (1100.0, 1300.0), "Mg(l)", False),
+    ("MgO", Phase.CR, "3200", None, "Mg", (2000.0, 2600.0), "Mg(g)", False),
+    ("K2O", Phase.CR, "1000", None, "K", (1100.0, 1300.0), "K(g)", False),
+    ("Cr2O3", Phase.CR, "300", None, "Cr", (1100.0, 2130.0), "Cr(s)", False),
+    ("NiO", Phase.CR, "600", None, "Ni", (1100.0, 1728.0), "Ni(s)", False),
+    ("MnO", Phase.CR, "900", None, "Mn", (1100.0, 1360.0), "Mn(beta,s)", False),
+    ("SiO2", Phase.L, "3600", None, "Si", (2500.0, 2600.0), "Si(l)", False),
+    ("TiO2", Phase.L, "3700", None, "Ti", (2130.0, 2600.0), "TiO2(l)", False),
+    ("ZrO2", Phase.CR, "2700", "ii", "Zr", (2125.0, 2600.0), "Zr(L)", False),
+)
+
+# Metal phase on the segment the same-phase rows continue. The factory
+# default is liquid, which is a different reaction for a solid or gas segment.
+_SAME_PHASE_METAL = {
+    ("CaO", "1000"): Phase.CR,
+    ("CaO", "3100"): Phase.G,
+    ("CaO", "800"): Phase.CR,
+    ("Al2O3", "1000"): Phase.L,
+    ("Al2O3", "2700"): Phase.L,
+    ("FeO", "3100"): Phase.L,
+    ("MgO", "1000"): Phase.L,
+    ("MgO", "3100"): Phase.G,
+    ("TiO2", "1000"): Phase.CR,
+    ("TiO2", "3600"): Phase.L,
+    ("SiO2", "3500"): Phase.L,
+    ("Na2O", "3000"): Phase.G,
+    ("Cr2O3", "400"): Phase.CR,
+    ("NiO", "700"): Phase.CR,
+    ("MnO", "1000"): Phase.CR,
+}
+
+
+@pytest.mark.parametrize(
+    ("formula", "phase", "temperature", "polymorph", "metal", "segment", "fragment", "same_phase"),
+    _OUTSIDE_SEGMENT_PIN,
+    ids=[
+        f"{formula}-{temperature}-{'same' if same else 'cross'}"
+        for formula, _phase, temperature, _poly, _metal, _segment, _fragment, same in _OUTSIDE_SEGMENT_PIN
+    ],
+)
+def test_outside_segment_refusals_are_pinned(
+    formula: str,
+    phase: Phase,
+    temperature: str,
+    polymorph: str | None,
+    metal: str,
+    segment: tuple[float, float],
+    fragment: str,
+    same_phase: bool,
+) -> None:
+    """Same-phase rows predict and flag. A phase crossing stays refused."""
+
+    # Generic crystal products match any identity polymorph. The factory
+    # requires a value on a crystal polymorph axis.
+    crystal_polymorph = polymorph
+    if phase is Phase.CR and crystal_polymorph is None:
+        crystal_polymorph = "crystalline"
+    identity = F.oxide_identity(
+        formula,
+        phase,
+        T_K=Decimal(temperature),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula=metal,
+        metal_phase=_SAME_PHASE_METAL.get((formula, temperature), Phase.L),
+        polymorph=crystal_polymorph,
+    )
+    attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            f"{formula}-{temperature}",
+            "exp-1",
+            identity,
+            Decimal("0"),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            source_id="nist-janaf-4th",
+        ),
+    )
+    if not same_phase:
+        assert attempt.value is None
+        assert attempt.notices == ()
+        assert attempt.authority is Authority.REFUSED
+        assert attempt.refusal_detail["reason"] == "ellingham-formation-outside-segment"
+        assert attempt.refusal_detail["segment_range_K"] == [segment[0], segment[1]]
+        assert fragment in str(attempt.refusal_detail["phase_basis"])
+        return
+    extension = ellingham_same_phase_extension(metal, float(temperature))
+    assert extension is not None
+    assert attempt.value is not None
+    assert attempt.authority is Authority.EXTRAPOLATED
+    assert attempt.refusal_reason is None
+    assert len(attempt.notices) == 1
+    notice = attempt.notices[0]
+    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.reason == extension["notice_reason"]
+    assert notice.band == str(segment)
+    assert "authority=extrapolated" in notice.reason
+    assert "extension_distance_K=" in notice.reason
+    assert "original_refusal_reason=ellingham-formation-outside-segment" in notice.reason
+    assert fragment in extension["phase_basis"]
+    if formula == "CaO" and temperature == "1000":
+        # Hand: -1269.498 - 1000*(-0.208094545) = -1061.403455 kJ/mol O2.
+        # Divided by 2 mol CaO per mol O2: -530.7017275. The battery builds
+        # Decimal(str(float)), which keeps one binary residue.
+        assert attempt.value == Decimal("-530.70172750000005")
+        log_attempt = predict_thermo_attempt(
+            Engine.INTERNAL_ANALYTICAL,
+            F.observation(
+                f"{formula}-{temperature}-logk",
+                "exp-1",
+                replace(identity, quantity=Quantity.LOG10_KF),
+                Decimal("0"),
+                evidence=EvidenceClass.COMPILATION_ASSESSED,
+                source_id="nist-janaf-4th",
+            ),
+        )
+        assert log_attempt.value == log10K_from_delta_fG_kJ_mol(
+            attempt.value,
+            Decimal(temperature),
+        )
+
+
+def _cao_3100_attempt(
+    metal_phase: Phase,
+    pressure_Pa: Decimal,
+    quantity: Quantity,
+    *,
+    oxide_phase: Phase | None = None,
+):
+    identity = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("3100"),
+        metal_phase=metal_phase,
+        per=PerBasis.MOL_SPECIES,
+        p_std=pressure_Pa,
+    )
+    if oxide_phase is not None:
+        reaction = identity.reaction.value
+        terms = tuple(
+            replace(
+                term,
+                species=replace(term.species, phase=oxide_phase),
+            )
+            if term.coefficient > 0 and term.species.formula == "CaO"
+            else term
+            for term in reaction.terms
+        )
+        identity = replace(identity, reaction=State.of(replace(reaction, terms=terms)))
+    return predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "cao-3100-phase",
+            "exp-1",
+            replace(identity, quantity=quantity),
+            Decimal("0"),
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("quantity", "pressure_Pa"),
+    [
+        (Quantity.DELTA_FG, Decimal("100000")),
+        (Quantity.DELTA_FG, Decimal("101325")),
+        (Quantity.LOG10_KF, Decimal("100000")),
+        (Quantity.LOG10_KF, Decimal("101325")),
+    ],
+    ids=["delta_fG-1bar", "delta_fG-1atm", "log10_Kf-1bar", "log10_Kf-1atm"],
+)
+def test_extension_matches_the_requested_reaction_phases(
+    quantity: Quantity,
+    pressure_Pa: Decimal,
+) -> None:
+    """A same-phase extension is refused when the requested metal or oxide
+    phase is not the segment's phase, at the fit pressure and at 1 atm.
+    """
+
+    gas = _cao_3100_attempt(Phase.G, pressure_Pa, quantity)
+    assert gas.value is not None
+    assert gas.authority is Authority.EXTRAPOLATED
+    assert gas.refusal_reason is None
+    bar_gibbs = _cao_3100_attempt(Phase.G, Decimal("100000"), Quantity.DELTA_FG)
+    if pressure_Pa == Decimal("100000"):
+        gibbs = bar_gibbs.value
+    else:
+        shift = standard_pressure_delta_g_kJ_per_mol(
+            Fraction(-3, 2),
+            Decimal("3100"),
+            Decimal("100000"),
+            Decimal("101325"),
+        )
+        gibbs = bar_gibbs.value + shift
+    if quantity is Quantity.DELTA_FG:
+        assert gas.value == gibbs
+    else:
+        assert gas.value == log10K_from_delta_fG_kJ_mol(gibbs, Decimal("3100"))
+
+    for metal_phase in (Phase.CR, Phase.L):
+        refused = _cao_3100_attempt(metal_phase, pressure_Pa, quantity)
+        assert refused.value is None
+        assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+        assert refused.refusal_detail["reason"] == (
+            "identity-mismatch-element-reference-phase"
+        )
+        assert refused.refusal_detail["element"] == "Ca"
+        assert refused.refusal_detail["cell_phase"] == metal_phase.value
+        assert refused.refusal_detail["segment_phase"] == Phase.G.value
+
+    oxide = _cao_3100_attempt(
+        Phase.G,
+        pressure_Pa,
+        quantity,
+        oxide_phase=Phase.L,
+    )
+    assert oxide.value is None
+    assert oxide.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert oxide.refusal_detail["element"] == "CaO"
+    assert oxide.refusal_detail["cell_phase"] == Phase.L.value
+    assert oxide.refusal_detail["segment_phase"] == Phase.CR.value
+
+
+def test_extension_refuses_a_known_mismatch_beside_an_unknown_term() -> None:
+    """An unknown O2 phase does not hide a metal phase the segment rejects."""
+
+    identity = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("3100"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    reaction = identity.reaction.value
+    terms = tuple(
+        replace(
+            term,
+            species=replace(term.species, phase=State.unknown("not printed")),
+        )
+        if term.species.formula == "O2"
+        else term
+        for term in reaction.terms
+    )
+    refused = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "cao-3100-unknown-o2",
+            "exp-1",
+            replace(identity, reaction=State.of(replace(reaction, terms=terms))),
+            Decimal("0"),
+        ),
+    )
+    assert refused.value is None
+    assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert refused.refusal_detail["reason"] == "identity-mismatch-element-reference-phase"
+    assert refused.refusal_detail["element"] == "Ca"
+    assert refused.refusal_detail["cell_phase"] == Phase.CR.value
+    assert refused.refusal_detail["segment_phase"] == Phase.G.value
+
+    matched = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("3100"),
+        metal_phase=Phase.G,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    matched_reaction = matched.reaction.value
+    matched_terms = tuple(
+        replace(
+            term,
+            species=replace(term.species, phase=State.unknown("not printed")),
+        )
+        if term.species.formula == "O2"
+        else term
+        for term in matched_reaction.terms
+    )
+    attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "cao-3100-gas-unknown-o2",
+            "exp-1",
+            replace(
+                matched,
+                reaction=State.of(replace(matched_reaction, terms=matched_terms)),
+            ),
+            Decimal("0"),
+        ),
+    )
+    assert attempt.value is not None
+    assert attempt.authority is Authority.EXTRAPOLATED
+
+
+def test_in_range_extension_leaves_the_element_basis_refusal() -> None:
+    """1800 K is inside the Ca(g) segment, so no extension is offered.
+
+    A crystal-Ca request at the fit pressure is the element-basis refusal.
+    The extension does not answer it.
+    """
+
+    identity = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1800"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-1800-cr-bar", "exp-1", identity, Decimal("0")),
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert attempt.refusal_detail["reason"] == (
+        "identity-mismatch-element-reference-phase"
+    )
+    assert attempt.refusal_detail["element"] == "Ca"
+    assert attempt.refusal_detail["cell_phase"] == Phase.CR.value
+    assert attempt.refusal_detail["segment_phase"] == Phase.G.value
+    assert ellingham_same_phase_extension("Ca", 1800.0) is None
 
 
 def test_quoted_compilation_row_is_not_omitted() -> None:

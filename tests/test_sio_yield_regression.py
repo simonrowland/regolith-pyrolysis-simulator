@@ -299,38 +299,21 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 # The resulting melt-activity and SiO route change moves these CLI totals:
 # lunar 1.0409922677e-05 -> 1.04099076417e-05,
 # mars 1.05360311732e-05 -> 1.05354760695e-05.
+from tests.studio_pin_support import sio_evolved_baseline
+
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.04099076417e-05,
-    "mars_basalt": 1.05354760695e-05,
+    feedstock: sio_evolved_baseline(feedstock)
+    for feedstock in ("lunar_mare_low_ti", "mars_basalt")
 }
 
 
 def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
-    """The same physical quantity is pinned in three files; they must agree.
+    """Both live aliases must equal the canonical fixture scalar.
 
-    2026-08-29. `sio_evolved_kg` for lunar_mare_low_ti C2A is hand-maintained in
-    THREE tracked locations that must move together on any regen:
-
-        tests/test_sio_yield_regression.py        BASELINE_SIO_EVOLVED_KG
-        tests/fixtures/sio_yield/<feedstock>_c2a.json   "sio_evolved_kg"
-        tests/chemistry/test_sio_chain_coherence.py     PHASE3BIS_SIO_EVOLVED_KG
-
-    Nothing checked that they agree. Regenerate the fixture and forget the
-    constant (or the reverse) and two tests assert DIFFERENT values for the same
-    quantity, each passing or failing on its own copy, with no signal that the
-    tree now contradicts itself. That failure mode is live right now: b-302 is a
-    pending regen of exactly these pins, so this guard exists to make that regen
-    safe rather than to catch today's tree, which is consistent.
-
-    Green today. It fires only on a PARTIAL update.
-
-    ★ DELIBERATELY NOT INCLUDED: scripts/emit_studio_pin_values.py's
-    LAPTOP_BASELINES. That copy is a historical snapshot on purpose -- its own
-    comment says "pre-regen pins at tip 0de9c6d" -- and its staged_silica_kg
-    already differs from the live pin in the 13th digit, which is the evidence
-    that it is a frozen comparison baseline and not a mirror. Requiring it to
-    track would make this guard fire on correct work. docs/ci-local-divergence.md
-    carries the value too, as prose in a table; also excluded, same reason.
+    The shared Studio emitter produces the live quantity; the committed SiO
+    fixture owns its expected value. Keep this guard to catch a consumer
+    acquiring a separate baseline again. LAPTOP_BASELINES in the emitter and
+    docs/ci-local-divergence.md remain deliberately historical snapshots.
     """
     fixture_dir = Path(__file__).resolve().parent / "fixtures" / "sio_yield"
 
@@ -363,7 +346,7 @@ def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
     assert not mismatches, (
         "sio_evolved_kg is pinned in several places and they have DIVERGED, so "
         "the tree now asserts two different values for one quantity. This is "
-        "what a partial regen looks like; update every location together.\n  "
+        "what a partial regen looks like; restore the shared fixture authority.\n  "
         + "\n  ".join(mismatches)
     )
 

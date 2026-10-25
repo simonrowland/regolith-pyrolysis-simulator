@@ -3271,15 +3271,18 @@ def qualification_notice(
     gate: Mapping[str, Any], *, engine_name: str = "alphamelts"
 ) -> dict[str, Any]:
     if engine_name == "alphamelts":
-        run_anyway = bool(gate.get("composition_valid", True))
-        bypassable = [
-            "certified SiO2 and temperature bands (predict-and-flag)"
-        ]
+        # t-1469 keeps the AlphaMELTS input-domain gate in the backend. The
+        # harness reports this gate but cannot bypass it; certified bands are
+        # notice+run and the listed crash classes remain backend refusals.
+        run_anyway = True
+        bypassable = []
         not_bypassable = [
-            "AlphaMELTS 14-oxide basis and non-empty silicate composition input checks",
-            "ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C (certified T min; notice+run, not a pre-launch refusal)",
+            "AlphaMELTSBackend._domain_gate (SiO2<=0 basis, major-oxide sum, forbidden or unrecognised species)",
+            "certified SiO2/T band is notice+run in _apply_engine_commissioning, not a skipped refusal",
             "ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR (1 bar inline in _equilibrate_subprocess)",
-            "fe_free_and_imposed_absolute_fo2 (Na2O/K2O-SiO2 family; not _domain_gate)",
+            "subprocess_fe_free_absolute_fo2_crash (two-component Na2O/K2O-SiO2, imposed absolute fO2)",
+            "subprocess_cao_sio2_binary_crash (two-component CaO-SiO2, with or without imposed fO2)",
+            "subprocess_fe_free_silicate_imposed_fo2_crash (measured Al2O3-CaO-SiO2, Al2O3-SiO2, CaO-Na2O-SiO2, imposed absolute or buffered fO2)",
         ]
     elif engine_name == "thermoengine":
         run_anyway = True
@@ -3416,8 +3419,6 @@ def _bypass_melts_domain_gate(backend: Any) -> None:
         and getattr(backend, "backend_name", None) != "alphamelts"
     ):
         backend._domain_gate = _pass  # type: ignore[method-assign]
-
-
 def run_isolated_cell_worker(
     payload: Mapping[str, Any],
     *,
@@ -3456,6 +3457,8 @@ def run_isolated_cell_worker(
         and handle.name in MELTS_FAMILY_ENGINES
         and handle.backend is not None
     ):
+        # Preserve the c7 ThermoEngine qualification exemption. The helper
+        # deliberately leaves AlphaMELTSBackend._domain_gate in place.
         _bypass_melts_domain_gate(handle.backend)
     if handle.name == "alphamelts" and handle.backend is not None:
         # A fresh per-cell backend used to start with an empty warning set.
@@ -4050,9 +4053,14 @@ def equilibrate_cell(
             liquid_fraction=None,
         )
 
+    # Qualification records a certified-band miss and still calls the
+    # engine. For AlphaMELTS, it does not replace _domain_gate. After t-894
+    # that method only refuses invalid input (SiO2<=0, major-oxide sum,
+    # forbidden or unrecognised species); skipping it launched those melts.
     if qualification and handle.name in MELTS_FAMILY_ENGINES:
+        # Preserve the c7 exemption for other MELTS-family engines; the
+        # helper is intentionally a no-op for AlphaMELTS.
         _bypass_melts_domain_gate(handle.backend)
-
     composition_kg, composition_mol = composition_kg_and_mol(pot.composition_wt_pct)
     temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
     fo2_log = _fo2_log_for_request(handle, po2)
