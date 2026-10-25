@@ -79,6 +79,7 @@ from simulator.battery.identity import (
     Identity,
     IdentityEqualKind,
     IdentityEqualOutcome,
+    IdentityRefusal,
     PA_PER_BAR_DEC,
     THERMOCHEMICAL_CALORIE_J,
     _AXIS_NAMES,
@@ -113,6 +114,7 @@ from simulator.battery.migrate import (
     convert_pressure_to_pa,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
+    mass_fraction_pair_to_valence_ratio,
     observation_matches_source_tokens,
     path_matches_source_tokens,
     phase_for_sample_form,
@@ -5997,8 +5999,14 @@ def _oxide_weight_fe_ratio(
         return _FE_REDOX_RATIO_UNDEFINED
     if not fe2o3.is_finite() or not feo.is_finite():
         return _FE_REDOX_RATIO_UNDEFINED
-    ratio = fe3_fe2_ratio_from_oxide_wt_pct(fe2o3, feo)
-    if ratio is None:
+    try:
+        ratio = mass_fraction_pair_to_valence_ratio(
+            fe2o3,
+            feo,
+            element="Fe",
+            mass_fraction_basis=("Fe2O3", "FeO"),
+        )
+    except IdentityRefusal:
         return _FE_REDOX_RATIO_UNDEFINED
     return ratio
 
@@ -6484,7 +6492,8 @@ def _predict_fe_redox(
     model_id = getattr(cell, "model_id", None)
     version = None if model_id is None else (str(model_id) or None)
     status = getattr(cell, "status", None)
-    if status != "ok":
+    out_of_domain = melts and getattr(cell, "engine_status", None) == "out_of_domain"
+    if status != "ok" and not out_of_domain:
         # The activity/vapour classifier in predict_with_engine stays on that
         # path (OpenIMCC species, internal-analytical input reasons). Redox
         # only separates an unavailable cell from an engine refusal.
@@ -6513,10 +6522,24 @@ def _predict_fe_redox(
         )
 
     ratio = _reported_engine_fe3_fe2_ratio(cell)
-    notices = cell_notices(Quantity.FE3_FE2_RATIO, engine, cell)
+    notices = cell_notices(quantity, engine, cell)
     authority, certified_band = _flags_from_scored_cell(
         cell, Authority.BRIDGE, None
     )
+    if out_of_domain:
+        notices += (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason=(
+                    f"{engine.value}_out_of_domain; reason="
+                    f"{getattr(cell, 'engine_reason', None) or 'unspecified'}"
+                ),
+                origin=f"engine:{engine.value}",
+                authority=Authority.EXTRAPOLATED,
+            ),
+        )
+        authority = Authority.EXTRAPOLATED
     if ratio is None:
         return refused(
             RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX,
@@ -6533,7 +6556,13 @@ def _predict_fe_redox(
             identity_out=prediction_identity,
             version=version,
         )
-    if ratio is _FE_REDOX_RATIO_UNDEFINED or not isinstance(ratio, Decimal):
+    if (
+        ratio is _FE_REDOX_RATIO_UNDEFINED
+        or not isinstance(ratio, Decimal)
+        or not ratio.is_finite()
+        or ratio < 0
+        or (quantity is Quantity.FE3_FE2_RATIO and ratio <= 0)
+    ):
         return refused(
             RefusalReason.METRIC_DOMAIN,
             {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
@@ -8551,7 +8580,12 @@ def predict_with_engine(
         )
     if (
         quantity is Quantity.VALENCE_RATIO
-        and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
+        and engine in {
+            Engine.OPENIMCC,
+            Engine.INTERNAL_ANALYTICAL,
+            Engine.ALPHAMELTS,
+            Engine.THERMOENGINE,
+        }
         and identity.species.formula == "Fe"
     ):
         return _predict_fe_redox(
@@ -11415,7 +11449,7 @@ def compile_residual(
     if (
         rail is Rail.REDOX
         and engine is Engine.INTERNAL_ANALYTICAL
-        and quantity is Quantity.FE3_FE2_RATIO
+        and quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
     ):
         # The attribution split applies only when both walks are COMPLETE.
         # An unresolved Kress citation, a printed-unresolved coefficient,
