@@ -1936,7 +1936,8 @@ def test_coverage_ledger_is_observation_first_and_exact(
         "activity_coefficient": (485, 1, 484, 1),
         "alpha": (93, 4, 89, 14),
         "gibbs_table": (314, 0, 314, 0),
-        "psat_series": (239, 1, 238, 2),
+        # famBAND04: +1 typed-refused Schneider 1980 Figure 2 series record.
+        "psat_series": (240, 1, 239, 2),
         "rate_series": (805, 2, 803, 2),
         "transition_point": (111, 15, 96, 15),
     }
@@ -1951,7 +1952,7 @@ def test_coverage_ledger_is_observation_first_and_exact(
         "gibbs_table": (314, 0, 0),
         "ordering_activity": (120, 0, 0),
         "ordering_bound": (163, 2, 2),
-        "psat_series": (239, 1, 2),
+        "psat_series": (240, 1, 2),  # famBAND04 Schneider 1980 Figure 2
         "rate_hkl": (641, 0, 0),
         "relative_volatility": (1, 0, 0),
         "transition_point": (111, 15, 15),
