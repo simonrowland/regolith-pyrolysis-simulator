@@ -630,3 +630,16 @@ def test_captured_asteroid_mixed_seeds_close_at_zero():
         assert solved.payload == {'CrO2': 0.0, 'CrO3': 0.0, 'SiO2_gas': seeds['SiO2_gas']}
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+def test_precomputed_zero_uses_the_same_overhead_residual():
+    # A nonzero overhead forcing cannot be hidden by zero audit terms.
+    forced = _SurfaceOxygenEvaluation(0.0, 0.0, 0.0, 0.0, {}, 0.0, 0.0, 0.0, -1.0)
+    with pytest.raises(ValueError):
+        _solve_surface_oxygen_balance(lambda _: pytest.fail('precomputed point re-evaluated'),
+                                     source_free_zero=forced)
+    # Internal coproduct retention cancels even when its audit terms are large.
+    retained = _SurfaceOxygenEvaluation(0.0, 0.0, 0.0, 0.0,
+        {'internal_coproduct': 0.1}, 0.0, 0.0, 0.1, 0.0)
+    assert _solve_surface_oxygen_balance(lambda _: pytest.fail('precomputed point re-evaluated'),
+                                         source_free_zero=retained) is retained
