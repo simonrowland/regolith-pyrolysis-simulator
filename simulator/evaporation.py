@@ -34,6 +34,8 @@ from simulator.fe_redox import (
 from simulator.melt_backend.base import MeltCompositionError
 from simulator.melt_backend.liquidus import (
     LIQUIDUS_LIQUID_EPSILON,
+    DEFAULT_LIQUIDUS_MIN_T_C,
+    DEFAULT_LIQUIDUS_MAX_T_C,
     DEFAULT_LIQUIDUS_SCAN_STEP_C,
 )
 from simulator.melt_regime import (
@@ -2240,10 +2242,17 @@ class EvaporationMixin:
                 # nearby. C / (C per cell) is dimensionless; multiplying
                 # back gives C. A failed warm bracket follows the existing
                 # broad backend/kernel ladder below, with unchanged budgets.
-                computing_cache['_liquidus_search_window_C'] = {
-                    'min_T_C': step * (math.floor(solidus / step) - 1),
-                    'max_T_C': step * (math.ceil(liquidus / step) + 1),
-                }
+                minimum = max(DEFAULT_LIQUIDUS_MIN_T_C,
+                              step * (math.floor(solidus / step) - 1))
+                maximum = min(DEFAULT_LIQUIDUS_MAX_T_C,
+                              step * (math.ceil(liquidus / step) + 1))
+                # Warming changes search cost, not its original domain. A
+                # different ladder's bounds may lie wholly outside it; then
+                # retain the normal broad search rather than an invalid window.
+                if minimum < maximum:
+                    computing_cache['_liquidus_search_window_C'] = {
+                        'min_T_C': minimum, 'max_T_C': maximum,
+                    }
         self._freeze_gate_liquid_fraction_cache = computing_cache
         self._freeze_gate_curve_in_progress = True
         cache_committed = False
