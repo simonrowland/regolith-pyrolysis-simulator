@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import AmountBasis
+from simulator.battery.enums import AmountBasis, EvidenceClass
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -167,6 +167,31 @@ def test_isolated_migration_binds_conditions_and_keeps_unprinted_pressure_unknow
         if raw_id.endswith(("_activity_feo", "_activity_feo15", "_gamma_feo", "_gamma_feo15")):
             assert migrated[raw_id].identity.temperature_K.is_value
             assert migrated[raw_id].identity.temperature_K.value == Decimal("1573")
+
+    gamma_ids = [raw_id for raw_id in migrated if raw_id.endswith(("_gamma_feo", "_gamma_feo15"))]
+    assert len(gamma_ids) == 18
+    for raw_id in gamma_ids:
+        oxide = "FeO" if raw_id.endswith("_gamma_feo") else "FeO1.5"
+        activity_id = raw_id.removesuffix("gamma_feo" if oxide == "FeO" else "gamma_feo15") + (
+            "activity_feo" if oxide == "FeO" else "activity_feo15"
+        )
+        source, values = _by_id(document, raw_id)
+        point = values["points"][0]
+        obs = migrated[raw_id]
+        assert source["values"]["method_class"] == "model_derived"
+        assert source["values"]["evidence_class"] == "model_derived"
+        assert obs.evidence.class_.is_value
+        assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert len(obs.derived_from) == 1
+        assert obs.derived_from[0].startswith(f"{SID}::{activity_id}::")
+        parameters = dict(obs.derivation.parameters)
+        mole_fraction = parameters[f"x({oxide})"]
+        assert mole_fraction.state.is_value
+        assert mole_fraction.state.value == (
+            Decimal(point["composition_as_published"]["components"][oxide]) / 100
+        )
+        assert mole_fraction.locator is not None
+        assert mole_fraction.locator.record == point["row_as_published"]
 
     for raw_id in (
         "hayashi_2019_t2_A1_activity_feo",

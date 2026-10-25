@@ -28,7 +28,7 @@ tables:
     type: activity_coefficient
     quantity: activity_coefficient
     unit: dimensionless
-    evidence_class: measured_reduced
+    evidence_class: model_derived
     phase: l
     per: dimensionless
     published_page: 1747
@@ -39,4 +39,5 @@ tables:
     values:
       - {column: 12, species: FeO, quantity: activity, unit: dimensionless activity, evidence_class: model_derived}
       - {column: 13, species: FeO1.5, quantity: activity, unit: dimensionless activity, evidence_class: model_derived}
-      - {column: 14, species: FeO, quantity: activity_coefficient, unit: dimensionless, evidence_class: measured_reduced}
+      - {column: 14, species: FeO, quantity: activity_coefficient, unit: dimensionless, evidence_class: model_derived}
+      - {column: 15, species: FeO1.5, quantity: activity_coefficient, unit: dimensionless, evidence_class: model_derived}
