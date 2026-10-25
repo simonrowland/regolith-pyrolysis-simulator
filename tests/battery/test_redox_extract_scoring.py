@@ -372,6 +372,39 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert residuals[0].refusal.reason is RefusalReason.DECISION_RULE_MISSING
 
 
+def test_openimcc_sossi_element_inventory_is_pinned(monkeypatch):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    _context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    captured = {}
+    original_evaluate_redox = openimcc.evaluate_redox
+
+    def capture_inventory(inventory, *args, **kwargs):
+        captured.update(inventory)
+        return original_evaluate_redox(inventory, *args, **kwargs)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", capture_inventory)
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.value is not None
+    assert captured == pytest.approx(
+        {
+            "O": 2.7962915750987705,
+            "Si": 0.787642821796046,
+            "Al": 0.08564523118393863,
+            "Fe": 0.1173456865013924,
+            "Mg": 0.9387907436680424,
+            "Ca": 0.036239334467851735,
+            "Na": 0.0003246401869672684,
+        },
+        rel=1e-15,
+    )
+
+
 def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
     pytest.importorskip("openimcc")
     import openimcc
