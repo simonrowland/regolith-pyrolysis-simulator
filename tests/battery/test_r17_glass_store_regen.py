@@ -6,8 +6,8 @@ quoted, but did not regenerate ``observations-v2``. Store consumers
 (``load_migrated_store``) still saw ``phase.value=l`` on all 128
 ``transition_temperature:glass-liquid`` tables (R17 P1).
 
-These tests pin the committed store: those series are unknown (never ``l``),
-Mg-013 / W-003 quote their printed markers, and no migrate-input commit is
+These landing-gate tests pin the regenerated committed store. Those series
+are unknown (never ``l``), Mg-013 / W-003 quote their printed markers, and no migrate-input commit is
 newer than the last store-output touch (STALE half of
 ``check_store_freshness``). Generator-only coverage stays in
 ``test_janaf_generator.py``.
@@ -136,24 +136,15 @@ def test_committed_store_mg013_and_w003_quote_printed_glass_markers() -> None:
 
 
 def test_committed_store_has_no_stale_migrate_input_commits() -> None:
-    """Reject unacknowledged post-regen migrate-input commits."""
+    """At the train gate, reject unacknowledged post-regen migrate inputs.
+
+    Offers may report stale before the train regen under d-255.
+    """
     if _git("rev-parse", "--is-shallow-repository").strip() == "true":
         pytest.skip("git_history_unavailable: freshness requires a full checkout")
     freshness = _load_freshness()
     neutral = freshness.STORE_NEUTRAL_INPUT_COMMITS
     require_git_history(REPO_ROOT, *sorted(neutral))
-    for revision in neutral:
-        if subprocess.run(
-            ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
-            cwd=REPO_ROOT,
-            capture_output=True,
-            text=True,
-            check=False,
-        ).returncode != 0:
-            pytest.skip(
-                "git_history_unavailable: acknowledged store-neutral input "
-                f"{revision} is not in HEAD history"
-            )
     head = _git("rev-parse", "HEAD").strip()
     last_store = _git(
         "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS

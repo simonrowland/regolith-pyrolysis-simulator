@@ -5723,6 +5723,22 @@ def test_unstated_printed_uncertainty_sets_a_band_and_notice() -> None:
     )
 
 
+def test_relative_standard_deviation_converts_to_absolute_sigma() -> None:
+    assert (
+        score_mod.metric_operation(Quantity.ELEMENT_FRACTION_REMAINING)
+        is MetricOperation.ABSOLUTE
+    )
+    sigma = score_mod._metric_uncertainty_width(
+        MetricOperation.ABSOLUTE,
+        Quantity.ELEMENT_FRACTION_REMAINING,
+        Decimal("0.959"),
+        Decimal("0.0103"),
+        "fraction",
+    )
+
+    assert sigma == Decimal("0.0098777")
+
+
 def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
     from simulator.battery.score import (
         headline_payload_records,

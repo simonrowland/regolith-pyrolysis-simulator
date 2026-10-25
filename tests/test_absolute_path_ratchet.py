@@ -312,6 +312,21 @@ def test_path_value_keys_match_the_extract_tree() -> None:
     assert not prose, f"PATH_VALUE_KEYS members carrying prose: {prose}"
 
 
+def test_neuman_2021_audit_file_uses_existing_path_key() -> None:
+    extract_path = EXTRACTS / (
+        "neuman-2021-k-cu-evaporation-isotope-fractionation.yaml"
+    )
+    source = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    extraction = source["extraction"]
+
+    assert "audit_path" not in extraction
+    assert "provenance_file" in vle.PATH_VALUE_KEYS
+    assert extraction["provenance_file"] == (
+        "data/literature/extracts/"
+        "neuman-2021-k-cu-evaporation-isotope-fractionation-audit.md"
+    )
+
+
 def test_line_regex_ceiling_is_gone() -> None:
     # A second pass/fail signal could report clean while parsed values are
     # absolute (ROR-b713); the parsed walk is the only rule.

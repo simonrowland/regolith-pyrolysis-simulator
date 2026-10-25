@@ -37,6 +37,8 @@ from simulator.battery.enums import (
     Phase,
     Polymorph,
     PolymorphRejectionKind,
+    KINETIC_YIELD_QUANTITIES,
+    QUANTITY_UNITS,
     Quantity,
     Rail,
     RawInputStatus,
@@ -52,6 +54,8 @@ from simulator.battery.score import predict_with_engine
 from simulator.battery.migrate import (
     REPO_ROOT,
     _notice_from_plain,
+    _evaporation_flux_selection,
+    _flux_unit_family,
     DuplicateContextIdError,
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
@@ -6818,6 +6822,18 @@ def test_shaw_quoted_density_migrates_with_canonical_unit_derivation() -> None:
     assert parameters["factor"].state.value == Decimal("1000")
 
 
+def test_fahrenheit_temperature_conversion_uses_printed_unit() -> None:
+    t_212, trail_212 = convert_temperature_to_k("212", "°F")
+    t_32, trail_32 = convert_temperature_to_k("32", "F")
+    assert t_212 == Decimal("373.15")
+    assert t_32 == Decimal("273.15")
+    assert trail_212 == trail_32 == "fahrenheit_to_kelvin"
+    selected = select_declared_source("temperature_K", None, {"T_F": "212"})
+    assert selected.amount == Decimal("373.15")
+    assert selected.field_name == "T_F"
+    assert selected.unit_trail == "fahrenheit_to_kelvin"
+
+
 def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
     from simulator.battery.migrate import PHASE_MAP
 
@@ -8146,7 +8162,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "transition_temperature": 58
     }
     # The reviewed residue-composition rail adds 516 Sossi ppm and 648 Hashimoto
-    # oxide cells. t-1152 adds 110 printed Markova 1984 Table 2 residue cells.
+    # oxide cells. The refreshed Gibson 1971 extract adds 15 printed after-1400 °C
+    # residue cells matching its numeric source rows. t-1152 adds 110 printed
+    # Markova 1984 Table 2 residue cells.
     # The independent source census validates each typed component against its
     # own printed field; the seven all-null Hashimoto rows stay absent.
     # t-1122 adds four 14163 1050°C residue-ppm cells each for K and Na from
@@ -8168,6 +8186,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     assert census.get("residue_component_composition") == 4353
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
+    assert per_source.get("gibson-1971-lunar-gas-release") == {
+        "residue_component_composition": 15
+    }
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
         "residue_component_composition": 8
     }
@@ -8201,7 +8222,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # F22 also adds Wang 2001's 90 canonical isotope_delta cells and Ozawa's 6.
     # Sossi remains 22. Neuman's 96 single decorated columns (the oracle above)
     # bring the pin 118->214.
-    assert census.get("isotope_delta") == 214
+    # nexttrain-fix1 adds Neuman 2021's 50 numeric isotope_delta rows, moving
+    # isotope_delta 214->264 and n_numeric 8265->8315 on this car store.
+    assert census.get("isotope_delta") == 264
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
@@ -8218,7 +8241,10 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 8265, (n_numeric, census, n_unavailable)
+    assert n_numeric == 8315, (n_numeric, census, n_unavailable)
+    assert per_source.get("neuman-2021-k-cu-evaporation-isotope-fractionation") == {
+        "isotope_delta": 50
+    }
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
@@ -12145,16 +12171,53 @@ def test_l05g1a_table_qualifier_leaves_reference_state_unknown(tmp_path: Path) -
 
 
 def test_l05g1a_does_not_cross_condensation_or_log_pressure() -> None:
+    """condensation_coefficient is its own token. A co-located activity field does not retarget it."""
+
     state, reason = map_quantity(
         None, {"quantity": "condensation_coefficient", "activity": 0.2}
     )
-    assert not state.is_value
+    assert state.is_value
+    assert state.value is Quantity.CONDENSATION_COEFFICIENT
+    assert state.value is not Quantity.ACTIVITY
+    assert reason is None
     state, reason = map_quantity(
         None,
         {"quantity": "log10_Psat_over_P0", "table_kJ_mol": 316.034, "activity": 1},
     )
     assert not state.is_value
     assert "unsupported" in (reason or "")
+
+
+def test_t1473_quantity_tokens_match_schema_and_stay_out_of_kinetic_yield() -> None:
+    """The t-1473 schema diff names three tokens. None joins the kinetic-yield set."""
+
+    expected = {
+        Quantity.CONDENSATION_COEFFICIENT: "dimensionless",
+        Quantity.EVAPORATION_FLUX: "subtype_defined",
+        Quantity.ELEMENT_FRACTION_REMAINING: "dimensionless",
+    }
+    schema = (REPO_ROOT / "data" / "literature" / "extracts" / "SCHEMA.md").read_text(
+        encoding="utf-8"
+    )
+    for quantity, unit in expected.items():
+        assert quantity.value in schema
+        assert QUANTITY_UNITS[quantity] == unit
+        assert quantity not in KINETIC_YIELD_QUANTITIES
+        state, reason = map_quantity(None, {"quantity": quantity.value})
+        assert state.is_value and state.value is quantity and reason is None
+    assert set(QUANTITY_UNITS) == set(Quantity)
+
+
+def test_lee_microgram_flux_unit_converts_to_kg_per_m2_second() -> None:
+    """Table 3's printed mass flux uses the exact μg/cm² to kg/m² factor."""
+
+    selection = _evaporation_flux_selection(
+        {"evaporation_flux": "39.9"}, "μg·cm^-2·sec^-1", ()
+    )
+
+    assert selection.amount == Decimal("0.000399")
+    assert selection.unit_trail == "ug_cm2_s_to_kg_m2_s"
+    assert _flux_unit_family("μg·cm^-2·sec^-1") == "kg_m-2_s-1"
 
 
 def test_l02_value_k_lifts_transition_temperature(tmp_path: Path) -> None:
@@ -13362,6 +13425,18 @@ def test_l05c1_store_alpha_values_lie_in_unit_interval() -> None:
     ]
     if not roots[0].is_dir():
         pytest.skip("migrated store not generated yet")
+    alpha_over_one_allowlist = {
+        "neumann-1954-liquid-k-evaporation-coefficient::"
+        "neumann_1954_k_alpha_table2::T=377.65:h=4b2e20e3e417": {
+            "source_id": "neumann-1954-liquid-k-evaporation-coefficient",
+            "page": 13,
+            "value": Decimal("1.01"),
+            "printed_uncertainty": "No numerical uncertainty for alpha is printed.",
+            "reason": "authors print alpha > 1; not a transcription error",
+            "page_quote": "104,5 … 1,01",
+        }
+    }
+    allowed_alpha_seen: set[str] = set()
     bad = []
     summary = load_observation_store_summary(REPO_ROOT)
     needle = b"evaporation_coefficient_alpha"
@@ -13379,8 +13454,30 @@ def test_l05c1_store_alpha_values_lie_in_unit_interval() -> None:
                     continue
                 amount = as_decimal(val.get("point"))
                 if not (as_decimal("0") < amount <= as_decimal("1")):
-                    bad.append(f"{obs.get('observation_id')} alpha={amount}")
+                    observation_id = str(obs.get("observation_id") or "")
+                    exception = alpha_over_one_allowlist.get(observation_id)
+                    uncertainty = obs.get("uncertainty") or {}
+                    verbatim_uncertainty = uncertainty.get("verbatim")
+                    printed_uncertainty = (
+                        verbatim_uncertainty.get("note")
+                        if isinstance(verbatim_uncertainty, dict)
+                        else None
+                    )
+                    locator = obs.get("locator") or {}
+                    if (
+                        exception is not None
+                        and obs.get("source_id") == exception["source_id"]
+                        and locator.get("page") == exception["page"]
+                        and amount == exception["value"]
+                        and printed_uncertainty == exception["printed_uncertainty"]
+                        and exception["reason"]
+                        == "authors print alpha > 1; not a transcription error"
+                    ):
+                        allowed_alpha_seen.add(observation_id)
+                    else:
+                        bad.append(f"{observation_id} alpha={amount}")
     assert not bad, bad[:20]
+    assert allowed_alpha_seen == set(alpha_over_one_allowlist)
 
 
 def test_l05c5_store_unavailable_values_are_queued() -> None:

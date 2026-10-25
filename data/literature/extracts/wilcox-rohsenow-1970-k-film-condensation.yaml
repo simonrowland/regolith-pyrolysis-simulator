@@ -1,0 +1,1328 @@
+schema_version: literature_extract.v1
+source_id: wilcox-rohsenow-1970-k-film-condensation
+source:
+  citation: Wilcox, S. J. & Rohsenow, W. M. (1970), “Film Condensation of Potassium Using Copper Condensing Block
+    for Precise Wall-Temperature Measurement,” Journal of Heat Transfer 92(3):359–371, DOI 10.1115/1.3449671
+  doi: 10.1115/1.3449671
+  year: 1970
+extraction:
+  method: MinerU table transcription cross-checked against pdftotext and rendered table layout
+  date: '2026-10-22'
+  worker: wave52-F66
+  note: Table 1 contains 22 measured potassium condensation-coefficient rows. Temperatures, vapor pressures, heat
+    fluxes, sigma, and run identifiers are retained as printed. The migrator converts printed T_F to identity temperature_K;
+    P_v and P_s are not asserted as total pressure.
+review_status: draft
+fidelity_samples:
+- species: K
+  observable: alpha
+  observation_id: wilcox_rohsenow_1970_k_run_1
+  field: alpha
+  value: '0.873'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 364
+    pdf_page_index: 5
+    note: Table 1, Series 1 run 1; PDF page 6
+species:
+  K:
+    observations:
+    - observation_id: wilcox_rohsenow_1970_k_run_1
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 1, run 1; Table 1; PDF page 6
+      T_F: '851.66'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '853.76'
+          locator: &id001
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 1, run 1; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '851.41'
+          locator: *id001
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '851.21'
+          locator: *id001
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '39941'
+          locator: *id001
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0178'
+          locator: *id001
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0174'
+          locator: *id001
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.873'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '1'
+        run_no_as_printed: '1'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_2
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 1, run 2; Table 1; PDF page 6
+      T_F: '841.01'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '843.01'
+          locator: &id002
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 1, run 2; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '840.77'
+          locator: *id002
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '840.58'
+          locator: *id002
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '38185'
+          locator: *id002
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0159'
+          locator: *id002
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0155'
+          locator: *id002
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.920'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '1'
+        run_no_as_printed: '2'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_3
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 1, run 3; Table 1; PDF page 6
+      T_F: '853.81'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '856.57'
+          locator: &id003
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 1, run 3; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '853.46'
+          locator: *id003
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '853.21'
+          locator: *id003
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '51687'
+          locator: *id003
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0183'
+          locator: *id003
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0178'
+          locator: *id003
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.855'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '1'
+        run_no_as_printed: '3'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_4
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 1, run 4; Table 1; PDF page 6
+      T_F: '987.15'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '988.32'
+          locator: &id004
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 1, run 4; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '986.68'
+          locator: *id004
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '986.39'
+          locator: *id004
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '62915'
+          locator: *id004
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0633'
+          locator: *id004
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0626'
+          locator: *id004
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.882'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '1'
+        run_no_as_printed: '4'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_5
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 1, run 5; Table 1; PDF page 6
+      T_F: '962.87'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '963.94'
+          locator: &id005
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 1, run 5; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '962.44'
+          locator: *id005
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '962.16'
+          locator: *id005
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '59388'
+          locator: *id005
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0512'
+          locator: *id005
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0507'
+          locator: *id005
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.981'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '1'
+        run_no_as_printed: '5'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_6
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 1, run 6; Table 1; PDF page 6
+      T_F: '979.98'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '981.19'
+          locator: &id006
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 1, run 6; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '979.54'
+          locator: *id006
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '979.26'
+          locator: *id006
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '59754'
+          locator: *id006
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0595'
+          locator: *id006
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0589'
+          locator: *id006
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.864'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '1'
+        run_no_as_printed: '6'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_7
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 1, run 7; Table 1; PDF page 6
+      T_F: '976.60'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '977.61'
+          locator: &id007
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 1, run 7; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '976.16'
+          locator: *id007
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '975.88'
+          locator: *id007
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '59602'
+          locator: *id007
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0577'
+          locator: *id007
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0572'
+          locator: *id007
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.964'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '1'
+        run_no_as_printed: '7'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_8
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 1, run 8; Table 1; PDF page 6
+      T_F: '861.99'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '864.23'
+          locator: &id008
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 1, run 8; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '861.67'
+          locator: *id008
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '861.43'
+          locator: *id008
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '48799'
+          locator: *id008
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0198'
+          locator: *id008
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0193'
+          locator: *id008
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.897'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '1'
+        run_no_as_printed: '8'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_9
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 2, run 9; Table 1; PDF page 6
+      T_F: '843.57'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '846.02'
+          locator: &id009
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 2, run 9; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '843.28'
+          locator: *id009
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '843.06'
+          locator: *id009
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '44633'
+          locator: *id009
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0164'
+          locator: *id009
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0160'
+          locator: *id009
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.885'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '2'
+        run_no_as_printed: '9'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_10
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 2, run 10; Table 1; PDF page 6
+      T_F: '850.09'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '852.45'
+          locator: &id010
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 2, run 10; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '849.82'
+          locator: *id010
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '849.61'
+          locator: *id010
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '43100'
+          locator: *id010
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0175'
+          locator: *id010
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0171'
+          locator: *id010
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.859'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '2'
+        run_no_as_printed: '10'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_11
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 2, run 11; Table 1; PDF page 6
+      T_F: '848.56'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '850.71'
+          locator: &id011
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 2, run 11; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '848.28'
+          locator: *id011
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '848.07'
+          locator: *id011
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '43084'
+          locator: *id011
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0172'
+          locator: *id011
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0168'
+          locator: *id011
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.912'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '2'
+        run_no_as_printed: '11'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_12
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 2, run 12; Table 1; PDF page 6
+      T_F: '850.38'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '853.04'
+          locator: &id012
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 2, run 12; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '850.00'
+          locator: *id012
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '849.73'
+          locator: *id012
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '54884'
+          locator: *id012
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0176'
+          locator: *id012
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0172'
+          locator: *id012
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.917'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '2'
+        run_no_as_printed: '12'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_13
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 2, run 13; Table 1; PDF page 6
+      T_F: '785.18'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '789.11'
+          locator: &id013
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 2, run 13; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '784.85'
+          locator: *id013
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '784.60'
+          locator: *id013
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '49431'
+          locator: *id013
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0088'
+          locator: *id013
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0084'
+          locator: *id013
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.959'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '2'
+        run_no_as_printed: '13'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_14
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 2, run 14; Table 1; PDF page 6
+      T_F: '756.55'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '761.31'
+          locator: &id014
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 2, run 14; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '756.25'
+          locator: *id014
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '756.01'
+          locator: *id014
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '47017'
+          locator: *id014
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0063'
+          locator: *id014
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0060'
+          locator: *id014
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.975'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '2'
+        run_no_as_printed: '14'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_15
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 2, run 15; Table 1; PDF page 6
+      T_F: '913.65'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '915.53'
+          locator: &id015
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 2, run 15; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '913.21'
+          locator: *id015
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '912.93'
+          locator: *id015
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '59815'
+          locator: *id015
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0328'
+          locator: *id015
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0322'
+          locator: *id015
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.882'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '2'
+        run_no_as_printed: '15'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_16
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 2, run 16; Table 1; PDF page 6
+      T_F: '971.71'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '973.07'
+          locator: &id016
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 2, run 16; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '971.23'
+          locator: *id016
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '970.93'
+          locator: *id016
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '63917'
+          locator: *id016
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0554'
+          locator: *id016
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0548'
+          locator: *id016
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.867'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '2'
+        run_no_as_printed: '16'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_17
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 2, run 17; Table 1; PDF page 6
+      T_F: '852.35'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '854.57'
+          locator: &id017
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 2, run 17; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '852.07'
+          locator: *id017
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '851.85'
+          locator: *id017
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '44301'
+          locator: *id017
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0179'
+          locator: *id017
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0175'
+          locator: *id017
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.894'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '2'
+        run_no_as_printed: '17'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_18
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 3, run 18; Table 1; PDF page 6
+      T_F: '839.89'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '842.26'
+          locator: &id018
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 3, run 18; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '839.60'
+          locator: *id018
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '839.37'
+          locator: *id018
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '45424'
+          locator: *id018
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0157'
+          locator: *id018
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0154'
+          locator: *id018
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.926'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '3'
+        run_no_as_printed: '18'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_19
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 3, run 19; Table 1; PDF page 6
+      T_F: '920.83'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '922.60'
+          locator: &id019
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 3, run 19; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '920.51'
+          locator: *id019
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '920.27'
+          locator: *id019
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '48654'
+          locator: *id019
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0351'
+          locator: *id019
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0345'
+          locator: *id019
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.785'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '3'
+        run_no_as_printed: '19'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_20
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 3, run 20; Table 1; PDF page 6
+      T_F: '989.88'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '990.94'
+          locator: &id020
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 3, run 20; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '989.52'
+          locator: *id020
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '989.28'
+          locator: *id020
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '51719'
+          locator: *id020
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0647'
+          locator: *id020
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0641'
+          locator: *id020
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.825'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '3'
+        run_no_as_printed: '20'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_21
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 3, run 21; Table 1; PDF page 6
+      T_F: '988.56'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '989.38'
+          locator: &id021
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 3, run 21; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '988.20'
+          locator: *id021
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '987.96'
+          locator: *id021
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '51725'
+          locator: *id021
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0638'
+          locator: *id021
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.0634'
+          locator: *id021
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.957'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '3'
+        run_no_as_printed: '21'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.
+    - observation_id: wilcox_rohsenow_1970_k_run_22
+      type: alpha
+      locator:
+        table: '1'
+        page: 6
+        published_page: 364
+        pdf_page_index: 5
+        note: Series 3, run 22; Table 1; PDF page 6
+      T_F: '1097.30'
+      phase: solid_polycrystalline
+      regime: film_condensation
+      units: dimensionless
+      point_conditions:
+        T_v_F_as_printed:
+          state:
+            tag: value
+            value: '1098.18'
+          locator: &id022
+            page: 6
+            published_page: 364
+            pdf_page_index: 5
+            table: '1'
+            note: Table 1, Series 3, run 22; PDF page 6
+        T_w_F_as_printed:
+          state:
+            tag: value
+            value: '1096.87'
+          locator: *id022
+        T_cu_ni_F_as_printed:
+          state:
+            tag: value
+            value: '1096.61'
+          locator: *id022
+        q_over_A_Btu_hr_ft2_as_printed:
+          state:
+            tag: value
+            value: '57992'
+          locator: *id022
+        P_v_atm_as_printed:
+          state:
+            tag: value
+            value: '0.1516'
+          locator: *id022
+        P_s_atm_as_printed:
+          state:
+            tag: value
+            value: '0.1506'
+          locator: *id022
+      values:
+        quantity: condensation_coefficient
+        method_class: calculated
+        alpha: '0.655'
+        gas_species: K(g)
+        substrate: nickel_plated_copper
+        technique: film condensation with copper condensing block
+        series_no_as_printed: '3'
+        run_no_as_printed: '22'
+        note: Sigma is calculated from equation (2); P_v and P_s are printed vapor/saturation pressures, not total
+          system pressure.

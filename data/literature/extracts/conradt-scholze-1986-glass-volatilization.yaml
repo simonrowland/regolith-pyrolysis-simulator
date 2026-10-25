@@ -1,0 +1,1569 @@
+schema_version: literature_extract.v1
+source_id: conradt-scholze-1986-glass-volatilization
+source:
+  citation: Conradt, R. and Scholze, H. (1986). Zur Verdampfung aus Glasschmelzen.
+    Glastechnische Berichte, 59(2), 34–52. doi:10.34657/14359.
+  year: 1986
+  doi: 10.34657/14359
+  corpus_asset: raw/conradt-scholze-1986-glass-volatilization/conradt-scholze-1986-glass-volatilization.pdf
+extraction:
+  method: Transcribed MinerU HTML table blocks and pdftotext-layout; every numeric
+    cell in Tables 5–6 checked against PDF page renders because machine text uses
+    comma decimals.
+  date: '2026-10-22'
+  worker: wave52-F63
+fidelity_samples:
+- species: Na2O
+  observable: rate_series
+  observation_id: conradt_scholze_t5_na2o_01
+  field: evaporation_flux_as_printed
+  value: '0.2'
+  locator: {page: 9, table: '5', note: 'P_H2O=0 bar; P_SO2=0 mbar; SO3=0.07 mass %'}
+- species: Na2O
+  observable: rate_series
+  observation_id: conradt_scholze_t5_na2o_13
+  field: evaporation_flux_as_printed
+  value: '0.4'
+  locator: {page: 9, table: '5', note: 'P_H2O=0.1 bar; P_SO2=0 mbar; SO3=0 mass %'}
+- species: K2O
+  observable: rate_series
+  observation_id: conradt_scholze_t6_k2o_28
+  field: evaporation_flux_as_printed
+  value: '1'
+  locator: {page: 10, table: '6', note: 'P_H2O=0.1 bar; K2O=17 mole %'}
+review_status: draft
+experiments:
+  conradt_scholze_table5_na2o_1400c:
+    method: glass_melt_evaporation
+    locator: &id001
+      page: 9
+      table: '5'
+    conditions:
+      T_C:
+        state:
+          tag: value
+          value: 1400
+        locator: *id001
+    sample:
+      form:
+        state:
+          tag: value
+          value: Na2O-CaO-SiO2 glass melt
+        locator:
+          page: 9
+          table: '5'
+  conradt_scholze_table6_k2o_1000c:
+    method: glass_melt_evaporation
+    locator: &id002
+      page: 10
+      table: '6'
+    conditions:
+      T_C:
+        state:
+          tag: value
+          value: 1000
+        locator: *id002
+    sample:
+      form:
+        state:
+          tag: value
+          value: K2O-B2O3 glass melt
+        locator:
+          page: 10
+          table: '6'
+species:
+  Na2O:
+    observations:
+    - observation_id: conradt_scholze_t5_na2o_01
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id003
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.07 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.07 mass %
+          locator: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.07'
+          locator: *id003
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000002'
+        evaporation_flux_as_printed: '0.2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.07 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_02
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id004
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.22 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.22 mass %
+          locator: *id004
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.22'
+          locator: *id004
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000002'
+        evaporation_flux_as_printed: '0.2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.22 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_03
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id005
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.34 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.34 mass %
+          locator: *id005
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.34'
+          locator: *id005
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000002'
+        evaporation_flux_as_printed: '0.2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.34 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_04
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id006
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.97 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.97 mass %
+          locator: *id006
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.97'
+          locator: *id006
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000003'
+        evaporation_flux_as_printed: '0.3'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=0 mbar; SO3=0.97 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_05
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id007
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.07 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.07 mass %
+          locator: *id007
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.07'
+          locator: *id007
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000003'
+        evaporation_flux_as_printed: '0.3'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.07 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_06
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id008
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.22 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.22 mass %
+          locator: *id008
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.22'
+          locator: *id008
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000002'
+        evaporation_flux_as_printed: '0.2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.22 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_07
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id009
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.34 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.34 mass %
+          locator: *id009
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.34'
+          locator: *id009
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000002'
+        evaporation_flux_as_printed: '0.2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.34 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_08
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id010
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.97 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.97 mass %
+          locator: *id010
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.97'
+          locator: *id010
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000003'
+        evaporation_flux_as_printed: '0.3'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=0.1 mbar; SO3=0.97 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_09
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id011
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.07 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.07 mass %
+          locator: *id011
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.07'
+          locator: *id011
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000002'
+        evaporation_flux_as_printed: '0.2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.07 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_10
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id012
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.22 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.22 mass %
+          locator: *id012
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.22'
+          locator: *id012
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000002'
+        evaporation_flux_as_printed: '0.2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.22 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_11
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id013
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.34 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.34 mass %
+          locator: *id013
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.34'
+          locator: *id013
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000002'
+        evaporation_flux_as_printed: '0.2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.34 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_12
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id014
+        page: 9
+        table: '5'
+        note: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.97 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.97 mass %
+          locator: *id014
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.97'
+          locator: *id014
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000003'
+        evaporation_flux_as_printed: '0.3'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0 bar; P_SO2=1 mbar; SO3=0.97 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_13
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id015
+        page: 9
+        table: '5'
+        note: P_H2O=0.1 bar; P_SO2=0 mbar; SO3=0 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar; P_SO2=0 mbar; SO3=0 mass %
+          locator: *id015
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0'
+          locator: *id015
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000004'
+        evaporation_flux_as_printed: '0.4'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.1 bar; P_SO2=0 mbar; SO3=0 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_14
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id016
+        page: 9
+        table: '5'
+        note: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.07 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.07 mass %
+          locator: *id016
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.07'
+          locator: *id016
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000009'
+        evaporation_flux_as_printed: '0.9'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.07 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_15
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id017
+        page: 9
+        table: '5'
+        note: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.22 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.22 mass %
+          locator: *id017
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.22'
+          locator: *id017
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000009'
+        evaporation_flux_as_printed: '0.9'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.22 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_16
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id018
+        page: 9
+        table: '5'
+        note: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.34 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.34 mass %
+          locator: *id018
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.34'
+          locator: *id018
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000009'
+        evaporation_flux_as_printed: '0.9'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.34 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_17
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id019
+        page: 9
+        table: '5'
+        note: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.97 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.97 mass %
+          locator: *id019
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.97'
+          locator: *id019
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000010'
+        evaporation_flux_as_printed: '1.0'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.1 bar; P_SO2=0.1 mbar; SO3=0.97 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_18
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id020
+        page: 9
+        table: '5'
+        note: P_H2O=0.1 bar; P_SO2=1 mbar; SO3=0.07 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar; P_SO2=1 mbar; SO3=0.07 mass %
+          locator: *id020
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.07'
+          locator: *id020
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000008'
+        evaporation_flux_as_printed: '0.8'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.1 bar; P_SO2=1 mbar; SO3=0.07 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_19
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id021
+        page: 9
+        table: '5'
+        note: P_H2O=0.1 bar; P_SO2=1 mbar; SO3=0.22 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar; P_SO2=1 mbar; SO3=0.22 mass %
+          locator: *id021
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.22'
+          locator: *id021
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000008'
+        evaporation_flux_as_printed: '0.8'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.1 bar; P_SO2=1 mbar; SO3=0.22 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_20
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id022
+        page: 9
+        table: '5'
+        note: P_H2O=0.1 bar; P_SO2=1 mbar; SO3=0.34 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar; P_SO2=1 mbar; SO3=0.34 mass %
+          locator: *id022
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.34'
+          locator: *id022
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000008'
+        evaporation_flux_as_printed: '0.8'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.1 bar; P_SO2=1 mbar; SO3=0.34 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_21
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id023
+        page: 9
+        table: '5'
+        note: P_H2O=0.2 bar; P_SO2=0 mbar; SO3=0 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.2 bar; P_SO2=0 mbar; SO3=0 mass %
+          locator: *id023
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0'
+          locator: *id023
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000007'
+        evaporation_flux_as_printed: '0.7'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.2 bar; P_SO2=0 mbar; SO3=0 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_22
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id024
+        page: 9
+        table: '5'
+        note: P_H2O=0.2 bar; P_SO2=0.1 mbar; SO3=0.07 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.2 bar; P_SO2=0.1 mbar; SO3=0.07 mass %
+          locator: *id024
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.07'
+          locator: *id024
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000011'
+        evaporation_flux_as_printed: '1.1'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.2 bar; P_SO2=0.1 mbar; SO3=0.07 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_23
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id025
+        page: 9
+        table: '5'
+        note: P_H2O=0.2 bar; P_SO2=0.1 mbar; SO3=0.22 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.2 bar; P_SO2=0.1 mbar; SO3=0.22 mass %
+          locator: *id025
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.22'
+          locator: *id025
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000012'
+        evaporation_flux_as_printed: '1.2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.2 bar; P_SO2=0.1 mbar; SO3=0.22 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_24
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id026
+        page: 9
+        table: '5'
+        note: P_H2O=0.2 bar; P_SO2=0.1 mbar; SO3=0.97 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.2 bar; P_SO2=0.1 mbar; SO3=0.97 mass %
+          locator: *id026
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.97'
+          locator: *id026
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000013'
+        evaporation_flux_as_printed: '1.3'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.2 bar; P_SO2=0.1 mbar; SO3=0.97 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_25
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id027
+        page: 9
+        table: '5'
+        note: P_H2O=0.2 bar; P_SO2=1 mbar; SO3=0.07 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.2 bar; P_SO2=1 mbar; SO3=0.07 mass %
+          locator: *id027
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.07'
+          locator: *id027
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000011'
+        evaporation_flux_as_printed: '1.1'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.2 bar; P_SO2=1 mbar; SO3=0.07 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_26
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id028
+        page: 9
+        table: '5'
+        note: P_H2O=0.2 bar; P_SO2=1 mbar; SO3=0.22 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.2 bar; P_SO2=1 mbar; SO3=0.22 mass %
+          locator: *id028
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.22'
+          locator: *id028
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000012'
+        evaporation_flux_as_printed: '1.2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.2 bar; P_SO2=1 mbar; SO3=0.22 mass %
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t5_na2o_27
+      experiment: conradt_scholze_table5_na2o_1400c
+      type: rate_series
+      locator: &id029
+        page: 9
+        table: '5'
+        note: P_H2O=0.2 bar; P_SO2=1 mbar; SO3=0.34 mass %
+      T_C: 1400
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.2 bar; P_SO2=1 mbar; SO3=0.34 mass %
+          locator: *id029
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+              - - SiO2
+                - '74'
+              - - SO3
+                - '0.34'
+          locator: *id029
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.0000011'
+        evaporation_flux_as_printed: '1.1'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: Na2O
+        composition_as_printed: 16 mass % Na2O, 10 mass % CaO, 74 mass % SiO2
+        condition_as_printed: P_H2O=0.2 bar; P_SO2=1 mbar; SO3=0.34 mass %
+        method_class: measured_direct
+  K2O:
+    observations:
+    - observation_id: conradt_scholze_t6_k2o_28
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id030
+        page: 10
+        table: '6'
+        note: P_H2O=0.1 bar; binary K2O-B2O3 melt (as printed); K2O=17 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar
+          locator: *id030
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '17 mole %'
+          locator: *id030
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000001'
+        evaporation_flux_as_printed: '1'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=17 mole %
+        condition_as_printed: P_H2O=0.1 bar
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t6_k2o_29
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id031
+        page: 10
+        table: '6'
+        note: P_H2O=0.1 bar; binary K2O-B2O3 melt (as printed); K2O=20 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar
+          locator: *id031
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '20 mole %'
+          locator: *id031
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000002'
+        evaporation_flux_as_printed: '2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=20 mole %
+        condition_as_printed: P_H2O=0.1 bar
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t6_k2o_30
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id032
+        page: 10
+        table: '6'
+        note: P_H2O=0.1 bar; binary K2O-B2O3 melt (as printed); K2O=25 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar
+          locator: *id032
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '25 mole %'
+          locator: *id032
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000005'
+        evaporation_flux_as_printed: '5'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=25 mole %
+        condition_as_printed: P_H2O=0.1 bar
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t6_k2o_31
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id033
+        page: 10
+        table: '6'
+        note: P_H2O=0.1 bar; binary K2O-B2O3 melt (as printed); K2O=33 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.1 bar
+          locator: *id033
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '33 mole %'
+          locator: *id033
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000016'
+        evaporation_flux_as_printed: '16'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=33 mole %
+        condition_as_printed: P_H2O=0.1 bar
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t6_k2o_32
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id034
+        page: 10
+        table: '6'
+        note: P_H2O=0.25 bar; binary K2O-B2O3 melt (as printed); K2O=17 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.25 bar
+          locator: *id034
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '17 mole %'
+          locator: *id034
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000001'
+        evaporation_flux_as_printed: '1'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=17 mole %
+        condition_as_printed: P_H2O=0.25 bar
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t6_k2o_33
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id035
+        page: 10
+        table: '6'
+        note: P_H2O=0.25 bar; binary K2O-B2O3 melt (as printed); K2O=20 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.25 bar
+          locator: *id035
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '20 mole %'
+          locator: *id035
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000003'
+        evaporation_flux_as_printed: '3'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=20 mole %
+        condition_as_printed: P_H2O=0.25 bar
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t6_k2o_34
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id036
+        page: 10
+        table: '6'
+        note: P_H2O=0.25 bar; binary K2O-B2O3 melt (as printed); K2O=25 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.25 bar
+          locator: *id036
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '25 mole %'
+          locator: *id036
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000005'
+        evaporation_flux_as_printed: '5'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=25 mole %
+        condition_as_printed: P_H2O=0.25 bar
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t6_k2o_35
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id037
+        page: 10
+        table: '6'
+        note: P_H2O=0.25 bar; binary K2O-B2O3 melt (as printed); K2O=33 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.25 bar
+          locator: *id037
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '33 mole %'
+          locator: *id037
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000014'
+        evaporation_flux_as_printed: '14'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=33 mole %
+        condition_as_printed: P_H2O=0.25 bar
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t6_k2o_36
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id038
+        page: 10
+        table: '6'
+        note: P_H2O=0.5 bar; binary K2O-B2O3 melt (as printed); K2O=17 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.5 bar
+          locator: *id038
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '17 mole %'
+          locator: *id038
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000002'
+        evaporation_flux_as_printed: '2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=17 mole %
+        condition_as_printed: P_H2O=0.5 bar
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t6_k2o_37
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id039
+        page: 10
+        table: '6'
+        note: P_H2O=0.5 bar; binary K2O-B2O3 melt (as printed); K2O=20 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.5 bar
+          locator: *id039
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '20 mole %'
+          locator: *id039
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000002'
+        evaporation_flux_as_printed: '2'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=20 mole %
+        condition_as_printed: P_H2O=0.5 bar
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t6_k2o_38
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id040
+        page: 10
+        table: '6'
+        note: P_H2O=0.5 bar; binary K2O-B2O3 melt (as printed); K2O=25 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.5 bar
+          locator: *id040
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '25 mole %'
+          locator: *id040
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000010'
+        evaporation_flux_as_printed: '10'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=25 mole %
+        condition_as_printed: P_H2O=0.5 bar
+        method_class: measured_direct
+    - observation_id: conradt_scholze_t6_k2o_39
+      experiment: conradt_scholze_table6_k2o_1000c
+      type: rate_series
+      locator: &id041
+        page: 10
+        table: '6'
+        note: P_H2O=0.5 bar; binary K2O-B2O3 melt (as printed); K2O=33 mole %
+      T_C: 1000
+      units: kg m^-2 s^-1
+      phase: liquid
+      regime: glass_melt_evaporation
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: P_H2O=0.5 bar
+          locator: *id041
+        composition:
+          state:
+            tag: value
+            value:
+              K2O: '33 mole %'
+          locator: *id041
+      values:
+        quantity: evaporation_flux
+        evaporation_flux: '0.000015'
+        evaporation_flux_as_printed: '15'
+        units_as_printed: 10^-6 kg m^-2 s^-1
+        component_as_printed: K2O
+        composition_as_printed: binary K2O-B2O3 melt (as printed); K2O=33 mole %
+        condition_as_printed: P_H2O=0.5 bar
+        method_class: measured_direct

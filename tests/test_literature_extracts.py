@@ -673,6 +673,193 @@ def test_okazaki_container_helium_ratio_uncertainty_is_pinned() -> None:
     assert "(1 sigma)" in printed_uncertainty
 
 
+def test_ni_2021_table1_render_pins_and_row_count() -> None:
+    """PDF p. 41 render pins for Table 1; the table has 18 printed rows."""
+    doc = yaml.safe_load(
+        (EXTRACTS / "ni-2021-laser-levitation-evaporation.yaml").read_text()
+    )
+    rows = [
+        row
+        for row in doc["species"]["basaltic_glass"]["context"]
+        if row["type"] == "table_row"
+    ]
+    table = {
+        row["values"]["table_row"]["sample"]: row["values"]["table_row"]
+        for row in rows
+    }
+
+    assert len(rows) == 18
+    assert table["Cu 1.12"]["mass_loss_pct"] == "1.11"
+    assert table["Cu 1.12"]["Cu_ppm"] == "517"
+    assert table["Cu 1.12"]["delta65Cu_permil"] == "7.10"
+    assert table["Cu 1.15"]["delta65Cu_permil"] == "3.71"
+
+
+def test_ni_2021_conditions_and_starting_composition_reach_identity() -> None:
+    path = EXTRACTS / "ni-2021-laser-levitation-evaporation.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    observations = list(migrator.result.observations.values())
+
+    assert len(observations) == 53
+    assert migrator.result.validation is not None
+    assert not migrator.result.validation.hard_issues
+    experiment = next(
+        row
+        for row in migrator.result.experiments.values()
+        if row.experiment_id.endswith("::experiment::table1-cu_1_12")
+    )
+    assert experiment.pressure_environment.sweep_gas.state.value.species == "Ar"
+    for observation in observations:
+        conditions = observation.point_conditions or {}
+        atmosphere = conditions.get("atmosphere")
+        if atmosphere is None:
+            continue
+        row_experiment = migrator.result.experiments[observation.experiment_id]
+        sweep_gas = row_experiment.pressure_environment.sweep_gas.state
+        if sweep_gas.is_value:
+            expected_species = (
+                sweep_gas.value
+                if isinstance(sweep_gas.value, str)
+                else sweep_gas.value.species
+            )
+            assert atmosphere.state.is_value
+            assert atmosphere.state.value == expected_species
+        else:
+            assert atmosphere.state.is_unknown
+    unheated = [o for o in observations if not o.identity.temperature_K.is_value]
+    assert len(unheated) == 5
+    for observation in observations:
+        if observation.identity.temperature_K.is_value:
+            assert observation.identity.temperature_K.value in {
+                Decimal("2023.15"), Decimal("2273.15"), Decimal("2423.15")
+            }
+        if observation.identity.temperature_K.is_value and observation.identity.quantity.value != "isotope_delta":
+            assert observation.identity.composition.is_value
+            composition_components = observation.identity.composition.value.components
+            expected_iron_token = (
+                "FeOT"
+                if observation.identity.quantity.value == "residue_component_composition"
+                else "FeO"
+            )
+            assert any(component == expected_iron_token and amount > 0 for component, amount in composition_components)
+            assert observation.identity.total_pressure_Pa.is_value
+            assert observation.identity.total_pressure_Pa.value == 101325
+            assert observation.identity.fO2_Pa.is_unknown
+
+
+def test_ni_2021_review_findings_are_pinned() -> None:
+    source = EXTRACTS / "ni-2021-laser-levitation-evaporation.yaml"
+    doc = yaml.safe_load(source.read_text())
+    cu_rows = doc["species"]["Cu"]["observations"]
+    by_id = {row["observation_id"]: row for row in cu_rows}
+
+    heated_row = by_id["ni_2021_cu_1_12_cu_residue"]
+    assert heated_row["values"]["points"] == [
+        {
+            "residue_ppm": "517",
+            "T_C": "1750",
+            "locator": {
+                "page": 41,
+                "pdf_page_index": 40,
+                "table": "1",
+                "row": "Cu 1.12",
+                "column": "C_Cu",
+            },
+        }
+    ]
+    assert "element_ppm_by_mass" not in heated_row["values"]
+
+    isotope_rows = [row for row in cu_rows if row["values"].get("quantity") == "isotope_delta"]
+    assert len(isotope_rows) == 18
+    for row in isotope_rows:
+        assert row["values"]["reference_standard"] == "NIST SRM 976"
+        assert row["values"]["bracketing_standard"] == "ERM-AE633"
+        assert row["values"]["reference_correction_permil"] == "+0.01"
+        assert row["values"]["reference_standard_locator"]["page"] == 13
+
+    for observation_id, expected in (
+        ("ni_2021_et1cu_cu_concentration", "1185"),
+        ("ni_2021_cu_1_15_cu_concentration", "1129"),
+    ):
+        assert by_id[observation_id]["values"]["points"][0]["residue_ppm"] == expected
+    for observation_id, expected in (
+        ("ni_2021_et1cu_delta65cu", "3.46"),
+        ("ni_2021_cu_1_15_delta65cu", "3.71"),
+    ):
+        assert by_id[observation_id]["values"]["isotope_delta_isotope_delta"] == expected
+        assert by_id[observation_id]["point_conditions"]["temperature_K"]["state"]["tag"] == "unknown"
+
+    experiment = next(row for row in doc["experiments"] if row["experiment_id"] == "table1-cu_1_12")
+    assert experiment["bench_id"] == "laser-aerodynamic-levitation"
+    assert experiment["sample"]["mass_kg"]["state"]["value"]["point"] == "0.000020044"
+    assert experiment["sample"]["mass_kg"]["locator"]["row"] == "Cu 1.12"
+    assert experiment["pressure_environment"]["total_pressure_Pa"]["locator"]["page"] == 25
+    assert "1 atm = 101325 Pa" in experiment["pressure_environment"]["total_pressure_Pa"]["locator"]["note"]
+    assert experiment["pressure_environment"]["sweep_gas"]["locator"]["page"] == 10
+    assert doc["benches"][0]["apparatus_family"]["locator"]["page"] == 9
+    assert doc["benches"][0]["temperature_measurement"]["sensor"]["locator"]["page"] == 9
+    heated_mass_loss = doc["species"]["basaltic_glass"]["observations"][0]
+    assert heated_mass_loss["values"]["quench_locator"]["page"] == 10
+    assert doc["species"]["basaltic_glass"]["observations"][0]["point_conditions"]["composition"]["state"]["value"]["amount_basis"] == "mass_percent"
+
+    quoted_prior = by_id["ni_2021_et1cu_cu_prior_assay_quoted"]
+    assert quoted_prior["values"]["method_class"] == "quoted_attributed"
+    assert quoted_prior["values"]["attribution"] == "Ni and Zhang (2016)"
+    assert quoted_prior["values"]["points"][0]["residue_ppm"] == "1174"
+    assert quoted_prior["uncertainty"]["verbatim"] == "+/- 121 ppm"
+
+    audit = (EXTRACTS / "ni-2021-laser-levitation-evaporation-audit.md").read_text()
+    assert "PDF p. 14 states 3.17‰" in audit
+    assert "PDF p. 13 states 3.17‰" not in audit
+    assert "99.53" not in source.read_text()
+    assert "printed oxide total" not in source.read_text()
+
+
+def test_ni_2021_residue_and_unheated_measurements_migrate() -> None:
+    path = EXTRACTS / "ni-2021-laser-levitation-evaporation.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    observations = list(migrator.result.observations.values())
+    mass_loss = next(o for o in observations if o.observation_id.endswith("ni_2021_cu_1_12_bulk_mass_loss"))
+    assert mass_loss.value.point == Decimal("0.0111")
+    residue = next(o for o in observations if "ni_2021_cu_1_12_cu_residue::" in o.observation_id)
+    assert residue.identity.subtype.is_value
+    assert residue.identity.subtype.value == "element_ppm_by_mass"
+    assert residue.identity.sample_mass_kg.is_value
+    assert residue.identity.sample_mass_kg.value == Decimal("0.000020044")
+    assert residue.value.point == Decimal("517")
+    assert residue.identity.temperature_K.value == Decimal("2023.15")
+    assert any(notice.kind.value == "total_iron_reported_as_feo" for notice in residue.notices)
+
+    for fragment, expected in (
+        ("ni_2021_et1cu_cu_concentration::points:", Decimal("1185")),
+        ("ni_2021_cu_1_15_cu_concentration::points:", Decimal("1129")),
+    ):
+        point = next(o for o in observations if fragment in o.observation_id)
+        assert point.value.point == expected
+        assert point.identity.temperature_K.is_unknown
+        assert point.identity.subtype.value == "element_ppm_by_mass"
+        if "cu_1_15" in fragment:
+            assert point.identity.sample_mass_kg.value == Decimal("0.000019664")
+        else:
+            assert point.identity.sample_mass_kg.is_unknown
+
+    for fragment, expected in (
+        ("ni_2021_et1cu_delta65cu", Decimal("3.46")),
+        ("ni_2021_cu_1_15_delta65cu", Decimal("3.71")),
+    ):
+        point = next(o for o in observations if fragment in o.observation_id)
+        assert point.value.point == expected
+        assert point.identity.temperature_K.is_unknown
+
+    quoted = next(o for o in observations if "ni_2021_et1cu_cu_prior_assay_quoted::points:" in o.observation_id)
+    assert quoted.value.point == Decimal("1174")
+    assert quoted.evidence.class_.is_value
+    assert quoted.evidence.class_.value.value == "quoted_attributed"
+    assert quoted.uncertainty.verbatim["verbatim"] == "+/- 121 ppm"
+
+
 def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None:
     from simulator.battery.enums import Quantity
     from simulator.battery.migrate import wt_pct_to_mole_fraction
@@ -773,6 +960,91 @@ def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
             experiment["thermal_schedule"]["cooling_or_quench"]
             == baseline["thermal_schedule"]["cooling_or_quench"]
         )
+
+
+def test_lee_1976_table3_cells_match_render_and_unprinted_conditions_stay_unknown(
+    tmp_path: Path,
+) -> None:
+    """Table 3's full 4x4 print is pinned to the page-3 render and migration."""
+    from simulator.battery.enums import Quantity
+
+    source = EXTRACTS / "lee-1976-chromium-oxide-vaporization.yaml"
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    rows = extract["species"]["Cr2O3"]["observations"]
+    assert len(rows) == 16
+    rendered = {
+        "lee1976_table3_porosity_0_018_T1745C": Decimal("39.9"),
+        "lee1976_table3_porosity_0_018_T1635C": Decimal("5.62"),
+        "lee1976_table3_porosity_0_018_T1575C": Decimal("1.62"),
+        "lee1976_table3_porosity_0_018_T1457C": Decimal("0.114"),
+        "lee1976_table3_porosity_0_250_T1745C": Decimal("42.3"),
+        "lee1976_table3_porosity_0_250_T1635C": Decimal("6.66"),
+        "lee1976_table3_porosity_0_250_T1575C": Decimal("1.84"),
+        "lee1976_table3_porosity_0_250_T1457C": Decimal("0.141"),
+        "lee1976_table3_porosity_0_300_T1745C": Decimal("45.1"),
+        "lee1976_table3_porosity_0_300_T1635C": Decimal("6.89"),
+        "lee1976_table3_porosity_0_300_T1575C": Decimal("2.19"),
+        "lee1976_table3_porosity_0_300_T1457C": Decimal("0.186"),
+        "lee1976_table3_porosity_0_380_T1745C": Decimal("47.6"),
+        "lee1976_table3_porosity_0_380_T1635C": Decimal("7.27"),
+        "lee1976_table3_porosity_0_380_T1575C": Decimal("2.47"),
+        "lee1976_table3_porosity_0_380_T1457C": Decimal("0.322"),
+    }
+    source_rows = {row["observation_id"]: row for row in rows}
+    for observation_id, expected in rendered.items():
+        row = source_rows[observation_id]
+        assert row["locator"]["page"] == 3
+        assert row["locator"]["published_page"] == 580
+        assert Decimal(row["values"]["evaporation_flux"]) == expected
+
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrator.finalize()
+    result = migrator.result
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+    assert len(result.observations) == 16
+    for observation_id, row in source_rows.items():
+        observation = result.observations[
+            f"lee-1976-chromium-oxide-vaporization::{observation_id}"
+        ]
+        printed = Decimal(row["values"]["evaporation_flux"])
+        assert observation.identity.quantity.value is Quantity.EVAPORATION_FLUX
+        assert observation.value.point == printed * Decimal("0.00001")
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.is_value
+        assert observation.identity.temperature_K.value == (
+            Decimal(str(row["T_C"])) + Decimal("273.15")
+        )
+        assert observation.identity.total_pressure_Pa.is_unknown
+        assert not observation.identity.fO2_Pa.is_value
+        assert observation.identity.species.formula == "Cr2O3"
+        assert "gas_species" not in row["values"]
+        assert "P_total" not in row["values"]
+        assert "flow" not in row["values"]
+        assert row["values"]["material_as_printed"] == "Cr2O3"
+        assert observation.point_conditions is not None
+        assert observation.point_conditions["pO2_atm"].state.is_value
+        oxygen_value = observation.point_conditions["pO2_atm"].state.value
+        assert oxygen_value.point == Decimal("1e-9")
+        assert oxygen_value.approximate is True
+        oxygen = row["point_conditions"]["pO2_atm"]
+        assert oxygen["state"] == {
+            "tag": "value",
+            "value": {
+                "kind": "point",
+                "point": "1e-9",
+                "approximate": True,
+            },
+        }
+        assert oxygen["locator"]["page"] == 4
+        assert oxygen["locator"]["published_page"] == 581
+        assert observation.provenance["printed_unit"] == "μg·cm^-2·sec^-1"
+        assert observation.provenance["flow"] == {
+            "flow_rate": {"state": "not_printed"},
+            "velocity": {"state": "not_printed"},
+            "geometry": {"state": "not_printed"},
+            "crucible_or_sample_area": {"state": "not_printed"},
+        }
 
 
 def test_sato_1976_migrates_all_numeric_table_cells() -> None:
@@ -5888,3 +6160,96 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
             ("(675.55,1619.08)", "(675.50,1620.00)"),
         )
     documents["shornikov-1997-cao-alumina-vapor"] = original
+def test_konta_1975_table_i_render_pins_and_residue_migration() -> None:
+    """Pin the scanned Table I values and prove every residue row lifts its axes."""
+    from simulator.battery.enums import Quantity
+
+    source_id = "konta-1975-moldavite-oxide-volatility"
+    path = EXTRACTS / f"{source_id}.yaml"
+    document = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    observations = {
+        item["observation_id"]: item
+        for species_data in document["species"].values()
+        for item in species_data.get("observations", [])
+    }
+    yaml_text = path.read_text(encoding="utf-8")
+    assert "total_pressure_atm" not in yaml_text
+    assert "pressure_atm" not in yaml_text
+    assert not any(
+        key in {"total_pressure_atm", "pressure_atm", "total_pressure_Pa"}
+        for item in observations.values()
+        for key in item["values"]
+    )
+    assert len(
+        [
+            item
+            for item in observations.values()
+            if item["values"].get("quantity") == "residue_component_composition"
+            and item["values"].get("analyte") != "H2O"
+        ]
+    ) == 132  # 11 oxides × 6 runs × raw and separately printed water-free basis.
+    water_rows = [
+        item for item in observations.values()
+        if item["values"].get("analyte") == "H2O"
+    ]
+    assert len(water_rows) == 21  # H2O+, H2O-, and recalculated combined-water cells.
+    assert observations["konta_1975_natural_H2O+_raw"]["values"]["printed_value_wt_pct"] == "3.16"
+    assert observations["konta_1975_natural_H2O-_raw"]["values"]["printed_value_wt_pct"] == "1.84"
+    assert len(document["experiments"]) == 6
+    for experiment in document["experiments"]:
+        sample_mass = experiment["sample"]["mass_kg"]
+        assert sample_mass["state"]["value"]["point"] == "0.010"
+        assert sample_mass["locator"]["page"] == 3
+        assert sample_mass["locator"]["published_page"] == 72
+    assert observations["konta_1975_5.91_SiO2_raw"]["values"]["SiO2_wt_pct"] == "77.04"
+    assert observations["konta_1975_10.52_Al2O3_raw"]["values"]["Al2O3_wt_pct"] == "18.14"
+    assert observations["konta_1975_13.92_SiO2_water_free"]["values"]["SiO2_wt_pct"] == "69.41"
+    assert observations["konta_1975_condensate_10.52_SiO2"]["values"]["value_wt_pct"] == "90.60"
+    condensate_rows = [
+        item for item in observations.values()
+        if item["values"].get("quantity") == "condensate_composition"
+    ]
+    assert len(condensate_rows) == 56  # Eight analytes × seven printed columns.
+    assert all(item["values"]["status"] == "typed_refusal" for item in condensate_rows)
+    assert all("schema_gap" in item["values"] for item in condensate_rows)
+    assert observations["konta_1975_condensate_8.26_SiO2"]["values"]["printed_form"] == "*"
+    assert observations["konta_1975_condensate_10.15_SiO2"]["values"]["printed_form"] == "—"
+    assert observations["konta_1975_condensate_5.91_SiO2"]["values"]["printed_form"] == "—"
+    assert observations["konta_1975_condensate_8.26_Na2O"]["values"]["value_wt_pct"] == "0.21"
+    assert observations["konta_1975_condensate_10.15_Na2O"]["values"]["printed_form"] == "—"
+    assert sum("T_C" in item["values"] for item in condensate_rows) == 48
+
+    migrator = battery_migrate.Migrator(REPO_ROOT)
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+    residue_rows = [
+        item
+        for item in result.observations.values()
+        if item.source_id == source_id
+        and item.identity.quantity.is_value
+        and item.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and item.identity.species.formula != "H2O"
+    ]
+    assert len(residue_rows) == 132
+    assert result.validation is not None and not result.validation.hard_issues
+    for item in residue_rows:
+        assert item.identity.temperature_K.is_value
+        assert item.identity.composition.is_value
+        assert item.identity.total_pressure_Pa.is_unknown
+        assert item.identity.sample_mass_kg.is_value
+        assert item.identity.sample_mass_kg.value == Decimal("0.010")
+        assert "temperature_K" in item.point_conditions
+        assert "starting_composition" in item.point_conditions
+        assert "thermal_function_A" in item.point_conditions
+    migrated_condensates = [
+        item for item in result.observations.values()
+        if item.source_id == source_id
+        and item.identity.quantity.is_value
+        and item.identity.quantity.value is Quantity.CONDENSATE_COMPOSITION
+    ]
+    assert len(migrated_condensates) == 56
+    assert sum(item.identity.temperature_K.is_value for item in migrated_condensates) == 48
+    assert next(
+        item for item in residue_rows if "konta_1975_5.91_SiO2_raw" in item.observation_id
+    ).value.point == Decimal("77.04")

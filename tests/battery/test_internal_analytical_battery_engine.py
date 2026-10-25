@@ -273,6 +273,36 @@ def test_internal_analytical_scores_cho_suito_1994_sio2_row() -> None:
     )
 
 
+def test_openimcc_kume_row_refuses_for_unprinted_source_polymorph() -> None:
+    context = battery_score.load_score_context(
+        Path(__file__).resolve().parents[2],
+        sources=("kume-2000-cao-activities",),
+    )
+    observation_id = (
+        "kume-2000-cao-activities::kume_2000_table1_sample_10_sio2_activity"
+    )
+    residual, _ = battery_score.compile_residual(
+        context.observations[observation_id],
+        Engine.OPENIMCC,
+        context=context,
+        comparison_ids={observation_id},
+    )
+
+    assert residual.execution.state is ExecutionState.NOT_PROBED
+    assert residual.status is battery_score.ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "fusion_source_reference_phase_unprinted"
+    )
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and notice.reason == "fusion_source_reference_phase_unprinted"
+        for notice in residual.notices
+    )
+
+
 def test_internal_analytical_scores_feo_with_ideal_fallback_notice() -> None:
     from simulator.battery.generators.bench import activity_request_for_engine
 
