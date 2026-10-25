@@ -4,8 +4,10 @@
 # that cell into one run context plus multiple typed-refusal composition cells.
 # Table 3 and Tables 9–11 are retained as row contexts because their equations,
 # coefficient tuples, inequalities, and paired fugacity values lack matching
-# scalar point forms. Table 5 and Table 6 magnesium-free subtables are likewise
-# retained as contexts because their values are inequalities.
+# scalar point forms. The scalar log-K columns are retained as typed refusals:
+# no current schema quantity represents general reaction equilibrium
+# constants. Table 5 and Table 6 magnesium-free subtables are likewise retained
+# as contexts because their values are inequalities.
 source_id: williams-1971-fe-mgo-sio2-o2-reaction-constants
 source:
   citation: >-
@@ -24,7 +26,9 @@ tables:
     table_index: 11
     published_page: 347
     type: gibbs_table
-    quantity: log10_Kf
+    quantity: reaction_equilibrium_constant
+    typed_refusal: true
+    reason: schema_gap_reaction_equilibrium_constant
     evidence_class: quoted_attributed
     unit: log10 equilibrium constant
     phase: cr
@@ -42,7 +46,9 @@ tables:
     table_index: 12
     published_page: 348
     type: gibbs_table
-    quantity: log10_Kf
+    quantity: reaction_equilibrium_constant
+    typed_refusal: true
+    reason: schema_gap_reaction_equilibrium_constant
     evidence_class: quoted_attributed
     unit: log10 equilibrium constant
     phase: cr
@@ -58,7 +64,9 @@ tables:
     table_index: 14
     published_page: 348
     type: gibbs_table
-    quantity: log10_Kf
+    quantity: reaction_equilibrium_constant
+    typed_refusal: true
+    reason: schema_gap_reaction_equilibrium_constant
     evidence_class: quoted_attributed
     unit: log10 equilibrium constant
     phase: cr
@@ -69,12 +77,14 @@ tables:
       unit: C
     values:
       - column: 5
-        species: Fe2SiO4
+        species: FeSi1/2O2
   - page: 16
     table_index: 16
     published_page: 349
     type: gibbs_table
-    quantity: log10_Kf
+    quantity: reaction_equilibrium_constant
+    typed_refusal: true
+    reason: schema_gap_reaction_equilibrium_constant
     evidence_class: quoted_attributed
     unit: log10 equilibrium constant
     phase: cr
@@ -90,7 +100,9 @@ tables:
     table_index: 17
     published_page: 349
     type: gibbs_table
-    quantity: log10_Kf
+    quantity: reaction_equilibrium_constant
+    typed_refusal: true
+    reason: schema_gap_reaction_equilibrium_constant
     evidence_class: quoted_attributed
     unit: log10 equilibrium constant
     phase: cr
@@ -101,4 +113,4 @@ tables:
       unit: C
     values:
       - column: 5
-        species: Fe2SiO4
+        species: FeSi1/2O2

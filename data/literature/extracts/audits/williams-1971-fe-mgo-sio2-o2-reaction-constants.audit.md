@@ -21,9 +21,18 @@ composition cells are retained as typed refusals because the current phase
 composition schema has no solid-mineral role for olivine, orthopyroxene, or
 magnesiowüstite. Values stay as printed mole percent with unit `%`; no division
 by 100 was applied. Table 3's six cited activity-composition equations are
-preserved as context. The 46 scalar log K points from Tables 4–8 migrate; the
-inequality bounds, A/B/C fit tuples, literature comparisons, and paired log
-fO2 entries remain typed context because those forms have no matching token.
+preserved as context. The 46 log K values from Tables 4–8 are typed refusals
+because the schema has no general reaction-equilibrium-constant quantity.
+Each row retains its printed reaction, log K value, qualifier when present,
+temperature, and table locator. No row claims `log10_Kf`: Table 4 and Table 8
+are exchange reactions; Tables 6 and 7 form products from compounds rather
+than elements; Table 5's Fe(1-x)O product is nonstoichiometric, so its
+formation elements and complete profile basis cannot be grounded from the
+printed row. The seven `min`/`max` qualifiers are preserved exactly without
+choosing a strict or inclusive bound. The Table 6 and Table 8 product label is
+recorded as printed `FeSi1/2O2`, not the previous `Fe2SiO4` formula label. The
+other inequality bounds, A/B/C fit tuples, literature comparisons, and paired
+log fO2 entries remain typed context.
 
 ## Conditions and evidence
 
@@ -44,11 +53,10 @@ assemblage per run. Tables 4–8 supply temperature but do not state pressure or
 fO2 in those rows; those conditions remain absent on the log K observations.
 
 The log K values are the authors' calculated outputs from run measurements
-and cited activity-composition relationships. Because the composition cells
-cannot migrate under the current schema, the fitted/calculated points are
-`quoted_attributed` under the extraction evidence rule; their attribution is
-recorded in each observation. The paper does not supply a complete migratable
-lineage for those calculations.
+and cited activity-composition relationships. Their printed values and
+attribution are retained, but the values migrate as `UNAVAILABLE` with the
+schema-gap refusal reason. They are not admitted as calculated or formation
+constant points.
 
 ## Numeric cell audit
 
@@ -79,10 +87,12 @@ composition cells O(25), P(20), and W(12) to their printed rows and pages.
 
 ## Table-tool reconciliation
 
-The committed mapping file describes the five scalar tables emitted by
-`mineru_table_draft.py`; the other table forms are hand-assembled or retained
-as context where the emitter cannot express their structure. The emitter
-produced 46 observations with no skipped value cells.
+The committed mapping file describes the five scalar tables drafted by
+`mineru_table_draft.py`; each candidate cell is retained as a typed refusal
+because no supported quantity token represents a general reaction
+equilibrium constant. The other table forms are hand-assembled or retained as
+context where the emitter cannot express their structure. All 46 candidate
+cells have no skipped values.
 
 The direct compare output has 46 `no-match` results because the compare command
 interprets the extract's correct printed table numbers (4–8) as MinerU block
@@ -93,19 +103,27 @@ table locators in the committed extract.
 
 ## Migration and scope gaps
 
-An isolated migration produced 46 observations, 0 hard issues, and 0 queued
-records. The focused test verifies that migrated log K identities receive the
-printed temperature, while composition, pressure, and fO2 are not applicable
-to this quantity profile and are absent from point conditions when the table
-does not print them. Table 1 and Table 2 run contexts retain their printed
-conditions separately.
+Before the refusal correction, isolated migration produced 46 point-valued
+`log10_Kf` observations, 0 hard issues, and 0 queued records; all 46 lacked
+reaction, formation-element, per-basis, and standard-pressure identity. After
+the correction, isolated migration still produces 46 observations, all 46
+`UNAVAILABLE` with admission reason
+`schema_gap_reaction_equilibrium_constant`, 0 scorable `log10_Kf` points, and
+0 hard issues. The migrator reports 92 unsupported-quantity/value queue
+entries for those rows because the schema has no corresponding quantity. The
+focused test verifies the printed reactions and values survive in observation
+provenance, the seven printed qualifiers remain intact, and only the printed
+temperature condition is mapped for Tables 4–8. Table 1 and Table 2 run
+contexts retain their printed conditions separately.
 
 Expected store delta without regeneration: 1 work, 83 experiments, and 46
-observations.
+observations, now all unavailable and rejected rather than scorable
+`log10_Kf` points.
 
-The schema gaps are the solid-mineral component role; point-valued log K
-inequalities; Table 9's A/B/C coefficient tuple and uncertainty form; Table
-10's comparison coefficients and ranges; and Table 11's paired measured and
+The schema gaps are a general reaction-equilibrium-constant quantity; the
+solid-mineral component role; point-valued log K inequalities; Table 9's A/B/C
+coefficient tuple and uncertainty form; Table 10's comparison coefficients
+and ranges; and Table 11's paired measured and
 calculated log fO2 form. Figures 2–9 contain figure-read candidates only and
 were not digitized. No schema, migrator, derived index, or battery store files
 were changed.

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 import yaml
 
+from simulator.battery.enums import AdmissionStatus, ValueKind
 from tests.battery.factories import migrate_one_extract
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,12 +30,12 @@ def _component_refusals(document: dict) -> dict[str, dict]:
     }
 
 
-def _migrated_render_pins(migrated: list[object]) -> dict[str, tuple[str, str, str]]:
+def _reaction_rows(document: dict) -> dict[str, tuple[str, dict]]:
     return {
-        row.observation_id.split("::")[-1]: (
-            str(row.value.point), str(row.locator.page), str(row.locator.table)
-        )
-        for row in migrated
+        row["observation_id"]: (species, row)
+        for species, block in document["species"].items()
+        for row in block.get("observations", [])
+        if row["observation_id"].startswith("williams71_t")
     }
 
 
@@ -66,14 +68,103 @@ def _printed_data_row_count(document: dict) -> int:
     return data_row_count
 
 
-def _assert_render_logk_pins(actual: dict[str, tuple[str, str, str]]) -> None:
+def _assert_render_reaction_pins(rows: dict[str, tuple[str, dict]]) -> None:
     expected = {
-        "williams71_t4_opsi_3c": ("-0.09", "14", "4"),
-        "williams71_t5_owi_3c": ("5.443", "15", "5"),
-        "williams71_t7_opsi_3c": ("5.610", "16", "7"),
+        "williams71_t4_opsi_3c": (
+            "-0.09",
+            "MgSi1/2O2 + FeSiO3 = MgSiO3 + FeSi1/2O2",
+            14,
+            "4",
+        ),
+        "williams71_t6_opsi_3c": (
+            "5.740",
+            "Fe + 1/2 SiO2 + 1/2 O2 = FeSi1/2O2",
+            15,
+            "6",
+        ),
+        "williams71_t5_owi_2c": (
+            "5.560",
+            "(1 - x)Fe + 1/2 O2 = Fe(1-x)O",
+            15,
+            "5",
+        ),
     }
-    for observation_id, value_and_locator in expected.items():
-        assert actual[observation_id] == value_and_locator
+    for observation_id, (value, reaction, page, table) in expected.items():
+        _species, row = rows[observation_id]
+        assert row["values"]["value_as_published"].strip("'\"") == value
+        assert row["values"]["reaction"] == reaction
+        assert row["locator"]["page"] == page
+        assert row["locator"]["table"] == table
+
+
+def _assert_reaction_refusal_rows(document: dict) -> None:
+    rows = _reaction_rows(document)
+    assert len(rows) == 46
+    for row in rows.values():
+        values = row[1]["values"]
+        assert values["quantity"] == "reaction_equilibrium_constant"
+        assert values["status"] == values["admission_status"] == "typed_refusal"
+        assert values["reason"] == values["unavailable_reason"] == (
+            "schema_gap_reaction_equilibrium_constant"
+        )
+        assert values["reaction"]
+        assert values["value_as_published"]
+        assert values["T_C"]
+        assert values["point_conditions"]["T_C"]["state"]["value"] == values["T_C"]
+
+    extrema = {
+        "williams71_t4_opsi_3c": "Min.",
+        "williams71_t5_owi_2c": "max",
+        "williams71_t6_opsi_3c": "min",
+        "williams71_t6_osi_3c": "max",
+        "williams71_t6_osi_1c": "min",
+        "williams71_t7_psi_2c": "max",
+        "williams71_t7_psi_4c": "min",
+    }
+    assert {
+        observation_id: rows[observation_id][1]["values"]["comment_as_published"]
+        for observation_id in extrema
+    } == extrema
+    assert rows["williams71_t6_opsi_3c"][0] == "FeSi1/2O2"
+    assert rows["williams71_t6_opsi_3c"][1]["values"]["formula"] == "FeSi1/2O2"
+
+
+def _assert_migrated_reaction_pins(rows: dict[str, object]) -> None:
+    expected = {
+        "williams71_t4_opsi_3c": (
+            "MgSi1/2O2 + FeSiO3 = MgSiO3 + FeSi1/2O2",
+            "-0.09",
+            "Min.",
+            14,
+            "4",
+        ),
+        "williams71_t6_opsi_3c": (
+            "Fe + 1/2 SiO2 + 1/2 O2 = FeSi1/2O2",
+            "5.740",
+            "min",
+            15,
+            "6",
+        ),
+        "williams71_t5_owi_2c": (
+            "(1 - x)Fe + 1/2 O2 = Fe(1-x)O",
+            "5.560",
+            "max",
+            15,
+            "5",
+        ),
+    }
+    for observation_id, (reaction, value, qualifier, page, table) in expected.items():
+        observation = rows[observation_id]
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.admission.status is AdmissionStatus.REJECTED
+        assert observation.admission.reason == "schema_gap_reaction_equilibrium_constant"
+        assert observation.provenance == {
+            "reaction_as_printed": reaction,
+            "log_K_value_as_printed": value,
+            "qualifier_as_published": qualifier,
+        }
+        assert observation.locator.page == page
+        assert observation.locator.table == table
 
 
 def _assert_render_pins(document: dict) -> None:
@@ -99,11 +190,21 @@ def _assert_render_pins(document: dict) -> None:
 def test_printed_rows_render_pins_and_mutations() -> None:
     document = _document()
     _assert_render_pins(document)
+    reaction_rows = _reaction_rows(document)
+    _assert_render_reaction_pins(reaction_rows)
+    _assert_reaction_refusal_rows(document)
 
     mutated = deepcopy(document)
     _component_refusals(mutated)["williams71_opsi_3a_o_composition"]["values"]["component_amount"] = "26"
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)
+
+    mutated_reaction = deepcopy(document)
+    _reaction_rows(mutated_reaction)["williams71_t4_opsi_3c"][1]["values"][
+        "value_as_published"
+    ] = "0.09"
+    with pytest.raises(AssertionError):
+        _assert_render_reaction_pins(_reaction_rows(mutated_reaction))
 
 
 def test_table_9_headings_are_context_rows_not_data_rows() -> None:
@@ -132,8 +233,9 @@ def test_table_9_headings_are_context_rows_not_data_rows() -> None:
         _printed_data_row_count(document)
 
 
-def test_isolated_migration_preserves_only_printed_conditions_and_logk_points() -> None:
+def test_isolated_migration_refuses_reaction_constants_without_schema_token() -> None:
     document = _document()
+    _assert_reaction_refusal_rows(document)
     refusals = _component_refusals(document)
     assert len(refusals) == 109
     for row in refusals.values():
@@ -152,35 +254,45 @@ def test_isolated_migration_preserves_only_printed_conditions_and_logk_points() 
     ]
     assert len(migrated) == 46
     assert not migrator.result.validation.hard_issues
-    assert not migrator.result.queue
-
-    # Identity axes for this log10_Kf profile: only temperature is applicable.
-    migrated_pins = _migrated_render_pins(migrated)
-    _assert_render_logk_pins(migrated_pins)
-    pinned = {
-        row.observation_id.split("::")[-1]: row
+    rows = {row.observation_id.split("::")[-1]: row for row in migrated}
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated) == 46
+    assert sum(
+        row.value.kind is ValueKind.UNAVAILABLE
+        and row.admission.reason == "schema_gap_reaction_equilibrium_constant"
         for row in migrated
-        if row.observation_id.split("::")[-1] in {
-            "williams71_t4_opsi_3c",
-            "williams71_t5_owi_3c",
-            "williams71_t7_opsi_3c",
-        }
-    }
-    for observation_id, observation in pinned.items():
-        temperature = "1573.15"
-        assert str(observation.value.point) == migrated_pins[observation_id][0]
-        assert str(observation.identity.temperature_K.value) == temperature
-        assert observation.point_conditions["temperature_K"].locator.table == observation.locator.table
-        assert observation.identity.composition.is_not_applicable
-        assert observation.identity.total_pressure_Pa.is_not_applicable
-        assert observation.identity.fO2_Pa.is_not_applicable
+    ) == 46
+    assert not any(
+        row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "log10_Kf"
+        and row.value.kind is ValueKind.POINT
+        for row in migrated
+    )
+    for observation in migrated:
+        assert observation.identity.temperature_K.is_value
+        assert "temperature_K" in observation.point_conditions
         assert "fO2_Pa" not in observation.point_conditions
         assert "total_pressure_Pa" not in observation.point_conditions
-        assert "composition" not in observation.point_conditions
 
-    mutated = dict(migrated_pins)
-    mutated["williams71_t4_opsi_3c"] = ("0.09", "14", "4")
+    reaction_pins = {
+        key: rows[key]
+        for key in (
+            "williams71_t4_opsi_3c",
+            "williams71_t6_opsi_3c",
+            "williams71_t5_owi_2c",
+        )
+    }
+    _assert_migrated_reaction_pins(reaction_pins)
+
+    mutated = dict(reaction_pins)
+    source_row = reaction_pins["williams71_t4_opsi_3c"]
+    mutated["williams71_t4_opsi_3c"] = replace(
+        source_row,
+        provenance={
+            **source_row.provenance,
+            "reaction_as_printed": "INVALID REACTION",
+        },
+    )
     with pytest.raises(AssertionError):
-        _assert_render_logk_pins(mutated)
+        _assert_migrated_reaction_pins(mutated)
 
     _assert_render_pins(document)
