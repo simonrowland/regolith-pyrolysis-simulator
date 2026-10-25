@@ -123,6 +123,101 @@ def test_diverted_alkali_sio_numeric_pin():
     }
 
 
+def test_evaporation_overhead_source_numeric_pin():
+    """Pin the existing shared source projection before consolidating it."""
+    source = _sim()._project_evaporation_overhead_source_mol_hr(
+        {"SiO": 1.0, "Na": 0.0007, "K": 0.0001}, {})
+    assert {sp: mol.hex() for sp, mol in source.items()} == {'SiO': '0x1.6af1875a0e72ap+4', 'O2': '0x1.6af1875a0e72bp+3', 'Na': '0x1.f2dd8993f4497p-6', 'K': '0x1.4f3cb1669146ep-9'}
+
+
+@pytest.mark.parametrize("sio_kg,retained,expected_o2", [
+    (1.179680414706, 3.86523814998e-9, 13.379915782435),
+    (5.133267625024, 3.17585413112e-9, 58.221436632609),
+    (5.806568174578, 3.23181618178e-9, 65.858000346813),
+])
+def test_stage3_includes_reviewed_same_hour_stream_oxygen(sio_kg, retained, expected_o2):
+    model = _model("through", hard_gate=False)
+    model.retained_vapor_mol = {"O2": retained}
+    melt = MeltState(temperature_C=1750)
+    melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8
+    result = model.route(EvaporationFlux({"SiO": sio_kg, "Na": 0.0007, "K": 0.0001}), melt)
+    reactions = result.stage3_reactive_alkali_by_species
+    for reaction in reactions.values():
+        assert reaction["available_oxygen_mol"] == pytest.approx(expected_o2 + retained, rel=1e-10)
+        assert reaction["uptake_mol"] == pytest.approx(reaction["transport_uptake_mol"])
+    assert sum(r["uptake_mol"] for r in reactions.values()) > 4 * retained
+
+
+@pytest.mark.parametrize("oxygen_mol", [1e-7, 1.0])
+def test_stage3_shared_oxygen_split_is_order_independent(monkeypatch, oxygen_mol):
+    import simulator.evaporation as source_owner
+    # Isolate carried-in oxidant competition from the newly evolved stream.
+    monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
+                        lambda *args, **kwargs: {}, raising=False)
+    results = []
+    for order in (("Na", "K"), ("K", "Na")):
+        model = _model("through", hard_gate=False)
+        model.retained_vapor_mol = {"O2": oxygen_mol}
+        melt = MeltState(temperature_C=1650)
+        melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8
+        rates = {"SiO": 1.0, **{sp: {"Na": 0.0007, "K": 0.0001}[sp] for sp in order}}
+        result = model.route(EvaporationFlux(rates), melt)
+        results.append({sp: r["uptake_mol"] for sp, r in result.stage3_reactive_alkali_by_species.items()})
+    assert results[0] == pytest.approx(results[1], rel=1e-12)
+    if oxygen_mol == 1e-7:
+        assert results[0] == pytest.approx({"Na": 3.69003728744e-7, "K": 3.09962712565e-8}, rel=1e-10)
+    else:
+        assert results[0] == pytest.approx({"Na": 0.0304483264479, "K": 0.00255765595947}, rel=1e-10)
+
+
+def test_stage3_na_gate_matches_liquid_activity_reference():
+    model = _model("through", hard_gate=False)
+    model.retained_vapor_mol = {"O2": 1.0}
+    melt = MeltState(temperature_C=1650)
+    # Geometric midpoint of the review's crystal and liquid critical pO2.
+    melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1.06560249466e-25
+    result = model.route(EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}), melt)
+    reaction = result.stage3_reactive_alkali_by_species["Na"]
+    assert reaction["log_Q_over_K"] == pytest.approx(0.251711636707, abs=1e-9)
+    assert not reaction["favoured"]
+
+
+def test_stage3_k_evaluation_flags_missing_liquid_reference():
+    model = _model("through", hard_gate=False)
+    result = model.route(EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}), MeltState())
+    notice = result.stage3_reactive_alkali_by_species["K"]["reference_state_notice"]
+    assert notice["status"] == "authority_extrapolated"
+    assert notice["message"] == ("reference-state mismatch: pure-liquid KO0.5 activity vs crystalline K2O dG; "
+                                 "no K2O fusion data; authority extrapolated")
+
+
+@pytest.mark.parametrize("order", [("SiO", "Na", "K"), ("Na", "K", "SiO")])
+def test_same_hour_zero_retained_oxygen_kernel_capture_closes(order):
+    from simulator.accounting.formulas import resolve_species_formula
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.campaign_mgr.overrides["C0"] = {"stage3_route": "through"}
+    model = _model("through", hard_gate=False)
+    model.train = sim.train
+    sim._condensation_model = model
+    sim.melt.oxygen_reservoir.headspace_ledger_pO2_bar = 0.0
+    assert not sim.atom_ledger.physical_mol_by_account("process.overhead_gas").get("O2", 0)
+    rates = {sp: {"SiO": 1.0, "Na": 0.0007, "K": 0.0001}[sp] for sp in order}
+    first = len(sim.atom_ledger.transitions)
+    sim._route_to_condensation(EvaporationFlux(rates))
+    transitions = sim.atom_ledger.transitions[first:]
+    for transition in transitions:
+        transition.validate_conservation(sim.species_formula_registry)
+    stage3 = sim.train.stages[3].collected_kg
+    oxide_mol = sum(stage3.get(sp, 0) / resolve_species_formula(sp).molar_mass_kg_per_mol()
+                    for sp in ("Na2O", "K2O"))
+    assert oxide_mol > 0
+    # SiO2 -> SiO + 1/2 O2 is the sole gas-side oxygen source here.
+    expected_source = 0.5 / resolve_species_formula("SiO").molar_mass_kg_per_mol()
+    oxygen_left = sim.atom_ledger.physical_mol_by_account("process.overhead_gas").get("O2", 0)
+    assert oxygen_left + 0.5 * oxide_mol == pytest.approx(expected_source, rel=1e-12)
+
+
 @pytest.mark.parametrize("oxygen_mol", [1.0, 1e-7, 0.0])
 def test_admitted_alkali_parcel_requires_reactive_stage3_uptake(oxygen_mol):
     from simulator.accounting.formulas import resolve_species_formula
