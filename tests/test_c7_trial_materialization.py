@@ -91,3 +91,27 @@ def test_accepted_hot_hour_hex():
         }
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+def test_pressure_trial_freezes_liquidus_and_sweep_boundary(monkeypatch):
+    sim = simulation()
+    try:
+        sim.melt.temperature_C = 1600.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        authority = sim._establish_melt_redox_gate_authority_for_current_hour()
+        sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        bulk = sim._vapor_pressure_transport_pO2_bar()
+        fraction = sim._melt_redox_liquid_fraction_factor(1873.15, gate_authority=authority)
+        trial = sim._detached_evaporation_projection()
+        # Redox changes during a batch must not invalidate the hour's frozen
+        # phase measurement or trigger another physical sweep ODE.
+        trial.melt.oxygen_reservoir.melt_intrinsic_fO2_log += 2.0
+        trial.melt.sweep_mol_per_s = 1.0
+        monkeypatch.setattr(trial, '_melt_redox_liquidus_gate_record',
+                            lambda **kw: pytest.fail('pressure trial repeated liquidus lookup'))
+        monkeypatch.setattr(trial, '_sweep_boundary_pO2_bar',
+                            lambda: pytest.fail('pressure trial repeated sweep balance'))
+        assert trial._melt_redox_liquid_fraction_factor(1873.15) == fraction
+        assert trial._headspace_transport_pO2_bar_from_ledger(0.0, head_o2_mol=0.0) == bulk
+    finally:
+        close_test_owned_magemin_backend(sim)
