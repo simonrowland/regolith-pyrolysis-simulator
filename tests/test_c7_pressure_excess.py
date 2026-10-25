@@ -28,7 +28,7 @@ def close_source(bulk, sources, *, film=False, stagnant=False):
         transport = oxygen_transport(bulk, delta, film=film, stagnant=stagnant)
         return _SurfaceOxygenEvaluation(
             bulk + delta, bulk + transport.flux_kg_s_m2 * transport.r_gas / 1e5,
-            transport.flux_kg_s_m2 / 0.031998, 0.0, sources, 0.0, 0.0, 0.0,
+            transport.flux_kg_s_m2 / 0.031998, 0.0, sources, 0.0, 0.0, 0.0, math.fsum(sources.values()),
             payload=delta, bulk_pO2_bar=bulk,
         )
     return _solve_surface_oxygen_balance(evaluate, bulk_pO2_bar=bulk)

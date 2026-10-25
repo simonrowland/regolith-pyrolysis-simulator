@@ -18,7 +18,8 @@ pytestmark = [pytest.mark.serial, pytest.mark.xdist_group('serial')]
 
 def evaluation(x, *, source=5.0, ferric=-2.0, other=-0.5, storage=1.0):
     return _SurfaceOxygenEvaluation(x, 0.0, 2.0 * x * 100000.0, 0.0,
-                                    {'reaction': source}, ferric, other, storage)
+                                    {'reaction': source}, ferric, other, storage,
+                                    source + 0.5 * ferric + other - storage)
 
 
 def test_signed_ferric_storage_and_consuming_source():
@@ -38,7 +39,7 @@ def test_proved_source_free_zero_is_exact():
 def test_source_free_positive_bulk_is_exact(bulk):
     def evaluate(excess):
         return _SurfaceOxygenEvaluation(
-            bulk + excess, bulk, 0.1 * excess, 0.0, {}, 0.0, 0.0, 0.0,
+            bulk + excess, bulk, 0.1 * excess, 0.0, {}, 0.0, 0.0, 0.0, 0.0,
             bulk_pO2_bar=bulk,
         )
     solved = _solve_surface_oxygen_balance(evaluate, bulk_pO2_bar=bulk)
@@ -95,7 +96,7 @@ def test_runtime_vacuum_consuming_carriers_prove_zero_source():
 def test_coordinate_convergence_across_a_jump_is_not_flux_convergence():
     def jump(x):
         return _SurfaceOxygenEvaluation(x, 0.0, 1.0 if x >= 1e-6 else 0.0,
-                                        0.0, {'source': 0.5}, 0.0, 0.0, 0.0)
+                                        0.0, {'source': 0.5}, 0.0, 0.0, 0.0, 0.5)
     with pytest.raises(OxygenClosureNonconvergence, match='without closing'):
         _solve_surface_oxygen_balance(jump)
 
@@ -470,6 +471,15 @@ def test_mixed_asteroid_zero_keeps_neutral_pressure():
         assert result.vapor_pressures_Pa['SiO2_gas'] > 0.0
         flux = sim._calculate_evaporation(result)
         assert flux.species_kg_hr['SiO2_gas'] > 0.0
+        solved = sim._solve_evaporative_oxygen_boundary(result)
+        assert solved.reaction_pO2_bar == solved.residual == 0.0
+        proposed, amounts, trial, _, _ = solved.payload
+        assert proposed.species_kg_hr.get('CrO2', 0.0) == 0.0
+        assert proposed.species_kg_hr.get('CrO3', 0.0) == 0.0
+        assert proposed.species_kg_hr['SiO2_gas'] > 0.0
+        assert amounts[0]['carrier:SiO2_gas'] > 0.0
+        assert any('oxygen-consuming carriers stop at zero oxygen' in notice
+                   for notice in trial._carrier_admission_notices)
     finally:
         close_test_owned_magemin_backend(sim)
 
@@ -514,3 +524,51 @@ def test_transport_bounded_batch_retains_internal_buffer_coproduct():
         assert limited._oxygen_uptake_transport_limited
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+def test_lunar_shaped_debit_resettles_at_inward_endpoint():
+    from engines.builtin.fe_redox_respeciation import BuiltinFeRedoxRespeciationProvider
+    from tests.chemistry.test_builtin_fe_redox_respeciation_provider import _request
+    from tests.test_c7_pressure_excess import oxygen_transport
+
+    bulk = 7.706491106080192e-26
+    area_dt = 0.41006003303200633 * 3600.0
+    stored = 0.00045222020932088954
+    debit = 5.7520419261263434e-18 * area_dt
+    provider = BuiltinFeRedoxRespeciationProvider()
+    template = {'process.cleaned_melt': {'FeO': 10.0, 'SiO2': 20.0},
+                'process.overhead_gas': {'O2': 10.0}}
+    full = provider.dispatch(_request({}, template, fO2_log=-3.0))
+    # Scale the actual provider's finite Fe parcel to the captured debit;
+    # all composition ratios and thermodynamic inputs remain identical.
+    factor = debit / full.transition.debits['process.overhead_gas']['O2']
+    accounts = deepcopy(template)
+    accounts['process.cleaned_melt'] = {s: n * factor for s, n in template['process.cleaned_melt'].items()}
+
+    def point(delta, *, bounded=False):
+        j = oxygen_transport(bulk, delta, film=True).flux_kg_s_m2 / 0.031998
+        controls = {'internal_o2_capacity_mol': max(0.0, -j) * area_dt} if bounded else {}
+        response = provider.dispatch(_request({}, accounts, fO2_log=-3.0, control_inputs=controls))
+        taken = response.transition.debits['process.overhead_gas']['O2']
+        return _SurfaceOxygenEvaluation(
+            bulk + delta, bulk, j, 0.0, {'internal_coproduct': stored},
+            -2.0 * taken / area_dt, 0.0, stored, -taken / area_dt,
+            oxygen_uptake_transport_limited=(
+                'oxygen_uptake_transport_limited' in response.diagnostic.get('flags', ())))
+
+    solved = _solve_surface_oxygen_balance(point, bulk_pO2_bar=bulk,
+        settle_inward_endpoint=lambda delta: point(delta, bounded=True))
+    assert solved.reaction_pO2_bar == 0.0
+    assert solved.oxygen_uptake_transport_limited
+    assert solved.storage_mol_m2_s == stored
+    assert solved.overhead_oxygen_mol_m2_s == pytest.approx(solved.oxygen_flux_mol_m2_s, rel=1e-12, abs=0.0)
+
+
+def test_finite_consuming_forcing_at_positive_bulk_still_refuses():
+    bulk = 7.706491106080192e-26
+    def point(delta):
+        return _SurfaceOxygenEvaluation(bulk + delta, bulk, delta, 0.0,
+            {'imposed_sink': -1.0}, 0.0, 0.0, 0.0, -1.0)
+    with pytest.raises(OxygenClosureNonconvergence, match='no interior'):
+        _solve_surface_oxygen_balance(point, bulk_pO2_bar=bulk,
+                                     settle_inward_endpoint=point)
