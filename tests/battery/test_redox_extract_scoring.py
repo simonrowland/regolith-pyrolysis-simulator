@@ -211,11 +211,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     ]
     assert len(values) == 18
     encoded = json.dumps(values, separators=(",", ":"), ensure_ascii=False).encode()
-    # Recorded OpenIMCC pin e1423d82237486f58dc8ffbb1f8c295f54f169c0.
-    # The previous digest 12100581851275f0... was e975edd229b7653ceac5dbac9558d0156e51c2f6.
-    # Measured inputs are unchanged. Two residuals move by one ulp:
-    # aithala_2026_2000_30_xanes 0.01757368426967503 -> 0.01757368426967494
-    # sossi_2020_per_ts2_xanes -0.08377464894838026 -> -0.08377464894838044
+    # Pinned with the declared OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 (pyproject.toml); under e975edd the digest is 12100581….
     assert hashlib.sha256(encoded).hexdigest() == (
         "c79971dce81ac423bf34a04525b3da956a437f83e6dbe1fa601d24c1627b8f44"
     )
