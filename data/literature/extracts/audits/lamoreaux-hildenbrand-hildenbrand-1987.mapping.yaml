@@ -1,0 +1,25 @@
+source_id: lamoreaux-hildenbrand-hildenbrand-1987
+source:
+  citation: >-
+    Lamoreaux, R. H., Hildenbrand, D. L. & Brewer, L., High-Temperature Vaporization Behavior of Oxides II.
+    Oxides of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg, J. Phys. Chem. Ref. Data 16 (1987) 419–443.
+extraction:
+  method: mineru_table_draft plus render-verified manual assembly
+  date: '2026-10-25'
+  worker: w1025b-lamo84
+review_status: draft
+tables:
+  - page: 4
+    table_index: 2
+    published_page: 421
+    type: transition_point
+    quantity: transition_temperature
+    unit: K; enthalpy of fusion divided by R in kK
+    evidence_class: quoted_attributed
+    phase: solid_liquid
+    rows: [2, 3, 4, 7, 8, 13, 14]
+    temperature: {column: 2, unit: K}
+    values:
+      - {column: 2, species: 1, quantity: transition_temperature, unit: K}
+      - {column: 4, species: 1, quantity: enthalpy_of_fusion_over_R, unit: kK}
+    attribution: Table 4 Tfus source-column references, transcribed individually on the assembled observations.

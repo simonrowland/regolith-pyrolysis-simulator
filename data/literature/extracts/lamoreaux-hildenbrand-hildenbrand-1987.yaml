@@ -173,6 +173,471 @@ species:
         Delta_f_H_298_over_R_uncertainty_kK: 0.3
         S_298_over_R: 8.66
         S_298_over_R_uncertainty: 0.05
+  BeO:
+    observations:
+    - observation_id: LH87_BeO_fusion
+      type: transition_point
+      locator: &lh87_beo_fusion_locator
+        table: Table 1
+        page: 4
+        published_page: 421
+        pdf_page_index: 3
+        note: BeO melting temperature and enthalpy of fusion
+        record: LH87_BeO_fusion
+      T_range_K: [2851, 2851]
+      phase: solid_liquid
+      units: K and kK as published
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '2851'}}
+          locator: *lh87_beo_fusion_locator
+      uncertainty:
+        T_m_uncertainty_K: 12
+        Delta_fus_H_over_R_uncertainty_kK: 0.7
+        confidence_level: not_stated
+      values:
+        property_kind: melting_point_and_enthalpy_of_fusion
+        T_m_K: 2851
+        T_m_uncertainty_K: 12
+        Delta_fus_H_over_R_kK: 10.3
+        Delta_fus_H_over_R_uncertainty_kK: 0.7
+        formula: BeO
+        method_class: quoted_attributed
+        attribution: "Table 4, Tfus source column: ref. 1 (Glushko et al., 1981)."
+    - observation_id: LH87_BeO_vapor_speciation
+      type: gas_speciation
+      locator:
+        section: Be-O system
+        page: 5
+        published_page: 422
+        pdf_page_index: 4
+        note: Qualitative Be-O vapor species under neutral/reducing and oxidizing conditions
+      phase: gas
+      units: species and reaction wording as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The qualitative summary gives no single temperature; figure values are excluded.
+          locator:
+            page: 5
+            published_page: 422
+            pdf_page_index: 4
+            section: Be-O system
+        atmosphere:
+          state:
+            tag: unknown
+            reason: This summary compares neutral/reducing and oxidizing regimes rather than one atmosphere.
+          locator:
+            page: 5
+            published_page: 422
+            pdf_page_index: 4
+            section: Be-O system
+      values:
+        quantity: vapor_species
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The schema has no admitted representation for qualitative cross-regime vapor species and reaction prose.
+        system_as_printed: Be-O
+        species_by_condition_as_printed:
+          neutral_and_reducing: Be atoms and oxygen species
+          oxidizing: [BeO(g), Be2O2(g), Be3O3(g), Be4O4(g), Be5O5(g)]
+        reaction_as_printed: Vaporization primarily by decomposition to Be atoms and oxygen species under neutral and reducing conditions.
+        attribution: Lamoreaux, Hildenbrand, and Brewer (1987), Be-O system review summary; thermodynamic input references are listed by species in Table 4.
+  MgO:
+    observations:
+    - observation_id: LH87_MgO_fusion
+      type: transition_point
+      locator: &lh87_mgo_fusion_locator
+        table: Table 1
+        page: 4
+        published_page: 421
+        pdf_page_index: 3
+        note: MgO melting temperature and enthalpy of fusion
+        record: LH87_MgO_fusion
+      T_range_K: [3100, 3100]
+      phase: solid_liquid
+      units: K and kK as published
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '3100'}}
+          locator: *lh87_mgo_fusion_locator
+      uncertainty:
+        T_m_uncertainty_K: 25
+        Delta_fus_H_over_R_uncertainty_kK: 0.7
+        confidence_level: not_stated
+      values:
+        property_kind: melting_point_and_enthalpy_of_fusion
+        T_m_K: 3100
+        T_m_uncertainty_K: 25
+        Delta_fus_H_over_R_kK: 9.3
+        Delta_fus_H_over_R_uncertainty_kK: 0.7
+        formula: MgO
+        method_class: quoted_attributed
+        attribution: "Table 4, Tfus source column: refs. 1 and 19 (Glushko et al., 1981; Hlavac, 1982)."
+    - observation_id: LH87_MgO_vapor_speciation
+      type: gas_speciation
+      locator:
+        section: Mg-O system
+        page: 5
+        published_page: 422
+        pdf_page_index: 4
+        note: Qualitative Mg-O vapor species under neutral/reducing and oxidizing conditions
+      phase: gas
+      units: species and reaction wording as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The qualitative summary gives no single temperature; figure values are excluded.
+          locator:
+            page: 5
+            published_page: 422
+            pdf_page_index: 4
+            section: Mg-O system
+        atmosphere:
+          state:
+            tag: unknown
+            reason: This summary compares neutral/reducing and oxidizing regimes rather than one atmosphere.
+          locator:
+            page: 5
+            published_page: 422
+            pdf_page_index: 4
+            section: Mg-O system
+      values:
+        quantity: vapor_species
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The schema has no admitted representation for qualitative cross-regime vapor species and reaction prose.
+        system_as_printed: Mg-O
+        species_by_condition_as_printed:
+          neutral_and_reducing: gaseous oxygen species and Mg(g)
+          oxidizing: MgO(g) partial pressure comparable to Mg(g)
+        reaction_as_printed: Vaporization by dissociation to gaseous oxygen species and Mg(g) under neutral and reducing conditions.
+        attribution: Lamoreaux, Hildenbrand, and Brewer (1987), Mg-O system review summary; thermodynamic input references are listed by species in Table 4.
+  CaO:
+    observations:
+    - observation_id: LH87_CaO_fusion
+      type: transition_point
+      locator: &lh87_cao_fusion_locator
+        table: Table 1
+        page: 4
+        published_page: 421
+        pdf_page_index: 3
+        note: CaO melting temperature and enthalpy of fusion
+        record: LH87_CaO_fusion
+      T_range_K: [2900, 2900]
+      phase: solid_liquid
+      units: K and kK as published
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '2900'}}
+          locator: *lh87_cao_fusion_locator
+      uncertainty:
+        T_m_uncertainty_as_printed_K: '(-50,+300)'
+        Delta_fus_H_over_R_uncertainty_kK: 0.6
+        note: asymmetric Tfus interval retained as printed; confidence level not stated
+      values:
+        property_kind: melting_point_and_enthalpy_of_fusion
+        T_m_K: 2900
+        T_m_uncertainty_as_printed_K: '(-50,+300)'
+        Delta_fus_H_over_R_kK: 6.3
+        Delta_fus_H_over_R_uncertainty_kK: 0.6
+        formula: CaO
+        method_class: quoted_attributed
+        attribution: "Table 4, Tfus source column: ref. 1 (Glushko et al., 1981)."
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The asymmetric Tfus interval has no schema token; its printed form is retained, and the row is refused.
+    - observation_id: LH87_CaO_vapor_speciation
+      type: gas_speciation
+      locator:
+        section: Ca-O system
+        page: 11
+        published_page: 428
+        pdf_page_index: 10
+        note: Qualitative Ca-O vapor species under neutral/reducing and oxidizing conditions
+      phase: gas
+      units: species and reaction wording as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The qualitative summary gives no single temperature; figure values are excluded.
+          locator:
+            page: 11
+            published_page: 428
+            pdf_page_index: 10
+            section: Ca-O system
+        atmosphere:
+          state:
+            tag: unknown
+            reason: This summary compares neutral/reducing and oxidizing regimes rather than one atmosphere.
+          locator:
+            page: 11
+            published_page: 428
+            pdf_page_index: 10
+            section: Ca-O system
+      values:
+        quantity: vapor_species
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The schema has no admitted representation for qualitative cross-regime vapor species and reaction prose.
+        system_as_printed: Ca-O
+        species_by_condition_as_printed:
+          neutral_and_reducing: Ca(g) and oxygen
+          oxidizing: CaO(g)
+        reaction_as_printed: Vaporization primarily by dissociation to Ca(g) and oxygen under neutral and reducing conditions.
+        attribution: Lamoreaux, Hildenbrand, and Brewer (1987), Ca-O system review summary; thermodynamic input references are listed by species in Table 4.
+  B2O3:
+    observations:
+    - observation_id: LH87_B2O3_fusion
+      type: transition_point
+      locator: &lh87_b2o3_fusion_locator
+        table: Table 1
+        page: 4
+        published_page: 421
+        pdf_page_index: 3
+        note: B2O3 melting temperature and enthalpy of fusion
+        record: LH87_B2O3_fusion
+      T_range_K: [723, 723]
+      phase: solid_liquid
+      units: K and kK as published
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '723'}}
+          locator: *lh87_b2o3_fusion_locator
+      uncertainty:
+        T_m_uncertainty_K: 1
+        Delta_fus_H_over_R_uncertainty_kK: 0.02
+        confidence_level: not_stated
+      values:
+        property_kind: melting_point_and_enthalpy_of_fusion
+        T_m_K: 723
+        T_m_uncertainty_K: 1
+        Delta_fus_H_over_R_kK: 2.95
+        Delta_fus_H_over_R_uncertainty_kK: 0.02
+        formula: B2O3
+        method_class: quoted_attributed
+        attribution: "Table 4, Tfus source column: ref. 1 (Glushko et al., 1981)."
+    - observation_id: LH87_B2O3_vapor_speciation
+      type: gas_speciation
+      locator:
+        section: B-O system
+        page: 14
+        published_page: 431
+        pdf_page_index: 13
+        note: Qualitative B-O vapor species under the reported temperature and oxygen-potential regimes
+      phase: gas
+      units: species and reaction wording as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The summary uses high/low temperature and a 1923 K figure boundary, not one point temperature.
+          locator:
+            page: 14
+            published_page: 431
+            pdf_page_index: 13
+            section: B-O system
+        atmosphere:
+          state:
+            tag: unknown
+            reason: The summary spans neutral, reducing, and oxidizing conditions rather than one atmosphere.
+          locator:
+            page: 14
+            published_page: 431
+            pdf_page_index: 13
+            section: B-O system
+      values:
+        quantity: vapor_species
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The schema has no admitted representation for qualitative cross-regime vapor species and reaction prose.
+        system_as_printed: B-O
+        species_by_condition_as_printed:
+          general: B2O3(g) is the primary vapor species
+          high_temperature_reducing: B2O2(g) becomes important
+          low_temperature_oxidizing: BO2(g) is important
+        reaction_as_printed: Vaporization primarily by evolution of B2O3(g); no balanced reaction is printed in this summary.
+        attribution: Lamoreaux, Hildenbrand, and Brewer (1987), B-O system review summary; thermodynamic input references are listed by species in Table 4.
+  Al2O3:
+    observations:
+    - observation_id: LH87_Al2O3_fusion
+      type: transition_point
+      locator: &lh87_al2o3_fusion_locator
+        table: Table 1
+        page: 4
+        published_page: 421
+        pdf_page_index: 3
+        note: Al2O3 melting temperature and enthalpy of fusion
+        record: LH87_Al2O3_fusion
+      T_range_K: [2327, 2327]
+      phase: solid_liquid
+      units: K and kK as published
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '2327'}}
+          locator: *lh87_al2o3_fusion_locator
+      uncertainty:
+        T_m_uncertainty_K: 4
+        Delta_fus_H_over_R_uncertainty_kK: 0.36
+        confidence_level: not_stated
+      values:
+        property_kind: melting_point_and_enthalpy_of_fusion
+        T_m_K: 2327
+        T_m_uncertainty_K: 4
+        Delta_fus_H_over_R_kK: 13.40
+        Delta_fus_H_over_R_uncertainty_kK: 0.36
+        formula: Al2O3
+        method_class: quoted_attributed
+        attribution: "Table 4, Tfus source column: refs. 1 and 19 (Glushko et al., 1981; Hlavac, 1982)."
+    - observation_id: LH87_Al2O3_vapor_speciation
+      type: gas_speciation
+      locator:
+        section: Al-O system
+        page: 15
+        published_page: 432
+        pdf_page_index: 14
+        note: Qualitative major gaseous aluminum species
+      phase: gas
+      units: species and condition wording as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The qualitative summary gives no single temperature; figure values are excluded.
+          locator:
+            page: 15
+            published_page: 432
+            pdf_page_index: 14
+            section: Al-O system
+        atmosphere:
+          state:
+            tag: unknown
+            reason: The summary says the major species depend on conditions without specifying one atmosphere.
+          locator:
+            page: 15
+            published_page: 432
+            pdf_page_index: 14
+            section: Al-O system
+      values:
+        quantity: vapor_species
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The schema has no admitted representation for qualitative vapor species and condition-dependent speciation prose.
+        system_as_printed: Al-O
+        major_gaseous_species_as_printed: [Al(g), AlO(g), Al2O(g)]
+        prior_review_species_claim_as_printed: AlO2(g) was selected by earlier reviews as dominant under oxidizing conditions; the authors note their disagreement based on newer data.
+        attribution: Lamoreaux, Hildenbrand, and Brewer (1987), Al-O system review summary; thermodynamic input references are listed by species in Table 4.
+  SiO2:
+    observations:
+    - observation_id: LH87_SiO2_quartz_fusion
+      type: transition_point
+      locator: &lh87_sio2_quartz_fusion_locator
+        table: Table 1
+        page: 4
+        published_page: 421
+        pdf_page_index: 3
+        note: SiO2(qu) melting temperature and enthalpy of fusion
+        record: LH87_SiO2_quartz_fusion
+      T_range_K: [1726, 1726]
+      phase: solid_liquid
+      units: K and kK as published
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1726'}}
+          locator: *lh87_sio2_quartz_fusion_locator
+      uncertainty:
+        T_m_uncertainty_K: 10
+        Delta_fus_H_over_R_uncertainty_kK: 0.1
+        confidence_level: not_stated
+      values:
+        property_kind: melting_point_and_enthalpy_of_fusion
+        condensed_form_as_printed: quartz
+        T_m_K: 1726
+        T_m_uncertainty_K: 10
+        Delta_fus_H_over_R_kK: 0.9
+        Delta_fus_H_over_R_uncertainty_kK: 0.1
+        formula: SiO2
+        method_class: quoted_attributed
+        attribution: "Table 4, Tfus source column: refs. 19 and 2 (Hlavac, 1982; Stull et al., 1971)."
+    - observation_id: LH87_SiO2_cristobalite_fusion
+      type: transition_point
+      locator: &lh87_sio2_cristobalite_fusion_locator
+        table: Table 1
+        page: 4
+        published_page: 421
+        pdf_page_index: 3
+        note: SiO2(cr) melting temperature and enthalpy of fusion
+        record: LH87_SiO2_cristobalite_fusion
+      T_range_K: [1996, 1996]
+      phase: solid_liquid
+      units: K and kK as published
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1996'}}
+          locator: *lh87_sio2_cristobalite_fusion_locator
+      uncertainty:
+        T_m_uncertainty_K: 5
+        Delta_fus_H_over_R_uncertainty_kK: 0.25
+        confidence_level: not_stated
+      values:
+        property_kind: melting_point_and_enthalpy_of_fusion
+        condensed_form_as_printed: cristobalite
+        T_m_K: 1996
+        T_m_uncertainty_K: 5
+        Delta_fus_H_over_R_kK: 1.15
+        Delta_fus_H_over_R_uncertainty_kK: 0.25
+        formula: SiO2
+        method_class: quoted_attributed
+        attribution: "Table 4, Tfus source column: refs. 16 and 2 (Glushko et al., 1979a; Stull et al., 1971)."
+    - observation_id: LH87_SiO2_vapor_speciation
+      type: gas_speciation
+      locator:
+        section: Si-O system
+        page: 18
+        published_page: 435
+        pdf_page_index: 17
+        note: Qualitative principal silicon-bearing vapor species by oxygen-potential regime
+      phase: gas
+      units: species and condition wording as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The summary identifies oxidizing SiO2(g) below about 2500 K but gives no point temperature.
+          locator:
+            page: 18
+            published_page: 435
+            pdf_page_index: 17
+            section: Si-O system
+        atmosphere:
+          state:
+            tag: unknown
+            reason: The summary compares neutral/reducing and oxidizing regimes rather than one atmosphere.
+          locator:
+            page: 18
+            published_page: 435
+            pdf_page_index: 17
+            section: Si-O system
+      values:
+        quantity: vapor_species
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The schema has no admitted representation for qualitative cross-regime vapor species and reaction prose.
+        system_as_printed: Si-O
+        species_by_condition_as_printed:
+          neutral_and_reducing: SiO(g) is the principal silicon-containing vaporization product
+          oxidizing_below_about_2500_K: SiO2(g) is favored
+        reaction_as_printed: The summary identifies vapor species and regimes but prints no balanced vaporization reaction.
+        attribution: Lamoreaux, Hildenbrand, and Brewer (1987), Si-O system review summary; thermodynamic input references are listed by species in Table 4.
 fidelity_samples:
 - path: species.Ga2O.observations[LH87_Ga2O_g_formation].values
   value:
