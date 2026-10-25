@@ -52,11 +52,6 @@ _OWNER_APPROVED_ALKALI_ALPHA_SOURCES = frozenset({
     "ta-shirai-2000-lpsc",
     "kems-005-fedkin-2006",
 })
-_OWNER_APPROVED_ALKALI_ALPHA_METHOD_CLASSES = {
-    "kems-006-zhang-2021": "directly_reduced_measurement",
-    "ta-shirai-2000-lpsc": "model_derived",
-    "kems-005-fedkin-2006": "author_estimate",
-}
 
 
 class ResidueInventoryRefusal(ValueError):
@@ -198,10 +193,6 @@ def collect_measured_evaporation_alphas(
             and source_id in _OWNER_APPROVED_ALKALI_ALPHA_SOURCES
         )
         method_class = getattr(getattr(observation, "evidence", None), "original_method_class", None)
-        if approved_alkali:
-            # Preserve the ruling's source method class where the typed row's
-            # evidence class is model-derived or the fit remains in context.
-            method_class = _OWNER_APPROVED_ALKALI_ALPHA_METHOD_CLASSES[source_id]
         append(
             source_id=source_id,
             species=formula,
@@ -235,7 +226,7 @@ def collect_measured_evaporation_alphas(
                 if (
                     method_class is not None
                     and method_class not in MEASURED_EVIDENCE
-                    and not (approved_alkali and method_class == "author_estimate")
+                    and not approved_alkali
                 ):
                     continue
                 classifications = tuple(
@@ -355,9 +346,14 @@ def estimate_loo_evaporation_alpha(
             alpha_value = row.alpha
         if math.isfinite(alpha_value) and 0.0 < alpha_value <= 1.0:
             by_source[row.source_id].append(alpha_value)
+            classification = (
+                f"method_class={row.method_class}"
+                if row.method_class
+                else f"evidence_class={row.evidence_class}"
+            )
             source_attributions.append(
                 f"{row.source_id}::{row.observation_id}="
-                f"{alpha_value:g} (method_class={row.method_class or 'unspecified'})"
+                f"{alpha_value:g} ({classification})"
             )
 
     source_values = tuple(sorted(

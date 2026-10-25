@@ -332,17 +332,17 @@ def test_alpha_collection_accepts_measured_store_observation():
 
 
 @pytest.mark.parametrize(
-    ("source_id", "formula", "value", "method_class"),
+    ("source_id", "formula", "value"),
     (
-        ("kems-006-zhang-2021", "Na", "0.14", "directly_reduced_measurement"),
-        ("kems-006-zhang-2021", "K", "0.13", "directly_reduced_measurement"),
-        ("ta-shirai-2000-lpsc", "Na", "0.08", "model_derived"),
-        ("kems-005-fedkin-2006", "Na", "0.26", "author_estimate"),
-        ("kems-005-fedkin-2006", "K", "0.13", "author_estimate"),
+        ("kems-006-zhang-2021", "Na", "0.14"),
+        ("kems-006-zhang-2021", "K", "0.13"),
+        ("ta-shirai-2000-lpsc", "Na", "0.08"),
+        ("kems-005-fedkin-2006", "Na", "0.26"),
+        ("kems-005-fedkin-2006", "K", "0.13"),
     ),
 )
 def test_d290_named_printed_alkali_alphas_keep_source_and_method_class(
-    source_id, formula, value, method_class
+    source_id, formula, value
 ):
     identity = Identity(
         quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
@@ -359,8 +359,31 @@ def test_d290_named_printed_alkali_alphas_keep_source_and_method_class(
 
     assert len(collected) == 1
     assert collected[0].source_id == source_id
-    assert collected[0].method_class == method_class
+    assert collected[0].method_class is None
+    assert collected[0].evidence_class == EvidenceClass.MODEL_DERIVED.value
     assert collected[0].owner_approved_printed_alkali_alpha is True
+
+
+def test_d290_alpha_attribution_preserves_recorded_method_class():
+    identity = Identity(
+        quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        species=Species("Na", Phase.G),
+        temperature_K=State.of(Decimal(str(T_K))),
+    )
+    observation = F.observation(
+        "fedkin-na-fit", "alpha-experiment", identity, Decimal("0.26"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id="kems-005-fedkin-2006",
+    )
+    observation = replace(
+        observation,
+        evidence=replace(observation.evidence, original_method_class="author_estimate"),
+    )
+
+    collected = collect_measured_evaporation_alphas((observation,))
+
+    assert collected[0].method_class == "author_estimate"
+    assert collected[0].evidence_class == EvidenceClass.MODEL_DERIVED.value
 
 
 def test_measured_context_arrhenius_is_evaluated_at_row_temperature():
@@ -437,10 +460,7 @@ def test_alkali_rate_rows_use_only_other_papers_alpha_with_provenance(
             evidence_class=EvidenceClass.MODEL_DERIVED.value,
             owner_approved_printed_alkali_alpha=True,
         ),
-        _alpha(
-            "independent-third-paper", formula, 0.4,
-            method_class="measured_direct",
-        ),
+        _alpha("independent-third-paper", formula, 0.4),
     )
     row = replace(_kinetic_row(formula), source_id=own_source)
     result = _predict_evaporation_rate(
@@ -468,7 +488,7 @@ def test_alkali_rate_rows_use_only_other_papers_alpha_with_provenance(
     assert other_source in alpha_notice.source
     assert "independent-third-paper" in alpha_notice.source
     assert f"method_class={other_method_class}" in alpha_notice.source
-    assert "method_class=measured_direct" in alpha_notice.source
+    assert "evidence_class=measured_direct" in alpha_notice.source
 
 
 @pytest.mark.parametrize("formula", ["Na", "K"])
