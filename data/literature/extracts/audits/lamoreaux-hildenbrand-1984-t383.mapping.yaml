@@ -1,0 +1,99 @@
+source_id: lamoreaux-hildenbrand-1984-t383
+source:
+  citation: "Lamoreaux, R. H. & Hildenbrand, D. L., High Temperature Vaporization Behavior of Oxides. I. Alkali Metal Binary Oxides, J. Phys. Chem. Ref. Data 13 (1984) 151–173."
+extraction:
+  method: mineru_table_draft plus render-verified manual assembly
+  date: '2026-10-25'
+  worker: w1025b-lamo84
+review_status: draft
+tables:
+  - page: 2
+    table_index: 4
+    published_page: 154
+    type: gibbs_table
+    quantity: gibbs_energy_function_polynomial_segments
+    evidence_class: quoted_attributed
+    unit: dimensionless GEF polynomial
+    phase: solid
+    rows: [35, 36, 37]
+    values:
+      - {column: 2, species: K2O}
+      - {column: 3, species: K2O}
+      - {column: 4, species: K2O}
+      - {column: 5, species: K2O}
+    attribution: "Lamoreaux and Hildenbrand (1984), Table 2; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+  - page: 2
+    table_index: 4
+    published_page: 154
+    type: gibbs_table
+    quantity: gibbs_energy_function_polynomial_segments
+    evidence_class: quoted_attributed
+    unit: dimensionless GEF polynomial
+    phase: liquid
+    rows: [38]
+    values:
+      - {column: 2, species: K2O}
+      - {column: 3, species: K2O}
+      - {column: 4, species: K2O}
+      - {column: 5, species: K2O}
+    attribution: "Lamoreaux and Hildenbrand (1984), Table 2; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+  - page: 2
+    table_index: 4
+    published_page: 154
+    type: gibbs_table
+    quantity: gibbs_energy_function_polynomial_segments
+    evidence_class: quoted_attributed
+    unit: dimensionless GEF polynomial
+    phase: gas
+    rows: [39, 40, 41]
+    values:
+      - {column: 2, species: K2O}
+      - {column: 3, species: K2O}
+      - {column: 4, species: K2O}
+      - {column: 5, species: K2O}
+    attribution: "Lamoreaux and Hildenbrand (1984), Table 2; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+  - page: 3
+    table_index: 6
+    published_page: 155
+    type: gibbs_table
+    quantity: enthalpy_increment_polynomial_segments
+    evidence_class: quoted_attributed
+    unit: enthalpy-increment polynomial coefficients
+    phase: solid
+    rows: [79, 80, 81]
+    values:
+      - {column: 2, species: K2O}
+      - {column: 3, species: K2O}
+      - {column: 4, species: K2O}
+      - {column: 5, species: K2O}
+    attribution: "Lamoreaux and Hildenbrand (1984), Table 3; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+  - page: 3
+    table_index: 6
+    published_page: 155
+    type: gibbs_table
+    quantity: enthalpy_increment_polynomial_segments
+    evidence_class: quoted_attributed
+    unit: enthalpy-increment polynomial coefficients
+    phase: liquid
+    rows: [82]
+    values:
+      - {column: 2, species: K2O}
+      - {column: 3, species: K2O}
+      - {column: 4, species: K2O}
+      - {column: 5, species: K2O}
+    attribution: "Lamoreaux and Hildenbrand (1984), Table 3; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+  - page: 3
+    table_index: 6
+    published_page: 155
+    type: gibbs_table
+    quantity: enthalpy_increment_polynomial_segments
+    evidence_class: quoted_attributed
+    unit: enthalpy-increment polynomial coefficients
+    phase: gas
+    rows: [83, 84]
+    values:
+      - {column: 2, species: K2O}
+      - {column: 3, species: K2O}
+      - {column: 4, species: K2O}
+      - {column: 5, species: K2O}
+    attribution: "Lamoreaux and Hildenbrand (1984), Table 3; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."

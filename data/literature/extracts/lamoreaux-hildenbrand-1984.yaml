@@ -456,6 +456,216 @@ species:
         formula: Na2O
         liquid_fef_starts_at_Tm: true
         verified_data_path: raw/lamoreaux-hildenbrand-1984-t383/lamoreaux-hildenbrand-1984-t383.pdf
+  K2O:
+    observations:
+    - observation_id: LH84_K2O_fusion
+      type: transition_point
+      locator:
+        table: Table 1
+        page: 1
+        published_page: 153
+        pdf_page_index: 0
+        note: K2O melting point and enthalpy of fusion; hand-transcribed because MinerU classified the body row as a header
+        record: LH84_K2O_fusion
+      T_range_K: [1190, 1190]
+      phase: solid_liquid
+      units: K and kK as published
+      uncertainty:
+        T_m_uncertainty_K: 50
+        Delta_fus_H_over_R_uncertainty_kK: 1.0
+        note: confidence level not stated
+      values:
+        property_kind: melting_point_and_enthalpy_of_fusion
+        T_m_K: 1190
+        T_m_uncertainty_K: 50
+        Delta_fus_H_over_R_kK: 4.8
+        Delta_fus_H_over_R_uncertainty_kK: 1.0
+        formula: K2O
+        method_class: quoted_attributed
+        attribution: "Lamoreaux and Hildenbrand (1984), Table 1; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+    - observation_id: LH84_K2O_s_GEF_segments
+      type: gibbs_table
+      locator:
+        table: Table 2
+        page: 2
+        published_page: 154
+        pdf_page_index: 1
+        note: K2O(s) Gibbs energy function; the 600–890 K B coefficient is 5.772 in the render and MinerU, while pdftotext reads 5.172
+        record: LH84_K2O_s_GEF_segments
+      T_range_K: [298, 1190]
+      phase: solid
+      standard_state: 1.01325 bar (1 atm), as printed on p. 153
+      units: dimensionless GEF polynomial (A, 10^3 B, 10^6 C, 10^9 D)
+      values:
+        quantity: gibbs_energy_function_polynomial_segments
+        formula: K2O
+        phase: solid
+        method_class: quoted_attributed
+        attribution: "Lamoreaux and Hildenbrand (1984), Table 2; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+        segments:
+        - {A: 14.68, B_1e3: -27.005, C_1e6: 64.596, D_1e9: -39.642, T_min_K: 298, T_max_K: 600}
+        - {A: 8.73, B_1e3: 5.772, C_1e6: 4.132, D_1e9: -2.363, T_min_K: 600, T_max_K: 890}
+        - {A: 2.42, B_1e3: 26.192, C_1e6: -17.967, D_1e9: 5.636, T_min_K: 890, T_max_K: 1190}
+    - observation_id: LH84_K2O_l_GEF_segments
+      type: gibbs_table
+      locator:
+        table: Table 2
+        page: 2
+        published_page: 154
+        pdf_page_index: 1
+        note: K2O(l) Gibbs energy function
+        record: LH84_K2O_l_GEF_segments
+      T_range_K: [1190, 3000]
+      phase: liquid
+      standard_state: 1.01325 bar (1 atm), as printed on p. 153
+      units: dimensionless GEF polynomial (A, 10^3 B, 10^6 C, 10^9 D)
+      values:
+        quantity: gibbs_energy_function_polynomial_segments
+        formula: K2O
+        phase: liquid
+        method_class: quoted_attributed
+        attribution: "Lamoreaux and Hildenbrand (1984), Table 2; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+        segments:
+        - {A: 0.80, B_1e3: 18.889, C_1e6: -4.532, D_1e9: 0.467, T_min_K: 1190, T_max_K: 3000}
+    - observation_id: LH84_K2O_g_GEF_segments
+      type: gibbs_table
+      locator:
+        table: Table 2
+        page: 2
+        published_page: 154
+        pdf_page_index: 1
+        note: K2O(g) Gibbs energy function
+        record: LH84_K2O_g_GEF_segments
+      T_range_K: [298, 3000]
+      phase: gas
+      standard_state: 1.01325 bar (1 atm), as printed on p. 153
+      units: dimensionless GEF polynomial (A, 10^3 B, 10^6 C, 10^9 D)
+      values:
+        quantity: gibbs_energy_function_polynomial_segments
+        formula: K2O
+        phase: gas
+        method_class: quoted_attributed
+        attribution: "Lamoreaux and Hildenbrand (1984), Table 2; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+        segments:
+        - {A: 36.52, B_1e3: -19.066, C_1e6: 45.948, D_1e9: -28.502, T_min_K: 298, T_max_K: 600}
+        - {A: 31.63, B_1e3: 7.039, C_1e6: -1.027, D_1e9: -0.062, T_min_K: 600, T_max_K: 1400}
+        - {A: 31.83, B_1e3: 7.112, C_1e6: -1.465, D_1e9: 0.141, T_min_K: 1400, T_max_K: 3000}
+    - observation_id: LH84_K2O_s_enthalpy_increment
+      type: gibbs_table
+      locator:
+        table: Table 3
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        note: K2O(s) enthalpy increment function
+        record: LH84_K2O_s_enthalpy_increment
+      T_range_K: [298, 1190]
+      phase: solid
+      units: enthalpy-increment polynomial coefficients as printed
+      values:
+        quantity: enthalpy_increment_polynomial_segments
+        formula: K2O
+        phase: solid
+        method_class: quoted_attributed
+        attribution: "Lamoreaux and Hildenbrand (1984), Table 3; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+        segments:
+        - {a: -2.29, b_1e3: 6.249, c_1e6: 5.508, d_1e9: -2.362, T_min_K: 298, T_max_K: 890}
+        - {a: -145.88, b_1e3: 460.411, c_1e6: -473.284, d_1e9: 165.926, T_min_K: 890, T_max_K: 1070}
+        - {a: -25.75, b_1e3: 45.078, c_1e6: -12.511, d_1e9: 0.000, T_min_K: 1070, T_max_K: 1190}
+    - observation_id: LH84_K2O_l_enthalpy_increment
+      type: gibbs_table
+      locator:
+        table: Table 3
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        note: K2O(l) enthalpy increment function
+        record: LH84_K2O_l_enthalpy_increment
+      T_range_K: [1190, 3000]
+      phase: liquid
+      units: enthalpy-increment polynomial coefficients as printed
+      values:
+        quantity: enthalpy_increment_polynomial_segments
+        formula: K2O
+        phase: liquid
+        method_class: quoted_attributed
+        attribution: "Lamoreaux and Hildenbrand (1984), Table 3; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+        segments:
+        - {a: 0.02, b_1e3: 12.581, c_1e6: 0, d_1e9: 0, T_min_K: 1190, T_max_K: 3000}
+    - observation_id: LH84_K2O_g_enthalpy_increment
+      type: gibbs_table
+      locator:
+        table: Table 3
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        note: K2O(g) enthalpy increment function
+        record: LH84_K2O_g_enthalpy_increment
+      T_range_K: [298, 3000]
+      phase: gas
+      units: enthalpy-increment polynomial coefficients as printed
+      values:
+        quantity: enthalpy_increment_polynomial_segments
+        formula: K2O
+        phase: gas
+        method_class: quoted_attributed
+        attribution: "Lamoreaux and Hildenbrand (1984), Table 3; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+        segments:
+        - {a: -1.05, b_1e3: 5.865, c_1e6: 1.296, d_1e9: -0.525, T_min_K: 298, T_max_K: 1000}
+        - {a: -2.13, b_1e3: 6.876, c_1e6: 0.045, d_1e9: -0.006, T_min_K: 1000, T_max_K: 3000}
+    - observation_id: LH84_K2O_s_formation
+      type: gibbs_table
+      locator:
+        table: Table 4
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        note: K2O(s) thermodynamic data at 298 K
+        record: LH84_K2O_s_formation
+      T_range_K: [298, 298]
+      phase: solid
+      standard_state: 1.01325 bar, as printed on p. 153
+      units: over_R in kK and dimensionless as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 0.25
+        S_298_over_R_uncertainty: 0.75
+        note: confidence level not stated
+      values:
+        formula: K2O
+        phase: solid
+        Delta_f_H_298_over_R_kK: -43.58
+        Delta_f_H_298_over_R_uncertainty_kK: 0.25
+        S_298_over_R: 11.32
+        S_298_over_R_uncertainty: 0.75
+        method_class: quoted_attributed
+        attribution: "Lamoreaux and Hildenbrand (1984), Table 4; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
+    - observation_id: LH84_K2O_g_formation
+      type: gibbs_table
+      locator:
+        table: Table 4
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        note: K2O(g) thermodynamic data at 298 K
+        record: LH84_K2O_g_formation
+      T_range_K: [298, 298]
+      phase: gas
+      standard_state: 1.01325 bar, as printed on p. 153
+      units: over_R in kK and dimensionless as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 0.26
+        S_298_over_R_uncertainty: 0.75
+        note: confidence level not stated
+      values:
+        formula: K2O
+        phase: gas
+        Delta_f_H_298_over_R_kK: -7.05
+        Delta_f_H_298_over_R_uncertainty_kK: 0.26
+        S_298_over_R: 34.17
+        S_298_over_R_uncertainty: 0.75
+        H298_minus_H0_over_R_kK: 1.64
+        method_class: quoted_attributed
+        attribution: "Lamoreaux and Hildenbrand (1984), Table 4; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
   Na:
     observations:
     - observation_id: LH84_Na_g_GEF_segments
