@@ -288,7 +288,12 @@ def _docs_private_prose_errors(doc: Any, label: str) -> list[str]:
             for key, value in node.items():
                 key_s = str(key)
                 child_path = f"{field_path}.{key_s}" if field_path else key_s
-                if key_s.endswith("_path"):
+                if key_s in PATH_VALUE_KEYS and isinstance(value, str):
+                    continue
+                if key_s in PATH_VALUE_KEYS and isinstance(value, (list, tuple)):
+                    for index, item in enumerate(value):
+                        if not isinstance(item, str):
+                            walk(item, f"{child_path}[{index}]")
                     continue
                 walk(value, child_path)
         elif isinstance(node, (list, tuple)):

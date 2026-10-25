@@ -205,10 +205,17 @@ def test_private_value_on_every_path_key_is_refused(key: str, form: str) -> None
     doc = _planted_doc(key, form, _PLANT_PRIVATE)
     errors = vle.validate_extract_document(doc, expected_source_id="probe")
     refused = [e for e in errors if "docs-private path refused" in e]
+    prose = [e for e in errors if "[docs-private-prose]" in e]
     assert len(refused) == 1, errors
     assert f"extraction.{key}" in refused[0]
     assert _PLANT_PRIVATE in refused[0]
-    assert errors == refused  # the refusal is the only error, not buried
+    if form in {"alias", "alias_in_list"}:
+        assert len(prose) == 1, errors
+        assert "extraction.probe_anchor" in prose[0]
+        assert len(errors) == 2
+    else:
+        assert prose == []
+        assert errors == refused
 
 
 @pytest.mark.parametrize("form", sorted(_PLANT_FORMS))
