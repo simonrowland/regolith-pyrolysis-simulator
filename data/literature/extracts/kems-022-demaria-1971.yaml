@@ -100,31 +100,24 @@ species:
         points:
         - T_K: 1396.0
           p_atm: 5.54e-09
-          p_Pa: 0.0005613405
           sample: '12022'
         - T_K: 1475.0
           p_atm: 4.96e-08
-          p_Pa: 0.00502572
           sample: '12022'
         - T_K: 1433.0
           p_atm: 3.78e-09
-          p_Pa: 0.0003830085
           sample: '12065'
         - T_K: 1482.0
           p_atm: 1.22e-08
-          p_Pa: 0.001236165
           sample: '12065'
         - T_K: 1499.0
           p_atm: 2.11e-08
-          p_Pa: 0.0021379575
           sample: '12065'
         - T_K: 1471.0
           p_atm: 1.27e-08
-          p_Pa: 0.0012868274999999999
           sample: '12065'
         - T_K: 1459.0
           p_atm: 8.78e-09
-          p_Pa: 0.0008896335
           sample: '12065'
         co_measured_context: same alkali T window as Na/K figure series (Figs 1–2); tabulated co-species
           O2 only
@@ -241,6 +234,14 @@ species:
         table: '2'
         line_range: 127-129
         paragraph: Partial pressures of Mn and Cr over sample 12022; initial points
+      derivation:
+        relation: Ion intensities were converted to partial pressures using the silver and, whenever possible, O/O2 calibrations.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: To convert ion intensities into pressures, the silver calibration and, whenever possible, the O/O2 calibration were utilized.
       T_range_K:
       - 1583.0
       - 1725.0
@@ -251,21 +252,19 @@ species:
       values:
         gas_species: Mn(g)
         quantity: partial_pressure_initial_points
+        method_class: measured_reduced
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         activity_order: 1e-5 to 1e-6 (authors)
         points:
         - T_K: 1583.0
           p_atm: 7.66e-09
-          p_Pa: 0.0007761495
           sample: '12022'
         - T_K: 1609.0
           p_atm: 1.32e-08
-          p_Pa: 0.00133749
           sample: '12022'
         - T_K: 1725.0
           p_atm: 8.47e-08
-          p_Pa: 0.0085822275
           sample: '12022'
         co_measured_with:
         - demaria_1971_cr_psat_table2_sample_12022
@@ -302,6 +301,14 @@ species:
         table: '2'
         line_range: 127-129
         paragraph: Partial pressures of Mn and Cr over sample 12022; initial points
+      derivation:
+        relation: Ion intensities were converted to partial pressures using the silver and, whenever possible, O/O2 calibrations.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: To convert ion intensities into pressures, the silver calibration and, whenever possible, the O/O2 calibration were utilized.
       T_range_K:
       - 1725.0
       - 1794.0
@@ -312,17 +319,16 @@ species:
       values:
         gas_species: Cr(g)
         quantity: partial_pressure_initial_points
+        method_class: measured_reduced
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         activity_order: 1e-5 to 1e-6 (authors)
         points:
         - T_K: 1725.0
           p_atm: 1.03e-08
-          p_Pa: 0.0010436475
           sample: '12022'
         - T_K: 1794.0
           p_atm: 6.2e-08
-          p_Pa: 0.00628215
           sample: '12022'
         co_measured_with:
         - demaria_1971_mn_psat_table2_sample_12022
@@ -358,6 +364,14 @@ species:
         table: '3'
         line_range: 143-145
         paragraph: Partial pressures of Mg over samples 12022 and 12065; indicative initial points
+      derivation:
+        relation: Ion intensities were converted to partial pressures using the silver and, whenever possible, O/O2 calibrations.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: To convert ion intensities into pressures, the silver calibration and, whenever possible, the O/O2 calibration were utilized.
       T_range_K:
       - 1650.0
       - 1927.0
@@ -368,48 +382,41 @@ species:
       values:
         gas_species: Mg(g)
         quantity: partial_pressure_initial_points
+        method_class: measured_reduced
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         activity_note: low activity; same order as pure-oxide decomposition pressures (Altman 1963)
         points:
         - T_K: 1650.0
           p_atm: 1.6e-08
-          p_Pa: 0.0016212000000000002
           instrument: BC
           sample: '12022'
         - T_K: 1694.0
           p_atm: 5.7e-08
-          p_Pa: 0.005775525
           instrument: NAA
           sample: '12022'
         - T_K: 1815.0
           p_atm: 3.96e-06
-          p_Pa: 0.401247
           instrument: NAA
           sample: '12022'
         - T_K: 1747.0
           p_atm: 1.65e-09
-          p_Pa: 0.0001671862
           instrument: NAA
           sample: '12065'
         - T_K: 1854.0
           p_atm: 9.4e-09
-          p_Pa: 0.000952455
           instrument: NAA
           sample: '12065'
         - T_K: 1776.0
           p_atm: 2.4e-09
-          p_Pa: 0.00024318
           instrument: NAA
           sample: '12065'
         - T_K: 1857.0
           p_atm: 8.85e-08
-          p_Pa: 0.0089672625
           instrument: NAA
           sample: '12065'
         - T_K: 1927.0
           p_atm: 3.2e-08
-          p_Pa: 0.0032424000000000003
           instrument: NAA
           sample: '12065'
         caveat: 'Authors: Mg activity decreased after initial observation — attribution of reported data
@@ -728,8 +735,9 @@ species:
       values:
         reaction: FeO(g) = Fe(g) + 1/2 O2(g)
         reaction_number: 4
-        quantity: third_law_and_second_law_delta_H0
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -739,13 +747,9 @@ species:
         third_law_delta_H0_kcal_mol:
           BC: 39 ± 2
           NAA: 38 ± 2
-        second_law_delta_H0_kcal_mol:
-          BC: 38 ± 3
-          footnote: a
         table: '6'
       uncertainty:
-        note: printed ± on Table 6; third-law inclusive of calibration errors; second-law is the
-          standard deviation (authors)
+        note: printed ± on Table 6; third-law inclusive of calibration errors
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -764,6 +768,29 @@ species:
             published_page: 1368
             pdf_page_index: 2
             paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+    - observation_id: demaria_1971_table6_feo_dissociation_second_law
+      type: gibbs_table
+      locator:
+        table: '6'
+        published_page: 1376
+        pdf_page_index: 10
+        paragraph: Second-law heat for reaction (4), footnote a
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: kcal/mole as published
+      values:
+        reaction: FeO(g) = Fe(g) + 1/2 O2(g)
+        reaction_number: 4
+        quantity: reaction_enthalpy_2nd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, second-law result"
+        condensed_phase: lunar_basalt_melt
+        second_law_delta_H0_kcal_mol:
+          BC: 38 ± 3
+        footnote: a
+        table: '6'
+      uncertainty:
+        note: printed ±3; footnote a identifies the second-law value
     - observation_id: demaria_1971_silver_and_o_o2_calibration
       type: rate_series
       locator:
@@ -907,57 +934,35 @@ species:
         points:
         - sample: '12022'
           T_K: 2060.0
-          minus_R_ln_Kp: 4.09
-          minus_delta_fef: 19.025
           delta_H0_kcal_mol: 47.6
         - sample: '12022'
           T_K: 2080.0
-          minus_R_ln_Kp: 3.8
-          minus_delta_fef: 19.02
           delta_H0_kcal_mol: 47.5
         - sample: '12022'
           T_K: 2120.0
-          minus_R_ln_Kp: 3.07
-          minus_delta_fef: 19.0
           delta_H0_kcal_mol: 46.8
         - sample: '12022'
           T_K: 2150.0
-          minus_R_ln_Kp: 3.07
-          minus_delta_fef: 18.99
           delta_H0_kcal_mol: 47.4
         - sample: '12022'
           T_K: 2170.0
-          minus_R_ln_Kp: 2.7
-          minus_delta_fef: 18.98
           delta_H0_kcal_mol: 47.0
         - sample: '12065'
           T_K: 1990.0
-          minus_R_ln_Kp: 4.62
-          minus_delta_fef: 19.05
           delta_H0_kcal_mol: 47.1
         - sample: '12065'
           T_K: 2035.0
-          minus_R_ln_Kp: 4.3
-          minus_delta_fef: 19.03
           delta_H0_kcal_mol: 47.5
         - sample: '12065'
           T_K: 2060.0
-          minus_R_ln_Kp: 3.98
-          minus_delta_fef: 19.02
           delta_H0_kcal_mol: 47.4
         - sample: '12065'
           T_K: 1850.0
-          minus_R_ln_Kp: 5.995
-          minus_delta_fef: 19.105
           delta_H0_kcal_mol: 46.4
           note: footnote b in table
-        mean_delta_H0_kcal_mol: 47.3
-        mean_delta_H0_sigma: 0.3
-        table6_summary_kcal_mol:
-          BC: 47 ± 2
-          NAA: 46 ± 2
+        mean_delta_H0_kcal_mol: 47.3 ± 0.3
       uncertainty:
-        note: std dev on mean ±0.3; third-law inclusive of calibration errors in Table 6 ±2
+        note: standard deviation on the mean is printed as ±0.3
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -978,6 +983,100 @@ species:
             source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_sio2_sio_o2_table7_minus_R_ln_Kp
+      type: gibbs_table
+      locator:
+        table: '7'
+        published_page: 1377
+        line_range: 330-334
+        paragraph: Table 7 negative R ln Kp values
+      T_range_K:
+      - 1850.0
+      - 2170.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: -R ln Kp as printed (kcal/mole)
+      values:
+        reaction: SiO2(g) = SiO(g) + 1/2 O2(g)
+        quantity: minus_R_ln_Kp
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 7"
+        points:
+        - sample: '12022'
+          T_K: 2060.0
+          value: 4.09
+        - sample: '12022'
+          T_K: 2080.0
+          value: 3.80
+        - sample: '12022'
+          T_K: 2120.0
+          value: 3.07
+        - sample: '12022'
+          T_K: 2150.0
+          value: 3.07
+        - sample: '12022'
+          T_K: 2170.0
+          value: 2.70
+        - sample: '12065'
+          T_K: 1990.0
+          value: 4.62
+        - sample: '12065'
+          T_K: 2035.0
+          value: 4.30
+        - sample: '12065'
+          T_K: 2060.0
+          value: 3.98
+        - sample: '12065'
+          T_K: 1850.0
+          value: 5.995
+          note: footnote b in table
+    - observation_id: demaria_1971_sio2_sio_o2_table7_minus_delta_fef
+      type: gibbs_table
+      locator:
+        table: '7'
+        published_page: 1377
+        line_range: 330-334
+        paragraph: Table 7 negative delta fef values
+      T_range_K:
+      - 1850.0
+      - 2170.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: -delta(fef) as printed (kcal/mole)
+      values:
+        reaction: SiO2(g) = SiO(g) + 1/2 O2(g)
+        quantity: minus_delta_fef
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 7"
+        points:
+        - sample: '12022'
+          T_K: 2060.0
+          value: 19.025
+        - sample: '12022'
+          T_K: 2080.0
+          value: 19.02
+        - sample: '12022'
+          T_K: 2120.0
+          value: 19.00
+        - sample: '12022'
+          T_K: 2150.0
+          value: 18.99
+        - sample: '12022'
+          T_K: 2170.0
+          value: 18.98
+        - sample: '12065'
+          T_K: 1990.0
+          value: 19.05
+        - sample: '12065'
+          T_K: 2035.0
+          value: 19.03
+        - sample: '12065'
+          T_K: 2060.0
+          value: 19.02
+        - sample: '12065'
+          T_K: 1850.0
+          value: 19.105
+          note: footnote b in table
     - observation_id: demaria_1971_table6_sio2_dissociation
       type: gibbs_table
       locator:
@@ -985,17 +1084,15 @@ species:
         published_page: 1376
         pdf_page_index: 10
         paragraph: Third-law heats of equilibrium reactions; reaction (1)
-      T_range_K:
-      - 1850.0
-      - 2170.0
       phase: lunar_basalt_melt_12022_12065
       regime: kems_effusion
       units: kcal/mole as published
       values:
         reaction: SiO2(g) = SiO(g) + 1/2 O2(g)
         reaction_number: 1
-        quantity: third_law_delta_H0_table6_summary
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -1148,17 +1245,15 @@ species:
         published_page: 1376
         pdf_page_index: 10
         paragraph: Third-law heats of equilibrium reactions; reaction (5)
-      T_range_K:
-      - 2000.0
-      - 2170.0
       phase: lunar_basalt_melt_12022_12065
       regime: kems_effusion
       units: kcal/mole as published
       values:
         reaction: TiO2(g) = TiO(g) + 1/2 O2(g)
         reaction_number: 5
-        quantity: third_law_delta_H0_table6
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_lunar_basalt
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -1196,17 +1291,15 @@ species:
         published_page: 1376
         pdf_page_index: 10
         paragraph: Third-law heats of equilibrium reactions; reaction (6)
-      T_range_K:
-      - 2000.0
-      - 2170.0
       phase: lunar_basalt_melt_12022_12065
       regime: kems_effusion
       units: kcal/mole as published
       values:
         reaction: TiO2(g) = TiO(g) + O(g)
         reaction_number: 6
-        quantity: third_law_and_second_law_delta_H0
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_lunar_basalt
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -1216,12 +1309,9 @@ species:
         third_law_delta_H0_kcal_mol:
           BC: null
           NAA: 142 ± 3
-        second_law_delta_H0_kcal_mol:
-          NAA: 143 ± 8
-          footnote: a
         table: '6'
       uncertainty:
-        note: printed ± on Table 6; second-law 143 ± 8 is footnote a under the NAA column
+        note: printed ±3; NAA is the reported third-law result
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -1234,6 +1324,29 @@ species:
             published_page: 1368
             pdf_page_index: 2
             paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+    - observation_id: demaria_1971_table6_tio2_atomic_o_second_law
+      type: gibbs_table
+      locator:
+        table: '6'
+        published_page: 1376
+        pdf_page_index: 10
+        paragraph: Second-law heat for reaction (6), footnote a
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: kcal/mole as published
+      values:
+        reaction: TiO2(g) = TiO(g) + O(g)
+        reaction_number: 6
+        quantity: reaction_enthalpy_2nd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, second-law result"
+        condensed_phase: lunar_basalt_melt
+        second_law_delta_H0_kcal_mol:
+          NAA: 143 ± 8
+        footnote: a
+        table: '6'
+      uncertainty:
+        note: printed ±8; footnote a identifies the second-law value
         cell_material:
           value: Re
           locator:
@@ -1249,6 +1362,14 @@ species:
         table: '4'
         line_range: 284-286
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+      derivation:
+        relation: Ion intensities were converted to partial pressures using the silver and, whenever possible, O/O2 calibrations.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: To convert ion intensities into pressures, the silver calibration and, whenever possible, the O/O2 calibration were utilized.
       T_range_K:
       - 2060.0
       - 2500.0
@@ -1291,55 +1412,46 @@ species:
               MnO: 0.31
           T_K: 2060.0
           p_atm: 5.07e-09
-          p_Pa: 0.0005137178
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2104.0
           p_atm: 1.13e-08
-          p_Pa: 0.0011449725000000001
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2125.0
           p_atm: 1.57e-08
-          p_Pa: 0.0015908025000000003
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2146.0
           p_atm: 2.24e-08
-          p_Pa: 0.00226968
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2180.0
           p_atm: 3.65e-08
-          p_Pa: 0.0036983625000000003
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2183.0
           p_atm: 3.82e-08
-          p_Pa: 0.003870615
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2194.0
           p_atm: 4.01e-08
-          p_Pa: 0.0040631325
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2290.0
           p_atm: 1.55e-07
-          p_Pa: 0.015705375
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2270.0
           p_atm: 1.04e-07
-          p_Pa: 0.0105378
           instrument: NAA
           sample: '12022'
         - <<: &smales_12065_catalogue_composition
@@ -1367,31 +1479,26 @@ species:
               Cr2O3: 0.50
           T_K: 2360.0
           p_atm: 6.9e-07
-          p_Pa: 0.06991425
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2395.0
           p_atm: 9.88e-07
-          p_Pa: 0.10010909999999999
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2425.0
           p_atm: 1.9e-06
-          p_Pa: 0.1925175
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2465.0
           p_atm: 3.39e-06
-          p_Pa: 0.34349175000000004
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2500.0
           p_atm: 4.73e-06
-          p_Pa: 0.47926725
           instrument: BC
           sample: '12065'
         co_measured_with:
@@ -1430,17 +1537,15 @@ species:
         published_page: 1376
         pdf_page_index: 10
         paragraph: Third-law heats of equilibrium reactions; reaction (3)
-      T_range_K:
-      - 2360.0
-      - 2500.0
       phase: lunar_basalt_melt_12022_12065
       regime: kems_effusion
       units: kcal/mole as published
       values:
         reaction: Al2O(g) + O(g) = 2 AlO(g)
         reaction_number: 3
-        quantity: third_law_delta_H0_table6
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_lunar_basalt
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -1479,6 +1584,14 @@ species:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         table: '4'
         line_range: 284-286
+      derivation:
+        relation: Ion intensities were converted to partial pressures using the silver and, whenever possible, O/O2 calibrations.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: To convert ion intensities into pressures, the silver calibration and, whenever possible, the O/O2 calibration were utilized.
       T_range_K:
       - 2320.0
       - 2500.0
@@ -1499,37 +1612,31 @@ species:
         - <<: *smales_12065_catalogue_composition
           T_K: 2320.0
           p_atm: 1.05e-06
-          p_Pa: 0.10639124999999999
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2360.0
           p_atm: 1.3e-06
-          p_Pa: 0.1317225
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2395.0
           p_atm: 2.22e-06
-          p_Pa: 0.2249415
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2425.0
           p_atm: 3.79e-06
-          p_Pa: 0.38402175
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2465.0
           p_atm: 6.84e-06
-          p_Pa: 0.693063
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2500.0
           p_atm: 8.96e-06
-          p_Pa: 0.907872
           instrument: BC
           sample: '12065'
         co_measured_with:
@@ -1592,32 +1699,16 @@ species:
         - demaria_1971_al_monatomic_figure7
         points:
         - T_K: 2360.0
-          Kp: 3.19e-05
-          minus_R_ln_Kp: 20.56
-          minus_delta_fef: 27.26
           delta_H0_kcal_mol: 112.8
         - T_K: 2395.0
-          Kp: 4.02e-05
-          minus_R_ln_Kp: 20.01
-          minus_delta_fef: 27.3
           delta_H0_kcal_mol: 113.4
         - T_K: 2425.0
-          Kp: 8.03e-05
-          minus_R_ln_Kp: 18.73
-          minus_delta_fef: 27.32
           delta_H0_kcal_mol: 111.6
         - T_K: 2465.0
-          Kp: 0.000133
-          minus_R_ln_Kp: 17.74
-          minus_delta_fef: 27.35
           delta_H0_kcal_mol: 111.1
         - T_K: 2500.0
-          Kp: 0.000158
-          minus_R_ln_Kp: 17.39
-          minus_delta_fef: 27.38
           delta_H0_kcal_mol: 111.9
-        mean_delta_H0_kcal_mol: 112.2
-        mean_delta_H0_sigma: 0.9
+        mean_delta_H0_kcal_mol: 112.2 ± 0.9
         literature_compare_kcal_mol: 112 ± 3 (this work BC Table 6) vs 115 ± 5 (Drowart et al. 1960)
         ratio_recoverable: Kp = p(Al)*p(O)/p(AlO) from simultaneous measurements — carrier ratios without
           absolute calibration
@@ -1643,6 +1734,93 @@ species:
             source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_alo_al_o_table8_Kp
+      type: gibbs_table
+      locator:
+        table: '8'
+        published_page: 1377
+        line_range: 337-341
+        paragraph: Table 8 equilibrium constants
+      T_range_K:
+      - 2360.0
+      - 2500.0
+      phase: lunar_basalt_melt_12065
+      regime: kems_effusion
+      units: dimensionless Kp as printed
+      values:
+        reaction: AlO(g) = Al(g) + O(g)
+        quantity: equilibrium_constant_Kp
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 8"
+        points:
+        - T_K: 2360.0
+          value: 3.19e-05
+        - T_K: 2395.0
+          value: 4.02e-05
+        - T_K: 2425.0
+          value: 8.03e-05
+        - T_K: 2465.0
+          value: 1.33e-04
+        - T_K: 2500.0
+          value: 1.58e-04
+    - observation_id: demaria_1971_alo_al_o_table8_minus_R_ln_Kp
+      type: gibbs_table
+      locator:
+        table: '8'
+        published_page: 1377
+        line_range: 337-341
+        paragraph: Table 8 negative R ln Kp values
+      T_range_K:
+      - 2360.0
+      - 2500.0
+      phase: lunar_basalt_melt_12065
+      regime: kems_effusion
+      units: -R ln Kp as printed (kcal/mole)
+      values:
+        reaction: AlO(g) = Al(g) + O(g)
+        quantity: minus_R_ln_Kp
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 8"
+        points:
+        - T_K: 2360.0
+          value: 20.56
+        - T_K: 2395.0
+          value: 20.01
+        - T_K: 2425.0
+          value: 18.73
+        - T_K: 2465.0
+          value: 17.74
+        - T_K: 2500.0
+          value: 17.39
+    - observation_id: demaria_1971_alo_al_o_table8_minus_delta_fef
+      type: gibbs_table
+      locator:
+        table: '8'
+        published_page: 1377
+        line_range: 337-341
+        paragraph: Table 8 negative delta fef values
+      T_range_K:
+      - 2360.0
+      - 2500.0
+      phase: lunar_basalt_melt_12065
+      regime: kems_effusion
+      units: -delta(fef) as printed (kcal/mole)
+      values:
+        reaction: AlO(g) = Al(g) + O(g)
+        quantity: minus_delta_fef
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 8"
+        points:
+        - T_K: 2360.0
+          value: 27.26
+        - T_K: 2395.0
+          value: 27.30
+        - T_K: 2425.0
+          value: 27.32
+        - T_K: 2465.0
+          value: 27.35
+        - T_K: 2500.0
+          value: 27.38
     - observation_id: demaria_1971_table6_alo_dissociation
       type: gibbs_table
       locator:
@@ -1650,17 +1828,15 @@ species:
         published_page: 1376
         pdf_page_index: 10
         paragraph: Third-law heats of equilibrium reactions; reaction (2)
-      T_range_K:
-      - 2360.0
-      - 2500.0
       phase: lunar_basalt_melt_12065
       regime: kems_effusion
       units: kcal/mole as published
       values:
         reaction: AlO(g) = Al(g) + O(g)
         reaction_number: 2
-        quantity: third_law_delta_H0_table6_summary
-        method_class: measured_direct
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 6, third-law result"
         material: Apollo_12_12065
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:
@@ -1778,79 +1954,66 @@ species:
         - <<: *smales_12022_catalogue_composition
           T_K: 2015.0
           p_atm: 9.2e-08
-          p_Pa: 0.009321900000000001
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2060.0
           p_atm: 2.2e-07
-          p_Pa: 0.022291500000000002
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2104.0
           p_atm: 3.2e-07
-          p_Pa: 0.032424
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2146.0
           p_atm: 6.5e-07
-          p_Pa: 0.06586125
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2162.0
           p_atm: 9.0e-07
-          p_Pa: 0.0911925
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2194.0
           p_atm: 8.54e-07
-          p_Pa: 0.08653155
           instrument: NAA
           sample: '12022'
         - <<: *smales_12022_catalogue_composition
           T_K: 2270.0
           p_atm: 2.0e-06
-          p_Pa: 0.20265
           instrument: NAA
           sample: '12022'
         - <<: *smales_12065_catalogue_composition
           T_K: 2320.0
           p_atm: 1.63e-06
-          p_Pa: 0.16515975
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2360.0
           p_atm: 2.91e-06
-          p_Pa: 0.29485575
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2395.0
           p_atm: 3.8e-06
-          p_Pa: 0.385035
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2425.0
           p_atm: 7.4e-06
-          p_Pa: 0.749805
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2465.0
           p_atm: 1.13e-05
-          p_Pa: 1.1449725
           instrument: BC
           sample: '12065'
         - <<: *smales_12065_catalogue_composition
           T_K: 2500.0
           p_atm: 1.42e-05
-          p_Pa: 1.438815
           instrument: BC
           sample: '12065'
         co_measured_with:
@@ -2040,7 +2203,7 @@ species:
               categorical redox boundary, not a numeric buffer; the tabulated p(O2) is the measurement.'
             algebra: pO2_bar = p_atm × (1.01325 bar / 1 atm) = 5.54e-9 × 1.01325 = 5.613405e-9 bar
             unit_check: 5.54e-9 atm × 101325 Pa/atm = 5.613405e-4 Pa; 5.613405e-4 Pa / 1e5 Pa/bar =
-              5.613405e-9 bar. Matches the already-stored Table 1 point p_Pa=0.0005613405.
+              5.613405e-9 bar. This agrees with the printed Table 1 O2 pressure range in atm; no converted p_Pa twin is stored.
             sanity_check: 5.6e-9 bar is the same order as the alkali-window O2 table (5.54e-9–4.96e-8
               atm). Distinct from DEFAULT_PO2_BAR=1e-8. Harness is observation-level, so this single
               measured pO2 is attached to the whole series; no Clausius–Clapeyron interpolation or
@@ -2050,7 +2213,6 @@ species:
           T_K: 1429.0
           invT_times_1e4_K_inv: 6.9979
           log10_p_atm: -6.106
-          p_Pa: 0.0793
           note: Fitted-line evaluation at investigation T (July Na report); consistent with upper-line
             visual digitization. Held-out only.
         points:
@@ -2058,7 +2220,6 @@ species:
           invT_times_1e4_K_inv: 6.946
           log10_p_atm: -6.039
           p_atm: 9.1411324e-07
-          p_Pa: 0.092622524
           marker_id: C1
           shape: circle
           fill: open
@@ -2074,7 +2235,6 @@ species:
           invT_times_1e4_K_inv: 7.037
           log10_p_atm: -6.145
           p_atm: 7.1614341e-07
-          p_Pa: 0.072563231
           marker_id: C2
           shape: circle
           fill: open
@@ -2090,7 +2250,6 @@ species:
           invT_times_1e4_K_inv: 7.262
           log10_p_atm: -6.716
           p_atm: 1.9230917e-07
-          p_Pa: 0.019485727
           marker_id: C3
           shape: circle
           fill: full
@@ -2106,7 +2265,6 @@ species:
           invT_times_1e4_K_inv: 7.362
           log10_p_atm: -7.148
           p_atm: 7.1121351e-08
-          p_Pa: 0.0072063709
           marker_id: C4
           shape: circle
           fill: open
@@ -2122,7 +2280,6 @@ species:
           invT_times_1e4_K_inv: 7.491
           log10_p_atm: -7.460
           p_atm: 3.4673685e-08
-          p_Pa: 0.0035133111
           marker_id: C5
           shape: circle
           fill: full
@@ -2138,7 +2295,6 @@ species:
           invT_times_1e4_K_inv: 7.708
           log10_p_atm: -8.037
           p_atm: 9.1833260e-09
-          p_Pa: 0.00093050050
           marker_id: C6
           shape: circle
           fill: open
@@ -2292,7 +2448,7 @@ species:
               not a Re/ReO2 buffer calculation.'
             algebra: pO2_bar = p_atm × (1.01325 bar / 1 atm) = 3.78e-9 × 1.01325 = 3.830085e-9 bar
             unit_check: 3.78e-9 atm × 101325 Pa/atm = 3.830085e-4 Pa; 3.830085e-4 Pa / 1e5 Pa/bar =
-              3.830085e-9 bar. Matches the already-stored Table 1 point p_Pa=0.0003830085.
+              3.830085e-9 bar. This agrees with the printed Table 1 O2 pressure range in atm; no converted p_Pa twin is stored.
           sanity_check: 3.8e-9 bar sits inside the 12065 alkali-window O2 table (3.78e-9–2.11e-8 atm).
               Distinct from DEFAULT_PO2_BAR=1e-8. Harness is observation-level, so this single measured
               pO2 is attached as context to the whole series; no interpolation or same-run pairing is
@@ -2303,7 +2459,6 @@ species:
           T_K: 1429.0
           invT_times_1e4_K_inv: 6.9979
           log10_p_atm: -7.743
-          p_Pa: 0.00183
           note: Fitted-line evaluation at investigation T (July Na report); consistent with lower-line
             visual digitization. Held-out only.
         points:
@@ -2311,7 +2466,6 @@ species:
           invT_times_1e4_K_inv: 6.567
           log10_p_atm: -6.463
           p_atm: 3.4434993e-07
-          p_Pa: 0.034891257
           marker_id: S1
           shape: square
           fill: open
@@ -2327,7 +2481,6 @@ species:
           invT_times_1e4_K_inv: 6.679
           log10_p_atm: -6.739
           p_atm: 1.8238957e-07
-          p_Pa: 0.018480623
           marker_id: S2
           shape: square
           fill: open
@@ -2343,7 +2496,6 @@ species:
           invT_times_1e4_K_inv: 6.766
           log10_p_atm: -6.945
           p_atm: 1.1350108e-07
-          p_Pa: 0.011500497
           marker_id: S3
           shape: square
           fill: open
@@ -2359,7 +2511,6 @@ species:
           invT_times_1e4_K_inv: 6.725
           log10_p_atm: -7.117
           p_atm: 7.6383578e-08
-          p_Pa: 0.0077395661
           marker_id: S4
           shape: square
           fill: full
@@ -2375,7 +2526,6 @@ species:
           invT_times_1e4_K_inv: 6.826
           log10_p_atm: -7.170
           p_atm: 6.7608298e-08
-          p_Pa: 0.0068504107
           marker_id: S5
           shape: square
           fill: open
@@ -2391,7 +2541,6 @@ species:
           invT_times_1e4_K_inv: 6.872
           log10_p_atm: -7.186
           p_atm: 6.5162839e-08
-          p_Pa: 0.0066026247
           marker_id: S6
           shape: square
           fill: open
@@ -2407,7 +2556,6 @@ species:
           invT_times_1e4_K_inv: 6.793
           log10_p_atm: -7.248
           p_atm: 5.6493697e-08
-          p_Pa: 0.0057242239
           marker_id: S7
           shape: square
           fill: full
@@ -2423,7 +2571,6 @@ species:
           invT_times_1e4_K_inv: 6.829
           log10_p_atm: -7.313
           p_atm: 4.8640721e-08
-          p_Pa: 0.004928521
           marker_id: S8
           shape: square
           fill: full
@@ -2439,7 +2586,6 @@ species:
           invT_times_1e4_K_inv: 6.889
           log10_p_atm: -7.409
           p_atm: 3.8994199e-08
-          p_Pa: 0.0039510872
           marker_id: S9
           shape: square
           fill: full
@@ -2455,7 +2601,6 @@ species:
           invT_times_1e4_K_inv: 6.933
           log10_p_atm: -7.467
           p_atm: 3.4119291e-08
-          p_Pa: 0.0034571372
           marker_id: S10
           shape: square
           fill: open
@@ -2471,7 +2616,6 @@ species:
           invT_times_1e4_K_inv: 7.101
           log10_p_atm: -8.025
           p_atm: 9.4406088e-09
-          p_Pa: 0.00095656968
           marker_id: S12
           shape: square
           fill: full
@@ -2487,7 +2631,6 @@ species:
           invT_times_1e4_K_inv: 7.147
           log10_p_atm: -8.136
           p_atm: 7.3113908e-09
-          p_Pa: 0.00074082668
           marker_id: S13
           shape: square
           fill: full
@@ -2503,7 +2646,6 @@ species:
           invT_times_1e4_K_inv: 7.329
           log10_p_atm: -8.706
           p_atm: 1.9678863e-09
-          p_Pa: 0.00019939608
           marker_id: S14
           shape: square
           fill: full
@@ -2519,7 +2661,6 @@ species:
           invT_times_1e4_K_inv: 7.529
           log10_p_atm: -9.413
           p_atm: 3.8636698e-10
-          p_Pa: 3.9148634e-05
           marker_id: S15
           shape: square
           fill: full
@@ -2984,16 +3125,25 @@ fidelity_samples:
     note: Table 6 reaction (3) BC 15.6 ± 2 kcal/mole
 - species: Fe
   observable: gibbs_table
-  observation_id: demaria_1971_table6_feo_dissociation
+  observation_id: demaria_1971_table6_feo_dissociation_second_law
   field: second_law_delta_H0_kcal_mol
   value:
     BC: 38 ± 3
-    footnote: a
   locator:
     table: '6'
     published_page: 1376
     pdf_page_index: 10
     note: Table 6 reaction (4) second-law BC 38 ± 3 kcal/mole (footnote a)
+- species: Fe
+  observable: gibbs_table
+  observation_id: demaria_1971_table6_feo_dissociation_second_law
+  field: footnote
+  value: a
+  locator:
+    table: '6'
+    published_page: 1376
+    pdf_page_index: 10
+    note: Table 6 reaction (4), footnote a
 - species: O2
   observable: rate_series
   observation_id: demaria_1971_sample_masses_splits
@@ -3038,13 +3188,22 @@ fidelity_samples:
     note: Table 6 reaction (2) BC 112 ± 3 kcal/mole
 - species: TiO2
   observable: gibbs_table
-  observation_id: demaria_1971_table6_tio2_atomic_o
+  observation_id: demaria_1971_table6_tio2_atomic_o_second_law
   field: second_law_delta_H0_kcal_mol
   value:
     NAA: 143 ± 8
-    footnote: a
   locator:
     table: '6'
     published_page: 1376
     pdf_page_index: 10
     note: Table 6 reaction (6) second-law NAA 143 ± 8 kcal/mole (footnote a)
+- species: TiO2
+  observable: gibbs_table
+  observation_id: demaria_1971_table6_tio2_atomic_o_second_law
+  field: footnote
+  value: a
+  locator:
+    table: '6'
+    published_page: 1376
+    pdf_page_index: 10
+    note: Table 6 reaction (6), footnote a
