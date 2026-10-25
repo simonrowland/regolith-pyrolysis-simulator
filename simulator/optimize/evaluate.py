@@ -41,7 +41,7 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.campaigns import CampaignPressureSetpointRefusal
-from simulator.chemistry.kernel import OXYGEN_SINK_CHANNEL_MODE_KEY, ProposalRejected
+from simulator.chemistry.kernel import CHEMISTRY_KERNEL_RUN_INPUT_KEYS, ProposalRejected
 from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     KnudsenRegimeRefusal,
@@ -3543,10 +3543,10 @@ def _diagnostic_chemistry_kernel_run_config(
 ) -> dict[str, Any]:
     if not isinstance(chemistry_kernel, MappingABC):
         return {}
-    if OXYGEN_SINK_CHANNEL_MODE_KEY not in chemistry_kernel:
-        return {}
     return {
-        OXYGEN_SINK_CHANNEL_MODE_KEY: chemistry_kernel[OXYGEN_SINK_CHANNEL_MODE_KEY]
+        key: chemistry_kernel[key]
+        for key in CHEMISTRY_KERNEL_RUN_INPUT_KEYS
+        if key in chemistry_kernel
     }
 
 

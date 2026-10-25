@@ -70,6 +70,7 @@ from simulator.accounting.yield_disposition import (
     ledger_snapshots_from_sim,
 )
 from simulator.chemistry.kernel import (
+    CHEMISTRY_KERNEL_RUN_INPUT_KEYS,
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     normalize_chemistry_kernel_config,
 )
@@ -198,7 +199,7 @@ SIO_WALL_SWEEP_DEFAULT_PO2_MODES: tuple[str, ...] = (
     "no_suppress",
     "o2_1mbar",
 )
-_SETPOINTS_PATCH_CHEMISTRY_KERNEL_KEYS = frozenset({OXYGEN_SINK_CHANNEL_MODE_KEY})
+_SETPOINTS_PATCH_CHEMISTRY_KERNEL_KEYS = CHEMISTRY_KERNEL_RUN_INPUT_KEYS
 SIO_WALL_SWEEP_PO2_MODE_CONFIG: dict[str, dict[str, Any]] = {
     "no_suppress": {
         "label": "C2A no-suppress SiO extraction",

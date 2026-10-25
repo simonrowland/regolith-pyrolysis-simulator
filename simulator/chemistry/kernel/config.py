@@ -19,6 +19,7 @@ DEFAULT_OXYGEN_SINK_CHANNEL_MODE = OxygenSinkChannelMode.LEGACY_SOURCE_EQUILIBRI
 OXYGEN_SINK_CHANNEL_MODE_VALUES: tuple[str, ...] = tuple(
     mode.value for mode in OxygenSinkChannelMode
 )
+CHEMISTRY_KERNEL_RUN_INPUT_KEYS = frozenset({OXYGEN_SINK_CHANNEL_MODE_KEY})
 
 _AUTHORITY_OPT_IN_BOOL_KEYS = (
     "allow_fallback_vapor",
