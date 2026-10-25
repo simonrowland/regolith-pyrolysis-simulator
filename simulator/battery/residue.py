@@ -366,6 +366,35 @@ class ResidueIntegrationInput:
 
 
 @dataclass(frozen=True)
+class ResidueFractionSegment:
+    """One printed isothermal interval in cumulative mass-loss fraction F."""
+
+    start_fraction: float
+    end_fraction: float
+    temperature_K: float
+
+
+@dataclass(frozen=True)
+class ResidueFractionIntegrationInput:
+    """Area-free residue inputs with one explicitly printed endpoint form."""
+
+    initial_inventory_mol: Mapping[str, float] | None
+    channels: Sequence[ResidueChannel] | None
+    temperature_path: Sequence[ResidueFractionSegment] | None
+    pressure_regime: ResiduePressureRegime | None
+    pressure_model: Callable[
+        [Mapping[str, float], float, float, ResiduePressureRegime], Mapping[str, float]
+    ] | None
+    mass_loss_fraction: float | None = None
+    mass_loss_kg: float | None = None
+    final_mass_kg: float | None = None
+    initial_mass_kg: float | None = None
+    target_source_id: str | None = None
+    melt_family: str | None = None
+    alpha_pool: Sequence[ResidueAlphaObservation] = ()
+
+
+@dataclass(frozen=True)
 class ResidueScheduleResult:
     residue_mol: Mapping[str, float]
     evaporated_mol: Mapping[str, float]
@@ -378,6 +407,13 @@ class ResidueScheduleResult:
     atom_closure_mol: Mapping[str, float]
     buffer_oxygen_exchange_mol: float
     refusal: ResidueEngineNonconvergence | None
+    notices: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class ResidueFractionResult:
+    residue_mol: Mapping[str, float]
+    mass_loss_fraction: float
     notices: tuple[str, ...]
 
 
@@ -1724,6 +1760,480 @@ def integrate_residue_schedule(
         atom_closure_mol=atom_closure,
         buffer_oxygen_exchange_mol=buffer_oxygen_exchange_mol,
         refusal=refusal,
+        notices=tuple(notices),
+    )
+
+
+def integrate_residue_fraction(
+    request: ResidueFractionIntegrationInput,
+) -> ResidueFractionResult:
+    """Integrate a residue to a printed cumulative mass-loss fraction.
+
+    Premise: every channel sees the same exposed area, and the equilibrium
+    pressures depend on composition and temperature rather than elapsed time.
+    The builtin HKL provider returns mass flux ``J_i`` in kg m^-2 s^-1; its
+    product-mole flux is ``J_i / M_i``. If ``r_p`` is the resulting parent
+    debit in mol m^-2 s^-1 and ``r_m`` is the corresponding sample mass-loss
+    rate in kg m^-2 s^-1, then ``dN_p/dt = -A r_p`` and
+    ``dF/dt = A r_m / m0`` for ``F = (m0 - m) / m0``. Dividing gives
+    ``dN_p/dF = -m0 * r_p / r_m``: area and time cancel. In buffered runs,
+    ``r_m`` follows the existing residue-mass projection, including oxygen
+    exchange when that exchange lowers the projected sample mass.
+
+    Units: ``m0`` is kg, ``r_p`` is mol m^-2 s^-1, and ``r_m`` is
+    kg m^-2 s^-1, so the derivative is mol per unit fraction. At ``F=0`` the inventory is exactly
+    unchanged. With one volatile parent and all other parents refractory,
+    ``N_v(F) = N_v(0) - F*m0/M_v`` until that parent is exhausted (the
+    single-volatile Rayleigh limit). If all components have equal relative
+    volatility, every parent debit is proportional to its current inventory,
+    so their ratios remain unchanged.
+    """
+    if request.initial_inventory_mol is None or not request.initial_inventory_mol:
+        raise ResidueInventoryRefusal("residue_inventory_missing")
+    try:
+        inventory = {
+            str(species): float(amount)
+            for species, amount in request.initial_inventory_mol.items()
+        }
+    except (AttributeError, TypeError, ValueError, OverflowError) as exc:
+        raise ResidueInventoryRefusal("residue_inventory_invalid") from exc
+    if any(
+        not species or not math.isfinite(amount) or amount < 0.0
+        for species, amount in inventory.items()
+    ):
+        raise ResidueInventoryRefusal("residue_inventory_invalid")
+    inventory_mass_kg = math.fsum(
+        amount * _formula_terms(species)[1]
+        for species, amount in inventory.items()
+    )
+    if inventory_mass_kg <= 0.0:
+        raise ResidueInventoryRefusal("residue_inventory_invalid")
+
+    endpoint_forms = sum(
+        value is not None
+        for value in (
+            request.mass_loss_fraction,
+            request.mass_loss_kg,
+            request.final_mass_kg,
+        )
+    )
+    if endpoint_forms == 0:
+        raise ResidueInventoryRefusal(
+            "residue_mass_loss_endpoint_missing",
+            "printed mass-loss fraction or printed mass/final mass is required",
+        )
+    if endpoint_forms != 1:
+        raise ResidueInventoryRefusal("residue_mass_loss_endpoint_ambiguous")
+    initial_mass_kg = inventory_mass_kg
+    if request.initial_mass_kg is not None:
+        try:
+            initial_mass_kg = float(request.initial_mass_kg)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ResidueInventoryRefusal("residue_sample_mass_invalid") from exc
+        if not math.isfinite(initial_mass_kg) or initial_mass_kg <= 0.0:
+            raise ResidueInventoryRefusal("residue_sample_mass_invalid")
+        scale = initial_mass_kg / inventory_mass_kg
+        inventory = {species: amount * scale for species, amount in inventory.items()}
+
+    try:
+        if request.mass_loss_fraction is not None:
+            target_fraction = float(request.mass_loss_fraction)
+        elif request.mass_loss_kg is not None:
+            if request.initial_mass_kg is None:
+                raise ResidueInventoryRefusal("residue_initial_sample_mass_missing")
+            target_fraction = float(request.mass_loss_kg) / initial_mass_kg
+        else:
+            if request.initial_mass_kg is None:
+                raise ResidueInventoryRefusal("residue_initial_sample_mass_missing")
+            target_fraction = (
+                initial_mass_kg - float(request.final_mass_kg)
+            ) / initial_mass_kg
+    except ResidueInventoryRefusal:
+        raise
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ResidueInventoryRefusal("residue_mass_loss_endpoint_invalid") from exc
+    if not math.isfinite(target_fraction) or target_fraction < 0.0:
+        raise ResidueInventoryRefusal("residue_mass_loss_endpoint_invalid")
+
+    if request.channels is None or not request.channels:
+        raise ResidueInventoryRefusal("residue_channels_missing")
+    if request.temperature_path is None or not request.temperature_path:
+        raise ResidueInventoryRefusal("residue_temperature_schedule_missing")
+    path: list[ResidueFractionSegment] = []
+    expected_start = 0.0
+    for segment in request.temperature_path:
+        try:
+            start = float(segment.start_fraction)
+            end = float(segment.end_fraction)
+            temperature = float(segment.temperature_K)
+        except (AttributeError, TypeError, ValueError, OverflowError) as exc:
+            raise ResidueInventoryRefusal("residue_schedule_invalid") from exc
+        if (
+            not all(math.isfinite(value) for value in (start, end, temperature))
+            or start < 0.0
+            or end <= start
+            or end > 1.0
+            or temperature <= 0.0
+            or not math.isclose(start, expected_start, rel_tol=0.0, abs_tol=1.0e-12)
+        ):
+            raise ResidueInventoryRefusal("residue_schedule_invalid")
+        path.append(ResidueFractionSegment(start, end, temperature))
+        expected_start = end
+    pressure = request.pressure_regime
+    if pressure is None or not pressure.mode:
+        raise ResidueInventoryRefusal("residue_pressure_regime_missing")
+    if pressure.mode not in {"vacuum_balance", "buffered_fO2"}:
+        raise ResidueInventoryRefusal(
+            "residue_pressure_regime_invalid", str(pressure.mode)
+        )
+    if pressure.total_pressure_Pa is None:
+        raise ResidueInventoryRefusal("residue_total_pressure_missing")
+    if pressure.background_pressure_Pa is None:
+        raise ResidueInventoryRefusal("residue_background_pressure_missing")
+    try:
+        total_pressure = float(pressure.total_pressure_Pa)
+        background_pressure = float(pressure.background_pressure_Pa)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ResidueInventoryRefusal("residue_pressure_regime_invalid") from exc
+    if (
+        not math.isfinite(total_pressure)
+        or total_pressure < 0.0
+        or not math.isfinite(background_pressure)
+        or background_pressure < 0.0
+    ):
+        raise ResidueInventoryRefusal("residue_pressure_regime_invalid")
+    if pressure.mode == "buffered_fO2":
+        if pressure.buffered_fO2_log is None:
+            raise ResidueInventoryRefusal("oxygen_condition_missing")
+        try:
+            buffered_logp = float(pressure.buffered_fO2_log)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ResidueInventoryRefusal("oxygen_condition_invalid") from exc
+        if not math.isfinite(buffered_logp) or buffered_logp > 0.0:
+            raise ResidueInventoryRefusal("oxygen_condition_invalid")
+    else:
+        if pressure.buffered_fO2_log is not None:
+            raise ResidueInventoryRefusal("residue_pressure_regime_invalid")
+        buffered_logp = None
+    if not callable(request.pressure_model):
+        raise ResidueInventoryRefusal("residue_pressure_model_missing")
+
+    alpha_pool = tuple(request.alpha_pool or ())
+    resolved_path: list[
+        tuple[float, float, float, tuple[_ChannelTerms, ...]]
+    ] = []
+    notices: list[str] = []
+    volatile_parents: set[str] = set()
+    for segment in path:
+        if segment.start_fraction >= target_fraction:
+            break
+        active_channels, alpha_notices = select_residue_channel_alphas(
+            request.channels,
+            alpha_pool,
+            target_source_id=request.target_source_id,
+            melt_family=request.melt_family,
+            temperature_K=segment.temperature_K,
+        )
+        terms = _channel_terms(
+            active_channels,
+            require_oxygen_channels=buffered_logp is None,
+        )
+        notices.extend(alpha_notices)
+        resolved_path.append((
+            segment.start_fraction,
+            min(segment.end_fraction, target_fraction),
+            segment.temperature_K,
+            terms,
+        ))
+        volatile_parents.update(
+            str(term.source.parent_oxide)
+            for term in terms
+            if term.source.parent_oxide and float(term.source.alpha) > 0.0
+        )
+    notices = list(dict.fromkeys(notices))
+    volatile_mass_kg = math.fsum(
+        inventory.get(parent, 0.0) * _formula_terms(parent)[1]
+        for parent in volatile_parents
+    )
+    target_mass_loss_kg = target_fraction * initial_mass_kg
+    if target_mass_loss_kg > volatile_mass_kg:
+        raise ResidueInventoryRefusal(
+            "residue_mass_loss_exceeds_volatile_inventory",
+            "printed mass loss "
+            f"{target_mass_loss_kg:.17g} kg exceeds total volatile inventory "
+            f"{volatile_mass_kg:.17g} kg (initial mass {initial_mass_kg:.17g} kg)",
+        )
+    if target_fraction > expected_start:
+        raise ResidueInventoryRefusal("residue_temperature_schedule_missing")
+
+    if target_fraction == 0.0:
+        return ResidueFractionResult(
+            residue_mol=dict(inventory),
+            mass_loss_fraction=0.0,
+            notices=tuple(notices),
+        )
+
+    from scipy.integrate import solve_ivp
+
+    parents = tuple(inventory)
+    parent_index = {parent: index for index, parent in enumerate(parents)}
+    buffer_index = len(parents)
+    state = [inventory[parent] for parent in parents] + [0.0]
+    accepted_pressure_evaluation = getattr(
+        request.pressure_model, "_on_accepted_evaluation", None
+    )
+    parent_mass = {
+        parent: _formula_terms(parent)[1] for parent in volatile_parents
+    }
+    oxygen_mass = _formula_terms("O")[1]
+    absolute_tolerance = max(
+        1.0e-30, 1.0e-12 * math.fsum(inventory.values())
+    )
+
+    for segment_start, segment_end, temperature, all_terms in resolved_path:
+        cursor = segment_start
+        if segment_end <= cursor:
+            continue
+        while cursor < segment_end:
+            current_inventory = {
+                parent: max(0.0, float(state[index]))
+                for parent, index in parent_index.items()
+            }
+            live_terms = tuple(
+                term
+                for term in all_terms
+                if term.source.parent_oxide is None
+                or current_inventory.get(term.source.parent_oxide, 0.0) > 0.0
+            )
+            if not any(
+                term.source.parent_oxide is not None
+                and current_inventory.get(term.source.parent_oxide, 0.0) > 0.0
+                and float(term.source.alpha) > 0.0
+                for term in live_terms
+            ):
+                raise ResidueInventoryRefusal(
+                    "residue_mass_loss_extent_unreachable",
+                    f"no volatile parent remains at F={cursor:.17g}",
+                )
+
+            def derivative(fraction, amounts):
+                trial_inventory = {
+                    parent: max(0.0, float(amounts[index]))
+                    for parent, index in parent_index.items()
+                }
+                active_inventory = {
+                    parent: amount
+                    for parent, amount in trial_inventory.items()
+                    if amount > 0.0
+                }
+                parent_terms = tuple(
+                    term for term in live_terms
+                    if term.source.parent_oxide is not None
+                    and trial_inventory.get(term.source.parent_oxide, 0.0) > 0.0
+                )
+                if not parent_terms:
+                    return [0.0 for _amount in amounts]
+
+                def pressure_at(log10_pO2_bar):
+                    return request.pressure_model(
+                        active_inventory,
+                        temperature,
+                        float(log10_pO2_bar),
+                        pressure,
+                    )
+
+                if buffered_logp is None:
+                    balance = _residue_oxygen_balance(
+                        live_terms,
+                        active_inventory,
+                        pressure_at,
+                        temperature,
+                        background_pressure,
+                        on_accepted_evaluation=(
+                            accepted_pressure_evaluation
+                            if callable(accepted_pressure_evaluation)
+                            else None
+                        ),
+                    )
+                    pressures = balance.pressures_Pa
+                else:
+                    pressures = pressure_at(buffered_logp)
+                    if not isinstance(pressures, Mapping):
+                        raise ResidueInventoryRefusal("residue_pressure_invalid")
+                    for term in parent_terms:
+                        if term.source.species not in pressures:
+                            raise ResidueInventoryRefusal(
+                                "channel_missing", term.source.species
+                            )
+                        try:
+                            value = float(pressures[term.source.species])
+                        except (TypeError, ValueError, OverflowError) as exc:
+                            raise ResidueInventoryRefusal(
+                                "residue_pressure_invalid", term.source.species
+                            ) from exc
+                        if not math.isfinite(value) or value < 0.0:
+                            raise ResidueInventoryRefusal(
+                                "residue_pressure_invalid", term.source.species
+                            )
+
+                mass_rates_kg_s = _finite_step_fluxes(
+                    parent_terms,
+                    active_inventory,
+                    temperature_K=temperature,
+                    area_m2=1.0,
+                    pressures_Pa=pressures,
+                    background_pressure_Pa=background_pressure,
+                )
+                term_by_species = {
+                    term.source.species: term for term in parent_terms
+                }
+                product_rates_mol_s = _product_molar_rates_from_mass_fluxes(
+                    mass_rates_kg_s, term_by_species
+                )
+                parent_rates_mol_s: defaultdict[str, float] = defaultdict(float)
+                for species, rate_kg_s in mass_rates_kg_s.items():
+                    rate = float(rate_kg_s)
+                    term = term_by_species[species]
+                    if not math.isfinite(rate) or rate < 0.0:
+                        raise ResidueInventoryRefusal(
+                            "residue_flux_invalid", species
+                        )
+                    product_rate = product_rates_mol_s[species]
+                    parent_rates_mol_s[str(term.source.parent_oxide)] += (
+                        product_rate * term.parent_moles_per_product
+                    )
+
+                if not any(rate > 0.0 for rate in parent_rates_mol_s.values()):
+                    raise ResidueInventoryRefusal(
+                        "residue_mass_loss_extent_unreachable",
+                        f"zero channel flux at F={fraction:.17g}",
+                    )
+                exchange_rate_mol_s = 0.0
+                if buffered_logp is not None:
+                    parent_oxygen_rate = math.fsum(
+                        rate * _formula_terms(parent)[0].get("O", 0.0)
+                        for parent, rate in parent_rates_mol_s.items()
+                    )
+                    gas_oxygen_rate = math.fsum(
+                        rate * _formula_terms(species)[0].get("O", 0.0)
+                        for species, rate in product_rates_mol_s.items()
+                    )
+                    exchange_rate_mol_s = gas_oxygen_rate - parent_oxygen_rate
+
+                parent_mass_loss_rate_kg_s = math.fsum(
+                    rate * parent_mass[parent]
+                    for parent, rate in parent_rates_mol_s.items()
+                )
+                if buffered_logp is not None:
+                    exchanged_for_mass = exchange_rate_mol_s
+                    current_exchange = float(amounts[buffer_index])
+                    if current_exchange > 0.0 or (
+                        current_exchange == 0.0 and exchange_rate_mol_s > 0.0
+                    ):
+                        exchanged_for_mass = 0.0
+                    mass_loss_rate_kg_s = (
+                        parent_mass_loss_rate_kg_s
+                        - exchanged_for_mass * oxygen_mass
+                    )
+                else:
+                    mass_loss_rate_kg_s = parent_mass_loss_rate_kg_s
+                if not math.isfinite(mass_loss_rate_kg_s) or mass_loss_rate_kg_s <= 0.0:
+                    raise ResidueInventoryRefusal(
+                        "residue_mass_loss_extent_unreachable",
+                        f"non-positive sample mass-loss rate at F={fraction:.17g}",
+                    )
+
+                scale = initial_mass_kg / mass_loss_rate_kg_s
+                changes = [0.0 for _amount in amounts]
+                for parent, rate in parent_rates_mol_s.items():
+                    changes[parent_index[parent]] = -scale * rate
+                changes[buffer_index] = scale * exchange_rate_mol_s
+                return changes
+
+            events = []
+            event_actions: list[tuple[str, str | None]] = []
+            live_parents = [
+                term.source.parent_oxide
+                for term in live_terms
+                if term.source.parent_oxide
+                and float(term.source.alpha) > 0.0
+            ]
+            live_parents = list(dict.fromkeys(live_parents))
+            for parent in live_parents:
+                index = parent_index[parent]
+                if current_inventory[parent] <= 0.0:
+                    continue
+
+                def exhausted(_fraction, amounts, index=index):
+                    return amounts[index]
+
+                exhausted.terminal = True
+                exhausted.direction = -1
+                events.append(exhausted)
+                event_actions.append(("parent", parent))
+            if buffered_logp is not None and state[buffer_index] != 0.0:
+                direction = 1 if state[buffer_index] < 0.0 else -1
+
+                def exchange_crossing(_fraction, amounts):
+                    return amounts[buffer_index]
+
+                exchange_crossing.terminal = True
+                exchange_crossing.direction = direction
+                events.append(exchange_crossing)
+                event_actions.append(("exchange", None))
+
+            solution = solve_ivp(
+                derivative,
+                (cursor, segment_end),
+                state,
+                method="DOP853",
+                events=events,
+                rtol=1.0e-10,
+                atol=absolute_tolerance,
+            )
+            if not solution.success:
+                raise ResidueInventoryRefusal(
+                    "residue_mass_loss_integration_failed", solution.message
+                )
+            state = [float(value) for value in solution.y[:, -1]]
+            previous_cursor = cursor
+            cursor = float(solution.t[-1])
+            for parent, index in parent_index.items():
+                if state[index] < -absolute_tolerance:
+                    raise ResidueInventoryRefusal(
+                        "residue_inventory_negative", parent
+                    )
+                state[index] = max(0.0, state[index])
+            hit_indices = [
+                event_index
+                for event_index, hit_list in enumerate(solution.t_events)
+                if len(hit_list)
+            ]
+            for event_index in hit_indices:
+                action, parent = event_actions[event_index]
+                if action == "parent":
+                    assert parent is not None
+                    state[parent_index[parent]] = 0.0
+                else:
+                    state[buffer_index] = 0.0
+            if cursor <= previous_cursor:
+                raise ResidueInventoryRefusal(
+                    "residue_mass_loss_integration_failed",
+                    f"solver made no progress at F={cursor:.17g}",
+                )
+            if not hit_indices and cursor < segment_end:
+                raise ResidueInventoryRefusal(
+                    "residue_mass_loss_integration_failed",
+                    f"solver stopped before F={segment_end:.17g}",
+                )
+
+    residue_mol = {
+        parent: max(0.0, float(state[index]))
+        for parent, index in parent_index.items()
+    }
+    return ResidueFractionResult(
+        residue_mol=residue_mol,
+        mass_loss_fraction=target_fraction,
         notices=tuple(notices),
     )
 
