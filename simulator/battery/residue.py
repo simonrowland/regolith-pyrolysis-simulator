@@ -98,6 +98,7 @@ class EvaporationAlphaEstimate:
     source_values: tuple[tuple[str, float], ...]
     melt_family_fallback: bool
     source_attributions: tuple[str, ...] = ()
+    temperature_attributions: tuple[tuple[str, tuple[float, ...]], ...] = ()
 
 
 def collect_measured_evaporation_alphas(
@@ -343,14 +344,15 @@ def estimate_loo_evaporation_alpha(
 ) -> EvaporationAlphaEstimate | ResidueInventoryRefusal:
     """Estimate alpha only from measured rows in other independent papers.
 
-    A scalar with a printed temperature is usable only there (or within its
-    printed range); a scalar with no printed T dependence is treated as
-    constant. An Arrhenius form is evaluated at T when its printed range
-    allows it. Multiple rows from one paper collapse to their median at T,
-    then the consensus is the median of those one-per-paper values. The band
-    is the cross-paper minimum and maximum. The current battery store has no
-    typed melt-family axis, so records without an explicit family use the
-    ruling's species-only fallback and the result records that limitation.
+    A scalar with a printed temperature is usable at that temperature. If
+    fewer than two independent papers overlap, the best available extension
+    treats each paper's scalar alpha as temperature-independent and flags the
+    transfer as extrapolated. This is preferable to refusing a prediction:
+    alpha is dimensionless and the store has no better cross-temperature
+    calibration. Multiple rows from one paper collapse to their median, then
+    the consensus is the median of those one-per-paper values. The current
+    battery store has no typed melt-family axis, so records without an explicit
+    family use the species-only fallback and the result records that limit.
     """
     from simulator.battery.enums import MEASURED_EVIDENCE
 
@@ -375,40 +377,78 @@ def estimate_loo_evaporation_alpha(
     if family_supported:
         candidates = tuple(row for row in candidates if row.melt_family == melt_family)
 
-    by_source: dict[str, list[float]] = defaultdict(list)
-    source_attributions: list[str] = []
-    for row in candidates:
+    def value_at(row: EvaporationAlphaObservation, *, transfer: bool) -> float | None:
         temperature_range = row.temperature_range_K
-        if temperature_range is not None and not (
+        if not transfer and temperature_range is not None and not (
             temperature_range[0] <= temperature_K <= temperature_range[1]
         ):
-            continue
+            return None
         if isinstance(row.alpha, Mapping):
             try:
                 if row.alpha.get("type") != "arrhenius":
-                    continue
-                alpha_value, _sigma = _evaluate_extracted_arrhenius_alpha(
-                    row.alpha, temperature_K
-                )
+                    return None
+                evaluation_temperature = temperature_K
+                if transfer and temperature_range is not None:
+                    evaluation_temperature = min(
+                        max(temperature_K, temperature_range[0]), temperature_range[1]
+                    )
+                return _evaluate_extracted_arrhenius_alpha(
+                    row.alpha, evaluation_temperature
+                )[0]
             except (KeyError, TypeError, ValueError, OverflowError):
-                continue
-        else:
-            if row.temperature_K is not None and not math.isclose(
+                return None
+        if (
+            not transfer
+            and row.temperature_K is not None
+            and not math.isclose(
                 row.temperature_K, temperature_K, rel_tol=0.0, abs_tol=1e-6
+            )
+        ):
+            return None
+        return float(row.alpha)
+
+    def collect_values(
+        rows: Sequence[EvaporationAlphaObservation], *, transfer: bool
+    ) -> tuple[dict[str, list[float]], list[str], dict[str, set[float]]]:
+        values_by_source: dict[str, list[float]] = defaultdict(list)
+        attributions: list[str] = []
+        temperatures_by_source: dict[str, set[float]] = defaultdict(set)
+        for row in rows:
+            alpha_value = value_at(row, transfer=transfer)
+            if (
+                alpha_value is None
+                or not math.isfinite(alpha_value)
+                or not 0.0 < alpha_value <= 1.0
             ):
                 continue
-            alpha_value = row.alpha
-        if math.isfinite(alpha_value) and 0.0 < alpha_value <= 1.0:
-            by_source[row.source_id].append(alpha_value)
+            values_by_source[row.source_id].append(alpha_value)
             classification = (
                 f"method_class={row.method_class}"
-                if row.method_class
-                else f"evidence_class={row.evidence_class}"
+                if row.method_class else f"evidence_class={row.evidence_class}"
             )
-            source_attributions.append(
-                f"{row.source_id}::{row.observation_id}="
-                f"{alpha_value:g} ({classification})"
+            attributions.append(
+                f"{row.source_id}::{row.observation_id}={alpha_value:g} ({classification})"
             )
+            if row.temperature_K is not None:
+                temperatures_by_source[row.source_id].add(row.temperature_K)
+            elif row.temperature_range_K is not None:
+                temperatures_by_source[row.source_id].update(row.temperature_range_K)
+        return values_by_source, attributions, temperatures_by_source
+
+    by_source, source_attributions, _ = collect_values(candidates, transfer=False)
+    transferred = len(by_source) < 2
+    temperature_attributions: tuple[tuple[str, tuple[float, ...]], ...] = ()
+    if transferred:
+        # With insufficient same-temperature coverage, hold each observed
+        # scalar alpha constant across T. Alpha is dimensionless and this is
+        # the available extension; the predictor flags it as extrapolated.
+        by_source, source_attributions, temperatures_by_source = collect_values(
+            candidates, transfer=True
+        )
+        temperature_attributions = tuple(sorted(
+            (source, tuple(sorted(temperatures_by_source.get(source, ()))))
+            for source in by_source
+        ))
 
     source_values = tuple(sorted(
         (source_id, median(values)) for source_id, values in by_source.items()
@@ -416,7 +456,8 @@ def estimate_loo_evaporation_alpha(
     if len(source_values) < 2:
         return ResidueInventoryRefusal(
             "alpha_loo_insufficient_sources",
-            f"species={species}; other_measured_sources_at_T={len(source_values)}; "
+            f"species={species}; other_measured_sources={len(source_values)}; "
+            f"temperature_transfer={transferred}; "
             f"excluded_source_id={exclude_source_id}",
         )
     values = tuple(value for _source_id, value in source_values)
@@ -427,6 +468,7 @@ def estimate_loo_evaporation_alpha(
         source_values=source_values,
         melt_family_fallback=family_fallback,
         source_attributions=tuple(sorted(source_attributions)),
+        temperature_attributions=temperature_attributions,
     )
 
 

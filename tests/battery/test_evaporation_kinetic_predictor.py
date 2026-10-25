@@ -552,6 +552,47 @@ def test_alkali_rate_rows_use_only_other_papers_alpha_with_provenance(
     assert "independent-third-paper" in alpha_notice.source
     assert f"method_class={other_method_class}" in alpha_notice.source
     assert "evidence_class=measured_direct" in alpha_notice.source
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and "alpha transferred across temperature" in notice.reason
+        for notice in result.notices
+    )
+
+
+@pytest.mark.parametrize("formula", ["Mg", "SiO", "Fe", "Ca", "Al", "Na", "K"])
+def test_rate_transfers_alpha_from_other_temperatures_and_flags_sources(formula):
+    alpha_rows = (
+        _alpha("target-paper", formula, 0.9),
+        replace(_alpha("paper-b", formula, 0.14), temperature_K=1473.15),
+        replace(_alpha("paper-c", formula, 0.08), temperature_K=1673.15),
+    )
+    result = _predict_evaporation_rate(
+        Engine.INTERNAL_ANALYTICAL,
+        _kinetic_row(formula),
+        experiment=F.tabulation_experiment(
+            "kinetic-experiment", method=MethodToken.LANGMUIR_FREE_EVAPORATION
+        ),
+        handles=None,
+        isolated=None,
+        bench=None,
+        alpha_observations=alpha_rows,
+        partial_pressure_observations=(),
+        pressure_predictor=_pressure_prediction,
+    )
+
+    transfer = next(
+        notice for notice in result.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    assert result.value is not None
+    assert result.authority is Authority.EXTRAPOLATED
+    assert "alpha transferred across temperature" in transfer.reason
+    assert "row T=2000 K" in transfer.reason
+    assert "paper-b" in transfer.source
+    assert "paper-c" in transfer.source
+    assert "1473.15 K" in transfer.source
+    assert "1673.15 K" in transfer.source
+    assert "target-paper" not in transfer.source
 
 
 @pytest.mark.parametrize("formula", ["Na", "K"])

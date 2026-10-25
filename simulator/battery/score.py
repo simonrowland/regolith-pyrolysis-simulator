@@ -7635,6 +7635,33 @@ def _predict_evaporation_rate(
     notices = list(pressure_prediction.notices)
     if ambient_notice is not None:
         notices.append(ambient_notice)
+    if alpha.temperature_attributions:
+        sampled_temperatures = tuple(
+            temperature
+            for _source, temperatures in alpha.temperature_attributions
+            for temperature in temperatures
+        )
+        source_temperatures = "; ".join(
+            f"{source} @ "
+            f"{', '.join(f'{value:g}' for value in temperatures) + ' K' if temperatures else 'temperature not stated'}"
+            for source, temperatures in alpha.temperature_attributions
+        )
+        notices.append(Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(Quantity.EVAPORATION_RATE,),
+            reason=(
+                "alpha transferred across temperature; "
+                f"row T={temperature:g} K; sources: {source_temperatures}"
+            ),
+            origin="residue:estimate_loo_evaporation_alpha",
+            source=source_temperatures,
+            band=(
+                f"alpha source temperatures [{min(sampled_temperatures):g}, "
+                f"{max(sampled_temperatures):g}] K"
+                if sampled_temperatures else "alpha source temperatures not stated"
+            ),
+            authority=Authority.EXTRAPOLATED,
+        ))
     if alpha.melt_family_fallback:
         notices.append(Notice(
             kind=NoticeKind.FALLBACK,
@@ -7658,6 +7685,10 @@ def _predict_evaporation_rate(
         pressure_prediction,
         value=Decimal(str(flux)),
         unit=unit,
+        authority=(
+            Authority.EXTRAPOLATED
+            if alpha.temperature_attributions else pressure_prediction.authority
+        ),
         coefficient_basis="leave_one_paper_out_hkl",
         notices=tuple(notices),
         coefficient_sources=tuple(dict.fromkeys(alpha_sources)),
