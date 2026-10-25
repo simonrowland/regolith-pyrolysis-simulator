@@ -948,29 +948,43 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
     doc = yaml.safe_load(JAYASURIYA_FE.read_text(encoding="utf-8"))
     observations = doc["species"]["Fe"]["observations"]
     assert sum(len(obs["values"]["points"]) for obs in observations) == 38
+    observations_by_id = {obs["observation_id"]: obs for obs in observations}
+    room_temperature = observations_by_id["jayasuriya_2004_rt_1pct"]
+    low_temperature = observations_by_id["jayasuriya_2004_42k_1pct"]
     assert [
         point["gas_mix_as_printed"]
-        for obs in observations[:2]
+        for obs in (room_temperature, low_temperature)
         for point in obs["values"]["points"]
         if point["sample_as_published"] == "FeV9"
     ] == ["O2 100.0 × 200 SCCM", "O2 100.0 × 200 SCCM"]
+    rt_points_by_sample = {
+        point["sample_as_published"]: point
+        for point in room_temperature["values"]["points"]
+    }
     rt_fractions = [
-        observations[0]["values"]["points"][i]["Fe3_over_sum_Fe"] for i in (1, 15)
+        rt_points_by_sample[sample]["Fe3_over_sum_Fe"]
+        for sample in ("FeV2", "FeV9")
     ]
     assert rt_fractions == [
         0.025,
         0.851,
     ]
+    high_fe = observations_by_id["jayasuriya_2004_rt_high_fe"]
+    high_fe_points_by_iron = {
+        Decimal(str(point["FeOT_wt_percent"])): point
+        for point in high_fe["values"]["points"]
+    }
     high_fe_fractions = [
-        observations[2]["values"]["points"][i]["Fe3_over_sum_Fe"] for i in (0, 14)
+        high_fe_points_by_iron[Decimal(iron)]["Fe3_over_sum_Fe"]
+        for iron in ("1.75", "26.82")
     ]
     assert high_fe_fractions == [
         0.846,
         0.218,
     ]
     assert [
-        observations[0]["locator"]["published_page"],
-        observations[2]["locator"]["published_page"],
+        room_temperature["locator"]["published_page"],
+        high_fe["locator"]["published_page"],
     ] == [1602, 1603]
 
     migrator = Migrator(ROOT)
@@ -981,6 +995,20 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
         for row in migrator.result.observations.values()
         if "jayasuriya_2004" in row.observation_id
     ]
+    rows_by_id = {row.observation_id: row for row in rows}
+    printed_fraction_by_id = {
+        "jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=74234cf30e3c": Decimal("0.025"),
+        "jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=f41c11d79766": Decimal("0.851"),
+        "jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=374aae3a0937": Decimal("0.846"),
+        "jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=16a31cc67ed5": Decimal("0.218"),
+    }
+    for observation_id, expected_fraction in printed_fraction_by_id.items():
+        row = rows_by_id[observation_id]
+        assert row.derivation is not None
+        assert (
+            dict(row.derivation.parameters)["original_Fe3_over_sum_Fe"].state.value
+            == expected_fraction
+        )
     assert len(rows) == 38
     assert migrator.result.registry_issues == []
     assert migrator.result.validation is not None
@@ -1020,8 +1048,7 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
         (Decimal("7.96"), Decimal("0.0619"), Decimal("0.0007")),
         (Decimal("26.82"), Decimal("0.2186"), Decimal("0.0011")),
     ]
-    high_fe_source_points = observations[2]["values"]["points"]
-    assert len(high_fe_source_points) == len(table4)
+    high_fe_source_points = high_fe["values"]["points"]
     high_fe_rows = [
         row
         for row in rows
@@ -1073,17 +1100,23 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
             "Fe2O3": Decimal("1.0"),
         }
     )
-    d60 = [
-        row
+    d60_ids = {
+        "jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_d60::T=1673.15:h=cf25a30f567e",
+        "jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_d60::T=1673.15:h=afc460dd6c23",
+    }
+    assert {
+        row.observation_id
         for row in rows
-        if row.point_conditions.get("total_pressure_Pa") is not None
-    ]
-    assert len(d60) == 2
+        if row.identity.total_pressure_Pa.is_value
+    } == d60_ids
+    for observation_id in d60_ids:
+        assert rows_by_id[observation_id].identity.total_pressure_Pa.value == Decimal(
+            "1100000000"
+        )
     assert all(
         row.identity.total_pressure_Pa.is_unknown
-        and row.point_conditions["total_pressure_Pa"].state.value.point
-        == Decimal("1100000000")
-        for row in d60
+        for row in rows
+        if row.observation_id not in d60_ids
     )
 
 
@@ -1375,7 +1408,6 @@ def test_extract_malformed_quench_condition_is_a_row_refusal(
         "observation_id",
         "ferric_fraction",
         "glass_rows",
-        "unknown_rows",
     ),
     (
         (
@@ -1383,21 +1415,18 @@ def test_extract_malformed_quench_condition_is_a_row_refusal(
             "aithala_2026_vf271_xanes",
             "0.816",
             16,
-            12,
         ),
         (
             "matzen-2022-martian-basalt-redox.yaml",
             "matzen_2022_run_7_method_a",
             "0.69",
             24,
-            0,
         ),
         (
             "sossi-2020-magma-ocean-redox.yaml",
             "sossi_2020_per_f_o2_1_xanes",
             "0.44",
             12,
-            0,
         ),
     ),
 )
@@ -1406,15 +1435,19 @@ def test_quenched_glass_fe_valence_extracts_migrate_as_glass(
     observation_id: str,
     ferric_fraction: str,
     glass_rows: int,
-    unknown_rows: int,
 ):
     extract = ROOT / "data/literature/extracts" / extract_name
     migrator = Migrator(ROOT)
     migrator._migrate_extract(extract)
     migrator.finalize()
-    rows = list(migrator.result.observations.values())
+    rows = [
+        row
+        for row in migrator.result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.FE3_FE2_RATIO
+    ]
     phases = Counter(phase_token(row.identity.species) for row in rows)
-    assert phases == Counter({Phase.GLASS: glass_rows, None: unknown_rows})
+    assert phases == Counter({Phase.GLASS: glass_rows})
 
     row = next(
         row

@@ -41,9 +41,15 @@ def test_matzen_2022_table_2_oxygen_values_migrate_to_all_observation_waypoints(
         f"matzen-2022-martian-basalt-redox::{observation_id}": value
         for observation_id, value in expected_by_observation.items()
     }
-    assert len(result.observations) == 24
+    redox_observations = {
+        observation_id: observation
+        for observation_id, observation in result.observations.items()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value.value == "fe3_fe2_ratio"
+    }
+    assert len(redox_observations) == 24
     selected_by_observation = {}
-    for observation in result.observations.values():
+    for observation in redox_observations.values():
         experiment = result.experiments[observation.experiment_id]
         bench = result.benches[experiment.bench_id]
         waypoint = oxygen_condition(experiment, bench, observation)

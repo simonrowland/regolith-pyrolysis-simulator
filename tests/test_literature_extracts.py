@@ -5421,13 +5421,23 @@ def test_matzen_observations_resolve_printed_log_fo2():
             row["values"]["log_fO2"]
         )
         for row in doc["species"]["Fe"]["observations"]
+        if row.get("values", {}).get("quantity") == "fe3_fe2_ratio"
     }
     migrator = battery_factories.migrate_one_extract(
         REPO_ROOT, path, index={}, aliases={}
     )
     migrator.finalize()
     result = migrator.result
-    observation_ids = result.observations_by_source[path.relative_to(REPO_ROOT).as_posix()]
+    source_observation_ids = result.observations_by_source[
+        path.relative_to(REPO_ROOT).as_posix()
+    ]
+    observation_ids = [
+        observation_id
+        for observation_id in source_observation_ids
+        if result.observations[observation_id].identity.quantity.is_value
+        and result.observations[observation_id].identity.quantity.value.value
+        == "fe3_fe2_ratio"
+    ]
 
     assert len(observation_ids) == len(expected) == 24
     for observation_id in observation_ids:

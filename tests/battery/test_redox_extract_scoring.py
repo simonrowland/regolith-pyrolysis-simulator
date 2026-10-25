@@ -1285,6 +1285,31 @@ def test_aithala_redox_rows_score_only_when_composition_is_printed():
         in _AITHALA_REDOX_EXPERIMENTS
     }
     assert len(projected_ids) == 6
+    vf_ids = {
+        row.observation_id
+        for row in redox_rows
+        if row.observation_id.rsplit("::", 1)[-1]
+        in {
+            "aithala_2026_vf271_xanes",
+            "aithala_2026_vf267_moessbauer",
+            "aithala_2026_vf231_xanes",
+            "aithala_2026_vf231_moessbauer",
+            "aithala_2026_vf268_xanes",
+            "aithala_2026_vf268_moessbauer",
+            "aithala_2026_vf270_xanes",
+            "aithala_2026_vf270_moessbauer",
+            "aithala_2026_vf274_xanes",
+            "aithala_2026_vf274_moessbauer",
+        }
+    }
+    assert len(vf_ids) == 10
+    assert all(
+        row.identity.composition is not None and row.identity.composition.is_value
+        for row in redox_rows
+        if row.observation_id in vf_ids
+    )
+    bound_ids = projected_ids | vf_ids
+    assert bound_ids == {row.observation_id for row in redox_rows}
     context = ScoreContext(
         result.works,
         result.experiments,
@@ -1297,14 +1322,14 @@ def test_aithala_redox_rows_score_only_when_composition_is_printed():
     for residual in residuals:
         observation_id = residual.key.split(":T=", 1)[0]
         engine = residual.key.rsplit("::", 1)[-1]
-        if observation_id in projected_ids and engine in {
+        if observation_id in bound_ids and engine in {
             "internal-analytical",
             "openimcc",
         }:
             assert residual.numeric is not None
             assert residual.refusal is not None
             assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
-        elif observation_id in projected_ids and engine in {
+        elif observation_id in bound_ids and engine in {
             "alphamelts",
             "thermoengine",
         }:

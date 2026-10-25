@@ -210,14 +210,14 @@ def test_feot_notice_follows_row_local_and_joined_compositions() -> None:
         )
     ]
     assert len(aithala_rows) == 28
-    assert len(feot_rows) == 18
+    assert len(feot_rows) == 28
     projected_redox_rows = [
         row
         for row in feot_rows
         if row.identity.quantity.is_value
         and row.identity.quantity.value.value == "fe3_fe2_ratio"
     ]
-    assert len(projected_redox_rows) == 6
+    assert len(projected_redox_rows) == 16
     missing_aithala_notice = [
         row.observation_id
         for row in projected_redox_rows
