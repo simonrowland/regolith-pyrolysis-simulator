@@ -429,3 +429,46 @@ def test_bulk_film_retains_species_without_an_active_source(monkeypatch):
         assert seen[0]['overhead_pressure_pa'] >= 1.0
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+@pytest.mark.parametrize('species', ('CrO2', 'CrO3', 'SiO2_gas'))
+def test_pressure_owner_zero_oxygen_limit(species, monkeypatch):
+    from simulator.config import load_config_bundle
+    from simulator.vapour_rail import catalog
+    evaluator = catalog.compile_vapour_rail_catalog(load_config_bundle().vapor_pressures).evaluator_for_hot_train(
+        species, process_phase='hot_train')
+    anchor = evaluator.evaluate(1343.15, source_activity=0.1, pO2_bar=1.0).pressure_pa
+    monkeypatch.setattr(catalog, 'o2_potential_from_pO2_bar',
+                        lambda **kw: pytest.fail('zero oxygen entered logarithmic adapter'))
+    pressure = evaluator.evaluate(1343.15, source_activity=0.1, pO2_bar=0.0).pressure_pa
+    assert pressure == (0.0 if species != 'SiO2_gas' else anchor)
+
+
+def test_consuming_pressure_underflow_is_zero():
+    from dataclasses import replace
+    from simulator.config import load_config_bundle
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+    evaluator = compile_vapour_rail_catalog(load_config_bundle().vapor_pressures).evaluator_for_hot_train(
+        'CrO3', process_phase='hot_train')
+    # A steep, consuming mass-action law can be below binary64 pressure.
+    evaluator = replace(evaluator, pO2_exponent=2.0, reaction_terms=())
+    assert evaluator.evaluate(1343.15, source_activity=0.1, pO2_bar=1e-300).pressure_pa == 0.0
+
+
+def test_mixed_asteroid_zero_keeps_neutral_pressure():
+    from simulator.melt_backend.base import EquilibriumResult
+    sim = simulation('s_type_asteroid_silicate')
+    try:
+        sim.melt.temperature_C = 1070.0
+        sim._frozen_evaporation_carriers = frozenset({'CrO2', 'CrO3', 'SiO2_gas'})
+        sim._reaction_pO2_bar = 0.0
+        assert sim._evaporation_carrier_zero_reason() == 'frozen_consuming_carriers_at_zero_oxygen'
+        result = EquilibriumResult(temperature_C=1070.0, liquid_fraction=1.0)
+        sim._refresh_vapor_pressures_from_kernel(result, include_diagnostic_shadows=False)
+        assert result.vapor_pressures_Pa.get('CrO2', 0.0) == 0.0
+        assert result.vapor_pressures_Pa.get('CrO3', 0.0) == 0.0
+        assert result.vapor_pressures_Pa['SiO2_gas'] > 0.0
+        flux = sim._calculate_evaporation(result)
+        assert flux.species_kg_hr['SiO2_gas'] > 0.0
+    finally:
+        close_test_owned_magemin_backend(sim)
