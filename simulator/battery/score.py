@@ -7645,22 +7645,36 @@ def _predict_evaporation_rate(
     pressure_bound_notice = None
     pressure_bound_extrapolated = False
     if ambient_pressure_bound is not None:
-        # With J(P_bulk)=J(0)*(1-P_bulk/P_eq) and
-        # 0<=P_bulk<=P_total, setting P_bulk=0 gives the maximum flux and
-        # bounds its relative error by eps=P_total/P_eq.
-        relative_flux_error_bound = ambient_pressure_bound / equilibrium_pressure_pa
-        pressure_bound_extrapolated = relative_flux_error_bound > 0.01
+        # J(P_bulk)=J(0)*(1-P_bulk/P_eq), so eps=P_total/P_eq bounds the
+        # flux reduction relative to the zero-bulk-pressure maximum:
+        # (J(0)-J(P_bulk))/J(0) <= eps. Against the unknown true flux,
+        # J(0)/J - 1 = (P_bulk/P_eq)/(1-P_bulk/P_eq) <= eps/(1-eps),
+        # which is unbounded when eps >= 1.
+        flux_reduction_bound = ambient_pressure_bound / equilibrium_pressure_pa
+        true_flux_error_bound = (
+            flux_reduction_bound / (1 - flux_reduction_bound)
+            if flux_reduction_bound < 1
+            else None
+        )
+        true_flux_error_text = (
+            f"{true_flux_error_bound:g}" if true_flux_error_bound is not None else "unbounded"
+        )
+        pressure_bound_extrapolated = flux_reduction_bound > 0.01
         pressure_bound_notice = Notice(
             kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
             affected_quantities=(Quantity.EVAPORATION_RATE,),
             reason=(
                 "ambient species partial pressure bounded by printed total pressure; "
                 f"P_bulk in [0, {ambient_pressure_bound:g}] Pa; "
-                f"relative_flux_error_bound={relative_flux_error_bound:g}"
+                f"flux_reduction_relative_to_zero_bulk_max={flux_reduction_bound:g}; "
+                f"true_flux_relative_error_bound={true_flux_error_text}"
             ),
             origin="score:_evaporation_ambient_pressure",
             source="printed total chamber pressure",
-            band=f"relative flux error <= {relative_flux_error_bound:g}",
+            band=(
+                f"flux reduction relative to zero-bulk-pressure maximum <= {flux_reduction_bound:g}; "
+                f"true-flux relative error <= {true_flux_error_text}"
+            ),
             authority=(
                 Authority.EXTRAPOLATED if pressure_bound_extrapolated else Authority.CERTIFIED
             ),

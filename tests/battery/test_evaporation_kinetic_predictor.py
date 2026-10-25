@@ -700,7 +700,9 @@ def test_printed_total_pressure_bounds_unprinted_ambient_partial():
     )
     assert prediction.value is not None
     assert "P_bulk in [0, 1e-05] Pa" in notice.reason
-    assert "relative_flux_error_bound=1e-07" in notice.reason
+    assert "flux_reduction_relative_to_zero_bulk_max=1e-07" in notice.reason
+    assert "true_flux_relative_error_bound=1e-07" in notice.reason
+    assert "flux reduction relative to zero-bulk-pressure maximum <= 1e-07" in notice.band
     assert notice.authority is Authority.CERTIFIED
     assert prediction.authority is Authority.CERTIFIED
 
@@ -729,9 +731,67 @@ def test_printed_total_pressure_bound_over_one_percent_is_extrapolated():
         if notice.origin == "score:_evaporation_ambient_pressure"
     )
     assert prediction.value is not None
-    assert "relative_flux_error_bound=0.02" in notice.reason
+    assert "flux_reduction_relative_to_zero_bulk_max=0.02" in notice.reason
+    assert "true_flux_relative_error_bound=0.0204082" in notice.reason
     assert notice.authority is Authority.EXTRAPOLATED
     assert prediction.authority is Authority.EXTRAPOLATED
+
+
+def test_printed_total_pressure_reports_both_error_normalizations():
+    row = _kinetic_row("Mg")
+    row = replace(
+        row,
+        identity=replace(row.identity, total_pressure_Pa=State.of(Decimal("50"))),
+    )
+    prediction = _predict_evaporation_rate(
+        Engine.INTERNAL_ANALYTICAL,
+        row,
+        experiment=None,
+        handles=None,
+        isolated=None,
+        bench=None,
+        alpha_observations=(_alpha("alpha-paper-b", "Mg", 0.1),
+                            _alpha("alpha-paper-c", "Mg", 0.3)),
+        partial_pressure_observations=(),
+        pressure_predictor=_pressure_prediction,
+    )
+
+    notice = next(
+        notice for notice in prediction.notices
+        if notice.origin == "score:_evaporation_ambient_pressure"
+    )
+    assert "flux_reduction_relative_to_zero_bulk_max=0.5" in notice.reason
+    assert "true_flux_relative_error_bound=1" in notice.reason
+    assert "flux reduction relative to zero-bulk-pressure maximum <= 0.5" in notice.band
+    assert "true-flux relative error <= 1" in notice.band
+
+
+def test_printed_total_pressure_reports_unbounded_true_flux_error():
+    row = _kinetic_row("Mg")
+    row = replace(
+        row,
+        identity=replace(row.identity, total_pressure_Pa=State.of(Decimal("100"))),
+    )
+    prediction = _predict_evaporation_rate(
+        Engine.INTERNAL_ANALYTICAL,
+        row,
+        experiment=None,
+        handles=None,
+        isolated=None,
+        bench=None,
+        alpha_observations=(_alpha("alpha-paper-b", "Mg", 0.1),
+                            _alpha("alpha-paper-c", "Mg", 0.3)),
+        partial_pressure_observations=(),
+        pressure_predictor=_pressure_prediction,
+    )
+
+    notice = next(
+        notice for notice in prediction.notices
+        if notice.origin == "score:_evaporation_ambient_pressure"
+    )
+    assert "flux_reduction_relative_to_zero_bulk_max=1" in notice.reason
+    assert "true_flux_relative_error_bound=unbounded" in notice.reason
+    assert "true-flux relative error <= unbounded" in notice.band
 
 
 def test_printed_sweep_gas_containing_evaporating_species_still_refuses():
