@@ -1,0 +1,130 @@
+source_id: maeda-1978-magnesia-transpiration-o2-h2o
+source:
+  citation: Maeda, E., Sasamoto, T., and Sata, T. (1978). Vaporization from Magnesia in O2-H2O Atmospheres. Yogyo-Kyokai-Shi 86(10), 491-499.
+extraction:
+  method: MinerU table draft emission; table layouts checked against rendered pages
+  date: '2026-10-25'
+  worker: w1025c-maed78
+review_status: draft
+tables:
+  - page: 6
+    table_index: 2
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: model_derived
+    unit: atm
+    phase: gas
+    regime: transpiration
+    condensed_form: MgO(s)
+    rows: all
+    temperature:
+      column: 2
+      unit: K
+    values:
+      - column: 7
+        species: Mg(OH)2
+    conditions:
+      - key: total_pressure_atm
+        state: {tag: value, value: '1'}
+        locator: {page: 4, pdf_page_index: 3, published_page: 494, equation: '1', note: 'The text states reaction-system total pressure P is 1 atm in this experiment.'}
+      - key: gas_mix
+        state: {tag: value, value: 'O2-H2O'}
+        locator: {page: 6, pdf_page_index: 5, published_page: 496, table: '2', note: 'Per-run water-vapor pressure is in the table; no per-run O2:H2O ratio is printed.'}
+      - key: fO2_Pa
+        state: {tag: unknown, reason: 'No per-run oxygen partial pressure or absolute fugacity is printed; do not derive an O2 balance from total pressure and p(H2O).'}
+        locator: {page: 6, pdf_page_index: 5, published_page: 496, table: '2'}
+      - key: composition
+        state: {tag: unknown, reason: 'The feed is reported as 99.9% MgO with an elemental impurity assay, but no closed run composition is published.'}
+        locator: {page: 4, pdf_page_index: 3, published_page: 494, table: '1', section: Materials}
+    render_verified:
+      - {row: 2, column: 7, text: '2.58×10^-6'}
+      - {row: 3, column: 7, text: '1.35×10^-6'}
+      - {row: 4, column: 7, text: '2.84×10^-6'}
+      - {row: 5, column: 7, text: '3.87×10^-6'}
+      - {row: 6, column: 7, text: '1.95×10^-6'}
+      - {row: 7, column: 7, text: '1.81×10^-6'}
+      - {row: 8, column: 7, text: '1.05×10^-6'}
+      - {row: 9, column: 7, text: '8.48×10^-7'}
+      - {row: 10, column: 7, text: '2.26×10^-7'}
+      - {row: 11, column: 7, text: '1.81×10^-6'}
+      - {row: 12, column: 7, text: '1.07×10^-6'}
+      - {row: 13, column: 7, text: '5.91×10^-7'}
+      - {row: 14, column: 7, text: '1.31×10^-6'}
+      - {row: 15, column: 7, text: '1.40×10^-6'}
+      - {row: 16, column: 7, text: '1.51×10^-6'}
+      - {row: 17, column: 7, text: '5.16×10^-6'}
+      - {row: 18, column: 7, text: '5.29×10^-6'}
+      - {row: 19, column: 7, text: '4.19×10^-6'}
+      - {row: 20, column: 7, text: '4.76×10^-6'}
+      - {row: 21, column: 7, text: '4.81×10^-6'}
+      - {row: 22, column: 7, text: '2.54×10^-6'}
+      - {row: 23, column: 7, text: '2.86×10^-6'}
+      - {row: 24, column: 7, text: '2.64×10^-6'}
+      - {row: 25, column: 7, text: '2.28×10^-6'}
+  - page: 8
+    table_index: 4
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: model_derived
+    unit: atm
+    phase: gas
+    regime: transpiration
+    condensed_form: MgO(s)
+    rows: [2, 3, 6, 8, 9, 10, 11]
+    temperature:
+      column: 2
+      unit: K
+    values:
+      - column: 6
+        species: MgO
+    conditions:
+      - key: total_pressure_atm
+        state: {tag: value, value: '1.0'}
+        locator: {page: 8, pdf_page_index: 7, published_page: 498, table: '4', note: 'Table caption states oxygen at 1.0 atm.'}
+      - key: gas_mix
+        state: {tag: value, value: 'oxygen'}
+        locator: {page: 8, pdf_page_index: 7, published_page: 498, table: '4'}
+      - key: composition
+        state: {tag: unknown, reason: 'The feed is reported as 99.9% MgO with an elemental impurity assay, but no closed run composition is published.'}
+        locator: {page: 8, pdf_page_index: 7, published_page: 498, table: '4'}
+    render_verified:
+      - {row: 2, column: 6, text: '3.33×10^-7'}
+      - {row: 3, column: 6, text: '1.91×10^-7'}
+      - {row: 6, column: 6, text: '7.40×10^-8'}
+      - {row: 8, column: 6, text: '4.51×10^-8'}
+      - {row: 9, column: 6, text: '2.55×10^-8'}
+      - {row: 10, column: 6, text: '3.98×10^-8'}
+      - {row: 11, column: 6, text: '1.04×10^-8'}
+  - page: 8
+    table_index: 4
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: model_derived
+    unit: atm
+    phase: gas
+    regime: transpiration
+    condensed_form: MgO(s)
+    rows: [4, 5, 7]
+    temperature:
+      column: 2
+      unit: K
+    values:
+      - column: 6
+        species: MgO
+    conditions:
+      - key: total_pressure_atm
+        state: {tag: value, value: '1.0'}
+        locator: {page: 8, pdf_page_index: 7, published_page: 498, table: '4', note: 'Table caption states oxygen at 1.0 atm.'}
+      - key: gas_mix
+        state: {tag: value, value: 'oxygen-carbon dioxide'}
+        locator: {page: 8, pdf_page_index: 7, published_page: 498, table: '4'}
+      - key: composition
+        state: {tag: unknown, reason: 'The feed is reported as 99.9% MgO with an elemental impurity assay, but no closed run composition is published.'}
+        locator: {page: 8, pdf_page_index: 7, published_page: 498, table: '4'}
+      - key: fO2_Pa
+        state: {tag: unknown, reason: 'O2+CO2 is printed but its ratio and oxygen partial pressure are not.'}
+        locator: {page: 8, pdf_page_index: 7, published_page: 498, table: '4', note: 'Footnote for starred rows.'}
+    render_verified:
+      - {row: 4, column: 6, text: '4.62×10^-8'}
+      - {row: 5, column: 6, text: '6.35×10^-8'}
+      - {row: 7, column: 6, text: '4.53×10^-8'}
