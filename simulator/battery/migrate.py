@@ -11771,6 +11771,23 @@ def _printed_fingerprint(raw: object) -> PrintedFingerprint | None:
     return tuple(sorted(pairs)) or None
 
 
+def _projected_composition_locator(
+    projected: Mapping[str, Any] | None,
+    printed: Located[Mapping[str, Any]] | None,
+    fallback: Locator | None,
+) -> Locator | None:
+    if (
+        projected is not None
+        and printed is not None
+        and printed.state.is_value
+        and printed.locator is not None
+        and _printed_fingerprint(projected)
+        == _printed_fingerprint(printed.state.value)
+    ):
+        return printed.locator
+    return fallback
+
+
 def _printed_composition_candidates(
     roots: Iterable[object],
     vocabulary: tuple[VocabEntry, ...],
@@ -15892,19 +15909,6 @@ class Migrator:
             if experiment_log_f_o2 is not None
             else None
         )
-        row_oxide_map = _oxide_map_from_mapping(values)
-        projected_oxide_map = row_oxide_map or (
-            sample_composition[0]
-            if isinstance(sample_composition, tuple)
-            else None
-        )
-        projected_oxide_locator = (
-            locator_from_mapping(obs.get("locator"))
-            if row_oxide_map
-            else sample_composition[1]
-            if isinstance(sample_composition, tuple)
-            else None
-        )
         t_for_rekey = None
         if isinstance(values, Mapping):
             t_sel_rekey = select_declared_source(AXIS_TEMPERATURE_K, None, values)
@@ -15962,6 +15966,27 @@ class Migrator:
             obs.get("locator"), fallback=f"extract:{source_id}:{obs_id}"
         )
         assert locator is not None
+        row_sample = sample_from_equipment(
+            obs.get("equipment"),
+            vocabulary=self._vocab,
+            values=values if isinstance(values, Mapping) else None,
+            locator=locator,
+        )
+        row_oxide_map = _oxide_map_from_mapping(values)
+        projected_oxide_map = row_oxide_map or (
+            sample_composition[0]
+            if isinstance(sample_composition, tuple)
+            else None
+        )
+        projected_oxide_locator = _projected_composition_locator(
+            projected_oxide_map,
+            row_sample.printed_composition,
+            locator_from_mapping(obs.get("locator"))
+            if row_oxide_map
+            else sample_composition[1]
+            if isinstance(sample_composition, tuple)
+            else None,
+        )
         obs_type = obs.get("type") if isinstance(obs.get("type"), str) else None
         quantity, q_reason = map_quantity(
             obs_type, values, units=obs.get("units"), row=obs
@@ -17112,12 +17137,6 @@ class Migrator:
         # children inherit these conditions, so only a map the observation
         # prints for itself attaches here; a map found only inside a nested
         # row list stays on that row's child (ROR P0, quoted Hastie Table 2).
-        row_sample = sample_from_equipment(
-            obs.get("equipment"),
-            vocabulary=self._vocab,
-            values=values if isinstance(values, Mapping) else None,
-            locator=locator,
-        )
         if (
             row_sample.printed_composition is not None
             and row_sample.printed_composition.state.is_value

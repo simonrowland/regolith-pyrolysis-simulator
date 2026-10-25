@@ -96,6 +96,7 @@ from simulator.battery.migrate import (
     _provenance_from_extract,
     _source_method_uncertainty_from_plain,
     _initial_oxide_map_from_values,
+    _projected_composition_locator,
     _located_printed_and_initial,
     load_migrated_store,
     expand_queue_entries,
@@ -363,6 +364,27 @@ from simulator.battery.validate import (
 )
 from simulator.yaml_cache import YAML12SafeLoader, load_cached_safe_yaml
 from tests.battery import factories as F
+
+
+def test_projected_composition_locator_uses_matching_printed_locator() -> None:
+    composition = {"SiO2": Decimal("60"), "Al2O3": Decimal("40")}
+    printed_locator = Locator(page=335, table="A.6.2", note="sample AS1")
+    observation_locator = Locator(page=160, table="IV.1")
+    located_printed = Located(State.of(composition), locator=printed_locator)
+
+    assert (
+        _projected_composition_locator(
+            composition, located_printed, observation_locator
+        )
+        == printed_locator
+    )
+    unlocated_printed = Located(State.of(composition))
+    assert (
+        _projected_composition_locator(
+            composition, unlocated_printed, observation_locator
+        )
+        == observation_locator
+    )
 
 FIXTURE_EXTRACT = {
     "schema_version": "literature_extract.v1",
