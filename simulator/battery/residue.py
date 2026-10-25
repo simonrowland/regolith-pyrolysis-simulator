@@ -990,6 +990,16 @@ def _finite_step_fluxes(
     return {str(species): float(rate) / _SECONDS_PER_HOUR for species, rate in rates.items()}
 
 
+def _product_molar_rates_from_mass_fluxes(
+    mass_rates_kg_s: Mapping[str, float],
+    terms_by_species: Mapping[str, _ChannelTerms],
+) -> dict[str, float]:
+    return {
+        species: float(rate_kg_s) / terms_by_species[species].molar_mass_kg_mol
+        for species, rate_kg_s in mass_rates_kg_s.items()
+    }
+
+
 def _residue_oxygen_balance(
     terms,
     inventory,
@@ -1194,10 +1204,9 @@ def integrate_residue_inventory(
             pressures_Pa=pressures,
             background_pressure_Pa=background_pressure_Pa,
         )
-        requested_product_mol_s = {
-            species: rate_kg_s / term_by_species[species].molar_mass_kg_mol
-            for species, rate_kg_s in requested_rates_kg_s.items()
-        }
+        requested_product_mol_s = _product_molar_rates_from_mass_fluxes(
+            requested_rates_kg_s, term_by_species
+        )
         channels_by_parent: defaultdict[str, list[tuple[_ChannelTerms, float]]] = defaultdict(list)
         for species, product_rate in requested_product_mol_s.items():
             term = term_by_species[species]
