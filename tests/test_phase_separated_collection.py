@@ -439,7 +439,8 @@ def test_purity_config_recipe_and_runtime_reject_invalid(field, value, tmp_path)
 
 
 @pytest.mark.parametrize("field, default, value", [
-    ("stage3_product_purity", 0.999, 0.998),
+    # d-287 explicitly revises the product default from 0.999 to 0.98.
+    ("stage3_product_purity", 0.98, 0.998),
     ("stage3_instantaneous_purity", 0.99, 0.98),
 ])
 def test_recipe_purity_reaches_same_train_after_lazy_init_and_reset(field, default, value):
@@ -462,6 +463,8 @@ def test_recipe_purity_reaches_same_train_after_lazy_init_and_reset(field, defau
 def test_retained_alkali_is_charged_to_live_purity_budget(monkeypatch, dose_factor):
     from simulator.accounting import resolve_species_formula
     model = _model("through")
+    # Exercise the supported 0.999 runtime override (d-287); the default is 0.98.
+    model.train.collection_route["stage3_product_purity"] = 0.999
     projection = CondensationRouteResult(condensed_by_stage_species={3: {"SiO": 1.0}})
     monkeypatch.setattr(model, "_route", lambda *args: projection)
     oxide = resolve_species_formula("K2O", {}).molar_mass_kg_per_mol()
@@ -551,7 +554,7 @@ def test_default_lunar_staged_continues_after_refused_window():
         assert event["substage"] == "sio_window"
         assert event["alkali_oxide_kg_hr"] > event["allowed_alkali_oxide_kg_hr"]
         assert event["silica_capture_kg_hr"] >= 0.0
-        assert event["stage3_product_purity"] == 0.999
+        assert event["stage3_product_purity"] == 0.98  # d-287 product default
         assert event["reason"] == "alkali_purity_exceeded"
         assert event["resolved_stage3_route"] == "divert"
     product = stage_purity_report(execution.simulator.train)["stage_3_sio_zone"]
