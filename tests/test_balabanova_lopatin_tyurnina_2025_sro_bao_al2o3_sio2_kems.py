@@ -35,9 +35,22 @@ def test_table_2_values_migrate_as_points_with_composition_temperature_and_speci
     assert len(oxygen_rows) == 11
     for raw in oxygen_rows:
         migrated = by_id[raw["observation_id"]]
-        assert migrated.evidence.class_.value.value == "measured_reduced"
-        assert 1 <= len(migrated.derived_from) <= 3
-        assert all(f"_p005_t02_r{raw['observation_id'].rsplit('_r', 1)[1].split('_c', 1)[0]}_c" in parent for parent in migrated.derived_from)
+        assert raw["values"]["method_class"] == "quoted_attributed"
+        assert raw["values"]["evidence_class"] == "quoted_attributed"
+        assert migrated.evidence.class_.value.value == "quoted_attributed"
+        assert migrated.value.point == Decimal(raw["values"]["pressure_Pa"])
+        assert not raw.get("derived_from")
+        assert not raw.get("derivation")
+        assert not migrated.derived_from
+    oxygen_by_row = {raw["locator"]["row_label"]: raw for raw in oxygen_rows}
+    r03_composition = dict(
+        oxygen_by_row["x=0"]["point_conditions"]["composition"]["state"]["value"]["components"]
+    )
+    r13_composition = dict(
+        oxygen_by_row["x=1"]["point_conditions"]["composition"]["state"]["value"]["components"]
+    )
+    assert r03_composition["BaO"] == "0.25"
+    assert r13_composition["SrO"] == "0.25"
     context = document["species"]["unknown"]["context"]
     cell = next(item for item in context if item["observation_id"] == "balabanova_2025_table1_unit_cell_context")
     assert cell["values"]["carbonate_oxide_route"] == {"a": "8.525", "b": "13.014", "c": "14.339", "beta": "115.08"}
@@ -47,6 +60,24 @@ def test_table_2_values_migrate_as_points_with_composition_temperature_and_speci
     assert "token exists" in loss["values"]["schema_gap"]
     energies = next(item for item in context if item["observation_id"] == "balabanova_2025_appearance_energies_context")
     assert energies["values"]["appearance_energies"] == "Sr 5.8 ± 0.3; Ba 5.4 ± 0.3; BaO 7.0 ± 0.3; SiO 11.5 ± 0.3"
+    endpoint_inputs = next(
+        item
+        for item in context
+        if item["observation_id"] == "balabanova_2025_table2_endpoint_vapour_inputs"
+    )
+    missing_inputs = endpoint_inputs["values"]["partial_pressure_inputs"]
+    assert missing_inputs["r03_c02"]["printed"] == "—"
+    assert missing_inputs["r03_c02"]["gas_species"] == "Ba"
+    assert missing_inputs["r03_c02"]["state"] == {
+        "tag": "unknown",
+        "reason": "not_published",
+    }
+    assert missing_inputs["r13_c04"]["printed"] == "—"
+    assert missing_inputs["r13_c04"]["gas_species"] == "Sr"
+    assert missing_inputs["r13_c04"]["state"] == {
+        "tag": "unknown",
+        "reason": "not_published",
+    }
     ba_activity = by_id["balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c07"]
     assert ba_activity.identity.reference_state.tag.value == "unknown"
     assert "SrAl2Si2O8 or BaAl2Si2O8" in ba_activity.identity.reference_state.reason
