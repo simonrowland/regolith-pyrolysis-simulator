@@ -7,6 +7,7 @@ log10 Kf = 0.092. The Ellingham segment at that temperature is
 
 from __future__ import annotations
 
+import math
 from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
@@ -60,6 +61,7 @@ from simulator.battery.score import (
     render_score_report,
 )
 from simulator.chemistry.ellingham_thermo import ELLINGHAM_FIT_SEGMENTS
+from simulator.physical_constants import GAS_CONSTANT
 from tests.battery import factories as F
 from tests.engine_availability import (
     magemin_binary_available,
@@ -3357,14 +3359,14 @@ def test_tabulated_gas_attempt_refuses_nonpositive_heat_capacity(monkeypatch) ->
 
 
 def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
-    """H−H298 keeps the enthalpy zero. S and Cp do not.
+    """H−H298 keeps the enthalpy zero; ideal-gas S converts pressure.
 
     Mg-001 at 1366.104 K is the reference-state gas: published H−H298 is
     169.298, which includes vaporization. Mg-005 at that node is 22.198.
     That enthalpy still refuses. B1259 magnesium S at 298.15 K declares
-    101325 Pa, so S refuses on pressure and the detail carries both
-    pressures. B1452 magnesium S at 1361 K declares 100000 Pa, so S
-    answers the gas table even though the elemental zero is the crystal.
+    101325 Pa and converts from JANAF's 1 bar gas entropy. B1452 magnesium
+    S at 1361 K declares 100000 Pa, so S answers the gas table even though
+    the elemental zero is the crystal.
     B1452 SiO has no elemental ideal-gas enthalpy reference; Cp and S
     still answer O-012, and H−H298 refuses. B1259 and B1452 oxygen are
     the ideal gas at 298.15 K, so those rows return the printed O-029
@@ -3420,20 +3422,31 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
         ),
     )
     robie_attempt = predict_thermo_attempt(Engine.VAPOROCK, robie)
-    assert robie_attempt.value is None
-    assert robie_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert (
-        robie_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    robie_at_bar = replace(
+        robie,
+        identity=replace(
+            robie.identity, standard_pressure_Pa=State.of(Decimal("100000"))
+        ),
     )
-    assert robie_attempt.refusal_detail["gas_table"] == "Mg-005"
-    assert robie_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
-    assert robie_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
-    assert robie_attempt.refusal_detail["coefficient_interval"] == "outside"
-    assert robie_attempt.refusal_detail["branch"] == "table"
-    assert (
-        robie_attempt.refusal_detail["observation_table"]
-        == "b1259-ht-0027-magnesium-reference-state"
+    robie_bar_attempt = predict_thermo_attempt(Engine.VAPOROCK, robie_at_bar)
+    expected_entropy_shift = -Decimal(str(GAS_CONSTANT)) * Decimal(
+        str(math.log(1.01325))
     )
+    assert robie_attempt.refusal_reason is None
+    assert robie_bar_attempt.refusal_reason is None
+    assert robie_attempt.value is not None
+    assert robie_bar_attempt.value is not None
+    assert (
+        abs(robie_attempt.value - robie_bar_attempt.value - expected_entropy_shift)
+        < Decimal("1e-12")
+    )
+    conversion = next(
+        notice
+        for notice in robie_attempt.notices
+        if notice.reason.startswith("ideal_gas_standard_state_conversion")
+    )
+    assert conversion.kind is NoticeKind.FALLBACK
+    assert conversion.affected_quantities == (Quantity.S,)
 
     assert b1452_ideal_gas("Mg") is False
     near_boiling = replace(
@@ -3572,13 +3585,12 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
     assert b1259_pressure != b1452_pressure
 
 
-def test_vaporock_gas_entropy_refuses_one_atmosphere_against_janaf() -> None:
-    """The stored B1259 oxygen entropy is 1 atm. JANAF's gas table is 0.1 MPa.
+def test_vaporock_gas_entropy_converts_one_atmosphere_to_janaf() -> None:
+    """The stored B1259 oxygen entropy is 1 atm; JANAF's gas table is 1 bar.
 
     b1259-298k-0060-oxygen S at 298.15 K is 204.999264 J/(mol·K) with
-    standard_pressure_Pa 101325. O-029's entropy is the 1 bar value.
-    S refuses and the detail carries both pressures. Cp at that same
-    declared pressure still returns the printed O-029 node.
+    standard_pressure_Pa 101325. O-029 supplies the 1 bar value. For an
+    ideal gas S(1 atm) = S(1 bar) − R ln(1.01325); Cp is unchanged.
     """
 
     import pytest
@@ -3609,13 +3621,21 @@ def test_vaporock_gas_entropy_refuses_one_atmosphere_against_janaf() -> None:
     assert observation.value.point == Decimal("204.999264")
 
     attempt = predict_thermo_attempt(Engine.VAPOROCK, observation)
-    assert attempt.value is None
-    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
-    assert attempt.refusal_detail["observation_pressure_Pa"] == "101325"
-    assert attempt.refusal_detail["gas_pressure_Pa"] == "100000"
-    assert attempt.refusal_detail["gas_pressure_Pa"] == format(STANDARD_PRESSURE_PA, "f")
-    assert attempt.refusal_detail["gas_table"] == "O-029"
+    printed_entropy = _printed_janaf_node("O-029", Decimal("298.15"), "entropy")
+    expected_shift = -Decimal(str(GAS_CONSTANT)) * Decimal(str(math.log(1.01325)))
+    assert STANDARD_PRESSURE_PA == Decimal("100000")
+    assert attempt.refusal_reason is None
+    assert attempt.value is not None
+    assert abs(attempt.value - (printed_entropy + expected_shift)) < Decimal("1e-12")
+    conversion = next(
+        notice
+        for notice in attempt.notices
+        if notice.reason.startswith("ideal_gas_standard_state_conversion")
+    )
+    assert conversion.kind is NoticeKind.FALLBACK
+    assert conversion.affected_quantities == (Quantity.S,)
+    assert conversion.source == "JANAF 100000 Pa"
+    assert conversion.destination == "printed 101325 Pa"
 
     printed_cp = _printed_janaf_node("O-029", Decimal("500"), "heat_capacity")
     heat_capacity = replace(
@@ -3655,12 +3675,10 @@ def _b1259_point(filename: str, observation_id: str):
 def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
     """Inside a coefficient row, each quantity keeps its own basis axis.
 
-    B1259 O2 entropy at 800 K is 1 atm, so S refuses with both pressures.
-    B1259 magnesium entropy at 1500 K is the same pressure refusal, not
-    an enthalpy-zero refusal. Mg-001 at 1500 K and 1 bar answers S and
-    Cp; its H−H298 still refuses. O2 H−H298 at 800 K follows the printed
-    O-029 node. K entropy at 1200 K answers on K-005 and on locator I.
-    The negative entropy case is 101325 Pa, not a different table id.
+    B1259 O2 and magnesium entropy at 1 atm convert from the 1 bar gas table.
+    Mg-001 at 1500 K and 1 bar answers S and Cp; its H−H298 still refuses.
+    O2 H−H298 at 800 K follows the printed O-029 node. K entropy at 1200 K
+    answers on K-005 and on locator I.
     Co, Mn, and Ni on (1000, 3000] store H = 0 and do not reproduce
     printed H−H298, so that enthalpy refuses. Co heat capacity on the
     same row still answers.
@@ -3676,14 +3694,27 @@ def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
         "S:shared:T=800:col=entropy:name=oxygen-(reference-state):v=b128b3593f",
     )
     entropy_attempt = predict_thermo_attempt(Engine.VAPOROCK, oxygen_entropy)
-    assert entropy_attempt.value is None
-    assert entropy_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert entropy_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
-    assert entropy_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
-    assert entropy_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
-    assert entropy_attempt.refusal_detail["gas_table"] == "O-029"
-    assert entropy_attempt.refusal_detail["coefficient_interval"] == "inside"
-    assert entropy_attempt.refusal_detail["branch"] == "shomate"
+    oxygen_at_bar = replace(
+        oxygen_entropy,
+        identity=replace(
+            oxygen_entropy.identity,
+            standard_pressure_Pa=State.of(Decimal("100000")),
+        ),
+    )
+    oxygen_bar_attempt = predict_thermo_attempt(Engine.VAPOROCK, oxygen_at_bar)
+    expected_entropy_shift = -Decimal(str(GAS_CONSTANT)) * Decimal(
+        str(math.log(1.01325))
+    )
+    assert entropy_attempt.value is not None
+    assert oxygen_bar_attempt.value is not None
+    assert (
+        abs(entropy_attempt.value - oxygen_bar_attempt.value - expected_entropy_shift)
+        < Decimal("1e-12")
+    )
+    assert any(
+        notice.reason.startswith("ideal_gas_standard_state_conversion")
+        for notice in entropy_attempt.notices
+    )
 
     magnesium_entropy = _b1259_point(
         "b1259-ht-0027-magnesium-reference-state.yaml",
@@ -3691,16 +3722,28 @@ def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
         "S:shared:T=1500:col=entropy:name=magnesium-(reference-state):v=48985b088a",
     )
     magnesium_attempt = predict_thermo_attempt(Engine.VAPOROCK, magnesium_entropy)
-    assert magnesium_attempt.value is None
-    assert magnesium_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert (
-        magnesium_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    magnesium_at_bar = replace(
+        magnesium_entropy,
+        identity=replace(
+            magnesium_entropy.identity,
+            standard_pressure_Pa=State.of(Decimal("100000")),
+        ),
     )
-    assert magnesium_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
-    assert magnesium_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
-    assert magnesium_attempt.refusal_detail["gas_table"] == "Mg-005"
-    assert magnesium_attempt.refusal_detail["coefficient_interval"] == "inside"
-    assert magnesium_attempt.refusal_detail["branch"] == "shomate"
+    magnesium_bar_attempt = predict_thermo_attempt(Engine.VAPOROCK, magnesium_at_bar)
+    assert magnesium_attempt.value is not None
+    assert magnesium_bar_attempt.value is not None
+    assert (
+        abs(
+            magnesium_attempt.value
+            - magnesium_bar_attempt.value
+            - expected_entropy_shift
+        )
+        < Decimal("1e-12")
+    )
+    assert any(
+        notice.reason.startswith("ideal_gas_standard_state_conversion")
+        for notice in magnesium_attempt.notices
+    )
 
     from simulator.battery.records import Locator
 
@@ -3800,8 +3843,8 @@ def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
     assert potassium_attempt.notices == ()
     assert potassium_attempt.authority is Authority.BRIDGE
 
-    # A different JANAF table id is not an entropy distinction. The
-    # negative case is a different standard pressure.
+    # A different JANAF table id is not an entropy distinction. An ideal gas
+    # at 1 atm converts from the same 1 bar table.
     locator_only = replace(
         potassium,
         observation_id="k-entropy-locator-i",
@@ -3835,15 +3878,21 @@ def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
         ),
     )
     atmosphere_attempt = predict_thermo_attempt(Engine.VAPOROCK, one_atmosphere)
-    assert atmosphere_attempt.value is None
-    assert atmosphere_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert atmosphere_attempt.refusal_reason is None
+    assert atmosphere_attempt.value is not None
+    assert potassium_attempt.value is not None
     assert (
-        atmosphere_attempt.refusal_detail["reason"]
-        == "tabulated_table_basis_mismatch"
+        abs(
+            atmosphere_attempt.value
+            - potassium_attempt.value
+            - expected_entropy_shift
+        )
+        < Decimal("1e-12")
     )
-    assert atmosphere_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
-    assert atmosphere_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
-    assert atmosphere_attempt.refusal_detail["gas_table"] == "K-005"
+    assert any(
+        notice.reason.startswith("ideal_gas_standard_state_conversion")
+        for notice in atmosphere_attempt.notices
+    )
 
     cobalt_enthalpy = _same_table_gas(
         "co-unverified-enthalpy",
