@@ -133,7 +133,11 @@ species:
       values:
         quantity: mass_loss_fraction
         method_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: >-
+          The extract has no quantity token for species removal; the printed
+          V2O5 extraction fraction is not total sample mass loss.
         loss_basis_as_printed: fraction of V2O5 extracted from the starting slag; the paper reports the
           extraction percentage, without numeric XRF inputs in this text passage
         sample_id: CSV1
@@ -241,7 +245,11 @@ species:
       values:
         quantity: mass_loss_fraction
         method_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: >-
+          The extract has no quantity token for species removal; the printed
+          V2O5 extraction fraction is not total sample mass loss.
         loss_basis_as_printed: fraction of V2O5 extracted from the starting slag; the paper reports the
           extraction percentage, without numeric XRF inputs in this text passage
         sample_id: CSV2

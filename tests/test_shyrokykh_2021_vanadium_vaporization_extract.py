@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, Quantity, ValueKind
+from simulator.battery.enums import AdmissionStatus, Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 from tests.literature_extract_test_helpers import iter_locators
 
@@ -147,7 +147,7 @@ def test_render_and_extract_cell_mutations_fail_table_binding() -> None:
         assert _table_ii_grid(changed_extract) == TABLE_II_RENDER
 
 
-def test_text_bounds_keep_sample_conditions_and_migrate_as_lower_bounds() -> None:
+def test_text_bounds_keep_source_cells_and_migrate_as_typed_refusals() -> None:
     document = _document()
     observations = document["species"]["V2O5"]["observations"]
     expected_bounds = {"CSV1": "77", "CSV2": "45"}
@@ -159,6 +159,9 @@ def test_text_bounds_keep_sample_conditions_and_migrate_as_lower_bounds() -> Non
             "bound_operator": ">",
             "bound_value": expected_bounds[sample],
         }
+        assert values["admission_status"] == "typed_refusal"
+        assert values["status"] == "typed_refusal"
+        assert "no quantity token for species removal" in values["reason"]
         assert "unavailable_reason" not in values
         composition = values["initial_composition_as_printed"]
         assert (
@@ -180,6 +183,8 @@ def test_text_bounds_keep_sample_conditions_and_migrate_as_lower_bounds() -> Non
     }
     for row in rows:
         assert row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        assert row.admission.status is AdmissionStatus.REJECTED
+        assert "species removal" in row.admission.reason
         assert row.identity.species.formula == "V2O5"
         assert row.identity.species.phase.value is Phase.L
         assert row.identity.temperature_K.value == 1873
