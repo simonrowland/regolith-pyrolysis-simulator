@@ -1035,7 +1035,12 @@ class CompiledPressureEvaluator:
         # the legacy_scalar_adapter.
         o2_term = self.o2_channel_term
         needs_o2 = self.pO2_exponent != 0.0
-        zero_oxygen = pO2_bar == 0.0 and self.pO2_exponent > 0.0
+        zero_oxygen = (
+            self.pO2_exponent > 0.0
+            and is_declared_real_scalar(pO2_bar, allow_numeric_str=True)
+            and float(pO2_bar) == 0.0
+            and not (reaction_inputs is not None and CHANNEL_O2 in reaction_inputs.channels)
+        )
         o2_potential = None
         pO2_bar_raw = pO2_bar
         if zero_oxygen:
