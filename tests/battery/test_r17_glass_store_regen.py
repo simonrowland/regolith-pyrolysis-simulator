@@ -23,7 +23,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from tests.git_history import require_git_history, store_neutral_ack_revisions
+from tests.git_history import require_git_history, require_store_neutral_ack_history
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 JANAF_STORE = (
@@ -139,11 +139,7 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
     """Reject unacknowledged post-regen migrate-input commits."""
     freshness = _load_freshness()
     neutral = freshness.STORE_NEUTRAL_INPUT_COMMITS
-    require_git_history(
-        REPO_ROOT,
-        *sorted(neutral),
-        *store_neutral_ack_revisions(REPO_ROOT),
-    )
+    require_store_neutral_ack_history(REPO_ROOT, freshness, *sorted(neutral))
     if _git("rev-parse", "--is-shallow-repository").strip() == "true":
         pytest.skip("git_history_unavailable: freshness requires a full checkout")
     for revision in neutral:
@@ -222,8 +218,10 @@ def test_mutation_restamping_mg013_liquid_fails_unknown_pin(tmp_path: Path) -> N
 
 def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
     """Mutation proof: on ``b5b9dacc8`` the STALE half still fires."""
-    require_git_history(REPO_ROOT, FRESHNESS_STALE_TIP)
     freshness = _load_freshness()
+    require_store_neutral_ack_history(
+        REPO_ROOT, freshness, FRESHNESS_STALE_TIP
+    )
     head = _git("rev-parse", FRESHNESS_STALE_TIP).strip()
     last_store = _git(
         "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS

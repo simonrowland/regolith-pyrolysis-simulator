@@ -54,18 +54,18 @@ def require_git_history(root: Path, *revisions: str) -> None:
             )
 
 
-def store_neutral_ack_revisions(root: Path) -> tuple[str, ...]:
-    """Return valid revision names from store-neutral acknowledgement files."""
-    ack_dir = root / "scripts" / "store_neutral_acks"
-    ack_revisions = []
-    if ack_dir.is_dir():
-        for path in sorted(ack_dir.iterdir()):
-            stem = path.stem
-            valid_length = 7 <= len(stem) <= 12 or len(stem) == 40
-            if (
-                path.suffix == ".txt"
-                and valid_length
-                and all(char in "0123456789abcdefABCDEF" for char in stem)
-            ):
-                ack_revisions.append(stem)
-    return tuple(ack_revisions)
+def require_store_neutral_ack_history(root: Path, freshness, *revisions: str) -> None:
+    """Use the freshness reader to validate ack files and guard their Git refs."""
+    require_git_history(root, *revisions)
+    try:
+        freshness._store_neutral_ack_commits()
+    except subprocess.CalledProcessError as exc:
+        command = exc.cmd
+        if not isinstance(command, (list, tuple)) or not command:
+            raise
+        revision = command[-1]
+        suffix = "^{commit}"
+        if not isinstance(revision, str) or not revision.endswith(suffix):
+            raise
+        require_git_history(root, *revisions, revision[: -len(suffix)])
+        raise

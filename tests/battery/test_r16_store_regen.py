@@ -24,7 +24,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from tests.git_history import require_git_history, store_neutral_ack_revisions
+from tests.git_history import require_git_history, require_store_neutral_ack_history
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -101,7 +101,7 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
 
 def _assert_committed_store_has_no_stale_inputs(root: Path) -> None:
     freshness = _load_freshness(root)
-    require_git_history(root, *store_neutral_ack_revisions(root))
+    require_store_neutral_ack_history(root, freshness)
     head = _git("rev-parse", "HEAD", root=root).strip()
     last_store = _git(
         "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS, root=root
@@ -241,8 +241,8 @@ def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
     migrate-input commits after ``2e9e17c3d`` would be reported. Guarding
     this keeps the freshness assertion from going vacuous.
     """
-    require_git_history(REPO_ROOT, STALE_TIP)
     freshness = _load_freshness()
+    require_store_neutral_ack_history(REPO_ROOT, freshness, STALE_TIP)
     head = _git("rev-parse", STALE_TIP).strip()
     last_store = _git(
         "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS
