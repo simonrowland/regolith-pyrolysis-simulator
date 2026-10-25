@@ -610,9 +610,8 @@ class EquilibriumMixin:
         else:
             intrinsic_fO2_log = float(intrinsic_fO2_value)
 
-        # Reaction oxygen is supplied by the surface closure; intrinsic fO2
-        # continues to own finite melt redox and Kress91 FeO activity.
-        melt_dissociation_pO2_bar = pO2_bar
+        # Match the source owner's retained metal-loss oxygen channel.
+        melt_dissociation_pO2_bar = 10.0 ** intrinsic_fO2_log
         feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
             floor_bar=vacuum_floor_bar,
         )
@@ -1250,7 +1249,7 @@ class EquilibriumMixin:
             K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
 
             # a_M(row basis) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
-            dissociation_pO2_bar = pO2_bar
+            dissociation_pO2_bar = melt_dissociation_pO2_bar
             # Premise: this fallback solves the melt-supported source pressure;
             # the later surface-flux layer owns overhead species backpressure.
             # For MgO(l) -> Mg(g) + 1/2 O2,

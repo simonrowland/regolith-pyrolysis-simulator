@@ -2989,10 +2989,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         return reservoir
 
-    def _settle_evaporative_redox_after_batch(self) -> None:
+    def _settle_evaporative_redox_after_batch(self, *, oxygen_release_capacity_mol=None) -> None:
         # Parent/shared-O2 caps reserve inventory for the whole carrier batch.
         # Only after every carrier commits may Fe re-speciation consume FeO.
         reservoir = self.melt.oxygen_reservoir
+        self._oxygen_release_transport_limited = False
         saturated = (
             self._fe_redox_internal_o2_capacity_mol_this_hr > OXYGEN_RESERVOIR_NOOP_MOL
         ) and (
@@ -3004,8 +3005,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # At saturation, solve the finite Fe split BEFORE moving the remainder:
             # 2 FeO + 1/2 O2 = Fe2O3, so uptake is Δn(Fe2O3)/2 mol O2.
             # Its ledger debit, not C_m * Δln(fO2), owns the absorbed atoms.
-            # At zero Fe uptake all the credited O2 leaves to overhead; no second
-            # source or parallel redox inventory is introduced.
+            # The remainder is still stored unless this step's film carries it.
             diagnostic = self._apply_fe_redox_respeciation(
                 oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
                 fO2_log_override=self._melt_redox_fO2_upper_bound_log(),
@@ -3013,6 +3013,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             excess_o2_mol = max(0.0, float(
                 self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(OXYGEN_SPECIES, 0.0)
             ))
+            # Film supply bounds inward uptake; symmetrically, outward release
+            # cannot exceed j_out*A*dt minus the batch's other gas credits.
+            # The caller supplies that remaining budget in mol O2. Thus
+            # n_release=min(n_buffer,budget), with the rest retained; at zero
+            # outward flux no stored O2 is dumped into the gas. Unlike the old
+            # whole-buffer jump this response can close j=dn_gas/(A*dt).
+            if oxygen_release_capacity_mol is not None and excess_o2_mol > oxygen_release_capacity_mol:
+                excess_o2_mol = oxygen_release_capacity_mol
+                self._oxygen_release_transport_limited = True
+                diagnostic.setdefault('flags', []).append('oxygen_release_transport_limited')
             if excess_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL:
                 # Drain only this evaporation-owned carrier, including a
                 # solid/no-capacity or hot-band refusal. Bubbler passthrough
@@ -3024,7 +3034,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 diagnostic['excess_o2_to_headspace_mol'] = excess_o2_mol
                 diagnostic.setdefault('flags', []).append('EXCESS_OXYGEN_TO_GAS')
-                self._fe_redox_respeciation_diagnostics_this_hr[-1].update(diagnostic)
+            self._fe_redox_respeciation_diagnostics_this_hr[-1].update(diagnostic)
         elif self._has_remaining_fe_redox_internal_o2_capacity():
             self._apply_fe_redox_respeciation(
                 oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
@@ -14584,6 +14594,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'storage_mol_m2_s': boundary.storage_mol_m2_s,
                 'oxygen_flux_mol_m2_s': boundary.oxygen_flux_mol_m2_s,
                 'oxygen_uptake_transport_limited': boundary.oxygen_uptake_transport_limited,
+                **({'oxygen_release_transport_limited': True}
+                   if projected._oxygen_release_transport_limited else {}),
                 'relative_residual': abs(boundary.residual) / gross if gross else 0.0,
                 'oxygen_series': oxygen_series,
                 'frozen_carriers': sorted(self._frozen_evaporation_carriers),
@@ -14627,7 +14639,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         transition_start = len(self.atom_ledger.transitions)
         buffer_before = self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(OXYGEN_SPECIES, 0.0)
         evap_flux, overhead_flux = self._apply_evaporation_carrier_batch(evap_flux,
-            oxygen_uptake_capacity_mol=(uptake_capacity if boundary is not None else None))
+            oxygen_uptake_capacity_mol=(uptake_capacity if boundary is not None else None),
+            oxygen_release_capacity_mol=(projected._evaporation_oxygen_release_capacity_mol
+                                         if boundary is not None else None))
         if boundary is not None:
             self._verify_evaporation_projection(predicted_amounts,
                 self._evaporation_signed_amounts(transition_start, buffer_before))

@@ -2714,10 +2714,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if intrinsic_fO2_log_supplied
             else None
         )
-        melt_dissociation_pO2_bar = transport_pO2_bar
+        melt_dissociation_pO2_bar = (
+            10.0 ** intrinsic_fO2_log if intrinsic_fO2_log is not None
+            else transport_pO2_bar
+        )
         melt_dissociation_pO2_clamped = False
-        # The supplied reaction-plane oxygen owns every mass-action channel.
-        # Intrinsic melt fO2 remains an independent finite Fe/activity input.
+        # Metal-loss O2 is retained in the melt buffer: dn_gas(O2)=0.
+        # Its p=C(T)*a^n*(fO2/f_ref)^e therefore uses intrinsic melt fO2,
+        # not the gas-film unknown. The ratio is dimensionless; at zero gas
+        # pO2 this source stays finite. Gas-funded consuming rails and SiO's
+        # gas coproduct still use the surface pressure supplied by C7.
         comp_wt = composition_wt_pct_from_account_view(
             request.account_view, self.DECLARED_ACCOUNT
         )
@@ -3523,13 +3529,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="K_decomp",
             )
-            dissociation_pO2_bar = transport_pO2_bar
+            dissociation_pO2_bar = melt_dissociation_pO2_bar
             if parent_oxide != 'FeO':
                 # t-571: the Ellingham O2 denominator is sourced from the
                 # owner-gated O2 channel potential (melt_interface plane).
                 # The potential retains the actual oxygen, including a domain
-                # notice beyond the evaluator band. FeO uses the same solved
-                # coordinate; Kress91 activity separately carries melt redox.
+                # notice beyond the evaluator band. Kress91 FeO activity also
+                # carries the intrinsic melt redox.
                 dissociation_pO2_bar = o2_potential_from_pO2_bar(
                     pO2_bar=dissociation_pO2_bar,
                     temperature_K=T_K,
@@ -3551,7 +3557,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             # co-evolution is a separate reaction-basis validation, not a
             # runtime boundary condition solved by that subtraction.
             # FeO already carries melt redox through its Kress91 activity and
-            # uses the same solved reaction denominator here.
+            # uses the same intrinsic reaction denominator here.
             numerator = _require_finite_vapor_value(
                 K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar,
                 species=species,
@@ -3888,7 +3894,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     pO2_bar=compiled_evaluator.pO2_reference_bar,
                 )
                 evaluator_pO2_bar = transport_pO2_bar
-                if compiled_evaluator.oxygen_fugacity_channel == "intrinsic_melt":
+                if (compiled_evaluator.oxygen_fugacity_channel == "intrinsic_melt"
+                        and compiled_evaluator.pO2_exponent < 0.0):
                     evaluator_pO2_bar = melt_dissociation_pO2_bar
                 evaluation = compiled_evaluator.evaluate(
                     T_K,
