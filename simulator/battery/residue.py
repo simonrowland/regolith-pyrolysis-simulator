@@ -11,6 +11,7 @@ from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from pathlib import Path
+from statistics import median
 from typing import Any
 
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
@@ -279,7 +280,7 @@ class ResidueChannel:
     species: str
     formula: str
     parent_oxide: str | None
-    alpha: float
+    alpha: float | None
     alpha_source: str
 
 
@@ -298,6 +299,366 @@ class ResidueInventoryResult:
     pO2_balance_floor_pO2_bar: float | None
     atom_closure_mol: Mapping[str, float]
     buffer_oxygen_exchange_mol: float = 0.0
+
+
+@dataclass(frozen=True)
+class ResidueThermalSegment:
+    temperature_K: float | None
+    duration_s: float | None
+    steps: int = 1
+
+
+@dataclass(frozen=True)
+class ResidueGeometryInput:
+    initial_area_m2: float | None
+    area_policy: str | None
+    initial_mass_kg: float | None = None
+    density_model: Callable[[Mapping[str, float], float], float] | None = None
+
+
+@dataclass(frozen=True)
+class ResiduePressureRegime:
+    mode: str | None
+    total_pressure_Pa: float | None
+    background_pressure_Pa: float | None
+    buffered_fO2_log: float | None = None
+
+
+@dataclass(frozen=True)
+class ResidueAlphaObservation:
+    source_id: str
+    species: str
+    alpha: float | Mapping[str, Any]
+    evidence_class: str
+    observation_id: str
+    temperature_K: float | None = None
+    temperature_range_K: tuple[float, float] | None = None
+    melt_family: str | None = None
+
+
+@dataclass(frozen=True)
+class ResidueAlphaEstimate:
+    value: float
+    band: tuple[float, float]
+    contributing_source_ids: tuple[str, ...]
+    source_values: tuple[tuple[str, float], ...]
+    melt_family_fallback: bool
+
+
+@dataclass(frozen=True)
+class ResidueIntegrationInput:
+    initial_inventory_mol: Mapping[str, float] | None
+    channels: Sequence[ResidueChannel] | None
+    thermal_schedule: Sequence[ResidueThermalSegment] | None
+    pressure_regime: ResiduePressureRegime | None
+    geometry: ResidueGeometryInput | None
+    pressure_model: Callable[
+        [Mapping[str, float], float, float, ResiduePressureRegime], Mapping[str, float]
+    ] | None
+    target_source_id: str | None = None
+    melt_family: str | None = None
+    alpha_pool: Sequence[ResidueAlphaObservation] = ()
+    exhaustion_floor_mol: float | None = None
+    retry_failed_step_once: bool = False
+    on_step: Callable[
+        [Mapping[str, float], Sequence[ResidueChannel], float, float], None
+    ] | None = None
+
+
+@dataclass(frozen=True)
+class ResidueScheduleResult:
+    residue_mol: Mapping[str, float]
+    evaporated_mol: Mapping[str, float]
+    pO2_bar_by_step: tuple[float, ...]
+    pO2_balance_bracket_boundary_by_step: tuple[
+        OxygenBalanceBracketBoundary | None, ...
+    ]
+    pO2_balance_floor: Mapping[str, float | int | None]
+    component_exhaustion_notices: tuple[dict[str, float | int | str], ...]
+    atom_closure_mol: Mapping[str, float]
+    buffer_oxygen_exchange_mol: float
+    refusal: ResidueEngineNonconvergence | None
+    notices: tuple[str, ...]
+
+
+def collect_measured_evaporation_alphas(
+    observations: Sequence[object],
+    source_documents: Sequence[Mapping[str, Any]] = (),
+) -> tuple[ResidueAlphaObservation, ...]:
+    """Normalize directly measured alpha rows and eligible extract contexts."""
+    from simulator.battery.enums import MEASURED_EVIDENCE, Quantity
+    from simulator.battery.extract_context import iter_extract_context_containers
+
+    collected: list[ResidueAlphaObservation] = []
+
+    def append(
+        *, source_id: object, species: object, alpha: object,
+        evidence_class: object, observation_id: object,
+        temperature_K: object = None, temperature_range_K: object = None,
+        melt_family: object = None,
+    ) -> None:
+        source = str(source_id or "")
+        formula = str(species or "").removesuffix("(g)")
+        evidence = str(getattr(evidence_class, "value", evidence_class) or "")
+        observation = str(observation_id or "")
+        if (
+            not source or not formula or evidence not in MEASURED_EVIDENCE
+            or not observation
+        ):
+            return
+        raw_range = None
+        if temperature_range_K is not None:
+            try:
+                parsed_range = tuple(float(value) for value in temperature_range_K)
+            except (TypeError, ValueError, OverflowError):
+                return
+            if (
+                len(parsed_range) != 2
+                or not all(math.isfinite(value) for value in parsed_range)
+                or parsed_range[0] > parsed_range[1]
+            ):
+                return
+            raw_range = parsed_range
+        try:
+            temperature = (
+                float(temperature_K) if temperature_K is not None else None
+            )
+        except (TypeError, ValueError, OverflowError):
+            return
+        if temperature is not None and not math.isfinite(temperature):
+            return
+        if isinstance(alpha, Mapping):
+            normalized_alpha: float | Mapping[str, Any] = dict(alpha)
+        else:
+            try:
+                normalized_alpha = float(alpha)
+            except (TypeError, ValueError, OverflowError):
+                return
+            if not math.isfinite(normalized_alpha):
+                return
+        family = str(melt_family).strip() if melt_family else None
+        collected.append(ResidueAlphaObservation(
+            source_id=source,
+            species=formula,
+            alpha=normalized_alpha,
+            evidence_class=evidence,
+            observation_id=observation,
+            temperature_K=temperature,
+            temperature_range_K=raw_range,
+            melt_family=family,
+        ))
+
+    for observation in observations:
+        identity = getattr(observation, "identity", None)
+        quantity = getattr(identity, "quantity", None)
+        quantity = getattr(quantity, "value", quantity)
+        if quantity != Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+            continue
+        evidence = getattr(getattr(observation, "evidence", None), "class_", None)
+        evidence = getattr(evidence, "value", evidence)
+        point = getattr(getattr(observation, "value", None), "point", None)
+        if point is None:
+            continue
+        temperature_state = getattr(identity, "temperature_K", None)
+        temperature = (
+            getattr(temperature_state, "value", None)
+            if getattr(temperature_state, "is_value", False) else None
+        )
+        if temperature is None:
+            condition = (getattr(observation, "point_conditions", None) or {}).get(
+                "temperature_K"
+            )
+            state = getattr(condition, "state", None)
+            temperature = (
+                getattr(state, "value", None)
+                if getattr(state, "is_value", False) else None
+            )
+        provenance = getattr(observation, "provenance", None)
+        family = provenance.get("melt_family") if isinstance(provenance, Mapping) else None
+        append(
+            source_id=getattr(observation, "source_id", None),
+            species=getattr(getattr(identity, "species", None), "formula", None),
+            alpha=point,
+            evidence_class=evidence,
+            observation_id=getattr(observation, "observation_id", None),
+            temperature_K=temperature,
+            melt_family=family,
+        )
+
+    for document in source_documents:
+        source_id = document.get("source_id")
+        for formula, rows in iter_extract_context_containers(document):
+            for row in rows or ():
+                if not isinstance(row, Mapping):
+                    continue
+                values = row.get("values")
+                if not isinstance(values, Mapping):
+                    continue
+                method_class = values.get("method_class")
+                if method_class is not None and method_class not in MEASURED_EVIDENCE:
+                    continue
+                classifications = tuple(
+                    str(getattr(value, "value", value)).lower()
+                    for value in (
+                        values.get("evidence_class"), method_class,
+                        row.get("evidence_class"), row.get("class_tag"),
+                    )
+                    if value
+                )
+                if any(
+                    label in {"compilation_assessed", "model_derived", "model"}
+                    or label.startswith("assumed")
+                    for label in classifications
+                ):
+                    continue
+                if "model" in str(row.get("type") or "").lower():
+                    continue
+                semantics = " ".join(str(value).lower() for value in (
+                    values.get("quantity"), values.get("alpha_kind"),
+                    row.get("type"), row.get("regime"),
+                ) if value)
+                if "condensation" in semantics:
+                    continue
+                evidence = (
+                    values.get("evidence_class")
+                    or method_class
+                    or row.get("evidence_class")
+                    or row.get("class_tag")
+                )
+                alpha = values.get("alpha_form")
+                if not isinstance(alpha, Mapping):
+                    alpha = values.get("alpha")
+                if alpha is None:
+                    continue
+                append(
+                    source_id=source_id,
+                    species=values.get("gas_species", formula),
+                    alpha=alpha,
+                    evidence_class=evidence,
+                    observation_id=row.get("observation_id"),
+                    temperature_K=values.get("temperature_K"),
+                    temperature_range_K=row.get("T_range_K"),
+                    melt_family=values.get("melt_family", row.get("melt_family")),
+                )
+    return tuple(collected)
+
+
+def estimate_loo_evaporation_alpha(
+    observations: Sequence[ResidueAlphaObservation],
+    *,
+    species: str,
+    melt_family: str | None,
+    temperature_K: float,
+    exclude_source_id: str,
+) -> ResidueAlphaEstimate | ResidueInventoryRefusal:
+    """Use a median over independent measured sources, excluding the target."""
+    from simulator.battery.enums import MEASURED_EVIDENCE
+
+    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+        return ResidueInventoryRefusal("alpha_temperature_invalid")
+    candidates = tuple(
+        row for row in observations
+        if row.species == species
+        and row.source_id != exclude_source_id
+        and row.evidence_class in MEASURED_EVIDENCE
+    )
+    family_supported = bool(melt_family) and bool(candidates) and all(
+        row.melt_family for row in candidates
+    )
+    family_fallback = not family_supported
+    if family_supported:
+        candidates = tuple(row for row in candidates if row.melt_family == melt_family)
+
+    by_source: dict[str, list[float]] = defaultdict(list)
+    for row in candidates:
+        temperature_range = row.temperature_range_K
+        if temperature_range is not None and not (
+            temperature_range[0] <= temperature_K <= temperature_range[1]
+        ):
+            continue
+        if isinstance(row.alpha, Mapping):
+            try:
+                if row.alpha.get("type") != "arrhenius":
+                    continue
+                alpha_value, _sigma = _evaluate_extracted_arrhenius_alpha(
+                    row.alpha, temperature_K
+                )
+            except (KeyError, TypeError, ValueError, OverflowError):
+                continue
+        else:
+            if row.temperature_K is not None and not math.isclose(
+                row.temperature_K, temperature_K, rel_tol=0.0, abs_tol=1.0e-6
+            ):
+                continue
+            alpha_value = row.alpha
+        if math.isfinite(alpha_value) and 0.0 < alpha_value <= 1.0:
+            by_source[row.source_id].append(alpha_value)
+
+    source_values = tuple(sorted(
+        (source_id, median(values)) for source_id, values in by_source.items()
+    ))
+    if len(source_values) < 2:
+        return ResidueInventoryRefusal(
+            "alpha_loo_insufficient_sources",
+            f"species={species}; other_measured_sources_at_T={len(source_values)}; "
+            f"excluded_source_id={exclude_source_id}",
+        )
+    values = tuple(value for _source_id, value in source_values)
+    return ResidueAlphaEstimate(
+        value=median(values),
+        band=(min(values), max(values)),
+        contributing_source_ids=tuple(source_id for source_id, _ in source_values),
+        source_values=source_values,
+        melt_family_fallback=family_fallback,
+    )
+
+
+def select_residue_channel_alphas(
+    channels: Sequence[ResidueChannel],
+    alpha_pool: Sequence[ResidueAlphaObservation],
+    *,
+    target_source_id: str | None,
+    melt_family: str | None,
+    temperature_K: float,
+) -> tuple[tuple[ResidueChannel, ...], tuple[str, ...]]:
+    """Resolve missing channel alphas from the independent-source LOO pool."""
+    unresolved = tuple(channel for channel in channels if channel.alpha is None)
+    if unresolved and not target_source_id:
+        raise ResidueInventoryRefusal("residue_alpha_target_source_missing")
+    resolved: list[ResidueChannel] = []
+    notices: list[str] = []
+    for channel in channels:
+        if channel.alpha is not None:
+            resolved.append(channel)
+            continue
+        estimate = estimate_loo_evaporation_alpha(
+            alpha_pool,
+            species=channel.species,
+            melt_family=melt_family,
+            temperature_K=temperature_K,
+            exclude_source_id=str(target_source_id),
+        )
+        if isinstance(estimate, ResidueInventoryRefusal):
+            if estimate.reason != "alpha_loo_insufficient_sources":
+                raise estimate
+            resolved.append(replace(
+                channel,
+                alpha=1.0,
+                alpha_source="alpha=1 upper bound; no independent LOO alpha",
+            ))
+            notices.append(f"alpha_upper_bound:{channel.species}:{estimate.detail}")
+            continue
+        resolved.append(replace(
+            channel,
+            alpha=estimate.value,
+            alpha_source=(
+                "LOO measured-source median: "
+                + ",".join(estimate.contributing_source_ids)
+            ),
+        ))
+        if estimate.melt_family_fallback:
+            notices.append(f"alpha_loo_species_only_fallback:{channel.species}")
+    return tuple(resolved), tuple(notices)
 
 
 @dataclass(frozen=True)
@@ -408,6 +769,10 @@ def _channel_terms(
                 "residue_channel_invalid", f"missing or duplicate channel {channel.species!r}"
             )
         seen.add(channel.species)
+        if channel.alpha is None:
+            raise ResidueInventoryRefusal(
+                "residue_alpha_missing", f"no alpha resolved for {channel.species!r}"
+            )
         if (
             not math.isfinite(float(channel.alpha))
             or float(channel.alpha) < 0.0
@@ -929,6 +1294,423 @@ def integrate_residue_inventory(
         ),
         atom_closure_mol=closure,
         buffer_oxygen_exchange_mol=buffer_oxygen_exchange_mol,
+    )
+
+
+def integrate_residue_schedule(
+    request: ResidueIntegrationInput,
+) -> ResidueScheduleResult:
+    """Integrate a declared composition, thermal schedule, pressure, and area.
+
+    Thermal segments are piecewise-isothermal intervals. A printed ramp is
+    represented by successive isothermal segments at the requested numerical
+    resolution; no temperature, duration, pressure, or geometry is inferred.
+    """
+    if request.initial_inventory_mol is None or not request.initial_inventory_mol:
+        raise ResidueInventoryRefusal("residue_inventory_missing")
+    try:
+        initial_inventory = {
+            str(species): float(amount)
+            for species, amount in request.initial_inventory_mol.items()
+        }
+    except (AttributeError, TypeError, ValueError, OverflowError) as exc:
+        raise ResidueInventoryRefusal("residue_inventory_invalid") from exc
+    if any(
+        not species or not math.isfinite(amount) or amount < 0.0
+        for species, amount in initial_inventory.items()
+    ):
+        raise ResidueInventoryRefusal("residue_inventory_invalid")
+    initial_mass_from_composition = math.fsum(
+        amount * _formula_terms(species)[1]
+        for species, amount in initial_inventory.items()
+    )
+    if initial_mass_from_composition <= 0.0:
+        raise ResidueInventoryRefusal("residue_inventory_invalid")
+
+    if request.channels is None:
+        raise ResidueInventoryRefusal("residue_channels_missing")
+    channels = tuple(request.channels)
+    if not channels:
+        raise ResidueInventoryRefusal("residue_channels_missing")
+    if request.thermal_schedule is None or not request.thermal_schedule:
+        raise ResidueInventoryRefusal("residue_temperature_schedule_missing")
+    schedule: list[ResidueThermalSegment] = []
+    for segment in request.thermal_schedule:
+        if segment.temperature_K is None:
+            raise ResidueInventoryRefusal("residue_temperature_missing")
+        if segment.duration_s is None:
+            raise ResidueInventoryRefusal("residue_duration_missing")
+        try:
+            temperature = float(segment.temperature_K)
+            duration = float(segment.duration_s)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ResidueInventoryRefusal("residue_schedule_invalid") from exc
+        if not math.isfinite(temperature) or temperature <= 0.0:
+            raise ResidueInventoryRefusal("residue_temperature_invalid")
+        if not math.isfinite(duration) or duration < 0.0:
+            raise ResidueInventoryRefusal("residue_duration_invalid")
+        if (
+            isinstance(segment.steps, bool)
+            or not isinstance(segment.steps, int)
+            or segment.steps < 1
+        ):
+            raise ResidueInventoryRefusal("residue_schedule_steps_invalid")
+        schedule.append(ResidueThermalSegment(temperature, duration, segment.steps))
+
+    geometry = request.geometry
+    if geometry is None:
+        raise ResidueInventoryRefusal("melt_surface_area_evolution_missing")
+    if geometry.initial_area_m2 is None:
+        raise ResidueInventoryRefusal("melt_surface_area_evolution_missing")
+    try:
+        initial_area = float(geometry.initial_area_m2)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ResidueInventoryRefusal("melt_surface_area_invalid") from exc
+    if not math.isfinite(initial_area) or initial_area <= 0.0:
+        raise ResidueInventoryRefusal("melt_surface_area_invalid")
+    if geometry.area_policy not in {"constant_area", "self_similar_sphere"}:
+        raise ResidueInventoryRefusal(
+            "residue_geometry_policy_unsupported", str(geometry.area_policy)
+        )
+    if geometry.initial_mass_kg is None:
+        initial_mass_kg = initial_mass_from_composition
+    else:
+        try:
+            initial_mass_kg = float(geometry.initial_mass_kg)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ResidueInventoryRefusal("residue_sample_mass_invalid") from exc
+        if not math.isfinite(initial_mass_kg) or initial_mass_kg <= 0.0:
+            raise ResidueInventoryRefusal("residue_sample_mass_invalid")
+
+    pressure = request.pressure_regime
+    if pressure is None or not pressure.mode:
+        raise ResidueInventoryRefusal("residue_pressure_regime_missing")
+    if pressure.mode not in {"vacuum_balance", "buffered_fO2"}:
+        raise ResidueInventoryRefusal(
+            "residue_pressure_regime_invalid", str(pressure.mode)
+        )
+    if pressure.total_pressure_Pa is None:
+        raise ResidueInventoryRefusal("residue_total_pressure_missing")
+    if pressure.background_pressure_Pa is None:
+        raise ResidueInventoryRefusal("residue_background_pressure_missing")
+    try:
+        total_pressure = float(pressure.total_pressure_Pa)
+        background_pressure = float(pressure.background_pressure_Pa)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ResidueInventoryRefusal("residue_pressure_regime_invalid") from exc
+    if (
+        not math.isfinite(total_pressure)
+        or total_pressure < 0.0
+        or not math.isfinite(background_pressure)
+        or background_pressure < 0.0
+    ):
+        raise ResidueInventoryRefusal("residue_pressure_regime_invalid")
+    if pressure.mode == "buffered_fO2":
+        if pressure.buffered_fO2_log is None:
+            raise ResidueInventoryRefusal("oxygen_condition_missing")
+        try:
+            buffered_fO2_log = float(pressure.buffered_fO2_log)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ResidueInventoryRefusal("oxygen_condition_invalid") from exc
+        if not math.isfinite(buffered_fO2_log) or buffered_fO2_log > 0.0:
+            raise ResidueInventoryRefusal("oxygen_condition_invalid")
+    else:
+        if pressure.buffered_fO2_log is not None:
+            raise ResidueInventoryRefusal("residue_pressure_regime_invalid")
+        buffered_fO2_log = None
+    if not callable(request.pressure_model):
+        raise ResidueInventoryRefusal("residue_pressure_model_missing")
+    if request.exhaustion_floor_mol is not None and (
+        not math.isfinite(float(request.exhaustion_floor_mol))
+        or float(request.exhaustion_floor_mol) <= 0.0
+    ):
+        raise ResidueInventoryRefusal("residue_exhaustion_floor_invalid")
+
+    alpha_pool = tuple(request.alpha_pool or ())
+    channels_by_segment: list[tuple[ResidueChannel, ...]] = []
+    notices: list[str] = []
+    for segment in schedule:
+        active_channels, alpha_notices = select_residue_channel_alphas(
+            channels,
+            alpha_pool,
+            target_source_id=request.target_source_id,
+            melt_family=request.melt_family,
+            temperature_K=float(segment.temperature_K),
+        )
+        _channel_terms(
+            active_channels,
+            require_oxygen_channels=buffered_fO2_log is None,
+        )
+        channels_by_segment.append(active_channels)
+        notices.extend(alpha_notices)
+    notices = list(dict.fromkeys(notices))
+
+    if (
+        geometry.area_policy == "self_similar_sphere"
+        and geometry.density_model is None
+    ):
+        notices.append("area_density_ratio_held_at_initial")
+    total_duration_s = math.fsum(float(segment.duration_s) for segment in schedule)
+    if total_duration_s == 0.0:
+        atoms = _atom_totals(initial_inventory, {})
+        return ResidueScheduleResult(
+            residue_mol=dict(initial_inventory),
+            evaporated_mol={},
+            pO2_bar_by_step=(),
+            pO2_balance_bracket_boundary_by_step=(),
+            pO2_balance_floor={
+                "steps_at_floor": 0,
+                "first_step": None,
+                "fraction_of_time_at_floor": 0.0,
+                "time_at_floor_s": 0.0,
+                "pO2_bar": None,
+            },
+            component_exhaustion_notices=(),
+            atom_closure_mol={element: 0.0 for element in atoms},
+            buffer_oxygen_exchange_mol=0.0,
+            refusal=None,
+            notices=tuple(notices),
+        )
+
+    initial_density: float | None = None
+    if geometry.area_policy == "self_similar_sphere" and geometry.density_model is not None:
+        try:
+            initial_density = float(
+                geometry.density_model(initial_inventory, schedule[0].temperature_K)
+            )
+        except (TypeError, ValueError, ArithmeticError) as exc:
+            raise ResidueInventoryRefusal("residue_density_invalid", str(exc)) from exc
+        if not math.isfinite(initial_density) or initial_density <= 0.0:
+            raise ResidueInventoryRefusal("residue_density_invalid")
+
+    inventory = dict(initial_inventory)
+    evaporated: defaultdict[str, float] = defaultdict(float)
+    exhausted: dict[str, float] = {}
+    exhaustion_notices: list[dict[str, float | int | str]] = []
+    pO2_steps: list[float] = []
+    bracket_boundaries: list[OxygenBalanceBracketBoundary | None] = []
+    pO2_floor_steps = 0
+    pO2_floor_first_step: int | None = None
+    pO2_floor_time_s = 0.0
+    pO2_floor_value: float | None = None
+    buffer_oxygen_exchange_mol = 0.0
+    elapsed_s = 0.0
+    refusal: ResidueEngineNonconvergence | None = None
+    global_step = 0
+
+    def remove_exhausted(*, step_number: int, substep: int) -> None:
+        floor = request.exhaustion_floor_mol
+        if floor is None:
+            return
+        for oxide, amount in tuple(inventory.items()):
+            if (
+                initial_inventory.get(oxide, 0.0) > 0.0
+                and oxide not in exhausted
+                and amount < floor
+            ):
+                exhausted[oxide] = amount
+                exhaustion_notices.append({
+                    "reason": "component_exhausted",
+                    "component": oxide,
+                    "step": step_number,
+                    "substep": substep,
+                    "time_reached_s": elapsed_s,
+                    "remaining_moles": amount,
+                    "exhaustion_floor_mol": floor,
+                })
+                inventory[oxide] = 0.0
+
+    def area_at(
+        temperature_K: float,
+        active_inventory: Mapping[str, float],
+    ) -> float:
+        if geometry.area_policy == "constant_area":
+            return initial_area
+        remaining_mass_kg = math.fsum(
+            amount * _formula_terms(oxide)[1]
+            for oxide, amount in active_inventory.items()
+        ) + min(0.0, buffer_oxygen_exchange_mol) * _formula_terms("O")[1]
+        if geometry.density_model is None:
+            return _self_similar_area_m2(
+                initial_area, remaining_mass_kg, initial_mass_kg
+            )
+        try:
+            current_density = float(
+                geometry.density_model(active_inventory, temperature_K)
+            )
+        except (TypeError, ValueError, ArithmeticError) as exc:
+            raise ResidueInventoryRefusal("residue_density_invalid", str(exc)) from exc
+        if not math.isfinite(current_density) or current_density <= 0.0:
+            raise ResidueInventoryRefusal("residue_density_invalid")
+        return _self_similar_area_m2(
+            initial_area,
+            remaining_mass_kg,
+            initial_mass_kg,
+            initial_density_kg_m3=initial_density,
+            remaining_density_kg_m3=current_density,
+        )
+
+    def advance(
+        *,
+        duration_s: float,
+        step_number: int,
+        substep: int,
+        segment: ResidueThermalSegment,
+        active_channels: Sequence[ResidueChannel],
+    ) -> None:
+        nonlocal inventory
+        nonlocal pO2_floor_steps, pO2_floor_time_s
+        nonlocal pO2_floor_first_step, pO2_floor_value
+        nonlocal buffer_oxygen_exchange_mol
+        remove_exhausted(step_number=step_number, substep=substep)
+        channels_for_step = tuple(
+            channel for channel in active_channels
+            if channel.parent_oxide is None or channel.parent_oxide not in exhausted
+        )
+        area_m2 = area_at(float(segment.temperature_K), inventory)
+
+        def pressure_at(
+            composition_mol: Mapping[str, float], log10_pO2_bar: float
+        ) -> Mapping[str, float]:
+            return request.pressure_model(
+                composition_mol,
+                float(segment.temperature_K),
+                float(log10_pO2_bar),
+                pressure,
+            )
+
+        step_result = integrate_residue_inventory(
+            inventory,
+            channels_for_step,
+            pressure_at,
+            temperature_K=float(segment.temperature_K),
+            duration_s=duration_s,
+            area_evolution_m2=(area_m2,),
+            buffered_fO2_log=buffered_fO2_log,
+            background_pressure_Pa=background_pressure,
+        )
+        if request.on_step is not None:
+            request.on_step(inventory, channels_for_step, area_m2, duration_s)
+        inventory = dict(step_result.residue_mol)
+        for species, amount in step_result.evaporated_mol.items():
+            evaporated[str(species)] += float(amount)
+        pO2_steps.extend(
+            float(value) for value in step_result.pO2_bar_by_step if value is not None
+        )
+        bracket_boundaries.extend(step_result.pO2_balance_bracket_boundary_by_step)
+        pO2_floor_steps += step_result.pO2_balance_floor_steps
+        pO2_floor_time_s += step_result.pO2_balance_floor_time_s
+        if (
+            pO2_floor_first_step is None
+            and step_result.pO2_balance_floor_first_step is not None
+        ):
+            pO2_floor_first_step = step_number
+            pO2_floor_value = step_result.pO2_balance_floor_pO2_bar
+        buffer_oxygen_exchange_mol += step_result.buffer_oxygen_exchange_mol
+
+    stop = False
+    for segment, active_channels in zip(schedule, channels_by_segment, strict=True):
+        duration_s = float(segment.duration_s)
+        # Premise: each declared piecewise-isothermal interval has N equal
+        # steps. Algebra: dt=duration/N; units are s, and N*dt returns the
+        # printed interval. The one-step limit is the original isothermal run.
+        step_duration_s = duration_s / segment.steps
+        for _ in range(segment.steps):
+            global_step += 1
+            try:
+                advance(
+                    duration_s=step_duration_s,
+                    step_number=global_step,
+                    substep=0,
+                    segment=segment,
+                    active_channels=active_channels,
+                )
+                elapsed_s += step_duration_s
+            except ResidueEngineNonconvergence as exc:
+                if not request.retry_failed_step_once:
+                    refusal = exc
+                    stop = True
+                    break
+                half_duration_s = step_duration_s / 2.0
+                retry_failed = False
+                for substep in (1, 2):
+                    try:
+                        advance(
+                            duration_s=half_duration_s,
+                            step_number=global_step,
+                            substep=substep,
+                            segment=segment,
+                            active_channels=active_channels,
+                        )
+                        elapsed_s += half_duration_s
+                    except ResidueEngineNonconvergence as retry_exc:
+                        exc = retry_exc
+                        retry_failed = True
+                        break
+                if retry_failed:
+                    refusal = ResidueEngineNonconvergence(
+                        exc.engine,
+                        exc.detail,
+                        composition_mol=inventory,
+                        step=global_step,
+                        time_reached_s=elapsed_s,
+                        retry="one interval halving; refined substep still failed",
+                        reason=exc.reason,
+                    )
+                    stop = True
+                    break
+        if stop:
+            break
+
+    if request.exhaustion_floor_mol is not None:
+        remove_exhausted(
+            step_number=global_step,
+            substep=0,
+        )
+    initial_atoms = _atom_totals(initial_inventory, {})
+    final_atoms = _atom_totals(inventory, evaporated)
+    if request.exhaustion_floor_mol is not None:
+        exhausted_atoms = _atom_totals(exhausted, {})
+        atom_closure: dict[str, float] = {}
+        for element in set(initial_atoms) | set(final_atoms) | set(exhausted_atoms):
+            residual = (
+                initial_atoms.get(element, 0.0)
+                - final_atoms.get(element, 0.0)
+                - exhausted_atoms.get(element, 0.0)
+            )
+            atom_closure[element] = residual
+            scale = max(
+                abs(initial_atoms.get(element, 0.0)),
+                abs(final_atoms.get(element, 0.0) + exhausted_atoms.get(element, 0.0)),
+                1.0e-300,
+            )
+            _check_residue_atom_residual(
+                element, residual, scale, "after exhaustion projection"
+            )
+    else:
+        atom_closure = _residue_atom_closure(
+            initial_atoms, final_atoms, buffer_oxygen_exchange_mol
+        )
+    pO2_floor = {
+        "steps_at_floor": pO2_floor_steps,
+        "first_step": pO2_floor_first_step,
+        "fraction_of_time_at_floor": (
+            pO2_floor_time_s / elapsed_s if elapsed_s > 0.0 else 0.0
+        ),
+        "time_at_floor_s": pO2_floor_time_s,
+        "pO2_bar": pO2_floor_value,
+    }
+    return ResidueScheduleResult(
+        residue_mol=dict(inventory),
+        evaporated_mol=dict(evaporated),
+        pO2_bar_by_step=tuple(pO2_steps),
+        pO2_balance_bracket_boundary_by_step=tuple(bracket_boundaries),
+        pO2_balance_floor=pO2_floor,
+        component_exhaustion_notices=tuple(exhaustion_notices),
+        atom_closure_mol=atom_closure,
+        buffer_oxygen_exchange_mol=buffer_oxygen_exchange_mol,
+        refusal=refusal,
+        notices=tuple(notices),
     )
 
 
@@ -2426,14 +3208,34 @@ def _hashimoto_project_oxide_wt_pct(inventory_mol: Mapping[str, float]) -> dict[
 
 
 def _self_similar_area_m2(
-    initial_area_m2: float, remaining_mass_kg: float, initial_mass_kg: float
+    initial_area_m2: float,
+    remaining_mass_kg: float,
+    initial_mass_kg: float,
+    *,
+    initial_density_kg_m3: float | None = None,
+    remaining_density_kg_m3: float | None = None,
 ) -> float:
-    # Constant density and self-similar shape: A=k V^(2/3), V=m/rho,
-    # hence A=A0*(m/m0)^(2/3). m/m0 is dimensionless and A is m2.
+    # Self-similar shape gives A=k V^(2/3), with V=m/rho. Dividing by
+    # the initial state yields A/A0=[(m/m0)*(rho0/rho)]^(2/3), so both
+    # factors are dimensionless and the result retains area units (m2).
+    # With no density model, hold rho/rho0 at one and recover the existing
+    # constant-density law A=A0*(m/m0)^(2/3).
     # Equal masses give equal areas; a sphere with V=4*pi*r^3/3 has
     # k=(36*pi)^(1/3) and therefore A=4*pi*r^2. For R-11, Af/A0=0.876
     # implies mf/m0=0.876^1.5=0.820; test the printed endpoints against
     # the source area uncertainty before applying this shape premise.
+    if initial_density_kg_m3 is not None or remaining_density_kg_m3 is not None:
+        if (
+            initial_density_kg_m3 is None
+            or remaining_density_kg_m3 is None
+            or initial_density_kg_m3 <= 0.0
+            or remaining_density_kg_m3 <= 0.0
+        ):
+            raise ResidueInventoryRefusal("residue_density_invalid")
+        density_ratio = initial_density_kg_m3 / remaining_density_kg_m3
+        return initial_area_m2 * (
+            max(0.0, remaining_mass_kg / initial_mass_kg) * density_ratio
+        ) ** (2.0 / 3.0)
     return initial_area_m2 * (
         max(0.0, remaining_mass_kg / initial_mass_kg) ** (2.0 / 3.0)
     )
@@ -2462,164 +3264,45 @@ def _hashimoto_integrate_geometry(
     if initial_sample_mass_kg is not None:
         # Thermal segments retain the original printed A0/m0 reference.
         initial_mass_kg = initial_sample_mass_kg
-    dt_s = duration_s / steps
-    pO2_steps: list[float] = []
-    evaporated_mol: defaultdict[str, float] = defaultdict(float)
-    exhausted_mol: dict[str, float] = {}
-    exhaustion_notices: list[dict[str, float | int | str]] = []
-    refusal: ResidueEngineNonconvergence | None = None
-    elapsed_s = 0.0
-    pO2_balance_floor_steps = 0
-    pO2_balance_floor_first_step: int | None = None
-    pO2_balance_floor_time_s = 0.0
-    pO2_balance_floor_pO2_bar: float | None = None
+    def pressure_at(
+        composition_mol: Mapping[str, float],
+        _temperature_K: float,
+        log10_pO2_bar: float,
+        _regime: ResiduePressureRegime,
+    ) -> Mapping[str, float]:
+        return pressure_model(composition_mol, log10_pO2_bar)
 
-    def remove_exhausted(*, step_number: int, time_s: float, substep: int) -> None:
-        for oxide, amount in tuple(inventory.items()):
-            if (
-                float(initial_inventory_mol.get(oxide, 0.0)) > 0.0
-                and oxide not in exhausted_mol
-                and amount < exhaustion_floor_mol
-            ):
-                exhausted_mol[oxide] = amount
-                exhaustion_notices.append(
-                    {
-                        "reason": "component_exhausted",
-                        "component": oxide,
-                        "step": step_number,
-                        "substep": substep,
-                        "time_reached_s": time_s,
-                        "remaining_moles": amount,
-                        "exhaustion_floor_mol": exhaustion_floor_mol,
-                    }
-                )
-                inventory[oxide] = 0.0
-
-    def area_for_current_inventory() -> float:
-        if geometry_policy_id != "sphere_shrinking":
-            return initial_area_m2
-        remaining_mass_kg = math.fsum(
-            amount * _formula_terms(oxide)[1]
-            for oxide, amount in inventory.items()
-        )
-        return _self_similar_area_m2(
-            initial_area_m2, remaining_mass_kg, initial_mass_kg
-        )
-
-    def advance(duration: float, *, step_number: int, substep: int) -> None:
-        nonlocal inventory
-        nonlocal pO2_balance_floor_steps
-        nonlocal pO2_balance_floor_first_step
-        nonlocal pO2_balance_floor_time_s
-        nonlocal pO2_balance_floor_pO2_bar
-        remove_exhausted(
-            step_number=step_number,
-            time_s=elapsed_s,
-            substep=substep,
-        )
-        active_channels = tuple(
-            channel
-            for channel in channels
-            if channel.parent_oxide is None
-            or channel.parent_oxide not in exhausted_mol
-        )
-        area_m2 = area_for_current_inventory()
-        step = integrate_residue_inventory(
-            inventory,
-            active_channels,
-            pressure_model,
-            temperature_K=temperature_K,
-            duration_s=duration,
-            area_evolution_m2=(area_m2,),
-            **({"background_pressure_Pa": background_pressure_Pa}
-               if background_pressure_Pa else {}),
-        )
-        if on_step is not None:
-            on_step(inventory, active_channels, area_m2, duration)
-        inventory = dict(step.residue_mol)
-        for species, amount in step.evaporated_mol.items():
-            evaporated_mol[str(species)] += float(amount)
-        pO2_steps.extend(
-            float(value) for value in step.pO2_bar_by_step if value is not None
-        )
-        pO2_balance_floor_steps += step.pO2_balance_floor_steps
-        pO2_balance_floor_time_s += step.pO2_balance_floor_time_s
-        if (
-            pO2_balance_floor_first_step is None
-            and step.pO2_balance_floor_first_step is not None
-        ):
-            pO2_balance_floor_first_step = step_number
-            pO2_balance_floor_pO2_bar = step.pO2_balance_floor_pO2_bar
-
-    for step_number in range(1, steps + 1):
-        try:
-            advance(dt_s, step_number=step_number, substep=0)
-            elapsed_s += dt_s
-        except ResidueEngineNonconvergence as exc:
-            # Retry the failed interval at half size, completing both halves
-            # only if the engine converges at each refined composition.
-            half_dt_s = dt_s / 2.0
-            retry_failed = False
-            for substep in (1, 2):
-                try:
-                    advance(half_dt_s, step_number=step_number, substep=substep)
-                    elapsed_s += half_dt_s
-                except ResidueEngineNonconvergence as retry_exc:
-                    exc = retry_exc
-                    retry_failed = True
-                    break
-            if retry_failed:
-                refusal = ResidueEngineNonconvergence(
-                    exc.engine,
-                    exc.detail,
-                    composition_mol=inventory,
-                    step=step_number,
-                    time_reached_s=elapsed_s,
-                    retry="one interval halving; refined substep still failed",
-                    reason=exc.reason,
-                )
-                break
-
-    remove_exhausted(
-        step_number=step_number if steps else 0,
-        time_s=elapsed_s,
-        substep=0,
-    )
-    final_atoms = _atom_totals(inventory, evaporated_mol)
-    exhausted_atoms = _atom_totals(exhausted_mol, {})
-    initial_atoms = _atom_totals(initial_inventory_mol, {})
-    closure: dict[str, float] = {}
-    for element in set(initial_atoms) | set(final_atoms) | set(exhausted_atoms):
-        residual = (
-            initial_atoms.get(element, 0.0)
-            - final_atoms.get(element, 0.0)
-            - exhausted_atoms.get(element, 0.0)
-        )
-        closure[element] = residual
-        scale = max(
-            abs(initial_atoms.get(element, 0.0)),
-            abs(final_atoms.get(element, 0.0) + exhausted_atoms.get(element, 0.0)),
-            1.0e-300,
-        )
-        _check_residue_atom_residual(element, residual, scale, "after exhaustion projection")
-    pO2_balance_floor = {
-        "steps_at_floor": pO2_balance_floor_steps,
-        "first_step": pO2_balance_floor_first_step,
-        "fraction_of_time_at_floor": (
-            pO2_balance_floor_time_s / elapsed_s if elapsed_s > 0.0 else 0.0
+    result = integrate_residue_schedule(ResidueIntegrationInput(
+        initial_inventory_mol=inventory,
+        channels=channels,
+        thermal_schedule=(ResidueThermalSegment(temperature_K, duration_s, steps),),
+        pressure_regime=ResiduePressureRegime(
+            "vacuum_balance", background_pressure_Pa, background_pressure_Pa
         ),
-        "time_at_floor_s": pO2_balance_floor_time_s,
-        "pO2_bar": pO2_balance_floor_pO2_bar,
-    }
+        geometry=ResidueGeometryInput(
+            initial_area_m2,
+            "self_similar_sphere" if geometry_policy_id == "sphere_shrinking"
+            else "constant_area",
+            initial_mass_kg,
+        ),
+        pressure_model=pressure_at,
+        exhaustion_floor_mol=exhaustion_floor_mol,
+        retry_failed_step_once=True,
+        on_step=on_step,
+    ))
+    if result.refusal is not None:
+        refusal = result.refusal
+    else:
+        refusal = None
     return _HashimotoGeometryIntegration(
-        composition_wt_pct=_hashimoto_project_oxide_wt_pct(inventory),
-        pO2_steps=tuple(pO2_steps),
-        exhaustion_notices=tuple(exhaustion_notices),
+        composition_wt_pct=_hashimoto_project_oxide_wt_pct(result.residue_mol),
+        pO2_steps=tuple(result.pO2_bar_by_step),
+        exhaustion_notices=result.component_exhaustion_notices,
         refusal=refusal,
-        atom_closure=closure,
-        inventory_mol=dict(inventory),
-        evaporated_mol=dict(evaporated_mol),
-        pO2_balance_floor=pO2_balance_floor,
+        atom_closure=dict(result.atom_closure_mol),
+        inventory_mol=dict(result.residue_mol),
+        evaporated_mol=dict(result.evaporated_mol),
+        pO2_balance_floor=dict(result.pO2_balance_floor),
     )
 
 
@@ -3570,6 +4253,14 @@ def _predict_sossi_residue_cohort(
                 )
                 return response.vapor_pressures_Pa
 
+        def schedule_pressure_model(
+            composition: Mapping[str, float],
+            _temperature_K: float,
+            log10_pO2_bar: float,
+            _regime: ResiduePressureRegime,
+        ) -> Mapping[str, float]:
+            return pressure_model(composition, log10_pO2_bar)
+
         try:
             initial_pressures = pressure_model(inventory, buffered_logp)
         except ResidueEngineNonconvergence as exc:
@@ -3647,36 +4338,27 @@ def _predict_sossi_residue_cohort(
             differences: list[float] = []
             buffer_exchange = 0.0
             while True:
-                current_inventory = dict(inventory)
-                buffer_exchange = 0.0
-                initial_total_mass = initial_melt_mass_kg
-                dt = duration_s / steps
-                for _step in range(steps):
-                    current_mass = math.fsum(
-                        amount * _formula_terms(oxide)[1]
-                        for oxide, amount in current_inventory.items()
-                    ) + min(0.0, buffer_exchange) * _formula_terms("O")[1]
-                    if geometry == "pt_loop_bead_sphere_shrinking":
-                        area = _self_similar_area_m2(
-                            areas[geometry], current_mass, initial_total_mass
-                        )
-                    else:
-                        area = areas[geometry]
-                    try:
-                        step_result = integrate_residue_inventory(
-                            current_inventory,
-                            channels,
-                            pressure_model,
-                            temperature_K=temperature_K,
-                            duration_s=dt,
-                            area_evolution_m2=(area,),
-                            buffered_fO2_log=buffered_logp,
-                        )
-                    except ResidueEngineNonconvergence as exc:
-                        run_refusal = exc
-                        break
-                    current_inventory = dict(step_result.residue_mol)
-                    buffer_exchange += step_result.buffer_oxygen_exchange_mol
+                schedule_result = integrate_residue_schedule(ResidueIntegrationInput(
+                    initial_inventory_mol=inventory,
+                    channels=channels,
+                    thermal_schedule=(
+                        ResidueThermalSegment(temperature_K, duration_s, steps),
+                    ),
+                    pressure_regime=ResiduePressureRegime(
+                        "buffered_fO2", total_pressure_Pa, 0.0, buffered_logp
+                    ),
+                    geometry=ResidueGeometryInput(
+                        areas[geometry],
+                        "self_similar_sphere"
+                        if geometry == "pt_loop_bead_sphere_shrinking"
+                        else "constant_area",
+                        initial_melt_mass_kg,
+                    ),
+                    pressure_model=schedule_pressure_model,
+                ))
+                current_inventory = dict(schedule_result.residue_mol)
+                buffer_exchange = schedule_result.buffer_oxygen_exchange_mol
+                run_refusal = schedule_result.refusal
                 if run_refusal is not None:
                     break
                 accepted = _sossi_project_element_ppm(
