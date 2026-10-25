@@ -49,7 +49,7 @@ Table 3 selected-cell audit (PDF p. 7 / published p. 424; all entries are in the
 | SiO2(qu) | `LH87_SiO2_quartz_table3` | same | (b) render-transcribed |
 | SiO2(g) | `LH87_SiO2_g_table3` | same | (b) render-transcribed |
 | Si2(g) | `LH87_Si2_g_table3` | same | (b) render-transcribed |
-| Si2O2(g) | `LH87_Si2O2_g_table3` | same | (b) render confirms the minus sign missing from one OCR variant; Table 4 provides no attribution; typed refusal |
+| Si2O2(g) | `LH87_Si2O2_g_table3` | same | (b) render confirms the minus sign missing from one OCR variant; Table 4 footnote b points to the p. 426 text, where the p. 435 Si-O discussion cites Khanna et al. (1981), Anderson and Ogden (1969), Porter et al. (1955), and Zmbov et al. (1973); retained as quoted_attributed, typed refusal only because no schema quantity token represents the combined Table 3 values |
 | Si3(g) | `LH87_Si3_g_table3` | same | (b) render-transcribed |
 
 The Table 2 system-level refusals cover printed species labels BeO(s/l/g), Be2O(g), Be2O2(g), Be3O3(g), Be4O4(g), Be5O5(g), Be6O6(g); MgO(s/l/g), Mg2(g); CaO(s/l/g), Ca2(g); B2O3(s/l/g), BO(g), BO2(g), B2(g), B2O(g), B2O2(g); AlO(g), AlO2(g), Al2(g), Al2O(g), Al2O2(g), Al2O3(s/l); and SiO(g), SiO2(qu./cr./l./g), Si2(g), Si2O2(g), Si3(g). Coefficient numbers remain unrecorded because of the schema gap; the rendered table confirms the row/column assignments and relevant coefficient spellings.

@@ -132,7 +132,18 @@ def test_lamoreaux_1987_table3_render_pins_and_selected_row_count():
         assert point["state"]["value"] == "298"
         assert "total_pressure_Pa" not in row["point_conditions"]
 
-    assert rows["LH87_Si2O2_g_table3"]["values"]["status"] == "typed_refusal"
+    si2o2 = rows["LH87_Si2O2_g_table3"]["values"]
+    assert si2o2["status"] == "typed_refusal"
+    assert si2o2["method_class"] == "quoted_attributed"
+    assert "See text" in si2o2["attribution"]
+    for reference in (
+        "Khanna et al. (1981)",
+        "Anderson and Ogden (1969)",
+        "Porter et al. (1955)",
+        "Zmbov et al. (1973)",
+    ):
+        assert reference in si2o2["attribution"]
+    assert si2o2["reason"] == "No schema quantity token represents this combined Table 3 value set."
     silicon_gef = next(
         row
         for row in document["species"]["SiO2"]["observations"]
