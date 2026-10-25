@@ -25,6 +25,7 @@ from tests.studio_pin_support import (  # noqa: E402
     capacity_pin_values, sio_pin_values, sio_report_at_wall_temperature,
     sio_evolved_baseline, staged_pin_values, sio_wall_report_at_temperature,
 )
+from simulator.config import _load_setpoints_file  # noqa: E402
 
 REPORT_PATH = ROOT / "studio-pin-report.json"
 
@@ -46,6 +47,9 @@ def _emit_capacity() -> dict:
     from simulator.state import CampaignPhase
     from tests.test_capacity_coupling import _real_capacity_sim
 
+    # Validate the shipped collector bands through the strict file boundary
+    # before the t-1480 real-capacity simulation loads its config bundle.
+    _load_setpoints_file(ROOT / "data" / "setpoints.yaml")
     sim = _real_capacity_sim()
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0

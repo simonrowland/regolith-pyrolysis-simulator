@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+from simulator.config import _load_setpoints_file  # noqa: E402
 from simulator.accounting.queries import AccountingQueries
 from simulator.backends import BackendSelectionPolicy
 from simulator.session import SimSession, SimSessionConfig
@@ -25,7 +26,7 @@ def _load(name: str) -> dict:
 
 
 def main() -> int:
-    setpoints = _load("setpoints.yaml")
+    setpoints = _load_setpoints_file(DATA / "setpoints.yaml")
     # SC-67's prototype opt-in is local to fixture generation.  Runtime and
     # checked-in setpoints remain fail-closed; provenance below records this.
     setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"] = True
