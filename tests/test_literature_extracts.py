@@ -5179,6 +5179,44 @@ def test_cottrell_table_1_compositions_reach_redox_identity():
     assert expected <= observed
 
 
+def test_aithala_wds_compositions_join_vf_redox_rows():
+    """Table S-2 WDS rows bind composition on each of the ten VF redox rows."""
+    path = EXTRACTS / "aithala-2026-magmatic-iron-redox-to-2100c.yaml"
+    rows = _migrate_redox_extract(path)
+    vf_rows = [row for row in rows if "_vf" in row.observation_id]
+
+    assert len(rows) == 16
+    assert len(vf_rows) == 10
+    assert all(row.identity.composition.is_value for row in rows)
+    for row in vf_rows:
+        composition = row.point_conditions["composition"]
+        assert composition.state.is_value
+        assert composition.locator.page == 14
+        assert composition.locator.table == "S-2"
+
+    expected = {
+        "aithala_2026_vf271_xanes": ("51.55", "12.07"),
+        "aithala_2026_vf267_moessbauer": ("50.79", "14.26"),
+        "aithala_2026_vf231_xanes": ("47.20", "15.94"),
+        "aithala_2026_vf231_moessbauer": ("47.20", "15.94"),
+        "aithala_2026_vf268_xanes": ("47.99", "14.94"),
+        "aithala_2026_vf268_moessbauer": ("47.99", "14.94"),
+        "aithala_2026_vf270_xanes": ("47.96", "14.87"),
+        "aithala_2026_vf270_moessbauer": ("47.96", "14.87"),
+        "aithala_2026_vf274_xanes": ("47.92", "15.04"),
+        "aithala_2026_vf274_moessbauer": ("47.92", "15.04"),
+    }
+    rows_by_id = {row.observation_id.rsplit("::", 1)[-1]: row for row in vf_rows}
+    assert expected.keys() == rows_by_id.keys()
+    for observation_id, (sio2, feot) in expected.items():
+        composition = rows_by_id[observation_id].point_conditions["composition"]
+        printed = dict(composition.inference.parameters)
+        assert printed["original_SiO2_wt_pct"].state.value == Decimal(sio2)
+        assert printed["original_FeOT_wt_pct"].state.value == Decimal(feot)
+        assert printed["original_SiO2_wt_pct"].locator.page == 14
+        assert printed["original_FeOT_wt_pct"].locator.page == 14
+
+
 def test_matzen_observations_resolve_printed_log_fo2():
     """Each Table 2 log fO2 lands on its observation and routes as printed."""
     from decimal import Decimal
