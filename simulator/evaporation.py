@@ -2632,6 +2632,7 @@ class EvaporationMixin:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
             gate_curve_provider_outcome_for_status,
+            gate_curve_provider_timed_out,
             mark_uncacheable_replay_disposition,
             record_gate_curve_provider_outcome,
         )
@@ -2658,34 +2659,36 @@ class EvaporationMixin:
                     f'gate provider registration failed: {type(exc).__name__}',
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
-        try:
-            result = self._dispatch_only(
-                ChemistryIntent.GATE_LIQUID_FRACTION,
-                control_inputs={},
-                fO2_log=fO2_log,
-                redox_state=redox_state,
-                fe_redox_policy='intrinsic',
-            )
-        except (
-            ProviderUnavailableError, LiquidusSampleError, EngineWorkerTimeout,
-        ) as exc:
-            record_gate_curve_provider_outcome(
-                self,
-                GateCurveProviderOutcome.FAILED,
-            )
-            mark_uncacheable_replay_disposition(
-                self,
-                f'gate liquid fraction provider unavailable: {type(exc).__name__}',
-            )
-            reasons.append(f'gate liquid fraction unavailable: {exc}')
-            return None
+        for attempt in range(2):
+            try:
+                result = self._dispatch_only(
+                    ChemistryIntent.GATE_LIQUID_FRACTION,
+                    control_inputs={},
+                    fO2_log=fO2_log,
+                    redox_state=redox_state,
+                    fe_redox_policy='intrinsic',
+                )
+            except (
+                ProviderUnavailableError, LiquidusSampleError, EngineWorkerTimeout,
+            ) as exc:
+                diagnostic = dict(getattr(exc, 'diagnostics', {}) or {})
+                if isinstance(exc, EngineWorkerTimeout):
+                    diagnostic['reason'] = 'engine_worker_timeout'
+                diagnostic['exception_class'] = type(exc).__name__
+                diagnostic['exception_message'] = str(exc)
+                status = str(getattr(exc, 'status', 'unavailable'))
+                warnings = list(getattr(exc, 'warnings', ()) or ())
+            else:
+                diagnostic = dict(getattr(result, 'diagnostic', None) or {})
+                status = str(
+                    getattr(result, 'status', None)
+                    or diagnostic.get('backend_status')
+                    or 'unavailable'
+                )
+                warnings = list(getattr(result, 'warnings', ()) or ())
+            if not gate_curve_provider_timed_out(diagnostic) or attempt == 1:
+                break
 
-        diagnostic = dict(getattr(result, 'diagnostic', None) or {})
-        status = str(
-            getattr(result, 'status', None)
-            or diagnostic.get('backend_status')
-            or 'unavailable'
-        )
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
         source = 'gate_liquid_fraction'
         fallback_provider = diagnostic.get('kernel_fallback_used')
@@ -2697,6 +2700,12 @@ class EvaporationMixin:
         )
         record_gate_curve_provider_outcome(self, status_outcome)
         if status_outcome is GateCurveProviderOutcome.FAILED:
+            if diagnostic.get('exception_class'):
+                mark_uncacheable_replay_disposition(
+                    self,
+                    'gate liquid fraction provider unavailable: '
+                    f"{diagnostic['exception_class']}",
+                )
             raise EvaporationFluxRefusal(
                 'liquid_fraction_provider_failed',
                 {
@@ -2705,50 +2714,64 @@ class EvaporationMixin:
                     'outcome': status_outcome,
                     'provider_diagnostic': diagnostic,
                     'status': status,
-                    'warnings': list(getattr(result, 'warnings', ()) or ()),
+                    'warnings': warnings,
+                    **({'detail': diagnostic['exception_message']}
+                       if diagnostic.get('exception_message') else {}),
                 },
             )
-        if status != 'ok':
-            projected = self._composition_projected_freeze_gate_curve(
-                diagnostic,
-                source=source,
-                reasons=reasons,
-                repair_notices=repair_notices,
-            )
-            if projected is not None:
-                return projected
-            if _diagnostic_names_composition_projected(diagnostic):
-                if not any(
-                    'composition_projected' in reason for reason in reasons
-                ):
-                    reasons.append(
-                        f'{source} composition_projected status={status}'
-                    )
-                return None
+        if status_outcome in {
+            GateCurveProviderOutcome.NUMERICAL_FAILURE,
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        }:
             if status_outcome is GateCurveProviderOutcome.STABLE_REFUSAL:
-                curve = self._freeze_gate_kress_floor_curve(None, reasons)
-                if curve is not None:
-                    from engines.magemin.domain import (
-                        _SIO2_MIN_WT_PCT, _SIO2_MAX_WT_PCT,
-                    )
+                projected = self._composition_projected_freeze_gate_curve(
+                    diagnostic,
+                    source=source,
+                    reasons=reasons,
+                    repair_notices=repair_notices,
+                )
+                if projected is not None:
+                    return projected
+                if _diagnostic_names_composition_projected(diagnostic):
+                    if not any(
+                        'composition_projected' in reason for reason in reasons
+                    ):
+                        reasons.append(
+                            f'{source} composition_projected status={status}'
+                        )
+                    return None
+            curve = self._freeze_gate_kress_floor_curve(None, reasons)
+            if curve is not None:
+                from engines.magemin.domain import (
+                    _SIO2_MIN_WT_PCT, _SIO2_MAX_WT_PCT,
+                )
 
-                    curve['gate_provider_refusal'] = {
-                        'provider': self._liquid_fraction_provider,
-                        'status': status,
-                        'reason': diagnostic.get('backend_status_reason'),
-                        'qualification': 'out_of_domain_kress91_floor_prediction',
-                        'authority': 'extrapolated',
-                        'certified_band': {
-                            'sio2_wt_pct': [_SIO2_MIN_WT_PCT, _SIO2_MAX_WT_PCT],
-                            'min_T_C': float(KRESS91_LIQUID_CALIBRATION_MIN_T_C),
-                            'max_T_C': float(KRESS91_LIQUID_CALIBRATION_MAX_T_C),
-                            'source': kress91_temperature_band_case(
-                                KRESS91_LIQUID_CALIBRATION_MIN_T_C,
-                            )['source'],
-                        },
-                        'warnings': list(getattr(result, 'warnings', ()) or ()),
-                    }
-                    return curve
+                curve['gate_provider_refusal'] = {
+                    'provider': self._liquid_fraction_provider,
+                    'status': status,
+                    'reason': diagnostic.get('backend_status_reason'),
+                    'qualification': (
+                        'numerical_failure_kress91_floor_prediction'
+                        if status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
+                        else 'out_of_domain_kress91_floor_prediction'
+                    ),
+                    'authority': 'extrapolated',
+                    'certified_band': {
+                        'sio2_wt_pct': [_SIO2_MIN_WT_PCT, _SIO2_MAX_WT_PCT],
+                        'min_T_C': float(KRESS91_LIQUID_CALIBRATION_MIN_T_C),
+                        'max_T_C': float(KRESS91_LIQUID_CALIBRATION_MAX_T_C),
+                        'source': kress91_temperature_band_case(
+                            KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+                        )['source'],
+                    },
+                    'warnings': warnings,
+                }
+                if status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE:
+                    curve['gate_provider_refusal'].update(
+                        provider_outcome=status_outcome,
+                        provider_diagnostic=diagnostic,
+                    )
+                return curve
             reasons.append(
                 'gate liquid fraction unavailable: '
                 f'status={status}'

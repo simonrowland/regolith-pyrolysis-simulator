@@ -214,27 +214,40 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
 
 
 @pytest.mark.parametrize('outer_status', ['ok', 'out_of_domain'])
-@pytest.mark.parametrize('nested', [
-    {'backend_status': 'unavailable'},
-    {'backend_status': 'not_converged'},
-    {'backend_status_reason': 'engine_worker_timeout'},
-    {'projected_liquidus_status': 'unavailable'},
-    {'projected_liquidus_status': 'not_converged'},
-    {'projected_liquidus_status': 'out_of_domain',
-     'projected_liquidus_diagnostics': {'reason': 'engine_worker_timeout'}},
+@pytest.mark.parametrize('nested, expected', [
+    ({'backend_status': 'unavailable'}, 'failed'),
+    ({'backend_status': 'not_converged'}, 'numerical_failure'),
+    ({'backend_status_reason': 'engine_worker_timeout'}, 'failed'),
+    ({'projected_liquidus_status': 'unavailable'}, 'numerical_failure'),
+    ({'projected_liquidus_status': 'not_converged'}, 'numerical_failure'),
+    ({'projected_liquidus_status': 'out_of_domain',
+      'projected_liquidus_diagnostics': {'reason': 'engine_worker_timeout'}}, 'failed'),
+    ({'projected_liquidus_status': 'not_converged',
+      'projected_liquidus_diagnostics': {'reason': 'engine_crash'}}, 'failed'),
+    ({'projected_liquidus_status': 'unavailable',
+      'projected_liquidus_diagnostics': {'reason': 'missing_binary'}}, 'failed'),
+    *[({'projected_liquidus_status': 'not_converged',
+        'projected_liquidus_diagnostics': {'backend_failure_exception': exception}}, 'failed')
+      for exception in ('EngineWorkerDied', 'EngineWorkerUnavailable',
+                        'MAGEMinProcessExit', 'FileNotFoundError', 'TimeoutExpired',
+                        'MAGEMinAggregateBudgetExceeded')],
+    *[({'projected_liquidus_status': 'not_converged',
+        'projected_liquidus_diagnostics': {'reason': reason}}, 'failed')
+      for reason in ('invalid_input', 'missing_input')],
 ])
-def test_wrapped_diagnostic_distinguishes_numerical_and_environment_failure(outer_status, nested):
+def test_wrapped_diagnostic_distinguishes_numerical_and_environment_failure(
+    outer_status, nested, expected,
+):
     assert gate_curve_provider_outcome_for_status(outer_status, {
         'backend_status_reason': 'composition_projected',
         'backend_diagnostics': nested,
-    }).value == ('failed' if 'engine_worker_timeout' in str(nested)
-                or nested == {'backend_status': 'unavailable'} else 'numerical_failure')
+    }).value == expected
 
 
-@pytest.mark.parametrize('exception', [False, True])
+@pytest.mark.parametrize('mode', ['reason', 'exception', 'backend_exception'])
 @pytest.mark.parametrize('recover', [False, True])
 def test_timeout_retries_same_declared_gate_once(
-    monkeypatch, exception, recover, vapor_pressure_data, feedstocks_data, setpoints_data,
+    monkeypatch, mode, recover, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     calls = []
@@ -245,13 +258,16 @@ def test_timeout_retries_same_declared_gate_once(
             return SimpleNamespace(status='ok', diagnostic={
                 'solidus_T_C': 1000.0, 'liquidus_T_C': 1300.0,
             })
-        if exception:
+        if mode == 'exception':
             raise EngineWorkerTimeout('magemin', 15.0, phase='liquidus')
         return SimpleNamespace(status='out_of_domain', diagnostic={
             'backend_status_reason': 'composition_projected',
             'backend_diagnostics': {
                 'projected_liquidus_status': 'not_converged',
-                'projected_liquidus_diagnostics': {'reason': 'engine_worker_timeout'},
+                'projected_liquidus_diagnostics': (
+                    {'backend_failure_exception': 'TimeoutExpired'}
+                    if mode == 'backend_exception' else {'reason': 'engine_worker_timeout'}
+                ),
             },
         })
 
