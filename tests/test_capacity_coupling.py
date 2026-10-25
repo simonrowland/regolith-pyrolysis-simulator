@@ -1013,24 +1013,15 @@ def test_catalog_intrinsic_fo2_refuses_without_exact_solve_diagnostic():
 
 def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     sim = _real_capacity_sim()
-    sim.campaign_mgr.campaigns["C0"]["p_total_mbar_default"] = 0.0
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0
     monkeypatch.setattr(
         sim,
         "_compute_capacity_coupling_shadow",
         lambda _equilibrium: (_ for _ in ()).throw(
-            AssertionError("default-off live path must not compute the capacity shadow")
+            AssertionError("default-off live path must not compute capacity")
         ),
     )
-
-    phosphorus_carriers = _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
-    p2o5_source_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"]
-    p2o5_projection_kg = sim.melt.composition_kg["P2O5"]
-    source_before_kg = float(
-        sim.atom_ledger.total_kg_by_account("process.cleaned_melt")
-    )
-    transport_calls = _record_transport_estimates(sim)
 
     snapshot = sim.step()
 
@@ -1050,110 +1041,6 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     assert sim._alpha_authority_status_by_species_engaged == (
         snapshot.evap_flux.alpha_authority_status_by_species
     )
-
-    # Default-off skips the optional shadow. This step still hits the
-    # mandatory C0 pipe cap: one estimate is over capacity, and the
-    # admitted release matches that estimate within the flux floor.
-    binding = [
-        call
-        for call in transport_calls
-        if call["demand_kg_hr"] > call["capacity_kg_hr"]
-    ]
-    assert len(binding) == 1
-    demand_kg_hr = binding[0]["demand_kg_hr"]
-    capacity_kg_hr = binding[0]["capacity_kg_hr"]
-    demand_species = binding[0]["species_kg_hr"]
-    cap_record = sim._last_subsolidus_bakeout["transport_cap"]
-    assert cap_record["demand_kg_hr"] == pytest.approx(
-        demand_kg_hr, rel=0.0, abs=0.0
-    )
-    assert cap_record["capacity_kg_hr"] == pytest.approx(
-        capacity_kg_hr, rel=0.0, abs=0.0
-    )
-    assert cap_record["scale"] == pytest.approx(
-        capacity_kg_hr / demand_kg_hr, rel=0.0, abs=0.0
-    )
-    released_kg_hr = snapshot.evap_flux.total_kg_hr
-    released_species = {
-        str(species): float(rate)
-        for species, rate in snapshot.evap_flux.species_kg_hr.items()
-        if float(rate) > 0.0
-    }
-    assert abs(released_kg_hr - capacity_kg_hr) <= _NONTRIVIAL_FLUX_KG_HR
-    assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
-
-    def _committed_vapor_kg(species: str) -> float:
-        credited = 0.0
-        for transition in sim.atom_ledger.transitions:
-            if transition.reason != f"evaporate_{species}":
-                continue
-            for lot in transition.credits:
-                credited += float(lot.species_kg.get(species, 0.0))
-        return credited
-
-    retained_total_kg = 0.0
-    for species in set(demand_species) | set(released_species):
-        demand_i = demand_species.get(species, 0.0)
-        released_i = released_species.get(species, 0.0)
-        committed_i = _committed_vapor_kg(species)
-        retained_i = demand_i - committed_i
-        assert abs(committed_i - released_i) <= _NONTRIVIAL_FLUX_KG_HR
-        assert abs(retained_i - (demand_i - released_i)) <= _NONTRIVIAL_FLUX_KG_HR
-        retained_total_kg += retained_i
-    assert abs(
-        retained_total_kg - (demand_kg_hr - released_kg_hr)
-    ) <= _NONTRIVIAL_FLUX_KG_HR
-    # Overhead bleed credits O2 after the cap. That credit is not in the
-    # admitted vapour flux, and it is the only extra cleaned-melt debit.
-    bleed_o2_kg = 0.0
-    for transition in sim.atom_ledger.transitions:
-        if transition.reason != "overhead_bleed":
-            continue
-        for lot in transition.credits:
-            bleed_o2_kg += float(lot.species_kg.get(OXYGEN_SPECIES, 0.0))
-    source_after_kg = float(
-        sim.atom_ledger.total_kg_by_account("process.cleaned_melt")
-    )
-    assert abs(snapshot.melt_mass_kg - source_after_kg) <= _NONTRIVIAL_FLUX_KG_HR
-    assert abs(
-        (source_before_kg - source_after_kg) - (released_kg_hr + bleed_o2_kg)
-    ) <= _NONTRIVIAL_FLUX_KG_HR
-    assert sim._subsolidus_pending_release is None
-    assert snapshot.mass_balance_error_pct <= 5.0e-12
-    assert snapshot.overhead.transport_saturation_pct == pytest.approx(
-        100.0,
-        rel=0.0,
-        abs=100.0 * _NONTRIVIAL_FLUX_KG_HR / capacity_kg_hr,
-    )
-    assert snapshot.hour == 1
-
-    assert set(phosphorus_carriers).isdisjoint(snapshot.evap_flux.species_kg_hr)
-    reasons = {
-        transition.reason for transition in sim.atom_ledger.transitions
-    }
-    assert {
-        f"evaporate_{carrier}" for carrier in phosphorus_carriers
-    }.isdisjoint(reasons)
-    assert {
-        f"condense_{carrier}" for carrier in phosphorus_carriers
-    }.isdisjoint(reasons)
-    assert sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"] == (
-        p2o5_source_kg
-    )
-    assert sim.melt.composition_kg["P2O5"] == p2o5_projection_kg
-    for carrier in phosphorus_carriers:
-        authority = sim.condensation_model.last_condensation_authority_by_species.get(
-            carrier
-        )
-        if authority is None:
-            continue
-        assert authority.get("mass_disposition") != "declared_cleanup_offgas"
-        evidence = authority.get("routing_authorization") or {}
-        assert evidence.get("stage") != "stage0_p_carriers"
-        assert authority.get("remaining_mass_kg_hr") in (None, 0.0)
-    assert "evaporate_Fe" in reasons
-    assert "condense_Fe" in reasons
-    assert "fe_redox_respeciation" in reasons
 
     assert sim._equipment is not None
     assert snapshot.overhead.initial_throat_area_m2 == pytest.approx(
@@ -1347,6 +1234,233 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         ),
         rel=1.0e-12,
         abs=1.0e-12,
+    )
+    # 2026-08-06 chemact-land merge: activity-cluster split does not change
+    # the OOD seam/roster; transition count DID NOT MOVE (still 36).
+    # The status-bearing out-of-domain point path removes one earlier
+    # zero-quantity transition; the hot-tail mechanism is otherwise unchanged.
+    # 2026-08-04 regrind batch: +3 transitions = evaporate_AlO, evaporate_Al2O,
+    # evaporate_CaO_gas (new carrier channels; per-carrier ledger transitions,
+    # grouped parent draw unchanged). b-142 adds evaporate_TiO and
+    # evaporate_TiO2_gas through the status-bearing OOR continuation described
+    # above (+2 transitions, 23 -> 25); all three Ti carrier debits still sum
+    # into one TiO2 parent draw. CrO3 adds none because its O2-consuming route
+    # is starved by the fixture's zero overhead O2, not by pressure/domain gating.
+    # The phosphorus union adds evaporate_P2 and evaporate_PO2. Regrind now
+    # rejects a whole coupled carrier transition when any nonzero ledger leg is
+    # at or below the 1e-12 kg floor, so the earlier PO dust transition is no
+    # longer committed (28 -> 27); snapshot flux and ledger remain identical.
+    # MC-4A adds one evaporate_CrO transition (1550 C head
+    # 0.0012405690130816466 Pa) through the shared Cr2O3 parent path. CrO2's
+    # 0.0011084725622752761 Pa head remains transition-free here because the
+    # oxidizing leg has no overhead O2 to debit (27 -> 28).
+    # 2026-08-05 MC-4 wave-1 union: 37 transitions (A adds evaporate_CrO et
+    # al.; B adds K2/K2O/MgO/Na2/Na2O/P2O5/Si/SiO2 reasons) — recomputed from
+    # the merged roster by execution.
+    # b-136 / t-559 posture rework (2026-08-08): transition count is an
+    # EXPLICIT attributed decision, not an incidental consequence of α
+    # withdrawal. Zhang proxy α is withdrawn, but Ca/Ti-family channels stay
+    # live on HKL ideal α=1.0 status-bearing upper bound. The seven channels
+    # that a refuse posture deleted (evaporate_Ca, evaporate_CaO_gas,
+    # evaporate_Ca2, evaporate_Ti, evaporate_TiO, evaporate_TiO2, condense_Ca)
+    # are retained. 1742cbb8 then drops evaporate_PO, evaporate_PO2, and
+    # evaporate_P2 (stage0_only admission, not a Ca/Ti α refuse). Count
+    # 36→33. t-766 now separately authorizes cleanup offgas with the positive
+    # source predicate; condensation stays inactive for those P carriers.
+    # b-314 (0c6d9811): 33 -> 34. The Al2O tier-2 proxy (alpha=0.3) no longer
+    # satisfies the measured-alpha requirement; this fixture's opted-in
+    # alpha=1.0 prototype fallback lifts its dust flux above the 1e-12 kg
+    # ledger-commit floor, so evaporate_Al2O commits again. Not a refusal
+    # drop: no channel is withdrawn.
+    # t-766: three admitted P evaporations and nine flagged capture transitions.
+    assert len(sim.atom_ledger.transitions) == 46
+    ca_ti_reasons = {
+        transition.reason for transition in sim.atom_ledger.transitions
+    }
+    # Disabling the reactive-product backstop must not make reversible Si
+    # condensation depend on reactivity metadata. Its ledger transition is
+    # the single-transition regression guard for 149df2858.
+    assert "condense_Si" in ca_ti_reasons
+    assert {"evaporate_P2", "evaporate_PO", "evaporate_PO2"} <= ca_ti_reasons
+    assert {
+        "condense_SiO", "condense_Al2O", "condense_AlO", "condense_CaO_gas",
+        "condense_CrO", "condense_MgO_gas", "condense_SiO2_gas", "condense_TiO",
+        "condense_TiO2_gas",
+    } <= ca_ti_reasons
+    # Six of the seven channels the refuse posture deleted appear as ledger
+    # transitions at this head (1550 C / hour-1). evaporate_Ca2 is
+    # channel-contract-complete under the HKL upper-bound α but does not
+    # emit a nonzero ledger transition here (pressure/flux floor); it must
+    # NOT be used as a silent-zero canary for α. The seven-channel *rail*
+    # finding (controller verification: 36→29 under refuse) is recorded in
+    # docs-private/research/2026-08-08-rp3-b136/report.md §8.
+    for required in (
+        "evaporate_Ca",
+        "evaporate_CaO_gas",
+        "evaporate_Ti",
+        "evaporate_TiO",
+        "evaporate_TiO2_gas",
+        "condense_Ca",
+    ):
+        assert required in ca_ti_reasons, required
+    assert tuple(
+        transition.reason for transition in sim.atom_ledger.transitions[-5:]
+    ) == (
+        "condense_TiO",
+        "evaporate_TiO2_gas",
+        "condense_TiO2_gas",
+        "fe_redox_respeciation",
+        "overhead_bleed",
+    )
+    # Admitted P source evidence authorizes cleanup offgas, not condensation.
+    for p_species in ("PO", "PO2", "P2"):
+        assert f"evaporate_{p_species}" in ca_ti_reasons, p_species
+        authority = sim.condensation_model.last_condensation_authority_by_species[
+            p_species
+        ]
+        evidence = authority["routing_authorization"]
+        assert evidence["active"] is True and evidence["stage"] == "stage0_p_carriers"
+        assert authority["authoritative_for_condensation"] is False
+        assert authority["mass_disposition"] == "declared_cleanup_offgas"
+        assert authority["remaining_mass_kg_hr"] > 0.0
+        assert authority["retained_in_source_mass_kg_hr"] == 0.0
+        assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0)
+        assert snapshot.evap_flux.species_kg_hr[p_species] > 0.0
+    assert "evaporate_Fe" in ca_ti_reasons
+    assert "condense_Fe" in ca_ti_reasons
+    assert snapshot.mass_balance_error_pct <= 5.0e-12
+
+
+def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkeypatch):
+    sim = _real_capacity_sim()
+    sim.campaign_mgr.campaigns["C0"]["p_total_mbar_default"] = 0.0
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 1600.0
+    monkeypatch.setattr(
+        sim,
+        "_compute_capacity_coupling_shadow",
+        lambda _equilibrium: (_ for _ in ()).throw(
+            AssertionError("default-off live path must not compute the capacity shadow")
+        ),
+    )
+
+    phosphorus_carriers = _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
+    p2o5_source_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"]
+    p2o5_projection_kg = sim.melt.composition_kg["P2O5"]
+    source_before_kg = float(
+        sim.atom_ledger.total_kg_by_account("process.cleaned_melt")
+    )
+    transport_calls = _record_transport_estimates(sim)
+
+    snapshot = sim.step()
+
+    # Default-off skips the optional shadow. This step still hits the
+    # mandatory C0 pipe cap: one estimate is over capacity, and the
+    # admitted release matches that estimate within the flux floor.
+    binding = [
+        call
+        for call in transport_calls
+        if call["demand_kg_hr"] > call["capacity_kg_hr"]
+    ]
+    assert len(binding) == 1
+    demand_kg_hr = binding[0]["demand_kg_hr"]
+    capacity_kg_hr = binding[0]["capacity_kg_hr"]
+    demand_species = binding[0]["species_kg_hr"]
+    cap_record = sim._last_subsolidus_bakeout["transport_cap"]
+    assert cap_record["demand_kg_hr"] == pytest.approx(
+        demand_kg_hr, rel=0.0, abs=0.0
+    )
+    assert cap_record["capacity_kg_hr"] == pytest.approx(
+        capacity_kg_hr, rel=0.0, abs=0.0
+    )
+    assert cap_record["scale"] == pytest.approx(
+        capacity_kg_hr / demand_kg_hr, rel=0.0, abs=0.0
+    )
+    released_kg_hr = snapshot.evap_flux.total_kg_hr
+    released_species = {
+        str(species): float(rate)
+        for species, rate in snapshot.evap_flux.species_kg_hr.items()
+        if float(rate) > 0.0
+    }
+    assert abs(released_kg_hr - capacity_kg_hr) <= _NONTRIVIAL_FLUX_KG_HR
+    assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
+
+    def _committed_vapor_kg(species: str) -> float:
+        credited = 0.0
+        for transition in sim.atom_ledger.transitions:
+            if transition.reason != f"evaporate_{species}":
+                continue
+            for lot in transition.credits:
+                credited += float(lot.species_kg.get(species, 0.0))
+        return credited
+
+    retained_total_kg = 0.0
+    for species in set(demand_species) | set(released_species):
+        demand_i = demand_species.get(species, 0.0)
+        released_i = released_species.get(species, 0.0)
+        committed_i = _committed_vapor_kg(species)
+        retained_i = demand_i - committed_i
+        assert abs(committed_i - released_i) <= _NONTRIVIAL_FLUX_KG_HR
+        assert abs(retained_i - (demand_i - released_i)) <= _NONTRIVIAL_FLUX_KG_HR
+        retained_total_kg += retained_i
+    assert abs(
+        retained_total_kg - (demand_kg_hr - released_kg_hr)
+    ) <= _NONTRIVIAL_FLUX_KG_HR
+    # Overhead bleed credits O2 after the cap. That credit is not in the
+    # admitted vapour flux, and it is the only extra cleaned-melt debit.
+    bleed_o2_kg = 0.0
+    for transition in sim.atom_ledger.transitions:
+        if transition.reason != "overhead_bleed":
+            continue
+        for lot in transition.credits:
+            bleed_o2_kg += float(lot.species_kg.get(OXYGEN_SPECIES, 0.0))
+    source_after_kg = float(
+        sim.atom_ledger.total_kg_by_account("process.cleaned_melt")
+    )
+    assert abs(snapshot.melt_mass_kg - source_after_kg) <= _NONTRIVIAL_FLUX_KG_HR
+    assert abs(
+        (source_before_kg - source_after_kg) - (released_kg_hr + bleed_o2_kg)
+    ) <= _NONTRIVIAL_FLUX_KG_HR
+    assert sim._subsolidus_pending_release is None
+    assert snapshot.mass_balance_error_pct <= 5.0e-12
+    assert snapshot.overhead.transport_saturation_pct == pytest.approx(
+        100.0,
+        rel=0.0,
+        abs=100.0 * _NONTRIVIAL_FLUX_KG_HR / capacity_kg_hr,
+    )
+    assert snapshot.hour == 1
+
+    assert set(phosphorus_carriers).isdisjoint(snapshot.evap_flux.species_kg_hr)
+    reasons = {
+        transition.reason for transition in sim.atom_ledger.transitions
+    }
+    assert {
+        f"evaporate_{carrier}" for carrier in phosphorus_carriers
+    }.isdisjoint(reasons)
+    assert {
+        f"condense_{carrier}" for carrier in phosphorus_carriers
+    }.isdisjoint(reasons)
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"] == (
+        p2o5_source_kg
+    )
+    assert sim.melt.composition_kg["P2O5"] == p2o5_projection_kg
+    for carrier in phosphorus_carriers:
+        authority = sim.condensation_model.last_condensation_authority_by_species.get(
+            carrier
+        )
+        if authority is None:
+            continue
+        assert authority.get("mass_disposition") != "declared_cleanup_offgas"
+        evidence = authority.get("routing_authorization") or {}
+        assert evidence.get("stage") != "stage0_p_carriers"
+        assert authority.get("remaining_mass_kg_hr") in (None, 0.0)
+    assert "evaporate_Fe" in reasons
+    assert "condense_Fe" in reasons
+    assert "fe_redox_respeciation" in reasons
+
+    assert sim._equipment is not None
+    assert snapshot.overhead.initial_throat_area_m2 == pytest.approx(
+        sim._equipment.pipe.initial_throat_area_m2
     )
 
     payload = _load_yaml("thermal_train_params.yaml")
