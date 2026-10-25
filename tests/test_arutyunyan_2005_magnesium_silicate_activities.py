@@ -93,13 +93,12 @@ def test_arutyunyan_2005_migration_preserves_each_activity_condition() -> None:
     for observation in result.observations.values():
         conditions = observation.point_conditions
         assert conditions is not None
-        for key in ("temperature_K", "composition", "phase_assemblage", "total_pressure_Pa"):
+        assert "total_pressure_Pa" not in conditions
+        for key in ("temperature_K", "composition", "phase_assemblage"):
             assert key in conditions
             assert conditions[key].locator is not None
             assert conditions[key].locator.published_page == 391
             assert conditions[key].locator.table == "2"
-        assert conditions["total_pressure_Pa"].state.is_unknown
-        assert conditions["total_pressure_Pa"].state.reason == "not_published"
         temperature = conditions["temperature_K"]
         assert temperature.state.is_value
         assert temperature.state.value == Decimal("1873")

@@ -71,8 +71,17 @@ def test_tables_match_rendered_rows_and_migrate_all_typed_values_as_points() -> 
             assert migrated.identity.temperature_K.is_value
             assert migrated.point_conditions is not None
             source_conditions = row["point_conditions"]
-            assert set(source_conditions) <= set(migrated.point_conditions)
+            assert source_conditions["total_pressure_Pa"]["state"] == {
+                "tag": "unknown",
+                "reason": "not_published",
+            }
+            assert "total_pressure_Pa" not in migrated.point_conditions
+            assert set(source_conditions) - {"total_pressure_Pa"} <= set(
+                migrated.point_conditions
+            )
             for key, source_condition in source_conditions.items():
+                if key == "total_pressure_Pa":
+                    continue
                 condition = migrated.point_conditions[key]
                 assert condition.state.tag.value == source_condition["state"]["tag"]
                 assert condition.locator is not None

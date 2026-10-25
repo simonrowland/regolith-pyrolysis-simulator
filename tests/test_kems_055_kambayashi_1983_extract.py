@@ -48,8 +48,19 @@ def test_extract_covers_table_values_and_migrates_every_typed_row_as_a_point() -
             assert migrated.identity.temperature_K.is_value
             assert migrated.point_conditions is not None
             source_conditions = row["point_conditions"]
-            assert set(source_conditions) <= set(migrated.point_conditions)
+            source_pressure = source_conditions.get("total_pressure_Pa")
+            if source_pressure is not None:
+                assert source_pressure["state"] == {
+                    "tag": "unknown",
+                    "reason": "not_published",
+                }
+            assert "total_pressure_Pa" not in migrated.point_conditions
+            assert set(source_conditions) - {"total_pressure_Pa"} <= set(
+                migrated.point_conditions
+            )
             for key, source_condition in source_conditions.items():
+                if key == "total_pressure_Pa":
+                    continue
                 condition = migrated.point_conditions[key]
                 assert condition.state.tag.value == source_condition["state"]["tag"]
                 assert condition.locator is not None
