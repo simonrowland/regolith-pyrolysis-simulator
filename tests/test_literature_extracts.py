@@ -2467,6 +2467,38 @@ def test_mathieu_2009_a6_2_activity_compositions_migrate() -> None:
     )
 
 
+def test_bischof_2023_kems_composition_locator_migrates() -> None:
+    """Keep the printed nominal-composition page on migrated KEMS rows."""
+    from simulator.battery.migrate import Migrator
+
+    filename = "kems-137-bischof-2023.yaml"
+    migrator = Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACTS / filename)
+    migrator.finalize()
+
+    printed_compositions = [
+        row for row in migrator.result.observations.values()
+        if row.source_id == "kems-137-bischof-2023"
+        and row.point_conditions
+        and (printed := row.point_conditions.get("printed_composition")) is not None
+        and printed.locator is not None
+        and printed.locator.section == "2.1. Sample preparation"
+    ]
+    assert len(printed_compositions) == 22
+    assert all(
+        row.point_conditions["printed_composition"].locator.pdf_page_index == 3
+        for row in printed_compositions
+    )
+
+    geometry = migrator.result.observations[
+        "kems-137-bischof-2023::bischof_2023_kems_geometry_and_calibration"
+    ]
+    locator = geometry.point_conditions["composition"].locator
+    assert locator is not None
+    assert locator.pdf_page_index == 3
+    assert locator.section == "2.1. Sample preparation"
+
+
 def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None:
     path = EXTRACTS / "kems-026-markova-1984.yaml"
     migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
