@@ -243,9 +243,10 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     continuous_products = continuous.product_ledger()
     staged_sio_stage = first.train.stages[3].collected_kg
     continuous_sio_stage = continuous.train.stages[3].collected_kg
-    staged_silica = staged_sio_stage.get("Si", 0.0) + staged_sio_stage.get(
-        "SiO2", 0.0
-    )
+    from tests.studio_pin_support import staged_pin_values
+
+    pins = staged_pin_values(first)
+    staged_silica = pins["staged_silica_kg"]
     continuous_silica = continuous_sio_stage.get(
         "Si", 0.0
     ) + continuous_sio_stage.get("SiO2", 0.0)
@@ -297,7 +298,7 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
         staged_silica, rel=1e-12
     )
     assert continuous_sio_stage == {}
-    assert staged_products["SiO"] == pytest.approx(0.0076796816652895455)
+    assert pins["staged_product_sio_kg"] == pytest.approx(0.0076796816652895455)
 
 
 def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():

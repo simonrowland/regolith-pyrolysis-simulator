@@ -21,7 +21,7 @@ from simulator.scalar_boundary import is_declared_real_scalar
 # Ellingham graph coverage or failed graph queries.
 DECOMP_VOLTAGES = {
     # NiO source: DeltaGf(NiO, ~1873 K) ~= -76 kJ/mol
-    # [Hemingway 1990 Am. Mineral. 75:781 + Robie & Hemingway + NEA
+    # [Hemingway 1990 (REF-045) Am. Mineral. 75:781 + Robie & Hemingway + NEA
     # Chemical Thermodynamics of Nickel]; E = -DeltaGf/(2F) ~= 0.39 V
     # standard-state. Runtime Nernst applies melt activity + pO2.
     'NiO': 0.39,
@@ -33,7 +33,7 @@ DECOMP_VOLTAGES = {
     # activity primaries; value intentionally unchanged.
     'Na2O': 0.5,
     'K2O': 0.5,
-    # O'Neill 1988 + Chase 1998 Fe-O emf/raw-thermo anchor.
+    # O'Neill 1988 (REF-046) + Chase 1998 Fe-O emf/raw-thermo anchor.
     'FeO': 0.75,
     # Reference-only legacy full-reduction threshold. Live MRE fixed
     # reduction excludes Fe2O3 because ferric Fe is represented by the

@@ -70,6 +70,12 @@ engine_fallback() {
   esac
 }
 
+# Reports are line-oriented; paths containing newlines are out of scope.
+report_path() {
+  local s=${1//\'/\'\\\'\'}
+  printf "'%s'" "$s"
+}
+
 pin_checkout() {
   local e="$1" raw parent base top
   raw="$(awk '$1=="checkout:" {print $2; exit}' "$PATCHES/$e/UPSTREAM.pin" 2>/dev/null || true)"
@@ -241,11 +247,11 @@ prepare_action_target() {
   fi
   if [ "$IMPORTABLE" -eq 0 ] && [ "$FORCE_PATH" -ne 1 ]; then
     override_var="$(engine_override_var "$e")"
-    echo "$e: refusing action on RESOLVED=$RESOLVED_PATH (interpreter does not load it; pass --force-path for $override_var)" >&2
+    echo "$e: refusing action on RESOLVED=$(report_path "$RESOLVED_PATH") (interpreter does not load it; pass --force-path for $override_var)" >&2
     return 1
   fi
   if ! validate_checkout "$e"; then
-    echo "$e: refusing action on RESOLVED=$RESOLVED_PATH ($CHECKOUT_STATUS)" >&2
+    echo "$e: refusing action on RESOLVED=$(report_path "$RESOLVED_PATH") ($CHECKOUT_STATUS)" >&2
     return 1
   fi
 }
@@ -284,13 +290,13 @@ cmd_status() {
     fi
     resolve_engine "$e" || true
     if ! validate_checkout "$e"; then
-      echo "$e: FAIL RESOLVED=${RESOLVED_PATH:-unresolved} — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
+      echo "$e: FAIL RESOLVED=$(report_path "${RESOLVED_PATH:-unresolved}") — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
       rc=1
       continue
     fi
     n=$(ls "$PATCHES/$e"/*.patch 2>/dev/null | wc -l | tr -d ' ')
     dirty=$(git -C "$RESOLVED_PATH" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
-    echo "$e: RESOLVED=$RESOLVED_PATH patches=$n  base=$CHECKOUT_STATUS  dirty_files=$dirty"
+    echo "$e: RESOLVED=$(report_path "$RESOLVED_PATH") patches=$n  base=$CHECKOUT_STATUS  dirty_files=$dirty"
   done
   return $rc
 }
@@ -352,38 +358,38 @@ cmd_verify() {
     fi
     if [ "$RESOLUTION_KIND" = "imported" ] && [ -n "$PIN_CHECKOUT" ] && \
        [ "$RESOLVED_PATH" != "$PIN_CHECKOUT" ]; then
-      echo "WARNING: $e imported checkout differs from UPSTREAM.pin checkout; IMPORTED=$RESOLVED_PATH PIN=$PIN_CHECKOUT; verifying IMPORTED=$RESOLVED_PATH"
+      echo "WARNING: $e imported checkout differs from UPSTREAM.pin checkout; IMPORTED=$(report_path "$RESOLVED_PATH") PIN=$(report_path "$PIN_CHECKOUT") ; verifying IMPORTED=$(report_path "$RESOLVED_PATH")"
     fi
     if ! validate_checkout "$e"; then
       if [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "fallback" ]; then
-        echo "$e: NOT-LOADED ($PYTHON) RESOLUTION=fallback FALLBACK=$CHECKOUT_STATUS RESOLVED=${RESOLVED_PATH:-unresolved}"
+        echo "$e: NOT-LOADED PYTHON=$(report_path "$PYTHON") RESOLUTION=fallback FALLBACK=$CHECKOUT_STATUS RESOLVED=$(report_path "${RESOLVED_PATH:-unresolved}")"
         rc=1
       elif [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "not-loaded" ]; then
-        echo "$e: NOT-LOADED ($PYTHON) RESOLUTION=$RESOLUTION_KIND FALLBACK=UNRESOLVED RESOLVED=${RESOLVED_PATH:-unresolved} — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
+        echo "$e: NOT-LOADED PYTHON=$(report_path "$PYTHON") RESOLUTION=$RESOLUTION_KIND FALLBACK=UNRESOLVED RESOLVED=$(report_path "${RESOLVED_PATH:-unresolved}") — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
         if [ "$ALLOW_NOT_LOADED" -ne 1 ]; then
           rc=1
         fi
       else
-        echo "$e: FAIL RESOLVED=${RESOLVED_PATH:-unresolved} PYTHON=$PYTHON RESOLUTION=$RESOLUTION_KIND — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
+        echo "$e: FAIL RESOLVED=$(report_path "${RESOLVED_PATH:-unresolved}") PYTHON=$(report_path "$PYTHON") RESOLUTION=$RESOLUTION_KIND — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
         rc=1
       fi
       continue
     fi
     compare_patchset "$e"
     if [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "fallback" ]; then
-      echo "$e: NOT-LOADED ($PYTHON) RESOLUTION=fallback FALLBACK=$PATCH_STATE RESOLVED=$RESOLVED_PATH"
+      echo "$e: NOT-LOADED PYTHON=$(report_path "$PYTHON") RESOLUTION=fallback FALLBACK=$PATCH_STATE RESOLVED=$(report_path "$RESOLVED_PATH")"
       if [ "$PATCH_STATE" != "MATCH" ] || [ "$ALLOW_NOT_LOADED" -ne 1 ]; then
         rc=1
       fi
     elif [ "$RESOLUTION_KIND" = "override" ]; then
-      echo "$e: ASSERTED PATCH=$PATCH_STATE RESOLVED=$RESOLVED_PATH (explicit ${OVERRIDE_VAR} override; not import-verified) PYTHON=$PYTHON"
+      echo "$e: ASSERTED PATCH=$PATCH_STATE RESOLVED=$(report_path "$RESOLVED_PATH") (explicit ${OVERRIDE_VAR} override; not import-verified) PYTHON=$(report_path "$PYTHON")"
       if [ "$PATCH_STATE" != "MATCH" ] || [ "$ALLOW_ASSERTED" -ne 1 ]; then
         rc=1
       fi
     elif [ "$PATCH_STATE" = "MATCH" ]; then
-      echo "$e: MATCH RESOLVED=$RESOLVED_PATH PYTHON=$PYTHON RESOLUTION=located"
+      echo "$e: MATCH RESOLVED=$(report_path "$RESOLVED_PATH") PYTHON=$(report_path "$PYTHON") RESOLUTION=located"
     else
-      echo "$e: DRIFT — engine tree differs from patch set RESOLVED=$RESOLVED_PATH PYTHON=$PYTHON RESOLUTION=located"
+      echo "$e: DRIFT — engine tree differs from patch set RESOLVED=$(report_path "$RESOLVED_PATH") PYTHON=$(report_path "$PYTHON") RESOLUTION=located"
       rc=1
     fi
   done
@@ -408,7 +414,7 @@ cmd_apply() {
     git -C "$d" apply --check "$p" 2>/dev/null && git -C "$d" apply "$p" || {
       echo "  FAILED — resolve by hand, then: $0 refresh $e"; return 1; }
   done
-  echo "$e: applied RESOLVED=$d"
+  echo "$e: applied RESOLVED=$(report_path "$d")"
 }
 
 # refresh only rewrites 0001 when it is the sole patch; multi-patch engines must be

@@ -261,6 +261,10 @@ class NoticeKind(StrEnum):
     LIQUIDUS_POSITION_CONTESTED = "liquidus_position_contested"
     QUENCH_ALTERED = "quench_altered"
     QUENCH_OXIDISING = "quench_oxidising"
+    # t-1465: a non-finite gbase token in a phase this read did not request.
+    # Advisory. The reason is the parser sentence (phase, field, raw token).
+    # It is not a flagged stratum and does not void the decision band.
+    UNREQUESTED_PHASE_NONFINITE = "unrequested_phase_nonfinite"
 
 
 class ReferenceStateConvention(StrEnum):
