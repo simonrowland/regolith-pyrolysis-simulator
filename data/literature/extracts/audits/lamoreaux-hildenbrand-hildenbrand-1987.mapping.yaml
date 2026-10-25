@@ -23,3 +23,53 @@ tables:
       - {column: 2, species: 1, quantity: transition_temperature, unit: K}
       - {column: 4, species: 1, quantity: enthalpy_of_fusion_over_R, unit: kK}
     attribution: Table 4 Tfus source-column references, transcribed individually on the assembled observations.
+manual_transcription_audit:
+  - printed_table: Table 2
+    pdf_pages: [5, 6]
+    draft_tables: [p005-t03, p005-t04, p006-t06]
+    printed_columns: [species, A, 10^3B, 10^6C, 10^9D, 10^12E, T_range_K]
+    selected_system_refusals:
+      - LH87_BeO_table2_GEF_refusal
+      - LH87_MgO_table2_GEF_refusal
+      - LH87_CaO_table2_GEF_refusal
+      - LH87_B2O3_table2_GEF_refusal
+      - LH87_Al2O3_table2_GEF_refusal
+      - LH87_SiO2_table2_GEF_refusal
+    schema_gap: Gibbs energy-function coefficients have no schema quantity token; no values were emitted.
+    cell_source: Render checked against pdftotext-layout, hybrid-high, and pipeline-ocr; flagged disagreements are recorded in the audit.
+  - printed_table: Table 3
+    pdf_pages: [7, 8]
+    draft_tables: [p007-t07, p007-t08]
+    printed_columns: [species, Delta_f_H_298_over_R, S_298_over_R, H298_minus_H0_over_R]
+    selected_records:
+      - LH87_BeO_s_table3
+      - LH87_BeO_g_table3
+      - LH87_Be2O_g_table3
+      - LH87_Be2O2_g_table3
+      - LH87_Be3O3_g_table3
+      - LH87_Be4O4_g_table3
+      - LH87_Be5O5_g_table3
+      - LH87_Be6O6_g_table3
+      - LH87_MgO_s_table3
+      - LH87_MgO_g_table3
+      - LH87_CaO_s_table3
+      - LH87_CaO_g_table3
+      - LH87_B2O3_s_table3
+      - LH87_B2O3_g_table3
+      - LH87_BO_g_table3
+      - LH87_BO2_g_table3
+      - LH87_B2O_g_table3
+      - LH87_B2O2_g_table3
+      - LH87_Al2O3_s_table3
+      - LH87_AlO_g_table3
+      - LH87_AlO2_g_table3
+      - LH87_Al2_g_table3
+      - LH87_Al2O_g_table3
+      - LH87_Al2O2_g_table3
+      - LH87_SiO_g_table3
+      - LH87_SiO2_quartz_table3
+      - LH87_SiO2_g_table3
+      - LH87_Si2_g_table3
+      - LH87_Si2O2_g_table3
+      - LH87_Si3_g_table3
+    cell_source: Render transcribed and checked for each selected row; variant disagreements are recorded in the audit.

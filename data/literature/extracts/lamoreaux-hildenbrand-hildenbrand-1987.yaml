@@ -8,9 +8,9 @@ source:
   url: https://doi.org/10.1063/1.555799
   year: 1987
 extraction:
-  method: manual transcription from vp-acquire-5 dominant-missing-12 DRAFT; validated in an internal review, 2026-07-30, vp-acquire-5
-  date: '2026-07-30'
-  worker: t508-store-gk
+  method: Prior six records retained; additions transcribed from table-reader drafts, OCR variants, and render checks.
+  date: '2026-10-25'
+  worker: w1025b-lamo84
   provenance_path: raw/lamoreaux-hildenbrand-hildenbrand-1987/lamoreaux-hildenbrand-hildenbrand-1987.pdf
 review_status: draft
 species:
@@ -245,6 +245,156 @@ species:
           oxidizing: [BeO(g), Be2O2(g), Be3O3(g), Be4O4(g), Be5O5(g)]
         reaction_as_printed: Vaporization primarily by decomposition to Be atoms and oxygen species under neutral and reducing conditions.
         attribution: Lamoreaux, Hildenbrand, and Brewer (1987), Be-O system review summary; thermodynamic input references are listed by species in Table 4.
+    - observation_id: LH87_BeO_table2_GEF_refusal
+      type: gibbs_table
+      locator: &lh87_table2_p422
+        table: Table 2
+        page: 5
+        published_page: 422
+        pdf_page_index: 4
+        note: Gibbs energy function coefficients; selected Be-O rows continue on published page 423.
+      units: coefficient scaling and temperature ranges as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: The coefficients cover multiple printed temperature intervals.}
+          locator: *lh87_table2_p422
+      values:
+        quantity: gibbs_energy_function_coefficients
+        method_class: quoted_attributed
+        status: typed_refusal
+        admission_status: typed_refusal
+        reason: The schema has no quantity token for the printed Gibbs energy function coefficients.
+        printed_rows_as_tabled: [BeO(s), BeO(l), BeO(g), Be2O(g), Be2O2(g), Be3O3(g), Be4O4(g), Be5O5(g), Be6O6(g)]
+        attribution: Table 2; individual data sources are listed in Table 4.
+    - observation_id: LH87_BeO_s_table3
+      type: gibbs_table
+      locator: &lh87_table3_p424
+        table: Table 3
+        page: 7
+        published_page: 424
+        pdf_page_index: 6
+        note: Selected standard-state thermodynamic values; row label is recorded per observation.
+      T_range_K: [298, 298]
+      phase: solid
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 0.3
+        S_298_over_R_uncertainty: 0.005
+        confidence_level: not_stated
+      values:
+        quantity: thermodynamic_table_values
+        formula: BeO(s)
+        Delta_f_H_298_over_R_kK: -73.29
+        S_298_over_R: 1.656
+        H298_minus_H0_over_R_kK: 0.3412
+        method_class: quoted_attributed
+        attribution: "Table 4, Table 3 columns: refs. 1,5,7(9),14 for thermal functions; refs. 7,1,5,9,14 for ΔfH°298."
+        status: typed_refusal
+        admission_status: typed_refusal
+        reason: No schema quantity token represents this combined Table 3 value set.
+    - observation_id: LH87_BeO_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 1.0
+        S_298_over_R_uncertainty: 0.05
+        confidence_level: not_stated
+      values:
+        quantity: thermodynamic_table_values
+        formula: BeO(g)
+        Delta_f_H_298_over_R_kK: 16.1
+        S_298_over_R: 23.756
+        H298_minus_H0_over_R_kK: 1.0449
+        method_class: quoted_attributed
+        attribution: "Table 4, Table 3 columns: refs. 1,5,14 for thermal functions and ΔfH°298."
+        status: typed_refusal
+        admission_status: typed_refusal
+        reason: No schema quantity token represents this combined Table 3 value set.
+    - observation_id: LH87_Be2O_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 0.3, S_298_over_R_uncertainty: 0.3, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Be2O(g), Delta_f_H_298_over_R_kK: -4.5, S_298_over_R: 27.403, H298_minus_H0_over_R_kK: 1.3459, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: ref. 1 for thermal functions and ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_Be2O2_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 3.0, S_298_over_R_uncertainty: 0.3, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Be2O2(g), Delta_f_H_298_over_R_kK: -46.3, S_298_over_R: 30.19, H298_minus_H0_over_R_kK: 1.4697, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: ref. 1 for thermal functions and ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_Be3O3_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 4.0, S_298_over_R_uncertainty: 0.3, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Be3O3(g), Delta_f_H_298_over_R_kK: -123.0, S_298_over_R: 34.045, H298_minus_H0_over_R_kK: 1.819, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: ref. 1 for thermal functions and ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_Be4O4_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 5.0, S_298_over_R_uncertainty: 0.3, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Be4O4(g), Delta_f_H_298_over_R_kK: -198.0, S_298_over_R: 35.644, H298_minus_H0_over_R_kK: 1.9044, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: ref. 1 for thermal functions and ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_Be5O5_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 15.0, S_298_over_R_uncertainty: 0.3, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Be5O5(g), Delta_f_H_298_over_R_kK: -265.0, S_298_over_R: 38.67, H298_minus_H0_over_R_kK: 2.290, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: ref. 2 for thermal functions; ΔfH°298 is marked b in Table 4.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+      note: S°298/R is parenthesized in print.
+    - observation_id: LH87_Be6O6_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 15.0, S_298_over_R_uncertainty: 0.5, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Be6O6(g), Delta_f_H_298_over_R_kK: -330.0, S_298_over_R: 41.26, H298_minus_H0_over_R_kK: 2.583, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 2,14 for thermal functions; ΔfH°298 is marked b in Table 4.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+      note: S°298/R is parenthesized in print.
   MgO:
     observations:
     - observation_id: LH87_MgO_fusion
@@ -317,6 +467,46 @@ species:
           oxidizing: MgO(g) partial pressure comparable to Mg(g)
         reaction_as_printed: Vaporization by dissociation to gaseous oxygen species and Mg(g) under neutral and reducing conditions.
         attribution: Lamoreaux, Hildenbrand, and Brewer (1987), Mg-O system review summary; thermodynamic input references are listed by species in Table 4.
+    - observation_id: LH87_MgO_table2_GEF_refusal
+      type: gibbs_table
+      locator: *lh87_table2_p422
+      units: coefficient scaling and temperature ranges as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: The coefficients cover multiple printed temperature intervals.}
+          locator: *lh87_table2_p422
+      values:
+        quantity: gibbs_energy_function_coefficients
+        method_class: quoted_attributed
+        status: typed_refusal
+        admission_status: typed_refusal
+        reason: The schema has no quantity token for the printed Gibbs energy function coefficients.
+        printed_rows_as_tabled: [MgO(s), MgO(l), MgO(g), Mg2(g)]
+        attribution: Table 2; individual data sources are listed in Table 4.
+    - observation_id: LH87_MgO_s_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: solid
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 0.04, S_298_over_R_uncertainty: 0.02, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: MgO(s), Delta_f_H_298_over_R_kK: -72.34, S_298_over_R: 3.24, H298_minus_H0_over_R_kK: 0.6206, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 1,5,7,9,14 for thermal functions; refs. 7,1,5,9,14 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_MgO_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 3.0, S_298_over_R_uncertainty: 0.01, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: MgO(g), Delta_f_H_298_over_R_kK: 7.0, S_298_over_R: 25.637, H298_minus_H0_over_R_kK: 1.0715, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 5,1,14 for thermal functions and ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
   CaO:
     observations:
     - observation_id: LH87_CaO_fusion
@@ -392,6 +582,46 @@ species:
           oxidizing: CaO(g)
         reaction_as_printed: Vaporization primarily by dissociation to Ca(g) and oxygen under neutral and reducing conditions.
         attribution: Lamoreaux, Hildenbrand, and Brewer (1987), Ca-O system review summary; thermodynamic input references are listed by species in Table 4.
+    - observation_id: LH87_CaO_table2_GEF_refusal
+      type: gibbs_table
+      locator: *lh87_table2_p422
+      units: coefficient scaling and temperature ranges as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: The coefficients cover multiple printed temperature intervals.}
+          locator: *lh87_table2_p422
+      values:
+        quantity: gibbs_energy_function_coefficients
+        method_class: quoted_attributed
+        status: typed_refusal
+        admission_status: typed_refusal
+        reason: The schema has no quantity token for the printed Gibbs energy function coefficients.
+        printed_rows_as_tabled: [CaO(s), CaO(l), CaO(g), Ca2(g)]
+        attribution: Table 2; individual data sources are listed in Table 4.
+    - observation_id: LH87_CaO_s_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: solid
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 0.1, S_298_over_R_uncertainty: 0.02, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: CaO(s), Delta_f_H_298_over_R_kK: -76.384, S_298_over_R: 4.582, H298_minus_H0_over_R_kK: 0.812, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 1(4),7,14 for thermal functions; refs. 7,1,4,9,14 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_CaO_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 2.0, S_298_over_R_uncertainty: 0.05, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: CaO(g), Delta_f_H_298_over_R_kK: 5.3, S_298_over_R: 26.412, H298_minus_H0_over_R_kK: 1.077, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 5,1,14 for thermal functions and ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
   B2O3:
     observations:
     - observation_id: LH87_B2O3_fusion
@@ -465,6 +695,94 @@ species:
           low_temperature_oxidizing: BO2(g) is important
         reaction_as_printed: Vaporization primarily by evolution of B2O3(g); no balanced reaction is printed in this summary.
         attribution: Lamoreaux, Hildenbrand, and Brewer (1987), B-O system review summary; thermodynamic input references are listed by species in Table 4.
+    - observation_id: LH87_B2O3_table2_GEF_refusal
+      type: gibbs_table
+      locator: *lh87_table2_p422
+      units: coefficient scaling and temperature ranges as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: The coefficients cover multiple printed temperature intervals.}
+          locator: *lh87_table2_p422
+      values:
+        quantity: gibbs_energy_function_coefficients
+        method_class: quoted_attributed
+        status: typed_refusal
+        admission_status: typed_refusal
+        reason: The schema has no quantity token for the printed Gibbs energy function coefficients.
+        printed_rows_as_tabled: [B2O3(s), B2O3(l), B2O3(g), BO(g), BO2(g), B2(g), B2O(g), B2O2(g)]
+        attribution: Table 2; individual data sources are listed in Table 4.
+    - observation_id: LH87_B2O3_s_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: solid
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 0.17, S_298_over_R_uncertainty: 0.04, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: B2O3(s), Delta_f_H_298_over_R_kK: -153.17, S_298_over_R: 6.491, H298_minus_H0_over_R_kK: 1.1187, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 1,3,7,9,14 for thermal functions and ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_B2O3_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 0.5, S_298_over_R_uncertainty: 0.5, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: B2O3(g), Delta_f_H_298_over_R_kK: -100.5, S_298_over_R: 34.371, H298_minus_H0_over_R_kK: 1.7341, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 1,3(9) for thermal functions; refs. 1,3,7,9 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_BO_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 1.0, S_298_over_R_uncertainty: 0.003, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: BO(g), Delta_f_H_298_over_R_kK: 1.2, S_298_over_R: 24.458, H298_minus_H0_over_R_kK: 1.0433, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 1,2,9,14 for thermal functions; refs. 1,2,14 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_BO2_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 2.0, S_298_over_R_uncertainty: 0.01, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: BO2(g), Delta_f_H_298_over_R_kK: -39.0, S_298_over_R: 27.665, H298_minus_H0_over_R_kK: 1.2956, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 1,2,9,14 for thermal functions; ref. 1 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_B2O_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 12.0, S_298_over_R_uncertainty: 0.5, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: B2O(g), Delta_f_H_298_over_R_kK: 33.0, S_298_over_R: 27.20, H298_minus_H0_over_R_kK: 1.4172, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 1,2,14 for thermal functions; ref. 1 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_B2O2_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 1.0, S_298_over_R_uncertainty: 0.2, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: B2O2(g), Delta_f_H_298_over_R_kK: -55.5, S_298_over_R: 30.015, H298_minus_H0_over_R_kK: 1.6112, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 1(2),(9) for thermal functions; refs. 1,2(9) for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
   Al2O3:
     observations:
     - observation_id: LH87_Al2O3_fusion
@@ -535,6 +853,96 @@ species:
         major_gaseous_species_as_printed: [Al(g), AlO(g), Al2O(g)]
         prior_review_species_claim_as_printed: AlO2(g) was selected by earlier reviews as dominant under oxidizing conditions; the authors note their disagreement based on newer data.
         attribution: Lamoreaux, Hildenbrand, and Brewer (1987), Al-O system review summary; thermodynamic input references are listed by species in Table 4.
+    - observation_id: LH87_Al2O3_table2_GEF_refusal
+      type: gibbs_table
+      locator: *lh87_table2_p422
+      units: coefficient scaling and temperature ranges as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: The coefficients cover multiple printed temperature intervals.}
+          locator: *lh87_table2_p422
+      values:
+        quantity: gibbs_energy_function_coefficients
+        method_class: quoted_attributed
+        status: typed_refusal
+        admission_status: typed_refusal
+        reason: The schema has no quantity token for the printed Gibbs energy function coefficients.
+        printed_rows_as_tabled: [AlO(g), AlO2(g), Al2(g), Al2O(g), Al2O2(g), Al2O3(s), Al2O3(l)]
+        attribution: Table 2; individual data sources are listed in Table 4.
+    - observation_id: LH87_Al2O3_s_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: solid
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 0.15, S_298_over_R_uncertainty: 0.01, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Al2O3(s), Delta_f_H_298_over_R_kK: -201.54, S_298_over_R: 6.127, H298_minus_H0_over_R_kK: 1.2047, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 17,1,7,9,14 for thermal functions; refs. 7,17,1,9,14 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_AlO_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 1.0, S_298_over_R_uncertainty: 0.01, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: AlO(g), Delta_f_H_298_over_R_kK: 8.1, S_298_over_R: 26.25, H298_minus_H0_over_R_kK: 1.0568, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: ref. 17(1) for thermal functions; refs. 17,1 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_AlO2_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 4.0, S_298_over_R_uncertainty: 1.0, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: AlO2(g), Delta_f_H_298_over_R_kK: -10.4, S_298_over_R: 30.27, H298_minus_H0_over_R_kK: 1.4483, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: ref. 17(1) for thermal functions and ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+      note: S°298/R is parenthesized in print.
+    - observation_id: LH87_Al2_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 2.5, S_298_over_R_uncertainty: 0.03, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Al2(g), Delta_f_H_298_over_R_kK: 59.0, S_298_over_R: 28.075, H298_minus_H0_over_R_kK: 1.1808, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: ref. 1 for thermal functions and ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_Al2O_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 2.0, S_298_over_R_uncertainty: 0.4, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Al2O(g), Delta_f_H_298_over_R_kK: -17.5, S_298_over_R: 30.33, H298_minus_H0_over_R_kK: 1.5288, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: ref. 17(1) for thermal functions and ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_Al2O2_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 4.0, S_298_over_R_uncertainty: 1.5, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Al2O2(g), Delta_f_H_298_over_R_kK: -47.5, S_298_over_R: 33.78, H298_minus_H0_over_R_kK: 1.7462, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 17,1 for thermal functions and ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+      note: S°298/R is parenthesized in print.
   SiO2:
     observations:
     - observation_id: LH87_SiO2_quartz_fusion
@@ -638,6 +1046,109 @@ species:
           oxidizing_below_about_2500_K: SiO2(g) is favored
         reaction_as_printed: The summary identifies vapor species and regimes but prints no balanced vaporization reaction.
         attribution: Lamoreaux, Hildenbrand, and Brewer (1987), Si-O system review summary; thermodynamic input references are listed by species in Table 4.
+    - observation_id: LH87_SiO2_table2_GEF_refusal
+      type: gibbs_table
+      locator:
+        table: Table 2
+        page: 6
+        published_page: 423
+        pdf_page_index: 5
+        note: Silicon oxide Gibbs energy function coefficient rows.
+      units: coefficient scaling and temperature ranges as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: The coefficients cover multiple printed temperature intervals.}
+          locator: *lh87_table2_p422
+      values:
+        quantity: gibbs_energy_function_coefficients
+        method_class: quoted_attributed
+        status: typed_refusal
+        admission_status: typed_refusal
+        reason: The schema has no quantity token for the printed Gibbs energy function coefficients.
+        printed_rows_as_tabled: [SiO(g), SiO2(qu.), SiO2(cr.), SiO2(l), SiO2(g), Si2(g), Si2O2(g), Si3(g)]
+        attribution: Table 2; individual data sources are listed in Table 4.
+    - observation_id: LH87_SiO_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 0.6, S_298_over_R_uncertainty: 0.002, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: SiO(g), Delta_f_H_298_over_R_kK: -11.9, S_298_over_R: 25.437, H298_minus_H0_over_R_kK: 1.0482, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 16,2,9,14 for thermal functions; refs. 16(2),9,14 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_SiO2_quartz_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: solid
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 0.1, S_298_over_R_uncertainty: 0.02, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: SiO2(qu), Delta_f_H_298_over_R_kK: -109.53, S_298_over_R: 4.99, H298_minus_H0_over_R_kK: 0.8318, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 7,2,9,14,16 for ΔfH°298; no thermal-function references are listed for SiO2(qu).", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_SiO2_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 1.0, S_298_over_R_uncertainty: 0.1, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: SiO2(g), Delta_f_H_298_over_R_kK: -38.7, S_298_over_R: 27.496, H298_minus_H0_over_R_kK: 1.268, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 16,2,14 for thermal functions; refs. 16,2,9,14 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_Si2_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 2.0, S_298_over_R_uncertainty: 0.1, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Si2(g), Delta_f_H_298_over_R_kK: 67.9, S_298_over_R: 27.625, H298_minus_H0_over_R_kK: 1.1141, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 16,2,9,14 for thermal functions; ref. 16 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
+    - observation_id: LH87_Si2O2_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 2.0, S_298_over_R_uncertainty: 3.0, confidence_level: not_stated}
+      values:
+        quantity: thermodynamic_table_values
+        formula: Si2O2(g)
+        Delta_f_H_298_over_R_kK: -43.22
+        S_298_over_R: 37.3
+        H298_minus_H0_over_R_kK: 1.835
+        method_class: quoted_attributed
+        attribution: Table 3 value; Table 4 lists no source references for Si2O2(g).
+        status: typed_refusal
+        admission_status: typed_refusal
+        reason: Table 4 provides no attribution for this selected value.
+    - observation_id: LH87_Si3_g_table3
+      type: gibbs_table
+      locator: *lh87_table3_p424
+      T_range_K: [298, 298]
+      phase: gas
+      units: kK for ΔfH°298/R and (H°298−H°0)/R; dimensionless S°298/R
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '298'}
+          locator: *lh87_table3_p424
+      uncertainty: {Delta_f_H_298_over_R_uncertainty_kK: 3.0, S_298_over_R_uncertainty: 0.6, confidence_level: not_stated}
+      values: {quantity: thermodynamic_table_values, formula: Si3(g), Delta_f_H_298_over_R_kK: 74.0, S_298_over_R: 32.3, H298_minus_H0_over_R_kK: 1.6783, method_class: quoted_attributed, attribution: "Table 4, Table 3 columns: refs. 23,2,14,16 for thermal functions; refs. 8,2,14,16 for ΔfH°298.", status: typed_refusal, admission_status: typed_refusal, reason: "No schema quantity token represents this combined Table 3 value set."}
 fidelity_samples:
 - path: species.Ga2O.observations[LH87_Ga2O_g_formation].values
   value:
