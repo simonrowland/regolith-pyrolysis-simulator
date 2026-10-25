@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery import migrate as battery_migrate
 from simulator.battery.enums import AmountBasis, EvidenceClass
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import validate_extract_document
@@ -145,12 +146,16 @@ def test_isolated_migration_binds_conditions_and_keeps_unprinted_pressure_unknow
     assert all("coordination" in obs.admission.reason for obs in unavailable)
 
     for row in _grid():
-        raw_id = f"hayashi_2019_t2_{row['sample']}_fe2_fraction"
-        source, values = _by_id(document, raw_id)
-        assert source["units"] == "%"
-        assert source["units_note"] == "Source wording: % of total Fe as printed"
-        assert migrated[raw_id].value.point == Decimal(row["Fe2+/Fetotal_pct"]) / 100
-
+        for suffix, grid_field in (
+            ("fe2_fraction", "Fe2+/Fetotal_pct"),
+            ("fe3_oct_fraction", "Fe3+(oct)/Fetotal_pct"),
+            ("fe3_tetr_fraction", "Fe3+(tetr)/Fetotal_pct"),
+        ):
+            raw_id = f"hayashi_2019_t2_{row['sample']}_{suffix}"
+            source, _values = _by_id(document, raw_id)
+            assert source["units"] == "%"
+            assert source["units_note"] == "Source wording: % of total Fe as printed"
+            assert migrated[raw_id].value.point == Decimal(row[grid_field]) / 100
     for raw_id, obs in migrated.items():
         source = raw_records[raw_id]
         conditions = source["values"].get("points", [{}])[0]["point_conditions"]
@@ -222,3 +227,30 @@ def test_isolated_migration_binds_conditions_and_keeps_unprinted_pressure_unknow
         else:
             assert gas.startswith("CO-CO2")
             assert point["gas_flow_rate_as_published"] == "100 ml/min"
+
+
+def test_percent_units_are_canonical_throughout_extract():
+    accepted = battery_migrate._PERCENT_FRACTION_UNITS
+
+    def assert_canonical(node):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if (
+                    key in {"units", "output_unit"}
+                    and isinstance(value, str)
+                    and "%" in value
+                ):
+                    assert value.casefold() in accepted, (key, value)
+                assert_canonical(value)
+        elif isinstance(node, list):
+            for value in node:
+                assert_canonical(value)
+
+    document = _document()
+    assert_canonical(document)
+
+    mutated = deepcopy(document)
+    record, _values = _by_id(mutated, "hayashi_2019_t2_A1_fe3_oct_fraction")
+    record["units"] = "% of total Fe as printed"
+    with pytest.raises(AssertionError):
+        assert_canonical(mutated)
