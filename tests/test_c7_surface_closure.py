@@ -472,3 +472,45 @@ def test_mixed_asteroid_zero_keeps_neutral_pressure():
         assert flux.species_kg_hr['SiO2_gas'] > 0.0
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+def test_internal_buffer_coproduct_is_not_overhead_gas_demand():
+    # Lunar smoke hour 29: store the coproduct without subtracting two gross
+    # floats to recover the gas demand. The overhead ledger delta owns R.
+    stored = 0.00045222020932088954
+    point = _SurfaceOxygenEvaluation(
+        7.706491106080192e-26, 7.706491106080192e-26, 0.0, 0.0,
+        {'Fe_Na_K_Mn': stored - 5.7520419261263434e-18}, 0.0, 0.0, stored,
+        overhead_oxygen_mol_m2_s=0.0)
+    assert point.residual == 0.0
+    assert point.storage_mol_m2_s == stored
+
+
+def test_transport_bounded_batch_retains_internal_buffer_coproduct():
+    from simulator.state import EvaporationFlux
+    sim = simulation('s_type_asteroid_silicate')
+    try:
+        sim.melt.temperature_C = 1070.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+        sim.atom_ledger.load_external_mol('process.overhead_gas', {'O2': 1.0},
+            material_origin='feedstock', source='test finite headspace')
+        sim._frozen_evaporation_carriers = frozenset({'Na', 'CrO2', 'CrO3'})
+        flux = EvaporationFlux(species_kg_hr={
+            'Na': 0.001, 'CrO2': 5.808349183114205e-10,
+            'CrO3': 3.3342076872338656e-10})
+        flux.update_totals()
+        full = sim._detached_evaporation_projection()
+        limited = sim._detached_evaporation_projection()
+        full._apply_evaporation_carrier_batch(deepcopy(flux))
+        start = len(limited.atom_ledger.transitions)
+        before = limited.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
+        # Lunar inward film supply at the recorded area and one-hour dt.
+        supply = 4.993391080925191e-25 * 0.41006003303200633 * 3600.0
+        limited._apply_evaporation_carrier_batch(deepcopy(flux), oxygen_uptake_capacity_mol=supply)
+        amounts, _ = limited._evaporation_signed_amounts(start, before)
+        assert amounts['gas:O2'] == pytest.approx(-supply, rel=1e-12, abs=0.0)
+        assert limited.atom_ledger.mol_by_account('reservoir.fo2_buffer') == full.atom_ledger.mol_by_account('reservoir.fo2_buffer')
+        assert limited._oxygen_uptake_transport_limited
+    finally:
+        close_test_owned_magemin_backend(sim)
