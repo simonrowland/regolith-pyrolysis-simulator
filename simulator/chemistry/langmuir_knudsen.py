@@ -559,7 +559,8 @@ class _SurfaceOxygenEvaluation:
 
     @property
     def balance_terms(self) -> tuple[float, ...]:
-        # All terms are mol O2/(m² s). Ferric rate is signed mol Fe2O3:
+        # Signed audit partition, mol O2/(m² s); the overhead delta owns
+        # the residual. Ferric rate is signed mol Fe2O3:
         # 2 FeO + 1/2 O2 -> Fe2O3, so reduction supplies +1/2 per mol.
         return (self.oxygen_flux_mol_m2_s,
                 0.5 * self.atomic_oxygen_flux_mol_m2_s,
@@ -587,7 +588,7 @@ def _solve_surface_oxygen_balance(
     settle_inward_endpoint: Callable[[float], _SurfaceOxygenEvaluation] | None = None,
     bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
 ) -> _SurfaceOxygenEvaluation:
-    """Close signed source/storage with an independently represented excess.
+    """Close film flux against the overhead change using signed excess.
 
     Premise: transport responds to Delta = p_surface - p_bulk, which can be
     much smaller than an ulp of p_bulk. Subtracting rounded absolute pressures
@@ -603,8 +604,8 @@ def _solve_surface_oxygen_balance(
     """
     if source_free_zero is not None:
         zero = source_free_zero
-        if zero.reaction_pO2_bar != 0.0 or any(zero.balance_terms):
-            raise ValueError('source-free zero requires individually zero balance terms')
+        if zero.reaction_pO2_bar != 0.0 or zero.residual != 0.0:
+            raise ValueError('zero endpoint must close the overhead oxygen balance')
         return zero
     low_log, high_log = map(float, bracket_log10_pO2_bar)
     bulk = float(bulk_pO2_bar)

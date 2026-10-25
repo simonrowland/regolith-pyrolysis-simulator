@@ -4214,15 +4214,14 @@ class EvaporationMixin:
             )
 
         try:
-            # Existing cold/no-liquid gates prove no carrier source independently
-            # of a trial pressure or rate cutoff. Settlement may still supply
-            # oxygen, so check its individually signed terms before accepting 0.
+            # Cold/no-liquid gates avoid positive-pressure trial work, but
+            # settlement must still close the same direct overhead residual.
             zero = None
             zero_reason = (self._evaporation_carrier_zero_reason(equilibrium, oxygen_bar=0.0)
                            if bulk == 0.0 else None)
             if bulk == 0.0 and zero_reason and zero_reason != 'frozen_consuming_carriers_at_zero_oxygen':
                 candidate = evaluate(0.0)
-                if not any(candidate.balance_terms):
+                if candidate.residual == 0.0:
                     zero = candidate
             solved = _solve_surface_oxygen_balance(
                 evaluate, bulk_pO2_bar=bulk, source_free_zero=zero,
