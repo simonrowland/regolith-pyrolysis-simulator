@@ -57,7 +57,7 @@ def test_sasamoto_1974_table_cells_conditions_and_migration_are_pinned() -> None
         row for row in mgo_rows if row["observation_id"].endswith("areal_rate_typed_refusal")
     ]
     table4_fit = [
-        row for row in mg_rows if row["observation_id"].endswith("overall_alpha_fit")
+        row for row in mgo_rows if row["observation_id"].endswith("overall_alpha_fit")
     ]
     table4_parameters = [
         row for row in mgo_rows if row["observation_id"].endswith("activation_parameters_typed_refusal")
@@ -65,6 +65,9 @@ def test_sasamoto_1974_table_cells_conditions_and_migration_are_pinned() -> None
 
     assert len(table3_pressure) == len(table3_alpha) == len(table3_rate) == 32
     assert len(table4_fit) == len(table4_parameters) == 6
+    assert all(row["phase"] == "condensed_solid" for row in table4_fit)
+    assert all(row["values"]["admission_status"] == "typed_refusal" for row in table4_fit)
+    assert all("overall MgO evaporation coefficient" in row["values"]["refusal_reason"] for row in table4_fit)
     table2 = next(
         row for row in extract["species"]["MgO"]["context"]
         if row["observation_id"].endswith("table2_specimen_porosity_density_and_molding_pressure")
@@ -155,6 +158,14 @@ def test_sasamoto_1974_table_cells_conditions_and_migration_are_pinned() -> None
         assert identity.composition.is_unknown
         assert identity.total_pressure_Pa.is_unknown
         assert identity.fO2_Pa.is_unknown
+
+    table4_identity = _migrated_by_id(migrator, "sasamoto_1974_table4_specimen_1_overall_alpha_fit").identity
+    assert table4_identity.species.formula == "MgO"
+    assert table4_identity.species.phase.value is battery_migrate.Phase.CR
+    assert _migrated_by_id(migrator, "sasamoto_1974_table4_specimen_1_overall_alpha_fit").value.kind.value == "unavailable"
+    table3_identity = _migrated_by_id(migrator, "sasamoto_1974_table3_1_1_mg_vaporization_coefficient").identity
+    assert table3_identity.species.formula == "Mg"
+    assert table3_identity.species.phase.value is battery_migrate.Phase.G
 
     assert all(check_fidelity_sample_matches(extract, sample) == [] for sample in extract["fidelity_samples"])
     mutated = copy.deepcopy(extract)

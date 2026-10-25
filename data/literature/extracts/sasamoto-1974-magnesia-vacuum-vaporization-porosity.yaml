@@ -65,7 +65,7 @@ fidelity_samples:
     table: '3'
     row_label: 1-1
     note: Rendered Table 3 cell, vaporization coefficient column.
-- species: Mg
+- species: MgO
   observable: alpha
   observation_id: sasamoto_1974_table4_specimen_6_overall_alpha_fit
   field: alpha_form
@@ -10542,6 +10542,23 @@ species:
         T_C: '1640'
         attribution: Sasamoto et al. (1974), Table 3, equation (9); equilibrium pressures are from Ackermann et
           al. [9].
+    context:
+    - observation_id: sasamoto_1974_single_crystal_surface_microscopy_30_min_protocol
+      type: experiment_series
+      locator:
+        page: 3
+        published_page: 605
+        pdf_page_index: 2
+        section: 3.1 Observation of the surface of MgO single crystal after vaporization
+      units: min as printed
+      values:
+        quantity: surface_microscopy_protocol_context
+        method_class: measured_direct
+        duration_min_as_printed: '30'
+        scope_note: Single-crystal specimens were vaporized at each temperature for 30 min for the separate surface-microscopy
+          sequence; this is not a duration for the Table 3 kinetic runs.
+  MgO:
+    observations:
     - observation_id: sasamoto_1974_table4_specimen_1_overall_alpha_fit
       type: alpha
       locator:
@@ -10550,8 +10567,8 @@ species:
         pdf_page_index: 6
         table: '4'
         row_label: '1'
-        note: Table 4 fit; input measurements are the Table 3 rate rows for the associated specimen(s).
-      phase: gas
+        note: 'Table 4 overall MgO coefficient fit; the condensed MgO(s) sample is described on PDF p. 2, distinct from the Table 3 Mg(g) coefficient.'
+      phase: condensed_solid
       regime: langmuir_free_vaporization
       units: dimensionless
       point_conditions:
@@ -10696,13 +10713,16 @@ species:
           type: arrhenius
           expression: α̅_MgO = 34.1 exp(-15,700/RT)
         overall_coefficient_as_printed: α̅_MgO = 34.1 exp(-15,700/RT)
-        specimen_number_as_printed: '1'
-        apparent_porosity_pct_as_printed: '0'
+        status: typed_refusal
+        admission_status: typed_refusal
+        refusal_reason: No schema token represents the overall MgO evaporation coefficient; preserve the printed fit without identifying it as Mg(g).
         equilibrium_parameters_as_printed:
           ΔH°_kcal_mol: '176.3'
           ΔS°_cal_deg_mol: '49.74'
           note: 'Printed below Table 4: at equilibrium.'
         calculation_as_printed: Calculated from experimental data assuming MgO(s) ⇌ Mg(g) + 1/2 O2(g).
+        specimen_number_as_printed: '1'
+        apparent_porosity_pct_as_printed: '0'
       derived_from:
       - sasamoto_1974_table3_1_1_areal_rate_typed_refusal
       - sasamoto_1974_table3_1_2_areal_rate_typed_refusal
@@ -10748,8 +10768,8 @@ species:
         pdf_page_index: 6
         table: '4'
         row_label: '2'
-        note: Table 4 fit; input measurements are the Table 3 rate rows for the associated specimen(s).
-      phase: gas
+        note: 'Table 4 overall MgO coefficient fit; the condensed MgO(s) sample is described on PDF p. 2, distinct from the Table 3 Mg(g) coefficient.'
+      phase: condensed_solid
       regime: langmuir_free_vaporization
       units: dimensionless
       point_conditions:
@@ -10893,13 +10913,16 @@ species:
           type: arrhenius
           expression: α̅_MgO = 42.9 exp(-15,000/RT)
         overall_coefficient_as_printed: α̅_MgO = 42.9 exp(-15,000/RT)
-        specimen_number_as_printed: '2'
-        apparent_porosity_pct_as_printed: '9.1'
+        status: typed_refusal
+        admission_status: typed_refusal
+        refusal_reason: No schema token represents the overall MgO evaporation coefficient; preserve the printed fit without identifying it as Mg(g).
         equilibrium_parameters_as_printed:
           ΔH°_kcal_mol: '176.3'
           ΔS°_cal_deg_mol: '49.74'
           note: 'Printed below Table 4: at equilibrium.'
         calculation_as_printed: Calculated from experimental data assuming MgO(s) ⇌ Mg(g) + 1/2 O2(g).
+        specimen_number_as_printed: '2'
+        apparent_porosity_pct_as_printed: '9.1'
       derived_from:
       - sasamoto_1974_table3_2_1_areal_rate_typed_refusal
       - sasamoto_1974_table3_2_2_areal_rate_typed_refusal
@@ -10939,8 +10962,8 @@ species:
         pdf_page_index: 6
         table: '4'
         row_label: '3'
-        note: Table 4 fit; input measurements are the Table 3 rate rows for the associated specimen(s).
-      phase: gas
+        note: 'Table 4 overall MgO coefficient fit; the condensed MgO(s) sample is described on PDF p. 2, distinct from the Table 3 Mg(g) coefficient.'
+      phase: condensed_solid
       regime: langmuir_free_vaporization
       units: dimensionless
       point_conditions:
@@ -11084,13 +11107,16 @@ species:
           type: arrhenius
           expression: α̅_MgO = 34.1 exp(-13,600/RT)
         overall_coefficient_as_printed: α̅_MgO = 34.1 exp(-13,600/RT)
-        specimen_number_as_printed: '3'
-        apparent_porosity_pct_as_printed: '14.5'
+        status: typed_refusal
+        admission_status: typed_refusal
+        refusal_reason: No schema token represents the overall MgO evaporation coefficient; preserve the printed fit without identifying it as Mg(g).
         equilibrium_parameters_as_printed:
           ΔH°_kcal_mol: '176.3'
           ΔS°_cal_deg_mol: '49.74'
           note: 'Printed below Table 4: at equilibrium.'
         calculation_as_printed: Calculated from experimental data assuming MgO(s) ⇌ Mg(g) + 1/2 O2(g).
+        specimen_number_as_printed: '3'
+        apparent_porosity_pct_as_printed: '14.5'
       derived_from:
       - sasamoto_1974_table3_3_1_areal_rate_typed_refusal
       - sasamoto_1974_table3_3_2_areal_rate_typed_refusal
@@ -11130,9 +11156,8 @@ species:
         pdf_page_index: 6
         table: '4'
         row_label: '4'
-        note: Table 4 fit; input measurements are the Table 3 rate rows for the associated specimen(s). The Table
-          4 H*, S*, and overall-coefficient cells span specimen rows 4 and 5.
-      phase: gas
+        note: 'Table 4 overall MgO coefficient fit; the condensed MgO(s) sample is described on PDF p. 2, distinct from the Table 3 Mg(g) coefficient. The coefficient cell spans specimen rows 4 and 5.'
+      phase: condensed_solid
       regime: langmuir_free_vaporization
       units: dimensionless
       point_conditions:
@@ -11276,13 +11301,16 @@ species:
           type: arrhenius
           expression: α̅_MgO = 15.2 exp(-10,500/RT)
         overall_coefficient_as_printed: α̅_MgO = 15.2 exp(-10,500/RT)
-        specimen_number_as_printed: '4'
-        apparent_porosity_pct_as_printed: '20.5'
+        status: typed_refusal
+        admission_status: typed_refusal
+        refusal_reason: No schema token represents the overall MgO evaporation coefficient; preserve the printed fit without identifying it as Mg(g).
         equilibrium_parameters_as_printed:
           ΔH°_kcal_mol: '176.3'
           ΔS°_cal_deg_mol: '49.74'
           note: 'Printed below Table 4: at equilibrium.'
         calculation_as_printed: Calculated from experimental data assuming MgO(s) ⇌ Mg(g) + 1/2 O2(g).
+        specimen_number_as_printed: '4'
+        apparent_porosity_pct_as_printed: '20.5'
       derived_from:
       - sasamoto_1974_table3_4_1_areal_rate_typed_refusal
       - sasamoto_1974_table3_4_2_areal_rate_typed_refusal
@@ -11330,9 +11358,8 @@ species:
         pdf_page_index: 6
         table: '4'
         row_label: '5'
-        note: Table 4 fit; input measurements are the Table 3 rate rows for the associated specimen(s). The Table
-          4 H*, S*, and overall-coefficient cells span specimen rows 4 and 5.
-      phase: gas
+        note: 'Table 4 overall MgO coefficient fit; the condensed MgO(s) sample is described on PDF p. 2, distinct from the Table 3 Mg(g) coefficient. The coefficient cell spans specimen rows 4 and 5.'
+      phase: condensed_solid
       regime: langmuir_free_vaporization
       units: dimensionless
       point_conditions:
@@ -11476,13 +11503,16 @@ species:
           type: arrhenius
           expression: α̅_MgO = 15.2 exp(-10,500/RT)
         overall_coefficient_as_printed: α̅_MgO = 15.2 exp(-10,500/RT)
-        specimen_number_as_printed: '5'
-        apparent_porosity_pct_as_printed: '25.0'
+        status: typed_refusal
+        admission_status: typed_refusal
+        refusal_reason: No schema token represents the overall MgO evaporation coefficient; preserve the printed fit without identifying it as Mg(g).
         equilibrium_parameters_as_printed:
           ΔH°_kcal_mol: '176.3'
           ΔS°_cal_deg_mol: '49.74'
           note: 'Printed below Table 4: at equilibrium.'
         calculation_as_printed: Calculated from experimental data assuming MgO(s) ⇌ Mg(g) + 1/2 O2(g).
+        specimen_number_as_printed: '5'
+        apparent_porosity_pct_as_printed: '25.0'
       derived_from:
       - sasamoto_1974_table3_4_1_areal_rate_typed_refusal
       - sasamoto_1974_table3_4_2_areal_rate_typed_refusal
@@ -11530,8 +11560,8 @@ species:
         pdf_page_index: 6
         table: '4'
         row_label: '6'
-        note: Table 4 fit; input measurements are the Table 3 rate rows for the associated specimen(s).
-      phase: gas
+        note: 'Table 4 overall MgO coefficient fit; the condensed MgO(s) sample is described on PDF p. 2, distinct from the Table 3 Mg(g) coefficient.'
+      phase: condensed_solid
       regime: langmuir_free_vaporization
       units: dimensionless
       point_conditions:
@@ -11675,13 +11705,16 @@ species:
           type: arrhenius
           expression: α̅_MgO = 12.3 exp(-9,130/RT)
         overall_coefficient_as_printed: α̅_MgO = 12.3 exp(-9,130/RT)
-        specimen_number_as_printed: '6'
-        apparent_porosity_pct_as_printed: '30.0'
+        status: typed_refusal
+        admission_status: typed_refusal
+        refusal_reason: No schema token represents the overall MgO evaporation coefficient; preserve the printed fit without identifying it as Mg(g).
         equilibrium_parameters_as_printed:
           ΔH°_kcal_mol: '176.3'
           ΔS°_cal_deg_mol: '49.74'
           note: 'Printed below Table 4: at equilibrium.'
         calculation_as_printed: Calculated from experimental data assuming MgO(s) ⇌ Mg(g) + 1/2 O2(g).
+        specimen_number_as_printed: '6'
+        apparent_porosity_pct_as_printed: '30.0'
       derived_from:
       - sasamoto_1974_table3_6_1_areal_rate_typed_refusal
       - sasamoto_1974_table3_6_2_areal_rate_typed_refusal
@@ -11713,23 +11746,6 @@ species:
         - Ackermann and Thorn, reference [9], for the equilibrium-pressure data used in the paper's calculation.
       uncertainty:
         note: No uncertainty for the fit is printed.
-    context:
-    - observation_id: sasamoto_1974_single_crystal_surface_microscopy_30_min_protocol
-      type: experiment_series
-      locator:
-        page: 3
-        published_page: 605
-        pdf_page_index: 2
-        section: 3.1 Observation of the surface of MgO single crystal after vaporization
-      units: min as printed
-      values:
-        quantity: surface_microscopy_protocol_context
-        method_class: measured_direct
-        duration_min_as_printed: '30'
-        scope_note: Single-crystal specimens were vaporized at each temperature for 30 min for the separate surface-microscopy
-          sequence; this is not a duration for the Table 3 kinetic runs.
-  MgO:
-    observations:
     - observation_id: sasamoto_1974_table3_1_1_areal_rate_typed_refusal
       type: rate_series
       locator:
