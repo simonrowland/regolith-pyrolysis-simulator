@@ -5125,10 +5125,7 @@ def _migrate_redox_extract(path: Path):
 
 def test_cottrell_table_1_compositions_reach_redox_identity():
     """Table 1 compositions reach every redox identity that has a numeric map."""
-    from decimal import InvalidOperation
-
     path = EXTRACTS / "cottrell-2009-iron-xanes.yaml"
-    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     rows = _migrate_redox_extract(path)
 
     assert len(rows) == 41
@@ -5136,28 +5133,51 @@ def test_cottrell_table_1_compositions_reach_redox_identity():
     assert len(bound) == 39
     assert sum(row.identity.composition.is_unknown for row in rows) == 2
 
-    expected = {
-        (Decimal("50.81"), Decimal("9.53")),  # AII, published p. 168
-        (Decimal("49.42"), Decimal("10.17")),  # LW, published p. 168
-        (Decimal("74.40"), Decimal("2.44")),  # DT_46, published p. 168
+    # Table 1, published p. 168: sample-to-column bindings and distinguishing
+    # oxide cells transcribed here independently of the extract's source maps.
+    sample_columns = {
+        "AII_-35": "AII",
+        "AII_-25": "AII",
+        "AII_-15": "AII",
+        "AII_-05": "AII",
+        "AII_0": "AII",
+        "AII_05": "AII",
+        "AII_15": "AII",
+        "AII_25": "AII",
+        "AII_35": "AII",
+        "AII_45": "AII",
+        "LW_-30": "LW",
+        "LW_-20": "LW",
+        "LW_-10": "LW",
+        "LW_0": "LW",
+        "LW_10": "LW",
+        "LW_20": "LW",
+        "568_2": "VG568",
+        "DT_46": "DT_46",
+        "DT_39": "DT_39",
+        "H2O_63": "H2O_63",
+        "DT_31": "DT_31",
+        "DT_18": "DT_18",
     }
-    observed = set()
-    expected_compositions = set()
-    for material in doc["source_material_compositions"].values():
-        try:
-            expected_compositions.add(
-                tuple(
-                    sorted(
-                        (
-                            "FeOT" if name == "FeOTOT" else name,
-                            Decimal(str(value)),
-                        )
-                        for name, value in material["values_as_published"].items()
-                    )
-                )
-            )
-        except InvalidOperation:
-            continue
+    table_columns = {
+        "AII": {"SiO2": "50.81", "FeOTOT": "9.53"},
+        "LW": {"SiO2": "49.42", "FeOTOT": "10.17"},
+        "VG568": {"SiO2": "77.51", "FeOTOT": "1.31"},
+        "DT_46": {"SiO2": "74.40", "Fe2O3": "3.58", "FeO": "2.44"},
+        "DT_39": {"SiO2": "73.10", "Fe2O3": "1.99", "FeO": "3.89"},
+        "H2O_63": {"SiO2": "70.40", "Fe2O3": "3.46", "FeO": "2.11"},
+        "DT_31": {"SiO2": "77.30", "Fe2O3": "3.01", "FeO": "1.59"},
+        "DT_18": {"SiO2": "72.60", "Fe2O3": "3.89", "FeO": "1.80"},
+    }
+    point_samples = {
+        ("cottrell_2009_rhyolite_mossbauer", 1): "DT_46",
+        ("cottrell_2009_rhyolite_mossbauer", 2): "DT_39",
+        ("cottrell_2009_moore_wet_chemistry_quotes", 0): "DT_46",
+        ("cottrell_2009_moore_wet_chemistry_quotes", 1): "DT_39",
+        ("cottrell_2009_moore_wet_chemistry_quotes", 2): "H2O_63",
+        ("cottrell_2009_moore_wet_chemistry_quotes", 4): "DT_31",
+        ("cottrell_2009_moore_wet_chemistry_quotes", 5): "DT_18",
+    }
     for row in bound:
         printed = row.point_conditions["printed_composition"]
         located_composition = row.point_conditions["composition"]
@@ -5166,17 +5186,38 @@ def test_cottrell_table_1_compositions_reach_redox_identity():
         assert row.identity.composition.is_value
         assert located_composition.locator.page == 2
         assert located_composition.locator.table == "1"
+        if ":row=" in row.observation_id:
+            sample = row.observation_id.rsplit(":row=", 1)[1].split(":h=", 1)[0]
+        else:
+            observation_id, point = row.observation_id.rsplit("::point:", 1)
+            sample = point_samples[(observation_id.rsplit("::", 1)[1], int(point))]
+        column = sample_columns[sample.upper()]
+        expected_cells = table_columns[column]
+        migrated_cells = {
+            "FeOT" if oxide == "FeOTOT" else oxide: value
+            for oxide, value in expected_cells.items()
+        }
         composition = printed.state.value
-        assert tuple(
-            sorted((name, Decimal(str(value))) for name, value in composition.items())
-        ) in expected_compositions
-        observed.add(
-            (
-                Decimal(composition["SiO2"]),
-                Decimal(composition.get("FeOT", composition.get("FeO"))),
-            )
+        assert {
+            oxide: Decimal(str(composition[oxide])) for oxide in migrated_cells
+        } == {oxide: Decimal(value) for oxide, value in migrated_cells.items()}
+        expected_fraction = battery_migrate.wt_pct_to_mole_fraction(
+            {oxide: Decimal(value) for oxide, value in migrated_cells.items()}
         )
-    assert expected <= observed
+        identity_components = dict(row.identity.composition.value.components)
+        expected_components = dict(expected_fraction.components)
+        selected_components = tuple(expected_components)
+        expected_total = sum(
+            (expected_components[name] for name in selected_components), Decimal(0)
+        )
+        identity_total = sum(
+            (identity_components[name] for name in selected_components), Decimal(0)
+        )
+        for name in selected_components:
+            assert abs(
+                identity_components[name] / identity_total
+                - expected_components[name] / expected_total
+            ) < Decimal("1e-25")
 
     aii_minus_15 = next(
         row for row in bound if ":row=aii_-15:" in row.observation_id

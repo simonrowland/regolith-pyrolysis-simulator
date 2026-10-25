@@ -1408,6 +1408,7 @@ def test_extract_malformed_quench_condition_is_a_row_refusal(
         "observation_id",
         "ferric_fraction",
         "glass_rows",
+        "unknown_rows",
     ),
     (
         (
@@ -1415,18 +1416,21 @@ def test_extract_malformed_quench_condition_is_a_row_refusal(
             "aithala_2026_vf271_xanes",
             "0.816",
             16,
+            12,
         ),
         (
             "matzen-2022-martian-basalt-redox.yaml",
             "matzen_2022_run_7_method_a",
             "0.69",
             24,
+            1,  # The added pooled composition record has unknown phase.
         ),
         (
             "sossi-2020-magma-ocean-redox.yaml",
             "sossi_2020_per_f_o2_1_xanes",
             "0.44",
             12,
+            0,
         ),
     ),
 )
@@ -1435,19 +1439,15 @@ def test_quenched_glass_fe_valence_extracts_migrate_as_glass(
     observation_id: str,
     ferric_fraction: str,
     glass_rows: int,
+    unknown_rows: int,
 ):
     extract = ROOT / "data/literature/extracts" / extract_name
     migrator = Migrator(ROOT)
     migrator._migrate_extract(extract)
     migrator.finalize()
-    rows = [
-        row
-        for row in migrator.result.observations.values()
-        if row.identity.quantity.is_value
-        and row.identity.quantity.value is Quantity.FE3_FE2_RATIO
-    ]
+    rows = list(migrator.result.observations.values())
     phases = Counter(phase_token(row.identity.species) for row in rows)
-    assert phases == Counter({Phase.GLASS: glass_rows})
+    assert phases == Counter({Phase.GLASS: glass_rows, None: unknown_rows})
 
     row = next(
         row
