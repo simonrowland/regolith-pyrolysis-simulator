@@ -125,8 +125,18 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     )
 
     def no_evaporation(inventory, *_args, **_kwargs):
-        return SimpleNamespace(
-            residue_mol=dict(inventory), buffer_oxygen_exchange_mol=0.0
+        return residue.ResidueInventoryResult(
+            residue_mol=dict(inventory),
+            evaporated_mol={},
+            pO2_bar_by_step=(),
+            pO2_balance_bracket_boundary_by_step=(),
+            pO2_balance_floor_steps=0,
+            pO2_balance_floor_first_step=None,
+            pO2_balance_floor_time_fraction=0.0,
+            pO2_balance_floor_time_s=0.0,
+            pO2_balance_floor_pO2_bar=None,
+            atom_closure_mol={},
+            buffer_oxygen_exchange_mol=0.0,
         )
 
     monkeypatch.setattr(residue, "integrate_residue_inventory", no_evaporation)

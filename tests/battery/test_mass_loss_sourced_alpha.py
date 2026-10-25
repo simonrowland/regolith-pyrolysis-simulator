@@ -108,7 +108,13 @@ def test_shrinking_area_numeric_pin_before_shared_formula_move(monkeypatch):
 
     monkeypatch.setattr(residue, "integrate_residue_inventory", half_inventory)
     residue._hashimoto_integrate_geometry(
-        {"MgO": 1.0}, (), lambda *_: {}, temperature_K=2073.15,
+        {"MgO": 1.0},
+        (
+            residue.ResidueChannel("Mg", "Mg", "MgO", 1.0, "pinned"),
+            residue.ResidueChannel("O2", "O2", None, 1.0, "pinned"),
+        ),
+        lambda *_: {},
+        temperature_K=2073.15,
         duration_s=2.0, steps=2, geometry_policy_id="sphere_shrinking",
         initial_area_m2=0.0000913,
     )

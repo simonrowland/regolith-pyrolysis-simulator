@@ -839,6 +839,8 @@ def test_hashimoto_engine_refusal_flags_one_run_and_keeps_cohort_moving(
         temperature_K,
         duration_s,
         area_evolution_m2,
+        buffered_fO2_log=None,
+        background_pressure_Pa=0.0,
     ):
         nonlocal failures_remaining
         if failures_remaining:
