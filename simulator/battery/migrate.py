@@ -8700,6 +8700,17 @@ def _source_point_condition_total_pressure_pa(
     return None
 
 
+def _keeps_phase_composition_unknown_total(observation: Observation) -> bool:
+    """Keep an explicit unknown total on equilibrium-phase composition rows."""
+
+    identity = observation.identity
+    return (
+        isinstance(identity, Identity)
+        and _quantity_token(identity.quantity)
+        is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+
+
 def _without_unprinted_total_pressure(
     point_conditions: Mapping[str, Located[Any]] | None,
 ) -> Mapping[str, Located[Any]] | None:
@@ -21708,13 +21719,7 @@ class Migrator:
 
     def _drop_unprinted_point_totals(self) -> None:
         for observation_id, observation in list(self.result.observations.items()):
-            experiment = self.result.experiments.get(observation.experiment_id)
-            if (
-                experiment is None
-                or not _knudsen_effusion_chamber_background_not_for_identity(
-                    experiment.method
-                )
-            ):
+            if _keeps_phase_composition_unknown_total(observation):
                 continue
             stripped = _without_unprinted_total_pressure(observation.point_conditions)
             if stripped is not observation.point_conditions:

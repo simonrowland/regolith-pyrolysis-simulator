@@ -127,7 +127,7 @@ def test_isolated_migration_keeps_species_temperature_and_unknown_conditions(tmp
         source_observation_id = row.observation_id.split("::")[1]
         assert int(conditions["T_C"].state.value) == expected_by_observation[source_observation_id]
         assert conditions["composition"].state.is_unknown
-        assert conditions["total_pressure_Pa"].state.is_unknown
+        assert "total_pressure_Pa" not in conditions
         assert conditions["fO2_log"].state.is_unknown
         assert row.evidence.class_.is_value
         assert row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
