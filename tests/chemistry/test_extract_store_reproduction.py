@@ -184,7 +184,9 @@ def test_store_yields_adopted_target_type_observations(
     assert len(kems) == 1952
     # Active KEMS source IDs grew from 45 to 81 (+36); source IDs and added
     # extract files are distinct counts (37 files were added).
-    assert len({obs.source_id for obs in kems}) == 81
+    # famBAND04: the Schneider 1980 Figure 2 series adds a new KEMS source
+    # (kems-212-schneider-1980-nbsir-80-2059): 81 -> 82.
+    assert len({obs.source_id for obs in kems}) == 82
     for obs in adopted_observations:
         assert obs.is_priority_winner or obs.adoption_basis in {"mass_spec_extract", "superseded"}
         assert obs.source_id
@@ -1908,7 +1910,8 @@ def test_coverage_ledger_is_observation_first_and_exact(
     assert coverage["skipped"] == 2025
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
     assert coverage["comparable_points"] == 34
-    assert coverage["gap_points"] == 2028
+    # famBAND04: the typed-refused Schneider record is one more gap point: 2028 -> 2029.
+    assert coverage["gap_points"] == 2029
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")
