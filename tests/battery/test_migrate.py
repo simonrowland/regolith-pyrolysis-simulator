@@ -4671,16 +4671,26 @@ def test_langmuir_migrated_rows_keep_qualified_derived_from() -> None:
     """
 
     migrator = Migrator(REPO_ROOT)
+    migrator._migrate_extract(
+        REPO_ROOT / "data" / "literature" / "extracts" / "kems-005-fedkin-2006.yaml"
+    )
     migrator._migrate_langmuir(
         REPO_ROOT / "data" / "literature" / "langmuir_knudsen_flux_validation.yaml"
     )
+    migrator.finalize()
     observations = migrator.result.observations
     assert observations["chromium_solid_langmuir_knudsen"].derived_from == (
         "kems-003-pound-1972::pound_1972_cr_solid_alpha_mccabe",
     )
+    fedkin_k = next(
+        observation_id
+        for observation_id in observations
+        if observation_id.startswith(
+            "kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir"
+        )
+    )
     assert observations["potassium_silicate_vacuum"].derived_from == (
-        "kems-005-fedkin-2006::context::fedkin_2006_k_yu_langmuir",
-        "kems-005-fedkin-2006::context::fedkin_2006_k_class_b1",
+        fedkin_k,
     )
     assert observations["iron_olivine_kems"].derived_from is None
 

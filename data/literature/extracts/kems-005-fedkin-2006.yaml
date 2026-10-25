@@ -363,10 +363,9 @@ species:
   SiO:
     observations: []
   Na:
-    observations: []
-    context:
+    observations:
     - observation_id: fedkin_2006_na_yu_langmuir
-      type: best_fit_model_context
+      type: alpha
       locator:
         source_path: text/kems-005-fedkin-2006/mineru/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
         figure: '4'
@@ -392,6 +391,8 @@ species:
         - 0.31
         gas_species: Na(g)
         material: Yu_et_al_2003_chondrule_analog
+        method_class: author_estimate
+        model: Fedkin et al. (2006) MELTS and Hertz-Knudsen fit to Yu et al. (2003) data
         note: Alexander (2002) got α_Na=0.12 on same data — competing; retain Fedkin
           value
         system_note: Yu et al. composition 1 chondrule analog; reported coefficient
@@ -423,13 +424,10 @@ species:
           locator:
             page: 9
             figure: '4'
-      context_note: Author-reported best-fit model coefficient for Yu et al. data;
-        model output, not a measured evaporation coefficient.
   K:
-    observations: []
-    context:
+    observations:
     - observation_id: fedkin_2006_k_yu_langmuir
-      type: best_fit_model_context
+      type: alpha
       locator:
         source_path: text/kems-005-fedkin-2006/mineru/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
         figure: '4'
@@ -454,6 +452,8 @@ species:
         - 0.15
         gas_species: K(g)
         material: Yu_et_al_2003_chondrule_analog
+        method_class: author_estimate
+        model: Fedkin et al. (2006) MELTS and Hertz-Knudsen fit to Yu et al. (2003) data
         system_note: Yu et al. composition 1 chondrule analog; reported coefficient
           at 1723 K.
         series:
@@ -484,11 +484,9 @@ species:
           locator:
             page: 9
             figure: '4'
-      context_note: Author-reported best-fit model coefficient for Yu et al. data;
-        model output, not a measured evaporation coefficient.
 fidelity_samples:
 - species: K
-  observable: best_fit_model_context
+  observable: alpha
   observation_id: fedkin_2006_k_yu_langmuir
   field: alpha
   value: 0.13
