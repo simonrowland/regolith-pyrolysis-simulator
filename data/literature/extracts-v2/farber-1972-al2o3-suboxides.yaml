@@ -1,0 +1,3424 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/farber-1972-al2o3-suboxides.yaml
+observations:
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al2o2_partial_pressure_table2::T=2200:h=b48ca8330d64
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000547155'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2200.
+  derivation:
+    relation: The authors reduced Table 1 relative intensities with the reaction (10) cross-section and multiplier-gain corrections,
+      obtained a third-law Al2O2 formation enthalpy of -113.6 ± 2.0 kcal/mol, and used it to calculate the Table 2 Al2O2 pressures
+      in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000054'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000000054'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al2o2_partial_pressure_table2::T=2300:h=2b2a093bbd23
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00036477'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2300.
+  derivation:
+    relation: The authors reduced Table 1 relative intensities with the reaction (10) cross-section and multiplier-gain corrections,
+      obtained a third-law Al2O2 formation enthalpy of -113.6 ± 2.0 kcal/mol, and used it to calculate the Table 2 Al2O2 pressures
+      in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000036'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000036'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al2o2_partial_pressure_table2::T=2400:h=1cf9b5354e40
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.001722525'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2400.
+  derivation:
+    relation: The authors reduced Table 1 relative intensities with the reaction (10) cross-section and multiplier-gain corrections,
+      obtained a third-law Al2O2 formation enthalpy of -113.6 ± 2.0 kcal/mol, and used it to calculate the Table 2 Al2O2 pressures
+      in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000017'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000017'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al2o3_estimated_partial_pressure_table2::T=2200:h=9f75689fe647
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.003141075'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: rejected
+    reason: The Al2O3 column is explicitly marked estimated and is not measured or reduced evidence.
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2200.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:farber-1972-al2o3-suboxides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000031'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al2o3_estimated_partial_pressure_table2::T=2300:h=b095cbe9d0a9
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.02127825'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: rejected
+    reason: The Al2O3 column is explicitly marked estimated and is not measured or reduced evidence.
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2300.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:farber-1972-al2o3-suboxides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000021'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al2o3_estimated_partial_pressure_table2::T=2400:h=1b3e48c96475
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.12159'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: rejected
+    reason: The Al2O3 column is explicitly marked estimated and is not measured or reduced evidence.
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2400.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:farber-1972-al2o3-suboxides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000012'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al2o_partial_pressure_table2::T=2200:h=613a558815f4
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0007194075'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2200.
+  derivation:
+    relation: The authors derived a third-law Al2O formation enthalpy of -33.2 ± 3.0 kcal/mol from Table 1 intensities, with
+      the AlO cross-section and multiplier-gain relationship, and used it to calculate the Table 2 Al2O pressures in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000071'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000071'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al2o_partial_pressure_table2::T=2300:h=ad7d4decc85f
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0044583'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2300.
+  derivation:
+    relation: The authors derived a third-law Al2O formation enthalpy of -33.2 ± 3.0 kcal/mol from Table 1 intensities, with
+      the AlO cross-section and multiplier-gain relationship, and used it to calculate the Table 2 Al2O pressures in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000044'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000044'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al2o_partial_pressure_table2::T=2400:h=2e62dece6c9c
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.03951675'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2400.
+  derivation:
+    relation: The authors derived a third-law Al2O formation enthalpy of -33.2 ± 3.0 kcal/mol from Table 1 intensities, with
+      the AlO cross-section and multiplier-gain relationship, and used it to calculate the Table 2 Al2O pressures in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000039'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000039'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al_partial_pressure_table2::T=2200:h=fcd62996a2aa
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0182385'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2200.
+  derivation:
+    relation: Partial pressure reduced from chopped KEMS ion intensity with the second-law van't Hoff relation and effusion-weight-loss
+      calibration described on pp. 250–251; Table 2 reports the result in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000018'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000018'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and weight-loss calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al_partial_pressure_table2::T=2300:h=8145819880f5
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.07599375'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2300.
+  derivation:
+    relation: Partial pressure reduced from chopped KEMS ion intensity with the second-law van't Hoff relation and effusion-weight-loss
+      calibration described on pp. 250–251; Table 2 reports the result in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000075'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000075'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and weight-loss calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_al_partial_pressure_table2::T=2400:h=1bc91718fb8a
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.3343725'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2400.
+  derivation:
+    relation: Partial pressure reduced from chopped KEMS ion intensity with the second-law van't Hoff relation and effusion-weight-loss
+      calibration described on pp. 250–251; Table 2 reports the result in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000033'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000033'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and weight-loss calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_alo2_partial_pressure_table2::T=2200:h=4e8a23a75f38
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000077007'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2200.
+  derivation:
+    relation: The authors calculated reaction (9) equilibrium constants from Table 1 intensities with cross-section and multiplier-gain
+      corrections, obtained a third-law AlO2 formation enthalpy of -44.3 ± 2.0 kcal/mol, and used it to calculate the Table
+      2 AlO2 pressures in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000076'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000000076'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_alo2_partial_pressure_table2::T=2300:h=2b59d8a64673
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0005167575'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2300.
+  derivation:
+    relation: The authors calculated reaction (9) equilibrium constants from Table 1 intensities with cross-section and multiplier-gain
+      corrections, obtained a third-law AlO2 formation enthalpy of -44.3 ± 2.0 kcal/mol, and used it to calculate the Table
+      2 AlO2 pressures in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000051'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000051'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_alo2_partial_pressure_table2::T=2400:h=80dd8546d128
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.004964925'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2400.
+  derivation:
+    relation: The authors calculated reaction (9) equilibrium constants from Table 1 intensities with cross-section and multiplier-gain
+      corrections, obtained a third-law AlO2 formation enthalpy of -44.3 ± 2.0 kcal/mol, and used it to calculate the Table
+      2 AlO2 pressures in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000049'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000049'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_alo_partial_pressure_table2::T=2200:h=b03656f4b6b5
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00344505'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2200.
+  derivation:
+    relation: Partial pressure reduced from chopped KEMS ion-intensity ratios and thermochemical functions. The authors state
+      on p. 254 that 17 kcal/mol for delta-Hf,298(AlO) was used to obtain these pressures.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000034'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000034'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_alo_partial_pressure_table2::T=2300:h=7082acd3d2da
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0182385'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2300.
+  derivation:
+    relation: Partial pressure reduced from chopped KEMS ion-intensity ratios and thermochemical functions. The authors state
+      on p. 254 that 17 kcal/mol for delta-Hf,298(AlO) was used to obtain these pressures.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000018'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000018'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_alo_partial_pressure_table2::T=2400:h=1b3e48c96475
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.12159'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2400.
+  derivation:
+    relation: Partial pressure reduced from chopped KEMS ion-intensity ratios and thermochemical functions. The authors state
+      on p. 254 that 17 kcal/mol for delta-Hf,298(AlO) was used to obtain these pressures.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000012'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000012'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_o_atomic_partial_pressure_table2::T=2200:h=8f4a5ac30948
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.02127825'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2200.
+  derivation:
+    relation: Partial pressure reduced from chopped KEMS ion intensity using the second-law equilibrium treatment for Al2O3(c)
+      = 2Al(g) + 3O(g), described on pp. 250–251; Table 2 reports the result in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000021'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000021'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and weight-loss calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_o_atomic_partial_pressure_table2::T=2300:h=445bdcf142f6
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.08815275'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2300.
+  derivation:
+    relation: Partial pressure reduced from chopped KEMS ion intensity using the second-law equilibrium treatment for Al2O3(c)
+      = 2Al(g) + 3O(g), described on pp. 250–251; Table 2 reports the result in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000087'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000087'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and weight-loss calibration inputs are not tabulated as pressure-reduction inputs.
+- observation_id: farber-1972-al2o3-suboxides::farber_1972_o_atomic_partial_pressure_table2::T=2400:h=92014c48320c
+  experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: pure_oxide_system
+        components:
+        - - Al2O3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.3951675'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+  notices: []
+  source_id: farber-1972-al2o3-suboxides
+  locator:
+    published_page: 253
+    pdf_page_index: 4
+    table: '2'
+  read_from: unknown:farber-1972-al2o3-suboxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+    temperature:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: T/K = 2400.
+  derivation:
+    relation: Partial pressure reduced from chopped KEMS ion intensity using the second-law equilibrium treatment for Al2O3(c)
+      = 2Al(g) + 3O(g), described on pp. 250–251; Table 2 reports the result in atm.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000039'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000039'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 253
+                pdf_page_index: 4
+                table: '2'
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 253
+          pdf_page_index: 4
+          table: '2'
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 252
+        pdf_page_index: 3
+        table: '1'
+        note: The raw chopped ion currents and weight-loss calibration inputs are not tabulated as pressure-reduction inputs.
