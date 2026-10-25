@@ -49,6 +49,24 @@ def test_miike_1974_activities_match_page_413_render_and_printed_row_counts() ->
         assert row["locator"]["published_page"] == 413
 
 
+def test_miike_1974_equation_1_locators_match_rendered_page_411() -> None:
+    """The rendered first PDF page prints Eq. (1) and the standard Gibbs energy on p. 411."""
+    extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    observations = extract["species"]["FeO"]["observations"]
+
+    assert len(observations) == 24
+    for row in observations:
+        locator = row["values"]["reference_state_locator"]
+        assert locator == {
+            "page": 1,
+            "pdf_page_index": 0,
+            "published_page": 411,
+            "equation": "1",
+            "section": "2.1",
+        }
+        assert row["derivation"]["method"]["locator"] == locator
+
+
 def test_miike_1974_isolated_migration_binds_printed_axes_and_no_total_pressure() -> None:
     """The isolated production migrator maps printed conditions without pressure assumptions."""
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
