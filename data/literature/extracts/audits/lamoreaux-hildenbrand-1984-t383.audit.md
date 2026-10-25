@@ -20,6 +20,6 @@ The committed `compare.txt` records two no-matches: the new K2O melting-temperat
 - New records: 9 observations (Table 1: 1; Table 2: 3; Table 3: 3; Table 4: 2). Table 2 has 7 K2O segments, and Table 3 has 6.
 - Evidence is `quoted_attributed` to the authors' selected compilation. Tables 1–4 refer readers to Table 5 for their underlying sources, but Table 5 is outside the supplied excerpt; each row says so in its attribution.
 - The excerpt states a 1.01325 bar standard state on p. 153. It is retained only as a standard-state label. No experimental total pressure or other point condition is printed for these compiled rows, so none is stored.
-- Table 2's Gibbs energy polynomial and Table 3's enthalpy-increment polynomial do not have matching `Quantity` enum tokens. They remain in the extract as typed-refused records; no schema or migrator token was added.
+- Table 2's Gibbs energy polynomial and Table 3's enthalpy-increment polynomial do not have matching `Quantity` enum tokens. Migration represents their coefficient rows as `EXPRESSION`/`PENDING` with unknown quantity; no schema or migrator token was added.
 - The excerpt contains no printable vapor-pressure table or log-p equation for K2O. Vapor-pressure curves are figure-only and are left as figure-read candidates.
 - Other oxides/species in the excerpt skipped for this addendum: Li2O, Li2O2, NaO2, Na2O, Na2O2, KO2, K2O2, RbO2, Rb2O, Rh2O2, CsO2, CsO3, Cs2O, Cs2O2, Cs3O, and barium-bearing species. Existing rows were not changed.

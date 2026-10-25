@@ -182,13 +182,26 @@ def test_lamoreaux_1987_isolated_migration_keeps_conditions_and_refusals():
     assert quartz.identity.species.polymorph.value is Polymorph.QUARTZ
     assert cristobalite.identity.species.phase.value is Phase.CR
     assert cristobalite.identity.species.polymorph.value is Polymorph.CRISTOBALITE_HIGH
-    for block in document["species"].values():
-        for observation in block.get("observations", []):
-            phase = observation.get("phase")
-            if phase in {"cr", "l"}:
-                row = by_id[observation["observation_id"]]
-                expected_phase = Phase.CR if phase == "cr" else Phase.L
-                assert row.identity.species.phase.value is expected_phase
+    expected_phases = {
+        "LH87_BeO_fusion": Phase.CR,
+        "LH87_MgO_fusion": Phase.CR,
+        "LH87_CaO_fusion": Phase.CR,
+        "LH87_B2O3_fusion": Phase.CR,
+        "LH87_Al2O3_fusion": Phase.CR,
+        "LH87_SiO2_quartz_fusion": Phase.CR,
+        "LH87_SiO2_cristobalite_fusion": Phase.CR,
+        "LH87_BeO_s_table3": Phase.CR,
+        "LH87_MgO_s_table3": Phase.CR,
+        "LH87_CaO_s_table3": Phase.CR,
+        "LH87_B2O3_s_table3": Phase.CR,
+        "LH87_Al2O3_s_table3": Phase.CR,
+        "LH87_SiO2_quartz_table3": Phase.CR,
+    }
+    assert set(expected_phases) <= set(by_id)
+    for observation_id, expected_phase in expected_phases.items():
+        assert (
+            by_id[observation_id].identity.species.phase.value is expected_phase
+        ), observation_id
     for block in document["species"].values():
         for observation in block.get("observations", []):
             observation_id = observation["observation_id"]

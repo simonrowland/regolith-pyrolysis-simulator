@@ -52,7 +52,9 @@ tables:
       - {column: 4, species: K2O}
       - {column: 5, species: K2O}
     attribution: "Lamoreaux and Hildenbrand (1984), Table 2; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
-  - page: 4
+# The MinerU OCR content list puts rows 79–84 in p003-t06; they print on PDF p. 4 / published p. 156.
+# `page` selects the draft block, so emitted locators say PDF p. 3; the extract keeps printed PDF p. 4.
+  - page: 3
     table_index: 6
     published_page: 156
     type: gibbs_table
@@ -67,7 +69,7 @@ tables:
       - {column: 4, species: K2O}
       - {column: 5, species: K2O}
     attribution: "Lamoreaux and Hildenbrand (1984), Table 3; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
-  - page: 4
+  - page: 3
     table_index: 6
     published_page: 156
     type: gibbs_table
@@ -82,7 +84,7 @@ tables:
       - {column: 4, species: K2O}
       - {column: 5, species: K2O}
     attribution: "Lamoreaux and Hildenbrand (1984), Table 3; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
-  - page: 4
+  - page: 3
     table_index: 6
     published_page: 156
     type: gibbs_table
