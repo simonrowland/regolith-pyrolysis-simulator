@@ -1,0 +1,104 @@
+from __future__ import annotations
+
+from decimal import Decimal
+from pathlib import Path
+
+import yaml
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE_ID = "sugawara-1999-fe-na-loss-gas-mixing-furnace"
+EXTRACT = ROOT / "data/literature/extracts" / f"{SOURCE_ID}.yaml"
+
+
+def test_sugawara_1999_render_pins_and_isolated_migration(tmp_path) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    source_rows = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in species["observations"]
+    }
+
+    # Render pins: Table 2 p. 429, Table 3 p. 430, and Table 6 p. 436.
+    pins = (
+        ("sugawara_1999_table2_m48413_feo_loss", "mass_loss_pct", "32", 5),
+        ("sugawara_1999_table3_m48313_average_glass_feot", "FeO_wt_pct", "12.59", 6),
+        ("sugawara_1999_table6_m52701_sio2_quenched_glass", "SiO2_wt_pct", "45.62", 12),
+        ("sugawara_1999_table6_m57105_na2o_loss", "mass_loss_pct", "-233", 12),
+    )
+    for observation_id, field, expected, page in pins:
+        row = source_rows[observation_id]
+        assert row["values"][field] == expected
+        assert row["locator"]["page"] == page
+
+    table2_loss_count = sum("table2_" in row_id and "_loss" in row_id for row_id in source_rows)
+    table3_glass_count = sum("table3_" in row_id for row_id in source_rows)
+    table6_loss_count = sum(
+        "table6_" in row_id and row["values"].get("quantity") == "mass_loss_fraction"
+        for row_id, row in source_rows.items()
+    )
+    table6_glass_count = sum(
+        "table6_" in row_id and row["values"].get("quantity") == "residue_component_composition"
+        for row_id, row in source_rows.items()
+    )
+    assert (table2_loss_count, table3_glass_count, table6_loss_count, table6_glass_count) == (
+        80,
+        60,
+        36,
+        108,
+    )
+    assert len(source_rows) == 284
+
+    # Printed run conditions reach every migrated row with source locators.
+    for row in source_rows.values():
+        conditions = row["point_conditions"]
+        for key in ("T_C", "fO2_log", "duration_h", "total_pressure_Pa", "composition", "gas_environment"):
+            assert conditions[key]["state"]["tag"] == "value"
+            assert conditions[key].get("locator")
+        assert conditions["total_pressure_Pa"]["locator"]["section"] == "Title"
+        assert conditions["total_pressure_Pa"]["state"]["value"] == "101325"
+        assert "sample_mass_kg" not in conditions
+        assert "gas_mixing_ratio" not in conditions
+        assert row["values"]["gas_mixing_ratio_state"]["tag"] == "unknown"
+        assert row["values"].get("sample_mass_kg") is None
+
+    glass_rows = [row for row in source_rows.values() if row.get("phase") == "glass"]
+    assert len(glass_rows) == 168
+    for row in glass_rows:
+        assert row["quench_state"]["state"] == {"tag": "value", "value": "not_stated"}
+        assert row["quench_state"]["locator"]["page"] == 4
+
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    result = _migrate_real_extract(tmp_path, f"{SOURCE_ID}.yaml")
+    migrated = {
+        row.observation_id.split("::", 1)[-1]: row
+        for row in result.observations.values()
+        if row.source_id == SOURCE_ID
+    }
+    assert len(migrated) == 284
+    assert result.validation.hard_issues == ()
+    assert all(row.value.kind.value == "point" for row in migrated.values())
+
+    loss = migrated[pins[0][0]]
+    glass_fe = migrated[pins[1][0]]
+    glass_silica = migrated[pins[2][0]]
+    assert loss.value.point == Decimal("0.32")
+    assert glass_fe.value.point == Decimal("12.59")
+    assert glass_silica.value.point == Decimal("45.62")
+    for row in (loss, glass_fe, glass_silica):
+        assert row.identity.composition.is_value
+        assert row.identity.total_pressure_Pa.value == Decimal("101325")
+        assert row.identity.temperature_K.is_value
+        for key in ("T_C", "fO2_log", "duration_h", "total_pressure_Pa", "composition", "gas_environment"):
+            condition = row.point_conditions[key]
+            assert condition.state.is_value
+            assert condition.locator is not None
+
+    # Current migration limitation: fill_identity's residue-component profile
+    # permits fO2_Pa as N/A, so it drops these printed-log identity values even
+    # though their point_conditions are retained. This is the outstanding
+    # acceptance blocker; changing the migrator is outside this extract task.
+    assert loss.identity.fO2_Pa.is_value
+    assert glass_fe.identity.fO2_Pa.is_unknown
+    assert glass_silica.identity.fO2_Pa.is_unknown
