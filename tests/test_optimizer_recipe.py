@@ -94,8 +94,12 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # changed, no values. Paths: campaigns.C2A_continuous.adaptive_control.
     # induction_stirring; endpoint_criteria.control.surface_renewal;
     # endpoint_criteria.general; furnace.induction_stirring.note.
+    # Config-ownership move: add the existing runtime Stage-6/7 bands to YAML.
+    # Removing exactly those two temp_range_C fields from resolved setpoints
+    # recovers 6e96c06b...; every other serialized input is unchanged. Numeric
+    # train/route pins and the bounds digest below remain unchanged.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "6e96c06bd07493a6db66db50de75fc9599b8a0353c5d08ae37d68f09ec90ccb6"
+        "2584074346931c132b487ffb6ce56511d26f76805d63bcfa14eb996d1fe5ea57"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
@@ -340,7 +344,10 @@ def _write_c5_mre_cap_bound_yaml(data_dir: Path, high: float, mtime_ns: int) -> 
                     "C5": {
                         "allow_mre_voltage_cap_upper_bound_V": high,
                     }
-                }
+                },
+                "condensation_train": yaml.safe_load(SETPOINTS_PATH.read_text())[
+                    "condensation_train"
+                ],
             },
             sort_keys=True,
         ),

@@ -36,6 +36,7 @@ def test_references_yaml_parses_and_schema_valid():
 
 
 def test_build_references_check_passes():
+    """Pin registry citations and generated pages to the current source tree."""
     result = subprocess.run(
         [sys.executable, str(BUILDER), "--check"],
         cwd=ROOT,

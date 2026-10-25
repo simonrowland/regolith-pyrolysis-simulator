@@ -610,43 +610,15 @@ def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
 
 
 def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None:
-    run = PyrolysisRun(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=24,
-        additives_kg={},
-        allow_fallback_vapor=True,
-        allow_unmeasured_alpha_fallback=True,
-        run_metadata_overrides={
-            "started_at_utc": "2026-05-15T00:00:00Z",
-            "kernel_commit_sha": "goal-18-fixture",
-        },
-    )
+    from tests.coating_golden import produce_coating_golden
 
-    payload = run.run()
-    # b-238 (2026-08-26): melt_redox_gate_floor_fallback_engagement counts
-    # _melt_redox_liquidus_floor_fallback engagements, and that count depends
-    # on whether _freeze_gate_curve() hits its cross-run cache — measured
-    # total_count 14 (cold) vs 0 (warm) from the SAME tree in back-to-back
-    # processes. A byte-identity pin over a cache-sensitive counter flaps red
-    # and green with zero code change, so the block is asserted by SHAPE here
-    # and excluded from the hash; the hash keeps pinning everything else.
-    engagement = payload.pop("melt_redox_gate_floor_fallback_engagement")
+    actual_bytes, engagement = produce_coating_golden()
     assert set(engagement) == {"engaged", "total_count", "by_hour"}
     assert isinstance(engagement["engaged"], bool)
     assert isinstance(engagement["total_count"], int)
     assert engagement["total_count"] >= 0
     assert engagement["engaged"] == (engagement["total_count"] > 0)
 
-    actual_bytes = (
-        json.dumps(
-            payload,
-            indent=2,
-            sort_keys=False,
-            allow_nan=False,
-        )
-        + "\n"
-    ).encode("utf-8")
     # Rebaselined 2026-08-18 (t-686) with the cause named, not to make a red
     # test pass. The prior digest 6e75e35e... was produced by the pre-t-470
     # rail; TWO intentional rail commits moved this whole-run hash, both
@@ -841,3 +813,19 @@ def test_opt_in_refusal_envelope_stays_serializable() -> None:
         "wall_deposition_rate_committed" not in row
         for row in payload["per_hour_summary"]
     )
+
+
+@pytest.mark.parametrize("consumer", ["test_support", "script"])
+def test_coating_producer_and_script_share_exact_preimage(monkeypatch, consumer):
+    import tests.coating_golden as producer
+    from scripts.regenerate_coating_diagnostic_golden import produce_bytes
+
+    engagement = {"engaged": False, "total_count": 0, "by_hour": {}}
+    payload = {"status": "ok", "z": 1.25, "melt_redox_gate_floor_fallback_engagement": engagement,
+               "a": {"diagnostic": None}}
+    monkeypatch.setattr(producer.PyrolysisRun, "run", lambda self: dict(payload))
+    expected = b'{\n  "status": "ok",\n  "z": 1.25,\n  "a": {\n    "diagnostic": null\n  }\n}\n'
+    if consumer == "test_support":
+        assert producer.produce_coating_golden() == (expected, engagement)
+    else:
+        assert produce_bytes() == expected

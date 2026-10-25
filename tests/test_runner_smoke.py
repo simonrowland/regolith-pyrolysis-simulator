@@ -23,11 +23,13 @@ from __future__ import annotations
 
 import hashlib
 from collections import defaultdict
+from dataclasses import replace
 import json
 import subprocess
 import sys
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import pytest
 
@@ -65,6 +67,7 @@ from simulator.runner import (
     _melt_redox_gate_floor_fallback_engagement,
     _runner_failure_result,
     _status_with_mass_balance_invariant,
+    build_sio_yield_report,
     _vapor_pressure_source_report,
 )
 from simulator.condensation import (
@@ -875,8 +878,8 @@ SCENARIOS = [
 ]
 
 
-def _run_scenario(scenario: dict) -> dict:
-    """Run a scenario and return the resulting JSON document.
+def _run_scenario(scenario: dict, *, capture: bool = False):
+    """Run once; optionally return raw flux and ledger preimages with the payload.
 
     Run metadata overrides pin started_at_utc + kernel_commit_sha to
     fixture-stable values so a fresh machine reproduces the goldens
@@ -895,7 +898,39 @@ def _run_scenario(scenario: dict) -> dict:
             "kernel_commit_sha": "goal-18-fixture",
         },
     )
-    return run.run()
+    if not capture:
+        return run.run()
+
+    flux_maps = []
+    dispatch = BuiltinEvaporationFluxProvider.dispatch
+
+    def capture_flux_maps(provider, request):
+        result = dispatch(provider, request)
+        flux_maps.append((result.diagnostic or {}).get("evaporation_flux_kg_hr"))
+        return result
+
+    with patch.object(BuiltinEvaporationFluxProvider, "dispatch", capture_flux_maps):
+        payload = run.run()
+    ledger_output = {
+        "product_ledger_kg_at_hour": [
+            row.get("product_ledger_kg_at_hour", {})
+            for row in payload["per_hour_summary"]
+        ],
+        "final_state": payload["final_state"],
+    }
+    return payload, {"flux_maps": flux_maps, "ledger_output": ledger_output}
+
+
+def _flux_ledger_pins(capture: dict) -> dict[str, str]:
+    def canonical_json(value):
+        return json.dumps(
+            value, sort_keys=True, separators=(",", ":"), allow_nan=False
+        ).encode("utf-8")
+
+    return {
+        "flux_maps_sha256": hashlib.sha256(canonical_json(capture["flux_maps"])).hexdigest(),
+        "ledger_sha256": hashlib.sha256(canonical_json(capture["ledger_output"])).hexdigest(),
+    }
 
 
 def test_o2_bubbler_engine_evidence_uses_effective_zero_override():
@@ -1718,7 +1753,7 @@ def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels():
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
-def test_runner_golden_fixture_matches(scenario, isolated_engine_config, monkeypatch):
+def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     """A live run must reproduce the committed golden fixture exactly."""
 
     # lunar_mare_low_ti_C0_24h.json + mars_basalt_C2A_12h.json: regenerated
@@ -1728,20 +1763,8 @@ def test_runner_golden_fixture_matches(scenario, isolated_engine_config, monkeyp
     # after repair: melt_redox_gate_floor_fallback_engagement = {engaged:
     # false, total_count: 0}. ci_carbonaceous_chondrite_C2B_12h.json was
     # unchanged. docs-private/research/2026-08-02-train13-adjudication.md
-    fixture_path = FIXTURES_DIR / scenario["fixture"]
-    expected = json.loads(fixture_path.read_text())
-    flux_maps = []
-    dispatch = BuiltinEvaporationFluxProvider.dispatch
-
-    def capture_flux_maps(provider, request):
-        result = dispatch(provider, request)
-        flux_maps.append((result.diagnostic or {}).get("evaporation_flux_kg_hr"))
-        return result
-
-    monkeypatch.setattr(
-        BuiltinEvaporationFluxProvider, "dispatch", capture_flux_maps
-    )
-    actual = _run_scenario(scenario)
+    actual, capture, expected_text = runner_golden_loader(scenario)
+    expected = json.loads(expected_text)
 
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
@@ -1751,22 +1774,7 @@ def test_runner_golden_fixture_matches(scenario, isolated_engine_config, monkeyp
         "`python3 scripts/regenerate_runner_goldens.py` if the change is "
         "intentional; the bare simulator.runner CLI omits scenario inputs."
     )
-    def canonical_json(value):
-        return json.dumps(
-            value, sort_keys=True, separators=(",", ":"), allow_nan=False
-        ).encode("utf-8")
-
-    ledger_output = {
-        "product_ledger_kg_at_hour": [
-            row.get("product_ledger_kg_at_hour", {})
-            for row in actual["per_hour_summary"]
-        ],
-        "final_state": actual["final_state"],
-    }
-    assert {
-        "flux_maps_sha256": hashlib.sha256(canonical_json(flux_maps)).hexdigest(),
-        "ledger_sha256": hashlib.sha256(canonical_json(ledger_output)).hexdigest(),
-    } == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
+    assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
 
 
 def test_runner_golden_output_ignores_host_binding_receipts(
@@ -2516,6 +2524,147 @@ def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
     assert type(replay_error.value) is PoisonedHourError
     assert len(observed_errors) == 2
     assert observed_errors[-1] is replay_error.value
+
+
+@pytest.fixture
+def successful_short_run_for_reporting_failure():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-15T00:00:00Z",
+            "kernel_commit_sha": "reporting-failure-smoke",
+        },
+    )
+    session = run._start_session()
+    run._apply_lab_area_bridge(session.simulator, run._lab_area_bridge())
+    run._apply_sio_pre_run_controls(session.simulator)
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status not in {"failed", "refused"}
+    return run, execution
+
+
+def _build_completed_report_without_propagated_lookup_error(builder):
+    try:
+        return builder()
+    except LookupError as exc:
+        pytest.fail(f"completed-run reporting exception propagated: {exc}")
+
+
+@pytest.mark.parametrize(
+    ("target", "report_key", "section"),
+    [
+        (
+            "reduced_real_cache",
+            "reduced_real_cache",
+            "run_metadata.reduced_real_cache",
+        ),
+        (
+            "_alpha_authority_status_by_species_engaged",
+            "alpha_authority_status_by_species",
+            "run_metadata.alpha_authority_status_by_species",
+        ),
+        (
+            "_last_c3_na_hold_adjustment",
+            "c3_na_hold_adjustment",
+            "run_metadata.c3_na_hold_adjustment",
+        ),
+    ],
+    ids=("reduced-real-cache", "alpha-authority-status", "c3-na-hold-adjustment"),
+)
+def test_runner_completed_run_records_serialization_failure(
+    target,
+    report_key,
+    section,
+    successful_short_run_for_reporting_failure,
+    monkeypatch,
+):
+    class SerializationPoison(dict):
+        def items(self):
+            raise LookupError("report serialization unavailable")
+
+    run, execution = successful_short_run_for_reporting_failure
+    poisoned_value = SerializationPoison({"marker": True})
+    if target == "reduced_real_cache":
+        execution = replace(execution, reduced_real_cache=poisoned_value)
+    else:
+        monkeypatch.setattr(
+            execution.simulator,
+            target,
+            {"poison": poisoned_value},
+            raising=False,
+        )
+
+    payload = _build_completed_report_without_propagated_lookup_error(
+        lambda: run._build_output(execution)
+    )
+
+    assert payload["status"] == execution.status
+    assert payload["run_metadata"][report_key] == {
+        "status": "unavailable",
+        "section": section,
+        "exception_type": "LookupError",
+        "reason": "report serialization unavailable",
+    }
+
+
+def test_runner_completed_run_records_alkali_credit_failure(
+    successful_short_run_for_reporting_failure,
+    monkeypatch,
+):
+    run, execution = successful_short_run_for_reporting_failure
+
+    def raise_alkali_credit():
+        raise LookupError("alkali credit unavailable")
+
+    monkeypatch.setattr(
+        execution.simulator,
+        "_c3_alkali_credit_outstanding_kg_by_species",
+        raise_alkali_credit,
+    )
+
+    payload = _build_completed_report_without_propagated_lookup_error(
+        lambda: run._build_output(execution)
+    )
+
+    assert payload["status"] == execution.status
+    assert payload["run_metadata"][
+        "c3_alkali_credit_outstanding_kg_by_species"
+    ] == {
+        "status": "unavailable",
+        "section": "run_metadata.c3_alkali_credit_outstanding_kg_by_species",
+        "exception_type": "LookupError",
+        "reason": "alkali credit unavailable",
+    }
+
+
+def test_sio_yield_report_records_silica_fume_stage_failure(monkeypatch):
+    def raise_silica_fume(_sim):
+        raise LookupError("silica fume stage unavailable")
+
+    monkeypatch.setattr(
+        "simulator.runner._stage_silica_fume_kg",
+        raise_silica_fume,
+    )
+
+    report = _build_completed_report_without_propagated_lookup_error(
+        lambda: build_sio_yield_report(
+            feedstock_id="lunar_mare_low_ti",
+            hours=1,
+            allow_unmeasured_alpha_fallback=True,
+        )
+    )
+
+    assert report["sio_to_silica_fume_kg"] == {
+        "status": "unavailable",
+        "section": "sio_yield_report.sio_to_silica_fume_kg",
+        "exception_type": "LookupError",
+        "reason": "silica fume stage unavailable",
+    }
 
 
 def test_runner_preserves_primary_failure_when_poison_enrichment_fails(

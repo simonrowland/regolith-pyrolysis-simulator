@@ -21,40 +21,28 @@ from simulator.condensation import (
     _sticking_reactivity_class,
     _wall_deposition_driving_pressure_pa,
 )
-from simulator.runner import build_sio_yield_report
+from tests.studio_pin_support import sio_pin_values, sio_wall_report_at_temperature
 from simulator.state import EvaporationFlux, MeltState, PipeSegment
 
 
 @lru_cache(maxsize=None)
 def _report_at_wall_T(liner_temperature_c: float) -> tuple[dict[str, Any], dict[str, float]]:
-    return build_sio_yield_report(
-        feedstock_id="lunar_mare_low_ti",
-        hours=24,
-        mass_kg=1000.0,
-        include_diagnostics=True,
-        liner_temperature_c=liner_temperature_c,
-        pO2_mbar=None,
-        # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
-        allow_unmeasured_alpha_fallback=True,
-    )
+    return sio_wall_report_at_temperature(liner_temperature_c)
 
 
 def _sio_wall_product_deposit_kg(liner_temperature_c: float) -> float:
     report, _ = _report_at_wall_T(liner_temperature_c)
-    wall = report["wall_deposit_kg"]
-    assert float(wall.get("SiO", 0.0)) == pytest.approx(0.0)
-    return float(wall.get("Si", 0.0)) + float(wall.get("SiO2", 0.0))
+    values = sio_pin_values(report)
+    assert values["wall_SiO_kg"] == pytest.approx(0.0)
+    return values["sio_wall_deposit_kg"]
 
 
-def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux(monkeypatch):
+def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # b-732: this wall-deposition pin explicitly exercises the unavailable
     # MAGEMin path. Host auto-detection otherwise changes redox capacity via
     # projected liquidus bounds (918.75--1370.3125 C with the lunar config)
     # versus the Kress-floor fallback, shifting the wall product by 1.34e-5
     # relative. Neither path calls the alphaMELTS vapour fallback (b-729).
-    from simulator.melt_backend.magemin import MAGEMinBackend
-
-    monkeypatch.setattr(MAGEMinBackend, "initialize", lambda self, config: False)
     _report_at_wall_T.cache_clear()
     # Post 2026-05-20 Antoine refit: builtin SiO P_sat dropped ~4700x to the
     # VapoRock-consistent value, so the 1050 C cold-liner deposit fell from

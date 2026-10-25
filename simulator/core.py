@@ -56,7 +56,11 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 
 class RefusalStateSnapshotError(TypeError):
     """Typed refusal when rollback state contains an unsupported proxy graph."""
@@ -118,24 +122,18 @@ class _RefusalSnapshotHistoryPrefix:
 
 
 class _RefusalSnapshotInsertedMapping:
-    """Rollback view of an insert-only mapping. Committed values are shared.
+    """Rollback view of the committed yield rows.
 
-    ``PyrolysisSimulator._yield_disposition_ledger_snapshots`` gains one key
-    per committed hour. Production writes that key with a new dict
-    (``capture_ledger_snapshot``); it does not mutate a committed value.
-    The hot snapshot therefore keeps the value references taken at the start
-    of the hour. A key overwritten during the hour still restores the
-    reference captured here. Terminal refusal deep-copies those references
-    into an owned dict. Any other attribute, and a non-dict value of this
-    attribute, stays on the ordinary deep-copy path.
+    Capture key/value references at the start of the hour so rollback can
+    discard inserted keys and restore overwritten values. Terminal refusal
+    deep-copies those references into an owned dict; successful steps keep
+    the committed values shared.
     """
 
     __slots__ = ('_source', '_items', '_memo')
 
     def __init__(self, source: dict[Any, Any], memo: Dict[int, Any]) -> None:
         self._source = source
-        # Capture the mapping as it exists now. A key inserted or replaced
-        # during the hour must not appear in the restored mapping.
         self._items = tuple(source.items())
         self._memo = memo
         memo[id(source)] = self
@@ -159,7 +157,7 @@ class _RefusalSnapshotInsertedMapping:
 
 
 def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
-    """Replace an internal history-prefix view with its rollback payload."""
+    """Replace internal history views with the detached rollback payload."""
 
     record = state.get('record')
     history = getattr(record, 'snapshots', None)
@@ -1332,7 +1330,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- Current state ---
         self.melt = MeltState()
         self.inventory = ProcessInventory()
-        self.train = CondensationTrain.create_default()
+        self.train = CondensationTrain.create_default(self.setpoints)
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar: Dict[str, float] = {}
 
@@ -1646,7 +1644,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.update_total_mass()
 
         # Reset condensation train
-        self.train = CondensationTrain.create_default()
+        self.train = CondensationTrain.create_default(self.setpoints)
+        if self._condensation_model is not None:
+            self._condensation_model.train = self.train
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
@@ -7780,24 +7780,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_PURE_COMPONENT,
+            VaporPressureComputationError,
             _pow10_pressure_or_raise,
             vapor_pressure_antoine_coefficients,
             vapor_pressure_source_label,
         )
 
-        antoine, coefficient_block = vapor_pressure_antoine_coefficients(
-            fe_row,
-            temperature_K=T_K,
-        )
+        try:
+            antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+                fe_row,
+                temperature_K=T_K,
+            )
+        except VaporPressureComputationError as exc:
+            raise AccountingError(str(exc)) from exc
         if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
             raise AccountingError(
                 'native Fe vapor partition requires metals.Fe.'
                 'pure_component_antoine; refusing legacy Fe vapor fit'
             )
-        A = float(antoine.get('A', 0.0) or 0.0)
-        B = float(antoine.get('B', 0.0) or 0.0)
-        C = float(antoine.get('C', 0.0) or 0.0)
-        if A <= 0.0 or T_K + C <= 0.0:
+        try:
+            A, B, C = _read_antoine_coefficients(antoine)
+        except _AntoineCoefficientRefusal as exc:
+            raise AccountingError(str(exc)) from exc
+        if T_K + C <= 0.0:
             raise AccountingError(
                 'native Fe vapor partition received invalid Fe '
                 'pure_component_antoine coefficients'
@@ -13815,10 +13820,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             memo[id(operating_history)] = _RefusalSnapshotHistoryPrefix(
                 operating_history, memo, mutable_tail=1,
             )
-        yield_rows = getattr(self, '_yield_disposition_ledger_snapshots', None)
+        yield_rows = getattr(
+            self, '_yield_disposition_ledger_snapshots', None,
+        )
         if defer_committed_history and type(yield_rows) is dict:
-            # Insert-only hour rows. Share the committed values; a non-dict
-            # occupant of this attribute falls through to the copy below.
+            # Terminal refusal copies the captured rows; non-dict values use
+            # the ordinary deepcopy path.
             _RefusalSnapshotInsertedMapping(yield_rows, memo)
         state_source = {
             name: value

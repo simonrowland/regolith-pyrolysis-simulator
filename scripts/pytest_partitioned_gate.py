@@ -25,6 +25,22 @@ def _run_bucket(name: str, args: list[str], repo_root: Path) -> int:
     return completed.returncode
 
 
+def _known_red_junit_path(extra: list[str], repo_root: Path) -> Path:
+    existing: Path | None = None
+    for index, argument in enumerate(extra):
+        if argument.startswith("--junitxml="):
+            existing = Path(argument.partition("=")[2])
+        elif argument == "--junitxml" and index + 1 < len(extra):
+            existing = Path(extra[index + 1])
+    if existing is None:
+        return repo_root / "known-red.xml"
+    if not existing.is_absolute():
+        existing = repo_root / existing
+    suffix = existing.suffix or ".xml"
+    stem = existing.stem if existing.suffix else existing.name
+    return existing.with_name(f"{stem}-known-red{suffix}")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Run pytest as xdist bulk + serial -n0 buckets."
@@ -52,11 +68,36 @@ def main(argv: list[str] | None = None) -> int:
         ),
     ]
 
+    gate_exit_code = 0
     for name, cmd in buckets:
         code = _run_bucket(name, cmd, repo_root)
         if code != 0:
-            return code
-    return 0
+            gate_exit_code = code
+            break
+
+    if "--collect-only" in extra:
+        print("Known-red result skipped (--collect-only)")
+        return gate_exit_code
+
+    known_red_junit = _known_red_junit_path(extra, repo_root)
+    known_red_junit.unlink(missing_ok=True)
+    known_red_code = _run_bucket(
+        "known-red",
+        [
+            python,
+            "-m",
+            "pytest",
+            "tests/",
+            "--known-red-only",
+            f"--junitxml={known_red_junit}",
+        ],
+        repo_root,
+    )
+    print(
+        f"Known-red result (non-gating): exit={known_red_code} "
+        f"junit={known_red_junit}"
+    )
+    return gate_exit_code
 
 
 if __name__ == "__main__":

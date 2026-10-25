@@ -53,7 +53,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.backends import (
     BackendSelectionPolicy,
 )
-from simulator.config import ConfigBundle, load_config_bundle
+from simulator.config import ConfigBundle, _load_setpoints_file, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import iron_oxide_values
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
@@ -1305,7 +1305,10 @@ class PyrolysisRun:
 
     def _load_setpoints(self) -> dict:
         path = self.setpoints_path or (DATA_DIR / "setpoints.yaml")
-        return _load_yaml(path)
+        try:
+            return _load_setpoints_file(path)
+        except FileNotFoundError as exc:
+            raise RunnerError(str(exc)) from exc
 
     def _load_vapor_pressures(self) -> dict:
         path = self.vapor_pressures_path or (DATA_DIR / "vapor_pressures.yaml")
@@ -1404,14 +1407,19 @@ class PyrolysisRun:
         c3_credit_drawn_kg = dict(
             getattr(sim, "_c3_alkali_credit_drawn_kg_by_species", {}) or {}
         )
-        c3_credit_outstanding_kg = (
-            sim._c3_alkali_credit_outstanding_kg_by_species()
+        c3_credit_outstanding_kg = _safe_failure_value(
+            lambda: sim._c3_alkali_credit_outstanding_kg_by_species(),
+            section=(
+                "run_metadata.c3_alkali_credit_outstanding_kg_by_species"
+            ),
         )
-        c3_credit_species = (
-            set(c3_credit_dose_kg)
-            | set(c3_credit_drawn_kg)
-            | set(c3_credit_outstanding_kg)
+        c3_credit_outstanding_unavailable = (
+            isinstance(c3_credit_outstanding_kg, Mapping)
+            and c3_credit_outstanding_kg.get("status") == "unavailable"
         )
+        c3_credit_species = set(c3_credit_dose_kg) | set(c3_credit_drawn_kg)
+        if not c3_credit_outstanding_unavailable:
+            c3_credit_species |= set(c3_credit_outstanding_kg)
         if c3_credit_species:
             ordered_species = sorted(c3_credit_species)
             run_metadata["c3_alkali_credit_dose_kg_by_species"] = {
@@ -1422,13 +1430,24 @@ class PyrolysisRun:
                 species: float(c3_credit_drawn_kg.get(species, 0.0))
                 for species in ordered_species
             }
-            run_metadata["c3_alkali_credit_outstanding_kg_by_species"] = {
-                species: float(c3_credit_outstanding_kg.get(species, 0.0))
-                for species in ordered_species
-            }
+            run_metadata["c3_alkali_credit_outstanding_kg_by_species"] = (
+                c3_credit_outstanding_kg
+                if c3_credit_outstanding_unavailable
+                else {
+                    species: float(
+                        c3_credit_outstanding_kg.get(species, 0.0)
+                    )
+                    for species in ordered_species
+                }
+            )
+        elif c3_credit_outstanding_unavailable:
+            run_metadata["c3_alkali_credit_outstanding_kg_by_species"] = (
+                c3_credit_outstanding_kg
+            )
         if execution.reduced_real_cache:
-            run_metadata["reduced_real_cache"] = _json_safe(
-                execution.reduced_real_cache
+            run_metadata["reduced_real_cache"] = _safe_failure_value(
+                lambda: _json_safe(execution.reduced_real_cache),
+                section="run_metadata.reduced_real_cache",
             )
         lab_area_bridge = _safe_failure_value(
             lambda: _json_safe(self._lab_area_bridge()),
@@ -1507,20 +1526,31 @@ class PyrolysisRun:
             ),
             section="run_metadata.pressure_coating_pareto_diagnostic",
         )
-        alpha_authority_status_by_species = dict(
-            getattr(sim, "_alpha_authority_status_by_species_engaged", {}) or {}
+        alpha_authority_status_by_species = _safe_failure_value(
+            lambda: _json_safe(
+                dict(
+                    getattr(
+                        sim,
+                        "_alpha_authority_status_by_species_engaged",
+                        {},
+                    )
+                    or {}
+                )
+            ),
+            section="run_metadata.alpha_authority_status_by_species",
         )
         if alpha_authority_status_by_species:
-            run_metadata["alpha_authority_status_by_species"] = _json_safe(
+            run_metadata["alpha_authority_status_by_species"] = (
                 alpha_authority_status_by_species
             )
-        c3_na_hold_adjustment = dict(
-            getattr(sim, "_last_c3_na_hold_adjustment", {}) or {}
+        c3_na_hold_adjustment = _safe_failure_value(
+            lambda: _json_safe(
+                dict(getattr(sim, "_last_c3_na_hold_adjustment", {}) or {})
+            ),
+            section="run_metadata.c3_na_hold_adjustment",
         )
         if c3_na_hold_adjustment:
-            run_metadata["c3_na_hold_adjustment"] = _json_safe(
-                c3_na_hold_adjustment
-            )
+            run_metadata["c3_na_hold_adjustment"] = c3_na_hold_adjustment
         cost_rollup_diagnostic = _safe_failure_value(
             lambda: _json_safe(
                 {
@@ -4496,15 +4526,20 @@ def build_sio_yield_report(
     sio_evolved_kg = sio_evaporated_mol * sio_molar_mass_kg_mol
     sio_yield_pct = sio_evolved_kg / mass_kg * 100.0
 
-    sio_to_silica_fume_kg = _stage_silica_fume_kg(sim)
     reported_stage_numbers = set(SIO_YIELD_STAGE_KEYS)
-    downstream_sio2_kg = sum(
-        stage.collected_kg.get("SiO2", 0.0)
-        for stage in sim.train.stages
-        if stage.stage_number not in reported_stage_numbers
-    )
-    sio_to_silica_fume_kg["terminal_offgas_escape"] = _clean_report_float(
-        downstream_sio2_kg + sio_escape_mol * sio_molar_mass_kg_mol
+    sio_to_silica_fume_kg = _safe_failure_value(
+        lambda: {
+            **_stage_silica_fume_kg(sim),
+            "terminal_offgas_escape": _clean_report_float(
+                sum(
+                    stage.collected_kg.get("SiO2", 0.0)
+                    for stage in sim.train.stages
+                    if stage.stage_number not in reported_stage_numbers
+                )
+                + sio_escape_mol * sio_molar_mass_kg_mol
+            ),
+        },
+        section="sio_yield_report.sio_to_silica_fume_kg",
     )
     condensation_model = sim.condensation_model
     sticking_notice = dict(
@@ -4715,15 +4750,22 @@ def _sio_tsweep_row(
     diagnostics: Mapping[str, float],
     mass_kg: float,
 ) -> dict[str, Any]:
-    stage3_silica_kg = float(
-        report.get("sio_to_silica_fume_kg", {}).get(
-            "stage_3_sio_zone_product", 0.0
-        )
+    sio_to_silica_fume_kg = report.get("sio_to_silica_fume_kg", {})
+    stage3_silica_kg = _safe_failure_value(
+        lambda: _clean_report_float(
+            float(sio_to_silica_fume_kg.get("stage_3_sio_zone_product", 0.0))
+        ),
+        section="sio_tsweep.stage3_silica_kg",
+        upstream=sio_to_silica_fume_kg,
     )
-    terminal_offgas_kg = float(
-        report.get("sio_to_silica_fume_kg", {}).get(
-            "terminal_offgas_escape", 0.0
-        )
+    terminal_offgas_escape_pct = _safe_failure_value(
+        lambda: _clean_report_float(
+            float(sio_to_silica_fume_kg.get("terminal_offgas_escape", 0.0))
+            / float(mass_kg)
+            * 100.0
+        ),
+        section="sio_tsweep.terminal_offgas_escape_pct",
+        upstream=sio_to_silica_fume_kg,
     )
     return {
         "cell_id": cell_id,
@@ -4733,10 +4775,8 @@ def _sio_tsweep_row(
         "sio_yield_pct_of_feedstock": _clean_report_float(
             float(report["sio_yield_pct_of_feedstock"])
         ),
-        "terminal_offgas_escape_pct": _clean_report_float(
-            terminal_offgas_kg / float(mass_kg) * 100.0
-        ),
-        "stage3_silica_kg": _clean_report_float(stage3_silica_kg),
+        "terminal_offgas_escape_pct": terminal_offgas_escape_pct,
+        "stage3_silica_kg": stage3_silica_kg,
         "mass_balance_err_pct": _clean_report_float(
             abs(
                 _required_mass_balance_value(
@@ -4779,6 +4819,11 @@ def _recommend_sio_tsweep_rows(
 
 
 def _sio_tsweep_table(rows: list[Mapping[str, Any]]) -> str:
+    def format_metric(value: Any) -> str:
+        if isinstance(value, Mapping) and value.get("status") == "unavailable":
+            return "unavailable"
+        return f"{float(value):.12g}"
+
     headers = (
         "rank",
         "cell_id",
@@ -4802,8 +4847,8 @@ def _sio_tsweep_table(rows: list[Mapping[str, Any]]) -> str:
             f"{float(row['T_hold_C']):g}",
             f"{float(row['ramp_C_per_hr']):g}",
             f"{float(row['sio_yield_pct_of_feedstock']):.12g}",
-            f"{float(row['terminal_offgas_escape_pct']):.12g}",
-            f"{float(row['stage3_silica_kg']):.12g}",
+            format_metric(row["terminal_offgas_escape_pct"]),
+            format_metric(row["stage3_silica_kg"]),
             f"{float(row['mass_balance_err_pct']):.12g}",
         ]
         lines.append("| " + " | ".join(values) + " |")
@@ -5069,10 +5114,13 @@ def _sio_wall_sweep_row(
     wall_deposit = report.get("wall_deposit_kg", {})
     sio_wall_kg = float(wall_deposit.get("SiO", 0.0))
     total_wall_kg = sum(float(value) for value in wall_deposit.values())
-    stage3_silica_kg = float(
-        report.get("sio_to_silica_fume_kg", {}).get(
-            "stage_3_sio_zone_product", 0.0
-        )
+    sio_to_silica_fume_kg = report.get("sio_to_silica_fume_kg", {})
+    stage3_silica_kg = _safe_failure_value(
+        lambda: _clean_report_float(
+            float(sio_to_silica_fume_kg.get("stage_3_sio_zone_product", 0.0))
+        ),
+        section="sio_wall_sweep.stage3_silica_kg",
+        upstream=sio_to_silica_fume_kg,
     )
     return {
         "cell_id": cell_id,
@@ -5091,7 +5139,7 @@ def _sio_wall_sweep_row(
         ),
         "sio_wall_deposit_kg": _clean_report_float(sio_wall_kg),
         "total_wall_deposit_kg": _clean_report_float(total_wall_kg),
-        "stage3_silica_kg": _clean_report_float(stage3_silica_kg),
+        "stage3_silica_kg": stage3_silica_kg,
         "sio_evolved_kg": _clean_report_float(float(report["sio_evolved_kg"])),
         "sio_yield_pct_of_feedstock": _clean_report_float(
             float(report["sio_yield_pct_of_feedstock"])
