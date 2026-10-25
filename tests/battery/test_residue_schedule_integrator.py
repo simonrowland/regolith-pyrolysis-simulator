@@ -322,6 +322,25 @@ def test_fraction_integrator_at_zero_returns_starting_inventory_without_flux_cal
     assert calls == 0
 
 
+def test_fraction_integrator_validates_zero_endpoint_channels_without_pressure_calls() -> None:
+    calls = 0
+
+    def pressure_model(*_args):
+        nonlocal calls
+        calls += 1
+        return {"FeO": 1.0e-3}
+
+    with pytest.raises(ResidueInventoryRefusal) as error:
+        integrate_residue_fraction(_fraction_request(
+            channels=(ResidueChannel("FeO", "FeO", "FeO", 2.0, "bad alpha"),),
+            mass_loss_fraction=0.0,
+            pressure_model=pressure_model,
+        ))
+
+    assert error.value.reason == "residue_alpha_invalid"
+    assert calls == 0
+
+
 def test_fraction_integrator_forwards_accepted_pressure_diagnostics() -> None:
     accepted: list[float] = []
 

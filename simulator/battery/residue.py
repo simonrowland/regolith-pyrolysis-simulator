@@ -1915,7 +1915,7 @@ def integrate_residue_fraction(
     notices: list[str] = []
     volatile_parents: set[str] = set()
     for segment in path:
-        if segment.start_fraction >= target_fraction:
+        if segment.start_fraction >= target_fraction and target_fraction > 0.0:
             break
         active_channels, alpha_notices = select_residue_channel_alphas(
             request.channels,
@@ -1928,6 +1928,8 @@ def integrate_residue_fraction(
             active_channels,
             require_oxygen_channels=buffered_logp is None,
         )
+        if target_fraction == 0.0:
+            break
         notices.extend(alpha_notices)
         resolved_path.append((
             segment.start_fraction,
