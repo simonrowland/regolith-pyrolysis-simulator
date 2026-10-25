@@ -13,6 +13,7 @@ from tests.golden_sections import (
     PRODUCER_CONTRACT, check_manifest, diff_nodes, flux_sections, json_bytes,
     load_json, nodes, partition, read_sections, reassemble, reassemble_flux, write_sections,
 )
+from tests.git_history import require_git_history
 from tests.test_runner_smoke import SCENARIOS
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,6 +67,7 @@ def _section_content_digest(files):
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
 def test_step2_migration_proof_on_base(scenario):
+    require_git_history(ROOT, BASE)
     path = f"tests/fixtures/runner/{scenario['fixture']}"
     pinned = subprocess.check_output(["git", "show", f"{BASE}:{path}"], cwd=ROOT)
     files = partition(load_json(pinned))
