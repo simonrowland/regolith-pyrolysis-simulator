@@ -129,9 +129,12 @@ def test_admitted_alkali_parcel_requires_reactive_stage3_uptake(oxygen_mol):
 
     model = _model("through", hard_gate=False)
     model.retained_vapor_mol = {"O2": oxygen_mol}
+    # A zero incoming-sweep command does not make retained headspace O2 vanish.
+    melt = MeltState(temperature_C=1650, pO2_mbar=0.0)
+    melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8 if oxygen_mol else 0.0
     result = model.route(
         EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}),
-        MeltState(temperature_C=1650, pO2_mbar=1e-5 if oxygen_mol else 0.0),
+        melt,
     )
     assert model.train.collection_route["stage3_route"] == "through"
     assert model.last_stage3_route_diagnostic["capture_purity"] >= 0.98
@@ -155,9 +158,11 @@ def test_admitted_alkali_parcel_requires_reactive_stage3_uptake(oxygen_mol):
 def test_vanishing_oxygen_pressure_disables_reaction_despite_available_oxidant():
     model = _model("through", hard_gate=False)
     model.retained_vapor_mol = {"O2": 1.0}
+    melt = MeltState(temperature_C=1650, pO2_mbar=1e-5)
+    melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-203
     result = model.route(
         EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}),
-        MeltState(temperature_C=1650, pO2_mbar=1e-200),
+        melt,
     )
     assert all(not r['favoured'] and r['log_Q_over_K'] > 0.0
                for r in result.stage3_reactive_alkali_by_species.values())
@@ -178,7 +183,8 @@ def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mo
     model = _model('through', hard_gate=False)
     model.train = sim.train
     sim._condensation_model = model
-    sim.melt.pO2_mbar = 1e-5 if oxygen_mol else 0.0
+    sim.melt.pO2_mbar = 0.0
+    sim.melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8 if oxygen_mol else 0.0
     model = sim.condensation_model
     flux = EvaporationFlux({'SiO': 1.0, 'Na': 0.0007, 'K': 0.0001})
     result = model.route(flux, sim.melt)
