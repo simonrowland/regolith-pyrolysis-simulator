@@ -2679,6 +2679,26 @@ _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
 })
 
 
+def gate_curve_provider_diagnostic_reasons(
+    diagnostic: Mapping[str, Any] | None,
+) -> tuple[str, ...]:
+    """Read a provider's structured reason codes for gate decisions."""
+    from engines.domain_reason import reason_value
+
+    reasons: list[str] = []
+    if isinstance(diagnostic, Mapping):
+        for field in (
+            "backend_status_reason",
+            "backend_failure_reason_code",
+            "reason",
+            "reason_refused",
+        ):
+            value = reason_value(diagnostic.get(field))
+            if value is not None and value.strip():
+                reasons.append(value.strip().lower())
+    return tuple(reasons)
+
+
 def gate_curve_provider_outcome_for_status(
     status: str,
     diagnostic: Mapping[str, Any] | None = None,
@@ -2710,15 +2730,7 @@ def gate_curve_provider_outcome_for_status(
             projected_status, diagnostic.get("projected_liquidus_diagnostics"),
         ) is GateCurveProviderOutcome.FAILED:
             return GateCurveProviderOutcome.FAILED
-        for field in (
-            "backend_status_reason",
-            "backend_failure_reason_code",
-            "reason",
-            "reason_refused",
-        ):
-            value = reason_value(diagnostic.get(field))
-            if value is not None and value.strip():
-                reasons.append(value.strip().lower())
+        reasons.extend(gate_curve_provider_diagnostic_reasons(diagnostic))
     transient_reasons = {
         reason_value(reason).lower()
         for reason in TRANSIENT_OUT_OF_DOMAIN_REASONS
