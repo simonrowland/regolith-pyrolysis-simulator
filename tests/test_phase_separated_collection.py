@@ -219,7 +219,7 @@ def test_stage3_k_evaluation_flags_missing_liquid_reference():
 
 
 @pytest.mark.parametrize("order", [("SiO", "Na", "K"), ("Na", "K", "SiO")])
-def test_same_hour_zero_retained_oxygen_kernel_capture_closes(order):
+def test_same_hour_zero_retained_oxygen_kernel_capture_closes(order, monkeypatch):
     from simulator.accounting.formulas import resolve_species_formula
     sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
@@ -230,6 +230,13 @@ def test_same_hour_zero_retained_oxygen_kernel_capture_closes(order):
     sim.melt.oxygen_reservoir.headspace_ledger_pO2_bar = 0.0
     assert not sim.atom_ledger.physical_mol_by_account("process.overhead_gas").get("O2", 0)
     rates = {sp: {"SiO": 1.0, "Na": 0.0007, "K": 0.0001}[sp] for sp in order}
+    from dataclasses import replace
+    original_route = model.route
+
+    def force_commit_order(flux, melt):
+        return replace(original_route(flux, melt), wall_route_species_order=order)
+
+    monkeypatch.setattr(model, "route", force_commit_order)
     first = len(sim.atom_ledger.transitions)
     sim._route_to_condensation(EvaporationFlux(rates))
     transitions = sim.atom_ledger.transitions[first:]
