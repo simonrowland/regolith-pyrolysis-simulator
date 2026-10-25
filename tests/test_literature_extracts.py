@@ -5888,3 +5888,100 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
             ("(675.55,1619.08)", "(675.50,1620.00)"),
         )
     documents["shornikov-1997-cao-alumina-vapor"] = original
+
+
+def test_katahira_2016_activity_rows_pin_render_and_migrate_all_conditions():
+    """Keep the six printed tables, row inputs, and unprinted pressure distinct."""
+    source = EXTRACTS / "katahira-2016-isij-feo133-activity-feox-cao-sio2.yaml"
+    extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
+    species = extract["species"]["FeO"]
+    rows = species["observations"]
+    context = species["context"]
+    assert len(rows) == 47
+    assert len(context) == 47
+    table_counts = Counter(
+        f"p{row['locator']['page']:03}_t{int(row['locator']['table']):02}"
+        for row in rows
+    )
+    assert table_counts == {
+        "p003_t01": 8,
+        "p003_t02": 5,
+        "p004_t03": 8,
+        "p004_t04": 6,
+        "p004_t05": 13,
+        "p004_t06": 7,
+    }
+
+    by_sample = {row["values"]["sample_id_as_printed"]: row for row in rows}
+    # These cells were read on the rendered pages 1166 and 1167.
+    for sample, activity, page in (
+        ("A01", "-1.564", 3),
+        ("A06", "-0.871", 3),
+        ("C25", "0.025", 4),
+    ):
+        row = by_sample[sample]
+        assert row["values"]["activity"] == activity
+        assert row["values"]["printed_form"] == "log10"
+        assert row["locator"]["page"] == page
+        assert row["locator"]["row_label"] == sample
+
+    pO2_to_pa = {
+        "2.5 × 10^-6 atm": "0.2533125",
+        "1.0 × 10^-4 atm": "10.1325",
+        "1.0 × 10^-2 atm": "1013.25",
+    }
+    context_by_id = {row["observation_id"]: row for row in context}
+    for row in rows:
+        values = row["values"]
+        conditions = row["point_conditions"]
+        assert row["phase"] == "l"
+        assert values["formula"] == "FeO1.33"
+        assert values["composition_basis_as_printed"] == (
+            "FeOx is calculated by considering FeOx as FeO"
+        )
+        assert values["pO2_as_printed"] in pO2_to_pa
+        assert conditions["fO2_Pa"]["state"]["value"] == pO2_to_pa[
+            values["pO2_as_printed"]
+        ]
+        assert conditions["temperature_K"]["state"]["value"]["point"] == "1573"
+        assert conditions["composition"]["state"]["value"]["amount_basis"] == "mass_percent"
+        assert conditions["composition"]["state"]["value"]["components"]
+        assert conditions["total_pressure_Pa"]["state"]["tag"] == "unknown"
+        assert "total gas pressure" in conditions["total_pressure_Pa"]["state"]["reason"]
+        assert "total_pressure_Pa" not in values
+        assert conditions["quench_state"]["state"]["value"] == "not_stated"
+        assert not any("Fe3" in key or "Fe2" in key for key in values)
+
+        parent = row["derived_from"][0]
+        assert parent.startswith(f"{extract['source_id']}::context::")
+        context_row = context_by_id[parent.split("::context::", 1)[1]]
+        assert context_row["values"]["N_Fe_in_Pt_as_printed"].endswith(" mol%")
+        assert context_row["values"]["log_gamma_Fe_as_printed"]
+        assert row["derivation"]["inputs"] == [parent]
+
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrator.finalize()
+    result = migrator.result
+    migrated = list(result.observations.values())
+    assert len(migrated) == 47
+    assert not result.validation.hard_issues
+    assert sum(item.value.kind.value == "unavailable" for item in migrated) == 0
+    for item in migrated:
+        identity = item.identity
+        conditions = item.point_conditions
+        assert identity.temperature_K.is_value
+        assert identity.composition.is_value
+        assert identity.fO2_Pa.is_value
+        assert identity.total_pressure_Pa.is_unknown
+        assert conditions["temperature_K"].state.is_value
+        assert conditions["composition"].state.is_value
+        assert conditions["fO2_Pa"].state.is_value
+        assert "total_pressure_Pa" not in conditions
+
+    migrated_by_id = {item.observation_id.split("::", 1)[-1]: item for item in migrated}
+    for sample in ("A01", "A06", "C25"):
+        source_row = by_sample[sample]
+        item = migrated_by_id[source_row["observation_id"]]
+        assert item.identity.species.formula == "FeO1.33"
+        assert item.identity.reference_state.is_value
+        assert item.identity.total_pressure_Pa.is_unknown

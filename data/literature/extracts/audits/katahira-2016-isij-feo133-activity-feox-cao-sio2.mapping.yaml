@@ -1,0 +1,360 @@
+# Table blocks: p003-t01/02 are Table 1(a)/(b), p004-t03/04 are Table 2(a)/(b), and p004-t05/06 are Table 3(a)/(b).
+# MinerU emits activity from column 13. Hand-retained row cells: 1 series, 2 sample id, 3 pO2, 4 phase, 5-8 liquidus composition, 9 C/S, 10 duration, 11 NFe in Pt, 12 log gamma Fe.
+# Column 5 FeOx is keyed as FeO because the paper says it calculates FeOx considering FeOx as FeO (published p. 1167).
+
+source_id: katahira-2016-isij-feo133-activity-feox-cao-sio2
+source:
+  citation: Katahira, Y. and Hayashi, M. (2016), "Activities of FeO1.33 in the FeOx-CaO-SiO2 and FeOx-CaO-SiO2-Al2O3
+    Slags at 1573 K Under Oxygen Partial Pressures between 10^-6 and 10^-2 atm", ISIJ International 56(7),
+    1164-1170.
+  year: 2016
+  doi: 10.2355/isijinternational.isijint-2016-065
+extraction:
+  method: MinerU table draft emit for the six (a)/(b) table blocks; row compositions and method context
+    retained from the draft cells and pdftotext.
+  date: '2026-10-25'
+  worker: w1025a-kat16
+review_status: draft
+tables:
+- page: 3
+  table_index: 1
+  published_page: 1166
+  type: activity_coefficient
+  quantity: activity
+  unit: dimensionless
+  evidence_class: measured_reduced
+  phase: l
+  per: mol_species
+  experiment: katahira_2016_equilibrium_experiments
+  temperature:
+    as_printed: '1573'
+    unit: K
+    column_header: Section 2.1 temperature at the uniform-temperature region
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Setpoint 1 573 K; controlled within 1 573 ± 2 K.
+  values:
+  - column: 13
+    species: FeO
+    quantity: activity
+    evidence_class: measured_reduced
+    unit: dimensionless
+  conditions:
+  - key: fO2_Pa
+    state:
+      tag: value
+      value: '0.2533125'
+    locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 1166
+      table: '1'
+      column_header: PO2 (atm)
+      note: Printed pO2 2.5 × 10^-6 atm; converted to Pa for the identity oxygen axis.
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: The source does not state the total gas pressure; the stated 50 mL/min is flow rate.
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+  - key: quench_state
+    state:
+      tag: value
+      value: not_stated
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Samples held at 1 573 K were quenched into iced water; preservation is not stated.
+- page: 3
+  table_index: 2
+  published_page: 1166
+  type: activity_coefficient
+  quantity: activity
+  unit: dimensionless
+  evidence_class: measured_reduced
+  phase: l
+  per: mol_species
+  experiment: katahira_2016_equilibrium_experiments
+  temperature:
+    as_printed: '1573'
+    unit: K
+    column_header: Section 2.1 temperature at the uniform-temperature region
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Setpoint 1 573 K; controlled within 1 573 ± 2 K.
+  values:
+  - column: 13
+    species: FeO
+    quantity: activity
+    evidence_class: measured_reduced
+    unit: dimensionless
+  conditions:
+  - key: fO2_Pa
+    state:
+      tag: value
+      value: '0.2533125'
+    locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 1166
+      table: '1'
+      column_header: PO2 (atm)
+      note: Printed pO2 2.5 × 10^-6 atm; converted to Pa for the identity oxygen axis.
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: The source does not state the total gas pressure; the stated 50 mL/min is flow rate.
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+  - key: quench_state
+    state:
+      tag: value
+      value: not_stated
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Samples held at 1 573 K were quenched into iced water; preservation is not stated.
+- page: 4
+  table_index: 3
+  published_page: 1167
+  type: activity_coefficient
+  quantity: activity
+  unit: dimensionless
+  evidence_class: measured_reduced
+  phase: l
+  per: mol_species
+  experiment: katahira_2016_equilibrium_experiments
+  temperature:
+    as_printed: '1573'
+    unit: K
+    column_header: Section 2.1 temperature at the uniform-temperature region
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Setpoint 1 573 K; controlled within 1 573 ± 2 K.
+  values:
+  - column: 13
+    species: FeO
+    quantity: activity
+    evidence_class: measured_reduced
+    unit: dimensionless
+  conditions:
+  - key: fO2_Pa
+    state:
+      tag: value
+      value: '10.1325'
+    locator:
+      page: 4
+      pdf_page_index: 3
+      published_page: 1167
+      table: '2'
+      column_header: PO2 (atm)
+      note: Printed pO2 1.0 × 10^-4 atm; converted to Pa for the identity oxygen axis.
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: The source does not state the total gas pressure; the stated 50 mL/min is flow rate.
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+  - key: quench_state
+    state:
+      tag: value
+      value: not_stated
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Samples held at 1 573 K were quenched into iced water; preservation is not stated.
+- page: 4
+  table_index: 4
+  published_page: 1167
+  type: activity_coefficient
+  quantity: activity
+  unit: dimensionless
+  evidence_class: measured_reduced
+  phase: l
+  per: mol_species
+  experiment: katahira_2016_equilibrium_experiments
+  temperature:
+    as_printed: '1573'
+    unit: K
+    column_header: Section 2.1 temperature at the uniform-temperature region
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Setpoint 1 573 K; controlled within 1 573 ± 2 K.
+  values:
+  - column: 13
+    species: FeO
+    quantity: activity
+    evidence_class: measured_reduced
+    unit: dimensionless
+  conditions:
+  - key: fO2_Pa
+    state:
+      tag: value
+      value: '10.1325'
+    locator:
+      page: 4
+      pdf_page_index: 3
+      published_page: 1167
+      table: '2'
+      column_header: PO2 (atm)
+      note: Printed pO2 1.0 × 10^-4 atm; converted to Pa for the identity oxygen axis.
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: The source does not state the total gas pressure; the stated 50 mL/min is flow rate.
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+  - key: quench_state
+    state:
+      tag: value
+      value: not_stated
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Samples held at 1 573 K were quenched into iced water; preservation is not stated.
+- page: 4
+  table_index: 5
+  published_page: 1167
+  type: activity_coefficient
+  quantity: activity
+  unit: dimensionless
+  evidence_class: measured_reduced
+  phase: l
+  per: mol_species
+  experiment: katahira_2016_equilibrium_experiments
+  temperature:
+    as_printed: '1573'
+    unit: K
+    column_header: Section 2.1 temperature at the uniform-temperature region
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Setpoint 1 573 K; controlled within 1 573 ± 2 K.
+  values:
+  - column: 13
+    species: FeO
+    quantity: activity
+    evidence_class: measured_reduced
+    unit: dimensionless
+  conditions:
+  - key: fO2_Pa
+    state:
+      tag: value
+      value: '1013.25'
+    locator:
+      page: 4
+      pdf_page_index: 3
+      published_page: 1167
+      table: '3'
+      column_header: PO2 (atm)
+      note: Printed pO2 1.0 × 10^-2 atm; converted to Pa for the identity oxygen axis.
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: The source does not state the total gas pressure; the stated 50 mL/min is flow rate.
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+  - key: quench_state
+    state:
+      tag: value
+      value: not_stated
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Samples held at 1 573 K were quenched into iced water; preservation is not stated.
+- page: 4
+  table_index: 6
+  published_page: 1167
+  type: activity_coefficient
+  quantity: activity
+  unit: dimensionless
+  evidence_class: measured_reduced
+  phase: l
+  per: mol_species
+  experiment: katahira_2016_equilibrium_experiments
+  temperature:
+    as_printed: '1573'
+    unit: K
+    column_header: Section 2.1 temperature at the uniform-temperature region
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Setpoint 1 573 K; controlled within 1 573 ± 2 K.
+  values:
+  - column: 13
+    species: FeO
+    quantity: activity
+    evidence_class: measured_reduced
+    unit: dimensionless
+  conditions:
+  - key: fO2_Pa
+    state:
+      tag: value
+      value: '1013.25'
+    locator:
+      page: 4
+      pdf_page_index: 3
+      published_page: 1167
+      table: '3'
+      column_header: PO2 (atm)
+      note: Printed pO2 1.0 × 10^-2 atm; converted to Pa for the identity oxygen axis.
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: The source does not state the total gas pressure; the stated 50 mL/min is flow rate.
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+  - key: quench_state
+    state:
+      tag: value
+      value: not_stated
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1165
+      section: 2.1 Equilibrium Experiments
+      note: Samples held at 1 573 K were quenched into iced water; preservation is not stated.
