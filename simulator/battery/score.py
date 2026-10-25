@@ -11024,7 +11024,13 @@ def load_score_context(
             )
             species = doc.get("species")
             if isinstance(species, Mapping) and any(
-                isinstance(body, Mapping) and body.get("context")
+                isinstance(body, Mapping) and (
+                    body.get("context")
+                    or any(
+                        isinstance(row, Mapping) and row.get("type") == "alpha"
+                        for row in body.get("observations") or ()
+                    )
+                )
                 for body in species.values()
             ):
                 alpha_context_documents.append(doc)

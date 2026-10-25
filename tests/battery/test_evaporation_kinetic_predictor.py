@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 
@@ -38,6 +39,7 @@ from simulator.battery.residue import (
     collect_measured_evaporation_alphas,
     estimate_loo_evaporation_alpha,
 )
+from simulator.battery.migrate import load_migrated_store, load_yaml
 from simulator.battery.score import (
     EnginePrediction,
     ScoreContext,
@@ -329,6 +331,67 @@ def test_alpha_collection_accepts_measured_store_observation():
     assert collected[0].species == "Mg"
     assert collected[0].alpha == pytest.approx(0.2)
     assert collected[0].temperature_K == T_K
+
+
+@pytest.mark.parametrize(("formula", "temperature", "stored", "printed"), [
+    ("Na", 1673.15, 2.62e-05, 0.14),
+    ("K", 1673.15, 1.11e-06, 0.13),
+])
+def test_zhang_printed_alpha_is_collected_separately_from_persisted_alpha_gamma(
+    formula, temperature, stored, printed
+):
+    from simulator.battery.enums import Quantity
+
+    root = Path(__file__).parents[2]
+    _works, _experiments, observations = load_migrated_store(
+        root, sources=("kems-006-zhang-2021",)
+    )
+    persisted = next(
+        observation for observation in observations.values()
+        if observation.source_id == "kems-006-zhang-2021"
+        and getattr(observation.identity.quantity, "value", observation.identity.quantity)
+        is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+        and observation.identity.species.formula == formula
+        and float(observation.value.point) == pytest.approx(stored)
+    )
+    assert float(persisted.value.point) == pytest.approx(stored)
+    extract = load_yaml(
+        root / "data/literature/extracts/kems-006-zhang-2021.yaml"
+    )
+    collected = collect_measured_evaporation_alphas(
+        (persisted,), (extract,)
+    )
+    zhang = next(
+        row for row in collected
+        if row.source_id == persisted.source_id
+        and row.species == formula
+        and row.temperature_K == pytest.approx(temperature)
+    )
+
+    assert zhang.alpha == pytest.approx(printed)
+    assert abs(zhang.alpha - float(persisted.value.point)) > 0.01
+    assert zhang.temperature_K == pytest.approx(temperature)
+
+
+def test_context_species_override_does_not_leak_to_sibling_rows():
+    source_document = {
+        "source_id": "kems-005-fedkin-2006",
+        "species": {"Mg": {"context": [
+            {"observation_id": "override", "values": {
+                "gas_species": "Na(g)", "method_class": "model_derived",
+                "alpha": 0.26,
+            }},
+            {"observation_id": "parent", "values": {
+                "method_class": "measured_direct", "alpha": 0.24,
+            }},
+        ]}},
+    }
+
+    rows = collect_measured_evaporation_alphas((), (source_document,))
+
+    assert [(row.observation_id, row.species) for row in rows] == [
+        ("override", "Na"), ("parent", "Mg")
+    ]
 
 
 @pytest.mark.parametrize(

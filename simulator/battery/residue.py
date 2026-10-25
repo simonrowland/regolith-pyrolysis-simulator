@@ -54,6 +54,15 @@ _OWNER_APPROVED_ALKALI_ALPHA_SOURCES = frozenset({
 })
 
 
+def _owner_approves_printed_alkali_alpha(source_id: object, species: object) -> bool:
+    """Whether the ruling admits a paper's printed Na/K alpha as evidence."""
+    formula = str(species or "").removesuffix("(g)")
+    return (
+        formula in {"Na", "K"}
+        and str(source_id or "") in _OWNER_APPROVED_ALKALI_ALPHA_SOURCES
+    )
+
+
 class ResidueInventoryRefusal(ValueError):
     """Typed absence or invalid input at the residue integration boundary."""
 
@@ -188,10 +197,16 @@ def collect_measured_evaporation_alphas(
         family = provenance.get("melt_family") if isinstance(provenance, Mapping) else None
         source_id = getattr(observation, "source_id", None)
         formula = getattr(getattr(identity, "species", None), "formula", None)
-        approved_alkali = (
-            formula in {"Na", "K"}
-            and source_id in _OWNER_APPROVED_ALKALI_ALPHA_SOURCES
-        )
+        approved_alkali = _owner_approves_printed_alkali_alpha(source_id, formula)
+        scoring = provenance.get("scoring") if isinstance(provenance, Mapping) else None
+        if (
+            approved_alkali
+            and isinstance(scoring, Mapping)
+            and scoring.get("kind") == "implied_alpha_from_alpha_times_Gamma"
+        ):
+            # This persisted endpoint is alpha*Gamma, retained for its existing
+            # scorer. The extract's printed alpha is collected below instead.
+            continue
         method_class = getattr(getattr(observation, "evidence", None), "original_method_class", None)
         append(
             source_id=source_id,
@@ -207,6 +222,47 @@ def collect_measured_evaporation_alphas(
 
     for document in source_documents:
         source_id = document.get("source_id")
+        species_document = document.get("species")
+        if isinstance(species_document, Mapping):
+            for container_formula, body in species_document.items():
+                if not isinstance(body, Mapping):
+                    continue
+                for row in body.get("observations") or ():
+                    if not isinstance(row, Mapping) or row.get("type") != "alpha":
+                        continue
+                    values = row.get("values")
+                    if not isinstance(values, Mapping):
+                        continue
+                    provenance = values.get("provenance")
+                    scoring = (
+                        provenance.get("scoring")
+                        if isinstance(provenance, Mapping) else None
+                    )
+                    if (
+                        not isinstance(scoring, Mapping)
+                        or scoring.get("kind") != "implied_alpha_from_alpha_times_Gamma"
+                    ):
+                        continue
+                    approved_alkali = _owner_approves_printed_alkali_alpha(
+                        source_id, container_formula
+                    )
+                    if not approved_alkali:
+                        continue
+                    for point in values.get("series") or ():
+                        if not isinstance(point, Mapping):
+                            continue
+                        append(
+                            source_id=source_id,
+                            species=container_formula,
+                            alpha=point.get("alpha_printed"),
+                            evidence_class=values.get("method_class"),
+                            observation_id=(
+                                f"{row.get('observation_id')}::T={point.get('T_K')}"
+                            ),
+                            temperature_K=point.get("T_K"),
+                            method_class=values.get("method_class"),
+                            owner_approved_printed_alkali_alpha=approved_alkali,
+                        )
         for formula, rows in iter_extract_context_containers(document):
             for row in rows or ():
                 if not isinstance(row, Mapping):
@@ -218,10 +274,9 @@ def collect_measured_evaporation_alphas(
                 # as measured. A row type or a printed model fit alone is not
                 # evidence that the alpha itself was measured.
                 method_class = values.get("method_class")
-                formula = str(values.get("gas_species", formula)).removesuffix("(g)")
-                approved_alkali = (
-                    formula in {"Na", "K"}
-                    and source_id in _OWNER_APPROVED_ALKALI_ALPHA_SOURCES
+                row_formula = str(values.get("gas_species", formula)).removesuffix("(g)")
+                approved_alkali = _owner_approves_printed_alkali_alpha(
+                    source_id, row_formula
                 )
                 if (
                     method_class is not None
@@ -265,7 +320,7 @@ def collect_measured_evaporation_alphas(
                     continue
                 append(
                     source_id=source_id,
-                    species=values.get("gas_species", formula),
+                    species=row_formula,
                     alpha=alpha,
                     evidence_class=evidence,
                     observation_id=row.get("observation_id"),
@@ -309,8 +364,7 @@ def estimate_loo_evaporation_alpha(
             row.evidence_class in MEASURED_EVIDENCE
             or (
                 row.owner_approved_printed_alkali_alpha
-                and species in {"Na", "K"}
-                and row.source_id in _OWNER_APPROVED_ALKALI_ALPHA_SOURCES
+                and _owner_approves_printed_alkali_alpha(row.source_id, species)
             )
         )
     )
