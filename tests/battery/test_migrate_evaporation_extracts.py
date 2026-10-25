@@ -361,6 +361,29 @@ def test_richter02_table1_flux_and_alpha_values_keep_conditions(tmp_path: Path) 
         "richter_2002_table1_per_run_gamma_context",
     )
     assert gamma_context["schema_gap"] == "t-1382"
+    area_record = gamma_context["values"]["per_run_avg_area_cm2"]
+    assert area_record["source_observation_ids"] == [
+        "richter_2002_mg_table1_per_run_areas_b1",
+        "richter_2002_sio_table1_per_run_areas_b1",
+    ]
+    assert area_record["values_by_run"] == {
+        "B-133-11": "0.12",
+        "B-133-12": "0.14",
+        "B-133-13": "0.15",
+        "B-133-15": "0.19",
+        "B-133-16": "0.13",
+        "B-133-17": "0.19",
+        "B-133-19": "0.26",
+        "B-113-8": "0.161",
+        "B-113-9": "0.135",
+        "B-113-10": "0.131",
+        "BCAI-ss1": "0.0672",
+        "BCAI-ss2": "0.0621",
+        "BCAI-s1": "0.168",
+        "BCAI-s3": "0.134",
+        "BCAI-m1": "0.407",
+        "BCAI-m2": "0.425",
+    }
     gamma_rows = [row for row in gamma_context["values"]["rows"] if row.get("run_id")]
     assert len(gamma_rows) == 32
     for row in gamma_rows:

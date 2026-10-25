@@ -1400,6 +1400,27 @@ species:
       note: Richter's own per-run reductions are retained in context until the companion
         TABLE_CSV asset is seated and the values can be typed with measured lineage.
       values:
+        per_run_avg_area_cm2:
+          source_observation_ids:
+          - richter_2002_mg_table1_per_run_areas_b1
+          - richter_2002_sio_table1_per_run_areas_b1
+          values_by_run:
+            B-133-11: '0.12'
+            B-133-12: '0.14'
+            B-133-13: '0.15'
+            B-133-15: '0.19'
+            B-133-16: '0.13'
+            B-133-17: '0.19'
+            B-133-19: '0.26'
+            B-113-8: '0.161'
+            B-113-9: '0.135'
+            B-113-10: '0.131'
+            BCAI-ss1: '0.0672'
+            BCAI-ss2: '0.0621'
+            BCAI-s1: '0.168'
+            BCAI-s3: '0.134'
+            BCAI-m1: '0.407'
+            BCAI-m2: '0.425'
         rows:
         - source_observation_id: richter_2002_sio_cai_langmuir_gamma
           element: SiO
