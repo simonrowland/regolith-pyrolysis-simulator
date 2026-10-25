@@ -17,13 +17,14 @@ from __future__ import annotations
 
 import importlib.util
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
 import yaml
 
-from tests.git_history import require_git_history
+from tests.git_history import require_git_history, store_neutral_ack_revisions
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -50,18 +51,18 @@ MIN_FO2_LOG_HITS = {
 STALE_TIP = "07ad01dae"
 
 
-def _git(*args: str) -> str:
+def _git(*args: str, root: Path | None = None) -> str:
     return subprocess.run(
         ["git", *args],
-        cwd=REPO_ROOT,
+        cwd=root or REPO_ROOT,
         capture_output=True,
         text=True,
         check=True,
     ).stdout
 
 
-def _load_freshness():
-    path = REPO_ROOT / "scripts" / "check_store_freshness.py"
+def _load_freshness(root: Path | None = None):
+    path = (root or REPO_ROOT) / "scripts" / "check_store_freshness.py"
     spec = importlib.util.spec_from_file_location("check_store_freshness", path)
     assert spec is not None and spec.loader is not None
     mod = importlib.util.module_from_spec(spec)
@@ -95,10 +96,15 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
     mid-series regen followed by extract/migrate edits without a tip regen
     fails in CI. Does not assert UNTRACED (pre-existing, out of R16 P1).
     """
-    freshness = _load_freshness()
-    head = _git("rev-parse", "HEAD").strip()
+    _assert_committed_store_has_no_stale_inputs(REPO_ROOT)
+
+
+def _assert_committed_store_has_no_stale_inputs(root: Path) -> None:
+    freshness = _load_freshness(root)
+    require_git_history(root, *store_neutral_ack_revisions(root))
+    head = _git("rev-parse", "HEAD", root=root).strip()
     last_store = _git(
-        "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS
+        "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS, root=root
     ).strip()
     assert last_store, "no store-output commit found"
     stale = freshness.stale_input_commits(head, last_store)
@@ -107,6 +113,79 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
         "scripts/battery_migrate.py + build_index --write-store-summary:\n"
         + "\n".join(f"  {k}: {v[:3]}" for k, v in stale.items())
     )
+
+
+def _fixture_git(root: Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(root), *args],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+
+
+def _fixture_commit(root: Path, message: str) -> str:
+    _fixture_git(root, "add", "--all")
+    _fixture_git(root, "commit", "-m", message)
+    return _fixture_git(root, "rev-parse", "HEAD").strip()
+
+
+def _make_freshness_repo(root: Path, *, missing_ack_history: bool) -> Path:
+    root.mkdir()
+    _fixture_git(root, "init", "-q")
+    _fixture_git(root, "config", "user.name", "Freshness test")
+    _fixture_git(root, "config", "user.email", "freshness@example.invalid")
+
+    scripts = root / "scripts"
+    scripts.mkdir()
+    source = Path(__file__).resolve().parents[2] / "scripts" / "check_store_freshness.py"
+    shutil.copy2(source, scripts / "check_store_freshness.py")
+    store = root / "data" / "literature" / "extracts-v2" / "store.yaml"
+    store.parent.mkdir(parents=True)
+    store.write_text("store: committed\n", encoding="utf-8")
+
+    ack_dir = scripts / "store_neutral_acks"
+    ack_dir.mkdir()
+    if missing_ack_history:
+        missing_revision = "f" * 40
+        (ack_dir / f"{missing_revision}.txt").write_text(
+            "store-neutral test receipt\n", encoding="utf-8"
+        )
+        _fixture_commit(root, "single commit stub")
+        return root
+
+    _fixture_commit(root, "store output")
+    acknowledged_input = root / "data" / "literature" / "extracts" / "acked.yaml"
+    acknowledged_input.parent.mkdir(parents=True)
+    acknowledged_input.write_text("input: acknowledged\n", encoding="utf-8")
+    acknowledged_revision = _fixture_commit(root, "acknowledged input")
+    (ack_dir / f"{acknowledged_revision}.txt").write_text(
+        "store-neutral test receipt\n", encoding="utf-8"
+    )
+    _fixture_commit(root, "acknowledgement receipt")
+
+    stale_input = root / "data" / "literature" / "extracts" / "stale.yaml"
+    stale_input.write_text("input: stale\n", encoding="utf-8")
+    _fixture_commit(root, "unacknowledged stale input")
+    return root
+
+
+def test_freshness_check_still_fails_with_a_real_stale_input_and_ack(
+    tmp_path: Path,
+) -> None:
+    repo = _make_freshness_repo(tmp_path / "full-repo", missing_ack_history=False)
+
+    with pytest.raises(AssertionError, match="store is STALE"):
+        _assert_committed_store_has_no_stale_inputs(repo)
+
+
+def test_freshness_check_skips_when_ack_history_is_missing(
+    tmp_path: Path,
+) -> None:
+    repo = _make_freshness_repo(tmp_path / "stub-repo", missing_ack_history=True)
+
+    with pytest.raises(pytest.skip.Exception, match="missing_git_history"):
+        _assert_committed_store_has_no_stale_inputs(repo)
 
 
 def test_mutation_pre_regen_tip_extracts_v2_have_zero_fo2_log() -> None:

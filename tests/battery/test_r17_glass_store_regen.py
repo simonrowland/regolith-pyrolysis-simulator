@@ -23,7 +23,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from tests.git_history import require_git_history
+from tests.git_history import require_git_history, store_neutral_ack_revisions
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 JANAF_STORE = (
@@ -137,11 +137,15 @@ def test_committed_store_mg013_and_w003_quote_printed_glass_markers() -> None:
 
 def test_committed_store_has_no_stale_migrate_input_commits() -> None:
     """Reject unacknowledged post-regen migrate-input commits."""
-    if _git("rev-parse", "--is-shallow-repository").strip() == "true":
-        pytest.skip("git_history_unavailable: freshness requires a full checkout")
     freshness = _load_freshness()
     neutral = freshness.STORE_NEUTRAL_INPUT_COMMITS
-    require_git_history(REPO_ROOT, *sorted(neutral))
+    require_git_history(
+        REPO_ROOT,
+        *sorted(neutral),
+        *store_neutral_ack_revisions(REPO_ROOT),
+    )
+    if _git("rev-parse", "--is-shallow-repository").strip() == "true":
+        pytest.skip("git_history_unavailable: freshness requires a full checkout")
     for revision in neutral:
         if subprocess.run(
             ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
