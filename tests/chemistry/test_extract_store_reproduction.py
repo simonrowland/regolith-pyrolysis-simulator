@@ -179,7 +179,9 @@ def test_store_yields_adopted_target_type_observations(
     # Offer 20 adds 51 Richter 2007 Table 1 residue rate_series rows
     # (kems-010-richter-2007, richter_2007_residue_table1_*). The aluminum
     # quoted non-loss bound stays on species Al (1900 -> 1951).
-    assert len(kems) == 1951
+    # famBAND04 (e72d720b9) corrects the Figure 2 marker centres, admitting
+    # one series observation: schneider_1980_k_psat_figure2_high_temperature_digitized.
+    assert len(kems) == 1952
     # Active KEMS source IDs grew from 45 to 81 (+36); source IDs and added
     # extract files are distinct counts (37 files were added).
     assert len({obs.source_id for obs in kems}) == 81
@@ -1895,13 +1897,15 @@ def test_coverage_ledger_is_observation_first_and_exact(
     # point counts. The rollup's “Extrapolated-alpha” label counts all
     # extrapolated findings: eight Fedkin SiO alpha/rate findings disappear
     # as model-fit duplicates, and one Si NBP finding resolves after 3e54afda8.
-    # Offer 20's 51 Richter Table 1 residue rows are skipped rate_hkl gaps
-    # (1996 -> 2047 observations, 1973 -> 2024 skipped, 1977 -> 2028 gap points).
+    # Offer 20's 51 Richter Table 1 residue rows are skipped rate_hkl gaps.
+    # famBAND04 (e72d720b9) adds one adopted Schneider Figure 2 series record
+    # (schneider_1980_k_psat_figure2_high_temperature_digitized): 2047 -> 2048;
+    # it is typed-refused and moves the skipped count from 2024 to 2025.
     assert coverage["observations"] == sum(
         obs.adoption_basis != "superseded" for obs in adopted_observations
-    ) == 2047
+    ) == 2048
     assert coverage["comparable"] == 23
-    assert coverage["skipped"] == 2024
+    assert coverage["skipped"] == 2025
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
     assert coverage["comparable_points"] == 34
     assert coverage["gap_points"] == 2028
