@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from tests.battery.factories import migrate_one_extract
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -98,6 +98,8 @@ def test_maeda_conditions_and_lineage_reach_isolated_migration() -> None:
     assert len(pressure_rows) == 34
     for observation in pressure_rows:
         identity = observation.identity
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         point = observation.point_conditions or {}
         assert identity.temperature_K is not None and identity.temperature_K.is_value
         assert identity.total_pressure_Pa is not None and identity.total_pressure_Pa.is_value

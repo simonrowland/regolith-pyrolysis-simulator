@@ -3839,7 +3839,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1948'
         pressure_atm: '2.58e-6'
         pressure_as_printed: 2.58 × 10^-6 atm
@@ -3856,16 +3856,14 @@ species:
         water_vapor_pressure_atm_as_printed: 8.26×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run01_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1948'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -3975,7 +3973,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1926'
         pressure_atm: '1.35e-6'
         pressure_as_printed: 1.35 × 10^-6 atm
@@ -3992,16 +3990,14 @@ species:
         water_vapor_pressure_atm_as_printed: 7.47×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run02_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1926'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -4111,7 +4107,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1926'
         pressure_atm: '2.84e-6'
         pressure_as_printed: 2.84 × 10^-6 atm
@@ -4128,16 +4124,14 @@ species:
         water_vapor_pressure_atm_as_printed: 1.25×10-1 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run03_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1926'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -4247,7 +4241,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1926'
         pressure_atm: '3.87e-6'
         pressure_as_printed: 3.87 × 10^-6 atm
@@ -4264,16 +4258,14 @@ species:
         water_vapor_pressure_atm_as_printed: 1.87×10-1 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run04_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1926'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -4383,7 +4375,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1917'
         pressure_atm: '1.95e-6'
         pressure_as_printed: 1.95 × 10^-6 atm
@@ -4400,16 +4392,14 @@ species:
         water_vapor_pressure_atm_as_printed: 8.26×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run05_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1917'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -4519,7 +4509,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1898'
         pressure_atm: '1.81e-6'
         pressure_as_printed: 1.81 × 10^-6 atm
@@ -4536,16 +4526,14 @@ species:
         water_vapor_pressure_atm_as_printed: 8.26×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run06_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1898'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -4655,7 +4643,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1861'
         pressure_atm: '1.05e-6'
         pressure_as_printed: 1.05 × 10^-6 atm
@@ -4672,16 +4660,14 @@ species:
         water_vapor_pressure_atm_as_printed: 8.26×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run07_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1861'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -4791,7 +4777,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1831'
         pressure_atm: '8.48e-7'
         pressure_as_printed: 8.48 × 10^-7 atm
@@ -4808,16 +4794,14 @@ species:
         water_vapor_pressure_atm_as_printed: 8.22×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run08_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1831'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -4927,7 +4911,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1831'
         pressure_atm: '2.26e-7'
         pressure_as_printed: 2.26 × 10^-7 atm
@@ -4944,16 +4928,14 @@ species:
         water_vapor_pressure_atm_as_printed: 2.72×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run09_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1831'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -5063,7 +5045,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1831'
         pressure_atm: '1.81e-6'
         pressure_as_printed: 1.81 × 10^-6 atm
@@ -5080,16 +5062,14 @@ species:
         water_vapor_pressure_atm_as_printed: 1.77×10-1 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run10_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1831'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -5199,7 +5179,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1831'
         pressure_atm: '1.07e-6'
         pressure_as_printed: 1.07 × 10^-6 atm
@@ -5216,16 +5196,14 @@ species:
         water_vapor_pressure_atm_as_printed: 1.14×10-1 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run11_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1831'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -5335,7 +5313,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1818'
         pressure_atm: '5.91e-7'
         pressure_as_printed: 5.91 × 10^-7 atm
@@ -5352,16 +5330,14 @@ species:
         water_vapor_pressure_atm_as_printed: 8.28×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run12_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1818'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -5471,7 +5447,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1807'
         pressure_atm: '1.31e-6'
         pressure_as_printed: 1.31 × 10^-6 atm
@@ -5488,16 +5464,14 @@ species:
         water_vapor_pressure_atm_as_printed: 1.54×10-1 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run13_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1807'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -5607,7 +5581,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1807'
         pressure_atm: '1.40e-6'
         pressure_as_printed: 1.40 × 10^-6 atm
@@ -5624,16 +5598,14 @@ species:
         water_vapor_pressure_atm_as_printed: 1.54×10-1 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run14_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1807'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -5743,7 +5715,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1807'
         pressure_atm: '1.51e-6'
         pressure_as_printed: 1.51 × 10^-6 atm
@@ -5760,16 +5732,14 @@ species:
         water_vapor_pressure_atm_as_printed: 1.54×10-1 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run15_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1807'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -5879,7 +5849,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1794'
         pressure_atm: '5.16e-6'
         pressure_as_printed: 5.16 × 10^-6 atm
@@ -5896,16 +5866,14 @@ species:
         water_vapor_pressure_atm_as_printed: 8.22×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run16_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1794'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -6015,7 +5983,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1788'
         pressure_atm: '5.29e-6'
         pressure_as_printed: 5.29 × 10^-6 atm
@@ -6032,16 +6000,14 @@ species:
         water_vapor_pressure_atm_as_printed: 8.26×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run17_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1788'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -6151,7 +6117,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1756'
         pressure_atm: '4.19e-6'
         pressure_as_printed: 4.19 × 10^-6 atm
@@ -6168,16 +6134,14 @@ species:
         water_vapor_pressure_atm_as_printed: 9.55×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run18_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1756'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -6287,7 +6251,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1748'
         pressure_atm: '4.76e-6'
         pressure_as_printed: 4.76 × 10^-6 atm
@@ -6304,16 +6268,14 @@ species:
         water_vapor_pressure_atm_as_printed: 9.60×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run19_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1748'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -6423,7 +6385,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1725'
         pressure_atm: '4.81e-6'
         pressure_as_printed: 4.81 × 10^-6 atm
@@ -6440,16 +6402,14 @@ species:
         water_vapor_pressure_atm_as_printed: 1.85×10-1 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run20_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1725'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -6559,7 +6519,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1724'
         pressure_atm: '2.54e-6'
         pressure_as_printed: 2.54 × 10^-6 atm
@@ -6576,16 +6536,14 @@ species:
         water_vapor_pressure_atm_as_printed: 8.26×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run21_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1724'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -6695,7 +6653,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1707'
         pressure_atm: '2.86e-6'
         pressure_as_printed: 2.86 × 10^-6 atm
@@ -6712,16 +6670,14 @@ species:
         water_vapor_pressure_atm_as_printed: 1.22×10-1 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run22_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1707'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -6831,7 +6787,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1694'
         pressure_atm: '2.64e-6'
         pressure_as_printed: 2.64 × 10^-6 atm
@@ -6848,16 +6804,14 @@ species:
         water_vapor_pressure_atm_as_printed: 8.26×10-2 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run23_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1694'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -6967,7 +6921,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1668'
         pressure_atm: '2.28e-6'
         pressure_as_printed: 2.28 × 10^-6 atm
@@ -6984,16 +6938,14 @@ species:
         water_vapor_pressure_atm_as_printed: 1.54×10-1 atm
         gas_mixture_as_printed: O2-H2O
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t2_run24_collected_mg_mass_typed_refusal
           locator:
-            page: 6
-            pdf_page_index: 5
-            table: '2'
-            row_label: '1668'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -7105,7 +7057,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1977'
         pressure_atm: '3.33e-7'
         pressure_as_printed: 3.33 × 10^-7 atm
@@ -7132,16 +7084,14 @@ species:
             row: '1'
             column_header: oxygen at 1.0 atm (caption)
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t4_run01_collected_mg_mass_typed_refusal
           locator:
-            page: 8
-            pdf_page_index: 7
-            table: '4'
-            row_label: '1977'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -7216,7 +7166,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1923'
         pressure_atm: '1.91e-7'
         pressure_as_printed: 1.91 × 10^-7 atm
@@ -7243,16 +7193,14 @@ species:
             row: '2'
             column_header: oxygen at 1.0 atm (caption)
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t4_run02_collected_mg_mass_typed_refusal
           locator:
-            page: 8
-            pdf_page_index: 7
-            table: '4'
-            row_label: '1923'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -7327,7 +7275,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1873'
         pressure_atm: '7.40e-8'
         pressure_as_printed: 7.40 × 10^-8 atm
@@ -7354,16 +7302,14 @@ species:
             row: '5'
             column_header: oxygen at 1.0 atm (caption)
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t4_run05_collected_mg_mass_typed_refusal
           locator:
-            page: 8
-            pdf_page_index: 7
-            table: '4'
-            row_label: '1873'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -7438,7 +7384,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1848'
         pressure_atm: '4.51e-8'
         pressure_as_printed: 4.51 × 10^-8 atm
@@ -7465,16 +7411,14 @@ species:
             row: '7'
             column_header: oxygen at 1.0 atm (caption)
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t4_run07_collected_mg_mass_typed_refusal
           locator:
-            page: 8
-            pdf_page_index: 7
-            table: '4'
-            row_label: '1848'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -7549,7 +7493,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1843'
         pressure_atm: '2.55e-8'
         pressure_as_printed: 2.55 × 10^-8 atm
@@ -7576,16 +7520,14 @@ species:
             row: '8'
             column_header: oxygen at 1.0 atm (caption)
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t4_run08_collected_mg_mass_typed_refusal
           locator:
-            page: 8
-            pdf_page_index: 7
-            table: '4'
-            row_label: '1843'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -7660,7 +7602,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1843'
         pressure_atm: '3.98e-8'
         pressure_as_printed: 3.98 × 10^-8 atm
@@ -7687,16 +7629,14 @@ species:
             row: '9'
             column_header: oxygen at 1.0 atm (caption)
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t4_run09_collected_mg_mass_typed_refusal
           locator:
-            page: 8
-            pdf_page_index: 7
-            table: '4'
-            row_label: '1843'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -7771,7 +7711,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1825'
         pressure_atm: '1.04e-8'
         pressure_as_printed: 1.04 × 10^-8 atm
@@ -7798,16 +7738,14 @@ species:
             row: '10'
             column_header: oxygen at 1.0 atm (caption)
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t4_run10_collected_mg_mass_typed_refusal
           locator:
-            page: 8
-            pdf_page_index: 7
-            table: '4'
-            row_label: '1825'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -7882,7 +7820,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1898'
         pressure_atm: '4.62e-8'
         pressure_as_printed: 4.62 × 10^-8 atm
@@ -7898,16 +7836,14 @@ species:
         flow_rate_cm3_s_as_printed: '1.08'
         gas_mixture_as_printed: O2+CO2
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t4_run03_collected_mg_mass_typed_refusal
           locator:
-            page: 8
-            pdf_page_index: 7
-            table: '4'
-            row_label: '1898'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -8004,7 +7940,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1873'
         pressure_atm: '6.35e-8'
         pressure_as_printed: 6.35 × 10^-8 atm
@@ -8020,16 +7956,14 @@ species:
         flow_rate_cm3_s_as_printed: '1.05'
         gas_mixture_as_printed: O2+CO2
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t4_run04_collected_mg_mass_typed_refusal
           locator:
-            page: 8
-            pdf_page_index: 7
-            table: '4'
-            row_label: '1873'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
@@ -8126,7 +8060,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: measured_reduced
         T_K: '1873'
         pressure_atm: '4.53e-8'
         pressure_as_printed: 4.53 × 10^-8 atm
@@ -8142,16 +8076,14 @@ species:
         flow_rate_cm3_s_as_printed: '1.05'
         gas_mixture_as_printed: O2+CO2
         derivation:
-          relation: The authors calculate this transpiration pressure from collected Mg and carrier-gas flow using
-            their printed pressure relation.
+          relation: Equation (1) reduces the measured collected Mg and carrier-gas amounts to transpiration pressure.
           inputs:
           - maeda_1978_t4_run06_collected_mg_mass_typed_refusal
           locator:
-            page: 8
-            pdf_page_index: 7
-            table: '4'
-            row_label: '1873'
-            column_header: p (atm)
+            page: 4
+            pdf_page_index: 3
+            published_page: 494
+            equation: '1'
       phase: gas
       regime: transpiration
       condensed_form: MgO(s)
