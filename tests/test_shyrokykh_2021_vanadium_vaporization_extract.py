@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -146,7 +147,7 @@ def test_render_and_extract_cell_mutations_fail_table_binding() -> None:
         assert _table_ii_grid(changed_extract) == TABLE_II_RENDER
 
 
-def test_text_bounds_keep_sample_and_conditions_but_expose_migration_gap() -> None:
+def test_text_bounds_keep_sample_conditions_and_migrate_as_lower_bounds() -> None:
     document = _document()
     observations = document["species"]["V2O5"]["observations"]
     expected_bounds = {"CSV1": "77", "CSV2": "45"}
@@ -158,7 +159,7 @@ def test_text_bounds_keep_sample_and_conditions_but_expose_migration_gap() -> No
             "bound_operator": ">",
             "bound_value": expected_bounds[sample],
         }
-        assert "t-1367" in values["unavailable_reason"]
+        assert "unavailable_reason" not in values
         composition = values["initial_composition_as_printed"]
         assert (
             sample,
@@ -173,6 +174,10 @@ def test_text_bounds_keep_sample_and_conditions_but_expose_migration_gap() -> No
     rows = list(migrator.result.observations.values())
     assert len(rows) == 2
     assert not migrator.result.validation.hard_issues
+    expected_mass_loss_bounds = {
+        "shyrokykh_2021_csv1_text_extraction_bound": Decimal("0.77"),
+        "shyrokykh_2021_csv2_text_extraction_bound": Decimal("0.45"),
+    }
     for row in rows:
         assert row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
         assert row.identity.species.formula == "V2O5"
@@ -181,7 +186,10 @@ def test_text_bounds_keep_sample_and_conditions_but_expose_migration_gap() -> No
         assert row.point_conditions is not None
         assert len(row.point_conditions) == 8
         assert all(item.locator is not None for item in row.point_conditions.values())
-        assert row.value.kind is ValueKind.UNAVAILABLE
+        assert row.value.kind is ValueKind.BOUND
+        assert row.value.bound_operator == ">"
+        local_id = row.observation_id.rsplit("::", 1)[-1]
+        assert row.value.bound_value == expected_mass_loss_bounds[local_id]
 
     figures = [
         item

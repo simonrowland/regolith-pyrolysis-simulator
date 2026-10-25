@@ -17,9 +17,8 @@ extraction:
   worker: fam17-1019
   table_disposition:
     Table I: CSV1/CSV2 starting compositions are bound to the corresponding text-reported yield bounds
-      by sample ID; CSV3 remains context because its outcomes are figure-only. The two bounds migrate
-      as unavailable with the typed reason in values.unavailable_reason; shared support is tracked by
-      t-1367.
+      by sample ID; CSV3 remains context because its outcomes are figure-only. The text-reported >77
+      and >45 mass pct yields migrate as mass-loss fraction bounds.
     Table II: Treatment matrix retained in context; it contains conditions but no measured outcome column.
     Table III: All 25 selected-element EDX atomic-percent cells retained in context because no token fits
       this partial elemental composition table.
@@ -149,8 +148,6 @@ species:
           bound_operator: '>'
           bound_value: '77'
         value_as_printed: more than 77 mass pct V2O5 extracted
-        unavailable_reason: legacy_migrator_does_not_lift_bound_named_mass_loss_field; t-1367 adds shared
-          support
     - observation_id: shyrokykh_2021_csv2_text_extraction_bound
       type: mass_loss
       locator: &id006
@@ -259,8 +256,6 @@ species:
           bound_operator: '>'
           bound_value: '45'
         value_as_printed: more than 45 mass pct V2O5 extracted
-        unavailable_reason: legacy_migrator_does_not_lift_bound_named_mass_loss_field; t-1367 adds shared
-          support
     context:
     - observation_id: shyrokykh_2021_table1_csv3_starting_composition_context
       type: measured_table_context
