@@ -761,6 +761,45 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     assert "calibration-not-grounded | vapour | internal-analytical | 1" in report
 
 
+def test_admitted_figure_only_kems_partial_pressure_scores_with_apparatus_flag() -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_strata,
+    )
+
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    reference = F.observation(
+        "figure-only-kems-pressure",
+        experiment.experiment_id,
+        replace(
+            _partial_identity(),
+            total_pressure_Pa=State.of(Decimal("1e-6")),
+        ),
+        Decimal("10"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+        source_id="kems-figure-only",
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.execution.state is ExecutionState.PRODUCED
+    assert residual.refusal is None
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        FLAGGED_STRATUM_FIGURE_ONLY,
+    )
+
+
 def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
@@ -4991,7 +5030,26 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
         ) is not None
         and point.series == "stolyarova_1996_table2_pCa_1933k"
     ]
-    assert len(selected) == 22
+    assert len(selected) == 29
+    # c2-effusion's d-274 printed-pressure fallback makes these seven
+    # existing Table 2 pCa points scoreable with an apparatus notice.
+    unverified_keys = {
+        residual.reference.rsplit(":", 1)[-1]
+        for residual, _point in selected
+        if any(
+            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            for notice in residual.notices
+        )
+    }
+    assert unverified_keys == {
+        "h=191f88c43b1b",
+        "h=4d3ab2cd6814",
+        "h=4f3dddc64866",
+        "h=67a63ea92d8f",
+        "h=69f870f37475",
+        "h=9151fe49ebd2",
+        "h=ffb85bc52460",
+    }
     e15_residual = selected[0][0]
     e15_observation = context.observations[e15_residual.reference]
     assert (
@@ -5009,7 +5067,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     points = tuple(point for _residual, point in selected)
     shape = score_mod._e15_level_shape_rows(points)[1]
     assert shape["x_axis"] == "x(CaO)"
-    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("6.38")
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("6.76")
 
     from simulator.battery.score import (
         _ScorePayloadAccumulator,
@@ -5028,12 +5086,12 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
         and row["series"] == "stolyarova_1996_table2_pCa_1933k"
         and row["statistic"] == "shape"
     )
-    assert production_shape["n"] == 22
+    assert production_shape["n"] == 29
     assert production_shape["population"] == "liquid"
     assert production_shape["x_axis"] == "x(CaO)"
     assert production_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("6.38")
+    ) == Decimal("6.76")
     assert (
         score_mod.FLAGGED_STRATUM_CELL_MATERIAL_INFERRED
         in production_shape["flags"]
@@ -5053,7 +5111,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     wrong_axis_shape = score_mod._e15_level_shape_rows(si_axis_points)[1]
     assert wrong_axis_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("-4.94")
+    ) == Decimal("-5.58")
 
     contested_payload = next(
         payload

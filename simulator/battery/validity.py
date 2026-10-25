@@ -717,9 +717,18 @@ def effusion_regime_unverified(
     )
     if pressure_sum is None:
         lower_bound = pressure_detail.get("printed_partial_pressure_lower_bound_Pa")
-        if lower_bound is not None and Decimal(str(lower_bound)) > pressure_limit:
+        uncalibrated_partial_pressure = (
+            quantity is Quantity.P_PARTIAL and ungrounded_detail is not None
+        )
+        if (
+            lower_bound is not None
+            and Decimal(str(lower_bound)) > pressure_limit
+            and not uncalibrated_partial_pressure
+        ):
             # A lower bound already above the limit proves the cell is outside
-            # the regime, even though species coverage is incomplete.
+            # the regime, even though species coverage is incomplete. An
+            # uncalibrated partial-pressure row remains scoreable with its
+            # calibration notice; its ungrounded value cannot refuse the run.
             pressure_detail["printed_partial_pressure_sum_Pa"] = str(lower_bound)
         checks.append(
             GateCheck(

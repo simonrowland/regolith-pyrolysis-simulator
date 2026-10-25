@@ -1342,10 +1342,18 @@ def _unverified_apparatus_notices(
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value in MEASURED_EVIDENCE
     )
+    figure_only_partial_pressure = (
+        quantity is Quantity.P_PARTIAL
+        and reference.evidence.class_.is_value
+        and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+    )
     calibration_flagged_partial_pressure = (
         quantity is Quantity.P_PARTIAL
         and reference.evidence.class_.is_value
-        and reference.evidence.class_.value in MEASURED_EVIDENCE
+        and (
+            reference.evidence.class_.value in MEASURED_EVIDENCE
+            or reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        )
         and _has_calibration_not_grounded(gates.checks)
     )
     calibration_flagged_activity = (
@@ -1355,6 +1363,7 @@ def _unverified_apparatus_notices(
     )
     if not (
         measured_pressure
+        or figure_only_partial_pressure
         or comparison_activity
         or unknown_method_activity
         or calibration_flagged_partial_pressure
