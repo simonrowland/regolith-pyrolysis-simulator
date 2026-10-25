@@ -619,6 +619,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             redox_state=redox_state,
             composition_mol_by_account=composition_mol_by_account,
             species_formula_registry=species_registry,
+            **dict(request.control_inputs.get('_liquidus_search_window_C') or {}),
         )
 
     @staticmethod

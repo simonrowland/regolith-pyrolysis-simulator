@@ -2225,6 +2225,21 @@ class EvaporationMixin:
             'curve': None,
             'status': 'computing',
         }
+        if isinstance(cached_curve, Mapping):
+            solidus = self._optional_float(cached_curve.get('solidus_T_C'))
+            liquidus = self._optional_float(cached_curve.get('liquidus_T_C'))
+            if solidus is not None and liquidus is not None and solidus < liquidus:
+                # Seed only: recompute the current composition's crossings.
+                # The existing finder scans a 50 C lattice. Round the prior
+                # bounds outwards and add one cell on each side, preserving
+                # its original bisection brackets when the crossings stay
+                # nearby. C / (C per cell) is dimensionless; multiplying
+                # back gives C. A failed warm bracket follows the existing
+                # broad backend/kernel ladder below, with unchanged budgets.
+                computing_cache['_liquidus_search_window_C'] = {
+                    'min_T_C': 50.0 * (math.floor(solidus / 50.0) - 1),
+                    'max_T_C': 50.0 * (math.ceil(liquidus / 50.0) + 1),
+                }
         self._freeze_gate_liquid_fraction_cache = computing_cache
         self._freeze_gate_curve_in_progress = True
         cache_committed = False
@@ -2609,9 +2624,12 @@ class EvaporationMixin:
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
         try:
+            window = (getattr(self, '_freeze_gate_liquid_fraction_cache', None) or {}).get(
+                '_liquidus_search_window_C'
+            )
             result = self._dispatch_only(
                 ChemistryIntent.GATE_LIQUID_FRACTION,
-                control_inputs={},
+                control_inputs=({'_liquidus_search_window_C': window} if window else {}),
                 fO2_log=fO2_log,
                 redox_state=redox_state,
                 fe_redox_policy='intrinsic',
