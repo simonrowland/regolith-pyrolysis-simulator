@@ -58,6 +58,30 @@ def test_failed_bracket_is_typed_and_never_an_endpoint():
             ferric=0.0, other=0.0, storage=0.0))
 
 
+def test_vacuum_consuming_source_can_close_at_physical_zero():
+    def consuming(x):
+        return evaluation(x, source=-x ** 0.25, ferric=0.0, other=0.0, storage=0.0)
+
+    solved = _solve_surface_oxygen_balance(consuming)
+    assert solved.reaction_pO2_bar == solved.gas_face_pO2_bar == 0.0
+    assert not any(solved.balance_terms)
+
+
+def test_runtime_vacuum_consuming_carriers_prove_zero_source():
+    sim = simulation('s_type_asteroid_silicate')
+    try:
+        sim.melt.temperature_C = 1055.0
+        sim._frozen_evaporation_carriers = frozenset({'CrO2', 'CrO3'})
+        sim._reaction_pO2_bar = 0.0
+        assert sim._evaporation_carrier_zero_reason() == 'frozen_consuming_carriers_at_zero_oxygen'
+        # Positive oxygen has a physical consuming flux; the zero proof must
+        # never suppress it away from the boundary.
+        sim._reaction_pO2_bar = 1e-12
+        assert sim._evaporation_carrier_zero_reason() is None
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
 def test_coordinate_convergence_across_a_jump_is_not_flux_convergence():
     def jump(x):
         return _SurfaceOxygenEvaluation(x, 0.0, 1.0 if x >= 1e-6 else 0.0,
