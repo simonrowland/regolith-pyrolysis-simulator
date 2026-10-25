@@ -27,20 +27,6 @@ reason = "Required hot-wall SiO saturation fit is unavailable."
 since = "7dd268c6f"
 
 [[test]]
-node = "tests/test_fail_loud_h2_h3.py::test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite"
-ticket = "b-813"
-tier = "pr"
-reason = "The commanded extreme-pO2 path no longer raises the pinned exception."
-since = "7dd268c6f"
-
-[[test]]
-node = "tests/test_stage0_harness.py::test_real_feedstock_stops_at_c0b_path_ab_pause"
-ticket = "b-1028"
-tier = "pr"
-reason = "Stage 0 pause reports dormant_by_epoch instead of the pinned refusal."
-since = "7dd268c6f"
-
-[[test]]
 node = "tests/test_staged_bakeout.py::test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture"
 ticket = "b-946"
 tier = "pr"
@@ -54,16 +40,3 @@ tier = "pr"
 reason = "Na Antoine wall segment has no usable extrapolation fit."
 since = "7dd268c6f"
 
-[[test]]
-node = "tests/test_web_socket_trace.py::test_pre_refactor_socket_trace_matches_golden"
-ticket = "b-810"
-tier = "pr"
-reason = "Socket trace differs from the committed pre-refactor golden."
-since = "7dd268c6f"
-
-[[test]]
-node = "tests/test_yield_disposition.py::test_session_multi_refusal_then_continue_matches_unattempted_hours"
-ticket = "b-810"
-tier = "pr"
-reason = "The test fixture omits the simulator condensation_model field."
-since = "7dd268c6f"
