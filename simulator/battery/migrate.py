@@ -9096,9 +9096,14 @@ _PARTIAL_PRESSURE_FIELDS = (
     "p_Na_at_1273_K_Pa",
     "p_K_at_1273_K_Pa",
 )
+_PARTIAL_PRESSURE_HEADER_SCALES = {
+    "P_P2_x1e8_atm_as_printed": Decimal("1e-8"),
+    "P_PO_x1e7_atm_as_printed": Decimal("1e-7"),
+    "P_PO2_x1e8_atm_as_printed": Decimal("1e-8"),
+}
 
 QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
-    Quantity.ACTIVITY: ("activity",),
+    Quantity.ACTIVITY: ("activity", "a_P2O5_times_1e17_as_printed"),
     Quantity.ACTIVITY_COEFFICIENT: ("gamma", "activity_coefficient"),
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: ("alpha", "alpha_times_Gamma"),
     Quantity.CONDENSATION_COEFFICIENT: ("alpha",),
@@ -9212,7 +9217,12 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "mass_yield_percent_about",
     ),
     Quantity.EVOLVED_GAS_YIELD: ("yield_ug_g",),
-    Quantity.INTERACTION_PARAMETER: ("wagner_interaction_parameter", "epsilon"),
+    Quantity.INTERACTION_PARAMETER: (
+        "wagner_interaction_parameter",
+        "epsilon",
+        "epsilon_P_i",
+        "epsilon_P_Si",
+    ),
     Quantity.TRANSITION_TEMPERATURE: (
         "value_K",
         "T_m_K",
@@ -9919,6 +9929,11 @@ def _uncertainty_as_log10_dex(
         else _log_width_in_dex(uncertainty.value, printed_form)
     )
     return replace(uncertainty, value=converted, basis="log10_dex")
+
+
+def _kambayashi_table7_activity_from_printed(value: object) -> Decimal | None:
+    amount = _as_dec_or_none(value)
+    return None if amount is None else amount * Decimal("1e-17")
 
 
 def _interval_selection(
@@ -10839,6 +10854,64 @@ def _selection_from_named_field(
             condition_ranges=condition_ranges,
             field_name=field_name,
         )
+    if q_token is Quantity.LOG10_KF:
+        a = _as_dec_or_none(payload.get("A"))
+        b = _as_dec_or_none(payload.get("B"))
+        validity = payload.get("temperature_range_as_printed")
+        if a is not None and b is not None:
+            domain = {"units_as_printed": units}
+            if isinstance(validity, str) and validity:
+                domain["temperature_range_as_printed"] = validity
+            return SourceSelection(
+                value=_value_from_plain(
+                    {
+                        "kind": ValueKind.EXPRESSION.value,
+                        "expression_text": "log10_K = A + B/T",
+                        "expression_parameters": (("A", a), ("B", b)),
+                        "expression_domain": json.dumps(
+                            domain,
+                            ensure_ascii=False,
+                            separators=(",", ":"),
+                        ),
+                    }
+                ),
+                field_name="A/B",
+                unit_trail=units,
+                condition_ranges=condition_ranges,
+            )
+    if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
+        expression = payload.get("expression")
+        validity = payload.get("temperature_range_as_printed")
+        if (
+            q_token is Quantity.P_PARTIAL
+            and isinstance(expression, str)
+            and expression.lstrip().startswith("fO2 =")
+        ):
+            return _unavailable_selection(
+                "printed expression defines oxygen fugacity, not partial pressure",
+                condition_ranges=condition_ranges,
+                field_name="expression",
+            )
+        if isinstance(expression, str) and expression:
+            domain = {"units_as_printed": units}
+            if isinstance(validity, str) and validity:
+                domain["temperature_range_as_printed"] = validity
+            return SourceSelection(
+                value=_value_from_plain(
+                    {
+                        "kind": ValueKind.EXPRESSION.value,
+                        "expression_text": expression,
+                        "expression_domain": json.dumps(
+                            domain,
+                            ensure_ascii=False,
+                            separators=(",", ":"),
+                        ),
+                    }
+                ),
+                field_name="expression",
+                unit_trail=units,
+                condition_ranges=condition_ranges,
+            )
     if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
         for key, unit in _PRESSURE_SERIES_KEYS:
             if key not in payload:
@@ -10875,6 +10948,44 @@ def _selection_from_named_field(
                 unit_trail=trail or "identity",
             )
         if q_token is Quantity.P_PARTIAL:
+            scaled_pressure_keys = [
+                key for key in _PARTIAL_PRESSURE_HEADER_SCALES if key in payload
+            ]
+            if len(scaled_pressure_keys) > 1:
+                return _unavailable_selection(
+                    "multiple gas-specific printed pressure columns are present; "
+                    "cannot identify one partial pressure from this row",
+                    condition_ranges=condition_ranges,
+                    field_name=", ".join(scaled_pressure_keys),
+                )
+            if scaled_pressure_keys:
+                key = scaled_pressure_keys[0]
+                scale = _PARTIAL_PRESSURE_HEADER_SCALES[key]
+                mantissa = _numeric_field(payload, key)
+                if mantissa is None:
+                    return _unavailable_selection(
+                        f"{key} is not a numeric printed pressure mantissa",
+                        condition_ranges=condition_ranges,
+                        unused_ancillary=_unused_ancillary(payload, key),
+                        field_name=key,
+                    )
+                # Table 6 headers give the atmosphere scale for each printed
+                # mantissa; apply that header once before the standard atm→Pa conversion.
+                val, trail = convert_pressure_to_pa(mantissa * scale, "atm")
+                if val is not None:
+                    return _point_selection(
+                        val,
+                        key,
+                        f"printed_header_scale:{scale} atm; {trail or 'atm_to_Pa'}",
+                        payload,
+                        condition_ranges,
+                    )
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded pressure",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                )
             for key in _PARTIAL_PRESSURE_FIELDS:
                 if key not in payload:
                     continue
@@ -10966,6 +11077,22 @@ def _selection_from_named_field(
                 malformed_fraction_bound = bound
                 continue
         amount = _numeric_field(payload, key)
+        if (
+            q_token is Quantity.ACTIVITY
+            and key == "a_P2O5_times_1e17_as_printed"
+            and amount is not None
+        ):
+            # Kambayashi Table 7 prints a_P2O5 x 10^17. Store the activity
+            # defined by that header directly; do not select its old derived twin.
+            amount = _kambayashi_table7_activity_from_printed(amount)
+            assert amount is not None
+            return _point_selection(
+                amount,
+                key,
+                "printed_header_multiplier:10^-17",
+                payload,
+                condition_ranges,
+            )
         if (
             amount is None
             and q_token is Quantity.MASS_LOSS_FRACTION
@@ -19718,6 +19845,18 @@ class Migrator:
                     observation_id=point_id,
                 )
             selection_payload: Mapping[str, Any] = raw_item
+            if (
+                q_token is Quantity.LOG10_KF
+                and isinstance(parent_values, Mapping)
+                and isinstance(parent_values.get("temperature_range_as_printed"), str)
+                and "temperature_range_as_printed" not in raw_item
+            ):
+                selection_payload = {
+                    **raw_item,
+                    "temperature_range_as_printed": parent_values[
+                        "temperature_range_as_printed"
+                    ],
+                }
             if (
                 q_token is Quantity.EVOLVED_GAS_YIELD
                 and isinstance(parent_values, Mapping)

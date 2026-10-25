@@ -68,15 +68,15 @@ species:
         - {reaction: 'PuO2(liq) = Pu(g) + 2O(g)', A: 18.67, B: -91886, sources: '[20,22,25]'}
       note: These are compiled thermodynamic inputs, not measurements made in this paper.
     - observation_id: fegley_cameron_1987_table3_imcc_pseudo_species
-      type: activity_coefficient
+      type: gibbs_table
       locator: {published_page: '211', table: '3', section: 'Thermodynamic data relating the activities of pseudospecies'}
       phase: condensed_liquid
       regime: imcc_nonideal_magma
       units: log10_K = A + B/T; T in K
       values:
-        quantity: interaction_parameter
+        quantity: log10_Kf
         evidence_class: author_estimate
-        method_class: authors_estimate
+        method_class: author_estimate
         model_generator: IMCC ideal mixing of complex components model; coefficients compiled, extrapolated, or estimated as detailed in Appendix 1
         rows:
         - {reaction: '2MgO + SiO2 = Mg2SiO4', A: -0.94, B: 7434}

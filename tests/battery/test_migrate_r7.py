@@ -25,6 +25,7 @@ from simulator.battery.migrate import (
     _YAML_LOADER,
     _standard_state_from_extract_text,
     compilation_family_from_store_path,
+    convert_temperature_to_k,
     iter_observation_store_paths,
     map_quantity,
     migrate,
@@ -879,6 +880,91 @@ def test_g1_unmapped_composition_and_nested_admission_are_not_absent(tmp_path):
     ):
         assert schaefer.admission.status.value == "pending"
         assert not any(notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in schaefer.notices)
+
+
+def test_yamada_table2_interaction_parameters_keep_their_printed_values_and_conditions(
+    tmp_path: Path,
+) -> None:
+    filename = "kems-105-yamada-1983.yaml"
+    extract = yaml.safe_load((EXTRACTS_DIR / filename).read_text(encoding="utf-8"))
+    result = _migrate_real_extract(tmp_path, filename)
+
+    expected_rows = {
+        "yamada_1983_epsilon_P_i_this_work_1600C": {
+            ("Al", Decimal("4.6")): 1600,
+            ("Si", Decimal("11.9")): 1600,
+            ("Ti", Decimal("-8.0")): 1600,
+            ("V", Decimal("-4.9")): 1600,
+            ("Cr", Decimal("-3.8")): 1600,
+            ("Co", Decimal("0.9")): 1600,
+            ("Ni", Decimal("0.7")): 1600,
+            ("Nb", Decimal("-5.4")): 1600,
+            ("Mo", Decimal("-0.4")): 1600,
+        },
+        "yamada_1983_table2_quoted_interaction_coefficients": {
+            ("Si", Decimal("21.0")): 1600,
+            ("Si", Decimal("14.2")): 1515,
+            ("Si", Decimal("11.0")): 1600,
+            ("Cr", Decimal("18.8")): 1600,
+            ("Cr", Decimal("-6.3")): 1600,
+            ("Ni", Decimal("0.0")): 1600,
+        },
+    }
+    assert extract["source_id"] == "kems-105-yamada-1983"
+    for observation_id, expected_by_point in expected_rows.items():
+        migrated_rows = [
+            observation
+            for key, observation in result.observations.items()
+            if f"::{observation_id}::" in key
+        ]
+        assert len(migrated_rows) == len(expected_by_point)
+        actual_points = set()
+        for observation in migrated_rows:
+            assert quantity_token(observation.identity) is Quantity.INTERACTION_PARAMETER
+            assert observation.value.kind is ValueKind.POINT
+            assert observation.identity.subtype is not None
+            assert observation.identity.subtype.is_unknown
+            solute = observation.point_conditions["solute"]
+            assert solute.state.is_value
+            key = (solute.state.value, observation.value.point)
+            assert key in expected_by_point
+            actual_points.add(key)
+            temperature_k = Decimal("1873.15") if expected_by_point[key] == 1600 else Decimal("1788.15")
+            temperature = observation.point_conditions["temperature_K"]
+            assert temperature.state.is_value
+            assert temperature.state.value == temperature_k
+            assert solute.locator.published_page == 54
+            assert solute.locator.table == "2"
+            assert observation.value.point == key[1]
+            if observation_id == "yamada_1983_epsilon_P_i_this_work_1600C":
+                assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert actual_points == set(expected_by_point)
+
+    body_text = result.observations[
+        f"{extract['source_id']}::yamada_1983_epsilon_P_Al_body_4p0_printed"
+    ]
+    assert quantity_token(body_text.identity) is Quantity.INTERACTION_PARAMETER
+    assert body_text.value.kind is ValueKind.POINT
+    assert body_text.value.point == Decimal("4.0")
+    assert body_text.point_conditions["solute"].state.value == "Al"
+    assert body_text.identity.subtype is not None
+    assert body_text.identity.subtype.is_unknown
+    assert body_text.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+
+    fruehan = result.observations[
+        f"{extract['source_id']}::yamada_1983_epsilon_P_Si_fruehan_aFe_12p6"
+    ]
+    assert quantity_token(fruehan.identity) is Quantity.INTERACTION_PARAMETER
+    assert fruehan.value.kind is ValueKind.POINT
+    assert fruehan.value.point == Decimal("12.6")
+    assert fruehan.identity.subtype is not None
+    assert fruehan.identity.subtype.is_unknown
+    fruehan_solute = fruehan.point_conditions["solute"]
+    assert fruehan_solute.state.value == "Si"
+    assert fruehan_solute.locator.published_page == 53
+    assert fruehan_solute.locator.section == "1. The Fe-P-Si System"
+    assert fruehan.point_conditions["temperature_K"].state.value == Decimal("1873.0")
+    assert fruehan.evidence.class_.value is EvidenceClass.MODEL_DERIVED
 
 
 def _leaves(value, prefix=""):

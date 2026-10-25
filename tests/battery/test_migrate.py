@@ -18085,6 +18085,21 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         for observation in table1
         if quantity_token(observation.identity) is Quantity.P_PARTIAL
     ]
+    ohara_po = [
+        observation
+        for observation in pressures
+        if observation.observation_id.startswith(
+            f"{source_id}::ohara_1987_table1_partial_pressures_1643k::"
+        )
+    ]
+    assert len(ohara_po) == 20
+    assert all(observation.value.kind is ValueKind.UNAVAILABLE for observation in ohara_po)
+    assert all(
+        "multiple gas-specific printed pressure columns" in (
+            observation.value.unavailable_reason or ""
+        )
+        for observation in ohara_po
+    )
     ion_currents = [
         observation
         for observation in table1
@@ -18697,6 +18712,7 @@ def _assert_kambayashi_sample_associations(doc: dict, result) -> None:
     sample_linked_series = (
         ("kambayashi_1985_table5_feto_p2o5_ion_current_ratios", "5", False),
         ("kambayashi_1985_table6_partial_pressures_and_dg", "6", True),
+        ("kambayashi_1985_po_table6_partial_pressure", "6", True),
         ("kambayashi_1985_po2_table6_partial_pressure", "6", True),
         ("kambayashi_1985_p2_table6_partial_pressure", "6", True),
         ("kambayashi_1985_table7_raoultian_a_p2o5", "7", True),
@@ -18711,11 +18727,68 @@ def _assert_kambayashi_sample_associations(doc: dict, result) -> None:
             expected = samples[int(row["sample_no"])]
             assert_composition_condition(observation, expected, "4")
             assert_temperature(observation, row, table)
+            if observation_id == "kambayashi_1985_table6_partial_pressures_and_dg":
+                assert observation.value.kind is ValueKind.UNAVAILABLE
+                assert "declared quantity is unknown" in (
+                    observation.value.unavailable_reason or ""
+                )
+                assert not any(
+                    key in row
+                    for key in (
+                        "P_P2_atm",
+                        "P_PO_atm",
+                        "P_PO2_atm",
+                        "P_P2_x1e8_atm_as_printed",
+                        "P_PO_x1e7_atm_as_printed",
+                        "P_PO2_x1e8_atm_as_printed",
+                    )
+                )
+            if observation_id == "kambayashi_1985_po_table6_partial_pressure":
+                printed = Decimal(str(row["P_PO_x1e7_atm_as_printed"]))
+                assert quantity_token(observation.identity) is Quantity.P_PARTIAL
+                assert observation.value.kind is ValueKind.POINT
+                assert observation.value.point == printed * Decimal("1e-7") * Decimal("101325")
+                if row["sample_no"] == 1 and row["T_C"] == 1370:
+                    # PDF p. 1917, Table 6: 2.86 x 10^-7 atm is the PO cell.
+                    assert printed == Decimal("2.86")
+                    assert observation.value.point == Decimal("2.86e-7") * Decimal("101325")
+            if observation_id == "kambayashi_1985_p2_table6_partial_pressure":
+                printed = Decimal(str(row["P_P2_x1e8_atm_as_printed"]))
+                assert quantity_token(observation.identity) is Quantity.P_PARTIAL
+                assert observation.value.kind is ValueKind.POINT
+                assert observation.value.point == printed * Decimal("1e-8") * Decimal("101325")
+                assert "P_atm" not in row
+                if row["sample_no"] == 1 and row["T_C"] == 1370:
+                    # PDF p. 1917, Table 6: 1.14 x 10^-8 atm is the P2 cell.
+                    assert printed == Decimal("1.14")
+                    assert observation.value.point == Decimal("1.14e-8") * Decimal("101325")
+            if observation_id == "kambayashi_1985_po2_table6_partial_pressure":
+                printed = Decimal(str(row["P_PO2_x1e8_atm_as_printed"]))
+                assert quantity_token(observation.identity) is Quantity.P_PARTIAL
+                assert observation.value.kind is ValueKind.POINT
+                assert observation.value.point == printed * Decimal("1e-8") * Decimal("101325")
+                assert "P_atm" not in row
+                if row["sample_no"] == 1 and row["T_C"] == 1370:
+                    # PDF p. 1917, Table 6: 3.78 x 10^-8 atm is the PO2 cell.
+                    assert printed == Decimal("3.78")
+                    assert observation.value.point == Decimal("3.78e-8") * Decimal("101325")
+            if observation_id == "kambayashi_1985_table7_raoultian_a_p2o5":
+                assert quantity_token(observation.identity) is Quantity.ACTIVITY
+                assert observation.value.kind is ValueKind.POINT
+                assert observation.value.point == (
+                    Decimal(str(row["a_P2O5_times_1e17_as_printed"]))
+                    * Decimal("1e-17")
+                )
+                assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+                if row["sample_no"] == 1 and row["T_C"] == 1370:
+                    # Header a_P2O5 × 10^17 = 1.2 means a = 1.2e-17 (PDF p. 1917, Table 7).
+                    assert observation.value.point == Decimal("1.2e-17")
             if composition_is_identity:
                 assert observation.identity.composition is not None
                 assert observation.identity.composition.is_value
                 assert dict(observation.identity.composition.value.components) == expected
             if observation_id in {
+                "kambayashi_1985_po_table6_partial_pressure",
                 "kambayashi_1985_po2_table6_partial_pressure",
                 "kambayashi_1985_p2_table6_partial_pressure",
             }:
@@ -18762,6 +18835,122 @@ def test_kambayashi_printed_compositions_and_conditions_reach_observations(
         assert observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
         assert observation.locator is not None
         assert "bound_not_point_ordering" in observation.locator.note
+
+
+def test_visscher_formula_fields_reach_modelled_pressure_expressions(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "visscher-fegley-2013-debris-disks.yaml", write=False
+    )
+    expected = {
+        "visscher_2013_sio2_pure_melt_vapor_pressure_fit": (
+            Quantity.P_SAT,
+            "log P_vap (SiO2, liq) = 8.203 − 25898.9/T",
+            "up to 6000 K",
+            "2",
+        ),
+        "visscher_2013_sio_partial_pressure_equilibrium": (
+            Quantity.P_PARTIAL,
+            "P_SiO = K4 * a_SiO2 * fO2^(-0.5)",
+            None,
+            "5",
+        ),
+        "visscher_2013_total_vapor_pressure_sum": (
+            Quantity.P_SAT,
+            "P_T = ΣP_i",
+            None,
+            "3",
+        ),
+        "visscher_2013_bse_total_vapor_pressure_fit": (
+            Quantity.P_SAT,
+            "log P_vap (BSE) ≈ −51.17 − 1048.8/T + 14.60 log T",
+            "2000-4000 K",
+            "6",
+        ),
+        "visscher_2013_bsm_total_vapor_pressure_fit": (
+            Quantity.P_SAT,
+            "log P_vap (BSM) ≈ −41.45 − 4052.3/T + 14.90 log T",
+            "2000-4000 K",
+            "7",
+        ),
+    }
+    for observation_id, (quantity, formula, validity, equation) in expected.items():
+        observation = result.observations[
+            f"visscher-fegley-2013-debris-disks::{observation_id}"
+        ]
+        assert quantity_token(observation.identity) is quantity
+        assert observation.value.kind is ValueKind.EXPRESSION
+        assert observation.value.expression_text == formula
+        if validity is None:
+            assert "temperature_range_as_printed" not in observation.value.expression_domain
+        else:
+            assert validity in observation.value.expression_domain
+        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert observation.locator is not None
+        assert observation.locator.equation == equation
+        # Published p. 4, equations (2), (3), (5), (6), and (7) contain the
+        # formulas; only the adjacent text before eq. (2) and after eqs. (6)-(7)
+        # prints the temperature ranges retained above.
+
+    oxygen_fugacity = result.observations[
+        "visscher-fegley-2013-debris-disks::visscher_2013_saturated_vapor_oxygen_fugacity"
+    ]
+    assert quantity_token(oxygen_fugacity.identity) is Quantity.P_PARTIAL
+    assert oxygen_fugacity.value.kind is ValueKind.UNAVAILABLE
+    assert "defines oxygen fugacity" in (
+        oxygen_fugacity.value.unavailable_reason or ""
+    )
+
+
+def test_no27_log_equilibrium_fits_keep_printed_coefficients_without_invented_domain(
+    tmp_path: Path,
+) -> None:
+    source_id = "no27-fegley-cameron-1987-epsl"
+    path = REPO_ROOT / "data/literature/extracts/no27-fegley-cameron-1987-epsl.yaml"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    source_observations = {
+        observation["observation_id"]: observation
+        for species in doc["species"].values()
+        for observation in species["observations"]
+    }
+    result = _migrate_real_extract(
+        tmp_path, "no27-fegley-cameron-1987-epsl.yaml", write=False
+    )
+    tables = (
+        ("fegley_cameron_1987_table1_pure_liquid_oxide_vaporization", "1", EvidenceClass.COMPILATION_ASSESSED),
+        ("fegley_cameron_1987_table2_gas_formation_data", "2", EvidenceClass.COMPILATION_ASSESSED),
+        ("fegley_cameron_1987_table3_imcc_pseudo_species", "3", EvidenceClass.AUTHOR_ESTIMATE),
+    )
+    for observation_id, table, evidence_class in tables:
+        rows = source_observations[observation_id]["values"]["rows"]
+        prefix = f"{source_id}::{observation_id}::"
+        migrated = [
+            observation
+            for key, observation in result.observations.items()
+            if key.startswith(prefix)
+        ]
+        assert len(migrated) == len(rows)
+        for observation, row in zip(migrated, rows, strict=True):
+            assert quantity_token(observation.identity) is Quantity.LOG10_KF
+            assert observation.value.kind is ValueKind.EXPRESSION
+            assert observation.value.expression_text == "log10_K = A + B/T"
+            assert dict(observation.value.expression_parameters) == {
+                "A": Decimal(str(row["A"])),
+                "B": Decimal(str(row["B"])),
+            }
+            assert "temperature_range_as_printed" not in observation.value.expression_domain
+            assert "log10_K = A + B/T; T in K" in observation.value.expression_domain
+            assert observation.identity.temperature_K is not None
+            assert observation.identity.temperature_K.is_unknown
+            assert observation.evidence.class_.value is evidence_class
+            assert observation.locator is not None
+            assert observation.locator.table == table
+            if table == "1" and row["reaction"] == "SiO2(liq) = Si(g) + 2O(g)":
+                assert dict(observation.value.expression_parameters) == {
+                    "A": Decimal("22.13"),
+                    "B": Decimal("-94311"),
+                }
 
 
 @pytest.mark.parametrize(

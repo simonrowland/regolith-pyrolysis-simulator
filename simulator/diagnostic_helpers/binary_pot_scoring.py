@@ -730,7 +730,18 @@ def iter_activity_comparators(
                     for row in rows:
                         if not isinstance(row, Mapping):
                             continue
-                        measured = _finite_positive(row.get("a_P2O5"))
+                        if "a_P2O5_times_1e17_as_printed" in row:
+                            from simulator.battery.migrate import (
+                                _kambayashi_table7_activity_from_printed,
+                            )
+
+                            measured = _finite_positive(
+                                _kambayashi_table7_activity_from_printed(
+                                    row["a_P2O5_times_1e17_as_printed"]
+                                )
+                            )
+                        else:
+                            measured = _finite_positive(row.get("a_P2O5"))
                         observable = "activity"
                         units = "1"
                         if measured is None:
