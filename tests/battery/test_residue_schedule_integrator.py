@@ -70,6 +70,17 @@ def test_zero_duration_returns_the_starting_inventory_without_pressure_calls() -
     assert calls == 0
 
 
+def test_buffered_oxygen_exchange_closes_with_exhaustion_accounting() -> None:
+    result = integrate_residue_schedule(
+        _request(exhaustion_floor_mol=1.0e-15)
+    )
+
+    assert result.refusal is None
+    assert result.buffer_oxygen_exchange_mol != 0.0
+    assert result.component_exhaustion_notices == ()
+    assert result.atom_closure_mol["O"] == pytest.approx(0.0, abs=1.0e-18)
+
+
 def test_zero_alpha_has_no_loss() -> None:
     initial = {"FeO": 1.0e-4, "SiO2": 1.0e-4}
     result = integrate_residue_schedule(_request(

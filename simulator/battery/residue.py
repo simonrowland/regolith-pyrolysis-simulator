@@ -1682,26 +1682,13 @@ def integrate_residue_schedule(
     final_atoms = _atom_totals(inventory, evaporated)
     if request.exhaustion_floor_mol is not None:
         exhausted_atoms = _atom_totals(exhausted, {})
-        atom_closure: dict[str, float] = {}
-        for element in set(initial_atoms) | set(final_atoms) | set(exhausted_atoms):
-            residual = (
-                initial_atoms.get(element, 0.0)
-                - final_atoms.get(element, 0.0)
-                - exhausted_atoms.get(element, 0.0)
-            )
-            atom_closure[element] = residual
-            scale = max(
-                abs(initial_atoms.get(element, 0.0)),
-                abs(final_atoms.get(element, 0.0) + exhausted_atoms.get(element, 0.0)),
-                1.0e-300,
-            )
-            _check_residue_atom_residual(
-                element, residual, scale, "after exhaustion projection"
-            )
-    else:
-        atom_closure = _residue_atom_closure(
-            initial_atoms, final_atoms, buffer_oxygen_exchange_mol
-        )
+        final_atoms = {
+            element: final_atoms.get(element, 0.0) + exhausted_atoms.get(element, 0.0)
+            for element in set(final_atoms) | set(exhausted_atoms)
+        }
+    atom_closure = _residue_atom_closure(
+        initial_atoms, final_atoms, buffer_oxygen_exchange_mol
+    )
     pO2_floor = {
         "steps_at_floor": pO2_floor_steps,
         "first_step": pO2_floor_first_step,
