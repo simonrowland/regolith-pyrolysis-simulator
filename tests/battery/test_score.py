@@ -680,27 +680,31 @@ def test_p_partial_without_composition_still_refuses_identity() -> None:
 
 
 @pytest.mark.parametrize(
-    ("typed_not_printed", "expected_reason"),
+    ("typed_not_printed", "expected_reason", "expected_record_status"),
     (
         (
             False,
             "calibration_not_grounded: No calibration entry has been recorded yet. "
             "(KEMS pressure requires a recorded calibration)",
+            "not_recorded",
         ),
         (
             True,
             "calibration_not_grounded: The source record says the calibration was "
             "not printed. (KEMS pressure requires a recorded calibration)",
+            "not_printed",
         ),
     ),
 )
 def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     typed_not_printed: bool,
     expected_reason: str,
+    expected_record_status: str,
 ) -> None:
     from simulator.battery.validity import run_validity_gates
     from simulator.battery.score import (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         flagged_strata,
         flagged_stratum_rows,
         render_score_report_from_payloads,
@@ -729,14 +733,19 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     pressure_check = next(
         check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
     )
-    assert gates.passed
-    assert pressure_check.passed
-    assert pressure_check.detail["flag"] == "calibration_not_grounded"
+    assert gates.passed is False
+    assert pressure_check.passed is False
     assert pressure_check.detail["reason"] == (
-        "calibration is not grounded for the in-cell fallback"
+        "incomplete printed species coverage; pressure sum is only a lower bound"
     )
-    assert pressure_check.detail["calibration_record_status"] == (
-        "not_printed" if typed_not_printed else "not_recorded"
+    assert pressure_check.detail["pressure_limit_Pa"]
+    calibration_check = next(
+        check for check in gates.checks if check.name == "kems_calibration"
+    )
+    assert calibration_check.passed
+    assert (
+        calibration_check.detail["calibration_record_status"]
+        == expected_record_status
     )
     residual, _ = compile_residual(
         reference,
@@ -745,34 +754,41 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
         prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
     )
 
+    # d-274 keeps uncomputable in-cell sums scoreable with a flagged tier.
     assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
     assert residual.score_eligible is False
     notice = next(
-        item for item in residual.notices
-        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
+        item
+        for item in residual.notices
+        if item.reason.startswith("calibration_not_grounded:")
     )
     assert notice.reason == expected_reason
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
     )
 
     diagnostic = flagged_stratum_rows(
         (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
     )
-    assert diagnostic[0]["stratum"] == FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
-    assert diagnostic[0]["n"] == 1
-    assert diagnostic[0]["median_dex"] is not None
-    assert diagnostic[0]["rms_dex"] is not None
+    assert {row["stratum"]: row["n"] for row in diagnostic} == {
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED: 1,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS: 1,
+    }
+    assert all(row["median_dex"] is not None for row in diagnostic)
+    assert all(row["rms_dex"] is not None for row in diagnostic)
 
     payload = residual_to_plain(residual)
     summary_rows = flagged_stratum_payloads(
         (payload,), (Engine.INTERNAL_ANALYTICAL,)
     )
-    assert summary_rows[0]["stratum"] == FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
-    assert summary_rows[0]["n"] == 1
-    assert summary_rows[0]["median_dex"] is not None
-    assert summary_rows[0]["rms_dex"] is not None
+    assert {row["stratum"]: row["n"] for row in summary_rows} == {
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED: 1,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS: 1,
+    }
+    assert all(row["median_dex"] is not None for row in summary_rows)
+    assert all(row["rms_dex"] is not None for row in summary_rows)
     report = render_score_report_from_payloads(
         (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
     )
@@ -780,8 +796,11 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
 
 
 def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> None:
-    from simulator.battery.score import FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
-    from simulator.battery.score import flagged_strata
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_strata,
+    )
 
     experiment = F.kems_experiment(kn=None, calibrated=False)
     reference = _uncalibrated_kems_partial_row(
@@ -813,8 +832,10 @@ def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> 
     assert openimcc.numeric.decision_band is None
     assert internal_analytical.numeric is not None
     assert internal_analytical.numeric.decision_band is None
+    # d-274 preserves both the calibration and in-cell apparatus flags per engine.
     assert flagged_strata(openimcc.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
     )
     assert flagged_strata(internal_analytical.notices) == flagged_strata(
         openimcc.notices
@@ -4312,6 +4333,7 @@ def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> N
     )
     assert pressure_check.passed is False
     assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
 
     context = _context(
         F.work(), experiment, activity, sodium, silicon, review="reviewed"
@@ -4331,7 +4353,139 @@ def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> N
     assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
-def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> None:
+def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses() -> None:
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("Na2O", Decimal("0.25")),
+            ("SiO2", Decimal("0.25")),
+            ("Al2O3", Decimal("0.5")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(composition=composition)
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=False
+    )
+    activity = F.observation(
+        "d274-incomplete-over-limit-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    activity = replace(
+        activity,
+        provenance=_comparison_activity_provenance("same_effective_setup_assumed"),
+    )
+    partial_identity = replace(
+        _partial_identity(),
+        temperature_K=identity.temperature_K,
+        fO2_Pa=identity.fO2_Pa,
+        total_pressure_Pa=identity.total_pressure_Pa,
+        composition=State.of(composition),
+    )
+    sodium = F.observation(
+        "d274-incomplete-over-limit-Na",
+        experiment.experiment_id,
+        partial_identity,
+        Decimal("6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    silicon = F.observation(
+        "d274-incomplete-over-limit-Si",
+        experiment.experiment_id,
+        replace(partial_identity, species=Species("Si", Phase.G)),
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    point_observations = (activity, sodium, silicon)
+    gates = run_validity_gates(
+        experiment, activity, point_observations=point_observations
+    )
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
+    assert pressure_check.detail["reason"] == (
+        "incomplete printed species coverage; pressure sum is only a lower bound"
+    )
+    assert pressure_check.detail["missing_species"] == ["Al"]
+    assert pressure_check.detail["printed_partial_pressure_lower_bound_Pa"] == "11"
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+
+    context = _context(
+        F.work(), experiment, *point_observations, review="reviewed"
+    )
+    residual, _ = compile_residual(
+        activity,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={row.observation_id for row in point_observations},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+        point_observations=point_observations,
+    )
+    # d-274 preserves refusal when the printed lower bound alone exceeds the limit.
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and "in_cell_partial_pressure_sum" in notice.reason
+        for notice in residual.notices
+    )
+
+
+def test_d274_uncalibrated_kems_psat_missing_sum_keeps_calibration_refusal() -> None:
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    reference = F.observation(
+        "d274-uncalibrated-psat-without-sum",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-uncalibrated-psat",
+    )
+    reference = replace(
+        reference,
+        evidence=replace(
+            reference.evidence,
+            original_method_class="measured_direct",
+        ),
+    )
+    gates = run_validity_gates(experiment, reference)
+    calibration_check = next(
+        check for check in gates.checks if check.name == "kems_calibration"
+    )
+    assert calibration_check.passed is False
+    assert calibration_check.detail["reason"] == (
+        "KEMS pressure requires a recorded calibration"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+    )
+    # d-274 does not let an in-cell notice waive the failed P_SAT calibration check.
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
+def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures() -> None:
     experiment = F.kems_experiment(calibrated=True, kn=None)
     experiment = replace(
         experiment,
@@ -4350,7 +4504,7 @@ def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> No
         identity,
         Decimal("0.2"),
         evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="kems-053-stolyarova-1991",
+        source_id="ferguson-2004-iron-vapor-pressure",
     )
     reference = replace(
         reference,
@@ -4359,6 +4513,11 @@ def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> No
             original_method_class="measured_direct",
         ),
     )
+    gates = run_validity_gates(experiment, reference)
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
     prediction = _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
     context = _context(F.work(), experiment, reference, review="reviewed")
     residual, _ = compile_residual(
@@ -4367,12 +4526,51 @@ def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> No
         context=context,
         prediction=prediction,
     )
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
+    # d-274 scores an uncomputable printed sum with an apparatus notice.
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
     assert residual.score_eligible is False
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-    assert residual.refusal.detail["primary_check"] == "in_cell_partial_pressure_sum"
+    assert residual.refusal is None
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+    )
+    assert (
+        "original_reason=incomplete printed species coverage; pressure sum is only a lower bound"
+        in notice.reason
+    )
+    assert "authority=extrapolated" in notice.reason
+    pressure_limit = pressure_check.detail["pressure_limit_Pa"]
+    assert f"regime_limit={pressure_limit} Pa" in notice.reason
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.band == (
+        f"free-molecular in-cell pressure sum <= {pressure_limit} Pa"
+    )
+
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    assert headline_rows(
+        (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+    )[0]["n"] == 0
+    assert [
+        (row["stratum"], row["n"])
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    ] == [(FLAGGED_STRATUM_UNVERIFIED_APPARATUS, 1)]
+    payload = residual_to_plain(residual)
+    for tier in ("measured", "compilation"):
+        assert headline_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,), tier=tier
+        )[0]["n"] == 0
+    assert flagged_stratum_payloads(
+        (payload,), (Engine.INTERNAL_ANALYTICAL,)
+    )[0]["n"] == 1
 
     missing = replace(
         reference,
@@ -14622,9 +14820,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert {row.reference for row in allibert_rows} == allibert_admitted
         assert all(row.status is ResidualStatus.REFUSED for row in allibert_rows)
         # b-617 types Allibert's printed per-point phases: the two xCaO = 0.80
-        # "CaO + melt" points refuse as two-phase bulk compositions; the 14
-        # single-phase points lack the pressure set required by the in-cell
-        # fallback and refuse as an unverified effusion regime.
+        # "CaO + melt" points refuse as two-phase bulk compositions. Under
+        # d-274, the 14 single-phase points with uncomputable pressure sums
+        # reach the test predictor with an unverified-apparatus notice.
         assert all(row.refusal is not None for row in allibert_rows)
         assert (
             sum(
@@ -14636,6 +14834,17 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert (
             sum(
                 row.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+                for row in allibert_rows
+            )
+            == 0
+        )
+        assert (
+            sum(
+                row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+                and any(
+                    notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                    for notice in row.notices
+                )
                 for row in allibert_rows
             )
             == 14

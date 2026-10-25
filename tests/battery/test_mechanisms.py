@@ -3738,6 +3738,46 @@ def test_mf_f04_in_cell_pressure_sum_passes_with_unstated_background_flagged() -
     assert not any(check.name == "background_pressure_stated" for check in result.checks)
 
 
+def test_mf_f04_calibrated_cell_falls_through_to_printed_pressure_sum() -> None:
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.kems_experiment(
+        orifice_area=None,
+        kn=None,
+        total_P=Decimal("1e-6"),
+        calibrated=True,
+    )
+    pressures = tuple(
+        _printed_kems_partial_pressure(
+            f"calibrated-{species.lower()}",
+            experiment.experiment_id,
+            species,
+            pressure,
+            composition,
+        )
+        for species, pressure in (("O2", "0.2"), ("Ca", "0.1"), ("SiO", "0.4"))
+    )
+
+    result = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=pressures[0],
+        point_observations=pressures,
+    )
+
+    # d-274 uses the printed in-cell sum when the calibrated route lacks geometry.
+    assert result.passed
+    assert not any(check.name == "orifice_knudsen" for check in result.checks)
+    pressure_check = next(
+        check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "0.7"
+
+
 def test_mf_f04_in_cell_pressure_sum_above_limit_refuses() -> None:
     composition = Composition(
         basis="printed_mole_fraction",

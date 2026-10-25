@@ -679,105 +679,20 @@ def effusion_regime_unverified(
                 )
             )
             return _pass(checks)
-        checks.append(
-            GateCheck(
-                "orifice_knudsen",
-                False,
-                {
-                    "reason": "unknown orifice Knudsen number; chamber pressure is not cell pressure",
-                },
-            )
-        )
-        return _fail(RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "orifice_knudsen")
+        # Chamber pressure cannot verify the cell regime here. Continue to the
+        # printed in-cell sum, which is the independent fallback evidence.
 
-    if not _calibration_grounded(calibration):
-        ungrounded_detail = (
-            _calibration_not_grounded_detail(calibration)
-            if quantity
-            in {
-                Quantity.P_PARTIAL,
-                Quantity.ACTIVITY,
-                Quantity.ACTIVITY_COEFFICIENT,
-            }
-            else None
-        )
-        if ungrounded_detail is None:
-            checks.append(
-                GateCheck(
-                    "in_cell_partial_pressure_sum",
-                    False,
-                    {
-                        "reason": "calibration is not grounded for the in-cell fallback",
-                        "route": "in_cell_fallback",
-                    },
-                )
-            )
-            return _fail(
-                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-                checks,
-                "in_cell_partial_pressure_sum",
-            )
-        if observation is None:
-            pressure_sum = None
-            pressure_detail = {"reason": "scored observation is unavailable"}
-        else:
-            pressure_sum, pressure_detail = _printed_in_cell_pressure_sum(
-                experiment,
-                observation,
-                point_observations,
-            )
-        pressure_limit = _in_cell_pressure_limit(experiment)
-        diameter_basis = (
-            "printed_orifice_diameter_p_over_d"
-            if diameter is not None
-            else "Drowart_standalone_usual_10_Pa_limit; no defensible d printed"
-        )
-        pressure_detail.update(
-            {
-                "pressure_limit_Pa": str(pressure_limit),
-                "limit_source": "Drowart et al. 2005, p. 689",
-                "limit_basis": diameter_basis,
-                "route": "in_cell_fallback",
-            }
-        )
-        if pressure_sum is None and quantity in {
+    ungrounded_detail = (
+        _calibration_not_grounded_detail(calibration)
+        if not _calibration_grounded(calibration)
+        and quantity
+        in {
+            Quantity.P_PARTIAL,
             Quantity.ACTIVITY,
             Quantity.ACTIVITY_COEFFICIENT,
-        }:
-            checks.append(
-                GateCheck(
-                    "in_cell_partial_pressure_sum",
-                    False,
-                    pressure_detail,
-                )
-            )
-            return _fail(
-                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-                checks,
-                "in_cell_partial_pressure_sum",
-            )
-        if pressure_sum is not None and pressure_sum > pressure_limit:
-            checks.append(
-                GateCheck("in_cell_partial_pressure_sum", False, pressure_detail)
-            )
-            return _fail(
-                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-                checks,
-                "in_cell_partial_pressure_sum",
-            )
-        checks.append(
-            GateCheck(
-                "in_cell_partial_pressure_sum",
-                True,
-                {
-                    **ungrounded_detail,
-                    "reason": "calibration is not grounded for the in-cell fallback",
-                    "route": "in_cell_fallback",
-                    "pressure_sum_detail": pressure_detail,
-                },
-            )
-        )
-        return _pass(checks)
+        }
+        else None
+    )
     if observation is None:
         pressure_sum = None
         pressure_detail = {"reason": "scored observation is unavailable"}
@@ -787,21 +702,7 @@ def effusion_regime_unverified(
             observation,
             point_observations,
         )
-    if pressure_sum is None:
-        checks.append(
-            GateCheck(
-                "in_cell_partial_pressure_sum",
-                False,
-                {**pressure_detail, "route": "in_cell_fallback"},
-            )
-        )
-        return _fail(
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-            checks,
-            "in_cell_partial_pressure_sum",
-        )
     pressure_limit = _in_cell_pressure_limit(experiment)
-    passed = pressure_sum <= pressure_limit
     diameter_basis = (
         "printed_orifice_diameter_p_over_d"
         if diameter is not None
@@ -815,6 +716,25 @@ def effusion_regime_unverified(
             "route": "in_cell_fallback",
         }
     )
+    if pressure_sum is None:
+        lower_bound = pressure_detail.get("printed_partial_pressure_lower_bound_Pa")
+        if lower_bound is not None and Decimal(str(lower_bound)) > pressure_limit:
+            # A lower bound already above the limit proves the cell is outside
+            # the regime, even though species coverage is incomplete.
+            pressure_detail["printed_partial_pressure_sum_Pa"] = str(lower_bound)
+        checks.append(
+            GateCheck(
+                "in_cell_partial_pressure_sum",
+                False,
+                pressure_detail,
+            )
+        )
+        return _fail(
+            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+            checks,
+            "in_cell_partial_pressure_sum",
+        )
+    passed = pressure_sum <= pressure_limit
     if passed:
         missing_orifice = "orifice Kn not printed" if diameter is not None else "orifice not printed"
         pressure_detail["flag"] = (
@@ -822,8 +742,23 @@ def effusion_regime_unverified(
             "(limit source: Drowart et al. 2005, p. 689; "
             f"{diameter_basis})"
         )
+    if ungrounded_detail is not None:
+        gate_detail = {
+            **pressure_detail,
+            **ungrounded_detail,
+        }
+        if passed:
+            gate_detail.update(
+                {
+                    "reason": "calibration is not grounded for the in-cell fallback",
+                    "route": "in_cell_fallback",
+                    "pressure_sum_detail": pressure_detail,
+                }
+            )
+    else:
+        gate_detail = pressure_detail
     checks.append(
-        GateCheck("in_cell_partial_pressure_sum", passed, pressure_detail)
+        GateCheck("in_cell_partial_pressure_sum", passed, gate_detail)
     )
     if not passed:
         return _fail(
@@ -1025,12 +960,32 @@ def _printed_in_cell_pressure_sum(
             )
     if not printed:
         return None, {"reason": "no admitted printed partial pressures at this exact point"}
+    # Repeated determinations for one species are not distinct gases. The
+    # largest admitted value per species is a conservative lower bound even
+    # when the printed species coverage is incomplete.
+    selected = {
+        species: max(rows, key=lambda row: (row[0], row[1]))
+        for species, rows in printed.items()
+    }
+    pressure_sum = sum((row[0] for row in selected.values()), Decimal(0))
+    sum_detail = {
+        "printed_partial_pressures_Pa": {
+            species: str(row[0]) for species, row in sorted(selected.items())
+        },
+        "included_observation_ids": sorted(row[1] for row in selected.values()),
+        "point_condition_keys": sorted(conditions),
+    }
+    lower_bound_detail = {
+        "printed_partial_pressure_lower_bound_Pa": str(pressure_sum)
+    }
     expected = _expected_dominant_vapours(composition)
     if expected is None:
         return None, {
             "reason": "composition does not establish which vapour species could dominate",
             "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
             "printed_species": sorted(printed),
+            **lower_bound_detail,
+            **sum_detail,
         }
     covered = set()
     for formula in printed:
@@ -1045,23 +1000,13 @@ def _printed_in_cell_pressure_sum(
             "required_dominant_species": list(expected),
             "printed_species": sorted(printed),
             "missing_species": missing,
+            **lower_bound_detail,
+            **sum_detail,
         }
-    # Multiple points for one species are repeated determinations, not distinct
-    # gases. Use the largest printed value to avoid double-counting and keep
-    # the total-pressure bound conservative.
-    selected = {
-        species: max(rows, key=lambda row: (row[0], row[1]))
-        for species, rows in printed.items()
-    }
-    pressure_sum = sum((row[0] for row in selected.values()), Decimal(0))
     return pressure_sum, {
         "printed_partial_pressure_sum_Pa": str(pressure_sum),
-        "printed_partial_pressures_Pa": {
-            species: str(row[0]) for species, row in sorted(selected.items())
-        },
-        "included_observation_ids": sorted(row[1] for row in selected.values()),
-        "point_condition_keys": sorted(conditions),
         "required_dominant_species": list(expected),
+        **sum_detail,
     }
 
 
