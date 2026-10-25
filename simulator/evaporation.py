@@ -75,6 +75,140 @@ _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
 })
 
 
+def _evaporation_stoich(species: str, sp_data: dict, registry):
+    parent_oxide = sp_data.get('parent_oxide', '')
+    if not parent_oxide:
+        raise AccountingError(
+            f"vapor species {species!r} requires parent_oxide "
+            "metadata before ledger routing"
+        )
+
+    has_oxide = sp_data.get('stoich_oxide_per_vapor') is not None
+    has_o2 = sp_data.get('stoich_O2_per_vapor') is not None
+    if has_oxide or has_o2:
+        missing = []
+        if not has_oxide:
+            missing.append('stoich_oxide_per_vapor')
+        if not has_o2:
+            missing.append('stoich_O2_per_vapor')
+        if missing:
+            raise AccountingError(
+                f"vapor species {species!r} from {parent_oxide!r} "
+                f"missing explicit stoich metadata: {', '.join(missing)}"
+            )
+        oxide_per_product = float(sp_data['stoich_oxide_per_vapor'])
+        O2_per_product = float(sp_data['stoich_O2_per_vapor'])
+        if oxide_per_product <= 0.0:
+            raise AccountingError(
+                f"vapor species {species!r} from {parent_oxide!r} "
+                "requires positive stoich_oxide_per_vapor"
+            )
+        if not math.isclose(
+            oxide_per_product,
+            1.0 + O2_per_product,
+            rel_tol=1e-6,
+            abs_tol=1e-9,
+        ):
+            raise AccountingError(
+                f"vapor species {species!r} from {parent_oxide!r} "
+                "stoich metadata must conserve mass: "
+                "stoich_oxide_per_vapor must equal "
+                "1 + stoich_O2_per_vapor"
+            )
+        _validate_evaporation_stoich_atoms(
+            parent_oxide,
+            species,
+            oxide_per_product,
+            O2_per_product, registry,
+        )
+        return {
+            'parent_oxide': parent_oxide,
+            'oxide_per_product_kg': oxide_per_product,
+            'O2_per_product_kg': O2_per_product,
+            'oxygen_destination': sp_data.get('oxygen_destination'),
+        }
+
+    implied = OXIDE_TO_METAL.get(parent_oxide, ('', 0, 0))[0]
+    if species != implied:
+        raise AccountingError(
+            f"vapor species {species!r} from {parent_oxide!r} requires "
+            "explicit stoich_oxide_per_vapor and stoich_O2_per_vapor; "
+            f"STOICH_RATIOS fallback only applies to elemental "
+            f"{implied!r}"
+        )
+    fallback = STOICH_RATIOS.get(parent_oxide)
+    if not fallback or fallback[0] <= 0:
+        raise AccountingError(
+            f"vapor species {species!r} from {parent_oxide!r} has no "
+            "valid elemental stoich fallback"
+        )
+    kg_product_per_kg_oxide, kg_O2_per_kg_oxide = fallback
+    oxide_per_product = 1.0 / kg_product_per_kg_oxide
+    O2_per_product = kg_O2_per_kg_oxide / kg_product_per_kg_oxide
+    if not math.isclose(
+        oxide_per_product,
+        1.0 + O2_per_product,
+        rel_tol=1e-6,
+        abs_tol=1e-9,
+    ):
+        raise AccountingError(
+            f"STOICH_RATIOS[{parent_oxide!r}] does not conserve mass"
+        )
+    _validate_evaporation_stoich_atoms(
+        parent_oxide,
+        species,
+        oxide_per_product,
+        O2_per_product, registry,
+    )
+    return {
+        'parent_oxide': parent_oxide,
+        'oxide_per_product_kg': oxide_per_product,
+        'O2_per_product_kg': O2_per_product,
+        'oxygen_destination': sp_data.get('oxygen_destination'),
+    }
+
+def _validate_evaporation_stoich_atoms(
+    parent_oxide: str,
+    product_species: str,
+    oxide_per_product_kg: float,
+    O2_per_product_kg: float,
+    registry,
+) -> None:
+    debit_atoms = _atom_moles_for_kg(
+        parent_oxide, oxide_per_product_kg, registry)
+    credit_atoms = defaultdict(float)
+    product_atoms = _atom_moles_for_kg(product_species, 1.0, registry)
+    for element, moles in product_atoms.items():
+        credit_atoms[element] += moles
+    if O2_per_product_kg >= 0.0:
+        oxygen_atoms = _atom_moles_for_kg('O2', O2_per_product_kg, registry)
+        for element, moles in oxygen_atoms.items():
+            credit_atoms[element] += moles
+    else:
+        oxygen_atoms = _atom_moles_for_kg('O2', abs(O2_per_product_kg), registry)
+        for element, moles in oxygen_atoms.items():
+            debit_atoms[element] = debit_atoms.get(element, 0.0) + moles
+
+    for element in set(debit_atoms) | set(credit_atoms):
+        debit = debit_atoms.get(element, 0.0)
+        credit = credit_atoms.get(element, 0.0)
+        if not math.isclose(debit, credit, rel_tol=1e-6, abs_tol=1e-9):
+            raise AccountingError(
+                f"vapor species {product_species!r} from "
+                f"{parent_oxide!r} stoich metadata does not conserve "
+                f"{element} atoms"
+            )
+
+def _atom_moles_for_kg(species: str, kg: float, registry) -> dict:
+    if kg <= 0.0:
+        return {}
+    formula = resolve_species_formula(
+        species, registry)
+    species_moles = float(kg) / formula.molar_mass_kg_per_mol()
+    return formula.atom_moles(species_moles)
+
+
+
 def _project_evaporation_overhead_source_mol_hr(
     rates_kg_hr: Mapping[str, float],
     stoich_by_species: Mapping[str, Mapping[str, Any]],
@@ -4861,136 +4995,18 @@ class EvaporationMixin:
         return converted
 
     def _evaporation_stoich(self, species: str, sp_data: dict):
-        parent_oxide = sp_data.get('parent_oxide', '')
-        if not parent_oxide:
-            raise AccountingError(
-                f"vapor species {species!r} requires parent_oxide "
-                "metadata before ledger routing"
-            )
-
-        has_oxide = sp_data.get('stoich_oxide_per_vapor') is not None
-        has_o2 = sp_data.get('stoich_O2_per_vapor') is not None
-        if has_oxide or has_o2:
-            missing = []
-            if not has_oxide:
-                missing.append('stoich_oxide_per_vapor')
-            if not has_o2:
-                missing.append('stoich_O2_per_vapor')
-            if missing:
-                raise AccountingError(
-                    f"vapor species {species!r} from {parent_oxide!r} "
-                    f"missing explicit stoich metadata: {', '.join(missing)}"
-                )
-            oxide_per_product = float(sp_data['stoich_oxide_per_vapor'])
-            O2_per_product = float(sp_data['stoich_O2_per_vapor'])
-            if oxide_per_product <= 0.0:
-                raise AccountingError(
-                    f"vapor species {species!r} from {parent_oxide!r} "
-                    "requires positive stoich_oxide_per_vapor"
-                )
-            if not math.isclose(
-                oxide_per_product,
-                1.0 + O2_per_product,
-                rel_tol=1e-6,
-                abs_tol=1e-9,
-            ):
-                raise AccountingError(
-                    f"vapor species {species!r} from {parent_oxide!r} "
-                    "stoich metadata must conserve mass: "
-                    "stoich_oxide_per_vapor must equal "
-                    "1 + stoich_O2_per_vapor"
-                )
-            self._validate_evaporation_stoich_atoms(
-                parent_oxide,
-                species,
-                oxide_per_product,
-                O2_per_product,
-            )
-            return {
-                'parent_oxide': parent_oxide,
-                'oxide_per_product_kg': oxide_per_product,
-                'O2_per_product_kg': O2_per_product,
-                'oxygen_destination': sp_data.get('oxygen_destination'),
-            }
-
-        implied = OXIDE_TO_METAL.get(parent_oxide, ('', 0, 0))[0]
-        if species != implied:
-            raise AccountingError(
-                f"vapor species {species!r} from {parent_oxide!r} requires "
-                "explicit stoich_oxide_per_vapor and stoich_O2_per_vapor; "
-                f"STOICH_RATIOS fallback only applies to elemental "
-                f"{implied!r}"
-            )
-        fallback = STOICH_RATIOS.get(parent_oxide)
-        if not fallback or fallback[0] <= 0:
-            raise AccountingError(
-                f"vapor species {species!r} from {parent_oxide!r} has no "
-                "valid elemental stoich fallback"
-            )
-        kg_product_per_kg_oxide, kg_O2_per_kg_oxide = fallback
-        oxide_per_product = 1.0 / kg_product_per_kg_oxide
-        O2_per_product = kg_O2_per_kg_oxide / kg_product_per_kg_oxide
-        if not math.isclose(
-            oxide_per_product,
-            1.0 + O2_per_product,
-            rel_tol=1e-6,
-            abs_tol=1e-9,
-        ):
-            raise AccountingError(
-                f"STOICH_RATIOS[{parent_oxide!r}] does not conserve mass"
-            )
-        self._validate_evaporation_stoich_atoms(
-            parent_oxide,
-            species,
-            oxide_per_product,
-            O2_per_product,
-        )
-        return {
-            'parent_oxide': parent_oxide,
-            'oxide_per_product_kg': oxide_per_product,
-            'O2_per_product_kg': O2_per_product,
-            'oxygen_destination': sp_data.get('oxygen_destination'),
-        }
+        return _evaporation_stoich(species, sp_data, self.species_formula_registry)
 
     def _validate_evaporation_stoich_atoms(
-        self,
-        parent_oxide: str,
-        product_species: str,
-        oxide_per_product_kg: float,
-        O2_per_product_kg: float,
+        self, parent_oxide: str, product_species: str,
+        oxide_per_product_kg: float, O2_per_product_kg: float,
     ) -> None:
-        debit_atoms = self._atom_moles_for_kg(
-            parent_oxide, oxide_per_product_kg)
-        credit_atoms = defaultdict(float)
-        product_atoms = self._atom_moles_for_kg(product_species, 1.0)
-        for element, moles in product_atoms.items():
-            credit_atoms[element] += moles
-        if O2_per_product_kg >= 0.0:
-            oxygen_atoms = self._atom_moles_for_kg('O2', O2_per_product_kg)
-            for element, moles in oxygen_atoms.items():
-                credit_atoms[element] += moles
-        else:
-            oxygen_atoms = self._atom_moles_for_kg('O2', abs(O2_per_product_kg))
-            for element, moles in oxygen_atoms.items():
-                debit_atoms[element] = debit_atoms.get(element, 0.0) + moles
-
-        for element in set(debit_atoms) | set(credit_atoms):
-            debit = debit_atoms.get(element, 0.0)
-            credit = credit_atoms.get(element, 0.0)
-            if not math.isclose(debit, credit, rel_tol=1e-6, abs_tol=1e-9):
-                raise AccountingError(
-                    f"vapor species {product_species!r} from "
-                    f"{parent_oxide!r} stoich metadata does not conserve "
-                    f"{element} atoms"
-                )
+        _validate_evaporation_stoich_atoms(
+            parent_oxide, product_species, oxide_per_product_kg,
+            O2_per_product_kg, self.species_formula_registry)
 
     def _atom_moles_for_kg(self, species: str, kg: float) -> dict:
-        if kg <= 0.0:
-            return {}
-        formula = resolve_species_formula(
-            species, self.species_formula_registry)
-        species_moles = float(kg) / formula.molar_mass_kg_per_mol()
-        return formula.atom_moles(species_moles)
+        return _atom_moles_for_kg(species, kg, self.species_formula_registry)
 
     def _project_condensed_stage_collection(
         self, route_result, species: str, credited_condensed_kg: float,
