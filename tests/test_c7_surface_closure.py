@@ -643,3 +643,61 @@ def test_precomputed_zero_uses_the_same_overhead_residual():
         {'internal_coproduct': 0.1}, 0.0, 0.0, 0.1, 0.0)
     assert _solve_surface_oxygen_balance(lambda _: pytest.fail('precomputed point re-evaluated'),
                                          source_free_zero=retained) is retained
+
+
+def test_lunar_hour23_retained_inverse_carriers_have_finite_zero_gas_limit():
+    from simulator.melt_backend.base import EquilibriumResult
+    sim = simulation('lunar_mare_low_ti', 'C0')
+    try:
+        sim.melt.temperature_C = 1055.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._frozen_evaporation_carriers = frozenset({'Fe', 'K', 'Mn', 'Na', 'SiO2_gas'})
+        sim._reaction_pO2_bar = 0.0
+        assert sim._evaporation_carrier_zero_reason() == 'frozen_consuming_carriers_at_zero_oxygen'
+        result = EquilibriumResult(temperature_C=1055.0, liquid_fraction=1.0)
+        sim._refresh_vapor_pressures_from_kernel(result, include_diagnostic_shadows=False)
+        at_zero = dict(result.vapor_pressures_Pa)
+        for species in ('K', 'Mn', 'Na'):
+            evaluator = sim.vapour_rail_catalog.evaluator_for_hot_train(species, process_phase='stage0')
+            assert evaluator.oxygen_fugacity_channel == 'intrinsic_melt'
+            assert evaluator.pO2_exponent < 0.0
+            assert 0.0 < at_zero[species] < math.inf
+            # The production transition owner parks metal-loss coproduct
+            # internally: there is no overhead oxygen forcing from this leg.
+            assert sim._project_evaporation_overhead_source_mol_hr({species: 0.001}, {}).get('O2', 0.0) == 0.0
+        sim._reaction_pO2_bar = 1e-12
+        sim._refresh_vapor_pressures_from_kernel(result, include_diagnostic_shadows=False)
+        assert {s: result.vapor_pressures_Pa[s] for s in ('K', 'Mn', 'Na')} == {
+            s: at_zero[s] for s in ('K', 'Mn', 'Na')}
+        sim._reaction_pO2_bar = 0.0
+        solved = sim._solve_evaporative_oxygen_boundary(result)
+        assert solved.residual == 0.0
+        assert all(math.isfinite(rate) for rate in solved.payload[0].species_kg_hr.values())
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
+@pytest.mark.parametrize('capacity', (0.0, 0.0027318327123612676, 1.0))
+def test_rh03_saturated_buffer_release_respects_film_capacity(monkeypatch, capacity):
+    sim = simulation()
+    try:
+        # Captured RH03 hour-3 gross storage-release jump, expressed on a
+        # unit area-second so these mol amounts retain the recorded values.
+        stored = 0.057022307388092434
+        sim.atom_ledger.load_external_mol('reservoir.fo2_buffer', {'O2': stored},
+            material_origin='feedstock', source='RH03 stored oxygen release operand')
+        sim._fe_redox_internal_o2_capacity_mol_this_hr = 1.0
+        sim._fe_redox_respeciation_diagnostics_this_hr = [{}]
+        monkeypatch.setattr(sim, '_melt_redox_fO2_upper_bound_log', lambda: -1000.0)
+        monkeypatch.setattr(sim, '_apply_fe_redox_respeciation', lambda **kw: {})
+        before_gas = sim.atom_ledger.mol_by_account('process.overhead_gas').get('O2', 0.0)
+        sim._settle_evaporative_redox_after_batch(oxygen_release_capacity_mol=capacity)
+        released = sim.atom_ledger.mol_by_account('process.overhead_gas').get('O2', 0.0) - before_gas
+        remaining = sim.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
+        assert released == pytest.approx(min(stored, capacity), rel=1e-12, abs=0.0)
+        assert remaining == pytest.approx(stored - released, rel=1e-12, abs=0.0)
+        assert sim._oxygen_release_transport_limited is (capacity < stored)
+        for transition in sim.atom_ledger.transitions:
+            transition.validate_conservation(sim.species_formula_registry)
+    finally:
+        close_test_owned_magemin_backend(sim)
