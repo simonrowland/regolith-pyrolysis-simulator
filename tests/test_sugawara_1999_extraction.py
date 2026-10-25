@@ -11,8 +11,50 @@ SOURCE_ID = "sugawara-1999-fe-na-loss-gas-mixing-furnace"
 EXTRACT = ROOT / "data/literature/extracts" / f"{SOURCE_ID}.yaml"
 
 
+def _assert_table6_phase_render_pins(document: dict) -> None:
+    context = next(
+        row
+        for species in document["species"].values()
+        for row in species.get("context", [])
+        if row.get("observation_id") == "sugawara_1999_table6_phase_proportions_totals_and_starting_compositions"
+    )
+    rows = {row["run_id"]: row for row in context["values"]["rows"]}
+    expected = {
+        "m52701": ({"glass": "100"}, "5"),
+        "m52705": ({"glass": "100"}, "7"),
+        "m57101": ({"glass": "100"}, "6"),
+        "m57105": ({"glass": "100"}, "6"),
+        "m52702": ({"glass": "100"}, "6"),
+        "m52706": ({"glass": "100"}, "6"),
+        "m57106": ({"glass": "100"}, "6"),
+        "m55801": ({"glass": "100"}, "4"),
+        "m57102": ({"glass": "100"}, "6"),
+        "m52703": ({"glass": "98", "olivine": "2"}, "5"),
+        "m52707": ({"glass": "100"}, "3"),
+        "m57107": ({"glass": "100"}, "6"),
+        "m55802": ({"glass": "100"}, "7"),
+        "m57103": ({"glass": "100"}, "6"),
+        "m52708": ({"glass": "96", "olivine": "4"}, "4"),
+        "m57104": ({"glass": "95", "olivine": "5"}, "6"),
+        "m55803": ({"glass": "99", "olivine": "1"}, "7"),
+        "m57108": ({"glass": "97", "olivine": "3"}, "6"),
+    }
+    assert len(rows) == len(expected) == 18
+    assert {
+        run_id: (row["phase_proportions_pct"], row["analysis_count"])
+        for run_id, row in rows.items()
+    } == expected
+    # Independent pins read from the PDF p. 12 render: one all-glass row and
+    # one mixed glass/olivine row.
+    assert rows["m52701"]["phase_proportions_pct"] == {"glass": "100"}
+    assert rows["m52701"]["analysis_count"] == "5"
+    assert rows["m52703"]["phase_proportions_pct"] == {"glass": "98", "olivine": "2"}
+    assert rows["m52703"]["analysis_count"] == "5"
+
+
 def test_sugawara_1999_render_pins_and_isolated_migration(tmp_path) -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_table6_phase_render_pins(document)
     source_rows = {
         row["observation_id"]: row
         for species in document["species"].values()

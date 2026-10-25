@@ -32878,9 +32878,10 @@ species:
       units: as printed
       values:
         quantity: unavailable
-        schema_gap: Starting compositions are inputs, while phase proportions and printed totals are table context;
-          final oxide analyses and loss ratios are typed observations. The rendered table has blank body cells in
-          the n° column, which MinerU omits.
+        schema_gap: Starting compositions are inputs, while phase proportions, analysis counts, and printed totals
+          are table context; final oxide analyses and loss ratios are typed observations. The rendered n° column
+          gives the number of analyses for every run; MinerU omits it, so counts are retained separately and blank
+          olivine cells are omitted from phase proportions.
         starting_compositions:
         - sample_id: S1
           composition_wt_pct_as_published: *id111
@@ -32899,78 +32900,79 @@ species:
           sample_id: S1
           experiment_code: a
           distance_cm: null
+          analysis_count: '5'
           phase_proportions_pct:
             glass: '100'
-            olivine: '5'
           total_wt_pct: '98.17'
         - run_id: m52705
           sample_id: S1
           experiment_code: b
           distance_cm: null
+          analysis_count: '7'
           phase_proportions_pct:
             glass: '100'
-            olivine: '7'
           total_wt_pct: '98.12'
         - run_id: m57101
           sample_id: S1
           experiment_code: c
           distance_cm: '8'
+          analysis_count: '6'
           phase_proportions_pct:
             glass: '100'
-            olivine: '6'
           total_wt_pct: '97.70'
         - run_id: m57105
           sample_id: S1
           experiment_code: e
           distance_cm: '6'
+          analysis_count: '6'
           phase_proportions_pct:
             glass: '100'
-            olivine: '6'
           total_wt_pct: '98.09'
         - run_id: m52702
           sample_id: S2
           experiment_code: a
           distance_cm: null
+          analysis_count: '6'
           phase_proportions_pct:
             glass: '100'
-            olivine: '6'
           total_wt_pct: '98.22'
         - run_id: m52706
           sample_id: S2
           experiment_code: b
           distance_cm: null
+          analysis_count: '6'
           phase_proportions_pct:
             glass: '100'
-            olivine: '6'
           total_wt_pct: '98.55'
         - run_id: m57106
           sample_id: S2
           experiment_code: c
           distance_cm: '6'
+          analysis_count: '6'
           phase_proportions_pct:
             glass: '100'
-            olivine: '6'
           total_wt_pct: '97.70'
         - run_id: m55801
           sample_id: S2
           experiment_code: d
           distance_cm: null
+          analysis_count: '4'
           phase_proportions_pct:
             glass: '100'
-            olivine: '4'
           total_wt_pct: '98.06'
         - run_id: m57102
           sample_id: S2
           experiment_code: e
           distance_cm: '8'
+          analysis_count: '6'
           phase_proportions_pct:
             glass: '100'
-            olivine: '6'
           total_wt_pct: '97.85'
         - run_id: m52703
           sample_id: S3
           experiment_code: a
           distance_cm: null
+          analysis_count: '5'
           phase_proportions_pct:
             glass: '98'
             olivine: '2'
@@ -32979,38 +32981,39 @@ species:
           sample_id: S3
           experiment_code: b
           distance_cm: null
+          analysis_count: '3'
           phase_proportions_pct:
             glass: '100'
-            olivine: '3'
           total_wt_pct: '98.36'
         - run_id: m57107
           sample_id: S3
           experiment_code: c
           distance_cm: '6'
+          analysis_count: '6'
           phase_proportions_pct:
             glass: '100'
-            olivine: '6'
           total_wt_pct: '98.07'
         - run_id: m55802
           sample_id: S3
           experiment_code: d
           distance_cm: null
+          analysis_count: '7'
           phase_proportions_pct:
             glass: '100'
-            olivine: '7'
           total_wt_pct: '98.45'
         - run_id: m57103
           sample_id: S3
           experiment_code: e
           distance_cm: '8'
+          analysis_count: '6'
           phase_proportions_pct:
             glass: '100'
-            olivine: '6'
           total_wt_pct: '98.51'
         - run_id: m52708
           sample_id: S4
           experiment_code: b
           distance_cm: null
+          analysis_count: '4'
           phase_proportions_pct:
             glass: '96'
             olivine: '4'
@@ -33019,6 +33022,7 @@ species:
           sample_id: S4
           experiment_code: c
           distance_cm: '8'
+          analysis_count: '6'
           phase_proportions_pct:
             glass: '95'
             olivine: '5'
@@ -33027,6 +33031,7 @@ species:
           sample_id: S4
           experiment_code: d
           distance_cm: null
+          analysis_count: '7'
           phase_proportions_pct:
             glass: '99'
             olivine: '1'
@@ -33035,6 +33040,7 @@ species:
           sample_id: S4
           experiment_code: e
           distance_cm: '6'
+          analysis_count: '6'
           phase_proportions_pct:
             glass: '97'
             olivine: '3'
