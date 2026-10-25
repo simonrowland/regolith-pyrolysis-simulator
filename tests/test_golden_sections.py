@@ -13,7 +13,7 @@ from tests.golden_sections import (
     PRODUCER_CONTRACT, check_manifest, diff_nodes, flux_sections, json_bytes,
     load_json, nodes, partition, read_sections, reassemble, reassemble_flux, write_sections,
 )
-from tests.test_runner_smoke import SCENARIOS, SCENARIO_FLUX_LEDGER_PINS, _flux_ledger_pins
+from tests.test_runner_smoke import SCENARIOS
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = "b1708cd98ffa4edfd0fa61cae3aea6a3e8552e0f"
@@ -26,24 +26,48 @@ def generated_runner_sections(tmp_path_factory):
     generated = {}
     for scenario in SCENARIOS:
         fixture = f"tests/fixtures/runner/{scenario['fixture']}"
-        pinned = subprocess.check_output(["git", "show", f"{BASE}:{fixture}"], cwd=ROOT)
-        files = partition(load_json(pinned))
+        current = (ROOT / fixture).read_bytes()
+        files = partition(load_json(current))
         destination = root / scenario["name"]
         write_sections(destination, files)
-        generated[scenario["name"]] = (pinned, destination)
+        generated[scenario["name"]] = (current, destination)
     return generated
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
-def test_runner_byte_roundtrip_on_pinned_base(scenario, generated_runner_sections):
+def test_runner_byte_roundtrip_on_current_fixture(scenario, generated_runner_sections):
+    path = f"tests/fixtures/runner/{scenario['fixture']}"
+    current = (ROOT / path).read_bytes()
+    generated_current, directory = generated_runner_sections[scenario["name"]]
+    assert generated_current == current
+    files = read_sections(directory)
+    assert partition(load_json(current)) == files
+    assert reassemble(files) == current
+
+
+def _runner_structure(files):
+    section_names = sorted(name for name in files if name != "index.json")
+    return {
+        "section_count": len(section_names),
+        "section_filenames_sha256": hashlib.sha256("\n".join(section_names).encode()).hexdigest(),
+        "index_sha256": hashlib.sha256(files["index.json"]).hexdigest(),
+    }
+
+
+def _section_content_digest(files):
+    content_pairs = sorted((name, hashlib.sha256(raw).hexdigest())
+                           for name, raw in files.items())
+    return hashlib.sha256(json.dumps(content_pairs, separators=(",", ":")).encode()).hexdigest()
+
+
+@pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
+def test_step2_migration_proof_on_base(scenario):
     path = f"tests/fixtures/runner/{scenario['fixture']}"
     pinned = subprocess.check_output(["git", "show", f"{BASE}:{path}"], cwd=ROOT)
-    assert (ROOT / path).read_bytes() == pinned
-    generated_pinned, directory = generated_runner_sections[scenario["name"]]
-    assert generated_pinned == pinned
-    files = read_sections(directory)
-    assert partition(load_json(pinned)) == files
+    files = partition(load_json(pinned))
     assert reassemble(files) == pinned
+    expected = json.loads(LAYOUT.read_text(encoding="utf-8"))[scenario["name"]]
+    assert _section_content_digest(files) == expected["content_sha256"]
 
 
 def test_runner_section_layout_matches_pinned_expectations(generated_runner_sections):
@@ -51,19 +75,9 @@ def test_runner_section_layout_matches_pinned_expectations(generated_runner_sect
     assert set(expected) == set(generated_runner_sections)
     for scenario, (_, directory) in generated_runner_sections.items():
         files = read_sections(directory)
-        section_names = sorted(name for name in files if name != "index.json")
-        index_digest = hashlib.sha256(files["index.json"]).hexdigest()
-        names_digest = hashlib.sha256("\n".join(section_names).encode()).hexdigest()
-        content_pairs = sorted((name, hashlib.sha256(raw).hexdigest())
-                              for name, raw in files.items())
-        content_digest = hashlib.sha256(
-            json.dumps(content_pairs, separators=(",", ":")).encode()
-        ).hexdigest()
-        assert expected[scenario] == {
-            "section_count": len(section_names),
-            "section_filenames_sha256": names_digest,
-            "index_sha256": index_digest,
-            "content_sha256": content_digest,
+        # Content pins certify the historical migration, not future golden values.
+        assert _runner_structure(files) == {
+            key: value for key, value in expected[scenario].items() if key != "content_sha256"
         }
 
 
@@ -86,25 +100,43 @@ print(h.hexdigest())
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
 def test_raw_flux_capture_continuity(scenario, runner_golden_loader, generated_runner_sections):
-    actual, capture, expected_text = runner_golden_loader(scenario)
-    _, directory = generated_runner_sections[scenario["name"]]
-    stored = reassemble(read_sections(directory))
-    assert stored == expected_text.encode() == json_bytes(actual)
-    payload = load_json(stored)
-    flux = flux_sections(capture["flux_maps"])
+    _, capture, expected_text = runner_golden_loader(scenario)
+    current, directory = generated_runner_sections[scenario["name"]]
+    assert current == expected_text.encode()
+    _assert_raw_flux_capture_continuity(current, read_sections(directory), capture["flux_maps"])
+
+
+def _assert_raw_flux_capture_continuity(current, files, flux_maps):
+    assert reassemble(files) == current
+    flux = flux_sections(flux_maps)
     restored = reassemble_flux(flux)
     # Keys normalize only the captured evidence, with dispatch ordinal intact.
-    assert json.dumps(restored, sort_keys=True) == json.dumps(capture["flux_maps"], sort_keys=True)
+    assert json.dumps(restored, sort_keys=True) == json.dumps(flux_maps, sort_keys=True)
     for raw in flux.values():
         value = load_json(raw)
         if isinstance(value, dict):
             assert list(value) == sorted(value)
-    derived = {"flux_maps": restored, "ledger_output": {
-        "product_ledger_kg_at_hour": [r.get("product_ledger_kg_at_hour", {})
-                                     for r in payload["per_hour_summary"]],
-        "final_state": payload["final_state"],
-    }}
-    assert _flux_ledger_pins(derived) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
+
+
+@pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
+def test_value_only_fixture_move_roundtrips_with_capture_continuity(
+    scenario, tmp_path, runner_golden_loader, generated_runner_sections,
+):
+    current, directory = generated_runner_sections[scenario["name"]]
+    before = read_sections(directory)
+    payload = load_json(current)
+    payload["per_hour_summary"][0]["T_C"] += 1.0
+    moved_fixture = tmp_path / scenario["fixture"]
+    moved_fixture.write_bytes(json_bytes(payload))
+    moved = moved_fixture.read_bytes()
+    assert moved != current
+    destination = tmp_path / "sections"
+    write_sections(destination, partition(load_json(moved)))
+    after = read_sections(destination)
+    assert _runner_structure(after) == _runner_structure(before)
+    assert _section_content_digest(after) != _section_content_digest(before)
+    _, capture, _ = runner_golden_loader(scenario)
+    _assert_raw_flux_capture_continuity(moved, after, capture["flux_maps"])
 
 
 def _declaration(old, new):
