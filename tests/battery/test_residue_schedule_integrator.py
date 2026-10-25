@@ -553,6 +553,84 @@ def test_fraction_path_reproduces_time_domain_composition_at_its_mass_loss_endpo
     )
 
 
+@pytest.mark.parametrize(
+    ("changes", "reason", "detail"),
+    [
+        (
+            {"initial_inventory_mol": {"FeO": -1.0}},
+            "residue_inventory_invalid",
+            "residue_inventory_invalid",
+        ),
+        (
+            {"pressure_regime": ResiduePressureRegime("unsupported", 100.0, 0.0)},
+            "residue_pressure_regime_invalid",
+            "unsupported",
+        ),
+        (
+            {"pressure_regime": ResiduePressureRegime("buffered_fO2", None, 0.0, -10.0)},
+            "residue_total_pressure_missing",
+            "residue_total_pressure_missing",
+        ),
+        (
+            {"pressure_regime": ResiduePressureRegime("buffered_fO2", 100.0, 0.0)},
+            "oxygen_condition_missing",
+            "oxygen_condition_missing",
+        ),
+        (
+            {"pressure_model": None},
+            "residue_pressure_model_missing",
+            "residue_pressure_model_missing",
+        ),
+    ],
+)
+def test_time_and_fraction_integrators_pin_shared_boundary_refusals(
+    changes, reason, detail
+) -> None:
+    failures = []
+    for integrate, request in (
+        (integrate_residue_schedule, _request),
+        (integrate_residue_fraction, _fraction_request),
+    ):
+        with pytest.raises(ResidueInventoryRefusal) as error:
+            integrate(request(**changes))
+        failures.append((error.value.reason, error.value.detail))
+
+    assert failures == [(reason, detail), (reason, detail)]
+
+
+def test_time_and_fraction_integrators_pin_current_numeric_outputs() -> None:
+    initial = {"FeO": 1.0e-4, "SiO2": 1.0e-4}
+    channels = (ResidueChannel("Fe", "Fe", "FeO", 1.0, "pin"),)
+    pressure_regime = ResiduePressureRegime("buffered_fO2", 100.0, 0.0, -10.0)
+    pressure_model = lambda *_args: {"Fe": 100.0}
+
+    timed = integrate_residue_schedule(_request(
+        initial_inventory_mol=initial,
+        channels=channels,
+        thermal_schedule=(ResidueThermalSegment(1800.0, 1.0, 1),),
+        pressure_regime=pressure_regime,
+        geometry=ResidueGeometryInput(1.0, "constant_area"),
+        pressure_model=pressure_model,
+    ))
+    fraction = integrate_residue_fraction(_fraction_request(
+        initial_inventory_mol=initial,
+        channels=channels,
+        temperature_path=(ResidueFractionSegment(0.0, 0.2, 1800.0),),
+        pressure_regime=pressure_regime,
+        pressure_model=pressure_model,
+        mass_loss_fraction=0.01,
+    ))
+
+    assert {key: value.hex() for key, value in timed.residue_mol.items()} == {
+        "FeO": "0x0.0p+0",
+        "SiO2": "0x1.a36e2eb1c432dp-14",
+    }
+    assert {key: value.hex() for key, value in fraction.residue_mol.items()} == {
+        "FeO": "0x1.9d219556f932ep-14",
+        "SiO2": "0x1.a36e2eb1c432dp-14",
+    }
+
+
 def test_missing_target_source_refuses_when_loo_alpha_is_needed() -> None:
     with pytest.raises(ResidueInventoryRefusal) as error:
         select_residue_channel_alphas(
