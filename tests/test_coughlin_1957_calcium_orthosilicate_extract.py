@@ -62,6 +62,31 @@ def test_render_pins_and_printed_table_counts() -> None:
     assert vle.check_fidelity_sample_matches(mutated, pins[next(iter(expected))])
 
 
+def test_gamma_equation_matches_render_transcription() -> None:
+    document = _document()
+    equation = (
+        "H_T − H_298.15 = 31.86 T + 6.16 × 10^-3 T^2 "
+        "+ 4.64 × 10^5 T^-1 − 11,603"
+    )
+    context = next(
+        row
+        for row in document["species"]["Ca2SiO4"]["context"]
+        if row["observation_id"] == "coughlin_obrien_1957_gamma_smoothing_equation"
+    )
+    assert context["values"]["equation_as_printed"] == equation
+
+    gamma_derivations = [
+        row
+        for row in _observations(document).values()
+        if row.get("phase_as_printed") == "gamma"
+        and row.get("derivation", {}).get("relation", "").startswith(
+            "Authors evaluated the printed equation"
+        )
+    ]
+    assert len(gamma_derivations) == 9
+    assert all(equation in row["derivation"]["relation"] for row in gamma_derivations)
+
+
 def test_isolated_migration_maps_each_heat_point_temperature_and_keeps_pressure_unknown() -> None:
     document = _document()
     source_rows = _observations(document)
