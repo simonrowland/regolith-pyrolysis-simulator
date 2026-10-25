@@ -16,7 +16,9 @@ from tests.golden_sections import (
 from tests.test_runner_smoke import SCENARIOS, SCENARIO_FLUX_LEDGER_PINS, _flux_ledger_pins
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = "b1708cd98ffa4edfd0fa61cae3aea6a3e8552e0f"
+# Rebased to the merged wall-Antoine runner fixture in 249dbd216; section
+# partitioning and byte-roundtrip assertions remain pinned to a committed tree.
+BASE = "249dbd216adb2dc5dd9b9b67418fb79b0f66f6bc"
 LAYOUT = ROOT / "tests/fixtures/golden_sections/runner-layout.json"
 
 
