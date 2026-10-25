@@ -382,17 +382,35 @@ def test_equal_relative_volatility_preserves_parent_mole_ratio() -> None:
             for species in molar_mass
         }
 
+    channels = (
+        ResidueChannel("FeO", "FeO", "FeO", 1.0, "measured"),
+        ResidueChannel("MgO", "MgO", "MgO", 1.0, "measured"),
+    )
     result = integrate_residue_fraction(_fraction_request(
         initial_inventory_mol=initial,
-        channels=(
-            ResidueChannel("FeO", "FeO", "FeO", 1.0, "measured"),
-            ResidueChannel("MgO", "MgO", "MgO", 1.0, "measured"),
+        channels=channels,
+        pressure_model=equal_relative_pressure,
+    ))
+    uniformly_scaled = integrate_residue_fraction(_fraction_request(
+        initial_inventory_mol=initial,
+        channels=tuple(
+            ResidueChannel(
+                channel.species,
+                channel.formula,
+                channel.parent_oxide,
+                0.25,
+                "same relative volatility at lower absolute alpha",
+            )
+            for channel in channels
         ),
         pressure_model=equal_relative_pressure,
     ))
 
     assert result.residue_mol["FeO"] / result.residue_mol["MgO"] == pytest.approx(
         initial["FeO"] / initial["MgO"], rel=1.0e-9
+    )
+    assert uniformly_scaled.residue_mol == pytest.approx(
+        result.residue_mol, rel=1.0e-9, abs=1.0e-20
     )
 
 

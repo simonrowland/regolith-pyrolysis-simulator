@@ -1786,7 +1786,9 @@ def integrate_residue_fraction(
     ``N_v(F) = N_v(0) - F*m0/M_v`` until that parent is exhausted (the
     single-volatile Rayleigh limit). If all components have equal relative
     volatility, every parent debit is proportional to its current inventory,
-    so their ratios remain unchanged.
+    so their ratios remain unchanged. Multiplying every ``alpha_i`` by the same
+    factor scales all fluxes equally and leaves the path unchanged; only
+    relative alpha values affect the composition at a given ``F``.
     """
     if request.initial_inventory_mol is None or not request.initial_inventory_mol:
         raise ResidueInventoryRefusal("residue_inventory_missing")

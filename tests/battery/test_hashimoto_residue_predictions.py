@@ -311,6 +311,113 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
     }
 
 
+def test_hashimoto_c3_2_area_free_path_matches_time_domain_at_printed_loss() -> None:
+    from scipy.optimize import brentq
+
+    from simulator.battery.residue import (
+        ResidueChannel,
+        ResidueFractionIntegrationInput,
+        ResidueFractionSegment,
+        ResidueGeometryInput,
+        ResidueIntegrationInput,
+        ResiduePressureRegime,
+        ResidueThermalSegment,
+        _formula_terms,
+        _hashimoto_point_value,
+        _hashimoto_project_oxide_wt_pct,
+        integrate_residue_fraction,
+        integrate_residue_schedule,
+    )
+
+    source = yaml.safe_load(SOURCE.read_text())
+    experiment = next(
+        row
+        for row in source["experiments"]
+        if row["experiment_id"] == "hashimoto-1983-run-17c3-2"
+    )
+    table3 = next(
+        observation["values"]["series"]
+        for species in source["species"].values()
+        for observation in species.get("observations", ())
+        if observation.get("observation_id")
+        == "hashimoto_1983_table3_residue_composition_series"
+    )
+    printed_endpoint = next(
+        row
+        for row in table3
+        if row["sample"] == "C3 (2)" and row["T_K"] == 1973.15
+    )["VF_wt_pct"] / 100.0
+    temperature_K = _hashimoto_point_value(experiment["conditions"]["temperature_K"])
+    initial_mass_kg = _hashimoto_point_value(experiment["sample"]["mass_kg"])
+    printed_wt_pct = experiment["sample"]["printed_composition"]["state"]["value"]
+    initial_inventory = {
+        oxide: float(wt_pct) * initial_mass_kg / 100.0 / _formula_terms(oxide)[1]
+        for oxide, wt_pct in printed_wt_pct.items()
+    }
+    assert printed_endpoint == pytest.approx(0.108)
+    assert temperature_K == 1973.15
+
+    channels = (
+        ResidueChannel("Fe", "Fe", "FeO", 1.0, "Hashimoto common-unity alpha arm"),
+        ResidueChannel("Mg", "Mg", "MgO", 1.0, "Hashimoto common-unity alpha arm"),
+        ResidueChannel("O2", "O2", None, 1.0, "oxygen-gas alpha=1.0"),
+    )
+    initial_feo = initial_inventory["FeO"]
+    initial_mgo = initial_inventory["MgO"]
+
+    def pressure_model(inventory, _temperature, log10_pO2_bar, _regime):
+        pO2_bar = 10.0**log10_pO2_bar
+        return {
+            "Fe": 5.0e-8 * inventory.get("FeO", 0.0) / initial_feo * pO2_bar**-0.5,
+            "Mg": 2.0e-8 * inventory.get("MgO", 0.0) / initial_mgo * pO2_bar**-0.5,
+            "O2": 100_000.0 * pO2_bar,
+        }
+
+    pressure_regime = ResiduePressureRegime("vacuum_balance", 0.0, 0.0)
+
+    def time_path(duration_s):
+        result = integrate_residue_schedule(ResidueIntegrationInput(
+            initial_inventory_mol=initial_inventory,
+            channels=channels,
+            thermal_schedule=(ResidueThermalSegment(temperature_K, duration_s, 256),),
+            pressure_regime=pressure_regime,
+            geometry=ResidueGeometryInput(
+                1.0, "constant_area", initial_mass_kg
+            ),
+            pressure_model=pressure_model,
+        ))
+        assert result.refusal is None
+        final_mass_kg = math.fsum(
+            amount * _formula_terms(oxide)[1]
+            for oxide, amount in result.residue_mol.items()
+        )
+        return (initial_mass_kg - final_mass_kg) / initial_mass_kg, result
+
+    endpoint_duration_s = brentq(
+        lambda duration_s: time_path(duration_s)[0] - printed_endpoint,
+        1.0e-9,
+        1002.0,
+        xtol=1.0e-10,
+    )
+    timed_loss_fraction, timed = time_path(endpoint_duration_s)
+    area_free = integrate_residue_fraction(ResidueFractionIntegrationInput(
+        initial_inventory_mol=initial_inventory,
+        channels=channels,
+        temperature_path=(ResidueFractionSegment(0.0, 1.0, temperature_K),),
+        pressure_regime=pressure_regime,
+        pressure_model=pressure_model,
+        mass_loss_fraction=printed_endpoint,
+        initial_mass_kg=initial_mass_kg,
+    ))
+    timed_wt_pct = _hashimoto_project_oxide_wt_pct(timed.residue_mol)
+    area_free_wt_pct = _hashimoto_project_oxide_wt_pct(area_free.residue_mol)
+
+    assert timed_loss_fraction == pytest.approx(printed_endpoint, abs=1.0e-10)
+    # Phase 1 accepts a maximum 2e-4 wt%-point refinement difference; the
+    # fraction solve uses DOP853 at rtol=1e-10 with the same pressure law.
+    assert area_free_wt_pct == pytest.approx(timed_wt_pct, rel=0.0, abs=2.0e-4)
+
+
 def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
