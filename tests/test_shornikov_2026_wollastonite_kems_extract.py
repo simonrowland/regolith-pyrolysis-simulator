@@ -14,7 +14,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     Phase,
     Quantity,
-    RefusalReason,
+    RawInputStatus,
     UncertaintyKind,
     ValueKind,
 )
@@ -177,6 +177,36 @@ def test_isolated_migration_carries_each_species_and_pressure_condition() -> Non
     # Prior migration 170 − 2 prose activities + 90 + 15 + 4 = 277.
     assert len(migrated) == 277
     assert not result.registry_issues
+    raw_input_source_ids = {
+        local_id
+        for local_id, (_, source) in source_rows.items()
+        if (
+            (source.get("values") or {}).get("derivation") or {}
+        ).get("raw_inputs", {}).get("state", {}).get("value")
+        == "not_printed"
+    }
+    assert len(raw_input_source_ids) == 10
+    for local_id in raw_input_source_ids:
+        rows = [
+            row
+            for row in migrated
+            if row.observation_id == f"{SID}::{local_id}"
+            or row.observation_id.startswith(f"{SID}::{local_id}::")
+        ]
+        assert rows
+        for row in rows:
+            assert row.derivation is not None
+            raw_inputs = row.derivation.raw_inputs
+            assert raw_inputs is not None
+            assert raw_inputs.state.is_value
+            assert raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+            assert raw_inputs.locator is not None
+            assert raw_inputs.locator.page is not None
+            method = row.derivation.method
+            assert method is not None
+            assert method.locator is not None
+            assert method.locator.equation is not None
+            assert row.derivation.references
     families = {_family(_local_id(row.observation_id)): 0 for row in migrated}
     for row in migrated:
         families[_family(_local_id(row.observation_id))] += 1
@@ -302,20 +332,8 @@ def test_isolated_migration_carries_each_species_and_pressure_condition() -> Non
     )
 
     assert result.validation is not None
-    hard = result.validation.hard_issues
-    assert len(hard) == 84
-    assert {issue.reason for issue in hard} == {RefusalReason.CONDITIONAL_FIELD}
-    missing_parent = [
-        issue for issue in hard if issue.detail == "derived observation requires derived_from"
-    ]
-    missing_derivation = [
-        issue for issue in hard if issue.detail == "derived observation requires derivation"
-    ]
-    assert len(missing_parent) == 80
-    assert len(missing_derivation) == 4
-    assert sum("table4_p_o_eq" in issue.path for issue in missing_parent) == 76
-    assert sum("table6_" in issue.path for issue in missing_parent) == 4
-    assert all("table6_" in issue.path for issue in missing_derivation)
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
 
 
 def test_every_deferred_figure_has_metadata_and_no_numeric_points() -> None:

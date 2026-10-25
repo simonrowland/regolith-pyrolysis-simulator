@@ -12204,8 +12204,27 @@ species:
         delta_rH_kJ_per_mol: 771
         delta_rH_uncertainty_as_printed: ± 13
         derivation:
-          inputs:
-          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          method:
+            state:
+              tag: value
+              value: Reaction thermodynamic value calculated using Eq. (21)
+            locator:
+              page: 13
+              pdf_page_index: 12
+              published_page: 619
+              equation: '(21)'
+          references:
+          - "Glushko et al. (1978-1982) [10]"
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 14
+              pdf_page_index: 13
+              published_page: 621
+              table: '6'
+              note: The Glushko equilibrium constants used in Eq. (21) are not printed here.
           relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants from
             Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals are not the
             Table 3 interval, so the Table 3 pressures are not linked.
@@ -12242,8 +12261,27 @@ species:
         delta_rS_J_per_mol_K: 242
         delta_rS_uncertainty_as_printed: ± 5
         derivation:
-          inputs:
-          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          method:
+            state:
+              tag: value
+              value: Reaction thermodynamic value calculated using Eq. (21)
+            locator:
+              page: 13
+              pdf_page_index: 12
+              published_page: 619
+              equation: '(21)'
+          references:
+          - "Glushko et al. (1978-1982) [10]"
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 14
+              pdf_page_index: 13
+              published_page: 621
+              table: '6'
+              note: The Glushko equilibrium constants used in Eq. (21) are not printed here.
           relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants from
             Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals are not the
             Table 3 interval, so the Table 3 pressures are not linked.
@@ -12279,8 +12317,27 @@ species:
         delta_rH_kJ_per_mol: 479
         delta_rH_uncertainty_as_printed: ± 12
         derivation:
-          inputs:
-          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          method:
+            state:
+              tag: value
+              value: Reaction thermodynamic value calculated using Eq. (21)
+            locator:
+              page: 13
+              pdf_page_index: 12
+              published_page: 619
+              equation: '(21)'
+          references:
+          - "Glushko et al. (1978-1982) [10]"
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 14
+              pdf_page_index: 13
+              published_page: 621
+              table: '6'
+              note: The Glushko equilibrium constants used in Eq. (21) are not printed here.
           relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants from
             Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals are not the
             Table 3 interval, so the Table 3 pressures are not linked.
@@ -12319,8 +12376,27 @@ species:
         delta_rS_J_per_mol_K: 47
         delta_rS_uncertainty_as_printed: ± 6
         derivation:
-          inputs:
-          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          method:
+            state:
+              tag: value
+              value: Reaction thermodynamic value calculated using Eq. (21)
+            locator:
+              page: 13
+              pdf_page_index: 12
+              published_page: 619
+              equation: '(21)'
+          references:
+          - "Glushko et al. (1978-1982) [10]"
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 14
+              pdf_page_index: 13
+              published_page: 621
+              table: '6'
+              note: The Glushko equilibrium constants used in Eq. (21) are not printed here.
           relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants from
             Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals are not the
             Table 3 interval, so the Table 3 pressures are not linked.
@@ -17160,8 +17236,29 @@ species:
         column_as_printed: (14)
         composition_as_printed: stoichiometric CaSiO3 wollastonite
         derivation:
-          inputs:
-          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          method:
+            state:
+              tag: value
+              value: Eq. (14) pressure calculation using K3(T)
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(14)'
+          references:
+          - "Glushko et al. (1978-1982) [10]"
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(14)'
+              note: The required K3(T) equilibrium constant from Glushko [10] is not printed here.
           relation: 'Eq. (14): p_O = K_3(T) p_CaO / p_Ca. The equilibrium constant is not printed in this paper,
             so the printed pressure cannot be reproduced from a parent in this extract.'
         equation_as_printed: p_O = K_3(T) p_CaO / p_Ca
@@ -17219,8 +17316,29 @@ species:
         column_as_printed: (15)
         composition_as_printed: stoichiometric CaSiO3 wollastonite
         derivation:
-          inputs:
-          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          method:
+            state:
+              tag: value
+              value: Eq. (15) pressure calculation using K4(T)
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(15)'
+          references:
+          - "Glushko et al. (1978-1982) [10]"
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(15)'
+              note: The required K4(T) equilibrium constant from Glushko [10] is not printed here.
           relation: 'Eq. (15): p_O = K_4(T) p_SiO2 / p_SiO. The equilibrium constant is not printed in this
             paper, so the printed pressure cannot be reproduced from a parent in this extract.'
         equation_as_printed: p_O = K_4(T) p_SiO2 / p_SiO
@@ -17299,8 +17417,29 @@ species:
         column_as_printed: (16)
         composition_as_printed: stoichiometric CaSiO3 wollastonite
         derivation:
-          inputs:
-          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          method:
+            state:
+              tag: value
+              value: Eq. (16) pressure calculation using K5(T)
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(16)'
+          references:
+          - "Glushko et al. (1978-1982) [10]"
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(16)'
+              note: The required K5(T) equilibrium constant from Glushko [10] is not printed here.
           relation: 'Eq. (16): p_O = p_O2^(1/2) / K_5(T)^(1/2). The equilibrium constant is not printed in this
             paper, so the printed pressure cannot be reproduced from a parent in this extract.'
         equation_as_printed: p_O = p_O2^(1/2) / K_5(T)^(1/2)
@@ -17379,8 +17518,29 @@ species:
         column_as_printed: (17)
         composition_as_printed: stoichiometric CaSiO3 wollastonite
         derivation:
-          inputs:
-          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          method:
+            state:
+              tag: value
+              value: Eq. (17) pressure calculation using K8(T)
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(17)'
+          references:
+          - "Glushko et al. (1978-1982) [10]"
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(17)'
+              note: The required K8(T) equilibrium constant from Glushko [10] is not printed here.
           relation: 'Eq. (17): p_O = K_8(T) p_MoO / p_Mo. The equilibrium constant is not printed in this paper,
             so the printed pressure cannot be reproduced from a parent in this extract.'
         equation_as_printed: p_O = K_8(T) p_MoO / p_Mo
@@ -17456,8 +17616,29 @@ species:
         column_as_printed: (18)
         composition_as_printed: stoichiometric CaSiO3 wollastonite
         derivation:
-          inputs:
-          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          method:
+            state:
+              tag: value
+              value: Eq. (18) pressure calculation using K9(T)
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(18)'
+          references:
+          - "Glushko et al. (1978-1982) [10]"
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(18)'
+              note: The required K9(T) equilibrium constant from Glushko [10] is not printed here.
           relation: 'Eq. (18): p_O = K_9(T) p_MoO2 / p_MoO. The equilibrium constant is not printed in this
             paper, so the printed pressure cannot be reproduced from a parent in this extract.'
         equation_as_printed: p_O = K_9(T) p_MoO2 / p_MoO
@@ -17536,8 +17717,29 @@ species:
         column_as_printed: (19)
         composition_as_printed: stoichiometric CaSiO3 wollastonite
         derivation:
-          inputs:
-          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          method:
+            state:
+              tag: value
+              value: Eq. (19) pressure calculation using K10(T)
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(19)'
+          references:
+          - "Glushko et al. (1978-1982) [10]"
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 12
+              pdf_page_index: 11
+              published_page: 619
+              table: '4'
+              equation: '(19)'
+              note: The required K10(T) equilibrium constant from Glushko [10] is not printed here.
           relation: 'Eq. (19): p_O = K_10(T) p_MoO3 / p_MoO2. The equilibrium constant is not printed in this
             paper, so the printed pressure cannot be reproduced from a parent in this extract.'
         equation_as_printed: p_O = K_10(T) p_MoO3 / p_MoO2
