@@ -593,3 +593,13 @@ def test_finite_consuming_forcing_at_positive_bulk_still_refuses():
     with pytest.raises(OxygenClosureNonconvergence, match='no interior'):
         _solve_surface_oxygen_balance(point, bulk_pO2_bar=bulk,
                                      settle_inward_endpoint=point)
+
+
+@pytest.mark.parametrize('species,oxygen', (('CrO2', False), ('SiO', 0.0)))
+def test_zero_limit_does_not_bypass_other_pressure_refusals(species, oxygen):
+    from simulator.config import load_config_bundle
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog, CatalogCompileError
+    evaluator = compile_vapour_rail_catalog(load_config_bundle().vapor_pressures.catalog_payload).evaluator_for_hot_train(
+        species, process_phase='hot_train')
+    with pytest.raises(CatalogCompileError):
+        evaluator.evaluate(1343.15, source_activity=0.1, pO2_bar=oxygen)
