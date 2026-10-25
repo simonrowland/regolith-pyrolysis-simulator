@@ -5240,7 +5240,7 @@
               ],
               "species_id": "P2O5_gas",
               "detail": "declared applicability predicate 'not_applicable' is inactive",
-              "flux_dormant": true
+              "flux_dormant": false
             }
           },
           "out_of_range": false,
@@ -5249,7 +5249,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "P4": {
           "species_id": "P4",
@@ -6454,7 +6454,7 @@
               ],
               "species_id": "P2O5_gas",
               "detail": "declared applicability predicate 'not_applicable' is inactive",
-              "flux_dormant": true
+              "flux_dormant": false
             }
           },
           "out_of_range": false,
@@ -6463,7 +6463,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "P4": {
           "species_id": "P4",
@@ -6802,7 +6802,7 @@
         "Na2": "eligible",
         "Na2O_gas": "eligible",
         "P2": "dormant_by_epoch",
-        "P2O5_gas": "dormant_by_epoch",
+        "P2O5_gas": "refusal",
         "P4": "dormant_by_epoch",
         "P4O10": "dormant_by_epoch",
         "P4O6": "dormant_by_epoch",
@@ -12331,7 +12331,7 @@
                 ],
                 "species_id": "P2O5_gas",
                 "detail": "declared applicability predicate 'not_applicable' is inactive",
-                "flux_dormant": true
+                "flux_dormant": false
               }
             },
             "out_of_range": false,
@@ -12340,7 +12340,7 @@
             "source_boundary": null,
             "source_reaction_activity": null,
             "is_flux_active": false,
-            "is_flux_dormant_by_epoch": true
+            "is_flux_dormant_by_epoch": false
           },
           "input_mass_kg_hr": 0.0,
           "remaining_mass_kg_hr": 0.0,
@@ -13654,13 +13654,13 @@
     "shadow_outcome": "missing_keys",
     "silent_zero": {
       "schema": "silent_zero.v1",
-      "count": 10,
+      "count": 11,
       "counts_by_reason": {
         "proven_below_threshold": 9,
-        "refused_upstream": 1
+        "refused_upstream": 2
       },
       "counts_by_doctrine_category": {
-        "1": 1,
+        "1": 2,
         "2": 0,
         "3": 9
       },
@@ -13742,6 +13742,14 @@
           "site": "evaporation.partial_channel_refusal",
           "doctrine_category": 1,
           "species": "Mg",
+          "field": "batch_channel_state",
+          "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
+        },
+        {
+          "zero_because": "refused_upstream",
+          "site": "evaporation.partial_channel_refusal",
+          "doctrine_category": 1,
+          "species": "P2O5_gas",
           "field": "batch_channel_state",
           "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
         }
@@ -17267,7 +17275,7 @@
           "Na2": "refusal",
           "Na2O_gas": "refusal",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -17617,7 +17625,7 @@
           "Na2": "refusal",
           "Na2O_gas": "refusal",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -17967,7 +17975,7 @@
           "Na2": "refusal",
           "Na2O_gas": "refusal",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -18317,7 +18325,7 @@
           "Na2": "refusal",
           "Na2O_gas": "refusal",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -18667,7 +18675,7 @@
           "Na2": "refusal",
           "Na2O_gas": "refusal",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -19017,7 +19025,7 @@
           "Na2": "refusal",
           "Na2O_gas": "refusal",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -22375,7 +22383,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -25851,7 +25859,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -29327,7 +29335,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -32803,7 +32811,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -36279,7 +36287,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -39755,7 +39763,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
