@@ -88,7 +88,7 @@ species:
           row: CMAS
           column: Tg (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: &costa_cmas_formula Ca0.3234Mg0.1071Al0.1524Si0.4933O1.646
@@ -160,7 +160,7 @@ species:
           row: CMAS
           column: Tc (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_cmas_formula
@@ -229,7 +229,7 @@ species:
           row: CMAS
           column: Tm (K)
         phase: cr
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_cmas_formula
@@ -295,7 +295,7 @@ species:
           row: CMAS
           column: ΔHfusion (kJ·mol−1)
         phase: cr
-        regime: DSC melting endotherm
+        regime: dta_dsc
         units: kJ mol−1
         values:
           formula: *costa_cmas_formula
@@ -366,7 +366,7 @@ species:
           row: Y-L
           column: Tg (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: &costa_y_l_formula Ca0.3182Mg0.1054Al0.1502Y0.0297Si0.486O1.665
@@ -437,7 +437,7 @@ species:
           row: Y-L
           column: Tc (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_y_l_formula
@@ -508,7 +508,7 @@ species:
           row: Y-L
           column: Tm (K)
         phase: cr
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_y_l_formula
@@ -576,7 +576,7 @@ species:
           row: Y-L
           column: ΔHfusion (kJ·mol−1)
         phase: cr
-        regime: DSC melting endotherm
+        regime: dta_dsc
         units: kJ mol−1
         values:
           formula: *costa_y_l_formula
@@ -649,7 +649,7 @@ species:
           row: Yb-L
           column: Tg (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: &costa_yb_l_formula Ca0.322Mg0.1057Al0.1484Yb0.0160Si0.490O1.654
@@ -720,7 +720,7 @@ species:
           row: Yb-L
           column: Tc (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_yb_l_formula
@@ -791,7 +791,7 @@ species:
           row: Yb-L
           column: Tm (K)
         phase: cr
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_yb_l_formula
@@ -859,7 +859,7 @@ species:
           row: Yb-L
           column: ΔHfusion (kJ·mol−1)
         phase: cr
-        regime: DSC melting endotherm
+        regime: dta_dsc
         units: kJ mol−1
         values:
           formula: *costa_yb_l_formula
@@ -932,7 +932,7 @@ species:
           row: Gd-L
           column: Tg (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: &costa_gd_l_formula Ca0.3224Mg0.1048Al0.1516Gd0.0173Si0.488O1.657
@@ -1003,7 +1003,7 @@ species:
           row: Gd-L
           column: Tc (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_gd_l_formula
@@ -1074,7 +1074,7 @@ species:
           row: Gd-L
           column: Tm (K)
         phase: cr
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_gd_l_formula
@@ -1142,7 +1142,7 @@ species:
           row: Gd-L
           column: ΔHfusion (kJ·mol−1)
         phase: cr
-        regime: DSC melting endotherm
+        regime: dta_dsc
         units: kJ mol−1
         values:
           formula: *costa_gd_l_formula
@@ -1215,7 +1215,7 @@ species:
           row: Y-H
           column: Tg (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: &costa_y_h_formula Ca0.3091Mg0.1008Al0.145Y0.0986Si0.468O1.711
@@ -1286,7 +1286,7 @@ species:
           row: Y-H
           column: Tc (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_y_h_formula
@@ -1357,7 +1357,7 @@ species:
           row: Y-H
           column: Tm (K)
         phase: cr
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_y_h_formula
@@ -1425,7 +1425,7 @@ species:
           row: Y-H
           column: ΔHfusion (kJ·mol−1)
         phase: cr
-        regime: DSC melting endotherm
+        regime: dta_dsc
         units: kJ mol−1
         values:
           formula: *costa_y_h_formula
@@ -1498,7 +1498,7 @@ species:
           row: Yb-H
           column: Tg (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: &costa_yb_h_formula Ca0.312Mg0.1006Al0.1266Yb0.099Si0.475O1.701
@@ -1569,7 +1569,7 @@ species:
           row: Yb-H
           column: Tc (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_yb_h_formula
@@ -1640,7 +1640,7 @@ species:
           row: Yb-H
           column: Tm (K)
         phase: cr
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_yb_h_formula
@@ -1708,7 +1708,7 @@ species:
           row: Yb-H
           column: ΔHfusion (kJ·mol−1)
         phase: cr
-        regime: DSC melting endotherm
+        regime: dta_dsc
         units: kJ mol−1
         values:
           formula: *costa_yb_h_formula
@@ -1781,7 +1781,7 @@ species:
           row: Gd-H
           column: Tg (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: &costa_gd_h_formula Ca0.312Mg0.0932Al0.1444Gd0.1004Si0.472O1.716
@@ -1852,7 +1852,7 @@ species:
           row: Gd-H
           column: Tc (K)
         phase: glass
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_gd_h_formula
@@ -1923,7 +1923,7 @@ species:
           row: Gd-H
           column: Tm (K)
         phase: cr
-        regime: simultaneous DSC-TGA heating
+        regime: dta_dsc
         units: K
         values:
           formula: *costa_gd_h_formula
@@ -1991,7 +1991,7 @@ species:
           row: Gd-H
           column: ΔHfusion (kJ·mol−1)
         phase: cr
-        regime: DSC melting endotherm
+        regime: dta_dsc
         units: kJ mol−1
         values:
           formula: *costa_gd_h_formula

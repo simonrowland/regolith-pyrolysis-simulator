@@ -5,6 +5,7 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import MethodToken
 from tests.battery.test_migrate import _migrate_real_extract
 
 
@@ -18,13 +19,13 @@ def test_costa_2025_table3_values_compositions_and_migration(tmp_path: Path) -> 
     container = extract["species"]["CaO"]
     context = {row["observation_id"]: row for row in container["context"]}
     source_rows = {
-        observation_id: row
-        for observation_id, row in context.items()
+        row["observation_id"]: row
+        for row in container["observations"]
         if row["locator"].get("table") == "3"
         and row["values"].get("quantity")
         in {"transition_temperature", "heat_of_fusion"}
     }
-    assert not container.get("observations")
+    assert len(source_rows) == 28
 
     # Table 3, PDF page 11: these literals were confirmed against its 600-dpi render.
     rendered_values = {
@@ -41,14 +42,16 @@ def test_costa_2025_table3_values_compositions_and_migration(tmp_path: Path) -> 
         assert row["locator"]["pdf_page_index"] == 10
         assert row["locator"]["table"] == "3"
 
-    assert len(source_rows) == 28
     composition_rows = {
         row["sample"]: row
         for row in context["costa_2025_table1_epma_glass_compositions"]["values"]["rows"]
     }
     assert len(composition_rows) == 7
     for row in source_rows.values():
-        assert row["type"] == "literature_context"
+        if row["values"]["quantity"] == "transition_temperature":
+            assert row["type"] == "transition_point"
+        else:
+            assert row["type"] == "heat_capacity_and_heat_content_series"
         composition = row["values"]["composition_mol"]
         assert composition["basis"] == "printed_mole_fraction"
         assert row["values"]["composition_as_published"]
@@ -140,10 +143,23 @@ def test_costa_2025_table3_values_compositions_and_migration(tmp_path: Path) -> 
     migrated_costa_rows = [
         row for row in result.observations.values() if row.source_id == SOURCE_ID
     ]
-    assert not migrated_costa_rows
+    assert len(migrated_costa_rows) == 28
     assert not any(
         row.identity.species.formula == "CaO" and row.identity.composition.is_unknown
         for row in result.observations.values()
         if row.source_id == SOURCE_ID
     )
     assert not result.validation.hard_issues
+    for observation in migrated_costa_rows:
+        source_row = source_rows[observation.observation_id.split("::", 1)[-1]]
+        temperature_state = source_row["point_conditions"]["temperature_K"]["state"]
+        assert temperature_state["tag"] == "value"
+        temperature = Decimal(str(temperature_state["value"]))
+        assert observation.point_conditions is not None
+        temperature_condition = observation.point_conditions["temperature_K"].state
+        assert temperature_condition.is_value
+        assert temperature_condition.value == temperature
+        assert observation.point_conditions["composition"].state.is_value
+        experiment = result.experiments[observation.experiment_id]
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.DTA_DSC
