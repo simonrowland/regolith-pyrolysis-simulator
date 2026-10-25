@@ -1,0 +1,42 @@
+source_id: hayashi-2019-isij-iron-oxide-activity-na2o-sio2-feo-fe2o3
+source:
+  citation: 'Hayashi, M., Horita, K., Endo, R., Watanabe, T. & Susa, M. (2019), Effect of Coordination Structure of Iron Ions on Iron Oxide Activities in Na2O-SiO2-FeO-Fe2O3 Melts, ISIJ International 59(10), 1744-1751.'
+extraction:
+  method: >-
+    MinerU table cells emitted for the activity and activity-coefficient columns; Table 1 master-glass composition vectors and Table 2 columns omitted by MinerU were hand-bound as row data. Machine text and MinerU were compared; page renders confirmed each table's row and column assignments and the omitted gamma FeO1.5 column.
+  date: '2026-10-25'
+  worker: w1025c-haya19
+review_status: draft
+tables:
+  - page: 2
+    table_index: 1
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: mol%
+    phase: glass
+    rows: all
+    values:
+      - {column: 2, species: Fe2O3}
+      - {column: 3, species: Na2O}
+      - {column: 4, species: SiO2}
+      - {column: 6, species: Fe2O3}
+      - {column: 7, species: Na2O}
+      - {column: 8, species: SiO2}
+  - page: 4
+    table_index: 2
+    type: activity_coefficient
+    quantity: activity_coefficient
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: l
+    per: dimensionless
+    published_page: 1747
+    temperature:
+      as_printed: '1 573 ± 2 K'
+      unit: K
+    rows: all
+    values:
+      - {column: 12, species: FeO, quantity: activity, unit: dimensionless activity, evidence_class: model_derived}
+      - {column: 13, species: FeO1.5, quantity: activity, unit: dimensionless activity, evidence_class: model_derived}
+      - {column: 14, species: FeO, quantity: activity_coefficient, unit: dimensionless, evidence_class: measured_reduced}
