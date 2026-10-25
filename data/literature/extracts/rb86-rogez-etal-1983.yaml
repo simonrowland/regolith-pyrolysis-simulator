@@ -15,7 +15,7 @@ extraction:
   worker: w1025b-roge83
 review_status: draft
 fidelity_samples:
-- path: species.NaAlSi3O8.observations[rb86_rogez_etal_1983_p009_t06_r03_c02].values.activity_as_printed
+- path: species.Na2Al2Si6O16.observations[rb86_rogez_etal_1983_p009_t06_r03_c02].values.activity_as_printed
   value: 0,847
   note: Table VI, xOr=0.1 albite activity, PDF p. 9 / published p. 126.
   locator:
@@ -24,7 +24,7 @@ fidelity_samples:
     published_page: 126
     table: VI
     row: '0.1'
-- path: species.KAlSi3O8.observations[rb86_rogez_etal_1983_p009_t06_r07_c03].values.activity_as_printed
+- path: species.K2Al2Si6O16.observations[rb86_rogez_etal_1983_p009_t06_r07_c03].values.activity_as_printed
   value: 0,250
   note: Table VI, xOr=0.5 orthose activity, PDF p. 9 / published p. 126.
   locator:
@@ -33,7 +33,7 @@ fidelity_samples:
     published_page: 126
     table: VI
     row: '0.5'
-- path: species.NaAlSi3O8.observations[rb86_rogez_etal_1983_p009_t06_r11_c02].values.activity_as_printed
+- path: species.Na2Al2Si6O16.observations[rb86_rogez_etal_1983_p009_t06_r11_c02].values.activity_as_printed
   value: 0,010
   note: Table VI, xOr=0.9 albite activity, PDF p. 9 / published p. 126.
   locator:
@@ -89,14 +89,14 @@ experiments:
         table: '4.2'
         note: No oxygen fugacity is stated.
 species:
-  NaAlSi3O8:
+  Na2Al2Si6O16:
     observations:
     - observation_id: rb86_rogez_etal_1983_p009_t06_r02_c02
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: '0'
         column_header: $a_{Ab}$
         published_page: 126
@@ -110,11 +110,11 @@ species:
         activity: '1'
         activity_as_printed: '1'
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: NaAlSi3O8
+        composition_component: Na2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '1'
-          KAlSi3O8: '0'
+          Na2Al2Si6O16: '1'
+          K2Al2Si6O16: '0'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -159,9 +159,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '1'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0'
           locator:
             page: 9
@@ -179,11 +179,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: NaAlSi3O8
+              formula: Na2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: NaAlSi3O8
+            component_basis: Na2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -192,12 +192,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: '0'
     - observation_id: rb86_rogez_etal_1983_p009_t06_r03_c02
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,1
         column_header: $a_{Ab}$
         published_page: 126
@@ -211,11 +212,11 @@ species:
         activity: '0.847'
         activity_as_printed: 0,847
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: NaAlSi3O8
+        composition_component: Na2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.9'
-          KAlSi3O8: '0.1'
+          Na2Al2Si6O16: '0.9'
+          K2Al2Si6O16: '0.1'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -260,9 +261,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.9'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.1'
           locator:
             page: 9
@@ -280,11 +281,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: NaAlSi3O8
+              formula: Na2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: NaAlSi3O8
+            component_basis: Na2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -293,12 +294,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,1
     - observation_id: rb86_rogez_etal_1983_p009_t06_r04_c02
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,2
         column_header: $a_{Ab}$
         published_page: 126
@@ -312,11 +314,11 @@ species:
         activity: '0.674'
         activity_as_printed: 0,674
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: NaAlSi3O8
+        composition_component: Na2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.8'
-          KAlSi3O8: '0.2'
+          Na2Al2Si6O16: '0.8'
+          K2Al2Si6O16: '0.2'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -361,9 +363,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.8'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.2'
           locator:
             page: 9
@@ -381,11 +383,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: NaAlSi3O8
+              formula: Na2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: NaAlSi3O8
+            component_basis: Na2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -394,12 +396,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,2
     - observation_id: rb86_rogez_etal_1983_p009_t06_r05_c02
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,3
         column_header: $a_{Ab}$
         published_page: 126
@@ -413,11 +416,11 @@ species:
         activity: '0.513'
         activity_as_printed: 0,513
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: NaAlSi3O8
+        composition_component: Na2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.7'
-          KAlSi3O8: '0.3'
+          Na2Al2Si6O16: '0.7'
+          K2Al2Si6O16: '0.3'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -462,9 +465,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.7'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.3'
           locator:
             page: 9
@@ -482,11 +485,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: NaAlSi3O8
+              formula: Na2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: NaAlSi3O8
+            component_basis: Na2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -495,12 +498,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,3
     - observation_id: rb86_rogez_etal_1983_p009_t06_r06_c02
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,4
         column_header: $a_{Ab}$
         published_page: 126
@@ -514,11 +518,11 @@ species:
         activity: '0.380'
         activity_as_printed: 0,380
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: NaAlSi3O8
+        composition_component: Na2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.6'
-          KAlSi3O8: '0.4'
+          Na2Al2Si6O16: '0.6'
+          K2Al2Si6O16: '0.4'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -563,9 +567,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.6'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.4'
           locator:
             page: 9
@@ -583,11 +587,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: NaAlSi3O8
+              formula: Na2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: NaAlSi3O8
+            component_basis: Na2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -596,12 +600,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,4
     - observation_id: rb86_rogez_etal_1983_p009_t06_r07_c02
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,5
         column_header: $a_{Ab}$
         published_page: 126
@@ -615,11 +620,11 @@ species:
         activity: '0.253'
         activity_as_printed: 0,253
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: NaAlSi3O8
+        composition_component: Na2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.5'
-          KAlSi3O8: '0.5'
+          Na2Al2Si6O16: '0.5'
+          K2Al2Si6O16: '0.5'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -664,9 +669,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.5'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.5'
           locator:
             page: 9
@@ -684,11 +689,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: NaAlSi3O8
+              formula: Na2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: NaAlSi3O8
+            component_basis: Na2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -697,12 +702,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,5
     - observation_id: rb86_rogez_etal_1983_p009_t06_r08_c02
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,6
         column_header: $a_{Ab}$
         published_page: 126
@@ -716,11 +722,11 @@ species:
         activity: '0.152'
         activity_as_printed: 0,152
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: NaAlSi3O8
+        composition_component: Na2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.4'
-          KAlSi3O8: '0.6'
+          Na2Al2Si6O16: '0.4'
+          K2Al2Si6O16: '0.6'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -765,9 +771,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.4'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.6'
           locator:
             page: 9
@@ -785,11 +791,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: NaAlSi3O8
+              formula: Na2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: NaAlSi3O8
+            component_basis: Na2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -798,12 +804,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,6
     - observation_id: rb86_rogez_etal_1983_p009_t06_r09_c02
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,7
         column_header: $a_{Ab}$
         published_page: 126
@@ -817,11 +824,11 @@ species:
         activity: '0.079'
         activity_as_printed: 0,079
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: NaAlSi3O8
+        composition_component: Na2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.3'
-          KAlSi3O8: '0.7'
+          Na2Al2Si6O16: '0.3'
+          K2Al2Si6O16: '0.7'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -866,9 +873,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.3'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.7'
           locator:
             page: 9
@@ -886,11 +893,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: NaAlSi3O8
+              formula: Na2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: NaAlSi3O8
+            component_basis: Na2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -899,12 +906,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,7
     - observation_id: rb86_rogez_etal_1983_p009_t06_r10_c02
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,8
         column_header: $a_{Ab}$
         published_page: 126
@@ -918,11 +926,11 @@ species:
         activity: '0.035'
         activity_as_printed: 0,035
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: NaAlSi3O8
+        composition_component: Na2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.2'
-          KAlSi3O8: '0.8'
+          Na2Al2Si6O16: '0.2'
+          K2Al2Si6O16: '0.8'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -967,9 +975,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.2'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.8'
           locator:
             page: 9
@@ -987,11 +995,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: NaAlSi3O8
+              formula: Na2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: NaAlSi3O8
+            component_basis: Na2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -1000,12 +1008,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,8
     - observation_id: rb86_rogez_etal_1983_p009_t06_r11_c02
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,9
         column_header: $a_{Ab}$
         published_page: 126
@@ -1019,11 +1028,11 @@ species:
         activity: '0.010'
         activity_as_printed: 0,010
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: NaAlSi3O8
+        composition_component: Na2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.1'
-          KAlSi3O8: '0.9'
+          Na2Al2Si6O16: '0.1'
+          K2Al2Si6O16: '0.9'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -1068,9 +1077,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.1'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.9'
           locator:
             page: 9
@@ -1088,11 +1097,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: NaAlSi3O8
+              formula: Na2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: NaAlSi3O8
+            component_basis: Na2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -1101,12 +1110,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,9
     - observation_id: rb86_rogez_etal_1983_p009_t06_r12_c02
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: '1'
         column_header: $a_{Ab}$
         published_page: 126
@@ -1120,11 +1130,11 @@ species:
         activity: '0'
         activity_as_printed: '0'
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: NaAlSi3O8
+        composition_component: Na2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0'
-          KAlSi3O8: '1'
+          Na2Al2Si6O16: '0'
+          K2Al2Si6O16: '1'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -1169,9 +1179,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '1'
           locator:
             page: 9
@@ -1189,11 +1199,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: NaAlSi3O8
+              formula: Na2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: NaAlSi3O8
+            component_basis: Na2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -1202,6 +1212,7 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: '1'
     context:
     - observation_id: rogez_1983_table_i_glass_analyses_schema_gap
       type: context_only
@@ -3814,14 +3825,34 @@ species:
         solvent_temperature_K: '970'
         solvent_preparation: 150 g solvent fractions were mixed, ground, remelted and held at 1320 K for 1.5 hours
           before analysis.
-  KAlSi3O8:
+    - observation_id: rogez_1983_addendum_spectrometry_formula_unit_basis
+      type: method
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 128
+        table: Addendum
+        section: formula-unit convention
+      units: formula units per mole of reported component
+      values:
+        method_class: method_only
+        quantity_as_printed: distinction between the calorimetry and mass-spectrometry component bases
+        calorimetry_component_basis: NaAlSi3O8 / KAlSi3O8
+        spectrometry_component_basis: Na2O, Al2O3, 6SiO2 / K2O, Al2O3, 6SiO2
+        spectrometry_formula_units:
+          albite: Na2Al2Si6O16
+          orthose: K2Al2Si6O16
+        monomer_treatment: The addendum separately discusses expressing the equilibrium using monomer feldspar formulas.
+        activity_basis_note: Table VI activities are encoded on the doubled spectrometry component basis printed
+          for that table, without converting the values.
+  K2Al2Si6O16:
     observations:
     - observation_id: rb86_rogez_etal_1983_p009_t06_r02_c03
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: '0'
         column_header: $a_{Or}$
         published_page: 126
@@ -3835,11 +3866,11 @@ species:
         activity: '0'
         activity_as_printed: '0'
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: KAlSi3O8
+        composition_component: K2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '1'
-          KAlSi3O8: '0'
+          Na2Al2Si6O16: '1'
+          K2Al2Si6O16: '0'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -3879,9 +3910,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '1'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0'
           locator:
             page: 9
@@ -3899,11 +3930,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: KAlSi3O8
+              formula: K2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: KAlSi3O8
+            component_basis: K2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -3912,12 +3943,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: '0'
     - observation_id: rb86_rogez_etal_1983_p009_t06_r03_c03
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,1
         column_header: $a_{Or}$
         published_page: 126
@@ -3931,11 +3963,11 @@ species:
         activity: '0.010'
         activity_as_printed: 0,010
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: KAlSi3O8
+        composition_component: K2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.9'
-          KAlSi3O8: '0.1'
+          Na2Al2Si6O16: '0.9'
+          K2Al2Si6O16: '0.1'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -3975,9 +4007,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.9'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.1'
           locator:
             page: 9
@@ -3995,11 +4027,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: KAlSi3O8
+              formula: K2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: KAlSi3O8
+            component_basis: K2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -4008,12 +4040,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,1
     - observation_id: rb86_rogez_etal_1983_p009_t06_r04_c03
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,2
         column_header: $a_{Or}$
         published_page: 126
@@ -4027,11 +4060,11 @@ species:
         activity: '0.038'
         activity_as_printed: 0,038
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: KAlSi3O8
+        composition_component: K2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.8'
-          KAlSi3O8: '0.2'
+          Na2Al2Si6O16: '0.8'
+          K2Al2Si6O16: '0.2'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -4071,9 +4104,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.8'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.2'
           locator:
             page: 9
@@ -4091,11 +4124,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: KAlSi3O8
+              formula: K2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: KAlSi3O8
+            component_basis: K2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -4104,12 +4137,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,2
     - observation_id: rb86_rogez_etal_1983_p009_t06_r05_c03
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,3
         column_header: $a_{Or}$
         published_page: 126
@@ -4123,11 +4157,11 @@ species:
         activity: '0.086'
         activity_as_printed: 0,086
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: KAlSi3O8
+        composition_component: K2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.7'
-          KAlSi3O8: '0.3'
+          Na2Al2Si6O16: '0.7'
+          K2Al2Si6O16: '0.3'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -4167,9 +4201,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.7'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.3'
           locator:
             page: 9
@@ -4187,11 +4221,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: KAlSi3O8
+              formula: K2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: KAlSi3O8
+            component_basis: K2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -4200,12 +4234,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,3
     - observation_id: rb86_rogez_etal_1983_p009_t06_r06_c03
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,4
         column_header: $a_{Or}$
         published_page: 126
@@ -4219,11 +4254,11 @@ species:
         activity: '0.152'
         activity_as_printed: 0,152
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: KAlSi3O8
+        composition_component: K2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.6'
-          KAlSi3O8: '0.4'
+          Na2Al2Si6O16: '0.6'
+          K2Al2Si6O16: '0.4'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -4263,9 +4298,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.6'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.4'
           locator:
             page: 9
@@ -4283,11 +4318,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: KAlSi3O8
+              formula: K2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: KAlSi3O8
+            component_basis: K2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -4296,12 +4331,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,4
     - observation_id: rb86_rogez_etal_1983_p009_t06_r07_c03
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,5
         column_header: $a_{Or}$
         published_page: 126
@@ -4315,11 +4351,11 @@ species:
         activity: '0.250'
         activity_as_printed: 0,250
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: KAlSi3O8
+        composition_component: K2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.5'
-          KAlSi3O8: '0.5'
+          Na2Al2Si6O16: '0.5'
+          K2Al2Si6O16: '0.5'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -4359,9 +4395,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.5'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.5'
           locator:
             page: 9
@@ -4379,11 +4415,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: KAlSi3O8
+              formula: K2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: KAlSi3O8
+            component_basis: K2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -4392,12 +4428,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,5
     - observation_id: rb86_rogez_etal_1983_p009_t06_r08_c03
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,6
         column_header: $a_{Or}$
         published_page: 126
@@ -4411,11 +4448,11 @@ species:
         activity: '0.379'
         activity_as_printed: 0,379
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: KAlSi3O8
+        composition_component: K2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.4'
-          KAlSi3O8: '0.6'
+          Na2Al2Si6O16: '0.4'
+          K2Al2Si6O16: '0.6'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -4455,9 +4492,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.4'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.6'
           locator:
             page: 9
@@ -4475,11 +4512,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: KAlSi3O8
+              formula: K2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: KAlSi3O8
+            component_basis: K2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -4488,12 +4525,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,6
     - observation_id: rb86_rogez_etal_1983_p009_t06_r09_c03
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,7
         column_header: $a_{Or}$
         published_page: 126
@@ -4507,11 +4545,11 @@ species:
         activity: '0.537'
         activity_as_printed: 0,537
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: KAlSi3O8
+        composition_component: K2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.3'
-          KAlSi3O8: '0.7'
+          Na2Al2Si6O16: '0.3'
+          K2Al2Si6O16: '0.7'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -4551,9 +4589,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.3'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.7'
           locator:
             page: 9
@@ -4571,11 +4609,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: KAlSi3O8
+              formula: K2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: KAlSi3O8
+            component_basis: K2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -4584,12 +4622,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,7
     - observation_id: rb86_rogez_etal_1983_p009_t06_r10_c03
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,8
         column_header: $a_{Or}$
         published_page: 126
@@ -4603,11 +4642,11 @@ species:
         activity: '0.706'
         activity_as_printed: 0,706
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: KAlSi3O8
+        composition_component: K2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.2'
-          KAlSi3O8: '0.8'
+          Na2Al2Si6O16: '0.2'
+          K2Al2Si6O16: '0.8'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -4647,9 +4686,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.2'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.8'
           locator:
             page: 9
@@ -4667,11 +4706,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: KAlSi3O8
+              formula: K2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: KAlSi3O8
+            component_basis: K2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -4680,12 +4719,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,8
     - observation_id: rb86_rogez_etal_1983_p009_t06_r11_c03
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: 0,9
         column_header: $a_{Or}$
         published_page: 126
@@ -4699,11 +4739,11 @@ species:
         activity: '0.871'
         activity_as_printed: 0,871
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: KAlSi3O8
+        composition_component: K2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0.1'
-          KAlSi3O8: '0.9'
+          Na2Al2Si6O16: '0.1'
+          K2Al2Si6O16: '0.9'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -4743,9 +4783,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0.1'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '0.9'
           locator:
             page: 9
@@ -4763,11 +4803,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: KAlSi3O8
+              formula: K2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: KAlSi3O8
+            component_basis: K2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -4776,12 +4816,13 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: 0,9
     - observation_id: rb86_rogez_etal_1983_p009_t06_r12_c03
       type: activity_coefficient
       locator:
         page: 9
         pdf_page_index: 8
-        table: '6'
+        table: VI
         row_label: '1'
         column_header: $a_{Or}$
         published_page: 126
@@ -4795,11 +4836,11 @@ species:
         activity: '1'
         activity_as_printed: '1'
         attribution: Rogez et al. (1983), Table VI; activities reported from this paper’s KEMS analysis.
-        composition_component: KAlSi3O8
+        composition_component: K2Al2Si6O16
         reference_state_as_printed: pure supercooled liquid albite and orthose components
         composition_mol:
-          NaAlSi3O8: '0'
-          KAlSi3O8: '1'
+          Na2Al2Si6O16: '0'
+          K2Al2Si6O16: '1'
         composition_mol_basis: printed_mole_fraction
       phase: l
       point_conditions:
@@ -4839,9 +4880,9 @@ species:
               basis: printed_mole_fraction
               amount_basis: mole_fraction
               components:
-              - - NaAlSi3O8
+              - - Na2Al2Si6O16
                 - '0'
-              - - KAlSi3O8
+              - - K2Al2Si6O16
                 - '1'
           locator:
             page: 9
@@ -4859,11 +4900,11 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: KAlSi3O8
+              formula: K2Al2Si6O16
               phase:
                 tag: value
                 value: l
-            component_basis: KAlSi3O8
+            component_basis: K2O, Al2O3, 6SiO2
         inferred: false
         note: Table VI caption states the reference is the pure supercooled liquid constituent.
         locator:
@@ -4872,3 +4913,4 @@ species:
           published_page: 126
           table: VI
           note: Table VI caption
+          row: '1'

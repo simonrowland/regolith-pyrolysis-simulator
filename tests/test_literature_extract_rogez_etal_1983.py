@@ -48,7 +48,7 @@ def _document():
 def _context(document, table):
     return next(
         row
-        for row in document["species"]["NaAlSi3O8"]["context"]
+        for row in document["species"]["Na2Al2Si6O16"]["context"]
         if row["locator"]["table"] == table
     )
 
@@ -60,10 +60,10 @@ def _activity_grid(document):
             if observation.get("type") != "activity_coefficient":
                 continue
             values = observation["values"]
-            x_or = values["composition_mol"]["KAlSi3O8"]
+            x_or = values["composition_mol"]["K2Al2Si6O16"]
             rows.setdefault(x_or, {})[formula] = values["activity_as_printed"]
     return tuple(
-        (x_or, cells["NaAlSi3O8"], cells["KAlSi3O8"])
+        (x_or, cells["Na2Al2Si6O16"], cells["K2Al2Si6O16"])
         for x_or, cells in sorted(rows.items(), key=lambda item: Decimal(item[0]))
     )
 
@@ -105,8 +105,27 @@ def test_render_grids_and_printed_table_row_counts():
     assert table_iv["values"]["uncertainty_notice"] == "confidence level not stated"
     assert len(_context(document, "Annexe")["values"]["rows"]) == 318
 
+    addendum = _context(document, "Addendum")
+    assert addendum["locator"] == {
+        "page": 11,
+        "pdf_page_index": 10,
+        "published_page": 128,
+        "table": "Addendum",
+        "section": "formula-unit convention",
+    }
+    assert addendum["values"]["calorimetry_component_basis"] == (
+        "NaAlSi3O8 / KAlSi3O8"
+    )
+    assert addendum["values"]["spectrometry_component_basis"] == (
+        "Na2O, Al2O3, 6SiO2 / K2O, Al2O3, 6SiO2"
+    )
+    assert addendum["values"]["spectrometry_formula_units"] == {
+        "albite": "Na2Al2Si6O16",
+        "orthose": "K2Al2Si6O16",
+    }
+
     mutated = deepcopy(document)
-    first_activity = mutated["species"]["NaAlSi3O8"]["observations"][0]
+    first_activity = mutated["species"]["Na2Al2Si6O16"]["observations"][0]
     first_activity["values"]["activity_as_printed"] = "0,999"
     assert _activity_grid(mutated) != TABLE_VI_RENDER_GRID
 
@@ -125,6 +144,22 @@ def test_isolated_migration_maps_printed_conditions_and_omits_unprinted_pressure
         observation.value.kind is not ValueKind.UNAVAILABLE
         for observation in observations
     )
+
+    expected_species_and_basis = {
+        "c02": ("Na2Al2Si6O16", "Na2O, Al2O3, 6SiO2"),
+        "c03": ("K2Al2Si6O16", "K2O, Al2O3, 6SiO2"),
+    }
+    for observation in observations:
+        expected_species, expected_basis = expected_species_and_basis[
+            observation.observation_id[-3:]
+        ]
+        assert observation.identity.species.formula == expected_species
+        assert observation.identity.reference_state.is_value
+        assert observation.identity.reference_state.value.endmember.formula == expected_species
+        assert observation.identity.reference_state.value.component_basis == expected_basis
+        assert set(observation.identity.composition.value.as_map()) == {
+            "Na2Al2Si6O16", "K2Al2Si6O16"
+        }
 
     for observation in observations:
         assert observation.identity.temperature_K.is_value
