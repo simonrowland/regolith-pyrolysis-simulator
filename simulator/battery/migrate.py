@@ -4354,12 +4354,13 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
     """Return (role, refusal) from the first ``composition_role`` declared.
 
     The row is read before its parent values block. ``initial_charge_only``
-    marks a printed starting charge that must carry the initial-charge proxy
-    flag. ``datum_state`` marks the sample composition at this datum's
-    measurement state, including a bulk two-phase sample; it applies to the
-    observation's point conditions and never marks the experiment's starting charge. Each typed
-    declaration is a bare token or a mapping with its page locator and quote.
-    A token outside the closed set is a refusal, never a guess.
+    marks a printed starting charge that stays sample context and cannot supply
+    a later datum's composition. ``datum_state`` marks the sample composition
+    at this datum's measurement state, including a bulk two-phase sample; it
+    applies to the observation's point conditions and never marks the
+    experiment's starting charge. Each typed declaration is a bare token or a
+    mapping with its page locator and quote. A token outside the closed set is
+    a refusal, never a guess.
     """
 
     for root in roots:
@@ -4375,6 +4376,57 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
             f"{sorted(_COMPOSITION_ROLE_TOKENS)}; composition left unstamped"
         )
     return None, None
+
+
+def _initial_charge_only_missing_composition(
+    identity: Identity,
+    point_conditions: Mapping[str, Located[Any]] | None,
+    notices: Sequence[Notice],
+    *,
+    role: str | None,
+    quantity: Quantity | None,
+    quantity_as_printed: object,
+    locator: Locator | None,
+    origin: str,
+) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
+    if (
+        role != INITIAL_CHARGE_ONLY_PROXY_FLAG
+        or quantity in {
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        }
+        or (
+            isinstance(quantity_as_printed, str)
+            and "composition" in quantity_as_printed.casefold()
+        )
+    ):
+        return identity, point_conditions, list(notices)
+    reason = (
+        "missing input: per-run composition is not published; the printed "
+        "initial charge is retained as sample context only"
+    )
+    conditions = {
+        **(point_conditions or {}),
+        "composition": Located(State.unknown(reason), locator=locator),
+    }
+    updated_notices = list(notices)
+    if quantity is not None:
+        updated_notices.append(
+            Notice(
+                kind=NoticeKind.SOURCE_DISAGREEMENT,
+                affected_quantities=(quantity,),
+                reason=(
+                    "composition_role=initial_charge_only: printed initial "
+                    "charge is sample context; per-run composition is not published"
+                ),
+                origin=origin,
+            )
+        )
+    return (
+        replace(identity, composition=State.unknown(reason)),
+        conditions,
+        updated_notices,
+    )
 
 
 def _owner_initial_from_printed(
@@ -16169,6 +16221,15 @@ class Migrator:
             projected_oxide_map, q_token, obs_id
         )
         composition_role_refusal: list[str] = []
+        composition_role, composition_role_error = _declared_composition_role(values)
+        if (
+            composition_role is None
+            and composition_role_error is None
+            and not _declared_wt_composition_point_map(values, obs.get("units"))
+        ):
+            composition_role, composition_role_error = _declared_composition_role(
+                obs.get("equipment")
+            )
         composition_located = _composition_located_from_values(
             values, locator, role_refusal=composition_role_refusal
         )
@@ -18033,6 +18094,18 @@ class Migrator:
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
         observation_notices: list[Notice] = []
+        identity, point_conditions, observation_notices = (
+            _initial_charge_only_missing_composition(
+                identity,
+                point_conditions,
+                observation_notices,
+                role=composition_role,
+                quantity=q_token,
+                quantity_as_printed=values.get("quantity"),
+                locator=locator,
+                origin=obs_id,
+            )
+        )
         if total_iron_notice is not None:
             observation_notices.append(total_iron_notice)
         observation_notices.extend(validity_notices)
@@ -19614,32 +19687,6 @@ class Migrator:
                     locator=point_locator,
                 ),
             }
-        if point_composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
-            composition_condition = (point_conditions or {}).get("composition")
-            if (
-                isinstance(composition_condition, Located)
-                and composition_condition.state.is_value
-                and isinstance(composition_condition.state.value, Composition)
-            ):
-                marked_composition = replace(
-                    composition_condition.state.value,
-                    proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
-                )
-                point_conditions = {
-                    **(point_conditions or {}),
-                    "composition": replace(
-                        composition_condition,
-                        state=State.of(marked_composition),
-                    ),
-                }
-                if (
-                    identity.composition is not None
-                    and identity.composition.is_value
-                ):
-                    identity = replace(
-                        identity,
-                        composition=State.of(marked_composition),
-                    )
         if identity.composition is None or not identity.composition.is_value:
             located_composition = (point_conditions or {}).get("composition")
             if (
@@ -19708,6 +19755,24 @@ class Migrator:
                         identity, total_pressure_Pa=State.of(pressure)
                     )
         child_notices = list(notices)
+        identity, point_conditions, child_notices = (
+            _initial_charge_only_missing_composition(
+                identity,
+                point_conditions,
+                child_notices,
+                role=point_composition_role,
+                quantity=q_token_point,
+                quantity_as_printed=(
+                    raw_item.get("quantity")
+                    if isinstance(raw_item, Mapping)
+                    else (parent_values or {}).get("quantity")
+                    if isinstance(parent_values, Mapping)
+                    else None
+                ),
+                locator=point_locator,
+                origin=point_id,
+            )
+        )
         parent_hold_notice = _hold_reason_notice(
             parent_reason,
             quantity=q_token_point,

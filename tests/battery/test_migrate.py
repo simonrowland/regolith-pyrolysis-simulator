@@ -2138,44 +2138,19 @@ def test_model_derived_raw_input_method_rejects_non_string_values(
     )
 
 
-def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
+def test_hastie_initial_charges_stay_contextual_for_figure_points(
     tmp_path: Path,
 ) -> None:
-    from simulator.battery.migrate import wt_pct_to_mole_fraction
     from simulator.battery.fo2_ladder import resolve_row_fo2
 
     result = _migrate_real_extract(tmp_path, "kems-020-hastie-1981-nbsir.yaml")
-    expected_wt_pct = {
-        "fig4_illite_K_SiO_digitized": {
-            "K2O": Decimal("7.4"),
-            "Al2O3": Decimal("26.0"),
-            "Fe2O3": Decimal("4.4"),
-            "MgO": Decimal("2.1"),
-            "SiO2": Decimal("60.2"),
-            "Na2O": Decimal("0.2"),
-        },
-        "fig5_glass_Na_this_work_digitized": {
-            "Na2O": Decimal("17"),
-            "CaO": Decimal("12"),
-            "SiO2": Decimal("71"),
-        },
-        "fig11_k1_slag_k2o_gamma_digitized": {
-            "K2O": Decimal("19.5"),
-            "Al2O3": Decimal("12.1"),
-            "Fe2O3": Decimal("14.3"),
-            "CaO": Decimal("3.8"),
-            "MgO": Decimal("1.0"),
-            "SiO2": Decimal("46.8"),
-            "Na2O": Decimal("0.5"),
-        },
-    }
     expected_counts = {
         "fig4_illite_K_SiO_digitized": 6,
         "fig5_glass_Na_this_work_digitized": 6,
         # The Figure 11 caption moves one point to TMS: 19 - 1 = 18 KMS.
         "fig11_k1_slag_k2o_gamma_digitized": 18,
     }
-    for series, composition_wt_pct in expected_wt_pct.items():
+    for series in expected_counts:
         rows = [
             observation
             for observation in result.observations.values()
@@ -2191,12 +2166,26 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
                 and observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
                 for observation in rows
             )
-        expected = wt_pct_to_mole_fraction(composition_wt_pct)
         for observation in rows:
             composition = observation.identity.composition
-            assert composition is not None and composition.is_value
-            assert composition.value.as_map() == expected.as_map()
-            assert composition.value.proxy_flag == "initial_charge_only"
+            assert composition is not None and composition.is_unknown
+            assert "per-run composition is not published" in composition.reason
+            point_composition = (observation.point_conditions or {}).get(
+                "composition"
+            )
+            assert point_composition is not None
+            assert point_composition.state.is_unknown
+            assert (
+                "per-run composition is not published"
+                in point_composition.state.reason
+            )
+            role_notices = [
+                notice
+                for notice in observation.notices
+                if "composition_role=initial_charge_only" in notice.reason
+            ]
+            assert len(role_notices) == 1
+            assert role_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
 
     k1 = next(
         row
@@ -2263,8 +2252,15 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
     assert moved_observation.identity.temperature_K.is_value
     assert moved_observation.identity.temperature_K.value == Decimal("1575.0")
     moved_composition = moved_observation.identity.composition
-    assert moved_composition is not None and moved_composition.is_value
-    assert moved_composition.value.proxy_flag == "initial_charge_only"
+    assert moved_composition is not None and moved_composition.is_unknown
+    assert "per-run composition is not published" in moved_composition.reason
+    moved_notices = [
+        notice
+        for notice in moved_observation.notices
+        if "composition_role=initial_charge_only" in notice.reason
+    ]
+    assert len(moved_notices) == 1
+    assert moved_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
     moved_experiment = result.experiments[moved_observation.experiment_id]
     moved_fo2 = resolve_row_fo2(
         moved_experiment,
@@ -2272,43 +2268,18 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
         moved_observation,
         quantity=Quantity.ACTIVITY_COEFFICIENT,
     )
-    assert moved_fo2 is not None
-    assert moved_fo2.tier == 4
-    assert moved_fo2.route == "intrinsic_melt_fO2"
-    assert moved_fo2.borrowed is True
-    assert math.isfinite(moved_fo2.log10_fO2_bar)
+    assert moved_fo2 is None
     moved_prediction = predict_with_engine(
         Engine.OPENIMCC,
         moved_observation,
         experiment=moved_experiment,
     )
     assert moved_prediction.value is None
-    # d-180 supplies numeric intrinsic fO2 for this open TMS row. It reaches
-    # OpenIMCC. The green pin and the venv pack both report single-cation
-    # KO0.5, so the closed-formula match refuses K2O instead of treating an
-    # engine-side species refusal as the terminal result.
-    assert moved_prediction.refusal_reason is RefusalReason.UNSUPPORTED
-    assert moved_prediction.refusal_detail["reason"] == (
-        "species_unmatched_in_engine_output"
-    )
-    assert moved_prediction.refusal_detail["formula"] == "K2O"
-    assert any(
-        notice.reason.startswith("fo2_tier=4; route=intrinsic_melt_fO2")
-        and notice.authority is not None
-        for notice in moved_prediction.notices
-    )
-    from simulator.battery.generators.bench import activity_request_for_engine
-
-    moved_request = activity_request_for_engine(
-        moved_experiment, moved_observation, "openimcc"
-    )
-    assert moved_request is not None
-    assert moved_request.payload is not None
-    assert moved_request.payload["fO2_borrowed"] is True
-    assert any(
-        flag["waypoint"] == "fo2_ladder" and flag["authority"] == "assumed"
-        for flag in moved_request.readiness.flags
-    )
+    assert moved_prediction.refusal_reason is RefusalReason.INVALID_SOURCE
+    assert moved_prediction.refusal_detail["reason"] == "invalid_source"
+    gap, = moved_prediction.refusal_detail["gaps"]
+    assert gap["waypoint"] == "normalized_composition"
+    assert gap["reason"] == "unsupported_print_form"
 
     na_kms = next(
         row

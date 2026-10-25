@@ -469,13 +469,25 @@ def _assert_plante_observations_use_analyzed_composition(
             f"::experiment::{experiment_id}"
         ), f"{source_id} is not independently bound to its source experiment"
         composition = observation.identity.composition
-        assert composition is not None and composition.is_value, source_id
-        actual = dict(composition.value.components)
-        assert len(actual) == 15 and set(actual) == set(expected), source_id
-        assert all(
-            abs(actual[name] - expected[name]) < Decimal("1e-11")
-            for name in expected
-        ), f"{source_id} composition differs from Table 1 analytical values"
+        if source_id == "plante_hastie_1983_table1_snw_glass_composition":
+            assert composition is not None and composition.is_value, source_id
+            actual = dict(composition.value.components)
+            assert len(actual) == 15 and set(actual) == set(expected), source_id
+            assert all(
+                abs(actual[name] - expected[name]) < Decimal("1e-11")
+                for name in expected
+            ), f"{source_id} composition differs from Table 1 analytical values"
+        else:
+            assert composition is not None and composition.is_unknown, source_id
+            assert "per-run composition is not published" in composition.reason
+            if observation.identity.quantity.is_value:
+                notices = [
+                    notice
+                    for notice in observation.notices
+                    if "composition_role=initial_charge_only" in notice.reason
+                ]
+                assert len(notices) == 1, source_id
+                assert notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
         if source_id in {
             "plante_hastie_1983_ru_re_sr_undetected",
             "plante_hastie_1983_detection_limits_quoted",
@@ -1092,11 +1104,12 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     )
     composition = row.identity.composition
     assert composition is not None and composition.is_unknown
-    assert "XxO" in composition.reason
+    assert "per-run composition is not published" in composition.reason
     printed = row.point_conditions["printed_composition"]
     assert printed.state.is_value and printed.state.value["XxO"] == Decimal("10")
     condition = row.point_conditions["composition"]
-    assert condition.state.is_unknown and "XxO" in condition.state.reason
+    assert condition.state.is_unknown
+    assert "per-run composition is not published" in condition.state.reason
     waypoint = normalized_composition(
         migrator.result.experiments[row.experiment_id], _bench(), row
     )
@@ -1104,8 +1117,10 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     assert waypoint.absence is not None
 
 
-def test_markova_point_refusal_mutation_proof(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Dropping the child refusal restores the parent's accepted composition."""
+def test_markova_initial_charge_stays_context_under_refusal_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Dropping a component refusal cannot promote the initial charge to a datum."""
     from simulator.battery.waypoints import normalized_composition
     from tests.battery.test_waypoints import _bench
 
@@ -1148,14 +1163,11 @@ def test_markova_point_refusal_mutation_proof(monkeypatch: pytest.MonkeyPatch) -
         if observation.observation_id.startswith(prefix)
         and observation.identity.temperature_K.value == target_t
     )
-    assert row.identity.composition.is_value
-    assert row.identity.composition.value == replace(
-        wt_pct_to_mole_fraction(raw["values"]["composition_wt_pct"]),
-        proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
-    )
+    assert row.identity.composition.is_unknown
+    assert "per-run composition is not published" in row.identity.composition.reason
     assert normalized_composition(
         migrator.result.experiments[row.experiment_id], _bench(), row
-    ).selected is not None
+    ).selected is None
 
 
 def test_plante_declared_map_mutation_proof(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -2431,7 +2443,7 @@ def test_markova_1984_mass_loss_identity_uses_its_own_panel_initial_charge() -> 
             ), (panel, row.get("observation_id"), identity_x0)
 
 
-def test_markova_1983_rows_use_each_points_own_printed_composition(
+def test_markova_1983_initial_charge_maps_remain_context_only(
     tmp_path: Path,
 ) -> None:
     source_path = (
@@ -2478,14 +2490,15 @@ def test_markova_1983_rows_use_each_points_own_printed_composition(
         if printed_wt != expected_wt:
             mismatches.append(f"{row['observation_id']}: printed map differs from source")
             continue
-        expected_x = dict(wt_pct_to_mole_fraction(expected_wt).components)
-        actual_x = _identity_composition_components(row)
-        if actual_x.keys() != expected_x.keys() or any(
-            abs(actual_x[oxide] - value) >= as_decimal("1e-12")
-            for oxide, value in expected_x.items()
+        composition = identity["composition"]
+        point = row["point_conditions"]["composition"]["state"]
+        if (
+            composition["tag"] != "unknown"
+            or point["tag"] != "unknown"
+            or "per-run composition is not published" not in composition["reason"]
         ):
             mismatches.append(
-                f"{row['observation_id']}: identity does not match its printed map"
+                f"{row['observation_id']}: initial charge became datum composition"
             )
     assert not mismatches, f"{len(mismatches)} composition mismatches: {mismatches}"
 
@@ -3232,13 +3245,8 @@ def test_plante_hastie_analytical_rows_keep_printed_order(tmp_path: Path) -> Non
         assert dict(identity.value.components) == dict(expected.components)
 
 
-def test_shornikov_pressure_rows_use_initial_charge_only(tmp_path: Path) -> None:
-    """The 1450-1500 K pressures use the p.115 bulk charge, not the residual.
-
-    p.116 calculates the residual-melt change from those pressures. The
-    proxy stays on the pressure rows. The experiment initial is the bulk
-    charge itself and is not flagged.
-    """
+def test_shornikov_pressure_rows_keep_initial_charge_as_context(tmp_path: Path) -> None:
+    """The p.115 charge is not the unpublished per-run composition at p.116."""
 
     values = _extract_values(
         "shornikov-2025-saratov-alkali-evaporation.yaml",
@@ -3256,21 +3264,26 @@ def test_shornikov_pressure_rows_use_initial_charge_only(tmp_path: Path) -> None
     )
     assert "residual melt" in role["locator"]["note"]
     printed = values["oxides_wt_pct"]
-    expected = wt_pct_to_mole_fraction(
-        {oxide: as_decimal(weight) for oxide, weight in printed.items()}
-    )
     result = _migrate_real_extract(
         tmp_path, "shornikov-2025-saratov-alkali-evaporation.yaml"
     )
     for local_id in _SHORNIKOV_PRESSURE_ROWS:
         observation = _observation(result, local_id)
-        for composition in (
-            observation.identity.composition,
-            (observation.point_conditions or {})["composition"].state,
-        ):
-            assert composition is not None and composition.is_value
-            assert composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
-            assert dict(composition.value.components) == dict(expected.components)
+        reason = "missing input: per-run composition is not published"
+        identity = observation.identity.composition
+        point = (observation.point_conditions or {})["composition"]
+        assert identity is not None and identity.is_unknown
+        assert reason in identity.reason
+        assert point.state.is_unknown and reason in point.state.reason
+        assert point.locator == observation.locator
+        role_notices = [
+            notice
+            for notice in observation.notices
+            if "composition_role=initial_charge_only" in notice.reason
+        ]
+        assert len(role_notices) == 1
+        assert role_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
+        assert "initial charge is sample context" in role_notices[0].reason
     experiment = next(
         item
         for item in result.experiments.values()
@@ -3279,6 +3292,11 @@ def test_shornikov_pressure_rows_use_initial_charge_only(tmp_path: Path) -> None
     initial = experiment.sample.initial_composition
     assert initial is not None and initial.state.is_value
     assert initial.state.value.proxy_flag is None
+    assert dict(initial.state.value.components) == dict(
+        wt_pct_to_mole_fraction(
+            {oxide: as_decimal(weight) for oxide, weight in printed.items()}
+        ).components
+    )
 
 
 def test_plante_1979_one_k2si2o5_charge_not_eight_series_experiments() -> None:
