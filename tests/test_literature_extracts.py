@@ -5217,6 +5217,72 @@ def test_aithala_wds_compositions_join_vf_redox_rows():
         assert printed["original_FeOT_wt_pct"].locator.page == 14
 
 
+def test_matzen_experimental_average_composition_joins_redox_rows():
+    """The Table 1 mean composition reaches all Syn-MB1 redox observations."""
+    path = EXTRACTS / "matzen-2022-martian-basalt-redox.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    rows = _migrate_redox_extract(path)
+    composition_row = next(
+        row
+        for row in doc["species"]["Fe"]["observations"]
+        if row["observation_id"] == "matzen_2022_syn_mb1_exp_average_composition"
+    )
+    printed = composition_row["values"]["oxide_wt_percent"]
+    expected_printed = {
+        "SiO2": "50.33±0.28",
+        "TiO2": "1.00±0.03",
+        "Al2O3": "10.09±0.08",
+        "FeO*": "18.13±0.31",
+        "MnO": "0.37±0.04",
+        "MgO": "11.76±0.09",
+        "CaO": "6.89±0.08",
+        "Na2O": "0.06±0.02",
+        "NiO": "0.33±0.08",
+    }
+
+    assert printed == expected_printed
+    assert "Cr2O3" not in printed and "K2O" not in printed
+    assert "below detection" in composition_row["values"]["composition_basis"]
+    assert len(rows) == 24
+    assert all(row.identity.composition.is_value for row in rows)
+
+    expected_centers = {
+        "SiO2": Decimal("50.33"),
+        "TiO2": Decimal("1.00"),
+        "Al2O3": Decimal("10.09"),
+        "FeOT": Decimal("18.13"),
+        "MnO": Decimal("0.37"),
+        "MgO": Decimal("11.76"),
+        "CaO": Decimal("6.89"),
+        "Na2O": Decimal("0.06"),
+        "NiO": Decimal("0.33"),
+    }
+    by_id = {row.observation_id.rsplit("::", 1)[-1]: row for row in rows}
+    pinned_rows = {
+        "matzen_2022_run_11_method_a",
+        "matzen_2022_run_30_method_b",
+        "matzen_2022_run_61_method_a",
+    }
+    assert pinned_rows <= by_id.keys()
+    for row in rows:
+        composition = row.point_conditions["composition"]
+        assert composition.locator.page == 38
+        assert composition.locator.table == 1
+        params = dict(composition.inference.parameters)
+        assert {
+            oxide: params[f"original_{oxide}_wt_pct"].state.value
+            for oxide in expected_centers
+        } == expected_centers
+        assert not {"Cr2O3", "K2O"}.intersection(
+            dict(row.identity.composition.value.components)
+        )
+        if row.observation_id.rsplit("::", 1)[-1] in pinned_rows:
+            assert all(
+                params[f"original_{oxide}_wt_pct"].locator.page == 38
+                for oxide in ("SiO2", "FeOT", "NiO")
+            )
+
+
 def test_matzen_observations_resolve_printed_log_fo2():
     """Each Table 2 log fO2 lands on its observation and routes as printed."""
     from decimal import Decimal
