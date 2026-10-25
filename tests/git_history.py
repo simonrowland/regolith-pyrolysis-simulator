@@ -24,41 +24,51 @@ def require_git_history(root: Path, *revisions: str) -> None:
 
     for revision in revisions:
         try:
-            subprocess.run(
+            object_type = subprocess.run(
                 [
                     "git",
                     "-C",
                     str(root),
-                    "rev-parse",
-                    "--verify",
-                    f"{revision}^{{commit}}",
+                    "cat-file",
+                    "-t",
+                    revision,
                 ],
                 check=True,
                 capture_output=True,
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            stderr = (exc.stderr or "").lower()
-            if "ambiguous" in stderr:
+            try:
+                matches = subprocess.run(
+                    [
+                        "git",
+                        "-C",
+                        str(root),
+                        "rev-parse",
+                        f"--disambiguate={revision}",
+                    ],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                ).stdout.splitlines()
+            except subprocess.CalledProcessError:
                 raise
-            if not any(
-                marker in stderr
-                for marker in (
-                    "needed a single revision",
-                    "unknown revision",
-                    "bad revision",
-                )
-            ):
+            if matches:
                 raise
             pytest.skip(
-                f"missing_git_history: required revision {revision!r} is unreachable: "
-                f"{exc.stderr.strip()}"
+                f"missing_git_history: required revision {revision!r} is unavailable: "
+                f"{(exc.stderr or '').strip()}"
+            )
+        resolved_type = object_type.stdout.strip()
+        if resolved_type != "commit":
+            raise ValueError(
+                f"required revision {revision!r} resolves to {resolved_type!r}, "
+                "not a commit"
             )
 
 
 def require_store_neutral_ack_history(root: Path, freshness, *revisions: str) -> None:
     """Use the freshness reader to validate ack files and guard their Git refs."""
-    require_git_history(root, *revisions)
     try:
         freshness._store_neutral_ack_commits()
     except subprocess.CalledProcessError as exc:
@@ -71,3 +81,4 @@ def require_store_neutral_ack_history(root: Path, freshness, *revisions: str) ->
             raise
         require_git_history(root, *revisions, revision[: -len(suffix)])
         raise
+    require_git_history(root, *revisions)

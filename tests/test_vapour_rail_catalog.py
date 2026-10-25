@@ -9,6 +9,7 @@ from pathlib import Path
 import subprocess
 import sys
 from types import SimpleNamespace
+import zlib
 
 import pytest
 import yaml
@@ -491,8 +492,12 @@ def test_require_git_history_skips_only_missing_history(
 ) -> None:
     from tests import git_history
 
-    def completed(returncode: int = 0, stderr: str = "") -> subprocess.CompletedProcess:
-        return subprocess.CompletedProcess([], returncode, "true\n", stderr)
+    def completed(
+        returncode: int = 0,
+        stderr: str = "",
+        stdout: str = "true\n",
+    ) -> subprocess.CompletedProcess:
+        return subprocess.CompletedProcess([], returncode, stdout, stderr)
 
     def run_results(results):
         remaining = iter(results)
@@ -508,7 +513,9 @@ def test_require_git_history_skips_only_missing_history(
         return fake_run
 
     monkeypatch.setattr(
-        git_history.subprocess, "run", run_results((completed(), completed()))
+        git_history.subprocess,
+        "run",
+        run_results((completed(), completed(stdout="commit\n"))),
     )
     try:
         require_git_history(tmp_path, "reachable")
@@ -526,7 +533,13 @@ def test_require_git_history_skips_only_missing_history(
     monkeypatch.setattr(
         git_history.subprocess,
         "run",
-        run_results((completed(), completed(128, "fatal: unknown revision"))),
+        run_results(
+            (
+                completed(),
+                completed(128, "fatal: unknown revision"),
+                completed(stdout=""),
+            )
+        ),
     )
     with pytest.raises(pytest.skip.Exception, match="missing_git_history"):
         require_git_history(tmp_path, "unreachable")
@@ -542,6 +555,7 @@ def test_require_git_history_skips_only_missing_history(
                     "error: short object ID deadbee is ambiguous\n"
                     "fatal: Needed a single revision\n",
                 ),
+                completed(stdout="deadbeef00000000000000000000000000000000\n"),
             )
         ),
     )
@@ -563,6 +577,81 @@ def test_require_git_history_skips_only_missing_history(
         assert raised.stderr == "fatal: permission denied"
     else:
         pytest.fail("unrelated Git error should propagate")
+
+
+def _init_history_repo(root: Path) -> Path:
+    root.mkdir()
+    subprocess.run(
+        ["git", "-C", str(root), "init", "-q"],
+        capture_output=True,
+        check=True,
+    )
+    return root
+
+
+def _history_git(root: Path, *args: str, input: bytes | None = None) -> bytes:
+    return subprocess.run(
+        ["git", "-C", str(root), *args],
+        input=input,
+        capture_output=True,
+        check=True,
+    ).stdout
+
+
+def _write_ambiguous_history_objects(root: Path) -> str:
+    tree = _history_git(root, "mktree", input=b"").decode().strip()
+    seen: dict[str, tuple[str, bytes]] = {}
+    for counter in range(100_000):
+        body = (
+            f"tree {tree}\n"
+            "author History test <history@example.invalid> 0 +0000\n"
+            f"committer History test <history@example.invalid> {counter} +0000\n"
+            f"\nambiguous history object {counter}\n"
+        ).encode("utf-8")
+        raw = f"commit {len(body)}\0".encode("ascii") + body
+        object_id = hashlib.sha1(raw).hexdigest()
+        prefix = object_id[:7]
+        previous = seen.get(prefix)
+        if previous is not None:
+            for candidate_id, candidate_raw in (previous, (object_id, raw)):
+                object_path = (
+                    root / ".git" / "objects" / candidate_id[:2] / candidate_id[2:]
+                )
+                object_path.parent.mkdir(parents=True, exist_ok=True)
+                object_path.write_bytes(zlib.compress(candidate_raw))
+            return prefix
+        seen[prefix] = object_id, raw
+    pytest.fail("could not generate an ambiguous seven-character Git prefix")
+
+
+def test_require_git_history_skips_absent_object_in_tmp_repo(tmp_path: Path) -> None:
+    repo = _init_history_repo(tmp_path / "missing-history")
+
+    with pytest.raises(pytest.skip.Exception, match="missing_git_history"):
+        require_git_history(repo, "f" * 40)
+
+
+def test_require_git_history_rejects_blob_object_in_tmp_repo(tmp_path: Path) -> None:
+    repo = _init_history_repo(tmp_path / "blob-history")
+    blob = _history_git(repo, "hash-object", "-w", "--stdin", input=b"not a commit\n")
+    blob_id = blob.decode().strip()
+
+    with pytest.raises(ValueError, match="not a commit"):
+        require_git_history(repo, blob_id)
+
+
+def test_require_git_history_rejects_ambiguous_ack_prefix_in_tmp_repo(
+    tmp_path: Path,
+) -> None:
+    repo = _init_history_repo(tmp_path / "ambiguous-history")
+    ack_dir = repo / "scripts" / "store_neutral_acks"
+    ack_dir.mkdir(parents=True)
+    prefix = _write_ambiguous_history_objects(repo)
+    ack = ack_dir / f"{prefix}.txt"
+    ack.write_text("ambiguous prefix test receipt\n", encoding="utf-8")
+
+    with pytest.raises(subprocess.CalledProcessError):
+        require_git_history(repo, ack.stem)
 
 
 def test_t622_oxidative_window_envelope_evidence_is_reproducible(
