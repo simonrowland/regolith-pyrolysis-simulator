@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import yaml
 
-from simulator.battery.enums import AdmissionStatus, ValueKind
+from simulator.battery.enums import AdmissionStatus, Phase, Polymorph, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -145,6 +145,13 @@ def test_lamoreaux_1987_isolated_migration_keeps_conditions_and_refusals():
     assert not result.registry_issues
     assert not result.validation.hard_issues
     by_id = {row.observation_id.rsplit("::", 1)[-1]: row for row in migrated}
+    quartz = by_id["LH87_SiO2_quartz_fusion"]
+    cristobalite = by_id["LH87_SiO2_cristobalite_fusion"]
+    assert quartz.identity != cristobalite.identity
+    assert quartz.identity.species.phase.value is Phase.CR
+    assert quartz.identity.species.polymorph.value is Polymorph.QUARTZ
+    assert cristobalite.identity.species.phase.value is Phase.CR
+    assert cristobalite.identity.species.polymorph.value is Polymorph.CRISTOBALITE_HIGH
     for block in document["species"].values():
         for observation in block.get("observations", []):
             observation_id = observation["observation_id"]

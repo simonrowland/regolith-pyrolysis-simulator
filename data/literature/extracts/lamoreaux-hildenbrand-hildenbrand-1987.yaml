@@ -955,7 +955,7 @@ species:
         note: SiO2(qu) melting temperature and enthalpy of fusion
         record: LH87_SiO2_quartz_fusion
       T_range_K: [1726, 1726]
-      phase: solid_liquid
+      phase: cr
       units: K and kK as published
       point_conditions:
         temperature_K:
@@ -967,7 +967,6 @@ species:
         confidence_level: not_stated
       values:
         property_kind: melting_point_and_enthalpy_of_fusion
-        condensed_form_as_printed: quartz
         T_m_K: 1726
         T_m_uncertainty_K: 10
         Delta_fus_H_over_R_kK: 0.9
@@ -975,6 +974,8 @@ species:
         formula: SiO2
         method_class: quoted_attributed
         attribution: "Table 4, Tfus source column: refs. 19 and 2 (Hlavac, 1982; Stull et al., 1971)."
+      condensed_form:
+        polymorph: quartz
     - observation_id: LH87_SiO2_cristobalite_fusion
       type: transition_point
       locator: &lh87_sio2_cristobalite_fusion_locator
@@ -985,7 +986,7 @@ species:
         note: SiO2(cr) melting temperature and enthalpy of fusion
         record: LH87_SiO2_cristobalite_fusion
       T_range_K: [1996, 1996]
-      phase: solid_liquid
+      phase: cr
       units: K and kK as published
       point_conditions:
         temperature_K:
@@ -997,7 +998,6 @@ species:
         confidence_level: not_stated
       values:
         property_kind: melting_point_and_enthalpy_of_fusion
-        condensed_form_as_printed: cristobalite
         T_m_K: 1996
         T_m_uncertainty_K: 5
         Delta_fus_H_over_R_kK: 1.15
@@ -1005,6 +1005,8 @@ species:
         formula: SiO2
         method_class: quoted_attributed
         attribution: "Table 4, Tfus source column: refs. 16 and 2 (Glushko et al., 1979a; Stull et al., 1971)."
+      condensed_form:
+        polymorph: cristobalite_high
     - observation_id: LH87_SiO2_vapor_speciation
       type: gas_speciation
       locator:
