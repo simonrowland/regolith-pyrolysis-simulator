@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import re
 from copy import deepcopy
 from decimal import Decimal
@@ -9,10 +8,11 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/lopatin-2023-na-barium-borate-kems.yaml"
 SID = "lopatin-2023-na-barium-borate-kems"
-CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS = regolith_corpus_root()
 TEXT = CORPUS / "text" / SID / "pdftotext-layout.txt"
 
 TABLE_COLUMNS = {

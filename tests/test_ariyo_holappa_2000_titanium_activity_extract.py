@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-import os
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/ariyo-holappa-2000-titanium-activity.yaml"
 SID = "ariyo-holappa-2000-titanium-activity"
-CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS = regolith_corpus_root()
 
 # Independently transcribed from the 600 dpi PDF renders of Table 1, pages 12–13.
 RENDER_GRID = [

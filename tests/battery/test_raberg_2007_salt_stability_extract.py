@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from decimal import Decimal
-import os
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 import simulator.battery.migrate as migrate_module
 from simulator.battery.enums import ValueKind
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
@@ -15,7 +15,7 @@ from tools.validate_literature_extracts import check_all_fidelity_samples_match
 ROOT = Path(__file__).resolve().parents[2]
 SID = 'raberg-2007-salt-stability-na2s-thermochemistry-thesis'
 EXTRACT = ROOT / 'data/literature/extracts' / f'{SID}.yaml'
-CORPUS = Path(os.environ.get('REGOLITH_CORPUS_ROOT', '/Users/simonrowland/Repos/regolith-corpus'))
+CORPUS = regolith_corpus_root()
 PDF = CORPUS / 'raw' / SID / f'{SID}.pdf'
 
 

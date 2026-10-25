@@ -3,13 +3,13 @@ from __future__ import annotations
 import csv
 from copy import deepcopy
 from decimal import Decimal
-import os
 from pathlib import Path
 import subprocess
 
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.battery.enums import Phase, Quantity, QuenchState, UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator
 from tests.literature_extract_test_helpers import iter_locators
@@ -265,7 +265,7 @@ def test_all_locators_use_one_based_physical_pages(document: dict) -> None:
 
 
 def test_cited_source_pages_are_present_and_guarded_when_corpus_is_absent() -> None:
-    corpus = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+    corpus = regolith_corpus_root()
     pdf = corpus / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
     if not pdf.is_file():
         pytest.skip(f"corpus PDF absent: {pdf}")

@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.battery.enums import Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
 SID = "hanson-jones-1998-am-cr-partitioning-olivine-liquid"
 EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
-CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS = regolith_corpus_root()
 PDF = CORPUS / "raw" / SID / f"{SID}.pdf"
 TEXT = CORPUS / "text" / SID / "pdftotext-layout.txt"
 

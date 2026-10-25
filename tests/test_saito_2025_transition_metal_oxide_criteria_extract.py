@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/saito-2025-transition-metal-oxide-criteria.yaml"
 SID = "saito-2025-transition-metal-oxide-criteria"
-CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS = regolith_corpus_root()
 
 
 @pytest.mark.skipif(not (CORPUS / "raw" / SID / f"{SID}.pdf").is_file(), reason="corpus source is absent")

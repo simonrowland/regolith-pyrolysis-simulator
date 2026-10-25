@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import csv
 import json
-import os
 from collections import Counter
 from decimal import Decimal
 from pathlib import Path
@@ -10,6 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from tools import mineru_table_draft as draft
 from tools import validate_literature_extracts as validator
 
@@ -17,7 +17,7 @@ from tools import validate_literature_extracts as validator
 FIXTURES = Path(__file__).parent / "fixtures" / "mineru-table-emit"
 # The corpus checkout to compare against. REGOLITH_CORPUS_ROOT lets a gate point at a
 # specific clone (the controller's, or a CI-provisioned one) instead of the default path.
-CORPUS_ROOT = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS_ROOT = regolith_corpus_root()
 EXTRACTS = (
     Path(__file__).resolve().parents[2] / "data" / "literature" / "extracts"
 )

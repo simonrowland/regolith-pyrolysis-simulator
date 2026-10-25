@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from copy import deepcopy
 from decimal import Decimal
-import os
 from pathlib import Path
 import re
 import subprocess
@@ -12,6 +11,7 @@ import subprocess
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import validate_extract_document
@@ -20,9 +20,7 @@ from tools.validate_literature_extracts import validate_extract_document
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID = "de-abreu-2024-li2o-sio2-thermochemistry"
 EXTRACT = ROOT / f"data/literature/extracts/{SOURCE_ID}.yaml"
-CORPUS_ROOT = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS_ROOT = regolith_corpus_root()
 PDF = CORPUS_ROOT / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
 
 # Independent transcription of Table 2 from the 600 dpi render on physical PDF pages 5–6.

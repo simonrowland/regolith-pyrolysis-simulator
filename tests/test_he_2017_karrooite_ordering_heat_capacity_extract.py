@@ -5,7 +5,6 @@ from __future__ import annotations
 from copy import deepcopy
 import csv
 from decimal import Decimal
-import os
 from pathlib import Path
 import re
 import subprocess
@@ -13,6 +12,7 @@ import subprocess
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from tests.literature_extract_test_helpers import iter_locators
 from simulator.battery.migrate import Migrator, load_index
 from data.literature.build_index import corpus_pointers, sha256_file
@@ -22,9 +22,7 @@ from tools.validate_literature_extracts import validate_extract_document
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID = "he-2017-karrooite-ordering-heat-capacity"
 EXTRACT = ROOT / "data/literature/extracts" / f"{SOURCE_ID}.yaml"
-CORPUS_ROOT = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS_ROOT = regolith_corpus_root()
 PDF = CORPUS_ROOT / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
 TABLE5_CSV = CORPUS_ROOT / "tables" / SOURCE_ID / "table-5.csv"
 TABLE1_RENDER_GRID = [
@@ -199,6 +197,8 @@ def test_mutating_an_extrapolated_entropy_context_value_breaks_the_source_pins()
 
 
 def test_isolated_migration_types_both_experimental_entropy_rows() -> None:
+    if not CORPUS_ROOT.is_dir():
+        pytest.skip("regolith-corpus checkout is absent")
     index = load_index()
     index[SOURCE_ID] = {
         "source_id": SOURCE_ID,

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from decimal import Decimal
 from unittest.mock import patch
@@ -8,13 +7,14 @@ from unittest.mock import patch
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 import simulator.battery.migrate as migrate_module
 from tests.battery.test_migrate import assert_extract_source_mutation_fails
 
 ROOT = Path(__file__).resolve().parents[2]
 SID = 'sugie-2021-sioc-mixed-bond-calorimetry'
 EXTRACT = ROOT / 'data/literature/extracts' / f'{SID}.yaml'
-CORPUS = Path(os.environ.get('REGOLITH_CORPUS_ROOT', '/Users/simonrowland/Repos/regolith-corpus'))
+CORPUS = regolith_corpus_root()
 PDF = CORPUS / 'raw' / SID / f'{SID}.pdf'
 
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
@@ -8,12 +7,13 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.battery.identity import atm_to_pa
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/park-morita-2025-vanadium-activity.yaml"
 SID = "park-morita-2025-vanadium-activity"
-CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS = regolith_corpus_root()
 
 
 @pytest.mark.skipif(not (CORPUS / "raw" / SID / f"{SID}.pdf").is_file(), reason="corpus source is absent")

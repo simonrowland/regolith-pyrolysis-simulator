@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from copy import deepcopy
-import os
 from pathlib import Path
 import re
 import subprocess
@@ -11,6 +10,7 @@ import subprocess
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.battery.enums import ValueKind
 from simulator.battery.migrate import Migrator
 from tests.literature_extract_test_helpers import iter_locators
@@ -20,9 +20,7 @@ from tools.validate_literature_extracts import validate_extract_document
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity.yaml"
 SOURCE_ID = "klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity"
-CORPUS_ROOT = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS_ROOT = regolith_corpus_root()
 PDF = CORPUS_ROOT / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
 
 

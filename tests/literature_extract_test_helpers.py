@@ -1,4 +1,3 @@
-import os
 import subprocess
 from collections.abc import Iterable
 from pathlib import Path
@@ -7,13 +6,11 @@ import pytest
 
 from simulator.battery.enums import ValueKind
 from simulator.battery.records import Observation
+from tests.helpers.corpus_paths import regolith_corpus_root
 
 
 def corpus_root() -> Path:
-    configured = os.environ.get("REGOLITH_CORPUS_ROOT")
-    if configured:
-        return Path(configured)
-    return Path.home() / "Repos" / "regolith-corpus"
+    return regolith_corpus_root()
 
 
 def assert_no_unavailable_observation_values(
@@ -46,10 +43,7 @@ def iter_locators(value: object):
 
 
 def source_page_text(source_id: str, page: int) -> str:
-    corpus_root = Path(
-        os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-    )
-    pdf = corpus_root / "raw" / source_id / f"{source_id}.pdf"
+    pdf = corpus_root() / "raw" / source_id / f"{source_id}.pdf"
     if not pdf.is_file():
         pytest.skip(f"source PDF is absent: {pdf}")
     result = subprocess.run(

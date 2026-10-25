@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
 SID = "wright-okamura-1977-makaopuhi-cooling"
 EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
-CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS = regolith_corpus_root()
 PDF = CORPUS / "raw" / SID / f"{SID}.pdf"
 
 # Independent transcription of Table 17's first three electron-microprobe

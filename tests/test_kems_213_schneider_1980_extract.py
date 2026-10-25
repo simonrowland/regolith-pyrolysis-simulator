@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import subprocess
 from copy import deepcopy
 from decimal import Decimal
@@ -9,6 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.battery.enums import Phase, Quantity
 from simulator.battery.migrate import Migrator, REPO_ROOT
 from tests.literature_extract_test_helpers import (
@@ -22,9 +22,7 @@ EXTRACT = (
     / "data/literature/extracts/kems-213-schneider-1980-nbsir-80-2139.yaml"
 )
 SOURCE_ID = "kems-213-schneider-1980-nbsir-80-2139"
-CORPUS_ROOT = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS_ROOT = regolith_corpus_root()
 PDF = CORPUS_ROOT / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
 
 # Independent transcription from the 600 dpi render of Table 1, physical PDF

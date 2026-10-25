@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import os
 import re
 import subprocess
 import sys
@@ -13,6 +12,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.battery.enums import Quantity
 from simulator.battery.migrate import Migrator, REPO_ROOT, source_files_for
 from tests.literature_extract_test_helpers import (
@@ -23,9 +23,7 @@ from tests.literature_extract_test_helpers import (
 
 SID = "neuman-2026-levitation-k-isotopes"
 EXTRACT = REPO_ROOT / f"data/literature/extracts/{SID}.yaml"
-CORPUS_ROOT = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS_ROOT = regolith_corpus_root()
 PDF = CORPUS_ROOT / "raw" / SID / f"{SID}.pdf"
 
 if str(REPO_ROOT / "tools") not in sys.path:

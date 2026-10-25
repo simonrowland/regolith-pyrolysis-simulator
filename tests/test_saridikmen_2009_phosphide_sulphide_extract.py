@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-import os
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/saridikmen-2009-phosphide-sulphide.yaml"
 SID = "saridikmen-2009-phosphide-sulphide"
-CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS = regolith_corpus_root()
 
 
 @pytest.mark.skipif(not (CORPUS / "raw" / SID / f"{SID}.pdf").is_file(), reason="corpus source is absent")

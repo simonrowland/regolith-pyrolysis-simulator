@@ -23,7 +23,7 @@ Four prose-reported invariant temperatures are typed as `quoted_attributed` tran
 
 The incomplete compositions remain unknown conditions with reasons; no balance oxide was reconstructed. The Glasser and Osborn invariant point also appears as an experimental marker in Fig. 8 (physical PDF page 7); this is one typed observation and the second locator is noted on its record.
 
-The three cited primary references and DOI field (blank where none is printed) are in `/private/tmp/claude-501/main-review/fam19-1019/primaries.tsv` for controller retrieval.
+The three cited primary references and DOI field (blank where none is printed) are retained in the controller retrieval table.
 
 ## Figure inventory
 
