@@ -367,6 +367,61 @@ def test_fraction_integrator_forwards_accepted_pressure_diagnostics() -> None:
     assert all(math.isfinite(value) for value in accepted)
 
 
+def test_fraction_integrator_flags_the_oxygen_balance_floor() -> None:
+    initial = {"FeO": 1.0e-4, "MgO": 1.0e-4}
+    channels = (
+        ResidueChannel("Fe", "Fe", "FeO", 1.0, "pin"),
+        ResidueChannel("MgO", "MgO", "MgO", 1.0, "pin"),
+        ResidueChannel("O2", "O2", None, 1.0, "pin"),
+    )
+    vacuum = ResiduePressureRegime("vacuum_balance", 0.0, 0.0)
+
+    def pressures(logp):
+        pO2_bar = 10.0**logp
+        return {
+            "Fe": 1.0e-50 * 10.0**(-logp / 2.0),
+            "MgO": 1.0e-3,
+            "O2": 1.0e5 * pO2_bar,
+        }
+
+    def time_pressure_model(_inventory, _temperature, logp, _regime):
+        return pressures(logp)
+
+    def fraction_pressure_model(_inventory, _temperature, logp, _regime):
+        return pressures(logp)
+
+    timed = integrate_residue_schedule(_request(
+        initial_inventory_mol=initial,
+        channels=channels,
+        thermal_schedule=(ResidueThermalSegment(1800.0, 1.0),),
+        pressure_regime=vacuum,
+        geometry=ResidueGeometryInput(1.0, "constant_area"),
+        pressure_model=time_pressure_model,
+    ))
+    fraction = integrate_residue_fraction(_fraction_request(
+        initial_inventory_mol=initial,
+        channels=channels,
+        temperature_path=(ResidueFractionSegment(0.0, 1.0, 1800.0),),
+        pressure_regime=vacuum,
+        pressure_model=fraction_pressure_model,
+        mass_loss_fraction=0.01,
+    ))
+
+    assert timed.pO2_balance_floor["steps_at_floor"] == 1
+    assert timed.pO2_balance_floor["pO2_bar"] == pytest.approx(1.0e-30)
+    floor_notices = [
+        notice for notice in fraction.notices
+        if notice.startswith("surface_pO2_at_balance_floor:")
+    ]
+    assert len(floor_notices) == 1
+    assert floor_notices[0].startswith(
+        "surface_pO2_at_balance_floor:boundary=lower:pO2_bar="
+    )
+    assert float(floor_notices[0].rsplit("pO2_bar=", 1)[1]) == pytest.approx(
+        1.0e-30
+    )
+
+
 def test_fraction_integrator_types_missing_and_invalid_vacuum_pressures() -> None:
     channels = (
         ResidueChannel("Fe", "Fe", "FeO", 1.0, "pin"),

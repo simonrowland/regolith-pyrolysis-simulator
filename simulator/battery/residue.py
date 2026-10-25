@@ -2069,6 +2069,14 @@ def integrate_residue_fraction(
                             "residue_mass_loss_extent_unreachable",
                             f"no positive parent pressure at F={fraction:.17g}",
                         ) from exc
+                    if balance.bracket_boundary == "lower":
+                        floor_notice = (
+                            "surface_pO2_at_balance_floor:"
+                            f"boundary={balance.bracket_boundary}:"
+                            f"pO2_bar={balance.pO2_bar:.17g}"
+                        )
+                        if floor_notice not in notices:
+                            notices.append(floor_notice)
                     pressures = balance.pressures_Pa
                 else:
                     pressures = pressure_at(buffered_logp)
