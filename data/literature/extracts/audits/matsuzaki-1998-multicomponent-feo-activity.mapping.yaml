@@ -1,0 +1,254 @@
+# Table 4 is drafted and QA-screened, but reports solution-model interaction
+# energies rather than the measured activity results requested for this extract.
+source_id: matsuzaki-1998-multicomponent-feo-activity
+source:
+  citation: >-
+    Matsuzaki, K., Higano, Y., Katsumata, K., and Ito, K. (1998). Activity
+    Measurement of FetO-SiO2-TiO2-(CaO, MgO, AlO1.5) Melts in Equilibrium with
+    Solid Iron. ISIJ International, 38(10), 1147–1149.
+  year: 1998
+  corpus_asset: raw/matsuzaki-1998-multicomponent-feo-activity/matsuzaki-1998-multicomponent-feo-activity.pdf
+  corpus_sha256: 37c68d874f43ff27114eaa7661761e0131e04b40fb3e0204ec5efe38e5763939
+extraction:
+  method: >-
+    MinerU Tables 1–3 were emitted with the table draft tool. Numeric-cell
+    discrepancies with pdftotext-layout were settled against page renders;
+    table row and column assignments were checked on each rendered page.
+  date: '2026-10-25'
+  worker: w1025b-mats98
+review_status: draft
+# For each table, column 1 is the printed sample number, column 2 is log10(P_O2/atm),
+# columns 3–7 are the per-row wt% oxide composition, column 8 is Fe3+/Fe2+, and
+# column 9 is X_FetO. Columns 3–7 are FeO, Fe2O3, TiO2, SiO2, and then CaO (Table 1),
+# MgO (Table 2), or AlO1.5 (Table 3). The table tool cannot combine these columns
+# into one composition condition, so the assembled extract preserves them per row.
+fidelity_samples:
+  - path: species.FeO.observations[matsuzaki_1998_multicomponent_feo_activity_p001_t01_r03_c10].values.activity
+    value: '0.36'
+    note: Table 1, sample 26; activity verified against the page 1147 render.
+    locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: 1147
+      table: '1'
+      row: '26'
+  - path: species.FeO.observations[matsuzaki_1998_multicomponent_feo_activity_p001_t02_r13_c11].values.gamma
+    value: '0.80'
+    note: Table 2, sample 56; activity coefficient verified against the page 1147 render.
+    locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: 1147
+      table: '2'
+      row: '56'
+  - path: species.FeO.observations[matsuzaki_1998_multicomponent_feo_activity_p002_t03_r24_c11].values.gamma
+    value: '0.67'
+    note: Table 3, sample 89; activity coefficient verified against the page 1148 render.
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 1148
+      table: '3'
+      row: '89'
+tables:
+  - page: 1
+    table_index: 1
+    published_page: 1147
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: measured_direct
+    unit: dimensionless activity
+    phase: l
+    regime: quench_equilibration
+    experiment: matsuzaki_1998_gas_slag_equilibration
+    conditions:
+      - key: atmosphere
+        state:
+          tag: value
+          value: H2 and CO2 gas mixture
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+      - key: fO2_control
+        state:
+          tag: value
+          value: P_O2 controlled by the H2/CO2 mixing ratio; row-wise ratio not printed
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+      - key: gas_mix
+        state:
+          tag: unknown
+          reason: The H2/CO2 mixture ratio for each sample is not printed.
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+      - key: total_pressure_Pa
+        state:
+          tag: unknown
+          reason: The total pressure of the equilibration gas is not stated.
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+    temperature:
+      as_printed: '1673'
+      unit: K
+      column_header: 1673 K in Experimental section
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 1147
+        section: 2. Experimental
+    values:
+      - column: 10
+        species: FeO
+        quantity: activity
+        evidence_class: measured_direct
+        unit: dimensionless activity
+      - column: 11
+        species: FeO
+        quantity: activity_coefficient
+        evidence_class: measured_reduced
+        unit: dimensionless activity coefficient
+  - page: 1
+    table_index: 2
+    published_page: 1147
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: measured_direct
+    unit: dimensionless activity
+    phase: l
+    regime: quench_equilibration
+    experiment: matsuzaki_1998_gas_slag_equilibration
+    conditions:
+      - key: atmosphere
+        state:
+          tag: value
+          value: H2 and CO2 gas mixture
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+      - key: fO2_control
+        state:
+          tag: value
+          value: P_O2 controlled by the H2/CO2 mixing ratio; row-wise ratio not printed
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+      - key: gas_mix
+        state:
+          tag: unknown
+          reason: The H2/CO2 mixture ratio for each sample is not printed.
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+      - key: total_pressure_Pa
+        state:
+          tag: unknown
+          reason: The total pressure of the equilibration gas is not stated.
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+    temperature:
+      as_printed: '1673'
+      unit: K
+      column_header: 1673 K in Experimental section
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 1147
+        section: 2. Experimental
+    values:
+      - column: 10
+        species: FeO
+        quantity: activity
+        evidence_class: measured_direct
+        unit: dimensionless activity
+      - column: 11
+        species: FeO
+        quantity: activity_coefficient
+        evidence_class: measured_reduced
+        unit: dimensionless activity coefficient
+  - page: 2
+    table_index: 3
+    published_page: 1148
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: measured_direct
+    unit: dimensionless activity
+    phase: l
+    regime: quench_equilibration
+    experiment: matsuzaki_1998_gas_slag_equilibration
+    conditions:
+      - key: atmosphere
+        state:
+          tag: value
+          value: H2 and CO2 gas mixture
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+      - key: fO2_control
+        state:
+          tag: value
+          value: P_O2 controlled by the H2/CO2 mixing ratio; row-wise ratio not printed
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+      - key: gas_mix
+        state:
+          tag: unknown
+          reason: The H2/CO2 mixture ratio for each sample is not printed.
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+      - key: total_pressure_Pa
+        state:
+          tag: unknown
+          reason: The total pressure of the equilibration gas is not stated.
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1147
+          section: 2. Experimental
+    temperature:
+      as_printed: '1673'
+      unit: K
+      column_header: 1673 K in Experimental section
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 1147
+        section: 2. Experimental
+    values:
+      - column: 10
+        species: FeO
+        quantity: activity
+        evidence_class: measured_direct
+        unit: dimensionless activity
+      - column: 11
+        species: FeO
+        quantity: activity_coefficient
+        evidence_class: measured_reduced
+        unit: dimensionless activity coefficient
