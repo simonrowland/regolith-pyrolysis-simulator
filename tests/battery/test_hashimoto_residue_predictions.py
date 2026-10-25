@@ -624,6 +624,40 @@ def test_hashimoto_without_melt_pack_identity_has_no_sf04_fallback(
     assert provenance["openimcc_model_id"] is None
 
 
+def test_hashimoto_integrator_forwards_accepted_pressure_diagnostics() -> None:
+    import simulator.battery.residue as residue
+
+    accepted: list[float] = []
+
+    def pressure_model(_inventory, log10_pO2_bar):
+        pO2_bar = 10.0**log10_pO2_bar
+        return {
+            "Fe": 5.0e-8 * pO2_bar**-0.5,
+            "Mg": 2.0e-8 * pO2_bar**-0.5,
+            "O2": 100_000.0 * pO2_bar,
+        }
+
+    pressure_model._on_accepted_evaluation = accepted.append
+    result = residue._hashimoto_integrate_geometry(
+        {"FeO": 1.0, "MgO": 2.0},
+        (
+            residue.ResidueChannel("Fe", "Fe", "FeO", 1.0, "pinned"),
+            residue.ResidueChannel("Mg", "Mg", "MgO", 1.0, "pinned"),
+            residue.ResidueChannel("O2", "O2", None, 1.0, "pinned"),
+        ),
+        pressure_model,
+        temperature_K=2000.0,
+        duration_s=10.0,
+        steps=3,
+        geometry_policy_id="sphere_shrinking",
+        initial_area_m2=0.001,
+    )
+
+    assert result.refusal is None
+    assert len(accepted) == 3
+    assert all(math.isfinite(value) for value in accepted)
+
+
 def test_hashimoto_internal_probe_diagnostic_does_not_survive_channel_refusal(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

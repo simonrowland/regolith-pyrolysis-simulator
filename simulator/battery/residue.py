@@ -1023,6 +1023,16 @@ def _residue_oxygen_balance(
         raise
 
 
+def _forward_accepted_pressure_evaluation(
+    pressure_model: object,
+    wrapper: Callable[..., Mapping[str, float]],
+) -> None:
+    """Keep accepted-root diagnostics attached across pressure adapters."""
+    callback = getattr(pressure_model, "_on_accepted_evaluation", None)
+    if callable(callback):
+        setattr(wrapper, "_on_accepted_evaluation", callback)
+
+
 def integrate_residue_inventory(
     initial_inventory_mol: Mapping[str, float],
     channels: Sequence[ResidueChannel],
@@ -1579,6 +1589,7 @@ def integrate_residue_schedule(
                 pressure,
             )
 
+        _forward_accepted_pressure_evaluation(request.pressure_model, pressure_at)
         step_result = integrate_residue_inventory(
             inventory,
             channels_for_step,
@@ -3272,6 +3283,7 @@ def _hashimoto_integrate_geometry(
     ) -> Mapping[str, float]:
         return pressure_model(composition_mol, log10_pO2_bar)
 
+    _forward_accepted_pressure_evaluation(pressure_model, pressure_at)
     result = integrate_residue_schedule(ResidueIntegrationInput(
         initial_inventory_mol=inventory,
         channels=channels,
@@ -4260,6 +4272,10 @@ def _predict_sossi_residue_cohort(
             _regime: ResiduePressureRegime,
         ) -> Mapping[str, float]:
             return pressure_model(composition, log10_pO2_bar)
+
+        _forward_accepted_pressure_evaluation(
+            pressure_model, schedule_pressure_model
+        )
 
         try:
             initial_pressures = pressure_model(inventory, buffered_logp)
