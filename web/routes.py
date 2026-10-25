@@ -32,6 +32,7 @@ from simulator.backend_names import (
 )
 from simulator.cost_parameters import RECIPE_COST_PARAMETERS_KEY
 from simulator.campaigns import CampaignManager
+from simulator.config import _load_setpoints_file
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
     CONTINUUM_BUFFER_KN,
@@ -273,6 +274,8 @@ class _StoredBackendResolutionCarrier:
 
 def _load_yaml(filename):
     path = DATA_DIR / filename
+    if filename == 'setpoints.yaml':
+        return _load_setpoints_file(path)
     if not path.exists():
         return {}
     with open(path) as f:

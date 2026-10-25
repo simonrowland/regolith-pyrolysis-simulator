@@ -56,7 +56,11 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     C0_FORECAST_ENGINE_NAMES,
@@ -147,8 +151,46 @@ class _RefusalSnapshotHistoryPrefix:
         memo.clear()
 
 
+class _RefusalSnapshotInsertedMapping:
+    """O(1) rollback view of the per-hour yield rows.
+
+    ``_yield_disposition_ledger_snapshots`` is written only by
+    ``capture_ledger_snapshot`` after a successful step.  It appends one
+    uniquely keyed hour row and never edits a committed row in place.  Keep
+    the source and its prefix length so the successful step avoids copying
+    the cumulative gross-event history.  On terminal refusal, deepcopy the
+    saved prefix into an ordinary detached dict before restoring it.
+    """
+
+    __slots__ = ('_source', '_length', '_memo')
+
+    def __init__(self, source: dict[Any, Any], memo: Dict[int, Any]) -> None:
+        self._source = source
+        self._length = len(source)
+        self._memo = memo
+        memo[id(source)] = self
+
+    def materialize(self) -> dict[Any, Any]:
+        materialized: dict[Any, Any] = {}
+        self._memo[id(self._source)] = materialized
+        for index, (key, item) in enumerate(self._source.items()):
+            if index >= self._length:
+                break
+            copied_item = _deepcopy_refusal_value(item, self._memo)
+            copied_key = _deepcopy_refusal_value(key, self._memo)
+            materialized[copied_key] = copied_item
+        return materialized
+
+    def release(self) -> None:
+        """Break the prefix↔memo cycle once the attempted hour resolves."""
+
+        memo = self._memo
+        self._memo = {}
+        memo.clear()
+
+
 def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
-    """Replace an internal history-prefix view with its rollback list."""
+    """Replace internal history views with the detached rollback payload."""
 
     record = state.get('record')
     history = getattr(record, 'snapshots', None)
@@ -158,6 +200,9 @@ def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
     history = getattr(model, 'operating_history', None)
     if isinstance(history, _RefusalSnapshotHistoryPrefix):
         model.operating_history = history.materialize()
+    inserted = state.get('_yield_disposition_ledger_snapshots')
+    if isinstance(inserted, _RefusalSnapshotInsertedMapping):
+        state['_yield_disposition_ledger_snapshots'] = inserted.materialize()
 
 
 _REFUSAL_MISSING = object()
@@ -1328,7 +1373,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- Current state ---
         self.melt = MeltState()
         self.inventory = ProcessInventory()
-        self.train = CondensationTrain.create_default()
+        self.train = CondensationTrain.create_default(self.setpoints)
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar: Dict[str, float] = {}
 
@@ -1642,7 +1687,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.update_total_mass()
 
         # Reset condensation train
-        self.train = CondensationTrain.create_default()
+        self.train = CondensationTrain.create_default(self.setpoints)
+        if self._condensation_model is not None:
+            self._condensation_model.train = self.train
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
@@ -7783,24 +7830,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_PURE_COMPONENT,
+            VaporPressureComputationError,
             _pow10_pressure_or_raise,
             vapor_pressure_antoine_coefficients,
             vapor_pressure_source_label,
         )
 
-        antoine, coefficient_block = vapor_pressure_antoine_coefficients(
-            fe_row,
-            temperature_K=T_K,
-        )
+        try:
+            antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+                fe_row,
+                temperature_K=T_K,
+            )
+        except VaporPressureComputationError as exc:
+            raise AccountingError(str(exc)) from exc
         if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
             raise AccountingError(
                 'native Fe vapor partition requires metals.Fe.'
                 'pure_component_antoine; refusing legacy Fe vapor fit'
             )
-        A = float(antoine.get('A', 0.0) or 0.0)
-        B = float(antoine.get('B', 0.0) or 0.0)
-        C = float(antoine.get('C', 0.0) or 0.0)
-        if A <= 0.0 or T_K + C <= 0.0:
+        try:
+            A, B, C = _read_antoine_coefficients(antoine)
+        except _AntoineCoefficientRefusal as exc:
+            raise AccountingError(str(exc)) from exc
+        if T_K + C <= 0.0:
             raise AccountingError(
                 'native Fe vapor partition received invalid Fe '
                 'pure_component_antoine coefficients'
@@ -14899,6 +14951,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             memo[id(operating_history)] = _RefusalSnapshotHistoryPrefix(
                 operating_history, memo, mutable_tail=1,
             )
+        yield_rows = getattr(
+            self, '_yield_disposition_ledger_snapshots', None,
+        )
+        if defer_committed_history and type(yield_rows) is dict:
+            # Each committed row retains all condensation gross events to
+            # date. Keep only the O(1) mapping frontier on the step hot path;
+            # terminal refusal materializes the old rows with owned values.
+            _RefusalSnapshotInsertedMapping(yield_rows, memo)
         state_source = {
             name: value
             for name, value in self.__dict__.items()
@@ -15016,6 +15076,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 terminal_refusal_state.get('_condensation_model'),
                 'operating_history', None,
             ),
+            terminal_refusal_state.get('_yield_disposition_ledger_snapshots'),
         )
         try:
             return self._step_one_hour()
@@ -15065,7 +15126,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             raise
         finally:
             for history in terminal_refusal_histories:
-                if isinstance(history, _RefusalSnapshotHistoryPrefix):
+                if isinstance(
+                    history,
+                    (
+                        _RefusalSnapshotHistoryPrefix,
+                        _RefusalSnapshotInsertedMapping,
+                    ),
+                ):
                     history.release()
 
     def _step_one_hour(self) -> HourSnapshot:

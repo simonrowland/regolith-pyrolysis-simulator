@@ -23,6 +23,7 @@ from scipy.optimize import linprog, minimize_scalar
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
+from engines.antoine import _antoine_log10_pressure, _read_antoine_coefficients
 from engines.builtin.vapor_pressure import _ELLINGHAM_THERMO
 from simulator.melt_backend.melt_envelope import (
     consume_melt_extrapolation_envelope,
@@ -205,12 +206,11 @@ def fallback_activity_term(
 def current_coefficients(vapor_pressure_data: dict[str, Any], species: str) -> tuple[float, float, float]:
     section = "oxide_vapors" if species == "SiO" else "metals"
     antoine = vapor_pressure_data[section][species]["antoine"]
-    return float(antoine["A"]), float(antoine["B"]), float(antoine.get("C") or 0.0)
+    return _read_antoine_coefficients(antoine)
 
 
 def predict_log10(coefficients: tuple[float, float, float], temperature_k: float) -> float:
-    A, B, C = coefficients
-    return A - B / (temperature_k + C)
+    return _antoine_log10_pressure(*coefficients, temperature_k)
 
 
 def residual_stats(

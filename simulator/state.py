@@ -13,10 +13,11 @@ import math
 import warnings
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Tuple
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.condensation_routing import target_species_for_stage_number
+from simulator.config import resolve_collector_bands_C
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe_errors import MalformedRecipeError
@@ -846,29 +847,30 @@ class CondensationTrain:
         return totals
 
     @staticmethod
-    def create_default() -> 'CondensationTrain':
-        """Build the standard 8-stage metals train."""
+    def create_default(setpoints: Mapping[str, Any] | None = None) -> 'CondensationTrain':
+        """Build the standard 8-stage metals train from config-owned bands."""
+        bands = resolve_collector_bands_C(setpoints)
         stages = [
             CondensationStage(0, 'Hot Duct (IR)',
-                              (1400, 1600), []),
+                              bands[0], []),
             CondensationStage(1, 'Fe Condenser',
-                              (1100, 1400),
+                              bands[1],
                               target_species_for_stage_number(1)),
             CondensationStage(2, 'Cr Oxide Harvester',
-                              (1100, 1300),
+                              bands[2],
                               target_species_for_stage_number(2)),
             CondensationStage(3, 'SiO Zone',
-                              (900, 1200),
+                              bands[3],
                               target_species_for_stage_number(3)),
             CondensationStage(4, 'Alkali/Mg Cyclone',
-                              (350, 700),
+                              bands[4],
                               target_species_for_stage_number(4)),
             CondensationStage(5, 'Vortex Dust Filter',
-                              (200, 350), []),
+                              bands[5], []),
             CondensationStage(6, 'Turbine-Compressor',
-                              (50, 200), []),
+                              bands[6], []),
             CondensationStage(7, 'Turbine Outlet Monitor',
-                              (20, 50), []),
+                              bands[7], []),
         ]
         return CondensationTrain(stages=stages)
 
