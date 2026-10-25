@@ -37,6 +37,35 @@ def _migrated_render_pins(migrated: list[object]) -> dict[str, tuple[str, str, s
     }
 
 
+def _printed_data_row_count(document: dict) -> int:
+    contexts = _context_rows(document)
+    run_rows = [
+        row
+        for row in contexts
+        if row.get("values", {}).get("quantity") == "printed_experimental_run_row"
+    ]
+    structural_rows = []
+    table_data_rows = 0
+    for row in contexts:
+        table_rows = row.get("values", {}).get("rows")
+        if not isinstance(table_rows, list):
+            continue
+        for table_row in table_rows:
+            if isinstance(table_row, dict) and table_row.get("row_type") == "structural_context":
+                structural_rows.append(table_row)
+            else:
+                table_data_rows += 1
+
+    assert len(structural_rows) == 2
+    assert {row["label"] for row in structural_rows} == {
+        "Derived with QFM by Wones and Gilbert (1969):",
+        "Derived Reactions:",
+    }
+    data_row_count = len(run_rows) + table_data_rows
+    assert document["extraction"]["printed_data_rows"] == data_row_count
+    return data_row_count
+
+
 def _assert_render_logk_pins(actual: dict[str, tuple[str, str, str]]) -> None:
     expected = {
         "williams71_t4_opsi_3c": ("-0.09", "14", "4"),
@@ -64,12 +93,7 @@ def _assert_render_pins(document: dict) -> None:
 
     run_rows = [r for r in _context_rows(document) if r.get("values", {}).get("quantity") == "printed_experimental_run_row"]
     assert len(run_rows) == 82
-    table_row_total = sum(
-        int(r["values"]["printed_row_count"])
-        for r in _context_rows(document)
-        if r.get("values", {}).get("printed_row_count") is not None
-    )
-    assert len(run_rows) + table_row_total == 174
+    assert _printed_data_row_count(document) == 172
 
 
 def test_printed_rows_render_pins_and_mutations() -> None:
@@ -80,6 +104,32 @@ def test_printed_rows_render_pins_and_mutations() -> None:
     _component_refusals(mutated)["williams71_opsi_3a_o_composition"]["values"]["component_amount"] = "26"
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)
+
+
+def test_table_9_headings_are_context_rows_not_data_rows() -> None:
+    document = _document()
+    table_9 = next(
+        row
+        for row in _context_rows(document)
+        if row.get("observation_id") == "williams71_table_9_fit_coefficients"
+    )
+    table_9_values = table_9["values"]
+    structural = [
+        row
+        for row in table_9_values["rows"]
+        if isinstance(row, dict) and row.get("row_type") == "structural_context"
+    ]
+    assert len(table_9_values["rows"]) == 22
+    assert len(structural) == 2
+    assert sum(
+        not (isinstance(row, dict) and row.get("row_type") == "structural_context")
+        for row in table_9_values["rows"]
+    ) == 20
+    assert _printed_data_row_count(document) == 172
+
+    structural[0].pop("row_type")
+    with pytest.raises(AssertionError):
+        _printed_data_row_count(document)
 
 
 def test_isolated_migration_preserves_only_printed_conditions_and_logk_points() -> None:

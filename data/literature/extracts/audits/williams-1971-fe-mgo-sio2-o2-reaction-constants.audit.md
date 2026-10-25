@@ -2,13 +2,17 @@
 
 ## Coverage and row reconciliation
 
-The paper contains 174 printed data rows across Tables 1–11. The extraction
-preserves all 82 experimental run rows from Table 1 (66) and Table 2 (16),
-plus 92 rows from Tables 3–11. Table 1's printed subtable counts are A=8, B=13,
+Tables 1–11 contain 174 printed rows, of which 172 are data rows. The other
+two are Table 9 section headings (“Derived with QFM by Wones and Gilbert
+(1969):” and “Derived Reactions:”); both remain explicitly marked as structural
+context rows. The extraction preserves all 82 experimental run rows from
+Table 1 (66) and Table 2 (16), plus 90 data rows from Tables 3–11. Table 1's
+printed subtable counts are A=8, B=13,
 C=6, D=8, E=15, F=16. Table 2 has A=10 and B=6. The remaining printed counts
 are: Table 3=6, Table 4=8, Table 5=10 plus 5 magnesium-free bounds, Table 6=8
 plus 3 magnesium-free bounds, Table 7=10, Table 8=10, Table 9=22, Table 10=7,
-and Table 11=3.
+and Table 11=3. Table 9 has 22 printed rows: 20 coefficient rows and the two
+structural headings.
 
 The 82 run rows preserve printed temperature, absolute log fO2 and its printed
 uncertainty, pressure where the run-table subtable states P=1 atm, starting

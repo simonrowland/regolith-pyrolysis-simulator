@@ -10,7 +10,7 @@ extraction:
   date: '2026-10-25'
   worker: w1025d-will71
   provenance_path: corpus/raw/williams-1971-fe-mgo-sio2-o2-reaction-constants/williams-1971-fe-mgo-sio2-o2-reaction-constants.pdf
-  printed_data_rows: 174
+  printed_data_rows: 172
 review_status: draft
 fidelity_samples:
 - path: species.Fe.context[williams71_opsi_3a_o_composition].values.component_amount
@@ -9675,7 +9675,8 @@ species:
           - '-0.0412'
           - ±0.05
           - '-'
-        - - 'Derived with QFM by Wones and Gilbert (1969):'
+        - row_type: structural_context
+          label: 'Derived with QFM by Wones and Gilbert (1969):'
         - - $K_{OSM}$
           - $2 Fe_{3}O_{4} + 3 SiO_{2} = 6 FeSi_{1/2}O_{2} + O_{2}$
           - -25,738
@@ -9683,7 +9684,8 @@ species:
           - '0.1539'
           - ±0.10
           - '-'
-        - - 'Derived Reactions:'
+        - row_type: structural_context
+          label: 'Derived Reactions:'
         - - $K_{fo}$
           - $MgO + 1/2 SiO_{2} = MgSi_{1/2}O_{2}$
           - 1,125
