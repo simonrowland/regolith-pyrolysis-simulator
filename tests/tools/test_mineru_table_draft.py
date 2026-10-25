@@ -242,6 +242,39 @@ def test_latex_numeric_cells_convert_and_compare(tmp_path: Path) -> None:
     assert [row["status"] for row in compared] == ["presence-only"] * 3
 
 
+def test_compare_alpha_scalar_with_table_cell_locator(tmp_path: Path) -> None:
+    csv_path = tmp_path / "p001-t01.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        writer.writerow({
+            "row": 2, "column": 4, "row_type": "body", "text": "$1.7\\times10^{-1}$",
+            "value_text": "$1.7\\times10^{-1}$", "mark": "", "numeric_column": 1,
+            "origin_row": 2, "origin_column": 4, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p001-t01", "pdf_page": 1, "csv": csv_path.name,
+        "columns": [{"column": 4, "header": "α at Tm/T=1.5"}],
+    }]}))
+    extract = {"species": {"MgO": {"observations": [{
+        "observation_id": "mgo-alpha",
+        "locator": {
+            "pdf_page_index": 0, "table": "1",
+            "table_row_number": 2, "table_column_number": 4,
+        },
+        "values": {"alpha": 0.17},
+    }]}}}
+
+    compared = draft.compare_extract_to_draft(extract, index_path)
+
+    assert len(compared) == 1
+    assert compared[0]["status"] == "matched"
+    assert compared[0]["matched_cell"]["row"] == 2
+    assert compared[0]["matched_cell"]["column"] == 4
+
+
 def test_compare_typed_transition_temperature_in_cr_unqualified_table(
     tmp_path: Path,
 ) -> None:

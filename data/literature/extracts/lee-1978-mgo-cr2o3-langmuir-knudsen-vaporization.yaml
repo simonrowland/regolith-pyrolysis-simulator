@@ -1,0 +1,442 @@
+schema_version: literature_extract.v1
+source_id: lee-1978-mgo-cr2o3-langmuir-knudsen-vaporization
+source:
+  citation: >-
+    Lee, H.-L. (1978), High Temperature Vaporization of the High Melting Point Oxides,
+    Journal of the Korean Ceramic Society 15(2), 72–78.
+  year: 1978
+  url: https://koreascience.or.kr/article/JAKO197811920031953.pdf
+extraction:
+  method: >-
+    MinerU Table 1 transcription checked against the independent Tesseract read and
+    the PDF render; machine-text audit for prose and figure captions.
+  date: '2026-10-25'
+  worker: w1025d-lee78
+review_status: draft
+fidelity_samples:
+  - species: ThO2
+    observable: alpha
+    observation_id: lee_1978_table1_tho2_alpha
+    field: alpha
+    value: 0.60
+    locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1', row_label: ThO2}
+  - species: MgO
+    observable: alpha
+    observation_id: lee_1978_table1_mgo_alpha
+    field: alpha
+    value: 0.17
+    locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1', row_label: MgO}
+  - species: Y2O3
+    observable: alpha
+    observation_id: lee_1978_table1_y2o3_alpha
+    field: alpha
+    value: 0.084
+    locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1', row_label: Y2O3}
+  - species: Yb2O3
+    observable: alpha
+    observation_id: lee_1978_table1_yb2o3_alpha
+    field: alpha
+    value: 0.078
+    locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1', row_label: Yb2O3}
+  - species: MgCr2O4
+    observable: alpha
+    observation_id: lee_1978_table1_mgcr2o4_alpha
+    field: alpha
+    value: 0.075
+    locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1', row_label: MgCr2O4}
+  - species: Cr2O3
+    observable: alpha
+    observation_id: lee_1978_table1_cr2o3_alpha
+    field: alpha
+    value: 0.0097
+    locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1', row_label: Cr2O3}
+  - species: Al2O3
+    observable: alpha
+    observation_id: lee_1978_table1_al2o3_alpha
+    field: alpha
+    value: 0.00020
+    locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1', row_label: Al2O3}
+species:
+  ThO2:
+    observations:
+      - observation_id: lee_1978_table1_tho2_alpha
+        type: alpha
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 76
+          table: '1'
+          table_row_number: 2
+          table_column_number: 4
+          row_label: ThO2
+          column_header: 'α at Tm/T = 1.5'
+        regime: Langmuir and Knudsen vapor-pressure comparison
+        units: dimensionless
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: 'Table 1 prints Tm/T = 1.5, not an absolute temperature.'
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          fO2_log:
+            state: {tag: unknown, reason: 'No oxygen fugacity or gas ratio is reported for this row.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          composition:
+            state: {tag: unknown, reason: 'Table 1 gives an oxide formula, not a melt or mixture composition.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: 'No total pressure for the cited ThO2 data is given in Table 1.'
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+        values:
+          quantity: alpha
+          alpha: 0.60
+          alpha_as_printed: '6.0 × 10⁻¹'
+          normalized_temperature_as_printed: 'Tm/T = 1.5'
+          method_class: quoted_attributed
+          attribution: 'Wolff and Alcock (1962), reference 27; Lee recalculates the original data.'
+  MgO:
+    observations:
+      - observation_id: lee_1978_table1_mgo_alpha
+        type: alpha
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 76
+          table: '1'
+          table_row_number: 3
+          table_column_number: 4
+          row_label: MgO
+          column_header: 'α at Tm/T = 1.5'
+        regime: Langmuir and Knudsen vapor-pressure comparison
+        units: dimensionless
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: 'Table 1 prints Tm/T = 1.5, not an absolute temperature.'
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          fO2_log:
+            state: {tag: unknown, reason: 'No oxygen fugacity or gas ratio is reported for this row.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          composition:
+            state: {tag: unknown, reason: 'Table 1 gives an oxide formula, not a melt or mixture composition.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: 'The abstract gives only an experiment-wide pressure upper bound, not an exact point total pressure.'
+            locator: {page: 1, pdf_page_index: 0, published_page: 72, paragraph: Abstract}
+          total_pressure_as_printed:
+            state:
+              tag: value
+              value: '<10^-5 torr'
+            locator: {page: 1, pdf_page_index: 0, published_page: 72, paragraph: Abstract}
+        values:
+          quantity: alpha
+          alpha: 0.17
+          alpha_as_printed: '1.7 × 10⁻¹'
+          normalized_temperature_as_printed: 'Tm/T = 1.5'
+          pressure_as_printed: '<10^-5 torr'
+          method_class: quoted_attributed
+          attribution: 'Lee (1978), author-calculated from this work’s MgO measurements; the plotted inputs are not tabulated.'
+    context:
+      - observation_id: lee_1978_measured_series_conditions
+        type: experiment_series
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 72
+          paragraph: Abstract
+        units: as printed
+        values:
+          quantity: experiment_series_conditions
+          compounds: 'MgO, Cr2O3, and MgCr2O4'
+          temperature_range_as_printed: '1300 to 1750 °C'
+          pressure_as_printed: '<10^-5 torr'
+          techniques_as_printed: Langmuir and Knudsen methods
+          note: 'The abstract gives a series range, not per-run temperatures or a point total pressure.'
+      - observation_id: lee_1978_langmuir_apparatus_geometry
+        type: apparatus
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 74
+          figure: '3'
+          section: 'III.1 Langmuir method'
+        units: as printed
+        values:
+          quantity: apparatus_geometry
+          furnace_as_printed: cylindrical tungsten resistance furnace; maximum temperature 2500 °C
+          temperature_sensor_as_printed: W5%Re/W26%Re thermocouple with electronic automatic control
+          temperature_calibration_as_printed: melting points of Pt, Pd, Au, and Ag; error within ±5 °C
+          sample_as_printed: sintered pellet, 12 mm diameter by 2 mm
+          sample_holder_as_printed: Pt10%Rh basket; sample at the center of the tungsten furnace
+          rate_measurement_as_printed: microbalance mass loss per specimen surface area per unit time
+          vacuum_system_as_printed: rotary pump and diffusion pump
+          pressure_as_printed: '<10^-5 torr'
+          unreported_geometry: pellet surface finish and per-run sample mass are not stated
+      - observation_id: lee_1978_knudsen_cell_geometry
+        type: apparatus
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 74
+          figure: '4'
+          section: 'III.2 Knudsen method'
+        units: as printed
+        values:
+          quantity: effusion_cell_geometry
+          cell_materials_as_printed:
+            - Pt10%Rh
+            - Pt30%Rh
+          orifice_area_to_sample_surface_area_ratio_as_printed: about 1:1000
+          Clausing_factor_Kc_range_as_printed: 0.62 to 0.65
+          sample_as_printed: powder in the effusion cell
+          rate_measurement_as_printed: mass loss per orifice area per unit time
+          drawn_support_materials: alumina, tungsten, graphite, and tungsten supporter
+          unreported_geometry: cell and orifice diameters are not stated
+      - observation_id: lee_1978_table1_fit_parameters_schema_gap
+        type: typed_refusal
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 76
+          table: '1'
+        units: as printed
+        values:
+          quantity: unavailable
+          status: typed_refusal
+          schema_gap: 'No store quantity token represents the fitted vaporization-entropy and vaporization-enthalpy differences in Table 1; retained here as printed parameters.'
+          delta_entropy_unit_as_printed: 'cal deg^-1 mole^-1'
+          delta_enthalpy_unit_as_printed: 'kcal mole^-1'
+          rows_as_printed:
+            - species: ThO2
+              delta_S_star_minus_delta_S_degree_as_printed: '2.01'
+              delta_H_star_minus_delta_H_degree_as_printed: '7.01'
+            - species: MgO
+              delta_S_star_minus_delta_S_degree_as_printed: '7.02'
+              delta_H_star_minus_delta_H_degree_as_printed: '21.57'
+            - species: Y2O3
+              delta_S_star_minus_delta_S_degree_as_printed: '9.83'
+              delta_H_star_minus_delta_H_degree_as_printed: '26.67'
+            - species: Yb2O3
+              delta_S_star_minus_delta_S_degree_as_printed: '10.38'
+              delta_H_star_minus_delta_H_degree_as_printed: '27.00'
+            - species: MgCr2O4
+              delta_S_star_minus_delta_S_degree_as_printed: '10.63'
+              delta_H_star_minus_delta_H_degree_as_printed: '29.17'
+            - species: Cr2O3
+              delta_S_star_minus_delta_S_degree_as_printed: '17.75'
+              delta_H_star_minus_delta_H_degree_as_printed: '46.82'
+            - species: Al2O3
+              delta_S_star_minus_delta_S_degree_as_printed: '34.23'
+              delta_H_star_minus_delta_H_degree_as_printed: '79.53'
+  Y2O3:
+    observations:
+      - observation_id: lee_1978_table1_y2o3_alpha
+        type: alpha
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 76
+          table: '1'
+          table_row_number: 4
+          table_column_number: 4
+          row_label: Y2O3
+          column_header: 'α at Tm/T = 1.5'
+        regime: Langmuir and Knudsen vapor-pressure comparison
+        units: dimensionless
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: 'Table 1 prints Tm/T = 1.5, not an absolute temperature.'
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          fO2_log:
+            state: {tag: unknown, reason: 'No oxygen fugacity or gas ratio is reported for this row.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          composition:
+            state: {tag: unknown, reason: 'Table 1 gives an oxide formula, not a melt or mixture composition.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: 'No total pressure for the cited Y2O3 data is given in Table 1.'
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+        values:
+          quantity: alpha
+          alpha: 0.084
+          alpha_as_printed: '8.4 × 10⁻²'
+          normalized_temperature_as_printed: 'Tm/T = 1.5'
+          method_class: quoted_attributed
+          attribution: 'Ackermann, Rauh, and Thorn (1964), reference 30; Lee recalculates the original data.'
+  Yb2O3:
+    observations:
+      - observation_id: lee_1978_table1_yb2o3_alpha
+        type: alpha
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 76
+          table: '1'
+          table_row_number: 5
+          table_column_number: 4
+          row_label: Yb2O3
+          column_header: 'α at Tm/T = 1.5'
+        regime: Langmuir and Knudsen vapor-pressure comparison
+        units: dimensionless
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: 'Table 1 prints Tm/T = 1.5, not an absolute temperature.'
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          fO2_log:
+            state: {tag: unknown, reason: 'No oxygen fugacity or gas ratio is reported for this row.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          composition:
+            state: {tag: unknown, reason: 'Table 1 gives an oxide formula, not a melt or mixture composition.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: 'No total pressure for the cited Yb2O3 data is given in Table 1.'
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+        values:
+          quantity: alpha
+          alpha: 0.078
+          alpha_as_printed: '7.8 × 10⁻²'
+          normalized_temperature_as_printed: 'Tm/T = 1.5'
+          method_class: quoted_attributed
+          attribution: 'Alcock and Peleg (1967), reference 29; Lee recalculates the original data.'
+  MgCr2O4:
+    observations:
+      - observation_id: lee_1978_table1_mgcr2o4_alpha
+        type: alpha
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 76
+          table: '1'
+          table_row_number: 6
+          table_column_number: 4
+          row_label: MgCr2O4
+          column_header: 'α at Tm/T = 1.5'
+        regime: Langmuir and Knudsen vapor-pressure comparison
+        units: dimensionless
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: 'Table 1 prints Tm/T = 1.5, not an absolute temperature.'
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          fO2_log:
+            state: {tag: unknown, reason: 'No oxygen fugacity or gas ratio is reported for this row.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          composition:
+            state: {tag: unknown, reason: 'Table 1 gives an oxide formula, not a melt or mixture composition.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: 'The abstract gives only an experiment-wide pressure upper bound, not an exact point total pressure.'
+            locator: {page: 1, pdf_page_index: 0, published_page: 72, paragraph: Abstract}
+          total_pressure_as_printed:
+            state:
+              tag: value
+              value: '<10^-5 torr'
+            locator: {page: 1, pdf_page_index: 0, published_page: 72, paragraph: Abstract}
+        values:
+          quantity: alpha
+          alpha: 0.075
+          alpha_as_printed: '7.5 × 10⁻²'
+          normalized_temperature_as_printed: 'Tm/T = 1.5'
+          pressure_as_printed: '<10^-5 torr'
+          method_class: quoted_attributed
+          attribution: 'Lee (1978), author-calculated from this work’s MgCr2O4 measurements; the plotted inputs are not tabulated.'
+  Cr2O3:
+    observations:
+      - observation_id: lee_1978_table1_cr2o3_alpha
+        type: alpha
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 76
+          table: '1'
+          table_row_number: 7
+          table_column_number: 4
+          row_label: Cr2O3
+          column_header: 'α at Tm/T = 1.5'
+        regime: Langmuir and Knudsen vapor-pressure comparison
+        units: dimensionless
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: 'Table 1 prints Tm/T = 1.5, not an absolute temperature.'
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          fO2_log:
+            state: {tag: unknown, reason: 'No oxygen fugacity or gas ratio is reported for this row.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          composition:
+            state: {tag: unknown, reason: 'Table 1 gives an oxide formula, not a melt or mixture composition.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: 'The abstract gives only an experiment-wide pressure upper bound, not an exact point total pressure.'
+            locator: {page: 1, pdf_page_index: 0, published_page: 72, paragraph: Abstract}
+          total_pressure_as_printed:
+            state:
+              tag: value
+              value: '<10^-5 torr'
+            locator: {page: 1, pdf_page_index: 0, published_page: 72, paragraph: Abstract}
+        values:
+          quantity: alpha
+          alpha: 0.0097
+          alpha_as_printed: '9.7 × 10⁻³'
+          normalized_temperature_as_printed: 'Tm/T = 1.5'
+          pressure_as_printed: '<10^-5 torr'
+          method_class: quoted_attributed
+          attribution: 'Lee (1978), author-calculated from this work’s Cr2O3 measurements; the plotted inputs are not tabulated.'
+  Al2O3:
+    observations:
+      - observation_id: lee_1978_table1_al2o3_alpha
+        type: alpha
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 76
+          table: '1'
+          table_row_number: 8
+          table_column_number: 4
+          row_label: Al2O3
+          column_header: 'α at Tm/T = 1.5'
+        regime: Langmuir and Knudsen vapor-pressure comparison
+        units: dimensionless
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: 'Table 1 prints Tm/T = 1.5, not an absolute temperature.'
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          fO2_log:
+            state: {tag: unknown, reason: 'No oxygen fugacity or gas ratio is reported for this row.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          composition:
+            state: {tag: unknown, reason: 'Table 1 gives an oxide formula, not a melt or mixture composition.'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: 'No total pressure for the cited Al2O3 data is given in Table 1.'
+            locator: {page: 5, pdf_page_index: 4, published_page: 76, table: '1'}
+        values:
+          quantity: alpha
+          alpha: 0.00020
+          alpha_as_printed: '2.0 × 10⁻⁴'
+          normalized_temperature_as_printed: 'Tm/T = 1.5'
+          method_class: quoted_attributed
+          attribution: 'JANAF Thermochemical Tables, 2nd edition (1970), reference 5; Lee recalculates the original data.'

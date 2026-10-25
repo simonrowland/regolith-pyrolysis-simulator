@@ -1,0 +1,26 @@
+source_id: lee-1978-mgo-cr2o3-langmuir-knudsen-vaporization
+source:
+  citation: >-
+    Lee, H.-L. (1978), High Temperature Vaporization of the High Melting Point Oxides,
+    Journal of the Korean Ceramic Society 15(2), 72–78.
+  year: 1978
+  url: https://koreascience.or.kr/article/JAKO197811920031953.pdf
+extraction:
+  method: mineru_table_draft emit; OCR cells checked against the page render
+  date: '2026-10-25'
+  worker: w1025d-lee78
+review_status: draft
+tables:
+  - page: 5
+    table_index: 1
+    type: alpha
+    quantity: alpha
+    evidence_class: quoted_attributed
+    unit: dimensionless
+    attribution: Lee (1978), Table 1; values at normalized temperature Tm/T = 1.5
+    published_page: 76
+    rows: all
+    species_form: printed_formula
+    value_pairs:
+      - species_column: 1
+        value_column: 4
