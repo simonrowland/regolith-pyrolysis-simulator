@@ -15832,7 +15832,7 @@
               ],
               "species_id": "Bi",
               "detail": "declared applicability predicate 'not_applicable' is inactive",
-              "flux_dormant": true
+              "flux_dormant": false
             }
           },
           "out_of_range": false,
@@ -15841,7 +15841,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "Ca": {
           "species_id": "Ca",
@@ -17963,7 +17963,7 @@
               ],
               "species_id": "P2O5_gas",
               "detail": "declared applicability predicate 'not_applicable' is inactive",
-              "flux_dormant": true
+              "flux_dormant": false
             }
           },
           "out_of_range": false,
@@ -17972,7 +17972,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "P4": {
           "species_id": "P4",
@@ -19079,7 +19079,7 @@
               ],
               "species_id": "Bi",
               "detail": "declared applicability predicate 'not_applicable' is inactive",
-              "flux_dormant": true
+              "flux_dormant": false
             }
           },
           "out_of_range": false,
@@ -19088,7 +19088,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "Cr2O3_gas": {
           "species_id": "Cr2O3_gas",
@@ -19267,7 +19267,7 @@
               ],
               "species_id": "P2O5_gas",
               "detail": "declared applicability predicate 'not_applicable' is inactive",
-              "flux_dormant": true
+              "flux_dormant": false
             }
           },
           "out_of_range": false,
@@ -19276,7 +19276,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "P4": {
           "species_id": "P4",
@@ -19586,7 +19586,7 @@
         "Al2O3_gas": "eligible",
         "AlO": "eligible",
         "AlO2": "eligible",
-        "Bi": "dormant_by_epoch",
+        "Bi": "refusal",
         "Ca": "eligible",
         "Ca2": "eligible",
         "CaO_gas": "eligible",
@@ -19609,7 +19609,7 @@
         "Na2": "eligible",
         "Na2O_gas": "eligible",
         "P2": "dormant_by_epoch",
-        "P2O5_gas": "dormant_by_epoch",
+        "P2O5_gas": "refusal",
         "P4": "dormant_by_epoch",
         "P4O10": "dormant_by_epoch",
         "P4O6": "dormant_by_epoch",
@@ -26065,7 +26065,7 @@
                 ],
                 "species_id": "Bi",
                 "detail": "declared applicability predicate 'not_applicable' is inactive",
-                "flux_dormant": true
+                "flux_dormant": false
               }
             },
             "out_of_range": false,
@@ -26074,7 +26074,7 @@
             "source_boundary": null,
             "source_reaction_activity": null,
             "is_flux_active": false,
-            "is_flux_dormant_by_epoch": true
+            "is_flux_dormant_by_epoch": false
           },
           "input_mass_kg_hr": 0.0,
           "remaining_mass_kg_hr": 0.0,
@@ -29424,7 +29424,7 @@
                 ],
                 "species_id": "P2O5_gas",
                 "detail": "declared applicability predicate 'not_applicable' is inactive",
-                "flux_dormant": true
+                "flux_dormant": false
               }
             },
             "out_of_range": false,
@@ -29433,7 +29433,7 @@
             "source_boundary": null,
             "source_reaction_activity": null,
             "is_flux_active": false,
-            "is_flux_dormant_by_epoch": true
+            "is_flux_dormant_by_epoch": false
           },
           "input_mass_kg_hr": 0.0,
           "remaining_mass_kg_hr": 0.0,
@@ -31395,13 +31395,13 @@
     "shadow_outcome": "missing_keys",
     "silent_zero": {
       "schema": "silent_zero.v1",
-      "count": 5,
+      "count": 7,
       "counts_by_reason": {
         "proven_below_threshold": 3,
-        "refused_upstream": 2
+        "refused_upstream": 4
       },
       "counts_by_doctrine_category": {
-        "1": 2,
+        "1": 4,
         "2": 0,
         "3": 3
       },
@@ -31434,6 +31434,14 @@
           "zero_because": "refused_upstream",
           "site": "evaporation.partial_channel_refusal",
           "doctrine_category": 1,
+          "species": "Bi",
+          "field": "batch_channel_state",
+          "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
+        },
+        {
+          "zero_because": "refused_upstream",
+          "site": "evaporation.partial_channel_refusal",
+          "doctrine_category": 1,
           "species": "Cr2O3_gas",
           "field": "batch_channel_state",
           "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
@@ -31443,6 +31451,14 @@
           "site": "evaporation.partial_channel_refusal",
           "doctrine_category": 1,
           "species": "MnO_gas",
+          "field": "batch_channel_state",
+          "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
+        },
+        {
+          "zero_because": "refused_upstream",
+          "site": "evaporation.partial_channel_refusal",
+          "doctrine_category": 1,
+          "species": "P2O5_gas",
           "field": "batch_channel_state",
           "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
         }
@@ -41317,7 +41333,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "dormant_by_epoch",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -41340,7 +41356,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -45456,7 +45472,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "dormant_by_epoch",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -45479,7 +45495,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -51394,7 +51410,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -51403,7 +51419,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -53415,7 +53431,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -53424,7 +53440,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -54611,7 +54627,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -54620,7 +54636,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P2": {
                 "species_id": "P2",
@@ -54717,7 +54733,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -54726,7 +54742,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -55240,7 +55256,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "dormant_by_epoch",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -55263,7 +55279,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -61172,7 +61188,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -61181,7 +61197,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -63217,7 +63233,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -63226,7 +63242,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -64413,7 +64429,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -64422,7 +64438,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P2": {
                 "species_id": "P2",
@@ -64519,7 +64535,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -64528,7 +64544,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -65044,7 +65060,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "dormant_by_epoch",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -65067,7 +65083,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -71283,7 +71299,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -71292,7 +71308,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -73328,7 +73344,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -73337,7 +73353,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -74524,7 +74540,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -74533,7 +74549,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P2": {
                 "species_id": "P2",
@@ -74630,7 +74646,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -74639,7 +74655,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -75153,7 +75169,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "dormant_by_epoch",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -75176,7 +75192,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -79360,7 +79376,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -79369,7 +79385,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -81822,7 +81838,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -81831,7 +81847,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -82726,7 +82742,7 @@
           "Na2": "dormant_by_epoch",
           "Na2O_gas": "dormant_by_epoch",
           "P2": "eligible",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "eligible",
           "P4O10": "eligible",
           "P4O6": "eligible",
@@ -86872,7 +86888,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -86881,7 +86897,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -89334,7 +89350,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -89343,7 +89359,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -90238,7 +90254,7 @@
           "Na2": "dormant_by_epoch",
           "Na2O_gas": "dormant_by_epoch",
           "P2": "eligible",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "eligible",
           "P4O10": "eligible",
           "P4O6": "eligible",
@@ -94384,7 +94400,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -94393,7 +94409,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -96846,7 +96862,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -96855,7 +96871,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -97750,7 +97766,7 @@
           "Na2": "dormant_by_epoch",
           "Na2O_gas": "dormant_by_epoch",
           "P2": "eligible",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "eligible",
           "P4O10": "eligible",
           "P4O6": "eligible",
@@ -108869,7 +108885,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -108878,7 +108894,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -110091,7 +110107,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -110100,7 +110116,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -111321,7 +111337,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -111330,7 +111346,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -112502,7 +112518,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -112511,7 +112527,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -113559,7 +113575,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -113582,7 +113598,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -123092,7 +123108,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -123101,7 +123117,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -124314,7 +124330,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -124323,7 +124339,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -125544,7 +125560,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -125553,7 +125569,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -126725,7 +126741,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -126734,7 +126750,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -127782,7 +127798,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -127805,7 +127821,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -138955,7 +138971,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -138964,7 +138980,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -140177,7 +140193,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -140186,7 +140202,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -141407,7 +141423,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -141416,7 +141432,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -142588,7 +142604,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -142597,7 +142613,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -143645,7 +143661,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -143668,7 +143684,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -153178,7 +153194,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -153187,7 +153203,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -154400,7 +154416,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -154409,7 +154425,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -155630,7 +155646,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -155639,7 +155655,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -156811,7 +156827,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -156820,7 +156836,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -157868,7 +157884,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -157891,7 +157907,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -171265,7 +171281,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -171274,7 +171290,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -172487,7 +172503,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -172496,7 +172512,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -173717,7 +173733,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -173726,7 +173742,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -174898,7 +174914,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -174907,7 +174923,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -175960,7 +175976,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -175983,7 +175999,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -189637,7 +189653,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -189646,7 +189662,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -190859,7 +190875,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -190868,7 +190884,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -192089,7 +192105,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -192098,7 +192114,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -193270,7 +193286,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -193279,7 +193295,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -194329,7 +194345,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -194352,7 +194368,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -208493,7 +208509,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -208502,7 +208518,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -209715,7 +209731,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -209724,7 +209740,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -210945,7 +210961,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -210954,7 +210970,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -212126,7 +212142,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -212135,7 +212151,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -213185,7 +213201,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -213208,7 +213224,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -245481,7 +245497,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -245490,7 +245506,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -246703,7 +246719,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -246712,7 +246728,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -247933,7 +247949,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -247942,7 +247958,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -249114,7 +249130,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -249123,7 +249139,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -250173,7 +250189,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -250196,7 +250212,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -263713,7 +263729,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -263722,7 +263738,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -264923,7 +264939,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -264932,7 +264948,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -266154,7 +266170,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -266163,7 +266179,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -267282,7 +267298,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -267291,7 +267307,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -268341,7 +268357,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -268364,7 +268380,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -281505,7 +281521,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -281514,7 +281530,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -282715,7 +282731,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -282724,7 +282740,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -283946,7 +283962,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -283955,7 +283971,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -285074,7 +285090,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -285083,7 +285099,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -286203,7 +286219,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -286226,7 +286242,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -297816,7 +297832,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -297825,7 +297841,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -299026,7 +299042,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -299035,7 +299051,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -300257,7 +300273,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -300266,7 +300282,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -301385,7 +301401,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -301394,7 +301410,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -302514,7 +302530,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -302537,7 +302553,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -315680,7 +315696,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -315689,7 +315705,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -316890,7 +316906,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -316899,7 +316915,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -318121,7 +318137,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -318130,7 +318146,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -319249,7 +319265,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -319258,7 +319274,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -320378,7 +320394,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -320401,7 +320417,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -331986,7 +332002,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -331995,7 +332011,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -333196,7 +333212,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -333205,7 +333221,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -334427,7 +334443,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -334436,7 +334452,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -335555,7 +335571,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -335564,7 +335580,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -336684,7 +336700,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -336707,7 +336723,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -349891,7 +349907,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -349900,7 +349916,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -351101,7 +351117,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -351110,7 +351126,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -352332,7 +352348,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -352341,7 +352357,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -353460,7 +353476,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -353469,7 +353485,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -356042,7 +356058,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -356065,7 +356081,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -367660,7 +367676,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -367669,7 +367685,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -368870,7 +368886,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -368879,7 +368895,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -370101,7 +370117,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -370110,7 +370126,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -371229,7 +371245,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -371238,7 +371254,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -374454,7 +374470,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -374477,7 +374493,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
@@ -387672,7 +387688,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -387681,7 +387697,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -388882,7 +388898,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -388891,7 +388907,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -390113,7 +390129,7 @@
                     ],
                     "species_id": "Bi",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -390122,7 +390138,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "Ca": {
                 "species_id": "Ca",
@@ -391241,7 +391257,7 @@
                     ],
                     "species_id": "P2O5_gas",
                     "detail": "declared applicability predicate 'not_applicable' is inactive",
-                    "flux_dormant": true
+                    "flux_dormant": false
                   }
                 },
                 "out_of_range": false,
@@ -391250,7 +391266,7 @@
                 "source_boundary": null,
                 "source_reaction_activity": null,
                 "is_flux_active": false,
-                "is_flux_dormant_by_epoch": true
+                "is_flux_dormant_by_epoch": false
               },
               "P4": {
                 "species_id": "P4",
@@ -395855,7 +395871,7 @@
           "Al2O3_gas": "eligible",
           "AlO": "eligible",
           "AlO2": "eligible",
-          "Bi": "dormant_by_epoch",
+          "Bi": "refusal",
           "Ca": "eligible",
           "Ca2": "eligible",
           "CaO_gas": "eligible",
@@ -395878,7 +395894,7 @@
           "Na2": "eligible",
           "Na2O_gas": "eligible",
           "P2": "dormant_by_epoch",
-          "P2O5_gas": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
           "P4": "dormant_by_epoch",
           "P4O10": "dormant_by_epoch",
           "P4O6": "dormant_by_epoch",
