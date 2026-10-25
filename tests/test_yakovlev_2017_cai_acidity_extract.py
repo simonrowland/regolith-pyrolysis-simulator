@@ -7,10 +7,10 @@ from simulator.battery.validate import validate_corpus
 EXTRACT = REPO_ROOT / "data/literature/extracts/yakovlev-2017-cai-acidity.yaml"
 
 
-def test_all_figures_retain_printed_identity_attribution_and_deferred_status():
+def test_all_figures_retain_printed_identity_attribution_and_digitisation_status():
     extract = yaml.safe_load(EXTRACT.read_text())
     assert extract["source"]["doi"] == "10.1134/S0016702917020070"
-    assert extract["species"]["SiO2"]["observations"] == []
+    assert len(extract["species"]["SiO2"]["observations"]) == 29
     context = {
         item["observation_id"]: item
         for item in extract["species"]["SiO2"]["context"]
@@ -28,7 +28,16 @@ def test_all_figures_retain_printed_identity_attribution_and_deferred_status():
         key: value for key, value in context.items() if value["type"] == "figure_record"
     }
     assert set(figures) == expected_figures
-    for figure in figures.values():
+    digitisation = {
+        "yakovlev_2017_figure1_major_oxide_vapor_pressures": "Deferred. Eight continuous curves and no discrete markers. No point was sampled.",
+        "yakovlev_2017_figure2_krymka_partial_pressures": "Read from the 600 dpi render. Counts are on the series rows and in the audit sidecar.",
+        "yakovlev_2017_figure3_krymka_residual_composition": "Read from the 600 dpi render. Five CaO triangles on the x-axis are deferred in the audit. Material loss is the point condition, not a second quantity.",
+        "yakovlev_2017_figure4_efremovka_partial_pressures": "Read from the 600 dpi render. Counts are on the series rows and in the audit sidecar.",
+        "yakovlev_2017_figure5_cao_mgo_sio2_activities": "Read from the 600 dpi render. Scored points are figure_only. The caption calculation attribution is in the observation note.",
+        "yakovlev_2017_figure6_al2o3_activities": "Read from the 600 dpi render. Scored points are figure_only. One bridge peak is refused in the audit.",
+        "yakovlev_2017_figure7_cai_bulk_composition_ratio": "39 filled circles are read in the audit sidecar only. No quantity token exists for an MgO/SiO2 ratio.",
+    }
+    for key, figure in figures.items():
         assert figure["locator"]["page"] == figure["locator"]["pdf_page_index"] + 1
         assert figure["panel"]
         assert figure["attribution"]
@@ -38,7 +47,7 @@ def test_all_figures_retain_printed_identity_attribution_and_deferred_status():
         assert figure["values"]["axes_as_printed"]
         assert figure["values"]["caption"]
         assert figure["values"]["series"]
-        assert figure["values"]["digitisation"] == "deferred to a figure pass"
+        assert figure["values"]["digitisation"] == digitisation[key]
         assert "points" not in figure["values"]
         assert all("marker" in series and "marker_count" in series for series in figure["values"]["series"])
 
@@ -80,7 +89,7 @@ def test_all_figures_retain_printed_identity_attribution_and_deferred_status():
         "model_derived",
     ]
     assert all(
-        "p_i° as the partial pressure of pure component i" in series["standard_state_as_printed"]
+        "p_i° is the partial pressure of pure component i" in series["standard_state_as_printed"]
         for series in figure5["values"]["series"]
     )
 
@@ -110,7 +119,7 @@ def test_all_figures_retain_printed_identity_attribution_and_deferred_status():
     assert all(item["approximate"] for item in loss_limits["upper_limits_as_printed"])
 
 
-def test_context_only_extract_migrates_with_no_typed_observations():
+def test_figure_extract_migrates_figure_only_observations():
     migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -124,8 +133,6 @@ def test_context_only_extract_migrates_with_no_typed_observations():
     )
     assert report.hard_issues == ()
     assert len(result.works) == 1
-    assert result.observations == {}
-    # No rows are typed while the plotted values are deferred, so species-formula
-    # identity checks are vacuous for this context-only extract.
+    assert len(result.observations) == 166
     for observation in result.observations.values():
         assert observation.identity.species.formula
