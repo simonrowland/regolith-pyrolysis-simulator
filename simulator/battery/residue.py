@@ -19,9 +19,11 @@ from simulator.accounting.formulas import parse_formula
 from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
 from simulator.battery.oxygen_balance import (
     OxygenBalanceBracketBoundary,
+    _VacuumPressureBundleError,
     _VacuumOxygenChannel,
     _net_evaporation_pressure_Pa,
     _solve_vacuum_oxygen_balance,
+    _validated_pressure_bundle,
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -1082,6 +1084,8 @@ def _residue_oxygen_balance(
         )
     except ResidueInventoryRefusal:
         raise
+    except _VacuumPressureBundleError as exc:
+        raise _residue_pressure_bundle_refusal(exc) from exc
     except ValueError as exc:
         # The shared root still emits ValueError for this contract violation.
         # Preserve its distinction without changing that owner's acceptance.
@@ -1092,11 +1096,23 @@ def _residue_oxygen_balance(
         raise
 
 
-def _residue_oxygen_balance_refusal(error, pressure_at, active_parent_terms):
+def _residue_pressure_bundle_refusal(error):
+    return ResidueInventoryRefusal("residue_pressure_invalid", str(error))
+
+
+def _residue_oxygen_balance_refusal(
+    error, pressure_at, active_parent_terms, pressure_terms
+):
     """Translate root errors, leaving the zero-parent-flux case to each path."""
-    low_pressure = pressure_at(-15.0)
+    try:
+        low_pressure = _validated_pressure_bundle(
+            pressure_at(-15.0),
+            tuple(term.source.species for term in pressure_terms),
+        )
+    except _VacuumPressureBundleError as exc:
+        raise _residue_pressure_bundle_refusal(exc) from exc
     if not any(
-        float(low_pressure.get(term.source.species, 0.0) or 0.0) > 0.0
+        low_pressure[term.source.species] > 0.0
         for term in active_parent_terms
     ):
         return None
@@ -1302,7 +1318,7 @@ def integrate_residue_inventory(
                 raise
             except ValueError as exc:
                 refusal = _residue_oxygen_balance_refusal(
-                    exc, pressure_at, active_parent_terms
+                    exc, pressure_at, active_parent_terms, terms
                 )
                 if refusal is None:
                     pO2_steps.append(None)
@@ -2061,7 +2077,7 @@ def integrate_residue_fraction(
                         raise
                     except ValueError as exc:
                         refusal = _residue_oxygen_balance_refusal(
-                            exc, pressure_at, active_parent_terms
+                            exc, pressure_at, active_parent_terms, live_terms
                         )
                         if refusal is not None:
                             raise refusal from exc

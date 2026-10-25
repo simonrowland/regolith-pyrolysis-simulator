@@ -121,6 +121,34 @@ class _VacuumOxygenBalance:
     alpha_sources: Mapping[str, str]
 
 
+class _VacuumPressureBundleError(ValueError):
+    """An engine returned a malformed species-pressure bundle."""
+
+
+def _validated_pressure_bundle(
+    model_pressures: object,
+    species: Sequence[str],
+) -> dict[str, float]:
+    if not isinstance(model_pressures, Mapping):
+        raise _VacuumPressureBundleError(
+            "pressure model must return a species-to-Pa mapping"
+        )
+    pressures: dict[str, float] = {}
+    for name in species:
+        try:
+            pressure = float(model_pressures[name])
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            raise _VacuumPressureBundleError(
+                f"pressure model is missing a valid {name!r} pressure"
+            ) from exc
+        if not math.isfinite(pressure) or pressure < 0.0:
+            raise _VacuumPressureBundleError(
+                f"pressure model returned invalid {name!r} pressure"
+            )
+        pressures[name] = pressure
+    return pressures
+
+
 def _net_evaporation_pressure_Pa(pressure_Pa: float, background_pressure_Pa: float) -> float:
     """HKL driving pressure; zero background preserves the vacuum expression."""
     return max(0.0, pressure_Pa - background_pressure_Pa)
@@ -222,23 +250,14 @@ def _solve_vacuum_oxygen_balance(
     ) -> tuple[float, dict[str, float], float, float]:
         if model_pressures is None:
             model_pressures = pressure_model(logp)
-        if not isinstance(model_pressures, Mapping):
-            raise ValueError("pressure model must return a species-to-Pa mapping")
-        pressures: dict[str, float] = {}
+        pressures = _validated_pressure_bundle(
+            model_pressures,
+            tuple(channel.species for channel in active_channels),
+        )
         oxygen_flux = 0.0
         parent_flux = 0.0
         for channel in active_channels:
-            try:
-                pressure = float(model_pressures[channel.species])
-            except (KeyError, TypeError, ValueError, OverflowError) as exc:
-                raise ValueError(
-                    f"pressure model is missing a valid {channel.species!r} pressure"
-                ) from exc
-            if not math.isfinite(pressure) or pressure < 0.0:
-                raise ValueError(
-                    f"pressure model returned invalid {channel.species!r} pressure"
-                )
-            pressures[channel.species] = pressure
+            pressure = pressures[channel.species]
             flux = molar_flux(channel, pressure)
             oxygen_flux += channel.oxygen_atoms * flux
             parent_flux += channel.parent_oxygen_demand * flux

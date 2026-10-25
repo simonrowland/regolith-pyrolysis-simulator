@@ -422,7 +422,7 @@ def test_fraction_integrator_flags_the_oxygen_balance_floor() -> None:
     )
 
 
-def test_fraction_integrator_types_missing_and_invalid_vacuum_pressures() -> None:
+def test_time_and_fraction_integrators_type_malformed_vacuum_pressures() -> None:
     channels = (
         ResidueChannel("Fe", "Fe", "FeO", 1.0, "pin"),
         ResidueChannel("O2", "O2", None, 1.0, "pin"),
@@ -432,6 +432,18 @@ def test_fraction_integrator_types_missing_and_invalid_vacuum_pressures() -> Non
     def missing_fe_pressure(*_args):
         return {"O2": 1.0e-5}
 
+    def nonnumeric_fe_pressure(*_args):
+        return {"Fe": "bad", "O2": 1.0e-5}
+
+    def non_mapping_pressure(*_args):
+        return None
+
+    def nonfinite_fe_pressure(*_args):
+        return {"Fe": float("nan"), "O2": 1.0e-5}
+
+    def negative_fe_pressure(*_args):
+        return {"Fe": -1.0, "O2": 1.0e-5}
+
     def root_above_bracket(_inventory, _temperature, logp, _regime):
         displacement = logp - 10.0
         return {
@@ -439,22 +451,107 @@ def test_fraction_integrator_types_missing_and_invalid_vacuum_pressures() -> Non
             "O2": 1.0e-20 * 10.0**displacement,
         }
 
-    cases = (
-        (missing_fe_pressure, "residue_mass_loss_extent_unreachable", None),
-        (root_above_bracket, "residue_oxygen_balance_failed", "no root in the declared pO2 bracket"),
+    malformed_cases = (
+        missing_fe_pressure,
+        nonnumeric_fe_pressure,
+        non_mapping_pressure,
+        nonfinite_fe_pressure,
+        negative_fe_pressure,
     )
-    for pressure_model, reason, detail in cases:
-        with pytest.raises(ResidueInventoryRefusal) as error:
-            integrate_residue_fraction(_fraction_request(
+    observed = []
+    for pressure_model in malformed_cases:
+        requests = (
+            (integrate_residue_schedule, _request(
+                channels=channels,
+                thermal_schedule=(ResidueThermalSegment(1800.0, 100.0, 1),),
+                pressure_regime=vacuum,
+                pressure_model=pressure_model,
+            )),
+            (integrate_residue_fraction, _fraction_request(
                 channels=channels,
                 pressure_regime=vacuum,
                 pressure_model=pressure_model,
                 mass_loss_fraction=0.01,
-            ))
+            )),
+        )
+        for integrate, request in requests:
+            try:
+                integrate(request)
+            except Exception as error:
+                observed.append((
+                    type(error).__name__,
+                    getattr(error, "reason", None),
+                ))
+            else:
+                observed.append(("success", None))
 
-        assert error.value.reason == reason
-        if detail is not None:
-            assert detail in error.value.detail
+    expected = [("ResidueInventoryRefusal", "residue_pressure_invalid")] * 10
+    assert observed == expected, f"malformed pressure outcomes: {observed!r}"
+
+    with pytest.raises(ResidueInventoryRefusal) as error:
+        integrate_residue_fraction(_fraction_request(
+            channels=channels,
+            pressure_regime=vacuum,
+            pressure_model=root_above_bracket,
+            mass_loss_fraction=0.01,
+        ))
+
+    assert error.value.reason == "residue_oxygen_balance_failed"
+    assert "no root in the declared pO2 bracket" in error.value.detail
+
+
+def test_zero_flux_fallback_requires_a_validated_pressure_bundle() -> None:
+    channels = (
+        ResidueChannel("Fe", "Fe", "FeO", 1.0, "pin"),
+        ResidueChannel("O2", "O2", None, 1.0, "pin"),
+    )
+    vacuum = ResiduePressureRegime("vacuum_balance", 100.0, 0.0)
+
+    def pressure_bundle_at_probe(_inventory, _temperature, logp, _regime):
+        if logp == -15.0:
+            return {"Fe": 0.0, "O2": 0.0}
+        return {"Fe": 1.0e-3, "O2": 1.0e-30}
+
+    def malformed_bundle_at_probe(_inventory, _temperature, logp, _regime):
+        if logp == -15.0:
+            return {"Fe": 0.0, "O2": "bad"}
+        return {"Fe": 1.0e-3, "O2": 1.0e-30}
+
+    timed = integrate_residue_schedule(_request(
+        channels=channels,
+        thermal_schedule=(ResidueThermalSegment(1800.0, 100.0, 1),),
+        pressure_regime=vacuum,
+        pressure_model=pressure_bundle_at_probe,
+    ))
+    assert timed.residue_mol == {"FeO": 1.0e-4, "SiO2": 1.0e-4}
+    assert timed.evaporated_mol == {}
+
+    with pytest.raises(ResidueInventoryRefusal) as error:
+        integrate_residue_fraction(_fraction_request(
+            channels=channels,
+            pressure_regime=vacuum,
+            pressure_model=pressure_bundle_at_probe,
+            mass_loss_fraction=0.01,
+        ))
+    assert error.value.reason == "residue_mass_loss_extent_unreachable"
+
+    for integrate, request in (
+        (integrate_residue_schedule, _request(
+            channels=channels,
+            thermal_schedule=(ResidueThermalSegment(1800.0, 100.0, 1),),
+            pressure_regime=vacuum,
+            pressure_model=malformed_bundle_at_probe,
+        )),
+        (integrate_residue_fraction, _fraction_request(
+            channels=channels,
+            pressure_regime=vacuum,
+            pressure_model=malformed_bundle_at_probe,
+            mass_loss_fraction=0.01,
+        )),
+    ):
+        with pytest.raises(ResidueInventoryRefusal) as error:
+            integrate(request)
+        assert error.value.reason == "residue_pressure_invalid"
 
 
 def test_one_volatile_parent_with_refractory_remainder_matches_rayleigh_limit() -> None:
