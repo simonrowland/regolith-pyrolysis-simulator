@@ -1,0 +1,150 @@
+source_id: sanbongi-1959-blast-furnace-slag-activities
+source:
+  citation: 'Sanbongi, K. & Omori, Y. (1959). Research on the Activity of Components in Fundamental System in Iron Blast Furnace Slag. I: Measurement of the Activity of Silica in the System of CaO-SiO2 and CaO-SiO2-Al2O3. Science Reports of the Research Institutes, Tohoku University, Series A 11, 244–263.'
+  year: 1959
+  corpus_asset: raw/sanbongi-1959-blast-furnace-slag-activities/sanbongi-1959-blast-furnace-slag-activities.pdf
+extraction:
+  method: >-
+    MinerU table drafts were read alongside the independent Tesseract OCR. Every mapped numeric cell and each table row/column assignment was checked against the page render because this source is scanned and the Tesseract layouts run columns together. The full row-level cell audit and normalized table mapping are in the adjacent source audit files. Figure points were not digitized.
+  date: '2026-10-25'
+  worker: w1025d-sanb59
+review_status: draft
+fidelity_samples:
+  - species: SiO2
+    observable: activity
+    observation_id: sanbongi_1959_blast_furnace_slag_activities_p005_t01_r03_c07
+    field: activity
+    value: '0.008'
+    locator: {page: 5, published_page: 248, table: '1', note: 'Table 1, row NB-1 activity cell.'}
+  - species: SiO2
+    observable: activity
+    observation_id: sanbongi_1959_blast_furnace_slag_activities_p009_t02_r04_c08
+    field: activity
+    value: '0.04'
+    locator: {page: 9, published_page: 252, table: '2', note: 'Table 2, row CB-1 activity cell.'}
+  - species: SiO2
+    observable: activity
+    observation_id: sanbongi_1959_blast_furnace_slag_activities_p010_t03_r04_c10
+    field: activity
+    value: '0.08'
+    locator: {page: 10, published_page: 253, table: '3', note: 'Table 3, row T 5-1 activity cell.'}
+  - species: SiO2
+    observable: activity
+    observation_id: sanbongi_1959_blast_furnace_slag_activities_p018_t05_r02_c02
+    field: activity
+    value: '0.03'
+    locator: {page: 18, published_page: 261, table: '4', note: 'Table 4, Present work activity cell.'}
+tables:
+  - page: 5
+    table_index: 1
+    published_page: 248
+    type: activity
+    quantity: activity
+    evidence_class: quoted_attributed
+    unit: dimensionless
+    phase: l
+    per: dimensionless
+    regime: emf_cell
+    attribution: 'Sanbongi and Omori, present work; author-reported activity reduced from the cell e.m.f.'
+    temperature: {as_printed: '1300', unit: C, locator: {page: 5, published_page: 248, table: '1', note: 'Table 1 caption states 1300°C.'}}
+    values:
+      - {column: 7, species: SiO2}
+  - page: 9
+    table_index: 2
+    published_page: 252
+    type: activity
+    quantity: activity
+    evidence_class: quoted_attributed
+    unit: dimensionless
+    phase: l
+    per: dimensionless
+    regime: emf_cell
+    attribution: 'Sanbongi and Omori, present work; author-reported activity reduced from the cell e.m.f.'
+    temperature: {as_printed: '1630', unit: C, locator: {page: 9, published_page: 252, table: '2', note: 'Table 2 caption states 1630°C.'}}
+    values:
+      - {column: 8, species: SiO2}
+  - page: 9
+    table_index: 2
+    published_page: 252
+    type: activity_coefficient
+    quantity: activity_coefficient
+    evidence_class: measured_reduced
+    unit: dimensionless
+    phase: l
+    per: dimensionless
+    regime: emf_cell
+    attribution: 'Sanbongi and Omori, present work; calculated from the printed silica activity and mole fraction using the relation stated in the Discussion.'
+    temperature: {as_printed: '1630', unit: C, locator: {page: 9, published_page: 252, table: '2', note: 'Table 2 caption states 1630°C.'}}
+    values:
+      - {column: 9, species: SiO2}
+  - page: 10
+    table_index: 3
+    published_page: 253
+    type: activity
+    quantity: activity
+    evidence_class: quoted_attributed
+    unit: dimensionless
+    phase: l
+    per: dimensionless
+    regime: emf_cell
+    attribution: 'Sanbongi and Omori, present work; author-reported activity reduced from the cell e.m.f.'
+    temperature: {as_printed: '1630', unit: C, locator: {page: 10, published_page: 253, table: '3', note: 'Table 3 caption states 1630°C.'}}
+    values:
+      - {column: 10, species: SiO2}
+  - page: 10
+    table_index: 3
+    published_page: 253
+    type: activity_coefficient
+    quantity: activity_coefficient
+    evidence_class: measured_reduced
+    unit: dimensionless
+    phase: l
+    per: dimensionless
+    regime: emf_cell
+    attribution: 'Sanbongi and Omori, present work; calculated from the printed silica activity and mole fraction using the relation stated in the Discussion.'
+    temperature: {as_printed: '1630', unit: C, locator: {page: 10, published_page: 253, table: '3', note: 'Table 3 caption states 1630°C.'}}
+    values:
+      - {column: 11, species: SiO2}
+  - page: 11
+    # Draft table index 4 is the printed continuation of Table 3.
+    table_index: 4
+    published_page: 254
+    type: activity
+    quantity: activity
+    evidence_class: quoted_attributed
+    unit: dimensionless
+    phase: l
+    per: dimensionless
+    regime: emf_cell
+    attribution: 'Sanbongi and Omori, present work; author-reported activity reduced from the cell e.m.f.'
+    temperature: {as_printed: '1630', unit: C, locator: {page: 11, published_page: 254, table: '3', note: 'Continued Table 3 caption states 1630°C.'}}
+    values:
+      - {column: 10, species: SiO2}
+  - page: 11
+    table_index: 4
+    published_page: 254
+    type: activity_coefficient
+    quantity: activity_coefficient
+    evidence_class: measured_reduced
+    unit: dimensionless
+    phase: l
+    per: dimensionless
+    regime: emf_cell
+    attribution: 'Sanbongi and Omori, present work; calculated from the printed silica activity and mole fraction using the relation stated in the Discussion.'
+    temperature: {as_printed: '1630', unit: C, locator: {page: 11, published_page: 254, table: '3', note: 'Continued Table 3 caption states 1630°C.'}}
+    values:
+      - {column: 11, species: SiO2}
+  - page: 18
+    # Draft table index 5 is the printed Table 4.
+    table_index: 5
+    published_page: 261
+    type: activity
+    quantity: activity
+    evidence_class: quoted_attributed
+    unit: dimensionless
+    phase: l
+    per: dimensionless
+    attribution: 'Comparison values as attributed in Sanbongi and Omori Table 4.'
+    temperature: {column: 3, unit: C}
+    values:
+      - {column: 2, species: SiO2}
