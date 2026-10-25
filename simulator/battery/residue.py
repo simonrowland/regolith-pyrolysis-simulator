@@ -1079,6 +1079,73 @@ def _forward_accepted_pressure_evaluation(
         setattr(wrapper, "_on_accepted_evaluation", callback)
 
 
+def _validate_residue_inventory(initial_inventory_mol):
+    """Validate and weigh inventory shared by the time and fraction paths."""
+    if initial_inventory_mol is None or not initial_inventory_mol:
+        raise ResidueInventoryRefusal("residue_inventory_missing")
+    try:
+        inventory = {
+            str(species): float(amount)
+            for species, amount in initial_inventory_mol.items()
+        }
+    except (AttributeError, TypeError, ValueError, OverflowError) as exc:
+        raise ResidueInventoryRefusal("residue_inventory_invalid") from exc
+    if any(
+        not species or not math.isfinite(amount) or amount < 0.0
+        for species, amount in inventory.items()
+    ):
+        raise ResidueInventoryRefusal("residue_inventory_invalid")
+    inventory_mass_kg = math.fsum(
+        amount * _formula_terms(species)[1]
+        for species, amount in inventory.items()
+    )
+    if inventory_mass_kg <= 0.0:
+        raise ResidueInventoryRefusal("residue_inventory_invalid")
+    return inventory, inventory_mass_kg
+
+
+def _validate_residue_pressure_regime(pressure, pressure_model):
+    """Validate pressure inputs shared by both schedule-based integrators."""
+    if pressure is None or not pressure.mode:
+        raise ResidueInventoryRefusal("residue_pressure_regime_missing")
+    if pressure.mode not in {"vacuum_balance", "buffered_fO2"}:
+        raise ResidueInventoryRefusal(
+            "residue_pressure_regime_invalid", str(pressure.mode)
+        )
+    if pressure.total_pressure_Pa is None:
+        raise ResidueInventoryRefusal("residue_total_pressure_missing")
+    if pressure.background_pressure_Pa is None:
+        raise ResidueInventoryRefusal("residue_background_pressure_missing")
+    try:
+        total_pressure = float(pressure.total_pressure_Pa)
+        background_pressure = float(pressure.background_pressure_Pa)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ResidueInventoryRefusal("residue_pressure_regime_invalid") from exc
+    if (
+        not math.isfinite(total_pressure)
+        or total_pressure < 0.0
+        or not math.isfinite(background_pressure)
+        or background_pressure < 0.0
+    ):
+        raise ResidueInventoryRefusal("residue_pressure_regime_invalid")
+    if pressure.mode == "buffered_fO2":
+        if pressure.buffered_fO2_log is None:
+            raise ResidueInventoryRefusal("oxygen_condition_missing")
+        try:
+            buffered_logp = float(pressure.buffered_fO2_log)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ResidueInventoryRefusal("oxygen_condition_invalid") from exc
+        if not math.isfinite(buffered_logp) or buffered_logp > 0.0:
+            raise ResidueInventoryRefusal("oxygen_condition_invalid")
+    else:
+        if pressure.buffered_fO2_log is not None:
+            raise ResidueInventoryRefusal("residue_pressure_regime_invalid")
+        buffered_logp = None
+    if not callable(pressure_model):
+        raise ResidueInventoryRefusal("residue_pressure_model_missing")
+    return background_pressure, buffered_logp
+
+
 def integrate_residue_inventory(
     initial_inventory_mol: Mapping[str, float],
     channels: Sequence[ResidueChannel],
@@ -1361,26 +1428,9 @@ def integrate_residue_schedule(
     represented by successive isothermal segments at the requested numerical
     resolution; no temperature, duration, pressure, or geometry is inferred.
     """
-    if request.initial_inventory_mol is None or not request.initial_inventory_mol:
-        raise ResidueInventoryRefusal("residue_inventory_missing")
-    try:
-        initial_inventory = {
-            str(species): float(amount)
-            for species, amount in request.initial_inventory_mol.items()
-        }
-    except (AttributeError, TypeError, ValueError, OverflowError) as exc:
-        raise ResidueInventoryRefusal("residue_inventory_invalid") from exc
-    if any(
-        not species or not math.isfinite(amount) or amount < 0.0
-        for species, amount in initial_inventory.items()
-    ):
-        raise ResidueInventoryRefusal("residue_inventory_invalid")
-    initial_mass_from_composition = math.fsum(
-        amount * _formula_terms(species)[1]
-        for species, amount in initial_inventory.items()
+    initial_inventory, initial_mass_from_composition = _validate_residue_inventory(
+        request.initial_inventory_mol
     )
-    if initial_mass_from_composition <= 0.0:
-        raise ResidueInventoryRefusal("residue_inventory_invalid")
 
     if request.channels is None:
         raise ResidueInventoryRefusal("residue_channels_missing")
@@ -1438,43 +1488,9 @@ def integrate_residue_schedule(
             raise ResidueInventoryRefusal("residue_sample_mass_invalid")
 
     pressure = request.pressure_regime
-    if pressure is None or not pressure.mode:
-        raise ResidueInventoryRefusal("residue_pressure_regime_missing")
-    if pressure.mode not in {"vacuum_balance", "buffered_fO2"}:
-        raise ResidueInventoryRefusal(
-            "residue_pressure_regime_invalid", str(pressure.mode)
-        )
-    if pressure.total_pressure_Pa is None:
-        raise ResidueInventoryRefusal("residue_total_pressure_missing")
-    if pressure.background_pressure_Pa is None:
-        raise ResidueInventoryRefusal("residue_background_pressure_missing")
-    try:
-        total_pressure = float(pressure.total_pressure_Pa)
-        background_pressure = float(pressure.background_pressure_Pa)
-    except (TypeError, ValueError, OverflowError) as exc:
-        raise ResidueInventoryRefusal("residue_pressure_regime_invalid") from exc
-    if (
-        not math.isfinite(total_pressure)
-        or total_pressure < 0.0
-        or not math.isfinite(background_pressure)
-        or background_pressure < 0.0
-    ):
-        raise ResidueInventoryRefusal("residue_pressure_regime_invalid")
-    if pressure.mode == "buffered_fO2":
-        if pressure.buffered_fO2_log is None:
-            raise ResidueInventoryRefusal("oxygen_condition_missing")
-        try:
-            buffered_fO2_log = float(pressure.buffered_fO2_log)
-        except (TypeError, ValueError, OverflowError) as exc:
-            raise ResidueInventoryRefusal("oxygen_condition_invalid") from exc
-        if not math.isfinite(buffered_fO2_log) or buffered_fO2_log > 0.0:
-            raise ResidueInventoryRefusal("oxygen_condition_invalid")
-    else:
-        if pressure.buffered_fO2_log is not None:
-            raise ResidueInventoryRefusal("residue_pressure_regime_invalid")
-        buffered_fO2_log = None
-    if not callable(request.pressure_model):
-        raise ResidueInventoryRefusal("residue_pressure_model_missing")
+    background_pressure, buffered_fO2_log = _validate_residue_pressure_regime(
+        pressure, request.pressure_model
+    )
     if request.exhaustion_floor_mol is not None and (
         not math.isfinite(float(request.exhaustion_floor_mol))
         or float(request.exhaustion_floor_mol) <= 0.0
@@ -1790,26 +1806,9 @@ def integrate_residue_fraction(
     factor scales all fluxes equally and leaves the path unchanged; only
     relative alpha values affect the composition at a given ``F``.
     """
-    if request.initial_inventory_mol is None or not request.initial_inventory_mol:
-        raise ResidueInventoryRefusal("residue_inventory_missing")
-    try:
-        inventory = {
-            str(species): float(amount)
-            for species, amount in request.initial_inventory_mol.items()
-        }
-    except (AttributeError, TypeError, ValueError, OverflowError) as exc:
-        raise ResidueInventoryRefusal("residue_inventory_invalid") from exc
-    if any(
-        not species or not math.isfinite(amount) or amount < 0.0
-        for species, amount in inventory.items()
-    ):
-        raise ResidueInventoryRefusal("residue_inventory_invalid")
-    inventory_mass_kg = math.fsum(
-        amount * _formula_terms(species)[1]
-        for species, amount in inventory.items()
+    inventory, inventory_mass_kg = _validate_residue_inventory(
+        request.initial_inventory_mol
     )
-    if inventory_mass_kg <= 0.0:
-        raise ResidueInventoryRefusal("residue_inventory_invalid")
 
     endpoint_forms = sum(
         value is not None
@@ -1882,43 +1881,9 @@ def integrate_residue_fraction(
         path.append(ResidueFractionSegment(start, end, temperature))
         expected_start = end
     pressure = request.pressure_regime
-    if pressure is None or not pressure.mode:
-        raise ResidueInventoryRefusal("residue_pressure_regime_missing")
-    if pressure.mode not in {"vacuum_balance", "buffered_fO2"}:
-        raise ResidueInventoryRefusal(
-            "residue_pressure_regime_invalid", str(pressure.mode)
-        )
-    if pressure.total_pressure_Pa is None:
-        raise ResidueInventoryRefusal("residue_total_pressure_missing")
-    if pressure.background_pressure_Pa is None:
-        raise ResidueInventoryRefusal("residue_background_pressure_missing")
-    try:
-        total_pressure = float(pressure.total_pressure_Pa)
-        background_pressure = float(pressure.background_pressure_Pa)
-    except (TypeError, ValueError, OverflowError) as exc:
-        raise ResidueInventoryRefusal("residue_pressure_regime_invalid") from exc
-    if (
-        not math.isfinite(total_pressure)
-        or total_pressure < 0.0
-        or not math.isfinite(background_pressure)
-        or background_pressure < 0.0
-    ):
-        raise ResidueInventoryRefusal("residue_pressure_regime_invalid")
-    if pressure.mode == "buffered_fO2":
-        if pressure.buffered_fO2_log is None:
-            raise ResidueInventoryRefusal("oxygen_condition_missing")
-        try:
-            buffered_logp = float(pressure.buffered_fO2_log)
-        except (TypeError, ValueError, OverflowError) as exc:
-            raise ResidueInventoryRefusal("oxygen_condition_invalid") from exc
-        if not math.isfinite(buffered_logp) or buffered_logp > 0.0:
-            raise ResidueInventoryRefusal("oxygen_condition_invalid")
-    else:
-        if pressure.buffered_fO2_log is not None:
-            raise ResidueInventoryRefusal("residue_pressure_regime_invalid")
-        buffered_logp = None
-    if not callable(request.pressure_model):
-        raise ResidueInventoryRefusal("residue_pressure_model_missing")
+    background_pressure, buffered_logp = _validate_residue_pressure_regime(
+        pressure, request.pressure_model
+    )
 
     alpha_pool = tuple(request.alpha_pool or ())
     resolved_path: list[
