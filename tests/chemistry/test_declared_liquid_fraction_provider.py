@@ -88,12 +88,13 @@ def test_analytical_gate_never_probes_magemin_and_flags_each_hour(
 
 
 @pytest.mark.parametrize('status', ['unavailable', 'not_converged'])
-def test_declared_magemin_failure_never_uses_another_liquidus(
+def test_declared_magemin_environment_failure_never_uses_another_liquidus(
     monkeypatch, status, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     monkeypatch.setattr(sim, '_dispatch_only', lambda *a, **kw: SimpleNamespace(
-        status=status, diagnostic={'backend_status': status},
+        status=status, diagnostic={'backend_status': status,
+                                   'backend_status_reason': 'missing_binary'},
     ))
     calls = []
     sim.backend.find_liquidus_solidus = lambda **kw: calls.append(kw)
@@ -120,9 +121,10 @@ def test_runner_reports_typed_startup_missing_input(monkeypatch):
     assert metadata['refusal_diagnostic']['reason'] == 'missing_input'
 
 
+@pytest.mark.parametrize('reason', ['engine_not_converged', 'engine_worker_timeout'])
 @pytest.mark.parametrize('status', ['unavailable', 'not_converged', 'out_of_domain'])
 def test_projected_solve_status_survives_actual_adapter_wrapping(
-    monkeypatch, status, vapor_pressure_data, feedstocks_data, setpoints_data,
+    monkeypatch, status, reason, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     store = PT0DeterminismStore('capture')
@@ -147,7 +149,7 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
                 temperature_C=temperature_C, status=status,
                 warnings=['injected projected-bulk solve refusal'],
                 diagnostics={'backend_status_reason': (
-                    'silicate_window' if status == 'out_of_domain' else 'engine_worker_timeout'
+                    'silicate_window' if status == 'out_of_domain' else reason
                 )},
             )
         return original_equilibrate(temperature_C, *args, **kwargs)
@@ -167,7 +169,7 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
             assert curve['source'] == 'kress91_liquid_calibration_floor'
             assert curve['composition_projected_notice']['authority'] == 'extrapolated'
             assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
-        else:
+        elif reason == 'engine_worker_timeout':
             for _ in range(2):
                 with pytest.raises(EvaporationFluxRefusal) as error:
                     sim._melt_redox_liquidus_gate_curve()
@@ -177,12 +179,34 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
                 assert sim._freeze_gate_liquid_fraction_curve_memo == {}
                 assert shared_cache == {}
                 assert store.capture_sequence == []
+        else:
+            for _ in range(2):
+                curve = sim._melt_redox_liquidus_gate_curve()
+                assert curve['source'] == 'kress91_liquid_calibration_floor'
+                notice = curve['gate_provider_refusal']
+                assert notice['provider_outcome'] == 'numerical_failure'
+                assert notice['authority'] == 'extrapolated'
+                assert notice['qualification'] == 'numerical_failure_kress91_floor_prediction'
+                assert notice['provider_diagnostic'] == diagnostics[-1]
+                assert notice['provider_diagnostic']['backend_diagnostics'][
+                    'projected_liquidus_status'
+                ] == status
+                assert notice['certified_band']['min_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+                assert sim._freeze_gate_provider_outcome.value == 'numerical_failure'
+                assert sim._freeze_gate_liquid_fraction_cache is None
+                assert sim._freeze_gate_liquid_fraction_curve_memo == {}
+                assert shared_cache == {}
+                assert store.capture_sequence == []
+                assert sim._make_snapshot().liquid_fraction_gate['redox'][
+                    'gate_provider_refusal'
+                ] == notice
+            assert len(diagnostics) == 2
         assert injected
         assert diagnostics[-1]['backend_status'] == 'out_of_domain'
         assert diagnostics[-1]['backend_diagnostics']['projected_liquidus_status'] == status
         assert diagnostics[-1]['backend_diagnostics']['projected_liquidus_diagnostics'][
             'backend_status_reason'
-        ] == ('silicate_window' if status == 'out_of_domain' else 'engine_worker_timeout')
+        ] == ('silicate_window' if status == 'out_of_domain' else reason)
         assert 'injected projected-bulk solve refusal' in diagnostics[-1]['backend_warnings']
         assert sim.atom_ledger.mol_by_account() == before
     finally:
@@ -199,11 +223,49 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
     {'projected_liquidus_status': 'out_of_domain',
      'projected_liquidus_diagnostics': {'reason': 'engine_worker_timeout'}},
 ])
-def test_numerical_failure_in_wrapped_diagnostic_vetoes_gate(outer_status, nested):
+def test_wrapped_diagnostic_distinguishes_numerical_and_environment_failure(outer_status, nested):
     assert gate_curve_provider_outcome_for_status(outer_status, {
         'backend_status_reason': 'composition_projected',
         'backend_diagnostics': nested,
-    }) is GateCurveProviderOutcome.FAILED
+    }).value == ('failed' if 'engine_worker_timeout' in str(nested)
+                or nested == {'backend_status': 'unavailable'} else 'numerical_failure')
+
+
+@pytest.mark.parametrize('exception', [False, True])
+@pytest.mark.parametrize('recover', [False, True])
+def test_timeout_retries_same_declared_gate_once(
+    monkeypatch, exception, recover, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    calls = []
+
+    def dispatch(intent, **kwargs):
+        calls.append((intent, kwargs))
+        if recover and len(calls) == 2:
+            return SimpleNamespace(status='ok', diagnostic={
+                'solidus_T_C': 1000.0, 'liquidus_T_C': 1300.0,
+            })
+        if exception:
+            raise EngineWorkerTimeout('magemin', 15.0, phase='liquidus')
+        return SimpleNamespace(status='out_of_domain', diagnostic={
+            'backend_status_reason': 'composition_projected',
+            'backend_diagnostics': {
+                'projected_liquidus_status': 'not_converged',
+                'projected_liquidus_diagnostics': {'reason': 'engine_worker_timeout'},
+            },
+        })
+
+    monkeypatch.setattr(sim, '_dispatch_only', dispatch)
+    if recover:
+        assert sim._freeze_gate_curve()['source'] == 'gate_liquid_fraction'
+    else:
+        with pytest.raises(EvaporationFluxRefusal) as error:
+            sim._freeze_gate_curve()
+        assert error.value.diagnostic['provider'] == 'magemin'
+        assert sim._freeze_gate_liquid_fraction_cache is None
+        assert sim._freeze_gate_liquid_fraction_curve_memo == {}
+    assert len(calls) == 2
+    assert calls[0] == calls[1]
 
 
 @pytest.mark.parametrize('failure', [
