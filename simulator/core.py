@@ -10329,7 +10329,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return
         zero_reason = (self._evaporation_carrier_zero_reason(result)
                        if getattr(self, '_reaction_pO2_bar', None) == 0.0 else None)
-        if zero_reason:
+        if zero_reason and zero_reason != 'frozen_consuming_carriers_at_zero_oxygen':
             result.vapor_pressures_Pa = {}
             result.vapor_pressures_source = {}
             self._last_vapor_pressures_source = {}

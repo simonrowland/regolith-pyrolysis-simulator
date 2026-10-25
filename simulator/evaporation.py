@@ -819,7 +819,7 @@ class EvaporationMixin:
                        if (getattr(self, '_reaction_pO2_bar', None) == 0.0
                            or getattr(self, '_frozen_evaporation_carriers', None) == frozenset())
                        else None)
-        if zero_reason or (
+        if (zero_reason and zero_reason != 'frozen_consuming_carriers_at_zero_oxygen') or (
             liquid_fraction is not None
             and legacy_raw_liquid_fraction_is_zero(liquid_fraction)
         ):
@@ -4022,10 +4022,10 @@ class EvaporationMixin:
             phase = 'stage0' if self.melt.campaign.name in {'C0', 'C0B'} else 'hot_train'
             evaluators = [self.vapour_rail_catalog.evaluator_for_hot_train(
                 species, process_phase=phase) for species in frozen]
-            # The catalog owns the mass-action powers. Every admitted source
-            # must vanish at zero oxygen; one inverse/constant channel defeats
-            # this proof. Settlement is checked separately in the signed solve.
-            if all(evaluator is not None and evaluator.pO2_exponent > 0.0
+            # The catalog owns the mass-action powers. Consuming channels
+            # vanish at zero oxygen; neutral channels keep their own flux.
+            # An inverse channel excludes the boundary. Settlement is checked separately in the signed solve.
+            if all(evaluator is not None and evaluator.pO2_exponent >= 0.0
                    for evaluator in evaluators):
                 return 'frozen_consuming_carriers_at_zero_oxygen'
         if self.melt.temperature_C + 273.15 < 400.0:

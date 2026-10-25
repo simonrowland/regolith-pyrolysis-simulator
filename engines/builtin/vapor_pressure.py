@@ -2805,14 +2805,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         oxide_vapor_extrapolations: dict[str, dict[str, object]] = {}
         ellingham_extrapolations: dict[str, dict[str, object]] = {}
         vapor_pressure_authority_limits: dict[str, dict[str, Any]] = {}
-        transport_o2 = o2_potential_from_pO2_bar(
-            pO2_bar=transport_pO2_bar,
-            temperature_K=T_K,
-            reaction_plane=REACTION_PLANE_MELT_INTERFACE,
-        )
-        transport_notice = transport_o2.observation_or_setpoint_receipt.get(
-            "extrapolation_notice"
-        )
+        # At a solved zero endpoint evaluate only the frozen admitted rails.
+        # Their pressure owner takes the mass-action limit without ln(0).
+        zero_carriers = (controls.get('_frozen_carriers')
+                         if transport_pO2_bar == 0.0 else None)
+        transport_notice = None
+        if transport_pO2_bar != 0.0:
+            transport_o2 = o2_potential_from_pO2_bar(
+                pO2_bar=transport_pO2_bar,
+                temperature_K=T_K,
+                reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+            )
+            transport_notice = transport_o2.observation_or_setpoint_receipt.get(
+                "extrapolation_notice"
+            )
         if transport_notice is not None:
             warnings.append(
                 f"{transport_notice['reason']}: "
@@ -2822,6 +2828,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
         metals_data = self._vapor_pressure_data.get('metals', {}) or {}
         for species in _ELLINGHAM_THERMO:
+            if zero_carriers is not None and species not in zero_carriers:
+                continue
             n_M, n_ox = ellingham_stoichiometry(species)
             sp_data = metals_data.get(species, {}) or {}
             if not sp_data:
@@ -3697,6 +3705,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         from simulator.vapour_rail.catalog import CatalogCompileError
 
         for name, data in oxide_vapors_data.items():
+            if zero_carriers is not None and name not in zero_carriers:
+                continue
             if self._vapour_rail_catalog is not None:
                 try:
                     self._vapour_rail_catalog.assert_hot_train_applicable(

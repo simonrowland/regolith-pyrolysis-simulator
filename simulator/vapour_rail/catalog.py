@@ -1034,10 +1034,16 @@ class CompiledPressureEvaluator:
         # to e · log10(p / p_ref) via channel_log10_contribution +
         # the legacy_scalar_adapter.
         o2_term = self.o2_channel_term
-        needs_o2 = abs(self.pO2_exponent) > 0.0 or o2_term is not None
+        needs_o2 = self.pO2_exponent != 0.0
+        zero_oxygen = pO2_bar == 0.0 and self.pO2_exponent > 0.0
         o2_potential = None
         pO2_bar_raw = pO2_bar
-        if needs_o2:
+        if zero_oxygen:
+            # p_i=C(T)*a**n*(pO2/p_ref)**e: e>0 gives exactly zero
+            # at vacuum. Apply the power limit before constructing ln(pO2).
+            # Bar/bar is dimensionless; neutral channels retain C(T)*a**n.
+            log10_pressure = -math.inf
+        elif needs_o2:
             plane = (
                 LEGACY_FO2_PLANE.get(self.oxygen_fugacity_channel or "")
                 or REACTION_PLANE_TRANSPORT_HEADSPACE
@@ -1111,7 +1117,7 @@ class CompiledPressureEvaluator:
         # pressure interval: activity depletion drives trace carriers below the
         # minimum, while far-above-window Stage-0 correlations can exceed the
         # maximum. Premise: P=10^logP Pa. Clamp only at the numerical endpoints so
-        # the first case never invents zero and the second retains the limiting
+        # the first case tends to zero and the second retains the limiting
         # escape direction without returning inf. Units remain Pa. Sanity: every
         # representable pressure is bit-for-bit unchanged; both cases remain typed
         # non-certifying continuations.
@@ -1120,13 +1126,13 @@ class CompiledPressureEvaluator:
         numerical_underflow = log10_pressure < math.log10(minimum_positive_pa)
         numerical_overflow = log10_pressure > math.log10(maximum_finite_pa)
         pressure_pa = (
-            minimum_positive_pa
+            0.0
             if numerical_underflow
             else maximum_finite_pa
             if numerical_overflow
             else 10.0**log10_pressure
         )
-        if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+        if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
             raise CatalogCompileError(
                 f"{self.species_id}: evaluator produced invalid pressure"
             )
@@ -1138,7 +1144,7 @@ class CompiledPressureEvaluator:
             status=(
                 self.out_of_range_status
                 if out_of_range
-                else "numerical_underflow_floor"
+                else "numerical_underflow_zero"
                 if numerical_underflow
                 else "numerical_overflow_ceiling"
                 if numerical_overflow
@@ -3404,7 +3410,7 @@ def _compile_thermo_reference_model(
                 K_eff = K
             ratio = K_eff ** (1.0 / vapor_nu)
             pressure_pa = ratio * Pstd
-            if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+            if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
                 raise CatalogCompileError(
                     f"{species_id}: thermo reaction evaluator produced invalid "
                     f"pressure at T={temperature_K}"
@@ -3485,7 +3491,7 @@ def _compile_thermo_reference_model(
         # P_sat / P° = exp(−(G_gas − G_cond)/(R T))
         ratio = math.exp(-(g_gas - g_cond))
         pressure_pa = ratio * Pstd
-        if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+        if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
             raise CatalogCompileError(
                 f"{species_id}: thermo pure-psat evaluator produced invalid "
                 f"pressure at T={temperature_K}"
