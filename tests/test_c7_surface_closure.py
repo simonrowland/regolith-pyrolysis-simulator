@@ -561,7 +561,7 @@ def test_lunar_shaped_debit_resettles_at_inward_endpoint():
         flux.update_totals()
 
         def point(delta, *, bounded=False):
-            j = oxygen_transport(bulk, delta, film=True).flux_kg_s_m2 / 0.031998
+            j = oxygen_transport(bulk, delta, film=True, temperature_K=1418.15, area_m2=0.41006003303200633).flux_kg_s_m2 / 0.031998
             trial = sim._detached_evaporation_projection()
             start = len(trial.atom_ledger.transitions)
             trial._apply_evaporation_carrier_batch(deepcopy(flux),
@@ -603,3 +603,30 @@ def test_zero_limit_does_not_bypass_other_pressure_refusals(species, oxygen):
         species, process_phase='hot_train')
     with pytest.raises(CatalogCompileError):
         evaluator.evaluate(1343.15, source_activity=0.1, pO2_bar=oxygen)
+
+
+def test_captured_asteroid_mixed_seeds_close_at_zero():
+    from tests.test_c7_pressure_excess import oxygen_transport
+    sim = simulation('s_type_asteroid_silicate')
+    try:
+        seeds = {'CrO2': 5.808349183114205e-10,
+                 'CrO3': 3.3342076872338656e-10,
+                 'SiO2_gas': 5.385943982436044e-12}
+        evaluators = {s: sim.vapour_rail_catalog.evaluator_for_hot_train(s, process_phase='hot_train') for s in seeds}
+        assert {s: e.pO2_exponent for s, e in evaluators.items()} == {'CrO2': 0.25, 'CrO3': 0.75, 'SiO2_gas': 0.0}
+        anchor = {s: e.evaluate(1343.15, source_activity=0.1, pO2_bar=1.0).pressure_pa for s, e in evaluators.items()}
+        area_dt = 0.41006003303200633 * 3600.0
+        def point(delta):
+            # HK flux is linear in channel pressure at fixed T/activity.
+            # Normalize by a finite owner evaluation: the zero limit is
+            # independent of that anchor; neutral pressure has ratio one.
+            rates = {s: seed * (evaluators[s].evaluate(1343.15, source_activity=0.1, pO2_bar=delta).pressure_pa / anchor[s]) for s, seed in seeds.items()}
+            gas = sim._project_evaporation_overhead_source_mol_hr(rates, {}).get('O2', 0.0) / area_dt
+            j = oxygen_transport(0.0, delta, temperature_K=1343.15, area_m2=0.41006003303200633).flux_kg_s_m2 / 0.031998
+            sources = {s: sim._project_evaporation_overhead_source_mol_hr({s: rate}, {}).get('O2', 0.0) / area_dt for s, rate in rates.items()}
+            return _SurfaceOxygenEvaluation(delta, 0.0, j, 0.0, sources, 0.0, 0.0, 0.0, gas, payload=rates)
+        solved = _solve_surface_oxygen_balance(point, bracket_log10_pO2_bar=(-12.0, 0.0))
+        assert solved.reaction_pO2_bar == solved.residual == 0.0
+        assert solved.payload == {'CrO2': 0.0, 'CrO3': 0.0, 'SiO2_gas': seeds['SiO2_gas']}
+    finally:
+        close_test_owned_magemin_backend(sim)

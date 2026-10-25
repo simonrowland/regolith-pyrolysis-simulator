@@ -9,12 +9,12 @@ from simulator.chemistry.langmuir_knudsen import (
 from simulator.transport_regime import SurfaceFlow, series_evaporation_flux
 
 
-def oxygen_transport(bulk, delta, *, film=False, stagnant=False):
+def oxygen_transport(bulk, delta, *, film=False, stagnant=False, temperature_K=1253.15, area_m2=0.2):
     return series_evaporation_flux(
-        'O2', (bulk + delta) * 1e5, bulk * 1e5, 1253.15, 0.031998, 1.0,
+        'O2', (bulk + delta) * 1e5, bulk * 1e5, temperature_K, 0.031998, 1.0,
         pressure_excess_pa=delta * 1e5, signed=True,
         gas_resistance_enabled=film, overhead_pressure_pa=max(900.0, bulk * 1e5),
-        melt_surface_area_m2=0.2,
+        melt_surface_area_m2=area_m2,
         surface_flow=(SurfaceFlow('stagnant_disk', 0.0, 'test', 'pool', 'stagnant')
                       if stagnant else None),
         stir_diagnostic=dict(axial_stir_applied=0.0, radial_stir_applied=0.0,
