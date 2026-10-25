@@ -20,13 +20,6 @@ reason = "Pause-resume drive exits before simulation_complete."
 since = "7dd268c6f"
 
 [[test]]
-node = "tests/test_web_functional_qa.py::test_headless_full_run_ledgers_and_product_story_match_runner"
-ticket = "b-947"
-tier = "nightly"
-reason = "Headless full-run product ledger differs from the runner."
-since = "7dd268c6f"
-
-[[test]]
 node = "tests/chemistry/test_builtin_condensation_route_provider.py::test_split_path_end_state_matches_pre_flip_account_balances[mars_basalt-additives_kg1]"
 ticket = "b-859"
 tier = "nightly"
@@ -69,13 +62,6 @@ reason = "MRE full-run fixture exceeds the 1800 second timeout."
 since = "7dd268c6f"
 
 [[test]]
-node = "tests/test_yield_root_cause.py::test_pyrolysis_track_c5_reduces_feo_without_additives"
-ticket = "b-872"
-tier = "nightly"
-reason = "C5 FeO reduction result differs from its pinned expectation."
-since = "7dd268c6f"
-
-[[test]]
 node = "tests/chemistry/test_sio_step_wall_deposit.py::test_hot_wall_sio_reactive_deposit_uses_product_psat_floor"
 ticket = "b-808"
 tier = "pr"
@@ -90,13 +76,6 @@ reason = "Host-dependent coating diagnostic digest differs from its golden."
 since = "7dd268c6f"
 
 [[test]]
-node = "tests/test_doc_anchors.py::test_doc_impl_anchors_resolve"
-ticket = "t-268"
-tier = "pr"
-reason = "Documented implementation anchor hints resolve to stale source lines."
-since = "7dd268c6f"
-
-[[test]]
 node = "tests/test_fail_loud_h2_h3.py::test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite"
 ticket = "b-813"
 tier = "pr"
@@ -108,13 +87,6 @@ node = "tests/test_rail_conformance.py::test_t3_na2o_activity_pin_remains_admitt
 ticket = "t-1208"
 tier = "pr"
 reason = "The pinned Na2O activity row key was superseded."
-since = "7dd268c6f"
-
-[[test]]
-node = "tests/test_references_registry.py::test_build_references_check_passes"
-ticket = "t-268"
-tier = "pr"
-reason = "Reference registry warnings cause the integrity check to fail."
 since = "7dd268c6f"
 
 [[test]]
