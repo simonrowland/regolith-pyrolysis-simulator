@@ -75,6 +75,48 @@ _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
 })
 
 
+def _project_evaporation_overhead_source_mol_hr(
+    rates_kg_hr: Mapping[str, float],
+    stoich_by_species: Mapping[str, Mapping[str, Any]],
+    registry: Mapping[str, Any],
+) -> dict[str, float]:
+    source_mol_hr: dict[str, float] = {}
+    o2_molar_mass = resolve_species_formula(
+        'O2', registry
+    ).molar_mass_kg_per_mol()
+    for species, raw_rate in rates_kg_hr.items():
+        rate_kg_hr = max(0.0, float(raw_rate))
+        if rate_kg_hr <= 0.0:
+            continue
+        formula = resolve_species_formula(
+            species, registry
+        )
+        source_mol_hr[species] = (
+            source_mol_hr.get(species, 0.0)
+            + rate_kg_hr / formula.molar_mass_kg_per_mol()
+        )
+        stoich = dict(stoich_by_species.get(species) or {})
+        o2_kg_hr = rate_kg_hr * float(
+            stoich.get('O2_per_product_kg') or 0.0
+        )
+        oxygen_destination = str(
+            stoich.get('oxygen_destination') or ''
+        )
+        vapor_oxygen_atoms = float(
+            formula.elements.get('O', 0.0) or 0.0
+        )
+        if (
+            o2_kg_hr < 0.0
+            or vapor_oxygen_atoms > 0.0
+            or oxygen_destination == 'process.overhead_gas'
+        ):
+            source_mol_hr['O2'] = (
+                source_mol_hr.get('O2', 0.0)
+                + o2_kg_hr / o2_molar_mass
+            )
+    return source_mol_hr
+
+
 class EvaporationFluxRefusal(ProviderUnavailableError):
     """Typed terminal refusal for unavailable authoritative flux inputs."""
 
@@ -3769,52 +3811,18 @@ class EvaporationMixin:
         rates_kg_hr: Mapping[str, float],
         stoich_by_species: Mapping[str, Mapping[str, Any]],
     ) -> dict[str, float]:
-        source_mol_hr: dict[str, float] = {}
-        o2_molar_mass = resolve_species_formula(
-            'O2', self.species_formula_registry
-        ).molar_mass_kg_per_mol()
+        resolved_stoich = dict(stoich_by_species)
         for species, raw_rate in rates_kg_hr.items():
-            rate_kg_hr = max(0.0, float(raw_rate))
-            if rate_kg_hr <= 0.0:
+            if float(raw_rate) <= 0.0 or resolved_stoich.get(species):
                 continue
-            formula = resolve_species_formula(
-                species, self.species_formula_registry
+            sp_data = dict(
+                (self.vapor_pressures.get('metals', {}) or {}).get(species, {})
+                or (self.vapor_pressures.get('oxide_vapors', {}) or {}).get(species, {})
             )
-            source_mol_hr[species] = (
-                source_mol_hr.get(species, 0.0)
-                + rate_kg_hr / formula.molar_mass_kg_per_mol()
-            )
-            stoich = dict(stoich_by_species.get(species) or {})
-            if not stoich:
-                sp_data = dict(
-                    (self.vapor_pressures.get('metals', {}) or {}).get(
-                        species, {}
-                    )
-                    or (self.vapor_pressures.get('oxide_vapors', {}) or {}).get(
-                        species, {}
-                    )
-                )
-                if sp_data:
-                    stoich = dict(self._evaporation_stoich(species, sp_data))
-            o2_kg_hr = rate_kg_hr * float(
-                stoich.get('O2_per_product_kg') or 0.0
-            )
-            oxygen_destination = str(
-                stoich.get('oxygen_destination') or ''
-            )
-            vapor_oxygen_atoms = float(
-                formula.elements.get('O', 0.0) or 0.0
-            )
-            if (
-                o2_kg_hr < 0.0
-                or vapor_oxygen_atoms > 0.0
-                or oxygen_destination == 'process.overhead_gas'
-            ):
-                source_mol_hr['O2'] = (
-                    source_mol_hr.get('O2', 0.0)
-                    + o2_kg_hr / o2_molar_mass
-                )
-        return source_mol_hr
+            if sp_data:
+                resolved_stoich[species] = self._evaporation_stoich(species, sp_data)
+        return _project_evaporation_overhead_source_mol_hr(
+            rates_kg_hr, resolved_stoich, self.species_formula_registry)
 
     def _apply_analytic_evaporation_depletion(
         self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,

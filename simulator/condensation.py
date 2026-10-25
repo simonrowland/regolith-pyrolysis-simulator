@@ -3193,14 +3193,25 @@ class CondensationModel:
                 temps=self.condensation_temperatures_C,
                 vapor_pressure_data=self.vapor_pressure_data,
             )
-            remaining_kg = rate_kg_hr
-            hkl_condensed_by_stage: Dict[int, float] = {}
-            remaining_after_stage: Dict[int, float] = {}
-            stage_alpha_records_by_stage: Dict[int, dict[str, Any]] = {}
-            reactive_kg = 0.0
-            for stage in self.train.active_stages:
+            stage_route_by_species[species] = {
+                'T_cond_C': T_cond,
+                'hkl_condensed_by_stage': {},
+                'remaining_after_stage': {},
+                'stage_alpha_records_by_stage': {},
+                'reactive_kg': 0.0,
+                'remaining_kg': rate_kg_hr,
+            }
+
+        for stage in self.train.active_stages:
+            for species, stage_route in stage_route_by_species.items():
+                rate_kg_hr = evap_flux.species_kg_hr[species]
+                remaining_kg = stage_route['remaining_kg']
+                T_cond = stage_route['T_cond_C']
+                hkl_condensed_by_stage = stage_route['hkl_condensed_by_stage']
+                remaining_after_stage = stage_route['remaining_after_stage']
+                stage_alpha_records_by_stage = stage_route['stage_alpha_records_by_stage']
                 if remaining_kg <= 1e-15:
-                    break
+                    continue
                 if _cr_stage_isolation_blocks(stage, species):
                     continue
                 stage_alpha_record = _stage_alpha_record(
@@ -3259,7 +3270,7 @@ class CondensationModel:
                     uptake_mol = min(demand_mol, 4.0 * oxygen_mol)
                     oxygen_mol -= uptake_mol / 4.0
                     condensed_kg = uptake_mol * molar_mass
-                    reactive_kg = condensed_kg
+                    stage_route['reactive_kg'] = condensed_kg
                     reaction.update(
                         transport_uptake_mol=demand_mol, uptake_mol=uptake_mol,
                         oxygen_debit_mol=uptake_mol / 4.0,
@@ -3274,6 +3285,12 @@ class CondensationModel:
                 remaining_after_stage[stage.stage_number] = max(
                     0.0, remaining_kg
                 )
+                stage_route['remaining_kg'] = remaining_kg
+
+        for species, stage_route in stage_route_by_species.items():
+            rate_kg_hr = evap_flux.species_kg_hr[species]
+            reactive_kg = stage_route['reactive_kg']
+            remaining_after_stage = stage_route['remaining_after_stage']
             segment_supply = self._segment_supply_by_name(
                 rate_kg_hr,
                 remaining_after_stage,
@@ -3288,16 +3305,11 @@ class CondensationModel:
                 vapor_pressure_data=self.vapor_pressure_data,
                 alpha_record_out=capture_budget_alpha_record,
             )
-            stage_route_by_species[species] = {
-                'T_cond_C': T_cond,
-                'hkl_condensed_by_stage': hkl_condensed_by_stage,
-                'remaining_after_stage': remaining_after_stage,
-                'stage_alpha_records_by_stage': stage_alpha_records_by_stage,
-                'segment_supply': segment_supply,
-                'capture_budget_kg': capture_budget_kg,
-                'capture_budget_alpha_record': capture_budget_alpha_record,
-                'reactive_kg': reactive_kg,
-            }
+            stage_route.update(
+                segment_supply=segment_supply,
+                capture_budget_kg=capture_budget_kg,
+                capture_budget_alpha_record=capture_budget_alpha_record,
+            )
 
         positive_wall_species = {
             species
