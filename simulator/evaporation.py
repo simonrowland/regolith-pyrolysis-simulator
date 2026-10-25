@@ -3945,6 +3945,7 @@ class EvaporationMixin:
         trial.__dict__.update({key: value for key, value in state.items()
                                if key != '_terminal_refusal_chem_registry_tables'})
         trial.atom_ledger = ledger
+        trial.condensation_model._pressure_trial = True
         trial.cost_ledger = copy.copy(self.cost_ledger)
         trial.cost_ledger.__dict__ = dict(cost_state)
         trial._chem_registry = copy.copy(self._chem_registry)
@@ -4059,6 +4060,9 @@ class EvaporationMixin:
             start = len(admission.atom_ledger.transitions)
             before = admission.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
             admission._apply_evaporation_carrier_batch(flux)
+            data = admission.condensation_model.vapor_pressure_data
+            if hasattr(data, '_route_catalog'):
+                seed.condensation_model.vapor_pressure_data._route_catalog = data._route_catalog
             amounts, _ = admission._evaporation_signed_amounts(start, before)
             seed._frozen_evaporation_carriers = frozenset(
                 key.removeprefix('carrier:') for key, value in amounts.items()

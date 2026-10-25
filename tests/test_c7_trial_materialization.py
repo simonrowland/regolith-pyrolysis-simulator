@@ -11,6 +11,47 @@ from tests.magemin_test_support import close_test_owned_magemin_backend
 pytestmark = [pytest.mark.serial, pytest.mark.xdist_group('serial')]
 
 
+def test_pressure_trials_keep_checks_without_materializing_diagnostics(monkeypatch):
+    from simulator.accounting.ledger import LedgerTransition
+    from simulator.vapour_rail import catalog
+
+    sim = simulation()
+    try:
+        sim.melt.temperature_C = 1600.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+        sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        journal_count = len(sim.atom_ledger._gross_account_flow_events)
+        compile_calls = []
+        conservation_calls = []
+        compile_catalog = catalog.compiled_catalog_for
+        validate = LedgerTransition.validate_conservation
+
+        def compile_once(*args, **kwargs):
+            compile_calls.append(1)
+            return compile_catalog(*args, **kwargs)
+
+        def check(transition, *args, **kwargs):
+            conservation_calls.append(1)
+            return validate(transition, *args, **kwargs)
+
+        monkeypatch.setattr(catalog, 'compiled_catalog_for', compile_once)
+        monkeypatch.setattr(LedgerTransition, 'validate_conservation', check)
+        monkeypatch.setattr('simulator.diagnostics.wall_sticking_alpha_provenance_notice',
+                            lambda *a, **k: pytest.fail('trial materialized authority diagnostics'))
+        solved = sim._solve_evaporative_oxygen_boundary()
+        trial = solved.payload[2]
+        assert len(compile_calls) == 1
+        assert conservation_calls
+        assert len(trial.atom_ledger._gross_account_flow_events) == journal_count
+        assert len(sim.atom_ledger._gross_account_flow_events) == journal_count
+        assert trial.atom_ledger._gross_account_flow_events is not sim.atom_ledger._gross_account_flow_events
+        assert trial.atom_ledger._gross_account_flow_events[0] is sim.atom_ledger._gross_account_flow_events[0]
+        assert solved.source_terms_mol_m2_s
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
 def test_accepted_hot_hour_hex():
     sim = simulation()
     try:

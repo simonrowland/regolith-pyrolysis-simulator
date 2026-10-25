@@ -720,6 +720,10 @@ class AtomLedger:
         return transition
 
     def _record_gross_lot(self, direction: str, lot: MaterialLot) -> None:
+        # Pressure residuals use conserved balances and signed transitions,
+        # never the reporting journal. Acceptance records the ordinary events.
+        if getattr(self, '_pressure_trial', False):
+            return
         flows = self._gross_account_flows[direction]
         account = str(lot.account)
         event_species = lot.species_moles_for(self.registry)
@@ -1760,11 +1764,20 @@ class AtomLedger:
             )
 
 
-def snapshot_atom_ledger(ledger: Any) -> Any:
+def snapshot_atom_ledger(ledger: Any, *, _pressure_trial: bool = False) -> Any:
     """Return an independently owned copy of every mutable ledger container."""
 
     snapshot = shallow_copy(ledger)
-    snapshot.__dict__ = _clone_owned_ledger_state(ledger.__dict__, {})
+    memo = {}
+    if _pressure_trial:
+        # Committed journal rows are read-only during pressure evaluation;
+        # _record_gross_lot withholds new rows, while all balance, origin and
+        # conservation checks still run. Ordinary rollback detaches every row.
+        events = ledger._gross_account_flow_events
+        memo[id(events)] = list(events)
+    snapshot.__dict__ = _clone_owned_ledger_state(ledger.__dict__, memo)
+    if _pressure_trial:
+        snapshot._pressure_trial = True
     return snapshot
 
 

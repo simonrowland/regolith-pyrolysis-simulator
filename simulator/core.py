@@ -14141,6 +14141,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if name in self.__dict__:
                     preserved_names.add(name)
                     memo[id(self.__dict__[name])] = self.__dict__[name]
+            # Condensation freezes this owned payload at construction. Its
+            # compiled admission catalog is immutable too; detached trials
+            # share both, keeping the compatibility-view cache slot private.
+            data = getattr(getattr(self, '_condensation_model', None),
+                           'vapor_pressure_data', None)
+            for value in (getattr(data, 'catalog_payload', None),
+                          getattr(data, '_route_catalog', None)):
+                if value is not None:
+                    memo[id(value)] = value
         record = getattr(self, 'record', None)
         record_snapshots = getattr(record, 'snapshots', None)
         if (
@@ -14206,7 +14215,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # A refused hour leaves no registry trace; restore every mutable
             # provider table before rebuilding the chemistry kernel.
             state['_terminal_refusal_chem_registry_tables'] = registry_tables
-        ledger = snapshot_atom_ledger(self.atom_ledger)
+        ledger = (snapshot_atom_ledger(self.atom_ledger, _pressure_trial=True)
+                  if state_receiver is not None else snapshot_atom_ledger(self.atom_ledger))
         cost_state = None
         if hasattr(self, 'cost_ledger'):
             cost_state = {

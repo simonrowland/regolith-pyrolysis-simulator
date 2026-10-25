@@ -2347,6 +2347,10 @@ class CondensationModel:
         data = self.vapor_pressure_data
         if not isinstance(data, VaporPressureCompatibilityView):
             return self._route(evap_flux, melt)
+        if getattr(self, '_pressure_trial', False):
+            if not hasattr(data, '_route_catalog'):
+                data._route_catalog = None
+            return self._route(evap_flux, melt)
         missing = object()
         previous = getattr(data, '_route_catalog', missing)
         data._route_catalog = None
@@ -2409,8 +2413,9 @@ class CondensationModel:
         raw_carrier_authority = getattr(
             evap_flux, 'carrier_authority_by_species', {}
         )
+        trial = getattr(self, '_pressure_trial', False)
         carrier_authority_by_species = {
-            str(species): copy.deepcopy(dict(record))
+            str(species): (dict(record) if trial else copy.deepcopy(dict(record)))
             for species, record in (
                 raw_carrier_authority.items()
                 if isinstance(raw_carrier_authority, Mapping)
@@ -2478,9 +2483,9 @@ class CondensationModel:
                 'authoritative_for_condensation': (
                     status == VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE
                 ),
-                'carrier_authority': copy.deepcopy(
+                **({} if trial else {'carrier_authority': copy.deepcopy(
                     carrier_authority_by_species.get(species, {})
-                ),
+                )}),
             }
             for species, status in sorted(
                 carrier_authority_status_by_species.items()
@@ -2500,23 +2505,25 @@ class CondensationModel:
             else {}
         )
         knudsen_diagnostic = self._enforce_knudsen_regime()
-        diagnostic = cold_spot_diagnostic(
-            [segment for segment in self.pipe_segments
-             if segment.name not in self.wall_temperature_input_refusals],
-            evap_flux.species_kg_hr,
-            margin_C=self.cold_spot_margin_C,
-            upstream_hot_wall_min_C=self.upstream_hot_wall_min_C,
-            temps=self.condensation_temperatures_C,
-            vapor_pressure_data=self.vapor_pressure_data,
-            species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
-        )
-        self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
-        self.cold_spot_history.append(copy.deepcopy(diagnostic))
-        cold_spot_warnings = tuple(diagnostic.get('warnings', ()))
-        if self.operating_history:
-            self.operating_history[-1]['cold_spot_warning_count'] = len(
-                cold_spot_warnings)
-            self.operating_history[-1]['cold_spot_warnings'] = cold_spot_warnings
+        cold_spot_warnings = ()
+        if not trial:
+            diagnostic = cold_spot_diagnostic(
+                [segment for segment in self.pipe_segments
+                 if segment.name not in self.wall_temperature_input_refusals],
+                evap_flux.species_kg_hr,
+                margin_C=self.cold_spot_margin_C,
+                upstream_hot_wall_min_C=self.upstream_hot_wall_min_C,
+                temps=self.condensation_temperatures_C,
+                vapor_pressure_data=self.vapor_pressure_data,
+                species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
+            )
+            self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
+            self.cold_spot_history.append(copy.deepcopy(diagnostic))
+            cold_spot_warnings = tuple(diagnostic.get('warnings', ()))
+            if self.operating_history:
+                self.operating_history[-1]['cold_spot_warning_count'] = len(
+                    cold_spot_warnings)
+                self.operating_history[-1]['cold_spot_warnings'] = cold_spot_warnings
 
         stage_route_by_species: dict[str, dict[str, Any]] = {}
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
@@ -2789,22 +2796,23 @@ class CondensationModel:
             capture_budget_alpha_record = dict(
                 stage_route['capture_budget_alpha_record']
             )
-            # Stage and capture-budget alpha records control the absence of a
-            # wall sink as well as a positive sink.  Preserve that evidence
-            # before any numerical-zero branch so a zero cannot erase a
-            # status-bearing coefficient evaluation.
-            alpha_provenance = (
-                wall_sticking_alpha_provenance_by_species
-                .setdefault(species, {})
-            )
-            for stage_number, record in stage_alpha_records_by_stage.items():
-                alpha_provenance[f'stage_{stage_number}'] = copy.deepcopy(
-                    record
+            if not trial:
+                # Stage and capture-budget alpha records control the absence of a
+                # wall sink as well as a positive sink.  Preserve that evidence
+                # before any numerical-zero branch so a zero cannot erase a
+                # status-bearing coefficient evaluation.
+                alpha_provenance = (
+                    wall_sticking_alpha_provenance_by_species
+                    .setdefault(species, {})
                 )
-            if capture_budget_alpha_record:
-                alpha_provenance['capture_budget'] = copy.deepcopy(
-                    capture_budget_alpha_record
-                )
+                for stage_number, record in stage_alpha_records_by_stage.items():
+                    alpha_provenance[f'stage_{stage_number}'] = copy.deepcopy(
+                        record
+                    )
+                if capture_budget_alpha_record:
+                    alpha_provenance['capture_budget'] = copy.deepcopy(
+                        capture_budget_alpha_record
+                    )
             capture_budget_kg = float(stage_route['capture_budget_kg'])
             if hkl_sink_total_kg <= 1e-15:
                 capture_budget_kg = 0.0
@@ -2864,6 +2872,37 @@ class CondensationModel:
                                 + condensed_kg)
             remaining_by_species[species] = max(
                 0.0, rate_kg_hr - capture_budget_kg)
+
+        route_result = CondensationRouteResult(
+            remaining_by_species=copy.deepcopy(remaining_by_species),
+            retained_in_source_by_species=copy.deepcopy(
+                retained_in_source_by_species
+            ),
+            condensed_by_stage_species=copy.deepcopy(
+                condensed_by_stage_species
+            ),
+            wall_deposit_by_species=copy.deepcopy(wall_deposit_by_species),
+            wall_deposit_by_segment_species=copy.deepcopy(
+                wall_deposit_by_segment_species
+            ),
+            wall_deposit_fraction_by_species=copy.deepcopy(
+                wall_deposit_fraction_by_species
+            ),
+            wall_deposit_account_fractions_by_species=(
+                copy.deepcopy(wall_deposit_account_fractions_by_species)),
+            wall_route_species_order=_wall_route_species_order(
+                evap_flux.species_kg_hr.keys()
+            ),
+            wall_alkali_binding_diagnostic_state_by_segment=copy.deepcopy(
+                self.wall_alkali_binding_diagnostic_state_by_account
+            ),
+            impurity_by_stage_species=copy.deepcopy(
+                impurity_by_stage_species
+            ),
+            condensation_authority_by_species=condensation_authority_by_species,
+        )
+        if trial:
+            return route_result
 
         from simulator.diagnostics import (
             _status_bearing_alpha_record,
@@ -3248,32 +3287,8 @@ class CondensationModel:
                     'condensation_refusals_by_species'
                 ] = copy.deepcopy(condensation_refusals_by_species)
 
-        return CondensationRouteResult(
-            remaining_by_species=copy.deepcopy(remaining_by_species),
-            retained_in_source_by_species=copy.deepcopy(
-                retained_in_source_by_species
-            ),
-            condensed_by_stage_species=copy.deepcopy(
-                condensed_by_stage_species
-            ),
-            wall_deposit_by_species=copy.deepcopy(wall_deposit_by_species),
-            wall_deposit_by_segment_species=copy.deepcopy(
-                wall_deposit_by_segment_species
-            ),
-            wall_deposit_fraction_by_species=copy.deepcopy(
-                wall_deposit_fraction_by_species
-            ),
-            wall_deposit_account_fractions_by_species=(
-                copy.deepcopy(wall_deposit_account_fractions_by_species)),
-            wall_route_species_order=_wall_route_species_order(
-                evap_flux.species_kg_hr.keys()
-            ),
-            wall_alkali_binding_diagnostic_state_by_segment=copy.deepcopy(
-                self.wall_alkali_binding_diagnostic_state_by_account
-            ),
-            impurity_by_stage_species=copy.deepcopy(
-                impurity_by_stage_species
-            ),
+        return replace(
+            route_result,
             antoine_extrapolations=copy.deepcopy(antoine_extrapolations),
             antoine_extrapolation_warnings=tuple(
                 antoine_extrapolation_warnings),
