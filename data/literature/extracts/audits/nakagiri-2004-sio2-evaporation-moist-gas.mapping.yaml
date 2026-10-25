@@ -1,0 +1,40 @@
+source_id: nakagiri-2004-sio2-evaporation-moist-gas
+source:
+  citation: >-
+    Takao Nakagiri and Kazuya Kurokawa (2004). Evaporation Behavior of SiO2 in
+    N2-O2-H2O Atmospheres. Materials Transactions 45(2):334-337.
+extraction:
+  method: >-
+    MinerU table draft emission of all four Table 1 rate columns. The final
+    column species is identified as SiO(OH)2 from the table caption and page 336
+    prose; the printed table header duplicates Si(OH)4. All numeric cells were
+    checked against the page 336 render. The area-specific rate unit is retained
+    in a typed-refusal context record because no quantity token represents it.
+  date: '2026-10-25'
+  worker: codex
+review_status: draft
+tables:
+  - page: 3
+    table_index: 1
+    type: rate_series
+    quantity: evaporation_rate
+    unit: kg/m^2 s
+    rows: all
+    temperature:
+      column: 1
+      unit: K
+    values:
+      - column: 2
+        species: SiO2
+        evidence_class: measured_direct
+      - column: 3
+        species: SiO2
+        evidence_class: measured_direct
+      - column: 4
+        species: Si(OH)4
+        evidence_class: quoted_attributed
+        attribution: Hashimoto [4] and Krikorian [6], as cited by Nakagiri and Kurokawa.
+      - column: 5
+        species: SiO(OH)2
+        evidence_class: quoted_attributed
+        attribution: Hashimoto [4] and Krikorian [6], as cited by Nakagiri and Kurokawa.

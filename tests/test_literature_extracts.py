@@ -5888,3 +5888,85 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
             ("(675.55,1619.08)", "(675.50,1620.00)"),
         )
     documents["shornikov-1997-cao-alumina-vapor"] = original
+
+
+def test_nakagiri_2004_table1_preserves_printed_rate_cells_and_unknown_pressure() -> None:
+    path = EXTRACTS / "nakagiri-2004-sio2-evaporation-moist-gas.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    block = document["species"]["SiO2"]
+    assert block["observations"] == []
+    table = next(
+        row
+        for row in block["context"]
+        if row["observation_id"] == "nakagiri_2004_table_1_evaporation_rate_context"
+    )
+    values = table["values"]
+    rows = values["rows"]
+
+    assert table["locator"]["published_page"] == 336
+    assert values["printed_body_row_count"] == len(rows) == 3
+    assert values["printed_numeric_cell_count"] == 15
+    assert values["measured_experiment_rate_count"] == 6
+    assert values["calculated_comparison_rate_count"] == 6
+    assert [row["temperature_K_as_printed"] for row in rows] == [
+        "1473",
+        "1573",
+        "1673",
+    ]
+    assert rows[0]["measured_runs"][0]["rate_kg_m-2_s-1_as_printed"] == (
+        "1.87 × 10⁻⁹"
+    )
+    assert rows[0]["measured_runs"][1]["rate_kg_m-2_s-1_as_printed"] == (
+        "1.10 × 10⁻⁹"
+    )
+    assert rows[2]["measured_runs"][1]["rate_kg_m-2_s-1_as_printed"] == (
+        "1.22 × 10⁻⁸"
+    )
+    assert rows[1]["calculated_comparisons"][1]["rate_kg_m-2_s-1_as_printed"] == (
+        "1.94 × 10⁻⁹"
+    )
+    assert all(
+        run["total_pressure_Pa"]["state"]
+        == {"tag": "unknown", "reason": "not_published"}
+        for row in rows
+        for run in row["measured_runs"]
+    )
+    assert values["gas_flow_rate_as_printed"] == {
+        "value": "8.33 × 10⁻⁶",
+        "unit": "m^3/s at room temperature",
+    }
+    figure_candidates = next(
+        row
+        for row in block["context"]
+        if row["observation_id"] == "nakagiri_2004_figures_1_to_4_read_candidates"
+    )
+    figure_values = figure_candidates["values"]
+    assert figure_values["digitisation"] == "deferred"
+    figure_conditions = figure_values["figure_conditions_as_printed"]
+    assert len(figure_conditions) == 10
+    assert {
+        row["gas_mixture_as_printed"]
+        for row in figure_conditions
+        if row["figure"] == "1"
+    } == {
+        "N2-19.6%H2O",
+        "N2-46.7%H2O",
+        "(N2-20%O2)-19.6%H2O",
+        "(N2-20%O2)-46.7%H2O",
+    }
+    assert figure_values["shared_run_conditions"]["total_pressure_Pa"]["state"] == {
+        "tag": "unknown",
+        "reason": "not_published",
+    }
+    assert "No numeric figure value is transcribed as zero" in figure_values[
+        "qualitative_mass_change_as_printed"
+    ]
+
+    migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+    assert result.observations == {}
+    assert sum(map(len, result.context_by_work.values())) == 2

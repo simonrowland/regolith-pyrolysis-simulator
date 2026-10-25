@@ -1,0 +1,335 @@
+schema_version: literature_extract.v1
+source_id: nakagiri-2004-sio2-evaporation-moist-gas
+source:
+  citation: >-
+    Takao Nakagiri and Kazuya Kurokawa (2004). Evaporation Behavior of SiO2 in
+    N2-O2-H2O Atmospheres. Materials Transactions 45(2):334-337.
+  year: 2004
+extraction:
+  method: >-
+    Born-digital pdftotext-layout with MinerU table draft for Table 1. The Table 1
+    cell assignments and every numeric cell were checked against the page 336
+    render. Printed area-specific rates are retained as typed-refusal context:
+    the schema has no kg m^-2 s^-1 quantity token. No rate or flow units were
+    converted. Figures 1-4 are listed as figure-read candidates; no plotted
+    values were digitized.
+  date: '2026-10-25'
+  worker: codex
+  provenance_path: text/nakagiri-2004-sio2-evaporation-moist-gas/pdftotext-layout.txt
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: nakagiri_2004_table_1_evaporation_rate_context
+      type: measured_table_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 336
+        table: '1'
+      units: k1 as printed, kg/m^2 s
+      values:
+        quantity: evaporation_rate
+        method_class: mixed
+        admission_status: typed_refusal
+        reason: >-
+          The printed rates are mass loss per area and time (kg m^-2 s^-1), while
+          the existing evaporation_rate quantity accepts total mass rate (kg s^-1).
+          No area-specific rate quantity exists, so the values are not converted
+          to a different observable.
+        schema_gap: No quantity token represents area-specific mass loss rate in kg m^-2 s^-1.
+        candidate_tokens:
+        - evaporation_rate
+        - mass_loss
+        printed_body_row_count: 3
+        printed_numeric_cell_count: 15
+        measured_experiment_rate_count: 6
+        calculated_comparison_rate_count: 6
+        general_exposure_temperature_K_as_printed: 1373-1673
+        general_exposure_duration_ks_as_printed: 3.6-176.4
+        water_vapor_concentrations_vol_percent_as_printed:
+        - '19.6'
+        - '46.7'
+        water_bath_temperature_K_as_printed:
+          for_19_6_vol_percent: '333'
+          for_46_7_vol_percent: '353'
+        gas_flow_rate_as_printed:
+          value: '8.33 × 10⁻⁶'
+          unit: m^3/s at room temperature
+        hot_gas_linear_velocity_as_printed:
+          value: '0.06-0.07'
+          unit: m/s at 1373-1673 K
+        sample_dimensions_as_printed: 10 x 10 x 2 x 10^-3 m
+        note_on_duration: >-
+          The 3.6-176.4 ks interval is the overall exposure-test range, not a
+          duration assigned to each rate. Table 1 rates are slopes from the
+          high-water-concentration time series in Figure 2.
+        note_on_pressure: >-
+          The experimental section gives gas composition and flow but no total
+          pressure. The general background discussion of atmospheric-pressure
+          water-vapor chemistry does not state the total pressure of these runs.
+        note_on_flow_schema: >-
+          The printed volume flow is m^3/s at room temperature. It is retained
+          as printed; the sweep_gas schema only accepts flow_sccm and does not
+          encode the stated reference temperature.
+        rows:
+        - temperature_K_as_printed: '1473'
+          table_row: 3
+          measured_runs:
+          - gas_mixture_as_printed: N2-46.7%H2O
+            water_vapor_vol_percent_as_printed: '46.7'
+            rate_kg_m-2_s-1_as_printed: '1.87 × 10⁻⁹'
+            method_class: measured_direct
+            gas_flow_rate_as_printed:
+              value: '8.33 × 10⁻⁶'
+              unit: m^3/s at room temperature
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 335
+                section: Experimental Method
+                note: The experimental method states no total pressure for this run.
+            exposure_duration_as_printed: >-
+              No per-rate duration is stated; the overall experiment range was
+              3.6-176.4 ks.
+          - gas_mixture_as_printed: '(N2-20%O2)-46.7%H2O'
+            water_vapor_vol_percent_as_printed: '46.7'
+            oxygen_vol_percent_as_printed: '20'
+            rate_kg_m-2_s-1_as_printed: '1.10 × 10⁻⁹'
+            method_class: measured_direct
+            gas_flow_rate_as_printed:
+              value: '8.33 × 10⁻⁶'
+              unit: m^3/s at room temperature
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 335
+                section: Experimental Method
+                note: The experimental method states no total pressure for this run.
+            exposure_duration_as_printed: >-
+              No per-rate duration is stated; the overall experiment range was
+              3.6-176.4 ks.
+          calculated_comparisons:
+          - gas_species_as_printed: Si(OH)4
+            rate_kg_m-2_s-1_as_printed: '4.37 × 10⁻¹⁰'
+            method_class: quoted_attributed
+            attribution: Hashimoto [4] and Krikorian [6], as cited by Nakagiri and Kurokawa.
+            water_vapor_partial_pressure_Pa_as_printed: '5 × 10⁴'
+            model: Langmuir free-evaporation equation
+          - gas_species_as_printed: SiO(OH)2
+            rate_kg_m-2_s-1_as_printed: '5.16 × 10⁻¹⁰'
+            method_class: quoted_attributed
+            attribution: Hashimoto [4] and Krikorian [6], as cited by Nakagiri and Kurokawa.
+            water_vapor_partial_pressure_Pa_as_printed: '5 × 10⁴'
+            model: Langmuir free-evaporation equation
+        - temperature_K_as_printed: '1573'
+          table_row: 4
+          measured_runs:
+          - gas_mixture_as_printed: N2-46.7%H2O
+            water_vapor_vol_percent_as_printed: '46.7'
+            rate_kg_m-2_s-1_as_printed: '2.24 × 10⁻⁹'
+            method_class: measured_direct
+            gas_flow_rate_as_printed:
+              value: '8.33 × 10⁻⁶'
+              unit: m^3/s at room temperature
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 335
+                section: Experimental Method
+                note: The experimental method states no total pressure for this run.
+            exposure_duration_as_printed: >-
+              No per-rate duration is stated; the overall experiment range was
+              3.6-176.4 ks.
+          - gas_mixture_as_printed: '(N2-20%O2)-46.7%H2O'
+            water_vapor_vol_percent_as_printed: '46.7'
+            oxygen_vol_percent_as_printed: '20'
+            rate_kg_m-2_s-1_as_printed: '1.87 × 10⁻⁹'
+            method_class: measured_direct
+            gas_flow_rate_as_printed:
+              value: '8.33 × 10⁻⁶'
+              unit: m^3/s at room temperature
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 335
+                section: Experimental Method
+                note: The experimental method states no total pressure for this run.
+            exposure_duration_as_printed: >-
+              No per-rate duration is stated; the overall experiment range was
+              3.6-176.4 ks.
+          calculated_comparisons:
+          - gas_species_as_printed: Si(OH)4
+            rate_kg_m-2_s-1_as_printed: '6.30 × 10⁻¹⁰'
+            method_class: quoted_attributed
+            attribution: Hashimoto [4] and Krikorian [6], as cited by Nakagiri and Kurokawa.
+            water_vapor_partial_pressure_Pa_as_printed: '5 × 10⁴'
+            model: Langmuir free-evaporation equation
+          - gas_species_as_printed: SiO(OH)2
+            rate_kg_m-2_s-1_as_printed: '1.94 × 10⁻⁹'
+            method_class: quoted_attributed
+            attribution: Hashimoto [4] and Krikorian [6], as cited by Nakagiri and Kurokawa.
+            water_vapor_partial_pressure_Pa_as_printed: '5 × 10⁴'
+            model: Langmuir free-evaporation equation
+        - temperature_K_as_printed: '1673'
+          table_row: 5
+          measured_runs:
+          - gas_mixture_as_printed: N2-46.7%H2O
+            water_vapor_vol_percent_as_printed: '46.7'
+            rate_kg_m-2_s-1_as_printed: '2.68 × 10⁻⁹'
+            method_class: measured_direct
+            gas_flow_rate_as_printed:
+              value: '8.33 × 10⁻⁶'
+              unit: m^3/s at room temperature
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 335
+                section: Experimental Method
+                note: The experimental method states no total pressure for this run.
+            exposure_duration_as_printed: >-
+              No per-rate duration is stated; the overall experiment range was
+              3.6-176.4 ks.
+          - gas_mixture_as_printed: '(N2-20%O2)-46.7%H2O'
+            water_vapor_vol_percent_as_printed: '46.7'
+            oxygen_vol_percent_as_printed: '20'
+            rate_kg_m-2_s-1_as_printed: '1.22 × 10⁻⁸'
+            method_class: measured_direct
+            gas_flow_rate_as_printed:
+              value: '8.33 × 10⁻⁶'
+              unit: m^3/s at room temperature
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 335
+                section: Experimental Method
+                note: The experimental method states no total pressure for this run.
+            exposure_duration_as_printed: >-
+              No per-rate duration is stated; the overall experiment range was
+              3.6-176.4 ks.
+          calculated_comparisons:
+          - gas_species_as_printed: Si(OH)4
+            rate_kg_m-2_s-1_as_printed: '7.57 × 10⁻¹⁰'
+            method_class: quoted_attributed
+            attribution: Hashimoto [4] and Krikorian [6], as cited by Nakagiri and Kurokawa.
+            water_vapor_partial_pressure_Pa_as_printed: '5 × 10⁴'
+            model: Langmuir free-evaporation equation
+          - gas_species_as_printed: SiO(OH)2
+            rate_kg_m-2_s-1_as_printed: '5.84 × 10⁻⁹'
+            method_class: quoted_attributed
+            attribution: Hashimoto [4] and Krikorian [6], as cited by Nakagiri and Kurokawa.
+            water_vapor_partial_pressure_Pa_as_printed: '5 × 10⁴'
+            model: Langmuir free-evaporation equation
+    - observation_id: nakagiri_2004_figures_1_to_4_read_candidates
+      type: figure_read_queue
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 335
+        figure: '1'
+      units: as printed on each figure axis
+      values:
+        quantity: mass_loss
+        method_class: figure_only
+        digitisation: deferred
+        reason: >-
+          Numeric points on Figures 1-4 are read from figures and are outside
+          this table extraction. Preserve the figures as candidates for a later
+          figure-reading pass; no plotted values are stored here.
+        figure_conditions_as_printed:
+        - figure: '1'
+          temperature_K_as_printed: '1473'
+          gas_mixture_as_printed: N2-19.6%H2O
+        - figure: '1'
+          temperature_K_as_printed: '1473'
+          gas_mixture_as_printed: N2-46.7%H2O
+        - figure: '1'
+          temperature_K_as_printed: '1473'
+          gas_mixture_as_printed: '(N2-20%O2)-19.6%H2O'
+        - figure: '1'
+          temperature_K_as_printed: '1473'
+          gas_mixture_as_printed: '(N2-20%O2)-46.7%H2O'
+        - figure: '2'
+          temperature_K_as_printed: '1473'
+          gas_mixture_as_printed: N2-46.7%H2O
+        - figure: '2'
+          temperature_K_as_printed: '1573'
+          gas_mixture_as_printed: N2-46.7%H2O
+        - figure: '2'
+          temperature_K_as_printed: '1673'
+          gas_mixture_as_printed: N2-46.7%H2O
+        - figure: '2'
+          temperature_K_as_printed: '1473'
+          gas_mixture_as_printed: '(N2-20%O2)-46.7%H2O'
+        - figure: '2'
+          temperature_K_as_printed: '1573'
+          gas_mixture_as_printed: '(N2-20%O2)-46.7%H2O'
+        - figure: '2'
+          temperature_K_as_printed: '1673'
+          gas_mixture_as_printed: '(N2-20%O2)-46.7%H2O'
+        shared_run_conditions:
+          gas_flow_rate_as_printed:
+            value: '8.33 × 10⁻⁶'
+            unit: m^3/s at room temperature
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 2
+              pdf_page_index: 1
+              published_page: 335
+              section: Experimental Method
+              note: The experimental method states no total pressure for these runs.
+          exposure_duration_as_printed: >-
+            No per-run duration is stated; the overall experiment range was
+            3.6-176.4 ks.
+        qualitative_mass_change_as_printed: >-
+          For the 19.6 vol% water mixtures, the source says that mass loss can
+          be ignored. No numeric figure value is transcribed as zero.
+        figures:
+        - figure: '1'
+          page: 2
+          pdf_page_index: 1
+          published_page: 335
+          caption: Change in mass of fused silica with time at 1473 K in N2-H2O and N2-O2-H2O atmospheres.
+        - figure: '2'
+          page: 2
+          pdf_page_index: 1
+          published_page: 335
+          caption: Mass loss at 1473-1673 K in N2-46.7%H2O and (N2-20%O2)-46.7%H2O atmospheres.
+        - figure: '3'
+          page: 3
+          pdf_page_index: 2
+          published_page: 336
+          caption: Calculated Si(OH)4 and SiO(OH)2 vapor pressures versus temperature.
+        - figure: '4'
+          page: 3
+          pdf_page_index: 2
+          published_page: 336
+          caption: Linear evaporation rates versus temperature and comparison with calculated species rates.
