@@ -288,14 +288,22 @@ def _number_decimal(text: str) -> Decimal | None:
 
 
 def _relative_ion_intensity_decimal(text: str) -> Decimal | None:
-    """Read the numeric intensity before a printed ionizing-energy note."""
+    """Read a numeric token followed only by known intensity annotations."""
     token = text.strip().replace("$", "")
-    prefix = re.match(
-        r"^[+\-−]?(?:\d+(?:\.\d*)?|\.\d+)"
-        r"(?:\s*\\times\s*10\s*\^\s*\{?[+\-−]?\d+\}?)?",
-        token,
-    )
-    return _number_decimal(prefix.group(0)) if prefix is not None else None
+    for end in range(len(token), 0, -1):
+        value = _number_decimal(token[:end].strip())
+        if value is None:
+            continue
+        suffix = token[end:].strip()
+        if not suffix:
+            return value
+        if re.fullmatch(
+            r"\(\d+\.\d+\)(?:\^\{[A-Za-z]\})?(?:\s*Average)?",
+            suffix,
+        ):
+            return value
+        return None
+    return None
 
 
 def _number_value(text: str) -> float | None:

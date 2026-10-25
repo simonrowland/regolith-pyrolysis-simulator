@@ -10,6 +10,7 @@ import yaml
 
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT
+from simulator.battery.validity import _calibration_grounded, underdetermined_apparatus
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -92,6 +93,27 @@ def test_render_pins_and_mutation_red_check() -> None:
         _assert_render_pins(mutated)
 
 
+def test_table7_reactions_distinguish_oxygen_from_zero() -> None:
+    observations = {
+        item["observation_id"]: item
+        for item in _document()["species"]["Sr2O"]["observations"]
+    }
+    expected = {
+        "drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p020_t16_r03_c02": (
+            r"Sr_{2}O(g) + 2O(g) + Mo(s) \rightarrow 2Sr(g) + MoO_{3}(g)"
+        ),
+        "drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p020_t16_r04_c02": (
+            r"Sr_{2}O(g) + 3O(g) \rightarrow 2Sr(g) + 2O_{2}(g)"
+        ),
+    }
+
+    for observation_id, reaction in expected.items():
+        observation = observations[observation_id]
+        assert observation["locator"]["row"] == reaction
+        assert observation["values"]["reaction_as_printed"] == reaction
+        assert observation["values"]["equilibrium_as_printed"] == reaction
+
+
 def test_isolated_migration_preserves_table_rows_and_unprinted_conditions() -> None:
     document = _document()
     ratio_observations = [
@@ -126,6 +148,40 @@ def test_isolated_migration_preserves_table_rows_and_unprinted_conditions() -> N
     assert len(unavailable) == 67
     assert len(points) == 169
     assert all(row.identity.quantity.value is Quantity.ION_INTENSITY_RATIO for row in points)
+    assert len({row.experiment_id for row in points}) == 1
+
+    calibration_text = (
+        "The source states no absolute pressure calibrations based on quantitative "
+        "vaporizations of the samples were carried out."
+    )
+    cell_text = "molybdenum and tungsten Knudsen cells"
+    cell_assignment_note = (
+        "does not assign either material to an individual table row"
+    )
+    for row in points:
+        experiment = migrated.result.experiments[row.experiment_id]
+        assert experiment.apparatus is not None
+        cell = experiment.apparatus.cell_material_and_liner
+        assert cell is not None and cell.state.is_value
+        assert cell.state.value == cell_text
+        assert cell.locator is not None and cell.locator.page == 8
+        assert cell_assignment_note in cell.locator.note
+        calibration = experiment.apparatus.calibration
+        assert calibration is not None
+        caveat = calibration["absolute_pressure_calibration"]
+        assert caveat.state.is_unknown
+        assert caveat.locator is not None and caveat.locator.page == 10
+        assert calibration_text in caveat.locator.note
+        assert not _calibration_grounded(calibration)
+
+        pressure_gate = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
+        calibration_check = next(
+            check for check in pressure_gate.checks if check.name == "kems_calibration"
+        )
+        assert calibration_check.passed
+        assert calibration_check.detail["missing"] == ["calibration"]
+        assert calibration_check.detail["flag"] == "calibration_not_grounded"
+        assert calibration_check.detail["calibration_record_status"] == "not_printed"
 
     for row in points:
         assert row.identity.temperature_K.is_value

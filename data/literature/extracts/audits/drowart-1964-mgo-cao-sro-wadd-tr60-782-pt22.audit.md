@@ -32,6 +32,10 @@ Printed row counts for Tables 2a–5c total 43 measured-temperature rows. The ta
 
 Table 6's MinerU block placed the data in header text, so its numeric cells were hand-transcribed from PDF page 19: MgO row, O/O₂ = 85.9, WO₂/WO₃ = 84.0, average = 85.0 ± 5; CaO row, O/O₂ = 90.1, MoO₂/MoO₃ = 93.4, WO₂/WO₃ = 93.1, average = 92.2 ± 5; SrO row, O/O₂ = 102.5, MoO₂/MoO₃ = 101.1, WO₂/WO₃ = 102.0, average = 101.9 ± 5. Table 7's equilibrium rows on PDF page 20 are 195.8, 193.0 and 191.5; its selected value is 193.4 ± 6. The selected value is hand-transcribed because MinerU merged it with the surrounding cell text.
 
+Table 7's page-20 render confirms the letter O in the two reactions involving Mo(s) and O₂(g); the extract's row locators, reaction labels and equilibrium labels now use that letter. The focused test pins both rendered reactions, and the 193.0 and 191.5 kcal/mole values are unchanged.
+
+The 169 relative-ion-intensity observations link to one KEMS experiment record. Its apparatus records the printed molybdenum and tungsten cell materials while preserving that the source does not assign a cell material to individual table rows. The apparatus calibration records the source's statement that no absolute pressure calibrations based on quantitative vaporizations were carried out; the calibration remains unknown and ungrounded. The measured rows remain ion-intensity ratios, not calibrated partial pressures.
+
 ## Render resolutions
 
 - Table 1, PDF page 12: MinerU read the WO₃ relative multiplier yield as 0.41; Tesseract read 0.42. The render confirms 0.41.
@@ -49,6 +53,6 @@ Table 6's MinerU block placed the data in header text, so its numeric cells were
 
 ## Isolated migration
 
-The seat migrator produced 236 observations: 169 point-valued relative ion-current observations and 67 unavailable typed-refusal observations. Hard issues: 0. Registry issues: 0. The four focused render pins are in `tests/test_drowart_1964_mgo_cao_sro_extract.py`; the test also mutates one pin and confirms the render assertion fails.
+The seat migrator produced 236 observations: 169 point-valued relative ion-current observations and 67 unavailable typed-refusal observations. Hard issues: 0. Registry issues: 0. All 169 point rows link to one experiment whose apparatus retains the molybdenum/tungsten cell statement and the uncalibrated-pressure caveat. The scorer's KEMS calibration check reports `calibration_not_grounded` for a partial-pressure conversion, so the rows remain relative ion-intensity ratios. The four focused render pins are in `tests/test_drowart_1964_mgo_cao_sro_extract.py`; the test also mutates one pin and confirms the render assertion fails.
 
 For the first three migrated ratio rows, identity axes are: composition = not applicable; total pressure = not applicable; fO₂ = not applicable; temperature = 2225 K, 2026 K, and 2114 K respectively. Each row retains its table temperature condition and locator.

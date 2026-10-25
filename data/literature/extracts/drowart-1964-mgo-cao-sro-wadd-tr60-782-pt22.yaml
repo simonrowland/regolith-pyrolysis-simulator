@@ -15,6 +15,34 @@ extraction:
   worker: w1025d-drow64
   provenance_path: raw/drowart-1964-mgo-cao-sro-wadd-tr60-782-pt22/drowart-1964-mgo-cao-sro-wadd-tr60-782-pt22.pdf
 review_status: draft
+experiments:
+  - experiment_id: drowart_1964_kems_series
+    method: knudsen_effusion
+    locator:
+      page: 8
+      pdf_page_index: 7
+      published_page: 2
+      note: Experimental description of the KEMS measurements and cells.
+    apparatus:
+      cell_material_and_liner:
+        state:
+          tag: value
+          value: molybdenum and tungsten Knudsen cells
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 2
+          note: The source identifies molybdenum and tungsten cells but does not assign either material to an individual table row.
+      calibration:
+        absolute_pressure_calibration:
+          state:
+            tag: unknown
+            reason: not printed; the source explicitly says no absolute pressure calibrations were carried out
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 4
+            note: The source states no absolute pressure calibrations based on quantitative vaporizations of the samples were carried out.
 skipped_empty_or_dash:
   total: 8
   tables:
@@ -95,6 +123,7 @@ species:
     observations:
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r02_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -145,6 +174,7 @@ species:
       - 2225.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r03_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -195,6 +225,7 @@ species:
       - 2026.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r04_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -245,6 +276,7 @@ species:
       - 2114.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r05_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -295,6 +327,7 @@ species:
       - 2110.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r06_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -345,6 +378,7 @@ species:
       - 2152.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r07_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -395,6 +429,7 @@ species:
       - 2137.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r08_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -445,6 +480,7 @@ species:
       - 2127.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r09_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -495,6 +531,7 @@ species:
       - 2274.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r02_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -545,6 +582,7 @@ species:
       - 2109.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r03_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -595,6 +633,7 @@ species:
       - 2225.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r04_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -645,6 +684,7 @@ species:
       - 2181.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r05_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -695,6 +735,7 @@ species:
       - 2222.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r06_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -745,6 +786,7 @@ species:
       - 2106.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r07_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -797,6 +839,7 @@ species:
     observations:
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r02_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -847,6 +890,7 @@ species:
       - 2410.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r03_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -897,6 +941,7 @@ species:
       - 2233.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r04_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -947,6 +992,7 @@ species:
       - 2168.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r05_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -997,6 +1043,7 @@ species:
       - 2231.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r02_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -1048,6 +1095,7 @@ species:
       - 2393.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r03_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -1099,6 +1147,7 @@ species:
       - 2410.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r04_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -1150,6 +1199,7 @@ species:
       - 2405.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t08_r02_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -1201,6 +1251,7 @@ species:
       - 2334.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t08_r03_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -1254,6 +1305,7 @@ species:
     observations:
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r02_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1305,6 +1357,7 @@ species:
       - 2233.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r03_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1356,6 +1409,7 @@ species:
       - 2156.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r04_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1407,6 +1461,7 @@ species:
       - 2265.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r05_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1458,6 +1513,7 @@ species:
       - 2321.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t10_r02_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1509,6 +1565,7 @@ species:
       - 2326.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r02_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1559,6 +1616,7 @@ species:
       - 2044.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r03_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1609,6 +1667,7 @@ species:
       - 1987.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r04_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1659,6 +1718,7 @@ species:
       - 1992.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r05_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1710,6 +1770,7 @@ species:
       - 2060.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r06_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1761,6 +1822,7 @@ species:
       - 2070.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r07_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1812,6 +1874,7 @@ species:
       - 2086.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r08_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1863,6 +1926,7 @@ species:
       - 2173.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r09_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -1914,6 +1978,7 @@ species:
       - 2233.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t13_r02_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -1964,6 +2029,7 @@ species:
       - 2149.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r02_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -2014,6 +2080,7 @@ species:
       - 2149.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r03_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -2064,6 +2131,7 @@ species:
       - 2260.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r04_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -2116,6 +2184,7 @@ species:
     observations:
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r02_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -2166,6 +2235,7 @@ species:
       - 2225.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r03_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -2216,6 +2286,7 @@ species:
       - 2026.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r04_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -2266,6 +2337,7 @@ species:
       - 2114.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r05_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -2316,6 +2388,7 @@ species:
       - 2110.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r06_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -2366,6 +2439,7 @@ species:
       - 2152.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r07_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -2416,6 +2490,7 @@ species:
       - 2137.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r08_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -2466,6 +2541,7 @@ species:
       - 2127.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r09_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -2516,6 +2592,7 @@ species:
       - 2274.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r02_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -2566,6 +2643,7 @@ species:
       - 2410.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r03_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -2616,6 +2694,7 @@ species:
       - 2233.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r04_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -2666,6 +2745,7 @@ species:
       - 2168.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r05_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -2716,6 +2796,7 @@ species:
       - 2231.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r02_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -2767,6 +2848,7 @@ species:
       - 2233.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r03_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -2818,6 +2900,7 @@ species:
       - 2156.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r04_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -2869,6 +2952,7 @@ species:
       - 2265.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r05_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -2920,6 +3004,7 @@ species:
       - 2321.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t12_r02_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -2970,6 +3055,7 @@ species:
       - 2060.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t12_r03_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -3021,6 +3107,7 @@ species:
       - 2086.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t12_r04_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -3072,6 +3159,7 @@ species:
       - 2228.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t13_r02_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -3122,6 +3210,7 @@ species:
       - 2149.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r02_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -3172,6 +3261,7 @@ species:
       - 2149.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r03_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -3222,6 +3312,7 @@ species:
       - 2260.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r04_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -3274,6 +3365,7 @@ species:
     observations:
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r02_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -3324,6 +3416,7 @@ species:
       - 2225.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r03_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -3374,6 +3467,7 @@ species:
       - 2026.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r04_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -3424,6 +3518,7 @@ species:
       - 2114.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r05_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -3474,6 +3569,7 @@ species:
       - 2110.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r06_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -3524,6 +3620,7 @@ species:
       - 2152.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r07_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -3574,6 +3671,7 @@ species:
       - 2137.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r08_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -3624,6 +3722,7 @@ species:
       - 2127.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r09_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -3674,6 +3773,7 @@ species:
       - 2274.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r02_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -3724,6 +3824,7 @@ species:
       - 2410.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r03_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -3774,6 +3875,7 @@ species:
       - 2233.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r04_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -3824,6 +3926,7 @@ species:
       - 2168.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r05_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -3874,6 +3977,7 @@ species:
       - 2231.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r02_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -3925,6 +4029,7 @@ species:
       - 2233.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r03_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -3976,6 +4081,7 @@ species:
       - 2156.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r04_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -4027,6 +4133,7 @@ species:
       - 2265.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r05_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -4078,6 +4185,7 @@ species:
       - 2321.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r02_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -4128,6 +4236,7 @@ species:
       - 2149.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r03_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -4178,6 +4287,7 @@ species:
       - 2260.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r04_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -4230,6 +4340,7 @@ species:
     observations:
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r02_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -4280,6 +4391,7 @@ species:
       - 2393.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r03_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -4330,6 +4442,7 @@ species:
       - 2410.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r04_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -4380,6 +4493,7 @@ species:
       - 2405.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r02_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -4430,6 +4544,7 @@ species:
       - 2044.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r03_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -4480,6 +4595,7 @@ species:
       - 1987.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r04_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -4530,6 +4646,7 @@ species:
       - 1992.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r05_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -4580,6 +4697,7 @@ species:
       - 2060.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r06_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -4630,6 +4748,7 @@ species:
       - 2070.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r07_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -4680,6 +4799,7 @@ species:
       - 2086.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r08_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -4731,6 +4851,7 @@ species:
       - 2173.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r09_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -4784,6 +4905,7 @@ species:
     observations:
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r02_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -4834,6 +4956,7 @@ species:
       - 2393.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r03_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -4884,6 +5007,7 @@ species:
       - 2410.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r04_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -4934,6 +5058,7 @@ species:
       - 2405.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r02_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -4984,6 +5109,7 @@ species:
       - 2044.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r03_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -5034,6 +5160,7 @@ species:
       - 1987.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r04_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -5084,6 +5211,7 @@ species:
       - 1992.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r05_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -5134,6 +5262,7 @@ species:
       - 2060.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r06_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -5184,6 +5313,7 @@ species:
       - 2070.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r07_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -5234,6 +5364,7 @@ species:
       - 2086.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r08_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -5285,6 +5416,7 @@ species:
       - 2173.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r09_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -5336,6 +5468,7 @@ species:
       - 2233.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t13_r02_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -5388,6 +5521,7 @@ species:
     observations:
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r02_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -5438,6 +5572,7 @@ species:
       - 2109.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r03_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -5488,6 +5623,7 @@ species:
       - 2225.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r04_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -5538,6 +5674,7 @@ species:
       - 2181.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r05_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -5588,6 +5725,7 @@ species:
       - 2222.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r06_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -5638,6 +5776,7 @@ species:
       - 2106.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r07_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -5688,6 +5827,7 @@ species:
       - 2152.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t08_r02_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -5738,6 +5878,7 @@ species:
       - 2334.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t08_r03_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -5788,6 +5929,7 @@ species:
       - 2328.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t10_r02_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -5841,6 +5983,7 @@ species:
     observations:
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r02_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -5891,6 +6034,7 @@ species:
       - 2109.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r03_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -5941,6 +6085,7 @@ species:
       - 2225.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r04_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -5991,6 +6136,7 @@ species:
       - 2181.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r05_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -6041,6 +6187,7 @@ species:
       - 2222.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r06_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -6091,6 +6238,7 @@ species:
       - 2106.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r07_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -6141,6 +6289,7 @@ species:
       - 2152.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t08_r02_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -6191,6 +6340,7 @@ species:
       - 2334.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t08_r03_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -6241,6 +6391,7 @@ species:
       - 2328.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t10_r02_c03
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -6370,6 +6521,7 @@ species:
         uncertainty_confidence_as_printed: 95% statistical probability
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r02_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -6471,6 +6623,7 @@ species:
         cell_as_read_by_MinerU: '-31.5'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r03_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -6572,6 +6725,7 @@ species:
         cell_as_read_by_MinerU: '-30.3'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r04_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -6673,6 +6827,7 @@ species:
         cell_as_read_by_MinerU: '-32.7'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r05_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -6774,6 +6929,7 @@ species:
         cell_as_read_by_MinerU: '-30.9'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r06_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -6875,6 +7031,7 @@ species:
         cell_as_read_by_MinerU: '-32.6'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r07_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -6976,6 +7133,7 @@ species:
         cell_as_read_by_MinerU: '-32.1'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r08_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -7077,6 +7235,7 @@ species:
         cell_as_read_by_MinerU: '-33.5'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t04_r09_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -7178,6 +7337,7 @@ species:
         cell_as_read_by_MinerU: '-32.9'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r02_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -7279,6 +7439,7 @@ species:
         cell_as_read_by_MinerU: '-59.9'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r03_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -7380,6 +7541,7 @@ species:
         cell_as_read_by_MinerU: '-63.3'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r04_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -7481,6 +7643,7 @@ species:
         cell_as_read_by_MinerU: '-63.0'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r05_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -7582,6 +7745,7 @@ species:
         cell_as_read_by_MinerU: '-62.6'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r06_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -7683,6 +7847,7 @@ species:
         cell_as_read_by_MinerU: '-61.7'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p015_t05_r07_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 15
         pdf_page_index: 14
@@ -8342,6 +8507,7 @@ species:
         uncertainty_confidence_as_printed: 95% statistical probability
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r02_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -8443,6 +8609,7 @@ species:
         cell_as_read_by_MinerU: '-29.2'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r03_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -8544,6 +8711,7 @@ species:
         cell_as_read_by_MinerU: '-30.7'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r04_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -8645,6 +8813,7 @@ species:
         cell_as_read_by_MinerU: '-24.8'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t06_r05_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -8746,6 +8915,7 @@ species:
         cell_as_read_by_MinerU: '-26.8'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r02_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -8848,6 +9018,7 @@ species:
         cell_as_read_by_MinerU: '-55.1'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r03_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -8950,6 +9121,7 @@ species:
         cell_as_read_by_MinerU: '-55.7'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t07_r04_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -9052,6 +9224,7 @@ species:
         cell_as_read_by_MinerU: '-57.7'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t08_r02_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -9154,6 +9327,7 @@ species:
         cell_as_read_by_MinerU: '-54.4'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p016_t08_r03_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 16
         pdf_page_index: 15
@@ -9531,6 +9705,7 @@ species:
         uncertainty_confidence_as_printed: 95% statistical probability
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r02_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -9633,6 +9808,7 @@ species:
         cell_as_read_by_MinerU: '-15.8'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r03_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -9735,6 +9911,7 @@ species:
         cell_as_read_by_MinerU: '-13.4'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r04_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -9837,6 +10014,7 @@ species:
         cell_as_read_by_MinerU: '-15.5'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t09_r05_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -9888,6 +10066,7 @@ species:
       - 2321.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t10_r02_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -9990,6 +10169,7 @@ species:
         cell_as_read_by_MinerU: '-45.2'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r02_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -10091,6 +10271,7 @@ species:
         cell_as_read_by_MinerU: '-45.6'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r03_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -10192,6 +10373,7 @@ species:
         cell_as_read_by_MinerU: '-46.5'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r04_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -10293,6 +10475,7 @@ species:
         cell_as_read_by_MinerU: '-47.6'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r05_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -10395,6 +10578,7 @@ species:
         cell_as_read_by_MinerU: '-49.8'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r06_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -10497,6 +10681,7 @@ species:
         cell_as_read_by_MinerU: '-48.3'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r07_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -10599,6 +10784,7 @@ species:
         cell_as_read_by_MinerU: '-49.0'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r08_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -10701,6 +10887,7 @@ species:
         cell_as_read_by_MinerU: '-48.0'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p017_t11_r09_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 17
         pdf_page_index: 16
@@ -10752,6 +10939,7 @@ species:
       - 2233.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t12_r02_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -10802,6 +10990,7 @@ species:
       - 2060.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t12_r03_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -10853,6 +11042,7 @@ species:
       - 2086.0
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t12_r04_c02
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -11128,6 +11318,7 @@ species:
         uncertainty_confidence_as_printed: 95% statistical probability
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t12_r02_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -11229,6 +11420,7 @@ species:
         cell_as_read_by_MinerU: '-8.1'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t12_r03_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -11330,6 +11522,7 @@ species:
         cell_as_read_by_MinerU: '-6.4'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t12_r04_c04
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -11431,6 +11624,7 @@ species:
         cell_as_read_by_MinerU: '-9.6'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t13_r02_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -11532,6 +11726,7 @@ species:
         cell_as_read_by_MinerU: '-61.0'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r02_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -11633,6 +11828,7 @@ species:
         cell_as_read_by_MinerU: '-41.3'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r03_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -11734,6 +11930,7 @@ species:
         cell_as_read_by_MinerU: '-45.6'
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p018_t14_r04_c05
       type: rate_series
+      experiment: drowart_1964_kems_series
       locator:
         page: 18
         pdf_page_index: 17
@@ -11878,7 +12075,7 @@ species:
         pdf_page_index: 19
         published_page: 14
         table: '7'
-        row: Sr_{2}O(g) + 20(g) + Mo(s) \rightarrow 2Sr(g) + MoO_{3}(g)
+        row: Sr_{2}O(g) + 2O(g) + Mo(s) \rightarrow 2Sr(g) + MoO_{3}(g)
         column_header: ΔH°oat(Sr2O)
         cell_as_read_by_MinerU: '193.0'
       units: kcal/mole
@@ -11905,10 +12102,10 @@ species:
         schema_gap: No stored quantity token represents this reaction enthalpy or thermochemical energy.
         printed_label: ΔH°oat(Sr2O)
         value_as_printed: '193.0'
-        reaction_as_printed: Sr_{2}O(g) + 20(g) + Mo(s) \rightarrow 2Sr(g) + MoO_{3}(g)
+        reaction_as_printed: Sr_{2}O(g) + 2O(g) + Mo(s) \rightarrow 2Sr(g) + MoO_{3}(g)
         derivation_as_printed: Calculated from Tables 5a–5c using D°(SrO)=101.9 kcal/mole, ΔH°sub(Mo)=157.1 kcal/mole
           [54], and ΔH°at(MoO3)=411.1 kcal/mole [53].
-        equilibrium_as_printed: Sr_{2}O(g) + 20(g) + Mo(s) \rightarrow 2Sr(g) + MoO_{3}(g)
+        equilibrium_as_printed: Sr_{2}O(g) + 2O(g) + Mo(s) \rightarrow 2Sr(g) + MoO_{3}(g)
     - observation_id: drowart_1964_mgo_cao_sro_wadd_tr60_782_pt22_p020_t16_r04_c02
       type: gibbs_table
       locator:
@@ -11916,7 +12113,7 @@ species:
         pdf_page_index: 19
         published_page: 14
         table: '7'
-        row: Sr_{2}O(g) + 30(g) \rightarrow 2Sr(g) + 2O_{2}(g)
+        row: Sr_{2}O(g) + 3O(g) \rightarrow 2Sr(g) + 2O_{2}(g)
         column_header: ΔH°oat(Sr2O)
         cell_as_read_by_MinerU: '191.5'
       units: kcal/mole
@@ -11943,10 +12140,10 @@ species:
         schema_gap: No stored quantity token represents this reaction enthalpy or thermochemical energy.
         printed_label: ΔH°oat(Sr2O)
         value_as_printed: '191.5'
-        reaction_as_printed: Sr_{2}O(g) + 30(g) \rightarrow 2Sr(g) + 2O_{2}(g)
+        reaction_as_printed: Sr_{2}O(g) + 3O(g) \rightarrow 2Sr(g) + 2O_{2}(g)
         derivation_as_printed: Calculated from Tables 5a–5c using D°(SrO)=101.9 kcal/mole, ΔH°sub(Mo)=157.1 kcal/mole
           [54], and ΔH°at(MoO3)=411.1 kcal/mole [53].
-        equilibrium_as_printed: Sr_{2}O(g) + 30(g) \rightarrow 2Sr(g) + 2O_{2}(g)
+        equilibrium_as_printed: Sr_{2}O(g) + 3O(g) \rightarrow 2Sr(g) + 2O_{2}(g)
     - observation_id: drowart_1964_table7_selected_atomization_energy_sr2o
       type: gibbs_table
       locator:

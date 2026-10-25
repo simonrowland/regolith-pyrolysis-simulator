@@ -4,6 +4,7 @@ import argparse
 import csv
 import json
 import shutil
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -240,6 +241,80 @@ def test_latex_numeric_cells_convert_and_compare(tmp_path: Path) -> None:
     }]}}}
     compared = draft.compare_extract_to_draft(extract, index_path)
     assert [row["status"] for row in compared] == ["presence-only"] * 3
+
+
+def test_compare_ion_intensity_uses_the_complete_scientific_token(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "p001-t01.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        for row, cells in (
+            (1, ("T, K", "I+(O)")),
+            (2, ("2233", "5.8e-5")),
+        ):
+            for column, text in enumerate(cells, start=1):
+                writer.writerow({
+                    "row": row,
+                    "column": column,
+                    "row_type": "header" if row == 1 else "body",
+                    "text": text,
+                    "value_text": text,
+                    "mark": "",
+                    "numeric_column": int(row > 1 and column == 2),
+                    "origin_row": row,
+                    "origin_column": column,
+                    "rowspan": 1,
+                    "colspan": 1,
+                    "flags": "[]",
+                })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p001-t01",
+        "pdf_page": 1,
+        "csv": csv_path.name,
+        "header_rows": [["T, K", "I+(O)"]],
+        "columns": [{"column": 2, "header": "I+(O)"}],
+    }]}), encoding="utf-8")
+    mapping = {"tables": [{
+        "page": 1,
+        "table_index": 1,
+        "type": "rate_series",
+        "quantity": "ion_intensity_ratio",
+        "values": [{"column": 2, "species": "O", "quantity": "ion_current_ratio"}],
+    }]}
+
+    def compare(value: str) -> dict:
+        extract = {"species": {"O": {"observations": [{
+            "observation_id": "ion-intensity",
+            "locator": {
+                "pdf_page": 1,
+                "table": "1",
+                "table_row_number": 2,
+                "table_column_number": 2,
+            },
+            "values": {"ion_current_ratio": value},
+        }]}}}
+        return draft.compare_extract_to_draft(extract, index_path, mapping)[0]
+
+    matched = compare("5.8e-5")
+    wrong_mantissa = compare("5.8")
+
+    assert matched["status"] == "matched"
+    assert matched["matched_cell"]["value"] == 5.8e-5
+    assert wrong_mantissa["status"] == "mismatch"
+    assert wrong_mantissa["matched_cell"] is None
+    assert draft._relative_ion_intensity_decimal(
+        "$1.6 \\times 10^{-4}$ (18.5)"
+    ) == Decimal("1.6e-4")
+    assert draft._relative_ion_intensity_decimal(
+        "$1.0(8.1)^{a}$"
+    ) == Decimal("1.0")
+    assert draft._relative_ion_intensity_decimal(
+        "$6.0 \\times 10^{-3}(9.5)$ Average"
+    ) == Decimal("6.0e-3")
+    assert draft._relative_ion_intensity_decimal("5.8e-5 stray") is None
 
 
 def test_compare_typed_transition_temperature_in_cr_unqualified_table(
