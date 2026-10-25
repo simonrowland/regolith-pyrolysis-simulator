@@ -1,6 +1,7 @@
-"""C7 chunk 1: exact production receipts at c313b3dc3, not validation claims.
+"""C7 exact production receipts, not experimental validation claims.
 
-The JSON is captured before the move. Existing independent stoichiometry,
+R4 recaptures the pinned rounding-level SI gas-constant physics move.
+The original source controls and strict hexadecimal assertions remain. Existing independent stoichiometry,
 JANAF, redox-refusal and thermodynamic tests remain the physics checks.
 """
 from collections.abc import Mapping

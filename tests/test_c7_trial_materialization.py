@@ -1,4 +1,4 @@
-"""Accepted hot-hour receipts captured at b6d038243 before trial refactoring."""
+"""Hot-hour production receipts after the pinned C7 R4 gas-constant move."""
 import hashlib
 import json
 
@@ -98,10 +98,10 @@ def test_accepted_hot_hour_hex():
         # and zero-rate records, rather than storing another 930 kB fixture.
         assert {key: hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
                 for key, value in receipt.items()} == {
-            'flux': 'bcd5d7fba1fd528578f866313c6160ab9bcb979c9694b6ca560fcef1580f5171',
-            'oxygen': '800d16a2841c263be5f3b91476d70da2f36aa9a3c3077bc6601da697e91b27ce',
-            'ledger': '4e3a0b5184683392bb660b5a6383dc24b6fd8c80d06595e62bfb19612d245262',
-            'condensation': 'c448718e84ef4f561393d6c998e0c47dda6779efca7daedb93de2116fd20b36d',
+            'flux': '7ccb59e92f653c29e73d4730de9c11d799cdbd9310565c6e977e3565cf833fe3',
+            'oxygen': '384e69e50af06874a8d1ffc9f454ab70e65f9ab363fc0f3551b2bf49bdb4f8ec',
+            'ledger': 'dab2227b6b6848e3810336e0a2d3eb8d8b799c3764633372279549a73f17ed3c',
+            'condensation': 'df66c025d9f9d52390593e07f74276b4ce0599131d333faf8f0a8dc4d8500599',
         }
     finally:
         close_test_owned_magemin_backend(sim)
