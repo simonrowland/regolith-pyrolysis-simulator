@@ -1,0 +1,53 @@
+source_id: rb86-rogez-etal-1983
+source:
+  citation: >-
+    Rogez, J., Chastel, R., Bergman, C., Brousse, C., Castanet, R. and Mathieu, J.-C.
+    (1983), Etude thermodynamique du systeme albite-orthose par calorimetrie de
+    dissolution et effusion de Knudsen couplee a un spectrometre de masse,
+    Bulletin de Mineralogie 106(1-2):119-128.
+  doi: 10.3406/bulmi.1983.7674
+  year: 1983
+extraction:
+  method: MinerU table draft emit for Table VI activities; the remaining printed tables are retained as typed-refused context because their quantities have no matching schema token.
+  date: '2026-10-25'
+  worker: w1025b-roge83
+review_status: draft
+tables:
+  - page: 9
+    table_index: 6
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless activity
+    evidence_class: quoted_attributed
+    phase: l
+    temperature:
+      as_printed: '1300'
+      unit: K
+      column_header: T = 1 300 K, Table VI caption
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 126
+        table: 'VI'
+    values:
+      - column: 2
+        species: NaAlSi3O8
+      - column: 3
+        species: KAlSi3O8
+    conditions:
+      - key: fO2_Pa
+        state: {tag: unknown, reason: not_published}
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 126
+          table: 'VI'
+          note: No oxygen fugacity is reported for these activity measurements.
+      - key: total_pressure_Pa
+        state: {tag: unknown, reason: not_published}
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 126
+          table: 'VI'
+          note: No total pressure is reported for these activity measurements.

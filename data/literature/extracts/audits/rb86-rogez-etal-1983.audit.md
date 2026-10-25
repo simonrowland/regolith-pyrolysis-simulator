@@ -1,0 +1,39 @@
+# Rogez et al. (1983) extraction audit
+
+The duplicate search by DOI, author/year, and title found no existing extract at the seat base or in reachable refs. The target extract had no prior history.
+
+## Table and row reconciliation
+
+The seat table tool converted the MinerU content list into 11 blocks. Its QA pre-screen reported low agreement for Table II (0.733), Table III (0.590), Table VI (0.500), and appendix blocks on PDF pp. 9–10 (0.372, 0.251, 0.006). The two empty appendix blocks on pp. 10–11 were retained in the inventory and reconciled against the renders.
+
+| PDF page | Printed material | Printed rows | Reconciliation |
+|---|---|---:|---|
+| 3 | Table I, glass analyses | 18 | Render confirms six theoretical composition rows, each followed by two measured analyses; five columns including the row label. |
+| 5 | Table II, alumina-alpha and quartz dissolution enthalpies | 7 | Render confirms four alumina-alpha and three quartz rows; material, attribution, enthalpy, deviation, n, and T columns were assigned separately. |
+| 5 | Table III, feldspar-glass dissolution enthalpies | 6 | Render confirms six xOr rows, with replicate and mean ± standard deviation cells kept separate. |
+| 5 | Table IV, feldspar-glass mixing enthalpies | 6 | Render confirms six xOr rows and both zero endpoints. MinerU's final `∅` was corrected to the printed `0`; the uncertainty width has no stated confidence level. |
+| 8 | Table V, normalized ion-current ratio | 10 | Numeric rows were marked as header by MinerU; all ten rows were transcribed from the render. Figures 2–7 remain figure-read candidates. |
+| 9 | Table VI, activities and excess Gibbs energies | 11 | Render confirms six numeric columns, the 11 xOr rows, and their row/column assignment. |
+| 9–11 | Appendix, primary KEMS series | 318 | Hybrid-high and pipeline-ocr variants were compared with the page renders. The xAb=0.3 second assay (19 rows) was absent from both variants and transcribed from PDF p. 10. Hybrid-high's xAb=0.875 at assay 2, run 18 was corrected to printed xAb=0.975 from the render. The xAb=0.997 series on p. 11 has 7 + 19 rows. |
+
+Appendix rows by printed composition and assay: xAb=0.003, 36 (16+20); 0.025, 41 (20+21); 0.1, 33 (9+24); 0.3, 29 (10+19); 0.5, 20; 0.6, 40 (20+20); 0.7, 36 (13+23); 0.9, 25 (13+12); 0.975, 32 (14+18); 0.997, 26 (7+19). Total: 318 rows.
+
+The cell audit at `rb86-rogez-etal-1983.cells.csv` records 1,488 numeric cells with PDF page, printed table/row/column, printed value, selected read source, and render confirmation: Table I 72, II 28, III 18, IV 12, V 20, VI 66, appendix 1,272. The appendix records hybrid-high for the cells it supplied, render for the missing assay rows, and the render correction for the misread xAb cell.
+
+## Extract decisions
+
+Table VI's 22 component activities are the scored observations. The paper says they were obtained by graphical integration of its Table V ratio relation (section 4.3, PDF p. 8). Table V's ratio has no matching quantity token and is retained as context, so d-110's rule for reported fit outputs with unstored inputs makes the activities `quoted_attributed`, attributed to Rogez et al. (1983), Table VI. The standard state is the pure supercooled liquid endmember; each observation carries its printed 1300 K temperature and binary row composition.
+
+No absolute alkali partial pressures, total pressure, or oxygen fugacity are tabulated. The Appendix's `10^4/T` and log ion-current ratio remain in their printed form; no absolute T or pressure was inferred. The migrated records leave total pressure out of point conditions and carry unknown fO2. No ambient, vacuum, or standard pressure was added.
+
+Other tables are retained as typed-refused context because the schema has no matching quantity token for glass oxide composition (Table I), dissolution enthalpies (Tables II–III), mixing enthalpy (Table IV), normalized ion-current ratio (Table V), excess Gibbs energies (Table VI), or the Appendix's reciprocal-temperature and log-ratio columns. The reference paper is not used as a derivation parent. Figures 2–7 are listed as figure-read candidates and were not digitized.
+
+PDF p. 2 states that the samples were held at 1873 K for 5–8 hours and quenched. It does not state whether quenching preserved or altered composition; glass context rows use `quench_status: not_stated` with that page-grounded statement. The 1320 K, 1.5 hour solvent preparation is kept separate from sample preparation. KEMS apparatus context records the initial molybdenum cell and MoOx/NaMoO3 signals, the switch to a platinum container with welded lid, 14 eV ionization, pyrometer ±5 K, temperature calibration by ionic-intensity plateaus at fusion, and the Belton–Fruehan (1967) ratio calibration method.
+
+## Tool comparison and migration
+
+`mineru_table_draft.py compare` reported 22 mismatches for the 22 Table VI activity observations (`matched=0`, `draft_candidate_count=10`). Each activity cell was resolved against the rendered Table VI and is listed in the cell audit. The raw compare report is preserved in `rb86-rogez-etal-1983.audit.compare.txt`.
+
+The isolated real migrator produced 22 observations, 9 context rows, 0 unavailable values, 0 queue entries, and 0 hard issues. All 22 identities received T=1300 K and the printed binary composition. The identity total-pressure and fO2 axes remain unknown. After migration, no total-pressure point condition is present; point-condition fO2 is unknown. No store regeneration was committed; the expected rebuilt-store delta is one work, one experiment, 22 activity observations, and 9 context rows.
+
+The focused regression test pins both rendered tables, printed row counts, per-observation condition mapping, and absence of unprinted total pressure. It also changes a pinned activity value and injects a pressure condition to confirm both checks reject those mutations. The focused test passed (2 tests); the direct validator passed with fidelity matching; and `test_yaml_flow_scalar_commas.py` passed all 17 checks. The repo-wide `test_literature_extracts.py` run collected 801 tests: 797 passed and 4 failed. `test_docs_private_reference_in_nested_prose_is_refused_but_path_is_allowed` failed its docs-private path assertion; `test_repo_extracts_validate_green`, `test_coverage_pending_stubs_not_found`, and `test_pilot_extract_count_exact_and_merge_smoke` reached the 300-second timeout while loading or merging the full corpus. The isolated validator and focused regression for this extract both pass.
