@@ -182,5 +182,10 @@ def test_grounded_alpha_hex(species):
 @pytest.mark.parametrize("key", ["r5:mars_basalt", "r5:lunar_mare_low_ti",
                                  "green:mars_basalt", "green:lunar_mare_low_ti"])
 def test_frozen_source_hex(key):
+    # C7 owner ruling: r5 Mars moves gas-face/Stefan diagnostics; c7-chunk2-r2.md,
+    # "Final regression and revert checks", delta-frozen-pin-summary.json.
+    # C7 owner ruling: r5 lunar moves the same signed-series diagnostics (same receipt).
+    # C7 owner ruling: green Mars moves the same signed-series diagnostics (same receipt).
+    # C7 owner ruling: green lunar moves the same signed-series diagnostics (same receipt).
     row = json.loads(FROZEN.read_text())[key]
     assert frozen_receipt(row) == expected("frozen", key)
