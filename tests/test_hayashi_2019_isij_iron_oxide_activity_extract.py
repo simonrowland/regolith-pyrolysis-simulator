@@ -144,6 +144,30 @@ def test_isolated_migration_binds_conditions_and_keeps_unprinted_pressure_unknow
     assert all(obs.admission.status.value == "rejected" for obs in unavailable)
     assert all("coordination" in obs.admission.reason for obs in unavailable)
 
+    for row in _grid():
+        raw_id = f"hayashi_2019_t2_{row['sample']}_fe2_fraction"
+        source, values = _by_id(document, raw_id)
+        assert source["units"] == "%"
+        assert source["units_note"] == "Source wording: % of total Fe as printed"
+        assert migrated[raw_id].value.point == Decimal(row["Fe2+/Fetotal_pct"]) / 100
+
+    for raw_id, obs in migrated.items():
+        source = raw_records[raw_id]
+        conditions = source["values"].get("points", [{}])[0]["point_conditions"]
+        assert obs.point_conditions is not None
+        for condition_name, condition in conditions.items():
+            assert condition["state"]["tag"] in {"value", "unknown"}
+            assert condition["locator"]
+        for condition_name in ("temperature_K", "composition"):
+            located = obs.point_conditions[condition_name]
+            assert located.state.is_value or located.state.is_unknown
+            assert located.locator is not None
+
+    for raw_id in migrated:
+        if raw_id.endswith(("_activity_feo", "_activity_feo15", "_gamma_feo", "_gamma_feo15")):
+            assert migrated[raw_id].identity.temperature_K.is_value
+            assert migrated[raw_id].identity.temperature_K.value == Decimal("1573")
+
     for raw_id in (
         "hayashi_2019_t2_A1_activity_feo",
         "hayashi_2019_t2_A1_fe2_fraction",
