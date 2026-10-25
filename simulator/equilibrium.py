@@ -278,6 +278,8 @@ class EquilibriumMixin:
     def _headspace_transport_pO2_bar(self) -> float:
         """O2 transport reservoir pO2 consumed by SiO/vapor transport."""
 
+        if getattr(self, '_pressure_trial', False):
+            return self._pressure_trial_bulk_pO2_bar
         if self.melt.sweep_mol_per_s is not None:
             return self._sweep_boundary_pO2_bar()
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)

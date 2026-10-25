@@ -3938,6 +3938,11 @@ class EvaporationMixin:
         """Read-only live-state projection using the existing snapshot owner."""
         from simulator.chemistry.kernel import ChemistryKernel
 
+        # Measure once on the parent, at the step-start intrinsic fO2.
+        # Composition/redox settlement in detached trials cannot invalidate
+        # this C7 frozen-hour measurement and launch another native scan.
+        authority = self._resolved_melt_redox_gate_authority()
+        bulk = self._vapor_pressure_transport_pO2_bar()
         trial = copy.copy(self)
         state, ledger, cost_state = self._snapshot_terminal_refusal_hour_state(
             defer_committed_history=True, state_receiver=trial)
@@ -3946,6 +3951,8 @@ class EvaporationMixin:
                                if key != '_terminal_refusal_chem_registry_tables'})
         trial.atom_ledger = ledger
         trial._pressure_trial = True
+        trial._pressure_trial_gate_authority = authority
+        trial._pressure_trial_bulk_pO2_bar = bulk
         if trial._condensation_model is not None:
             trial._condensation_model._pressure_trial = True
         trial.cost_ledger = copy.copy(self.cost_ledger)

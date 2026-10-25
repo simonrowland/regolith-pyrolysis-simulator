@@ -4305,6 +4305,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         head_o2_mol: Optional[float] = None,
     ) -> float:
+        if getattr(self, '_pressure_trial', False):
+            return self._pressure_trial_bulk_pO2_bar
         if self.melt.sweep_mol_per_s is not None:
             return self._sweep_boundary_pO2_bar()
         if str(getattr(self.melt.atmosphere, 'name', '') or '') in {
@@ -4956,6 +4958,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         redox_state: RedoxState | None = None,
     ) -> _MeltRedoxGateAuthority:
+        if getattr(self, '_pressure_trial', False):
+            return self._pressure_trial_gate_authority
         redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         if gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
             pinned_hour = getattr(
