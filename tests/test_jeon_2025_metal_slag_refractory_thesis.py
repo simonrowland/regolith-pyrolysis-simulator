@@ -66,27 +66,28 @@ def test_thesis_only_table8_migrates_all_components_and_duplicate_tables_stay_co
     assert not result.validation.hard_issues
     source_rows = _rows(document)
     assert len(source_rows) == 330
-    migrated = {
-        item.observation_id.rsplit("::", 1)[-1]: item
-        for item in result.observations.values()
-    }
-    assert set(migrated) == set(source_rows)
-    for observation_id, item in migrated.items():
-        species, source = source_rows[observation_id]
-        assert item.value.kind.value == "point"
-        assert item.value.point == Decimal(str(source["values"]["value"]))
-        assert item.identity.species.formula == species
-        assert item.identity.temperature_K.is_value
-        assert item.point_conditions["T_C"].state.is_value
-        assert item.point_conditions["sample_id"].state.is_value
-        assert item.point_conditions["composition"].state.is_value
-        assert item.point_conditions["equilibration_time_hours"].state.is_value
-        assert item.point_conditions["atmosphere"].state.is_value
-        assert not item.notices
-        if "uncertainty" in source:
-            assert source["uncertainty"]["as_published"] not in {"± 0", "± 0.0"}
-    assert migrated["jeonthesis_t8_s1_olivine_eds_mgo"].value.point == Decimal("61.1")
-    assert migrated["jeonthesis_t8_s23_slag_epma_sio2"].value.point == Decimal("54.2")
+    _assert_render_pins(document)
+    assert all(
+        "value" in source["values"]
+        and source["values"]["quantity"] == "equilibrium_phase_composition"
+        for _species, source in source_rows.values()
+    )
+    # d-233 leaves crystal phase roles outside the closed schema. Preserve every
+    # Table 8 value and pin the migrator's typed refusal for each row.
+    refusals = [
+        item
+        for item in result.queue
+        if item.source == "data/literature/extracts/jeon-2025-metal-slag-refractory-thesis.yaml"
+    ]
+    assert len(refusals) == len(source_rows)
+    assert {
+        item.observation_id.rsplit("::", 1)[-1] for item in refusals
+    } == set(source_rows)
+    assert all(
+        item.axes == ["phase_composition"]
+        and item.why == "phase_label is not a closed phase role (melt, slag, glass, metal, matte)"
+        for item in refusals
+    )
     contexts = [row for block in document["species"].values() for row in block.get("context", [])]
     linked = [row for row in contexts if row.get("observation_id", "").startswith(("jeonthesis_t5_", "jeonthesis_t9_", "jeonthesis_t10_")) and row.get("values", {}).get("linked_observation_id")]
     assert len(linked) == 305

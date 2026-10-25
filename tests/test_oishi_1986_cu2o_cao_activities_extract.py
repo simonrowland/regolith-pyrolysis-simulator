@@ -8,7 +8,6 @@ from decimal import Decimal
 import pytest
 import yaml
 
-from simulator.battery.enums import ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT
 
 
@@ -63,23 +62,42 @@ def test_table1_component_rows_migrate_as_points_with_printed_oxygen_log() -> No
     result = migrator.result
 
     assert not result.validation.hard_issues
-    observations = list(result.observations.values())
-    assert len(observations) == 48
-    assert all(observation.value.kind is ValueKind.POINT for observation in observations)
-    assert all(observation.identity.temperature_K.value == 1573 for observation in observations)
+    source_rows = [
+        (formula, row)
+        for formula, block in document["species"].items()
+        for row in block["observations"]
+    ]
+    assert len(source_rows) == 48
+    assert _table1_grid(document) == TABLE1_RENDER_GRID
+    # d-233 leaves crystal/oxide phase roles outside the closed schema. Keep
+    # every printed cell and pin the migrator's typed refusal for each row.
+    refusals = [
+        item
+        for item in result.queue
+        if item.source == "data/literature/extracts/oishi-1986-cu2o-cao-activities.yaml"
+    ]
+    assert len(refusals) == len(source_rows)
+    assert {
+        item.observation_id.rsplit("::", 1)[-1] for item in refusals
+    } == {row["observation_id"] for _formula, row in source_rows}
+    assert all(
+        item.axes == ["phase_composition"]
+        and item.why == "phase_label is not a closed phase role (melt, slag, glass, metal, matte)"
+        for item in refusals
+    )
     printed_logs = ("-3.48", "-3.52", "-3.56", "-3.62", "-3.70", "-3.66", "-3.77", "-3.74", "-3.76", "-3.84", "-3.78", "-3.81")
-    landed_logs = []
-    for observation in observations:
-        oxygen = observation.point_conditions["fO2_log"]
-        assert oxygen.state.is_value
-        assert oxygen.locator is not None
-        landed_logs.append(str(oxygen.state.value))
+    printed_log_values = []
+    for _formula, observation in source_rows:
+        oxygen = observation["values"]["log_fO2"]
+        printed_log_values.append(str(oxygen["value"]))
         assert any(
-            f"log(pO2/p°) = {printed_log} as printed; p° = 101325 Pa = 1 atm" in oxygen.locator.note
+            f"log(pO2/p°) = {printed_log} as printed; p° = 101325 Pa = 1 atm" in oxygen["quote"]
             for printed_log in printed_logs
         )
-        assert not observation.identity.fO2_Pa.is_value
-    assert sorted(landed_logs) == sorted(printed_logs * 4)
+        assert oxygen["units"] == "log10(atm)"
+        assert oxygen["locator"]["page"] == 2
+        assert oxygen["locator"]["pdf_page_index"] == 1
+    assert sorted(printed_log_values) == sorted(printed_logs * 4)
     for formula in ("Cu", "O", "CaO", "MgO"):
         rows = document["species"][formula]["observations"]
         assert [row["values"]["log_fO2"]["value"] for row in rows] == list(printed_logs)
@@ -91,7 +109,7 @@ def test_table1_component_rows_migrate_as_points_with_printed_oxygen_log() -> No
     )
     assert printed_o2["values"]["reference_as_printed"] == "p° = 101325 Pa = 1 atm"
     assert printed_o2["values"]["field"] == "values.log_fO2 on each typed composition row"
-    assert Decimal(observations[0].value.point) == Decimal("90.32")
+    assert Decimal(source_rows[0][1]["values"]["value"]) == Decimal("90.32")
 
 
 def test_plotted_data_figures_are_deferred_without_numeric_points() -> None:

@@ -68,21 +68,28 @@ def test_isolated_migration_keeps_all_typed_points_species_conditions_and_temper
     assert not result.validation.hard_issues
     source_rows = _rows(document)
     assert len(source_rows) == 203
-    migrated = {
-        item.observation_id.rsplit("::", 1)[-1]: item
-        for item in result.observations.values()
-    }
-    assert set(migrated) == set(source_rows)
-    for observation_id, item in migrated.items():
-        species, source = source_rows[observation_id]
-        assert item.value.kind.value == "point"
-        assert item.value.point == Decimal(str(source["values"]["value"]))
-        assert item.identity.species.formula == species
-        assert item.identity.temperature_K.is_value
-        assert item.point_conditions["sample_id"].state.is_value
-        assert not item.notices
-    assert migrated["jeon25_2_mgo_al2o3_p3_mgo"].value.point == Decimal("12.7")
-    assert migrated["jeon25_3_mgo_cr2o3_p4_cr2o3"].value.point == Decimal("66.6")
+    _assert_grid(document)
+    assert all(
+        "value" in source["values"]
+        and source["values"]["quantity"] == "equilibrium_phase_composition"
+        for _species, source in source_rows.values()
+    )
+    # d-233 leaves crystal phase roles outside the closed schema. Preserve every
+    # table value and pin the migrator's typed refusal for each row.
+    refusals = [
+        item
+        for item in result.queue
+        if item.source == "data/literature/extracts/jeon-lindberg-2025-mgo-refractory-slag-interface.yaml"
+    ]
+    assert len(refusals) == len(source_rows)
+    assert {
+        item.observation_id.rsplit("::", 1)[-1] for item in refusals
+    } == set(source_rows)
+    assert all(
+        item.axes == ["phase_composition"]
+        and item.why == "phase_label is not a closed phase role (melt, slag, glass, metal, matte)"
+        for item in refusals
+    )
 
 
 def test_context_rows_keep_correct_table_locators_and_printed_values() -> None:
