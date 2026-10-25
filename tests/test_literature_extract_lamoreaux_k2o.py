@@ -39,6 +39,8 @@ def test_lamoreaux_k2o_rows_match_render_and_preserve_printed_row_counts():
         assert row["locator"]["page"] == 4
         assert row["locator"]["published_page"] == 156
         assert row["locator"]["pdf_page_index"] == 3
+    assert gas_increment["T_range_K"] == [290, 3000]
+    assert gas_increment["values"]["segments"][0]["T_min_K"] == 290
     assert gas_increment["values"]["segments"][0]["a"] == -1.05
 
     solid_thermo = rows["LH84_K2O_s_formation"]
