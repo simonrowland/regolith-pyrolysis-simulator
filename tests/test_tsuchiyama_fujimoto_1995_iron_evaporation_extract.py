@@ -96,6 +96,25 @@ def test_printed_tables_pin_render_cells_and_reject_mutation() -> None:
     assert check_all_fidelity_samples_match(mutated, label="mutated Tsuchiyama Table 1")
 
 
+def test_context_locators_pin_correct_source_pages() -> None:
+    document = _document()
+    rows = _observations(document)
+
+    for row in rows:
+        oxygen_locator = row["point_conditions"]["fO2_Pa"]["locator"]
+        assert oxygen_locator["page"] == 3
+        assert oxygen_locator["published_page"] == 207
+
+    alpha_context = next(
+        item for item in document["species"]["Fe"]["context"]
+        if item["observation_id"] == "tsuchiyama_fujimoto_1995_alpha_v_comparison_context"
+    )
+    assert alpha_context["locator"]["page"] == 8
+    assert alpha_context["locator"]["pdf_page_index"] == 7
+    assert alpha_context["locator"]["published_page"] == 212
+    assert alpha_context["values"]["attribution"].endswith("p. 212.")
+
+
 def test_conditions_survive_isolated_migration_and_schema_gaps_are_refused() -> None:
     document = _document()
     migrator = Migrator(root=ROOT, index={}, aliases={})

@@ -58,9 +58,9 @@ The standard deviations are stored as printed, with confidence level not stated.
 |---|---|---|
 | 99.99% starting-plate purity | p. 2, published p. 206, Experiments prose | MinerU content-list text and pdftotext agree; stored as starting-material text, not a full composition |
 | Total-pressure range 10⁻⁵ to 10⁻⁶ Torr | p. 3, published p. 207, Experiments prose | MinerU text and pdftotext agree; stored verbatim on each row and as a located Pa interval in `point_conditions.total_pressure_Pa`, using 1 Torr = 101325/760 Pa |
-| Estimated pO₂ about 10⁻⁹ atm, range 3 × 10⁻⁹ to 3 × 10⁻¹⁰ atm | p. 4, published p. 208, Results prose | MinerU text and pdftotext agree; the paper conditions this estimate on residual gas being air and notes diffusion-pump oil can lower it. It is retained as text and not assigned to fO₂ |
+| Estimated pO₂ about 10⁻⁹ atm, range 3 × 10⁻⁹ to 3 × 10⁻¹⁰ atm | p. 3, published p. 207, Results prose | MinerU text and pdftotext agree; the paper conditions this estimate on residual gas being air and notes diffusion-pump oil can lower it. It is retained as text and not assigned to fO₂ |
 | γ-iron stable over 1075–1312°C | p. 7, published p. 211, Discussion | MinerU markdown and pdftotext agree; rows are `phase: cr` with `condensed_form.polymorph: gamma` |
-| αᵥ about 0.5; ln(αᵥ) = −0.890 + 299/T | p. 7, published p. 211, Discussion | MinerU markdown and pdftotext agree; retained as quoted model context because JANAF equilibrium Fe(g) inputs are not stored |
+| αᵥ about 0.5; ln(αᵥ) = −0.890 + 299/T | p. 8, published p. 212, Discussion | MinerU markdown and pdftotext agree; retained as quoted model context because JANAF equilibrium Fe(g) inputs are not stored |
 
 The caption and row headings assign all Table 1 and Table 2 rows to metallic Fe. The starting plates are stated as 99.99% pure polycrystalline metallic iron; the source reaction is Fe(s) = Fe(g). The experiment pressure is a series range, not a per-run point. The source gives only a residual-air estimate of oxygen partial pressure, not a stated oxygen fugacity. There is no full sample composition. No ambient pressure, one atmosphere, or unprinted room temperature was added.
 
