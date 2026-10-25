@@ -125,3 +125,32 @@ def test_isolated_migration_maps_printed_conditions_and_leaves_unprinted_axes_un
             if suffix == "fe3_fe2_ratio":
                 assert identity["valence_basis"]["tag"] == "value"
                 assert conditions["quench_state"]["state"]["value"] == "not_stated"
+
+
+def test_experiment_binds_printed_charge_and_crucible() -> None:
+    document = _document()
+    equipment = _by_run(document, "Fe_tO")["101"]["equipment"]
+    assert equipment["sample_mass_g"]["value"] == "4"
+    assert equipment["sample_mass_g"]["locator"]["published_page"] == 853
+    assert equipment["crucible_material"]["value"] == "pure iron"
+    assert equipment["crucible_material"]["locator"]["published_page"] == 853
+
+    migrator = Migrator(root=ROOT)
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+    assert not migrator.result.validation.hard_issues
+    experiment = next(iter(migrator.result.experiments.values()))
+    migrated = to_plain(experiment)
+    assert migrated["sample"]["mass_kg"]["state"]["value"] == {
+        "kind": "point",
+        "point": "0.004",
+        "approximate": False,
+    }
+    assert migrated["sample"]["mass_kg"]["locator"]["published_page"] == 853
+    assert migrated["apparatus"]["cell_material_and_liner"]["state"] == {
+        "tag": "value",
+        "value": "pure iron",
+    }
+    assert migrated["apparatus"]["cell_material_and_liner"]["locator"][
+        "published_page"
+    ] == 853
