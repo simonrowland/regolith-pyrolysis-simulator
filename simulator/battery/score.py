@@ -6050,7 +6050,7 @@ def _predict_fe_redox(
     handles: Mapping[str, object] | None = None,
     isolated: bool | None = None,
 ) -> EnginePrediction:
-    """Predict Fe3+/Fe2+ from Kress91, OpenIMCC, or a MELTS ferric split.
+    """Predict the requested Fe redox quantity with its existing model.
 
     Internal-analytical keeps the Kress91 split. OpenIMCC calls
     ``openimcc.evaluate_redox`` on the printed composition and fO2, and
@@ -6060,6 +6060,7 @@ def _predict_fe_redox(
     ``fe3_fe2_ratio_from_ferric_fraction``. Other engines stay refused.
     """
 
+    quantity = quantity_token(identity)
     if engine not in (
         Engine.INTERNAL_ANALYTICAL,
         Engine.OPENIMCC,
@@ -6114,6 +6115,34 @@ def _predict_fe_redox(
             identity=identity_out if identity_out is not None else identity,
             version=version,
         )
+
+    fe3_total_iron_fraction = quantity is Quantity.VALENCE_RATIO
+    if fe3_total_iron_fraction:
+        basis_state = identity.valence_basis
+        basis = (
+            basis_state.value
+            if basis_state is not None and basis_state.is_value
+            else None
+        )
+        if not (
+            basis is not None
+            and basis.numerator_oxidation_states == (3,)
+            and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+            and basis.denominator_oxidation_state is None
+            and basis.value_form is ValenceValueForm.FRACTION
+        ):
+            return refused(
+                RefusalReason.UNSUPPORTED,
+                {"reason": "fe_valence_ratio_basis_not_supported"},
+            )
+
+    def reported_value(fe3_fe2_ratio: float | Decimal) -> Decimal:
+        value = as_decimal(str(fe3_fe2_ratio))
+        if fe3_total_iron_fraction:
+            # With FeT = Fe3+ + Fe2+ and r = Fe3+/Fe2+, Fe3+/FeT = r/(1+r).
+            # Sanity: r = 2 gives a ferric fraction of 2/3.
+            value = value / (Decimal(1) + value)
+        return value
 
     material = _fe_redox_material(observation, identity)
     if isinstance(material, _FeRedoxRefusal):
@@ -6226,7 +6255,7 @@ def _predict_fe_redox(
             notices = (
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                    affected_quantities=(quantity,),
                     reason=(
                         "openimcc_redox_pack_extrapolation; rows="
                         f"{', '.join(extrapolated_rows)}; "
@@ -6240,7 +6269,7 @@ def _predict_fe_redox(
         notices += tuple(
             Notice(
                 kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-                affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                affected_quantities=(quantity,),
                 reason=str(flag),
                 origin="openimcc.evaluate_redox",
             )
@@ -6258,7 +6287,7 @@ def _predict_fe_redox(
                 state=ExecutionState.PRODUCED,
                 call_evidence="openimcc.evaluate_redox",
             ),
-            value=as_decimal(str(prediction_value)),
+            value=reported_value(prediction_value),
             unit="dimensionless",
             authority=authority,
             notices=notices,
@@ -6327,7 +6356,7 @@ def _predict_fe_redox(
             notices = (
                 Notice(
                     kind=NoticeKind.COMPOSITION_PROJECTED,
-                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                    affected_quantities=(quantity,),
                     reason=(
                         "Kress91 oxide basis omits composition components: "
                         f"{', '.join(kress_basis.dropped_components)}; "
@@ -6345,7 +6374,7 @@ def _predict_fe_redox(
             notices += (
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                affected_quantities=(quantity,),
                     reason=(
                         f"kress91_{band['status']}; authority={band['source']}; "
                         f"calibrated_temperature_C=[{KRESS91_LIQUID_CALIBRATION_MIN_T_C:g},"
@@ -6372,7 +6401,7 @@ def _predict_fe_redox(
                 state=ExecutionState.PRODUCED,
                 call_evidence="simulator.fe_redox:kress91_split",
             ),
-            value=as_decimal(str(prediction_value)),
+            value=reported_value(prediction_value),
             unit="dimensionless",
             authority=authority,
             notices=notices,
@@ -6522,7 +6551,7 @@ def _predict_fe_redox(
             state=ExecutionState.PRODUCED,
             call_evidence=call_evidence,
         ),
-        value=ratio,
+        value=reported_value(ratio),
         unit="dimensionless",
         authority=authority,
         notices=notices,
@@ -8512,6 +8541,19 @@ def predict_with_engine(
             engine, observation, identity, channel, sources
         )
     if quantity is Quantity.FE3_FE2_RATIO:
+        return _predict_fe_redox(
+            engine,
+            observation,
+            identity,
+            channel,
+            handles=handles,
+            isolated=isolated,
+        )
+    if (
+        quantity is Quantity.VALENCE_RATIO
+        and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
+        and identity.species.formula == "Fe"
+    ):
         return _predict_fe_redox(
             engine,
             observation,

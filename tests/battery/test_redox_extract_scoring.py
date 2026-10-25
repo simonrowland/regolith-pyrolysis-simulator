@@ -24,9 +24,13 @@ from simulator.battery.enums import (
     Rail,
     RefusalReason,
     ResidualStatus,
+    ValenceDenominatorKind,
+    ValenceValueForm,
 )
+from simulator.battery.identity import ValenceBasis
 from simulator.battery.migrate import (
     Migrator,
+    _identity_from_plain,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     load_yaml,
@@ -98,6 +102,90 @@ def _sossi_aithala_redox_context():
         benches=result.benches,
     )
     return context, observations
+
+
+def _stored_fe_valence_fraction_basis():
+    root = Path(__file__).resolve().parents[2]
+    store = load_yaml(
+        root / "data/literature/extracts-v2/berry-2018-morb-iron-redox.yaml"
+    )
+    row = next(
+        row
+        for row in store["observations"]
+        if row["identity"]["quantity"].get("value") == "valence_ratio"
+        and row["identity"]["species"]["formula"] == "Fe"
+    )
+    basis = _identity_from_plain(row["identity"]).valence_basis.value
+    assert basis == ValenceBasis(
+        numerator_oxidation_states=(3,),
+        denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+        denominator_oxidation_state=None,
+        value_form=ValenceValueForm.FRACTION,
+    )
+    return basis
+
+
+def _as_stored_fe_valence_fraction(observation):
+    identity = replace(
+        observation.identity,
+        quantity=Quantity.VALENCE_RATIO,
+        valence_basis=State.of(_stored_fe_valence_fraction_basis()),
+    )
+    return replace(observation, identity=identity)
+
+
+@pytest.mark.parametrize(
+    "engine", (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
+)
+def test_stored_fe3_total_iron_fraction_uses_fe_redox_prediction(engine):
+    if engine is Engine.OPENIMCC:
+        pytest.importorskip("openimcc")
+    _context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+
+    fe3_fe2 = predict_with_engine(engine, observation)
+    fe3_total_iron = predict_with_engine(
+        engine, _as_stored_fe_valence_fraction(observation)
+    )
+
+    assert fe3_fe2.value is not None, fe3_fe2.refusal_detail
+    assert fe3_total_iron.value == fe3_fe2.value / (Decimal(1) + fe3_fe2.value)
+    assert fe3_total_iron.refusal_reason is None
+
+
+@pytest.mark.parametrize(
+    "engine", (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
+)
+def test_stored_fe_valence_fraction_without_printed_fo2_refuses(engine):
+    if engine is Engine.OPENIMCC:
+        pytest.importorskip("openimcc")
+    _context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    conditions = dict(observation.point_conditions or {})
+    conditions.pop("fO2_log", None)
+    conditions.pop("fO2_Pa", None)
+    valence_observation = _as_stored_fe_valence_fraction(observation)
+    missing_fo2 = replace(
+        valence_observation,
+        point_conditions=conditions,
+        identity=replace(
+            valence_observation.identity,
+            fO2_Pa=None,
+        ),
+    )
+
+    prediction = predict_with_engine(engine, missing_fo2)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "printed_fO2",
+    }
 
 
 def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
