@@ -67,6 +67,16 @@ def test_vacuum_consuming_source_can_close_at_physical_zero():
     assert not any(solved.balance_terms)
 
 
+def test_unavailable_zero_endpoint_remains_a_typed_refusal():
+    def consuming(x):
+        if x == 0.0:
+            raise ValueError('positive-pressure chemical-potential boundary required')
+        return evaluation(x, source=-x ** 0.25, ferric=0.0, other=0.0, storage=0.0)
+
+    with pytest.raises(OxygenClosureNonconvergence, match='zero endpoint unavailable'):
+        _solve_surface_oxygen_balance(consuming)
+
+
 def test_runtime_vacuum_consuming_carriers_prove_zero_source():
     sim = simulation('s_type_asteroid_silicate')
     try:
