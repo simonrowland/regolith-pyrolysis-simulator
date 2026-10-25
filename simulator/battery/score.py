@@ -340,6 +340,9 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.EVAPORATION_RATE: MetricOperation.RELATIVE,
     Quantity.MASS_LOSS_RATE: MetricOperation.RELATIVE,
     Quantity.WALL_DEPOSIT_MASS: MetricOperation.RELATIVE,
+    Quantity.WALL_DEPOSIT_AREAL_MASS: MetricOperation.RELATIVE,
+    Quantity.WALL_DEPOSITION_FLUX: MetricOperation.RELATIVE,
+    Quantity.WALL_DEW_TEMPERATURE: MetricOperation.ABSOLUTE,
     Quantity.TRANSITION_TEMPERATURE: MetricOperation.ABSOLUTE,
     Quantity.FE3_FE2_RATIO: MetricOperation.DEX,
     Quantity.VISCOSITY: MetricOperation.DEX,
@@ -525,6 +528,400 @@ class EnginePrediction:
 
 def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
     return {"reason": "quantity_not_predicted", "quantity": quantity.value}
+
+
+@lru_cache(maxsize=1)
+def _wall_deposition_formula_registry() -> Mapping[str, object]:
+    """Load the same species formula registry used by simulator mass projections."""
+
+    from simulator.accounting.formulas import load_species_formulas
+
+    return load_species_formulas(REPO_ROOT / "data" / "species_catalog.yaml")
+
+
+def _wall_deposition_refusal(
+    engine: Engine,
+    identity: Identity,
+    quantity: Quantity,
+    *,
+    reason: str,
+    detail: Mapping[str, object] | None = None,
+    refusal_reason: RefusalReason = RefusalReason.UNSUPPORTED,
+) -> EnginePrediction:
+    refusal_detail: dict[str, object] = {"reason": reason, "quantity": quantity.value}
+    if detail:
+        refusal_detail.update(detail)
+    return EnginePrediction(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        lineage_complete=False,
+        refusal_reason=refusal_reason,
+        refusal_detail=refusal_detail,
+        identity=identity,
+    )
+
+
+def _wall_deposition_notices(
+    quantity: Quantity,
+    origin: str,
+    reasons: Iterable[str],
+) -> tuple[Notice, ...]:
+    return tuple(
+        Notice(
+            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+            affected_quantities=(quantity,),
+            reason=reason,
+            origin=origin,
+            source="simulator.condensation",
+        )
+        for reason in reasons
+    )
+
+
+def _predict_wall_deposition(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    quantity: Quantity,
+    experiment: Experiment | None,
+) -> EnginePrediction:
+    """Predict only wall quantities whose local pressure and state are printed."""
+
+    conditions = observation.point_conditions or {}
+
+    def located_number(value: Located[Any] | None) -> float | None:
+        if (
+            value is None
+            or value.locator is None
+            or not value.state.is_value
+            or value.state.value is None
+        ):
+            return None
+        raw = value.state.value
+        if isinstance(raw, Value):
+            point = point_magnitude(raw)
+            return None if point is None else float(point)
+        try:
+            number = float(raw)
+        except (TypeError, ValueError):
+            return None
+        return number if math.isfinite(number) else None
+
+    local = conditions.get("wall_species_partial_pressure_Pa")
+    source_kind = conditions.get("vapour_source_kind")
+    source_token = (
+        source_kind.state.value
+        if isinstance(source_kind, Located)
+        and source_kind.locator is not None
+        and source_kind.state.is_value
+        else None
+    )
+    if quantity is Quantity.WALL_DEPOSIT_AREAL_MASS:
+        return _wall_deposition_refusal(
+            engine,
+            identity,
+            quantity,
+            reason="requires_process_run_context",
+            detail={
+                "detail": (
+                    "areal mass for a simulated exposure needs the committed segment ledger; "
+                    "this row does not report a constant source rate for J×dt integration"
+                )
+            },
+        )
+
+    if (
+        not isinstance(local, Located)
+        or local.locator is None
+        or not local.state.is_value
+        or local.state.value is None
+    ):
+        return _wall_deposition_refusal(
+            engine,
+            identity,
+            quantity,
+            reason=(
+                "requires_process_run_context"
+                if source_token in {"melt", "upstream_partial_pressure"}
+                else "local_wall_pressure_required"
+            ),
+            detail={
+                "missing": "point_conditions.wall_species_partial_pressure_Pa",
+                "source_kind": source_token,
+            },
+        )
+    local_pressure_pa = located_number(local)
+    if local_pressure_pa is None or local_pressure_pa <= 0.0:
+        return _wall_deposition_refusal(
+            engine,
+            identity,
+            quantity,
+            reason="invalid_local_wall_species_partial_pressure",
+            detail={"value": str(local.state.value)},
+            refusal_reason=RefusalReason.UNDERDETERMINED_APPARATUS,
+        )
+
+    species = identity.species.formula
+    from simulator.condensation import antoine_dew_temperature_diagnostic
+
+    if quantity is Quantity.WALL_DEW_TEMPERATURE:
+        diagnostic = antoine_dew_temperature_diagnostic(
+            species,
+            local_pressure_pa,
+        )
+        status = str(diagnostic.get("status") or "")
+        temperature = diagnostic.get("temperature_K")
+        if status not in {"diagnostic_only", "extrapolated"} or temperature is None:
+            no_curve = status in {
+                "unavailable_no_certified_antoine_range",
+                "refused_outside_certified_surface",
+            }
+            return _wall_deposition_refusal(
+                engine,
+                identity,
+                quantity,
+                reason=("no_certified_wall_p_sat" if no_curve else status or "dew_inverse_refused"),
+                detail={
+                    "species": species,
+                    "diagnostic": diagnostic,
+                },
+            )
+        try:
+            dew_temperature = float(temperature)
+        except (TypeError, ValueError):
+            dew_temperature = math.nan
+        if not math.isfinite(dew_temperature) or dew_temperature <= 0.0:
+            return _wall_deposition_refusal(
+                engine,
+                identity,
+                quantity,
+                reason="dew_inverse_returned_invalid_temperature",
+                detail={"diagnostic": diagnostic},
+            )
+        notices: list[Notice] = []
+        if status == "extrapolated":
+            valid_range = diagnostic.get("valid_range_K")
+            notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        "wall dew inverse extrapolated beyond the certified "
+                        f"temperature band {valid_range} K"
+                    ),
+                    origin=observation.observation_id,
+                    source="existing_condensation_antoine_surface",
+                    authority=Authority.EXTRAPOLATED,
+                    band=str(valid_range),
+                )
+            )
+        return EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=f"{engine.value}:wall-dew-inverse:{species}",
+            ),
+            value=as_decimal(str(dew_temperature)),
+            unit=QUANTITY_UNITS[quantity],
+            authority=(
+                Authority.EXTRAPOLATED
+                if status == "extrapolated"
+                else Authority.CERTIFIED
+            ),
+            notices=tuple(notices),
+            coefficient_sources=("existing_condensation_antoine_surface",),
+            lineage_complete=False,
+            identity=identity,
+        )
+
+    wall_state = identity.wall
+    wall = (
+        wall_state.value
+        if wall_state is not None and wall_state.is_value
+        else None
+    )
+    if wall is None or experiment is None or experiment.apparatus is None:
+        return _wall_deposition_refusal(
+            engine,
+            identity,
+            quantity,
+            reason="wall_flux_inputs_required",
+            detail={"missing": "identity.wall or experiment.apparatus.geometry"},
+            refusal_reason=RefusalReason.UNDERDETERMINED_APPARATUS,
+        )
+
+    def state_number(state: State[Any] | None) -> float | None:
+        if state is None or not state.is_value or state.value is None:
+            return None
+        try:
+            number = float(state.value)
+        except (TypeError, ValueError):
+            return None
+        return number if math.isfinite(number) else None
+
+    wall_temperature_K = state_number(wall.temperature_K)
+    wall_area_m2 = state_number(wall.area_m2)
+    wall_material = (
+        wall.material.value
+        if wall.material is not None and wall.material.is_value
+        else None
+    )
+    wall_location = (
+        wall.location.value
+        if wall.location is not None and wall.location.is_value
+        else None
+    )
+    total_pressure_pa = state_number(identity.total_pressure_Pa)
+    gas_temperature_K = located_number(conditions.get("gas_temperature_K"))
+    geometry = experiment.apparatus.geometry
+    inner_diameter = None if geometry is None else geometry.pipe_inner_diameter_m
+    segment_length = None if geometry is None else geometry.segment_length_m
+    segment_position = None if geometry is None else geometry.segment_position_m
+    pipe_diameter_m = located_number(inner_diameter)
+    segment_length_m = located_number(segment_length)
+    segment_position_m = located_number(segment_position)
+    carrier = identity.sweep_gas
+    carrier_species = None
+    if carrier is not None and carrier.is_value and carrier.value is not None:
+        carrier_species = str(carrier.value.species)
+    missing = [
+        name
+        for name, value in (
+            ("identity.wall.temperature_K", wall_temperature_K),
+            ("identity.wall.area_m2", wall_area_m2),
+            ("identity.wall.material", wall_material),
+            ("identity.wall.location", wall_location),
+            ("identity.total_pressure_Pa", total_pressure_pa),
+            ("point_conditions.gas_temperature_K", gas_temperature_K),
+            ("apparatus.geometry.pipe_inner_diameter_m", pipe_diameter_m),
+            ("apparatus.geometry.segment_length_m", segment_length_m),
+            ("apparatus.geometry.segment_position_m", segment_position_m),
+            ("identity.sweep_gas", carrier_species),
+        )
+        if value is None
+    ]
+    if missing:
+        return _wall_deposition_refusal(
+            engine,
+            identity,
+            quantity,
+            reason="wall_flux_inputs_required",
+            detail={"missing": missing},
+            refusal_reason=RefusalReason.UNDERDETERMINED_APPARATUS,
+        )
+    if (
+        wall_temperature_K <= 0.0
+        or wall_area_m2 <= 0.0
+        or total_pressure_pa <= 0.0
+        or gas_temperature_K <= 0.0
+        or pipe_diameter_m <= 0.0
+        or segment_length_m <= 0.0
+        or segment_position_m < 0.0
+        or carrier_species == "none"
+    ):
+        return _wall_deposition_refusal(
+            engine,
+            identity,
+            quantity,
+            reason="wall_flux_inputs_invalid",
+            detail={"carrier_species": carrier_species},
+            refusal_reason=RefusalReason.UNDERDETERMINED_APPARATUS,
+        )
+
+    from simulator.condensation import _wall_deposition_flux_diagnostic
+
+    diagnostic = _wall_deposition_flux_diagnostic(
+        species=species,
+        local_partial_pressure_pa=local_pressure_pa,
+        wall_temperature_K=wall_temperature_K,
+        gas_temperature_K=gas_temperature_K,
+        total_pressure_pa=total_pressure_pa,
+        pipe_diameter_m=pipe_diameter_m,
+        segment_length_m=segment_length_m,
+        wall_area_m2=wall_area_m2,
+        wall_material=str(wall_material),
+        wall_location=str(wall_location),
+        carrier_gas=carrier_species,
+        formula_registry=_wall_deposition_formula_registry(),
+    )
+    if diagnostic.get("status") != "produced":
+        reason = str(diagnostic.get("reason") or "wall_flux_input_refused")
+        return _wall_deposition_refusal(
+            engine,
+            identity,
+            quantity,
+            reason=reason,
+            detail={key: value for key, value in diagnostic.items() if key not in {"status", "reason"}},
+            refusal_reason=(
+                RefusalReason.UNSUPPORTED
+                if reason == "no_certified_wall_p_sat"
+                else RefusalReason.UNDERDETERMINED_APPARATUS
+            ),
+        )
+
+    mass_flux_kg_m2_s = float(diagnostic["mass_flux_kg_m2_s"])
+    if not math.isfinite(mass_flux_kg_m2_s) or mass_flux_kg_m2_s < 0.0:
+        return _wall_deposition_refusal(
+            engine,
+            identity,
+            quantity,
+            reason="wall_flux_returned_invalid_mass_rate",
+            detail={"value": str(mass_flux_kg_m2_s)},
+            refusal_reason=RefusalReason.UNDERDETERMINED_APPARATUS,
+        )
+    notice_reasons = diagnostic.get("approximation_flags") or ()
+    notices = list(
+        _wall_deposition_notices(
+            quantity,
+            observation.observation_id,
+            (
+                f"{reason}: Poiseuille-only capacity; local flux does not resolve molecular/Clausing conductance"
+                if reason == "poiseuille_only_pipe_capacity"
+                else str(reason)
+                for reason in notice_reasons
+            ),
+        )
+    )
+    saturation_notice = diagnostic.get("wall_saturation_pressure_notice")
+    wall_authority = (
+        Authority.EXTRAPOLATED
+        if isinstance(saturation_notice, Mapping)
+        and saturation_notice.get("authority_level") == "extrapolated"
+        else Authority.CERTIFIED
+    )
+    if wall_authority is Authority.EXTRAPOLATED:
+        notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason=str(saturation_notice.get("reason") or "wall Psat extrapolated outside its certified band"),
+                origin=observation.observation_id,
+                source="existing_condensation_antoine_surface",
+                authority=Authority.EXTRAPOLATED,
+                band=str(saturation_notice.get("valid_range_K")),
+            )
+        )
+    return EnginePrediction(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence=f"{engine.value}:wall-deposition-local-flux:{species}",
+        ),
+        value=as_decimal(str(mass_flux_kg_m2_s)),
+        unit=QUANTITY_UNITS[quantity],
+        authority=wall_authority,
+        notices=tuple(notices),
+        coefficient_sources=(
+            "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+            str((diagnostic.get("alpha_s_record") or {}).get("source") or "wall_alpha_record"),
+        ),
+        lineage_complete=False,
+        identity=identity,
+    )
 
 
 @dataclass(frozen=True)
@@ -9346,6 +9743,18 @@ def predict_with_engine(
             channel,
             handles=handles,
             isolated=isolated,
+        )
+    if quantity in {
+        Quantity.WALL_DEPOSIT_AREAL_MASS,
+        Quantity.WALL_DEPOSITION_FLUX,
+        Quantity.WALL_DEW_TEMPERATURE,
+    }:
+        return _predict_wall_deposition(
+            engine,
+            observation,
+            identity,
+            quantity,
+            experiment,
         )
     phase_basis = (
         identity.subtype.value

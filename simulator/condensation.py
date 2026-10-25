@@ -5307,19 +5307,26 @@ def antoine_dew_temperature_diagnostic(
         }
 
     data = _species_vapor_data(species, vapor_pressure_data=vapor_pressure_data)
-    from engines.builtin.vapor_pressure import vapor_pressure_valid_range_K
+    from engines.builtin.vapor_pressure import (
+        vapor_pressure_valid_range_K,
+        wall_condensation_antoine_coefficients,
+    )
 
-    candidate_ranges: list[tuple[float, float]] = []
-    for block_name in (None, "pure_component_antoine", "antoine"):
-        valid = vapor_pressure_valid_range_K(data, block_name)
-        if isinstance(valid, (list, tuple)) and len(valid) == 2:
-            try:
-                low, high = float(valid[0]), float(valid[1])
-            except (TypeError, ValueError):
-                continue
-            if math.isfinite(low) and math.isfinite(high) and 0.0 < low < high:
-                candidate_ranges.append((low, high))
-    if not candidate_ranges:
+    wall_coefficients, wall_coefficient_block = wall_condensation_antoine_coefficients(data)
+    valid = vapor_pressure_valid_range_K(data, wall_coefficient_block)
+    try:
+        low, high = float(valid[0]), float(valid[1])
+    except (KeyError, TypeError, ValueError, IndexError):
+        low = high = math.nan
+    has_certified_range = (
+        math.isfinite(low)
+        and math.isfinite(high)
+        and 0.0 < low < high
+    )
+    if not wall_coefficients and (
+        wall_coefficient_block == "pure_component_antoine"
+        or not has_certified_range
+    ):
         return {
             "status": "unavailable_no_certified_antoine_range",
             "temperature_K": None,
@@ -5328,12 +5335,18 @@ def antoine_dew_temperature_diagnostic(
             "routing_authority": False,
         }
 
-    low = min(item[0] for item in candidate_ranges)
-    high = max(item[1] for item in candidate_ranges)
+    if has_certified_range:
+        certified_range = [low, high]
+    else:
+        # Numerical seeds only: Fe's pure-component Antoine sidecar has no
+        # certified range. This interval starts finite positive-pressure
+        # bracketing; it is never reported as a certified band.
+        low, high = 300.0, 600.0
+        certified_range = None
     try:
         p_low = _antoine_psat_pa(species, low, vapor_pressure_data=vapor_pressure_data)
         p_high = _antoine_psat_pa(species, high, vapor_pressure_data=vapor_pressure_data)
-    except (KeyError, ValueError) as exc:
+    except (KeyError, ValueError, WallSaturationPressureRefusal) as exc:
         return {
             "status": "refused_outside_certified_surface",
             "temperature_K": None,
@@ -5342,16 +5355,74 @@ def antoine_dew_temperature_diagnostic(
             "provenance": "existing_condensation_antoine_surface",
             "routing_authority": False,
         }
-    if p_low is None or p_high is None or not min(p_low, p_high) <= target <= max(p_low, p_high):
+    if p_low is None or p_high is None:
         return {
             "status": "refused_pressure_outside_certified_range",
             "temperature_K": None,
             "partial_pressure_Pa": target,
-            "valid_range_K": [low, high],
+            "valid_range_K": certified_range,
             "provenance": "existing_condensation_antoine_surface",
             "routing_authority": False,
         }
     increasing = p_high > p_low
+    extrapolated = (
+        not has_certified_range
+        or not min(p_low, p_high) <= target <= max(p_low, p_high)
+    )
+    if extrapolated:
+        # Extend only the side needed to reach the printed pressure. The Antoine
+        # owner records out-of-band evaluation as extrapolated; this diagnostic
+        # does not grant routing authority to the result.
+        bracket_temperature = high if (target > max(p_low, p_high)) == increasing else low
+        bracket_pressure = p_high if bracket_temperature == high else p_low
+        extending_high_temperature = bracket_temperature == high
+        for _ in range(80):
+            needs_extension = (
+                bracket_pressure < target
+                if increasing == extending_high_temperature
+                else bracket_pressure > target
+            )
+            if needs_extension:
+                next_temperature = (
+                    bracket_temperature * 2.0
+                    if extending_high_temperature
+                    else bracket_temperature / 2.0
+                )
+            else:
+                break
+            if not math.isfinite(next_temperature) or next_temperature <= 0.0:
+                break
+            try:
+                next_pressure = _antoine_psat_pa(
+                    species,
+                    next_temperature,
+                    vapor_pressure_data=vapor_pressure_data,
+                )
+            except (KeyError, ValueError, WallSaturationPressureRefusal):
+                next_pressure = None
+            if next_pressure is None or not math.isfinite(next_pressure) or next_pressure <= 0.0:
+                break
+            if (next_pressure < target) != (bracket_pressure < target):
+                if extending_high_temperature:
+                    low, high = sorted((bracket_temperature, next_temperature))
+                else:
+                    low, high = sorted((next_temperature, bracket_temperature))
+                p_low = _antoine_psat_pa(species, low, vapor_pressure_data=vapor_pressure_data)
+                p_high = _antoine_psat_pa(species, high, vapor_pressure_data=vapor_pressure_data)
+                break
+            bracket_temperature = next_temperature
+            bracket_pressure = next_pressure
+        else:
+            p_low = p_high = None
+        if p_low is None or p_high is None or not min(p_low, p_high) <= target <= max(p_low, p_high):
+            return {
+                "status": "refused_pressure_outside_certified_range",
+                "temperature_K": None,
+                "partial_pressure_Pa": target,
+                "valid_range_K": certified_range,
+                "provenance": "existing_condensation_antoine_surface",
+                "routing_authority": False,
+            }
     for _ in range(80):
         midpoint = (low + high) / 2.0
         pressure = _antoine_psat_pa(
@@ -5365,11 +5436,33 @@ def antoine_dew_temperature_diagnostic(
             low = midpoint
         else:
             high = midpoint
+    # Premise: the same Antoine surface maps saturation temperature to pressure.
+    # Algebra: solve P_sat(T_dew) = p_i by bisection over its pressure bracket.
+    # Units: both sides are Pa and the returned root is K. Sanity: feeding
+    # P_sat(800 K) returns 800 K to the inverse tolerance.
+    dew_temperature = (low + high) / 2.0
+    _, root_coefficient_block = wall_condensation_antoine_coefficients(
+        data,
+        temperature_K=dew_temperature,
+    )
+    root_authority = _record_antoine_extrapolation(
+        species,
+        dew_temperature,
+        data,
+        root_coefficient_block,
+        antoine_extrapolations=None,
+        antoine_extrapolation_warnings=None,
+    )
+    root_range = root_authority["valid_range_K"]
     return {
-        "status": "diagnostic_only",
-        "temperature_K": (low + high) / 2.0,
+        "status": (
+            "extrapolated"
+            if root_authority["authority_level"] == "extrapolated"
+            else "diagnostic_only"
+        ),
+        "temperature_K": dew_temperature,
         "partial_pressure_Pa": target,
-        "valid_range_K": [min(item[0] for item in candidate_ranges), max(item[1] for item in candidate_ranges)],
+        "valid_range_K": None if root_range is None else list(root_range),
         "provenance": "existing_condensation_antoine_surface",
         "routing_authority": False,
     }
@@ -5839,7 +5932,7 @@ def _record_antoine_extrapolation(
     *,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
     antoine_extrapolation_warnings: list[str] | None,
-) -> None:
+) -> dict[str, Any]:
     from engines.builtin.vapor_pressure import (
         _coefficient_mapping,
         vapor_pressure_valid_range_K,
@@ -5850,27 +5943,35 @@ def _record_antoine_extrapolation(
         coefficient_block,
         temperature_K=T_K,
     )
-    if not (isinstance(valid_range, (list, tuple)) and len(valid_range) == 2):
-        return
-    try:
-        valid_low = float(valid_range[0])
-        valid_high = float(valid_range[1])
-    except (TypeError, ValueError):
-        return
-    if not (
+    valid_low = valid_high = math.nan
+    if isinstance(valid_range, (list, tuple)) and len(valid_range) == 2:
+        try:
+            valid_low, valid_high = float(valid_range[0]), float(valid_range[1])
+        except (TypeError, ValueError):
+            pass
+    has_finite_range = (
         math.isfinite(valid_low)
         and math.isfinite(valid_high)
         and valid_low <= valid_high
-    ):
-        return
-    if valid_low <= T_K <= valid_high:
-        return
-
+    )
+    resolved_range = (valid_low, valid_high) if has_finite_range else None
+    if has_finite_range and valid_low <= T_K <= valid_high:
+        return {
+            'temperature_K': T_K,
+            'valid_range_K': resolved_range,
+            'authority_level': 'certified',
+            'reason': None,
+            'status': 'certified',
+        }
     record = {
         'temperature_K': T_K,
-        'valid_range_K': (valid_low, valid_high),
+        'valid_range_K': resolved_range,
         'authority_level': 'extrapolated',
-        'reason': 'wall_saturation_pressure_out_of_validated_range',
+        'reason': (
+            'wall_saturation_pressure_out_of_validated_range'
+            if has_finite_range
+            else 'wall_saturation_pressure_has_no_finite_valid_range'
+        ),
         'status': 'extrapolated',
     }
     # The selector already chose the flank and attached the gap flag.
@@ -5917,7 +6018,7 @@ def _record_antoine_extrapolation(
                     suffix += 1
                 key = f'{species}#{suffix}'
             antoine_extrapolations[key] = record
-    if antoine_extrapolation_warnings is not None:
+    if antoine_extrapolation_warnings is not None and has_finite_range:
         temperature_text = f"{T_K:.3f}".rstrip('0').rstrip('.')
         warning = (
             f"{species} metal Antoine fit extrapolated beyond "
@@ -5926,6 +6027,7 @@ def _record_antoine_extrapolation(
         )
         if warning not in antoine_extrapolation_warnings:
             antoine_extrapolation_warnings.append(warning)
+    return record
 
 
 def _antoine_psat_pa(
@@ -7320,6 +7422,146 @@ def _knudsen_regime_factor(knudsen_number: float) -> float:
         return 0.0
     factor = knudsen_number / (knudsen_number + CONTINUUM_BUFFER_KN)
     return max(0.0, min(1.0, factor))
+
+
+def _wall_deposition_flux_diagnostic(
+    *,
+    species: str,
+    local_partial_pressure_pa: float,
+    wall_temperature_K: float,
+    gas_temperature_K: float,
+    total_pressure_pa: float,
+    pipe_diameter_m: float,
+    segment_length_m: float,
+    wall_area_m2: float,
+    wall_material: str,
+    wall_location: str,
+    carrier_gas: str,
+    formula_registry: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Predict local wall flux and expose the owner model's limits."""
+
+    segment = PipeSegment(
+        name=str(wall_location),
+        upstream_stage="local-pressure-input",
+        downstream_stage=str(wall_location),
+        wall_temperature_C=float(wall_temperature_K) - CELSIUS_TO_KELVIN_OFFSET,
+        length_m=float(segment_length_m),
+        inner_diameter_m=float(pipe_diameter_m),
+        declared_area_m2=float(wall_area_m2),
+        liner_material=str(wall_material),
+    )
+    alpha_record = _wall_alpha_record(
+        species,
+        MATERIALS_DATA,
+        segment=segment,
+        T_K=float(wall_temperature_K),
+    )
+    try:
+        alpha_s = _required_record_alpha_s(
+            alpha_record,
+            species=species,
+            site="battery_wall_deposition_flux_prediction",
+        )
+        knudsen_number = _knudsen_number(
+            total_pressure_pa,
+            gas_temperature_K,
+            pipe_diameter_m,
+            carrier_gas=carrier_gas,
+        )
+        regime = classify_knudsen_regime(knudsen_number)
+        saturation_diagnostic: dict[str, Any] = {}
+        extrapolations: dict[str, dict[str, Any]] = {}
+        extrapolation_warnings: list[str] = []
+        molar_flux = _series_resistance_deposition_flux_mol_m2_s(
+            species,
+            local_partial_pressure_pa,
+            wall_temperature_K,
+            alpha_s,
+            pipe_diameter_m=pipe_diameter_m,
+            regime_factor=_knudsen_regime_factor(knudsen_number),
+            T_gas_K=gas_temperature_K,
+            overhead_pressure_pa=total_pressure_pa,
+            carrier_gas=carrier_gas,
+            radial_stir_factor=1.0,
+            vapor_pressure_data=VAPOR_PRESSURE_DATA,
+            reactive_product_backstop=False,
+            antoine_extrapolations=extrapolations,
+            antoine_extrapolation_warnings=extrapolation_warnings,
+            diagnostic_out=saturation_diagnostic,
+        )
+    except WallSaturationPressureRefusal as exc:
+        return {
+            "status": "refused",
+            "reason": "no_certified_wall_p_sat",
+            "species": species,
+            "refusal": str(exc),
+        }
+    except DepositionInputRefusal as exc:
+        return {
+            "status": "refused",
+            "reason": "wall_flux_input_refused",
+            "parameter": exc.parameter,
+            "refusal": str(exc),
+        }
+    if saturation_diagnostic.get("wall_saturation_pressure_refused"):
+        return {
+            "status": "refused",
+            "reason": "no_certified_wall_p_sat",
+            "species": species,
+            "refusal": saturation_diagnostic.get(
+                "wall_saturation_pressure_refusal_reason"
+            ),
+            "refusal_type": saturation_diagnostic.get(
+                "wall_saturation_pressure_refusal_type"
+            ),
+        }
+
+    from simulator.wall_deposition import (
+        SECONDS_PER_HOUR,
+        _wall_deposition_flux_budget_kg_hr,
+    )
+
+    # Premise: the series-resistance owner returns J in mol/m²/s and the
+    # production accounting converter applies M from the species registry.
+    # Algebra: J_mass = [J×1 m²×M×3600 s/h]/[1 m²×3600 s/h].
+    # Units: (mol/m²/s)(m²)(kg/mol) = kg/s; A=1 m² gives kg/m²/s.
+    # Sanity: Na at 1e-4
+    # mol/m²/s gives 2.298976928e-6 kg/m²/s.
+    mass_flux_kg_m2_s = _wall_deposition_flux_budget_kg_hr(
+        species=species,
+        flux_mol_m2_s=float(molar_flux),
+        surface_area_m2=1.0,
+        formula_registry=formula_registry,
+    ) / SECONDS_PER_HOUR
+    flags = [
+        f"local_regime={regime.value}; Kn={knudsen_number:.6g}",
+        "poiseuille_only_pipe_capacity",
+        (
+            "alpha_s_source="
+            f"{alpha_record.get('source')}; alpha_s={alpha_s:.6g}; "
+            f"status={alpha_record.get('status') or alpha_record.get('qualification_status')}"
+        ),
+        "continuous_coating_rate_open",
+    ]
+    if regime is KnudsenRegime.TRANSITIONAL:
+        flags.append("transitional_wall_smooth_interpolation")
+    if regime is KnudsenRegime.FREE_MOLECULAR:
+        flags.extend(
+            ("free_molecular_line_of_sight_area_proxy", "full_ballistic_regime_open")
+        )
+    return {
+        "status": "produced",
+        "molar_flux_mol_m2_s": float(molar_flux),
+        "mass_flux_kg_m2_s": mass_flux_kg_m2_s,
+        "regime": regime.value,
+        "knudsen_number": knudsen_number,
+        "alpha_s_record": alpha_record,
+        "approximation_flags": flags,
+        "wall_saturation_pressure_notice": saturation_diagnostic.get(
+            "wall_saturation_pressure_notice"
+        ),
+    }
 
 
 def _invalid_pipe_diameter_diagnostic(

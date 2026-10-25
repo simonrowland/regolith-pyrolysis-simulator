@@ -193,6 +193,29 @@ def wall_deposit_by_segment_species_kg(ledger: Any) -> dict[tuple[str, str], flo
     return result
 
 
+def _wall_deposit_areal_mass_kg_m2(
+    ledger: Any,
+    *,
+    segment: str,
+    species: str,
+    wall_area_m2: float,
+) -> float | None:
+    """Return committed wall ledger mass per area, or None for a missing entry."""
+
+    area = float(wall_area_m2)
+    if not math.isfinite(area) or area <= 0.0:
+        raise ValueError("wall area must be finite and positive")
+    ledger_masses_kg = wall_deposit_by_segment_species_kg(ledger)
+    key = (str(segment), str(species))
+    if key not in ledger_masses_kg:
+        return None
+    ledger_mass_kg = ledger_masses_kg[key]
+    # Premise: the committed segment ledger stores mass in kg and the wall
+    # identity supplies its area in m². Algebra: m_A = m_segment / A_wall.
+    # Units: kg / m² = kg/m². Sanity: 0.3 kg over 0.02 m² is 15 kg/m².
+    return ledger_mass_kg / area
+
+
 def condensed_by_species_from_snapshots(
     snapshots: tuple[HourSnapshot, ...],
 ) -> dict[str, float]:
