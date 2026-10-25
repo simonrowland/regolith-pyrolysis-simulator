@@ -435,7 +435,7 @@ def test_bulk_film_retains_species_without_an_active_source(monkeypatch):
 def test_pressure_owner_zero_oxygen_limit(species, monkeypatch):
     from simulator.config import load_config_bundle
     from simulator.vapour_rail import catalog
-    evaluator = catalog.compile_vapour_rail_catalog(load_config_bundle().vapor_pressures).evaluator_for_hot_train(
+    evaluator = catalog.compile_vapour_rail_catalog(load_config_bundle().vapor_pressures.catalog_payload).evaluator_for_hot_train(
         species, process_phase='hot_train')
     anchor = evaluator.evaluate(1343.15, source_activity=0.1, pO2_bar=1.0).pressure_pa
     monkeypatch.setattr(catalog, 'o2_potential_from_pO2_bar',
@@ -448,7 +448,7 @@ def test_consuming_pressure_underflow_is_zero():
     from dataclasses import replace
     from simulator.config import load_config_bundle
     from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
-    evaluator = compile_vapour_rail_catalog(load_config_bundle().vapor_pressures).evaluator_for_hot_train(
+    evaluator = compile_vapour_rail_catalog(load_config_bundle().vapor_pressures.catalog_payload).evaluator_for_hot_train(
         'CrO3', process_phase='hot_train')
     # A steep, consuming mass-action law can be below binary64 pressure.
     evaluator = replace(evaluator, pO2_exponent=2.0, reaction_terms=())
