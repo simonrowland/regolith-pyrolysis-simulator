@@ -52,6 +52,30 @@ def _assert_table6_phase_render_pins(document: dict) -> None:
     assert rows["m52703"]["analysis_count"] == "5"
 
 
+def _assert_table6_locator_pins(source_rows: dict) -> None:
+    glass_rows = [
+        row
+        for observation_id, row in source_rows.items()
+        if "table6_" in observation_id
+        and row["values"].get("quantity") == "residue_component_composition"
+    ]
+    assert len(glass_rows) == 108
+    for row in glass_rows:
+        locator = row["locator"]
+        assert locator["page"] == 12
+        assert locator["table"] == "6"
+        assert locator["column_header"] == row["values"]["analyte_as_published"]
+        assert "table_column_number" not in locator
+
+    # Printed p. 436 row 4 places this value under SiO2 (physical column 9);
+    # the draft's column 8 is retained only in the audit crosswalk.
+    silica = source_rows["sugawara_1999_table6_m52701_sio2_quenched_glass"]["locator"]
+    assert silica["table_row_number"] == 4
+    assert silica["row_label"] == "m52701"
+    assert silica["column_header"] == "SiO2"
+    assert "table_column_number" not in silica
+
+
 def test_sugawara_1999_render_pins_and_isolated_migration(tmp_path) -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     _assert_table6_phase_render_pins(document)
@@ -60,6 +84,7 @@ def test_sugawara_1999_render_pins_and_isolated_migration(tmp_path) -> None:
         for species in document["species"].values()
         for row in species["observations"]
     }
+    _assert_table6_locator_pins(source_rows)
 
     # Render pins: Table 2 p. 429, Table 3 p. 430, and Table 6 p. 436.
     pins = (
