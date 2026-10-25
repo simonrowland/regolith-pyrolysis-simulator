@@ -30,6 +30,14 @@ def _component_refusals(document: dict) -> dict[str, dict]:
     }
 
 
+def _run_contexts(document: dict) -> dict[str, dict]:
+    return {
+        row["values"]["run"]: row
+        for row in _context_rows(document)
+        if row.get("values", {}).get("quantity") == "printed_experimental_run_row"
+    }
+
+
 def _reaction_rows(document: dict) -> dict[str, tuple[str, dict]]:
     return {
         row["observation_id"]: (species, row)
@@ -231,6 +239,45 @@ def test_table_9_headings_are_context_rows_not_data_rows() -> None:
     structural[0].pop("row_type")
     with pytest.raises(AssertionError):
         _printed_data_row_count(document)
+
+
+def test_printed_footnotes_stay_with_their_tables_and_runs() -> None:
+    document = _document()
+    run_contexts = _run_contexts(document)
+    table_1_footnote = "* Done with iron-saturated platinum foil containers."
+    for run, table in (
+        ("OWI-2a*", "1(b)"),
+        ("OWI-2b*", "1(b)"),
+        ("OWI-2c*", "1(b)"),
+        ("OWI-1a*", "1(c)"),
+        ("OWI-1b*", "1(c)"),
+        ("OWI-1c*", "1(c)"),
+    ):
+        row = run_contexts[run]
+        assert row["values"]["table_footnote_as_published"] == table_1_footnote
+        assert row["locator"]["page"] == 9
+        assert row["locator"]["table"] == table
+        assert row["locator"]["row"] == run
+
+    table_2_run = run_contexts["Fa-6a"]
+    assert table_2_run["values"]["starting_material_as_printed"] == "oxides*"
+    assert table_2_run["values"]["starting_material_footnote_as_published"] == (
+        "* Mixture of iron and α-cristobalite of fayalite composition."
+    )
+    assert table_2_run["locator"]["page"] == 11
+    assert table_2_run["locator"]["table"] == "2(b)"
+
+    table_9 = next(
+        row
+        for row in _context_rows(document)
+        if row.get("observation_id") == "williams71_table_9_fit_coefficients"
+    )
+    values = table_9["values"]
+    assert values["table_footnote_as_published"] == "* x = 0.055."
+    assert values["rows"][2][0] == "$K_{wü}$"
+    assert values["rows"][2][1] == "$(1 - x)Fe + 1/2 O_{2} = Fe_{(1-x)}O$"
+    assert table_9["locator"]["page"] == 21
+    assert table_9["locator"]["table"] == "9"
 
 
 def test_isolated_migration_refuses_reaction_constants_without_schema_token() -> None:

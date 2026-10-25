@@ -14,6 +14,14 @@ plus 3 magnesium-free bounds, Table 7=10, Table 8=10, Table 9=22, Table 10=7,
 and Table 11=3. Table 9 has 22 printed rows: 20 coefficient rows and the two
 structural headings.
 
+The printed table footnotes remain attached to their located context without
+adding observations or numeric compositions. On PDF page 9, the six starred
+Table 1 OWI runs in subtables 1(b) and 1(c) retain `* Done with iron-saturated
+platinum foil containers.` in their run rows. On PDF page 11, Table 2 run
+Fa-6a retains the `oxides*` definition, `* Mixture of iron and α-cristobalite
+of fayalite composition.` Table 9's page 21 context retains `* x = 0.055.`
+The extract still records 172 data rows.
+
 The 82 run rows preserve printed temperature, absolute log fO2 and its printed
 uncertainty, pressure where the run-table subtable states P=1 atm, starting
 material, product assemblage, and duration. The 109 printed O/P/W product
@@ -87,19 +95,22 @@ composition cells O(25), P(20), and W(12) to their printed rows and pages.
 
 ## Table-tool reconciliation
 
-The committed mapping file describes the five scalar tables drafted by
-`mineru_table_draft.py`; each candidate cell is retained as a typed refusal
-because no supported quantity token represents a general reaction
-equilibrium constant. The other table forms are hand-assembled or retained as
-context where the emitter cannot express their structure. All 46 candidate
-cells have no skipped values.
+The committed mapping file describes the five scalar tables for
+`mineru_table_draft.py` and uses only mapping keys accepted by the tool. Its
+comment records that after emission the unsupported reaction constants are
+manually assembled as typed refusals with printed reaction, value, and
+qualifier provenance. The emission completed with 46 candidate observations
+and no skipped values. Other table forms are hand-assembled or retained as
+context where the emitter cannot express their structure.
 
-The direct compare output has 46 `no-match` results because the compare command
-interprets the extract's correct printed table numbers (4–8) as MinerU block
-numbers (11, 12, 14, 16, 17). The companion `compare-draft-blocks.csv` uses a
-temporary comparison copy with draft block, row, and column coordinates; it
-matches all 46 values with no mismatch. No draft coordinates replace printed
-table locators in the committed extract.
+Both comparison CSVs were regenerated from the final extract. The direct
+`compare.csv` has 46 `no-match` results because the printed table numbers
+(4–8) differ from MinerU block numbers (11, 12, 14, 16, 17). The companion
+`compare-draft-blocks.csv` uses a temporary comparison copy with draft block,
+row, and column coordinates; it has 46 matches and no mismatches. Both files
+use `FeSi1/2O2` for the Table 6 and Table 8 species paths; neither contains a
+`Fe2SiO4` dot-path. No draft coordinates replace printed table locators in
+the committed extract.
 
 ## Migration and scope gaps
 

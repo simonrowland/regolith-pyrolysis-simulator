@@ -4,10 +4,12 @@
 # that cell into one run context plus multiple typed-refusal composition cells.
 # Table 3 and Tables 9–11 are retained as row contexts because their equations,
 # coefficient tuples, inequalities, and paired fugacity values lack matching
-# scalar point forms. The scalar log-K columns are retained as typed refusals:
+# scalar point forms. The emitter drafts scalar log-K cells as candidates.
+# After emission, the extract is manually assembled as typed refusals because
 # no current schema quantity represents general reaction equilibrium
-# constants. Table 5 and Table 6 magnesium-free subtables are likewise retained
-# as contexts because their values are inequalities.
+# constants; provenance adds the printed reaction, log K value, and qualifier.
+# Table 5 and Table 6 magnesium-free subtables remain contexts because their
+# values are inequalities.
 source_id: williams-1971-fe-mgo-sio2-o2-reaction-constants
 source:
   citation: >-
@@ -27,8 +29,6 @@ tables:
     published_page: 347
     type: gibbs_table
     quantity: reaction_equilibrium_constant
-    typed_refusal: true
-    reason: schema_gap_reaction_equilibrium_constant
     evidence_class: quoted_attributed
     unit: log10 equilibrium constant
     phase: cr
@@ -47,8 +47,6 @@ tables:
     published_page: 348
     type: gibbs_table
     quantity: reaction_equilibrium_constant
-    typed_refusal: true
-    reason: schema_gap_reaction_equilibrium_constant
     evidence_class: quoted_attributed
     unit: log10 equilibrium constant
     phase: cr
@@ -65,8 +63,6 @@ tables:
     published_page: 348
     type: gibbs_table
     quantity: reaction_equilibrium_constant
-    typed_refusal: true
-    reason: schema_gap_reaction_equilibrium_constant
     evidence_class: quoted_attributed
     unit: log10 equilibrium constant
     phase: cr
@@ -83,8 +79,6 @@ tables:
     published_page: 349
     type: gibbs_table
     quantity: reaction_equilibrium_constant
-    typed_refusal: true
-    reason: schema_gap_reaction_equilibrium_constant
     evidence_class: quoted_attributed
     unit: log10 equilibrium constant
     phase: cr
@@ -101,8 +95,6 @@ tables:
     published_page: 349
     type: gibbs_table
     quantity: reaction_equilibrium_constant
-    typed_refusal: true
-    reason: schema_gap_reaction_equilibrium_constant
     evidence_class: quoted_attributed
     unit: log10 equilibrium constant
     phase: cr
