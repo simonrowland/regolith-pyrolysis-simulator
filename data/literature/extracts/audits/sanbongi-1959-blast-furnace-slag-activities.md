@@ -98,7 +98,7 @@ Cell columns below are printed table columns. Table 1 stores c2–c5 composition
 ## Reconciliations and interpretation
 
 - Table 2 M is printed on CB-1 and ditto marks repeat it for the remaining rows. Table 3 row marks M, G, and paired marks were read row by row; the extract preserves M/G in the row value and resolves the container in point conditions.
-- The paper states that the CaO–SiO2–Al2O3 series are saturated with mullite and corundum (PDF p.9, printed p.252); this series condition is attached to all Table 3 rows.
+- Table 3 contains six fixed-alumina series (T5–T30) and the separate AS-1–AS-5 saturation series. The paper’s mullite-and-corundum saturation statement (PDF p.9, printed p.252) applies only to the AS rows; the T5–T30 rows carry no saturation condition.
 - The Table 2 and Table 3 activity standard is β-cristobalite at 1630°C (PDF p.14, printed p.257; Eq. 3-13). The activity coefficient relation γA=aA/NA is stated in the Discussion (PDF p.16, printed p.259); each coefficient is measured_reduced from its row's stored activity and SiO2 mole fraction, with a derived_from link to the activity row. Activity values remain quoted_attributed because the e.m.f. input has no schema quantity.
 - Table 1 gives no reference state; it remains unknown. Table 4 gives no numeric liquid composition, and cited reference standard states are not specified here. The present-work Table 4 value is extrapolated from Fig. 3; figure values were not digitized.
 - The reference-slag composition differs between PDF p.8 / printed p.251 (45.2% CaO, 2.2% SiO2, 53.6% Al2O3) and PDF p.14 / printed p.257 (45.2%, 2.2%, 52.6%). Both printed values were confirmed against renders; neither is used as a row composition.

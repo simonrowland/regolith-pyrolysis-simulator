@@ -151,6 +151,24 @@ def test_render_pins_row_counts_and_evidence_lineage(migrated_extract) -> None:
             assert condition.locator is not None, (observation_id, key)
             assert condition.state.tag.value == raw["state"]["tag"], (observation_id, key)
 
+        if source["locator"]["table"] == "3":
+            printed_row = source["locator"]["note"].split(";", 1)[0].removeprefix(
+                "Printed row "
+            )
+            saturation = migrated.point_conditions.get("phase_assemblage")
+            if printed_row.startswith("AS-"):
+                assert saturation is not None, observation_id
+                assert saturation.state.is_value
+                assert saturation.state.value == (
+                    "slag series saturated with mullite and corundum"
+                )
+                assert saturation.locator is not None
+                assert saturation.locator.page == 9
+                assert saturation.locator.table == "3"
+            else:
+                assert printed_row.startswith("T"), (observation_id, printed_row)
+                assert saturation is None, observation_id
+
         printed_composition = raw_conditions["composition"]["state"]["tag"] == "value"
         composition = migrated.identity.composition
         if printed_composition:
