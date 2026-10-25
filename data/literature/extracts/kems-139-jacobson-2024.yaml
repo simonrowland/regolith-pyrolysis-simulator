@@ -60,10 +60,7 @@ fidelity_samples:
     pdf_page_index: 18
     note: Table 1 SiO(g) 0.004541139 bar (FactSage) with De Maria checkmark
     page: 19
-- species: HfO
-  observable: gibbs_table
-  observation_id: jacobson_2024_t2_hfo_third_law_compilation
-  field: I_cps_at_1934K
+- path: species.HfO.observations[jacobson_2024_t2_hfo_ion_intensity].values.points[0].I_cps
   value: 170.4
   locator:
     table: '2'
@@ -71,10 +68,7 @@ fidelity_samples:
     pdf_page_index: 23
     note: Table 2 first row T=1934 I=170.4 cps
     page: 24
-- species: HfO
-  observable: gibbs_table
-  observation_id: jacobson_2024_t2_hfo_third_law_compilation
-  field: delta_rH_298_J_mol_at_1934K
+- path: species.HfO.observations[jacobson_2024_t2_hfo_third_law_compilation].values.points[0].delta_rH_298_J_mol
   value: 616914.8
   locator:
     table: '2'
@@ -184,11 +178,15 @@ species:
       units: bar as printed
       values:
         quantity: predicted_partial_pressure
-        method_class: quoted_attributed
+        method_class: model_derived
         attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-        semantics: bound_not_point_ordering
         factsage_note: factsage_model_output_not_measurement
         model_as_printed: SLAG database in FactSage at 2500 K
+        derived_from: [jacobson_2024_t1_snyder_12022_composition]
+        derivation:
+          relation: Table 1 FactSage SLAG equilibrium pressures calculated for the lunar basalt 12022 composition at 2500 K; printed bar values are converted to Pa.
+          inputs: [jacobson_2024_t1_snyder_12022_composition]
+          output_unit: Pa
         cited_primary: '[115] Bale CW et al., FactSage thermochemical software and databases, CAL 26 (2002)
           189-228'
         cited_primary_doi: 10.1016/S0364-5916(02)00035-4
@@ -419,8 +417,8 @@ species:
         note: presence/absence only; no numeric p(i) in this review table
   HfO:
     observations:
-    - observation_id: jacobson_2024_t2_hfo_third_law_compilation
-      type: gibbs_table
+    - observation_id: jacobson_2024_t2_hfo_ion_intensity
+      type: rate_series
       locator:
         table: '2'
         page: 24
@@ -432,9 +430,9 @@ species:
       - 2034.0
       phase: Hf_plus_HfO2_univariant
       regime: kems_third_law_thermochemistry
-      units: I in cps; kIT/σ in bar; Δgef in J/mol K; ΔrH(298) in J/mol; as printed
+      units: I (cps) as printed
       values:
-        quantity: third_law_reaction_enthalpy_and_compiled_ion_intensity
+        quantity: ion_intensity
         method_class: review_compilation
         semantics: compiled_from_cited_primary_not_this_papers_measurement
         reaction_as_printed: ½Hf(s) + ½HfO2(s) = HfO(g)
@@ -446,8 +444,67 @@ species:
         sigma_m2: 8.2e-10
         k_as_printed: 1.68 × 10⁻²³ bar-m²/cps-K
         k_bar_m2_cps_K: 1.68e-23
-        columns_as_printed: T (K) | I (cps) | Standard deviation | IT (cps K) | kIT/σ (bar) | −RT ln Kp
-          (J/mol) | Δgef (J/mol K) | ΔrH (298) = −RT ln Kp − T Δgef (J/mol)
+        points:
+        - T_K: 1934.0
+          I_cps: 170.4
+          standard_deviation_I_cps: 8.3
+          sigma: 8.3
+        - T_K: 1986.0
+          I_cps: 457.6
+          standard_deviation_I_cps: 14.5
+          sigma: 14.5
+        - T_K: 1957.0
+          I_cps: 296.1
+          standard_deviation_I_cps: 18.7
+          sigma: 18.7
+        - T_K: 1945.0
+          I_cps: 228.0
+          standard_deviation_I_cps: 11.6
+          sigma: 11.6
+        - T_K: 1994.0
+          I_cps: 519.9
+          standard_deviation_I_cps: 25.7
+          sigma: 25.7
+        - T_K: 2034.0
+          I_cps: 896.0
+          standard_deviation_I_cps: 21.4
+          sigma: 21.4
+        - T_K: 1952.0
+          I_cps: 264.5
+          standard_deviation_I_cps: 14.4
+          sigma: 14.4
+        - T_K: 2004.0
+          I_cps: 622.2
+          standard_deviation_I_cps: 18.1
+          sigma: 18.1
+      uncertainty:
+        note: standard_deviation column is of the printed ion intensity I (cps)
+    - observation_id: jacobson_2024_t2_hfo_third_law_compilation
+      type: rate_series
+      locator:
+        table: '2'
+        page: 23
+        published_page: 23
+        pdf_page_index: 24
+        note: Third law thermodynamic calculations for 1/2 Hf(s) + 1/2 HfO2(s) = HfO(g)
+      T_range_K:
+      - 1934.0
+      - 2034.0
+      phase: Hf_plus_HfO2_univariant
+      regime: kems_third_law_thermochemistry
+      units: ΔrH (298) in J/mol as printed
+      values:
+        quantity: third_law_reaction_enthalpy
+        method_class: review_compilation
+        unavailable_reason: no existing quantity enum matches the printed third-law reaction enthalpy for ½Hf(s) + ½HfO2(s) = HfO(g) at 298 K
+        reaction_as_printed: ½Hf(s) + ½HfO2(s) = HfO(g)
+        cited_primary: '[15] Bauschlicher CW Jr, Kowalski BA, Jacobson NS, Quantum chemical and experimental thermodynamic studies of HfO(g), J. Chem. Phys. 157 (2022) 154302'
+        cited_primary_doi: 10.1063/5.0120504
+        sigma_as_printed: 8.2 × 10⁻¹⁰ m²
+        sigma_m2: 8.2e-10
+        k_as_printed: 1.68 × 10⁻²³ bar-m²/cps-K
+        k_bar_m2_cps_K: 1.68e-23
+        columns_as_printed: T (K) | I (cps) | Standard deviation | IT (cps K) | kIT/σ (bar) | −RT ln Kp (J/mol) | Δgef (J/mol K) | ΔrH (298) = −RT ln Kp − T Δgef (J/mol)
         column_roles:
           T_K: compiled instrument temperature from [15]
           I_cps: compiled measured HfO+ ion intensity from [15]
@@ -457,8 +514,6 @@ species:
           minus_RT_ln_Kp_J_mol: derived
           delta_gef_J_mol_K: tabulated free-energy function (negative as printed)
           delta_rH_298_J_mol: third-law derived ΔrH(298); cells are positive J/mol as printed
-        I_cps_at_1934K: 170.4
-        delta_rH_298_J_mol_at_1934K: 616914.8
         points:
         - T_K: 1934.0
           I_cps: 170.4
@@ -565,8 +620,7 @@ species:
           delta_rH_298_J_mol_as_printed: 616,119.7
           quote: 2004  622.2  18.1  1,246,848.7  2.55E-08  291,285.7  -162.09  616,119.7
         table_csv: tables/kems-139-jacobson-2024/t2.csv
-        quote: TABLE 2 Third law thermodynamic calculations for the reaction ½Hf(s) + ½HfO2(s) = HfO(g),
-          using σ = 8.2 × 10⁻¹⁰ m² and k = 1.68 × 10⁻²³ bar-m²/cps-K.
+        quote: TABLE 2 Third law thermodynamic calculations for the reaction ½Hf(s) + ½HfO2(s) = HfO(g), using σ = 8.2 × 10⁻¹⁰ m² and k = 1.68 × 10⁻²³ bar-m²/cps-K.
       uncertainty:
         note: standard_deviation column is of I (cps) as printed; no sigma on ΔrH cells
     - observation_id: jacobson_2024_t2_hfo_second_law_narrative

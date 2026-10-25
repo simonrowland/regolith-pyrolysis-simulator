@@ -11,9 +11,10 @@ extraction:
   method: Official J-STAGE OA PDF (corpus raw/kems-058-ohara-1987/kems-058-ohara-1987.pdf, sha256 bdfd6ed46cdd3937ae2a3b9802356ea1867ebbb24e815602dad271a74ef45832).; validated in an internal review, 2026-09-12, kems-extracts
     No MinerU decode. Tables 1-2 transcribed from a 400 dpi pdftoppm render of PDF pages 1-6 (published
     pp. 1337-1342). pdftotext-layout is a noisy OCR layer and was not used as data. Table 1 ion-current
-    ratios labelled measured; Table 1 partial pressures and Table 2 a_P2O5 / ln gamma / L_P that pass
-    through JANAF P4O10 or slag-metal free-energy functions labelled model_derived. Interaction parameters
-    are least-squares of those activity coefficients. Figs 1-3 figure-only. Sample 20 is in Table 1 only;
+    ratios labelled measured; Table 2 a_P2O5 is measured_reduced from the authors' measured KEMS
+    ion-current ratios using the JANAF P4O10 standard pressure. Table 1 partial pressures and Table 2
+    ln gamma / L_P that pass through JANAF P4O10 or slag-metal free-energy functions are model_derived.
+    Interaction parameters are least-squares of those activity coefficients. Figs 1-3 figure-only. Sample 20 is in Table 1 only;
     composition not invented.
   date: '2026-09-12'
   worker: extract-kems-057
@@ -2113,6 +2114,11 @@ species:
       uncertainty:
         note: figure-only calculated L_P; not digitised
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_1
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-1
       type: activity_coefficient
       locator:
@@ -2134,8 +2140,8 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
@@ -2144,6 +2150,7 @@ species:
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.042898315936', FeO: '0.869985701925', Fe2O3: '0.047281831626', CaO: '0.039834150513'}
         sample_1_two_phase_note: Table 2 No. 1 (CaO addition) is suspected two-phase; authors did not
           use it for the interaction-parameter fit
+        activity: '2.5e-17'
         row:
           sample_no: 1
           P2O5_mol_percent: 3.92
@@ -2151,15 +2158,20 @@ species:
           CaO_mol_percent: 3.64
           Fe2_over_Fe3: 9.2
           a_P2O5_times_1e17: 2.5
+          a_P2O5: '2.5e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -35.05
           L_P: 570
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 2.5000000000000003e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_2
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-2
       type: activity_coefficient
       locator:
@@ -2181,14 +2193,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.07679892813', FeO: '0.83293722032', Fe2O3: '0.038561908348', CaO: '0.051701943202'}
+        activity: '4.8e-17'
         row:
           sample_no: 2
           P2O5_mol_percent: 7.13
@@ -2196,15 +2209,20 @@ species:
           CaO_mol_percent: 4.8
           Fe2_over_Fe3: 10.8
           a_P2O5_times_1e17: 4.8
+          a_P2O5: '4.8e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.89
           L_P: 666
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 4.8000000000000003e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_3
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-3
       type: activity_coefficient
       locator:
@@ -2226,14 +2244,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.098323201937', FeO: '0.81539912956', Fe2O3: '0.038462223092', CaO: '0.047815445411'}
+        activity: '8.4e-17'
         row:
           sample_no: 3
           P2O5_mol_percent: 9.13
@@ -2241,15 +2260,20 @@ species:
           CaO_mol_percent: 4.44
           Fe2_over_Fe3: 10.6
           a_P2O5_times_1e17: 8.4
+          a_P2O5: '8.4e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.64
           L_P: 589
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 8.400000000000001e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_4
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-4
       type: activity_coefficient
       locator:
@@ -2271,14 +2295,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.103484718249', FeO: '0.810337400281', Fe2O3: '0.043566526897', CaO: '0.042611354573'}
+        activity: '6.3e-17'
         row:
           sample_no: 4
           P2O5_mol_percent: 9.52
@@ -2286,15 +2311,20 @@ species:
           CaO_mol_percent: 3.92
           Fe2_over_Fe3: 9.3
           a_P2O5_times_1e17: 6.3
+          a_P2O5: '6.3e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.89
           L_P: 690
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 6.3e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_5
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-5
       type: activity_coefficient
       locator:
@@ -2316,14 +2346,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.04573135069', FeO: '0.867977597788', Fe2O3: '0.040559700831', MgO: '0.045731350691'}
+        activity: '4.6e-17'
         row:
           sample_no: 5
           P2O5_mol_percent: 4.23
@@ -2331,15 +2362,20 @@ species:
           MgO_mol_percent: 4.23
           Fe2_over_Fe3: 10.7
           a_P2O5_times_1e17: 4.6
+          a_P2O5: '4.6e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.44
           L_P: 452
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 4.6e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_6
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-6
       type: activity_coefficient
       locator:
@@ -2361,14 +2397,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.06912172071', FeO: '0.835663462061', Fe2O3: '0.048585085004', MgO: '0.046629732225'}
+        activity: '4.8e-17'
         row:
           sample_no: 6
           P2O5_mol_percent: 6.3
@@ -2376,15 +2413,20 @@ species:
           MgO_mol_percent: 4.25
           Fe2_over_Fe3: 8.6
           a_P2O5_times_1e17: 4.8
+          a_P2O5: '4.8e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.76
           L_P: 615
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 4.8000000000000003e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_7
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-7
       type: activity_coefficient
       locator:
@@ -2406,14 +2448,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.078974471567', FeO: '0.825344803497', Fe2O3: '0.043901319335', MgO: '0.051779405601'}
+        activity: '5.9e-17'
         row:
           sample_no: 7
           P2O5_mol_percent: 7.26
@@ -2421,15 +2464,20 @@ species:
           MgO_mol_percent: 4.76
           Fe2_over_Fe3: 9.4
           a_P2O5_times_1e17: 5.9
+          a_P2O5: '5.9e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.76
           L_P: 615
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 5.900000000000001e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_8
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-8
       type: activity_coefficient
       locator:
@@ -2451,14 +2499,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.088094154114', FeO: '0.823562745193', Fe2O3: '0.042451687897', MgO: '0.045891412796'}
+        activity: '7.8e-17'
         row:
           sample_no: 8
           P2O5_mol_percent: 8.12
@@ -2466,15 +2515,20 @@ species:
           MgO_mol_percent: 4.23
           Fe2_over_Fe3: 9.7
           a_P2O5_times_1e17: 7.8
+          a_P2O5: '7.8e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.54
           L_P: 578
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 7.8e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_9
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-9
       type: activity_coefficient
       locator:
@@ -2496,14 +2550,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.019634005006', FeO: '0.880547142064', Fe2O3: '0.045389027941', MnO: '0.054429824989'}
+        activity: '2.0e-17'
         row:
           sample_no: 9
           P2O5_mol_percent: 1.8
@@ -2511,15 +2566,20 @@ species:
           MnO_mol_percent: 4.99
           Fe2_over_Fe3: 9.7
           a_P2O5_times_1e17: 2.0
+          a_P2O5: '2.0e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.44
           L_P: 310
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 2.0e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_10
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-10
       type: activity_coefficient
       locator:
@@ -2541,14 +2601,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.048933519405', FeO: '0.857408495179', Fe2O3: '0.042445965108', MnO: '0.051212020308'}
+        activity: '5.8e-17'
         row:
           sample_no: 10
           P2O5_mol_percent: 4.51
@@ -2556,15 +2617,20 @@ species:
           MnO_mol_percent: 4.72
           Fe2_over_Fe3: 10.1
           a_P2O5_times_1e17: 5.8
+          a_P2O5: '5.8e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.28
           L_P: 416
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 5.8e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_11
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-11
       type: activity_coefficient
       locator:
@@ -2586,14 +2652,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.064145513658', FeO: '0.836247707127', Fe2O3: '0.049191041596', MnO: '0.050415737619'}
+        activity: '6.8e-17'
         row:
           sample_no: 11
           P2O5_mol_percent: 5.84
@@ -2601,15 +2668,20 @@ species:
           MnO_mol_percent: 4.59
           Fe2_over_Fe3: 8.5
           a_P2O5_times_1e17: 6.8
+          a_P2O5: '6.8e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.36
           L_P: 477
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 6.800000000000001e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_12
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-12
       type: activity_coefficient
       locator:
@@ -2631,14 +2703,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.066126170226', FeO: '0.838956535928', Fe2O3: '0.045595463909', MnO: '0.049321829937'}
+        activity: '8.2e-17'
         row:
           sample_no: 12
           P2O5_mol_percent: 6.06
@@ -2646,15 +2719,20 @@ species:
           MnO_mol_percent: 4.52
           Fe2_over_Fe3: 9.2
           a_P2O5_times_1e17: 8.2
+          a_P2O5: '8.2e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.2
           L_P: 447
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 8.2e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_13
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-13
       type: activity_coefficient
       locator:
@@ -2676,14 +2754,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.090348121492', FeO: '0.819677560554', Fe2O3: '0.042251420647', MnO: '0.047722897307'}
+        activity: '9.7e-17'
         row:
           sample_no: 13
           P2O5_mol_percent: 8.33
@@ -2691,15 +2770,20 @@ species:
           MnO_mol_percent: 4.4
           Fe2_over_Fe3: 9.7
           a_P2O5_times_1e17: 9.7
+          a_P2O5: '9.7e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.36
           L_P: 520
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 9.7e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_14
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-14
       type: activity_coefficient
       locator:
@@ -2721,14 +2805,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.020651354189', FeO: '0.875461307229', Fe2O3: '0.049183219507', SiO2: '0.054704119075'}
+        activity: '3.3e-17'
         row:
           sample_no: 14
           P2O5_mol_percent: 1.88
@@ -2736,15 +2821,20 @@ species:
           SiO2_mol_percent: 4.98
           Fe2_over_Fe3: 8.9
           a_P2O5_times_1e17: 3.3
+          a_P2O5: '3.3e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.01
           L_P: 253
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 3.3e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_15
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-15
       type: activity_coefficient
       locator:
@@ -2766,14 +2856,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.047524519808', FeO: '0.842905231305', Fe2O3: '0.046313474248', SiO2: '0.063256774639'}
+        activity: '8.2e-17'
         row:
           sample_no: 15
           P2O5_mol_percent: 4.35
@@ -2781,15 +2872,20 @@ species:
           SiO2_mol_percent: 5.79
           Fe2_over_Fe3: 9.1
           a_P2O5_times_1e17: 8.2
+          a_P2O5: '8.2e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -33.9
           L_P: 343
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 8.2e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_16
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-16
       type: activity_coefficient
       locator:
@@ -2811,14 +2907,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.05189878588', FeO: '0.851975370414', Fe2O3: '0.046303009262', SiO2: '0.049822834444'}
+        activity: '7.8e-17'
         row:
           sample_no: 16
           P2O5_mol_percent: 4.75
@@ -2826,15 +2923,20 @@ species:
           SiO2_mol_percent: 4.56
           Fe2_over_Fe3: 9.2
           a_P2O5_times_1e17: 7.8
+          a_P2O5: '7.8e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.07
           L_P: 379
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 7.8e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_17
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-17
       type: activity_coefficient
       locator:
@@ -2856,14 +2958,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.069562882612', FeO: '0.830662657072', Fe2O3: '0.047739233165', SiO2: '0.052035227151'}
+        activity: '1.10e-16'
         row:
           sample_no: 17
           P2O5_mol_percent: 6.35
@@ -2871,15 +2974,20 @@ species:
           SiO2_mol_percent: 4.75
           Fe2_over_Fe3: 8.7
           a_P2O5_times_1e17: 11.0
+          a_P2O5: '1.10e-16'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.01
           L_P: 406
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 1.1000000000000001e-16
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_18
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-18
       type: activity_coefficient
       locator:
@@ -2901,14 +3009,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.072801791597', FeO: '0.786885543575', Fe2O3: '0.036095667136', CaO: '0.047605295242', SiO2: '0.05661170245'}
+        activity: '3.3e-17'
         row:
           sample_no: 18
           P2O5_mol_percent: 6.79
@@ -2917,15 +3026,20 @@ species:
           SiO2_mol_percent: 5.28
           Fe2_over_Fe3: 10.9
           a_P2O5_times_1e17: 3.3
+          a_P2O5: '3.3e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.23
           L_P: 784
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 3.3e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_19
+      derived_from: [pdf:kems-058-ohara-1987]
+      derivation:
+        relation: author_mass_spectrometric_activity_reduction
+        inputs: [pdf:kems-058-ohara-1987]
+        output_unit: dimensionless
       experiment: feto-p2o5-sample-19
       type: activity_coefficient
       locator:
@@ -2947,14 +3061,15 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
+        quantity: raoultian_activity
+        method_class: measured_reduced
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
           eqs. (12)-(23), not a KEMS observable.
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.090324058615', FeO: '0.779428917553', Fe2O3: '0.031943808096', CaO: '0.047130221397', SiO2: '0.051172994339'}
+        activity: '6.1e-17'
         row:
           sample_no: 19
           P2O5_mol_percent: 8.49
@@ -2963,12 +3078,12 @@ species:
           SiO2_mol_percent: 4.81
           Fe2_over_Fe3: 12.2
           a_P2O5_times_1e17: 6.1
+          a_P2O5: '6.1e-17'
+          a_conversion: 'a = printed cell x 10^-17; header a_P2O5 x 10^17'
           ln_gamma_P2O5: -34.9
           L_P: 665
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 6.1e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     context:
