@@ -8,6 +8,21 @@ from tests.test_c7_closure_routing import simulation
 from tests.magemin_test_support import close_test_owned_magemin_backend
 
 
+def test_existing_liquidus_search_defaults_are_pinned():
+    import inspect
+    from simulator.melt_backend.liquidus import find_liquidus_solidus_by_fraction
+    from simulator.melt_backend.magemin import MAGEMinBackend
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    # Historical finder inputs, pinned before moving their ownership.
+    for finder in (find_liquidus_solidus_by_fraction,
+                   MAGEMinBackend.find_liquidus_solidus,
+                   AlphaMELTSBackend.find_liquidus_solidus):
+        parameters = inspect.signature(finder).parameters
+        assert {k: parameters[k].default for k in ('min_T_C', 'max_T_C', 'scan_step_C')} == {
+            'min_T_C': 400.0, 'max_T_C': 2200.0, 'scan_step_C': 50.0}
+
+
 def test_narrow_window_preserves_finder_crossings_with_fewer_samples():
     from simulator.melt_backend.liquidus import find_liquidus_solidus_by_fraction
 
@@ -29,6 +44,9 @@ def test_narrow_window_preserves_finder_crossings_with_fewer_samples():
 @pytest.mark.parametrize('previous_curve, expected', (
     ({'solidus_T_C': 1171.875, 'liquidus_T_C': 1360.9375},
      {'min_T_C': 1100.0, 'max_T_C': 1450.0}),
+    ({'solidus_T_C': 400.0, 'liquidus_T_C': 2200.0},
+     {'min_T_C': 400.0, 'max_T_C': 2200.0}),
+    ({'solidus_T_C': 2300.0, 'liquidus_T_C': 2400.0}, {}),
     (None, {}),
 ))
 def test_previous_hour_bounds_seed_gate_search(monkeypatch, previous_curve, expected):
