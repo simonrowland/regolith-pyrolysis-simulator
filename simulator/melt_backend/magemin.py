@@ -1882,6 +1882,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 ),
             )
             diagnostics['projected_liquidus_status'] = projected.status
+            diagnostics['projected_liquidus_diagnostics'] = dict(
+                projected.diagnostics or {}
+            )
             diagnostics['composition_projected_notice'] = notice
             if (
                 projected.status == 'ok'
@@ -1909,6 +1912,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
             warnings_out = [
                 *warnings_out,
+                *projected.warnings,
                 (
                     'composition_projected bulk has no projected liquidus; '
                     f'status={projected.status}'

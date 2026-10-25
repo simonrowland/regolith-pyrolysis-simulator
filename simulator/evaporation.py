@@ -2697,8 +2697,17 @@ class EvaporationMixin:
         )
         record_gate_curve_provider_outcome(self, status_outcome)
         if status_outcome is GateCurveProviderOutcome.FAILED:
-            reasons.append(f'gate liquid fraction unavailable: status={status}')
-            return None
+            raise EvaporationFluxRefusal(
+                'liquid_fraction_provider_failed',
+                {
+                    'provider': self._liquid_fraction_provider,
+                    'reason': 'liquid_fraction_provider_failed',
+                    'outcome': status_outcome,
+                    'provider_diagnostic': diagnostic,
+                    'status': status,
+                    'warnings': list(getattr(result, 'warnings', ()) or ()),
+                },
+            )
         if status != 'ok':
             projected = self._composition_projected_freeze_gate_curve(
                 diagnostic,
@@ -2719,12 +2728,24 @@ class EvaporationMixin:
             if status_outcome is GateCurveProviderOutcome.STABLE_REFUSAL:
                 curve = self._freeze_gate_kress_floor_curve(None, reasons)
                 if curve is not None:
+                    from engines.magemin.domain import (
+                        _SIO2_MIN_WT_PCT, _SIO2_MAX_WT_PCT,
+                    )
+
                     curve['gate_provider_refusal'] = {
                         'provider': self._liquid_fraction_provider,
                         'status': status,
                         'reason': diagnostic.get('backend_status_reason'),
                         'qualification': 'out_of_domain_kress91_floor_prediction',
                         'authority': 'extrapolated',
+                        'certified_band': {
+                            'sio2_wt_pct': [_SIO2_MIN_WT_PCT, _SIO2_MAX_WT_PCT],
+                            'min_T_C': float(KRESS91_LIQUID_CALIBRATION_MIN_T_C),
+                            'max_T_C': float(KRESS91_LIQUID_CALIBRATION_MAX_T_C),
+                            'source': kress91_temperature_band_case(
+                                KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+                            )['source'],
+                        },
                         'warnings': list(getattr(result, 'warnings', ()) or ()),
                     }
                     return curve

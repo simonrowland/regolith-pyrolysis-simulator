@@ -2698,6 +2698,18 @@ def gate_curve_provider_outcome_for_status(
     normalized_status = str(status).strip().lower()
     reasons: list[str] = []
     if isinstance(diagnostic, Mapping):
+        backend = diagnostic.get("backend_diagnostics")
+        if isinstance(backend, Mapping) and gate_curve_provider_outcome_for_status(
+            backend.get("backend_status") or status, backend,
+        ) is GateCurveProviderOutcome.FAILED:
+            return GateCurveProviderOutcome.FAILED
+        # The requested bulk can be out of domain while its projected-bulk
+        # solve failed numerically. That failure vetoes all extension curves.
+        projected_status = diagnostic.get("projected_liquidus_status")
+        if projected_status is not None and gate_curve_provider_outcome_for_status(
+            projected_status, diagnostic.get("projected_liquidus_diagnostics"),
+        ) is GateCurveProviderOutcome.FAILED:
+            return GateCurveProviderOutcome.FAILED
         for field in (
             "backend_status_reason",
             "backend_failure_reason_code",

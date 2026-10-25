@@ -638,15 +638,6 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((1018.75, 0.0), (1320.3125, 1.0)),
             ),
         ],
-        'ci_carbonaceous_chondrite_C2B_12h': [
-            (
-                'C2B',
-                'kress91_liquid_calibration_floor',
-                1200.0,
-                1200.000001,
-                ((1200.0, 0.0), (1200.000001, 1.0)),
-            ),
-        ],
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
@@ -685,7 +676,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         name = scenario['name']
         current_scenario[0] = name
         equilibrations_before = equilibrium_count[0]
-        PyrolysisRun(
+        result = PyrolysisRun(
             feedstock_id=scenario['feedstock_id'],
             campaign=scenario['campaign'],
             hours=scenario['hours'],
@@ -695,8 +686,15 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             setpoints_patch={'freeze_gate': {'enabled': True}},
         ).run()
         if name == 'ci_carbonaceous_chondrite_C2B_12h':
-            assert rebuild_counts[name] == 1
-            assert equilibrium_count[0] - equilibrations_before == 8
+            assert result['status'] == 'refused'
+            diagnostic = result['run_metadata']['refusal_diagnostic']
+            assert diagnostic['reason'] == 'liquid_fraction_provider_failed'
+            assert diagnostic['provider_diagnostic']['backend_diagnostics'][
+                'projected_liquidus_status'
+            ] in {'unavailable', 'not_converged'}
+            assert rebuild_counts.get(name, 0) == 0
+            assert name not in observed
+            assert equilibrium_count[0] > equilibrations_before
 
     assert observed == expected
 
@@ -4341,11 +4339,13 @@ def test_shuttle_bakeout_cycle_counter_waits_for_successful_hour(
     feedstocks_data,
     setpoints_data,
 ):
+    setpoints = deepcopy(setpoints_data)
+    setpoints['chemistry_kernel']['liquid_fraction_provider'] = 'analytical'
     sim = _build_sim(
         'lunar_mare_low_ti',
         vapor_pressure_data,
         feedstocks_data,
-        setpoints_data,
+        setpoints,
         additives_kg={'K': 1.0},
     )
     sim.start_campaign(CampaignPhase.C3_K)
