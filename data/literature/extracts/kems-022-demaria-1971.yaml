@@ -914,9 +914,9 @@ species:
       units: kcal/mol for ΔH0; -R ln Kp as published
       values:
         reaction: SiO2(g) = SiO(g) + 1/2 O2(g)
-        quantity: third_law_delta_H0_from_simultaneous_partial_pressures
-        method_class: third_law_kems
-        evidence_class: authors_third_law_from_this_work_pressures
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 7, third-law result"
         context_note: >-
           Context only: this is an author-derived reaction enthalpy from simultaneous partial
           pressures. No current quantity token fits this printed reaction quantity; it is not a
@@ -1380,8 +1380,7 @@ species:
       values:
         gas_species: Al2O(g)
         quantity: p_partial
-        method_class: measured_direct
-        evidence_class: authors_this_work
+        method_class: measured_reduced
         admission_status: admitted
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
@@ -1602,12 +1601,12 @@ species:
       values:
         gas_species: AlO(g)
         quantity: p_partial
-        method_class: measured_direct
-        evidence_class: authors_this_work
+        method_class: measured_reduced
         admission_status: admitted
         material: Apollo_12_12065
         condensed_phase: lunar_basalt_melt
-        reliability_note: AlO NAA points mostly final-range — excluded by authors from tables
+        reliability_note: AlO NAA points mostly final-range — excluded by authors from tables. The retained
+          series is BC on sample 12065.
         points:
         - <<: *smales_12065_catalogue_composition
           T_K: 2320.0
@@ -1680,13 +1679,14 @@ species:
       units: Kp dimensionless (partial P in atm standard); ΔH0 kcal/mol
       values:
         reaction: AlO(g) = Al(g) + O(g)
-        quantity: third_law_Kp_and_delta_H0
-        method_class: third_law_kems
-        evidence_class: authors_third_law_from_this_work_pressures
+        quantity: reaction_enthalpy_3rd_law
+        method_class: quoted_attributed
+        attribution: "De Maria et al. (1971), Table 8, third-law result"
         context_note: >-
-          Context only: Table 8 prints equilibrium Kp values and a third-law reaction enthalpy.
-          No current quantity token fits Kp or this reaction enthalpy, so neither is recast as a
-          partial pressure or formation enthalpy.
+          Context only: Table 8 prints an author-derived third-law reaction enthalpy from simultaneous
+          measurements. This reaction enthalpy remains untyped because no registered quantity token
+          fits; it is not a formation enthalpy. The separate Kp observation carries the equilibrium
+          constants.
         material: Apollo_12_12065_BC
         condensed_phase: lunar_basalt_melt
         gas_species_in_equilibrium:

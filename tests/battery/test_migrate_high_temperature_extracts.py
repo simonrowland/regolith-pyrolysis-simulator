@@ -172,7 +172,7 @@ def test_demaria_table4_points_keep_printed_values_and_temperatures(migrated_tar
         assert observation.identity.quantity.is_value
         assert observation.identity.quantity.value is Quantity.P_PARTIAL
         assert observation.evidence.class_.is_value
-        assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert observation.admission.status is AdmissionStatus.ADMITTED
         temperature = observation.point_conditions["temperature_K"]
         assert temperature.state.is_value
@@ -351,13 +351,15 @@ def test_demaria_context_rows_keep_unmapped_thermochemistry_reasons() -> None:
     table8 = species["AlO"]["observations"][1]["values"]
     assert table7["condensed_phase"] == "lunar_basalt_melt"
     assert table8["condensed_phase"] == "lunar_basalt_melt"
-    expected_method = "third_law_kems"
+    expected_method = "quoted_attributed"
     assert table7["method_class"] == expected_method
-    assert table7["evidence_class"] == "authors_third_law_from_this_work_pressures"
+    assert table7["quantity"] == "reaction_enthalpy_3rd_law"
+    assert table7["attribution"] == "De Maria et al. (1971), Table 7, third-law result"
     assert "no current quantity token fits" in table7["context_note"].casefold()
     assert table8["method_class"] == expected_method
-    assert table8["evidence_class"] == "authors_third_law_from_this_work_pressures"
-    assert "no current quantity token fits kp" in table8["context_note"].casefold()
+    assert table8["quantity"] == "reaction_enthalpy_3rd_law"
+    assert table8["attribution"] == "De Maria et al. (1971), Table 8, third-law result"
+    assert "remains untyped" in table8["context_note"].casefold()
     table4 = species["Al2O"]["observations"][0]["values"]
     assert "Only intermediate-range data included by authors" in table4[
         "reliability_note"
