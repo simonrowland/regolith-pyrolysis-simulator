@@ -32,7 +32,10 @@ from simulator.fe_redox import (
     normalize_redox_state,
 )
 from simulator.melt_backend.base import MeltCompositionError
-from simulator.melt_backend.liquidus import LIQUIDUS_LIQUID_EPSILON
+from simulator.melt_backend.liquidus import (
+    LIQUIDUS_LIQUID_EPSILON,
+    DEFAULT_LIQUIDUS_SCAN_STEP_C,
+)
 from simulator.melt_regime import (
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
@@ -2229,6 +2232,7 @@ class EvaporationMixin:
             solidus = self._optional_float(cached_curve.get('solidus_T_C'))
             liquidus = self._optional_float(cached_curve.get('liquidus_T_C'))
             if solidus is not None and liquidus is not None and solidus < liquidus:
+                step = DEFAULT_LIQUIDUS_SCAN_STEP_C
                 # Seed only: recompute the current composition's crossings.
                 # The existing finder scans a 50 C lattice. Round the prior
                 # bounds outwards and add one cell on each side, preserving
@@ -2237,8 +2241,8 @@ class EvaporationMixin:
                 # back gives C. A failed warm bracket follows the existing
                 # broad backend/kernel ladder below, with unchanged budgets.
                 computing_cache['_liquidus_search_window_C'] = {
-                    'min_T_C': 50.0 * (math.floor(solidus / 50.0) - 1),
-                    'max_T_C': 50.0 * (math.ceil(liquidus / 50.0) + 1),
+                    'min_T_C': step * (math.floor(solidus / step) - 1),
+                    'max_T_C': step * (math.ceil(liquidus / step) + 1),
                 }
         self._freeze_gate_liquid_fraction_cache = computing_cache
         self._freeze_gate_curve_in_progress = True

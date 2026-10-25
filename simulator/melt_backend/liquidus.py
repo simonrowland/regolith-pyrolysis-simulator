@@ -36,6 +36,9 @@ from simulator.melt_regime import liquid_fraction_invalidity
 #   far below 101 * 60 s, so it bounds the spinel-hang class.
 # Unit check: all terms in seconds; product is seconds.
 DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 300.0
+DEFAULT_LIQUIDUS_MIN_T_C = 400.0
+DEFAULT_LIQUIDUS_MAX_T_C = 2200.0
+DEFAULT_LIQUIDUS_SCAN_STEP_C = 50.0
 MAX_LIQUIDUS_SCAN_POINTS = 100_000
 # frac_M >= 1 - LIQUIDUS_LIQUID_EPSILON is liquid. This is the finder's
 # declaration tolerance. The freeze-gate consumer may snap a supplied
@@ -349,9 +352,9 @@ class EquilibriumCrystallizationPathResult:
 def find_liquidus_solidus_by_fraction(
     sample_fraction: Callable[..., float],
     *,
-    min_T_C: float = 400.0,
-    max_T_C: float = 2200.0,
-    scan_step_C: float = 50.0,
+    min_T_C: float = DEFAULT_LIQUIDUS_MIN_T_C,
+    max_T_C: float = DEFAULT_LIQUIDUS_MAX_T_C,
+    scan_step_C: float = DEFAULT_LIQUIDUS_SCAN_STEP_C,
     tolerance_C: float = 2.0,
     solid_epsilon: float = 1.0e-3,
     liquid_epsilon: float = LIQUIDUS_LIQUID_EPSILON,

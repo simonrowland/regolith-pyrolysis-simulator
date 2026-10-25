@@ -138,6 +138,9 @@ from simulator.engine_pool import (
 )
 from simulator.melt_backend.liquidus import (
     DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
+    DEFAULT_LIQUIDUS_MIN_T_C,
+    DEFAULT_LIQUIDUS_MAX_T_C,
+    DEFAULT_LIQUIDUS_SCAN_STEP_C,
     LiquidusSampleError,
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
@@ -1638,9 +1641,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             Mapping[str, Mapping[str, float]]
         ] = None,
         species_formula_registry: Optional[Mapping[str, Any]] = None,
-        min_T_C: float = 400.0,
-        max_T_C: float = 2200.0,
-        scan_step_C: float = 50.0,
+        min_T_C: float = DEFAULT_LIQUIDUS_MIN_T_C,
+        max_T_C: float = DEFAULT_LIQUIDUS_MAX_T_C,
+        scan_step_C: float = DEFAULT_LIQUIDUS_SCAN_STEP_C,
         tolerance_C: float = 2.0,
         projected_retry: bool = False,
         projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
