@@ -8700,24 +8700,6 @@ def _source_point_condition_total_pressure_pa(
     return None
 
 
-def _keeps_phase_composition_unknown_total(observation: Observation) -> bool:
-    """An equilibrium-phase row keeps a source-unknown point total.
-
-    The unprinted-total strip is the Knudsen in-cell rule: an unknown total
-    is not a set point and blocks same-point partial-pressure matching.
-    Equilibrium phase rows are not that case. Table 1 prose subtypes and
-    Table 2 wt% initial glasses both state the absence, and the point
-    condition is that statement. Identity still follows the profile.
-    """
-
-    identity = observation.identity
-    if not isinstance(identity, Identity):
-        return False
-    return (
-        _quantity_token(identity.quantity) is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-    )
-
-
 def _without_unprinted_total_pressure(
     point_conditions: Mapping[str, Located[Any]] | None,
 ) -> Mapping[str, Located[Any]] | None:
@@ -21726,7 +21708,13 @@ class Migrator:
 
     def _drop_unprinted_point_totals(self) -> None:
         for observation_id, observation in list(self.result.observations.items()):
-            if _keeps_phase_composition_unknown_total(observation):
+            experiment = self.result.experiments.get(observation.experiment_id)
+            if (
+                experiment is None
+                or not _knudsen_effusion_chamber_background_not_for_identity(
+                    experiment.method
+                )
+            ):
                 continue
             stripped = _without_unprinted_total_pressure(observation.point_conditions)
             if stripped is not observation.point_conditions:
