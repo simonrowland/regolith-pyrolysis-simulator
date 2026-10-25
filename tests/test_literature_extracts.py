@@ -2318,6 +2318,146 @@ def test_repo_extracts_validate_green():
     assert errors == [], "\n".join(errors[:20])
 
 
+def test_mathieu_2009_a6_2_activity_compositions_migrate() -> None:
+    """Pin Na2O parsing and the fully printed A.6.2 sample compositions."""
+    from simulator.battery.enums import Phase, Quantity, ReferenceStateConvention
+    from simulator.battery.identity import profile_for
+    from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
+
+    filename = "mathieu-2009-sodium-solubility-thesis.yaml"
+    source = load_cached_safe_yaml((EXTRACTS / filename).read_text())
+    assert set(source["species"]) == {"Na2O"}
+    assert {sample["species"] for sample in source["fidelity_samples"]} == {"Na2O"}
+
+    migrator = Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACTS / filename)
+    migrator.finalize()
+    source_id = "mathieu-2009-sodium-solubility-thesis"
+    observations = [
+        row for row in migrator.result.observations.values()
+        if row.source_id == source_id
+    ]
+    activities = [
+        row for row in observations
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+    ]
+    assert len(observations) == 421
+    assert len(activities) == 209
+    assert all(row.identity.species.formula == "Na2O" for row in activities)
+    assert all(
+        row.identity.reference_state.is_value
+        and row.identity.reference_state.value.convention
+        is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        and row.identity.reference_state.value.endmember.formula == "Na2O"
+        and row.identity.reference_state.value.endmember.phase.is_value
+        and row.identity.reference_state.value.endmember.phase.value is Phase.L
+        for row in activities
+    )
+
+    source_activity_rows = source["species"]["Na2O"]["observations"]
+    source_activities = [
+        row for row in source_activity_rows
+        if row.get("type") == "activity_coefficient"
+    ]
+    assert sum(
+        "composition_wt_pct" in row.get("values", {})
+        for row in source_activities
+    ) == 192
+    assert sum(
+        row.identity.composition is not None
+        and row.identity.composition.is_value
+        for row in activities
+    ) == 192
+    complete = [
+        row for row in activities
+        if all(
+            (state := getattr(row.identity, axis)) is not None and state.is_value
+            for axis in profile_for(row.identity).required
+        )
+    ]
+    assert len(complete) == 192
+
+    pins = {
+        "mathieu_2009_t38_acmas5_as1_gamma_na2o": (
+            335,
+            "ACMAS5 AS1",
+            {
+                "Na2O": 21.07,
+                "MgO": 0.04,
+                "SiO2": 55.96,
+                "Al2O3": 22.63,
+                "CaO": 0.30,
+            },
+        ),
+        "mathieu_2009_t38_acmas10_cm2_0_gamma_na2o": (
+            336,
+            "ACMAS10 CM2-0",
+            {
+                "Na2O": 12.05,
+                "MgO": 0.39,
+                "SiO2": 21.05,
+                "Al2O3": 42.45,
+                "CaO": 24.04,
+            },
+        ),
+        "mathieu_2009_t38_acmas40_cmas19_gamma_na2o": (
+            340,
+            "ACMAS40 CMAS19",
+            {
+                "Na2O": 15.82,
+                "MgO": 0.03,
+                "SiO2": 52.23,
+                "Al2O3": 6.79,
+                "CaO": 25.13,
+            },
+        ),
+    }
+    for observation_id, (page, source_row, expected) in pins.items():
+        source_row_data = next(
+            row for row in source_activities
+            if row["observation_id"] == observation_id
+        )
+        assert source_row_data["values"]["composition_wt_pct"] == expected
+        assert source_row_data["values"]["composition_locator"] == {
+            "pdf_page": page,
+            "table": "A.6.2",
+            "row": source_row,
+        }
+        migrated = next(
+            row for row in activities
+            if row.observation_id.endswith(f"::{observation_id}")
+        )
+        assert migrated.identity.temperature_K.value == Decimal("1673.15")
+        assert migrated.identity.composition.value.as_map() == (
+            wt_pct_to_mole_fraction(
+                {oxide: Decimal(str(value)) for oxide, value in expected.items()}
+            ).as_map()
+        )
+        assert "A.6.2" in source_row_data["values"]["composition_basis"]
+        assert "after Na equilibration" in source_row_data["values"]["composition_basis"]
+
+    for row in observations:
+        temperature = row.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        located_temperature = (row.point_conditions or {}).get("temperature_K")
+        assert located_temperature is not None
+        assert located_temperature.state.is_value
+        assert located_temperature.state.value == temperature.value
+        assert located_temperature.locator is not None
+
+    issues = [
+        issue for issue in migrator.result.validation.hard_issues
+        if f"{source_id}::mathieu_2009_t" in issue.path
+    ]
+    assert len(issues) == 209
+    assert all(
+        issue.reason.value == "conditional_field"
+        and "is prose, not a resolvable observation id" in issue.detail
+        for issue in issues
+    )
+
+
 def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None:
     path = EXTRACTS / "kems-026-markova-1984.yaml"
     migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
