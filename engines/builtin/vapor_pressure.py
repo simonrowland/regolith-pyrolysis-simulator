@@ -4399,10 +4399,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
-                if name == "SiO" and oxide_extrapolated:
-                    vapor_pressure_provenance[name]["extrapolation_notice"] = dict(
-                        oxide_vapor_extrapolations[name]
-                    )
                 oxygen_notice = (
                     evaluation.extrapolation_notice
                     if compiled_evaluator is not None
@@ -4441,6 +4437,25 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     field="P_eq_Pa",
                     pressure_rail="oxide_vapor",
                 )
+
+        # The carrier adapter copies this field into its public extra. Keep its
+        # notice aligned with the temperature-extrapolation diagnostic.
+        for extrapolations, reason in (
+            (
+                metal_extrapolations,
+                "metal_vapor_pressure_out_of_validated_range",
+            ),
+            (
+                oxide_vapor_extrapolations,
+                "oxide_vapor_pressure_out_of_validated_range",
+            ),
+        ):
+            for species, notice in extrapolations.items():
+                notice.setdefault("authority_level", "extrapolated")
+                notice.setdefault("reason", reason)
+                provenance = vapor_pressure_provenance.get(species)
+                if provenance is not None:
+                    provenance["extrapolation_notice"] = dict(notice)
 
         # YAML authority/bracket labels (pressure-neutral; Bug B pattern).
         species_authority: dict[str, dict[str, Any]] = {}
