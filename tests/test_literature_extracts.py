@@ -5104,6 +5104,81 @@ def test_matzen_run_2_3_duration_seconds_matches_table_2():
     assert run["thermal_schedule"]["total_duration_s"]["state"]["value"] == "148320"
 
 
+def _migrate_redox_extract(path: Path):
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT, path, index={}, aliases={}
+    )
+    migrator.finalize()
+    result = migrator.result
+    source = path.relative_to(REPO_ROOT).as_posix()
+    rows = [
+        result.observations[observation_id]
+        for observation_id in result.observations_by_source[source]
+    ]
+    return [
+        row
+        for row in rows
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "fe3_fe2_ratio"
+    ]
+
+
+def test_cottrell_table_1_compositions_reach_redox_identity():
+    """Table 1 compositions reach every redox identity that has a numeric map."""
+    from decimal import InvalidOperation
+
+    path = EXTRACTS / "cottrell-2009-iron-xanes.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    rows = _migrate_redox_extract(path)
+
+    assert len(rows) == 41
+    bound = [row for row in rows if row.identity.composition.is_value]
+    assert len(bound) == 39
+    assert sum(row.identity.composition.is_unknown for row in rows) == 2
+
+    expected = {
+        (Decimal("50.81"), Decimal("9.53")),  # AII, published p. 168
+        (Decimal("49.42"), Decimal("10.17")),  # LW, published p. 168
+        (Decimal("74.40"), Decimal("2.44")),  # DT_46, published p. 168
+    }
+    observed = set()
+    expected_compositions = set()
+    for material in doc["source_material_compositions"].values():
+        try:
+            expected_compositions.add(
+                tuple(
+                    sorted(
+                        (
+                            "FeOT" if name == "FeOTOT" else name,
+                            Decimal(str(value)),
+                        )
+                        for name, value in material["values_as_published"].items()
+                    )
+                )
+            )
+        except InvalidOperation:
+            continue
+    for row in bound:
+        printed = row.point_conditions["printed_composition"]
+        located_composition = row.point_conditions["composition"]
+        assert printed.state.is_value
+        assert located_composition.state.is_value
+        assert row.identity.composition.is_value
+        assert located_composition.locator.page == 2
+        assert located_composition.locator.table == "1"
+        composition = printed.state.value
+        assert tuple(
+            sorted((name, Decimal(str(value))) for name, value in composition.items())
+        ) in expected_compositions
+        observed.add(
+            (
+                Decimal(composition["SiO2"]),
+                Decimal(composition.get("FeOT", composition.get("FeO"))),
+            )
+        )
+    assert expected <= observed
+
+
 def test_matzen_observations_resolve_printed_log_fo2():
     """Each Table 2 log fO2 lands on its observation and routes as printed."""
     from decimal import Decimal

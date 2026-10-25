@@ -417,6 +417,78 @@ source_material_compositions:
         tag: value
         value: '97.81'
       locator: *table1_DT_18
+# Table 1 maps reused by the redox rows. FeOTOT is the printed total-iron column; FeOT is the migrator key.
+identity_compositions_wt_pct:
+  LW: &identity_composition_LW
+    SiO2: "49.42"
+    TiO2: "1.94"
+    Al2O3: "17.21"
+    FeOT: "10.17"
+    MgO: "6.13"
+    CaO: "8.78"
+    Na2O: "3.17"
+    K2O: "1.50"
+    P2O5: "1.12"
+  AII: &identity_composition_AII
+    SiO2: "50.81"
+    TiO2: "1.73"
+    Al2O3: "16.14"
+    FeOT: "9.53"
+    MgO: "7.40"
+    CaO: "11.20"
+    Na2O: "2.75"
+    K2O: "0.15"
+    P2O5: "0.14"
+  DT_46: &identity_composition_DT_46
+    SiO2: "74.40"
+    TiO2: "0.25"
+    Al2O3: "10.10"
+    Fe2O3: "3.58"
+    FeO: "2.44"
+    MgO: "0.01"
+    CaO: "0.24"
+    Na2O: "4.57"
+    K2O: "4.48"
+  DT_39: &identity_composition_DT_39
+    SiO2: "73.10"
+    TiO2: "0.26"
+    Al2O3: "9.90"
+    Fe2O3: "1.99"
+    FeO: "3.89"
+    MgO: "0.01"
+    CaO: "0.24"
+    Na2O: "5.01"
+    K2O: "4.36"
+  H2O_63: &identity_composition_H2O_63
+    SiO2: "70.40"
+    TiO2: "0.23"
+    Al2O3: "9.50"
+    Fe2O3: "3.46"
+    FeO: "2.11"
+    MgO: "0.02"
+    CaO: "0.24"
+    Na2O: "5.22"
+    K2O: "4.26"
+  DT_31: &identity_composition_DT_31
+    SiO2: "77.30"
+    TiO2: "0.25"
+    Al2O3: "10.50"
+    Fe2O3: "3.01"
+    FeO: "1.59"
+    MgO: "0.03"
+    CaO: "0.23"
+    Na2O: "3.29"
+    K2O: "3.33"
+  DT_18: &identity_composition_DT_18
+    SiO2: "72.60"
+    TiO2: "0.25"
+    Al2O3: "9.90"
+    Fe2O3: "3.89"
+    FeO: "1.80"
+    MgO: "0.01"
+    CaO: "0.19"
+    Na2O: "4.76"
+    K2O: "4.31"
 conditions_source_locators:
   basalt_pressure: &basalt_pressure_locator
     page: 2
@@ -586,6 +658,8 @@ species:
           quantity: fe3_fe2_ratio
           series:
             - sample: 'AII_-35'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_minus_35
               T_C: 1350
               log_fO2_as_published: '-10.19'
@@ -626,6 +700,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_-30'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_minus_30
               T_C: 1350
               log_fO2_as_published: '-9.86'
@@ -666,6 +742,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_-25'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_minus_25
               T_C: 1350
               log_fO2_as_published: '-9.31'
@@ -706,6 +784,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_-20'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_minus_20
               T_C: 1350
               log_fO2_as_published: '-8.72'
@@ -747,6 +827,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_-15'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_minus_15
               T_C: 1350
               log_fO2_as_published: '-8.22'
@@ -788,6 +870,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_-10'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_minus_10
               T_C: 1350
               log_fO2_as_published: '-7.72'
@@ -829,6 +913,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_-05'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_minus_05
               T_C: 1350
               log_fO2_as_published: '-7.20'
@@ -870,6 +956,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_0'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_0
               T_C: 1350
               log_fO2_as_published: '-6.68'
@@ -912,6 +1000,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_0'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_0
               T_C: 1350
               log_fO2_as_published: '-6.71'
@@ -953,6 +1043,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_05'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_05
               T_C: 1350
               log_fO2_as_published: '-6.24'
@@ -994,6 +1086,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_10'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_10
               T_C: 1350
               log_fO2_as_published: '-5.72'
@@ -1035,6 +1129,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_15'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_15
               T_C: 1350
               log_fO2_as_published: '-5.24'
@@ -1076,6 +1172,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_20'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_20
               T_C: 1350
               log_fO2_as_published: '-4.73'
@@ -1117,6 +1215,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_25'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_25
               T_C: 1350
               log_fO2_as_published: '-4.25'
@@ -1158,6 +1258,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_35'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_35
               T_C: 1350
               log_fO2_as_published: '-3.22'
@@ -1199,6 +1301,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_45'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_45
               T_C: 1350
               log_fO2_as_published: '-2.20'
@@ -1254,6 +1358,8 @@ species:
           quantity: fe3_fe2_ratio
           series:
             - sample: 'AII_-35'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_minus_35
               T_C: 1350
               log_fO2_as_published: '-10.19'
@@ -1290,6 +1396,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_-30'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_minus_30
               T_C: 1350
               log_fO2_as_published: '-9.86'
@@ -1326,6 +1434,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_-25'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_minus_25
               T_C: 1350
               log_fO2_as_published: '-9.31'
@@ -1362,6 +1472,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_-20'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_minus_20
               T_C: 1350
               log_fO2_as_published: '-8.72'
@@ -1398,6 +1510,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_-15'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_minus_15
               T_C: 1350
               log_fO2_as_published: '-8.22'
@@ -1434,6 +1548,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_-10'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_minus_10
               T_C: 1350
               log_fO2_as_published: '-7.72'
@@ -1470,6 +1586,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_-05'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_minus_05
               T_C: 1350
               log_fO2_as_published: '-7.20'
@@ -1506,6 +1624,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_0'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_0
               T_C: 1350
               log_fO2_as_published: '-6.68'
@@ -1542,6 +1662,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_0'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_0
               T_C: 1350
               log_fO2_as_published: '-6.71'
@@ -1578,6 +1700,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_05'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_05
               T_C: 1350
               log_fO2_as_published: '-6.24'
@@ -1614,6 +1738,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_10'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_10
               T_C: 1350
               log_fO2_as_published: '-5.72'
@@ -1650,6 +1776,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_15'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_15
               T_C: 1350
               log_fO2_as_published: '-5.24'
@@ -1686,6 +1814,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'LW_20'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_LW
               locator: *row_LW_20
               T_C: 1350
               log_fO2_as_published: '-4.73'
@@ -1722,6 +1852,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_25'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_25
               T_C: 1350
               log_fO2_as_published: '-4.25'
@@ -1758,6 +1890,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_35'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_35
               T_C: 1350
               log_fO2_as_published: '-3.22'
@@ -1794,6 +1928,8 @@ species:
                     value: 'CO/CO2; flow ratio not published'
                   locator: *basalt_gas_locator
             - sample: 'AII_45'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_AII
               locator: *row_AII_45
               T_C: 1350
               log_fO2_as_published: '-2.20'
@@ -1897,6 +2033,8 @@ species:
                     reason: not_published
                   locator: *568_temperature_locator
             - sample: 'DT_46'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_DT_46
               locator: *row_DT_46
               delta_QFM_as_published: '3.67'
               single_session_drift_corrected_centroid_eV: '7113.244'
@@ -1933,6 +2071,8 @@ species:
                     reason: not_published
                   locator: *rhyolite_conditions_locator
             - sample: 'DT_39'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_DT_39
               locator: *row_DT_39
               delta_QFM_as_published: '0.85'
               single_session_drift_corrected_centroid_eV: '7112.858'
@@ -1985,6 +2125,8 @@ species:
           quantity: fe3_fe2_ratio
           series:
             - sample: 'DT_46'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_DT_46
               locator: *row_DT_46
               delta_QFM_as_published: '3.67'
               Fe3_over_FeT: '0.569'
@@ -2023,6 +2165,8 @@ species:
                     reason: not_published
                   locator: *rhyolite_conditions_locator
             - sample: 'DT_39'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_DT_39
               locator: *row_DT_39
               delta_QFM_as_published: '0.85'
               Fe3_over_FeT: '0.315'
@@ -2061,6 +2205,8 @@ species:
                     reason: not_published
                   locator: *rhyolite_conditions_locator
             - sample: 'H2O_63'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_H2O_63
               locator: *row_H2O_63
               delta_QFM_as_published: '2.48'
               single_session_drift_corrected_centroid_eV: '7113.298'
@@ -2140,6 +2286,8 @@ species:
                     reason: not_published
                   locator: *rhyolite_conditions_locator
             - sample: 'DT_31'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_DT_31
               locator: *row_DT_31
               delta_QFM_as_published: '5.13'
               single_session_drift_corrected_centroid_eV: '7113.282'
@@ -2176,6 +2324,8 @@ species:
                     reason: not_published
                   locator: *rhyolite_conditions_locator
             - sample: 'DT_18'
+              composition_role: datum_state
+              composition_wt_pct: *identity_composition_DT_18
               locator: *row_DT_18
               delta_QFM_as_published: '4.74'
               single_session_drift_corrected_centroid_eV: '7113.355'
