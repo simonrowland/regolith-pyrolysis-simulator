@@ -161,6 +161,69 @@ def test_candidate_composition_inputs_come_from_typed_fields(
     assert candidate.overlap_fraction == 1.0
 
 
+def _catalog_self_antoine_input(runtime_form: str):
+    spec = composer.CompositionSpec(
+        carrier="In2O",
+        elements=("In", "O"),
+        pair_count=1,
+        tier=STRICT,
+        pathway="catalog_self_executable",
+        anchor_key=None,
+        overlap_fraction=1.0,
+    )
+    row = {
+        "formula": "In2O",
+        "pressure_models": [
+            {
+                "species_basis": "monomer",
+                "valid_domain": {"temperature_K": [873.15, 1223.15]},
+            }
+        ],
+        "t431_correlations": [
+            {
+                "kind": "standard_reaction",
+                "gas_species": "In2O(g)",
+                "runtime_form": runtime_form,
+                "source_form": "log10(p_In2O/atm) = -13150/T_K + 7.58",
+                "coefficients": {"A": 12.585717, "B": 13150.0},
+            }
+        ],
+    }
+    return spec, row
+
+
+def test_catalog_self_composer_preserves_declared_two_parameter_antoine() -> None:
+    spec, row = _catalog_self_antoine_input(
+        "log10(p_In2O/Pa) = A - B/T_K"
+    )
+
+    composed, _comments = composer._catalog_self_row(spec, row)
+
+    assert composed["pressure_models"][0]["coefficients"] == {
+        "A": 12.585717,
+        "B": 13150.0,
+        "C": 0.0,
+    }
+
+
+def test_catalog_self_composer_refuses_missing_C_in_three_parameter_antoine() -> None:
+    spec, row = _catalog_self_antoine_input(
+        "log10(p_In2O/Pa) = A - B/(T_K + C)"
+    )
+
+    refusal = None
+    try:
+        composer._catalog_self_row(spec, row)
+    except Exception as exc:
+        refusal = exc
+    else:
+        pytest.fail("missing Antoine C in a three-parameter form was accepted")
+
+    assert refusal is not None
+    assert type(refusal).__name__ == "_AntoineCoefficientRefusal"
+    assert str(refusal) == "missing_antoine_coefficient: coefficient=C value=None"
+
+
 def test_ba_pilot_three_way_split_and_owner_specific_refusals() -> None:
     payload = _payload("vapor_pressures.yaml")
     catalog = compile_vapour_rail_catalog(payload)

@@ -24,7 +24,11 @@ from typing import Any, Iterator, Mapping, Sequence
 
 import yaml
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_FIT_SEGMENTS,
@@ -1092,10 +1096,8 @@ def _pure_component_antoine_pa(row: Mapping[str, Any], T_K: float) -> float | No
     if not isinstance(pca, Mapping):
         return None
     try:
-        A = float(pca["A"])
-        B = float(pca["B"])
-        C = float(pca.get("C") or 0.0)
-    except (KeyError, TypeError, ValueError):
+        A, B, C = _read_antoine_coefficients(pca)
+    except _AntoineCoefficientRefusal:
         return None
     denom = float(T_K) + C
     if denom <= 0.0:

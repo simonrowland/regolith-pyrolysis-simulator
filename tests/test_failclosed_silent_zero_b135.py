@@ -182,28 +182,13 @@ def test_a1_unknown_species_refuses_not_zero_pressure() -> None:
         )
 
 
-def test_a1_corrupt_antoine_refuses_not_zero_pressure() -> None:
-    import copy
-
-    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
-
-    view = vapor_pressure_legacy_view(
-        ellingham_graph._load_default_vapor_pressure_data()
+def test_a1_zero_antoine_A_computes_pressure() -> None:
+    # The oxide-vapor reference uses log10(P/Pa) = A - B/(T + C).
+    coefficients = {"A": 0.0, "B": 1.0, "C": 1.0}
+    pressure = ellingham_graph._antoine_reference_pressure_Pa(
+        coefficients, 1800.0
     )
-    # Oxide-vapor path is Antoine-only; A<=0 must refuse, not claim P_eff=0.
-    corrupted = copy.deepcopy(dict(view))
-    oxide = dict(corrupted.get("oxide_vapors") or {})
-    sio = dict(oxide.get("SiO") or {})
-    sio["antoine"] = {"A": 0.0, "B": 1.0, "C": 1.0}
-    oxide["SiO"] = sio
-    corrupted["oxide_vapors"] = oxide
-    with pytest.raises(EllinghamPressureRefusal, match="Antoine"):
-        ellingham_graph.effective_equilibrium_pressure_Pa(
-            "SiO",
-            1800.0,
-            1e-9,
-            vapor_pressure_data=corrupted,
-        )
+    assert pressure == pytest.approx(10.0 ** (-1.0 / 1801.0))
 
 
 # ---------------------------------------------------------------------------

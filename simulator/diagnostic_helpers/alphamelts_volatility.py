@@ -17,9 +17,13 @@ import yaml
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _is_missing_antoine_intercept,
     _antoine_skip_notices_for_omitted_species,
     _append_antoine_skip_notice,
     _antoine_log10_pressure,
+    _antoine_skip_reason_for_refusal,
+    _read_antoine_coefficients,
 )
 from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
@@ -31,6 +35,7 @@ from engines.builtin.vapor_pressure import (
     VaporPressureComputationError,
     _ELLINGHAM_THERMO,
     _is_noncertifying_pseudo_vapor_pressure_runtime,
+    _raise_invalid_antoine_coefficient,
     _range_tuple,
     vapor_pressure_antoine_coefficients,
     vapor_pressure_source_label,
@@ -379,19 +384,25 @@ def _analytical_vapor_pressures_from_activities(
             temperature_K=T_K,
         ):
             continue
-        A = float(antoine.get("A", 0.0) or 0.0)
-        B = float(antoine.get("B", 0.0) or 0.0)
-        C = float(antoine.get("C", 0.0) or 0.0)
-        if not (A > 0.0 and T_K > 300.0):
-            if not A > 0.0:
-                _append_antoine_skip_notice(
-                    warnings,
-                    antoine_skip_notice_keys,
-                    antoine,
-                    species=species,
-                    site="alphamelts_volatility.metal_antoine",
-                    temperature_K=T_K,
+        try:
+            A, B, C = _read_antoine_coefficients(antoine)
+        except _AntoineCoefficientRefusal as exc:
+            if not _is_missing_antoine_intercept(exc):
+                _raise_invalid_antoine_for_volatility_diagnostic(
+                    exc,
+                    species=str(species),
                 )
+            _append_antoine_skip_notice(
+                warnings,
+                antoine_skip_notice_keys,
+                antoine,
+                species=species,
+                site="alphamelts_volatility.metal_antoine",
+                temperature_K=T_K,
+                reason=_antoine_skip_reason_for_refusal(exc),
+            )
+            continue
+        if T_K <= 300.0:
             continue
         activity = float(activities.get(parent_oxide, 0.0) or 0.0)
         wt_activity = max(0.0, float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0)
@@ -511,10 +522,14 @@ def _analytical_vapor_pressures_from_activities(
     for species, data in (vapor_pressure_data.get("oxide_vapors", {}) or {}).items():
         data = data or {}
         antoine = data.get("antoine", {}) or {}
-        A = float(antoine.get("A", 0.0) or 0.0)
-        B = float(antoine.get("B", 0.0) or 0.0)
-        C = float(antoine.get("C", 0.0) or 0.0)
-        if not A > 0.0:
+        try:
+            A, B, C = _read_antoine_coefficients(antoine)
+        except _AntoineCoefficientRefusal as exc:
+            if not _is_missing_antoine_intercept(exc):
+                _raise_invalid_antoine_for_volatility_diagnostic(
+                    exc,
+                    species=str(species),
+                )
             _append_antoine_skip_notice(
                 warnings,
                 antoine_skip_notice_keys,
@@ -522,6 +537,7 @@ def _analytical_vapor_pressures_from_activities(
                 species=species,
                 site="alphamelts_volatility.oxide_vapor_antoine",
                 temperature_K=T_K,
+                reason=_antoine_skip_reason_for_refusal(exc),
             )
             continue
         parent_oxide = str(data.get("parent_oxide", "") or "")
@@ -942,6 +958,20 @@ def _finite_number(value: float, *, species: str, field: str) -> float:
             f"species={species} field={field} value={value!r}"
         )
     return numeric
+
+
+def _raise_invalid_antoine_for_volatility_diagnostic(
+    refusal: _AntoineCoefficientRefusal,
+    *,
+    species: str,
+) -> None:
+    if refusal.invalid_kind == "nonfinite":
+        _raise_invalid_antoine_coefficient(
+            refusal,
+            species=species,
+            field="P_reference_Antoine_Pa",
+        )
+    raise ValueError(str(refusal)) from refusal
 
 
 def _pow10(log10_value: float, *, species: str) -> float:

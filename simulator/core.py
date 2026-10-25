@@ -56,7 +56,11 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 
 class RefusalStateSnapshotError(TypeError):
     """Typed refusal when rollback state contains an unsupported proxy graph."""
@@ -7736,24 +7740,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_PURE_COMPONENT,
+            VaporPressureComputationError,
             _pow10_pressure_or_raise,
             vapor_pressure_antoine_coefficients,
             vapor_pressure_source_label,
         )
 
-        antoine, coefficient_block = vapor_pressure_antoine_coefficients(
-            fe_row,
-            temperature_K=T_K,
-        )
+        try:
+            antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+                fe_row,
+                temperature_K=T_K,
+            )
+        except VaporPressureComputationError as exc:
+            raise AccountingError(str(exc)) from exc
         if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
             raise AccountingError(
                 'native Fe vapor partition requires metals.Fe.'
                 'pure_component_antoine; refusing legacy Fe vapor fit'
             )
-        A = float(antoine.get('A', 0.0) or 0.0)
-        B = float(antoine.get('B', 0.0) or 0.0)
-        C = float(antoine.get('C', 0.0) or 0.0)
-        if A <= 0.0 or T_K + C <= 0.0:
+        try:
+            A, B, C = _read_antoine_coefficients(antoine)
+        except _AntoineCoefficientRefusal as exc:
+            raise AccountingError(str(exc)) from exc
+        if T_K + C <= 0.0:
             raise AccountingError(
                 'native Fe vapor partition received invalid Fe '
                 'pure_component_antoine coefficients'

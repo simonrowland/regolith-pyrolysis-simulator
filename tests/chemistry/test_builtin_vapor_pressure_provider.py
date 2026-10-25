@@ -357,6 +357,43 @@ def _assert_antoine_skip_notice(
     assert warnings.count(expected) == 1
 
 
+def _assert_antoine_skip_or_finite_intercept_pressure(
+    result,
+    *,
+    species: str,
+    site: str,
+    a_value: float | None,
+    reason: str,
+    temperature_K: float,
+) -> None:
+    diagnostic = getattr(result, "diagnostic", None)
+    pressures = (
+        diagnostic["vapor_pressures_Pa"]
+        if diagnostic is not None
+        else result.vapor_pressures_Pa
+    )
+    if a_value is None:
+        _assert_antoine_skip_notice(
+            result.warnings,
+            species=species,
+            site=site,
+            reason=reason,
+            temperature_K=temperature_K,
+        )
+        assert species not in pressures
+        return
+
+    assert a_value <= 0.0
+    assert species in pressures
+    assert math.isfinite(float(pressures[species])) and pressures[species] > 0.0
+    assert not any(
+        notice.startswith(
+            f"antoine_species_skipped: species={species} site={site} "
+        )
+        for notice in result.warnings
+    )
+
+
 @pytest.mark.parametrize(
     "pressure",
     (0.0, -1.0, float("nan"), float("inf"), None),
@@ -409,14 +446,14 @@ def test_builtin_provider_reports_skipped_metal_antoine_A(
     provider._vapour_rail_catalog = None
     result = provider.dispatch(_request_for_oxide_at_T_K("Na2O", 900.0))
 
-    _assert_antoine_skip_notice(
-        result.warnings,
+    _assert_antoine_skip_or_finite_intercept_pressure(
+        result,
         species="Na",
         site="builtin_vapor_pressure.metal_antoine",
+        a_value=a_value,
         reason=reason,
         temperature_K=900.0,
     )
-    assert "Na" not in result.diagnostic["vapor_pressures_Pa"]
 
 
 @pytest.mark.parametrize(
@@ -436,14 +473,14 @@ def test_builtin_provider_reports_skipped_liquid_oxide_antoine_A(
     provider._vapour_rail_catalog = None
     result = provider.dispatch(_request_for_oxide_at_T_K("Al2O3", 1800.0))
 
-    _assert_antoine_skip_notice(
-        result.warnings,
+    _assert_antoine_skip_or_finite_intercept_pressure(
+        result,
         species="Al",
         site="builtin_vapor_pressure.liquid_oxide_antoine",
+        a_value=a_value,
         reason=reason,
         temperature_K=1800.0,
     )
-    assert "Al" not in result.diagnostic["vapor_pressures_Pa"]
 
 
 @pytest.mark.parametrize(
@@ -465,14 +502,14 @@ def test_builtin_provider_reports_skipped_gas_rail_antoine_A(
     provider._vapour_rail_catalog = None
     result = provider.dispatch(_request_for_oxide_at_T_K("CaO", 1800.0))
 
-    _assert_antoine_skip_notice(
-        result.warnings,
+    _assert_antoine_skip_or_finite_intercept_pressure(
+        result,
         species="Ca",
         site="builtin_vapor_pressure.gas_rail_antoine",
+        a_value=a_value,
         reason=reason,
         temperature_K=1800.0,
     )
-    assert "Ca" not in result.diagnostic["vapor_pressures_Pa"]
 
 
 @pytest.mark.parametrize(
@@ -492,11 +529,36 @@ def test_builtin_provider_reports_skipped_oxide_vapor_antoine_A(
     provider._vapour_rail_catalog = None
     result = provider.dispatch(_request_for_oxide_at_T_K("SiO2", 1900.0))
 
+    _assert_antoine_skip_or_finite_intercept_pressure(
+        result,
+        species="SiO",
+        site="builtin_vapor_pressure.oxide_vapor_antoine",
+        a_value=a_value,
+        reason=reason,
+        temperature_K=1900.0,
+    )
+
+
+def test_builtin_provider_skips_three_parameter_oxide_vapor_missing_C(
+    vapor_pressure_data,
+) -> None:
+    data = copy.deepcopy(vapor_pressure_data)
+    row = data["oxide_vapors"]["SiO"]
+    row["antoine"] = {
+        "A": 5.0,
+        "B": 1000.0,
+        "runtime_form": "log10(P_Pa) = A - B / (T_K + C)",
+    }
+
+    provider = BuiltinVaporPressureProvider(data)
+    provider._vapour_rail_catalog = None
+    result = provider.dispatch(_request_for_oxide_at_T_K("SiO2", 1900.0))
+
     _assert_antoine_skip_notice(
         result.warnings,
         species="SiO",
         site="builtin_vapor_pressure.oxide_vapor_antoine",
-        reason=reason,
+        reason="missing_antoine_C",
         temperature_K=1900.0,
     )
     assert "SiO" not in result.diagnostic["vapor_pressures_Pa"]
@@ -2010,14 +2072,14 @@ def test_equilibrium_reports_skipped_metal_antoine_A(
         melt=_FeOnlyHighTMelt(),
     )._internal_analytical_equilibrium()
 
-    _assert_antoine_skip_notice(
-        result.warnings,
+    _assert_antoine_skip_or_finite_intercept_pressure(
+        result,
         species="Fe",
         site="equilibrium.internal_analytical.metal_antoine",
+        a_value=a_value,
         reason=reason,
         temperature_K=1873.15,
     )
-    assert "Fe" not in result.vapor_pressures_Pa
 
 
 @pytest.mark.parametrize(
@@ -2038,14 +2100,14 @@ def test_equilibrium_reports_skipped_liquid_oxide_antoine_A(
         melt=_AlOnlyMelt(),
     )._internal_analytical_equilibrium()
 
-    _assert_antoine_skip_notice(
-        result.warnings,
+    _assert_antoine_skip_or_finite_intercept_pressure(
+        result,
         species="Al",
         site="equilibrium.internal_analytical.liquid_oxide_antoine",
+        a_value=a_value,
         reason=reason,
         temperature_K=1800.0,
     )
-    assert "Al" not in result.vapor_pressures_Pa
 
 
 @pytest.mark.parametrize(
@@ -2068,14 +2130,14 @@ def test_equilibrium_reports_skipped_gas_rail_antoine_A(
         melt=_MgOnlyMelt(1800.0),
     )._internal_analytical_equilibrium()
 
-    _assert_antoine_skip_notice(
-        result.warnings,
+    _assert_antoine_skip_or_finite_intercept_pressure(
+        result,
         species="Mg",
         site="equilibrium.internal_analytical.gas_rail_antoine",
+        a_value=a_value,
         reason=reason,
         temperature_K=1800.0,
     )
-    assert "Mg" not in result.vapor_pressures_Pa
 
 
 @pytest.mark.parametrize(
@@ -2096,14 +2158,51 @@ def test_equilibrium_reports_skipped_oxide_vapor_antoine_A(
         melt=_SiOnlyMelt(),
     )._internal_analytical_equilibrium()
 
-    _assert_antoine_skip_notice(
-        result.warnings,
+    _assert_antoine_skip_or_finite_intercept_pressure(
+        result,
         species="SiO",
         site="equilibrium.internal_analytical.oxide_vapor_antoine",
+        a_value=a_value,
         reason=reason,
         temperature_K=1900.0,
     )
-    assert "SiO" not in result.vapor_pressures_Pa
+
+
+@pytest.mark.parametrize(
+    "rail",
+    ("metal", "liquid_oxide", "gas_rail", "oxide_vapor"),
+)
+def test_equilibrium_raises_public_error_for_invalid_antoine_coefficients(
+    vapor_pressure_data, rail
+) -> None:
+    data = copy.deepcopy(vapor_pressure_data)
+    coefficients = {"A": float("inf"), "B": 0.0, "C": 0.0}
+    if rail == "metal":
+        row = data["metals"]["Fe"]
+        row["fit_target"] = "pure_component_psat"
+        row["interval_required"] = False
+        row.pop("liquid_oxide_standard_reaction", None)
+        row.pop("gas_rail_standard_reaction", None)
+        row["pure_component_antoine"] = coefficients
+        row["antoine"] = dict(coefficients)
+        model = _LegacyInternalAnalyticalModel(data, melt=_FeOnlyHighTMelt())
+    elif rail == "liquid_oxide":
+        data["metals"]["Al"]["liquid_oxide_standard_reaction"][
+            "antoine"
+        ] = coefficients
+        model = _LegacyInternalAnalyticalModel(data, melt=_AlOnlyMelt())
+    elif rail == "gas_rail":
+        block = data["metals"]["Mg"]["gas_rail_standard_reaction"]
+        block["status"] = "active"
+        block["authoritative"] = True
+        block["antoine"] = coefficients
+        model = _LegacyInternalAnalyticalModel(data, melt=_MgOnlyMelt(1800.0))
+    else:
+        data["oxide_vapors"]["SiO"]["antoine"] = coefficients
+        model = _LegacyInternalAnalyticalModel(data, melt=_SiOnlyMelt())
+
+    with pytest.raises(VaporPressureComputationError):
+        model._internal_analytical_equilibrium()
 
 
 def test_legacy_sio_continues_below_reference(vapor_pressure_data, monkeypatch):
