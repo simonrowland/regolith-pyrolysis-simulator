@@ -15,10 +15,12 @@ they predate this series' fo2 hole.
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import re
 import shutil
 import subprocess
+import zlib
 from pathlib import Path
 
 import pytest
@@ -170,6 +172,32 @@ def _make_freshness_repo(root: Path, *, missing_ack_history: bool) -> Path:
     return root
 
 
+def _write_ambiguous_commit_pair(root: Path) -> str:
+    tree = _fixture_git(root, "rev-parse", "HEAD^{tree}").strip()
+    seen: dict[str, tuple[str, bytes]] = {}
+    for counter in range(100_000):
+        body = (
+            f"tree {tree}\n"
+            "author Freshness test <freshness@example.invalid> 0 +0000\n"
+            f"committer Freshness test <freshness@example.invalid> {counter} +0000\n"
+            f"\nsynthetic ambiguous ack {counter}\n"
+        ).encode("utf-8")
+        raw = f"commit {len(body)}\0".encode("ascii") + body
+        object_id = hashlib.sha1(raw).hexdigest()
+        prefix = object_id[:7]
+        previous = seen.get(prefix)
+        if previous is not None:
+            for candidate_id, candidate_raw in (previous, (object_id, raw)):
+                object_path = (
+                    root / ".git" / "objects" / candidate_id[:2] / candidate_id[2:]
+                )
+                object_path.parent.mkdir(parents=True, exist_ok=True)
+                object_path.write_bytes(zlib.compress(candidate_raw))
+            return prefix
+        seen[prefix] = object_id, raw
+    pytest.fail("could not generate an ambiguous seven-character Git prefix")
+
+
 def test_freshness_check_still_fails_with_a_real_stale_input_and_ack(
     tmp_path: Path,
 ) -> None:
@@ -186,6 +214,24 @@ def test_freshness_check_skips_when_ack_history_is_missing(
 
     with pytest.raises(pytest.skip.Exception, match="missing_git_history"):
         _assert_committed_store_has_no_stale_inputs(repo)
+
+
+def test_freshness_history_guard_rejects_an_ambiguous_ack_prefix(
+    tmp_path: Path,
+) -> None:
+    repo = _make_freshness_repo(tmp_path / "ambiguous-repo", missing_ack_history=True)
+    ack_dir = repo / "scripts" / "store_neutral_acks"
+    for path in ack_dir.iterdir():
+        path.unlink()
+    prefix = _write_ambiguous_commit_pair(repo)
+    (ack_dir / f"{prefix}.txt").write_text(
+        "ambiguous-prefix test receipt\n", encoding="utf-8"
+    )
+    freshness = _load_freshness(repo)
+
+    with pytest.raises(subprocess.CalledProcessError) as error:
+        require_store_neutral_ack_history(repo, freshness)
+    assert "ambiguous" in (error.value.stderr or "").lower()
 
 
 def test_mutation_pre_regen_tip_extracts_v2_have_zero_fo2_log() -> None:

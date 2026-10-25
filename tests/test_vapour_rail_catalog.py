@@ -531,6 +531,24 @@ def test_require_git_history_skips_only_missing_history(
     with pytest.raises(pytest.skip.Exception, match="missing_git_history"):
         require_git_history(tmp_path, "unreachable")
 
+    monkeypatch.setattr(
+        git_history.subprocess,
+        "run",
+        run_results(
+            (
+                completed(),
+                completed(
+                    128,
+                    "error: short object ID deadbee is ambiguous\n"
+                    "fatal: Needed a single revision\n",
+                ),
+            )
+        ),
+    )
+    with pytest.raises(subprocess.CalledProcessError) as error:
+        require_git_history(tmp_path, "deadbee")
+    assert "ambiguous" in (error.value.stderr or "")
+
     def other_error(*_args, **_kwargs):
         raise subprocess.CalledProcessError(
             2, ["git"], stderr="fatal: permission denied"

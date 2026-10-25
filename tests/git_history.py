@@ -39,6 +39,8 @@ def require_git_history(root: Path, *revisions: str) -> None:
             )
         except subprocess.CalledProcessError as exc:
             stderr = (exc.stderr or "").lower()
+            if "ambiguous" in stderr:
+                raise
             if not any(
                 marker in stderr
                 for marker in (
